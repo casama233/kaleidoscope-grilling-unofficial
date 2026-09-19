@@ -43,6 +43,7 @@ def resolve_alias(ref,aliases):
 def read_source_model(identifier, ancestry=(), source_root=None):
  """Independent source resolver: never reads the converter's resolved-model cache."""
  root=Path(source_root) if source_root is not None else ASSETS
+ if isinstance(identifier,str) and ":" not in identifier:identifier="minecraft:"+identifier
  if not isinstance(identifier,str) or not re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+",identifier):raise ValueError('Invalid source identifier')
  ns,name=identifier.split(':',1)
  if any(part in ('','.','..') for part in name.split('/')):raise ValueError('Unsafe source identifier')
@@ -74,14 +75,22 @@ def source_faces(record,spec):
    for face,f in e['faces'].items():
     ref=resolve_alias(f['texture'],data['textures']);ns,path=ref.split(':',1)
     if ref not in textures:textures[ref]=np.asarray(Image.open(ASSETS/ns/'textures'/(path+'.png')).convert('RGBA'))
-    tex=textures[ref];uv=rectangle(f['uv'])
+    tex=textures[ref]
+    if 'uv' not in f:
+     if e['from'] != [0,0,0] or e['to'] != [16,16,16]:raise ValueError('Implicit source UV outside full cube')
+     uv=rectangle([0,0,16,16])
+    else:uv=rectangle(f['uv'])
     # Java source corners are rotated independently of exporter endpoint baking.
     face_rotation=f.get('rotation',0)
     if isinstance(face_rotation,bool) or face_rotation not in (0,90,180,270):raise ValueError('Unsupported Java face rotation')
     uv=np.roll(uv,-int(face_rotation//90),axis=0)*np.array([tex.shape[1]/16,tex.shape[0]/16])
     rect=record['atlas_regions'][ref]
     puv=uv+np.array([rect['x'],rect['y']])
-    points=(vertices(e['from'],e['to'],face)-pivot)@mat.T+pivot+offset
+    relative=vertices(e['from'],e['to'],face)-pivot
+    if r.get('rescale'):
+     factors=np.full(3,1/np.cos(np.radians(r['angle'])));factors['xyz'.index(r['axis'])]=1
+     relative=relative*factors
+    points=relative@mat.T+pivot+offset
     faces.append({'points':points,'uv':uv,'atlas_uv':puv,'tex':tex,'source_face':face})
  return faces
 
@@ -174,7 +183,7 @@ def render(faces,view,frame,width=W,height=H):
    region=(slice(yl,yh+1),slice(xl,xh+1));visible=mask&(alpha==1)&(depth>opaque_depth[region]+1e-8)
    image[region][visible]=rgb[visible];opaque_depth[region][visible]=depth[visible]
    transparent=mask&(alpha>0)&(alpha<1)
-   if transparent.any():fragments.append((float(p[:,2].mean()),region,depth,alpha,rgb,transparent))
+   if transparent.any():fragments.append((round(float(p[:,2].mean()),9),region,depth,alpha,rgb,transparent))
  for _,region,depth,alpha,rgb,mask in sorted(fragments,key=lambda f:f[0]):
   mask&=depth>=opaque_depth[region]-1e-8
   aa=(alpha*mask)[...,None];image[region]=image[region]*(1-aa)+rgb*aa

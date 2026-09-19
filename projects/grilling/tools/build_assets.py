@@ -58,6 +58,8 @@ def resource_path(identifier: str, kind: str, root: Path = ASSETS) -> Path:
 
 
 def resolve_model(identifier: str, root: Path = ASSETS, chain: tuple[str, ...] = ()) -> dict:
+    if isinstance(identifier, str) and ":" not in identifier:
+        identifier = "minecraft:" + identifier
     if identifier in chain or len(chain) >= 48:
         raise AssetError("Parent cycle/depth: " + " -> ".join((*chain, identifier)))
     path = resource_path(identifier, "models", root)
@@ -516,10 +518,14 @@ def build() -> dict:
             raise AssetError("allow_native_uv_rotation must be boolean")
         if native and spec.get("inward_surfaces"):
             raise AssetError("Combined inward surface and native quarter turn path requires separate validation")
-        uv_model, uv_changes = lower_uv_half_turns(original, allow_quarter_turns=native)
+        prepared, template_warnings = original, []
+        if spec.get("reference_template"):
+            from reference_templates import prepare
+            prepared, template_warnings = prepare(original, spec.get("source_tint_pending", False))
+        uv_model, uv_changes = lower_uv_half_turns(prepared, allow_quarter_turns=native)
         model, changes = (lower_mixed_axis_surfaces(uv_model) if spec.get("mixed_axis_surfaces") else
                           lower_inward_surfaces(uv_model) if spec.get("inward_surfaces") else (uv_model, []))
-        warnings = inspect_model(model, allow_native_uv_rotation=native) + changes + uv_changes + metadata_warnings(original)
+        warnings = inspect_model(model, allow_native_uv_rotation=native) + changes + uv_changes + metadata_warnings(original) + template_warnings
         if spec.get("mixed_axis_surfaces"):
             particle=original.get("textures",{}).get("particle")
             if particle and not resource_path(texture_id(particle,original["textures"]),"textures").is_file():

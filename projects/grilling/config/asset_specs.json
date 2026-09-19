@@ -1,5 +1,5 @@
 {
-  "version": "A1.12.0",
+  "version": "A1.14.0",
   "complete_mod_assets": false,
   "gameplay_enabled": false,
   "candidates": [
@@ -5119,6 +5119,220 @@
         ]
       ],
       "age": 7
+    },
+    {
+      "name": "houttuynia_stage_0",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage0",
+      "atlas_name": "houttuynia_stage_0",
+      "label_zh": "魚腥草・階段 0",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_1",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage1",
+      "atlas_name": "houttuynia_stage_1",
+      "label_zh": "魚腥草・階段 1",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_2",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage2",
+      "atlas_name": "houttuynia_stage_2",
+      "label_zh": "魚腥草・階段 2",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_3",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage3",
+      "atlas_name": "houttuynia_stage_3",
+      "label_zh": "魚腥草・階段 3",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_4",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage4",
+      "atlas_name": "houttuynia_stage_4",
+      "label_zh": "魚腥草・階段 4",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_5",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage5",
+      "atlas_name": "houttuynia_stage_5",
+      "label_zh": "魚腥草・階段 5",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_6",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage6",
+      "atlas_name": "houttuynia_stage_6",
+      "label_zh": "魚腥草・階段 6",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_7",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage7",
+      "atlas_name": "houttuynia_stage_7",
+      "label_zh": "魚腥草・階段 7",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_5_2",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage5_2",
+      "atlas_name": "houttuynia_stage_5_2",
+      "label_zh": "魚腥草・階段 5_2",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_6_2",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage6_2",
+      "atlas_name": "houttuynia_stage_6_2",
+      "label_zh": "魚腥草・階段 6_2",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "houttuynia_stage_7_2",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage7_2",
+      "atlas_name": "houttuynia_stage_7_2",
+      "label_zh": "魚腥草・階段 7_2",
+      "group": "houttuynia",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true
+    },
+    {
+      "name": "pepper_log",
+      "source_model": "kaleidoscope_grilling:block/pepper_log",
+      "atlas_name": "pepper_log",
+      "label_zh": "花椒原木",
+      "group": "pepper",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true,
+      "source_tint_pending": false
+    },
+    {
+      "name": "pepper_leaves",
+      "source_model": "kaleidoscope_grilling:block/pepper_leaves",
+      "atlas_name": "pepper_leaves",
+      "label_zh": "花椒樹葉・未結果",
+      "group": "pepper",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true,
+      "source_tint_pending": true
+    },
+    {
+      "name": "pepper_leaves_fruiting",
+      "source_model": "kaleidoscope_grilling:block/pepper_leaves_fruiting",
+      "atlas_name": "pepper_leaves_fruiting",
+      "label_zh": "花椒樹葉・結果",
+      "group": "pepper",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true,
+      "source_tint_pending": true
+    },
+    {
+      "name": "pepper_sapling",
+      "source_model": "kaleidoscope_grilling:block/pepper_sapling",
+      "atlas_name": "pepper_sapling",
+      "label_zh": "花椒樹苗",
+      "group": "pepper",
+      "offsets": [
+        [
+          0,
+          0
+        ]
+      ],
+      "reference_template": true,
+      "source_tint_pending": false
     }
   ]
 }

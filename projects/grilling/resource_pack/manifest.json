@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "KG Assets A1.12.0 — REVIEW ONLY",
+    "name": "KG Assets A1.14.0 — REVIEW ONLY",
     "description": "素材資源庫；沒有行為包、食譜或遊戲功能。不是完整移植。",
     "uuid": "f7e3525c-bf07-57dc-aec4-f3b08716090b",
     "version": [
       0,
       1,
-      12
+      14
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        12
+        14
       ]
     }
   ],

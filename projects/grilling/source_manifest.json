@@ -6305,6 +6305,416 @@
       "representation": "raw-utf8-exact",
       "upstream_byte_match": true,
       "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage0.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage0.json",
+      "upstream_git_blob_sha1": "27cb5e6afa716c372df17217c3c2007f707d6612",
+      "local_git_blob_sha1": "27cb5e6afa716c372df17217c3c2007f707d6612",
+      "local_sha256": "3eb3ff08fa38f1cb9f8024d74f2bdc9459f3b0bdd2282cd7d8641c77de7091a5",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage1.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage1.json",
+      "upstream_git_blob_sha1": "f3741677da23929eac3a0c0a71a939b5adadd1c3",
+      "local_git_blob_sha1": "f3741677da23929eac3a0c0a71a939b5adadd1c3",
+      "local_sha256": "648196a96ac8a139e71756aaacaf3fe6caa05cbc35d5df4cdca9ae66bae63440",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage2.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage2.json",
+      "upstream_git_blob_sha1": "48d2e93421531c29269b97a3b5ef1a505bb0391d",
+      "local_git_blob_sha1": "48d2e93421531c29269b97a3b5ef1a505bb0391d",
+      "local_sha256": "7f41190e9a6538dd257891b86e22d52a6fe55eb4322c024570ab19adba9d66a4",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage3.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage3.json",
+      "upstream_git_blob_sha1": "0ffb9128525fd3e078a43d91ae714573ad22cce2",
+      "local_git_blob_sha1": "0ffb9128525fd3e078a43d91ae714573ad22cce2",
+      "local_sha256": "916eba592bd097284abb983562a069efe1426432753ed1088667f24bb1ccb89b",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage4.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage4.json",
+      "upstream_git_blob_sha1": "8d6b6a60d064912e28c57727db49c89d9fffdfec",
+      "local_git_blob_sha1": "8d6b6a60d064912e28c57727db49c89d9fffdfec",
+      "local_sha256": "f73688cb15a862936493c75b004cab9e7064ae3aa38fb1c9b79f90b5c41b9a88",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage5.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage5.json",
+      "upstream_git_blob_sha1": "ce2495b28ca0f7eba9d0665df43899b9d1a9dec6",
+      "local_git_blob_sha1": "ce2495b28ca0f7eba9d0665df43899b9d1a9dec6",
+      "local_sha256": "390231c9283add3f6793c5c8e90267d5fac646abfef87755a9e6c489d3fe2339",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage6.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage6.json",
+      "upstream_git_blob_sha1": "1b25dcd7829a1b583e1fec1dbefaf7d7b119167b",
+      "local_git_blob_sha1": "1b25dcd7829a1b583e1fec1dbefaf7d7b119167b",
+      "local_sha256": "c3ea02a3fe672c68431f4a0376c5736dcd4e92ea35f4fa5890db297d925aac53",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage7.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage7.json",
+      "upstream_git_blob_sha1": "e8a838ffc489fd0a9dc8d6ceac5f388792506017",
+      "local_git_blob_sha1": "e8a838ffc489fd0a9dc8d6ceac5f388792506017",
+      "local_sha256": "8debd360b1c60653bd25ee06447afa93fff2c2e7a7292f72c8a51de07ae4e7a4",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage5_2.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage5_2.json",
+      "upstream_git_blob_sha1": "bfe144dd1c770aef3cc85037943a7c296e401995",
+      "local_git_blob_sha1": "bfe144dd1c770aef3cc85037943a7c296e401995",
+      "local_sha256": "74604f02ad779cbf316a68b45b31ed2d81580943f6ebf90d58c193931068b796",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage6_2.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage6_2.json",
+      "upstream_git_blob_sha1": "c696defa62a03b9d408f4bed89650b84ac73aef5",
+      "local_git_blob_sha1": "c696defa62a03b9d408f4bed89650b84ac73aef5",
+      "local_sha256": "d16f9080311d5d8746e9afb3a3563e8f1cd1b86c1b311d2b2190c94153196353",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage7_2.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/houttuynia_crop_stage7_2.json",
+      "upstream_git_blob_sha1": "37d1e3138c6ae1039aeaa3a41c45e6e161919d31",
+      "local_git_blob_sha1": "37d1e3138c6ae1039aeaa3a41c45e6e161919d31",
+      "local_sha256": "63677944c4c02df714cd8c4470f441183bfdf680cb0ac094f893de75551c1c6e",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_log.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_log.json",
+      "upstream_git_blob_sha1": "e264758967f53f44058eb17ed4a513b7ccf21848",
+      "local_git_blob_sha1": "e264758967f53f44058eb17ed4a513b7ccf21848",
+      "local_sha256": "968e34791fafd7dd54d4bdef8a82f1bbf713071435e89e35db0a6b883fc0f2c2",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_leaves.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_leaves.json",
+      "upstream_git_blob_sha1": "5cecd5b8cb5a2f7ad3f1df1dbbc3d5eb70b6a356",
+      "local_git_blob_sha1": "5cecd5b8cb5a2f7ad3f1df1dbbc3d5eb70b6a356",
+      "local_sha256": "3034ee470587ece747ba70f7b3b5682d187174fdf15c6833295f412aa6d5015d",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_leaves_fruiting.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_leaves_fruiting.json",
+      "upstream_git_blob_sha1": "72f69a84af519e8227bf8eac5087d36e67c9fb27",
+      "local_git_blob_sha1": "72f69a84af519e8227bf8eac5087d36e67c9fb27",
+      "local_sha256": "2d8c4676311b52c59d7ba7f33177ea4c63a72f5ab38d43876cce7dfc4af30650",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_sapling.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/models/block/pepper_sapling.json",
+      "upstream_git_blob_sha1": "24059490dcf4e5db0c4eafe738d4eab4ae4b5635",
+      "local_git_blob_sha1": "24059490dcf4e5db0c4eafe738d4eab4ae4b5635",
+      "local_sha256": "bb88d277680999a4e12c86655c7c278e1595579337482bcaabb8c5b25a739eab",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage0.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage0.png",
+      "upstream_git_blob_sha1": "228a95ee694f75f6f2770f74fb3b85acf044d92a",
+      "local_git_blob_sha1": "228a95ee694f75f6f2770f74fb3b85acf044d92a",
+      "local_sha256": "f28ef23a460d282c37aff6ff6325414c556d53f0394f4173ac8e27effbe60984",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage1.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage1.png",
+      "upstream_git_blob_sha1": "5a0dda7aa376f96e42e8c20b7b3eb53bc1164592",
+      "local_git_blob_sha1": "5a0dda7aa376f96e42e8c20b7b3eb53bc1164592",
+      "local_sha256": "84cfc0abff30ceef84da846def65a46b6f4eddca45258e996534fe9588a1a23a",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage2.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage2.png",
+      "upstream_git_blob_sha1": "fdfa5a086de21aa2a437f1b2838e8c5a8efe473e",
+      "local_git_blob_sha1": "fdfa5a086de21aa2a437f1b2838e8c5a8efe473e",
+      "local_sha256": "ae10a88e564a31e3e6a03c9b7b50a6414fea2f80a214f8ea32f3d5583950d1d0",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage3.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage3.png",
+      "upstream_git_blob_sha1": "1c587cbab8282e3b883f1534eab91bf226a10385",
+      "local_git_blob_sha1": "1c587cbab8282e3b883f1534eab91bf226a10385",
+      "local_sha256": "de5b02a2c3cc869debfa1dde88fb516dd888b38c42324487e47a10a9d2f431de",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage4.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage4.png",
+      "upstream_git_blob_sha1": "5b9c4285c8fc3b23ea3cd5a431935955776f1471",
+      "local_git_blob_sha1": "5b9c4285c8fc3b23ea3cd5a431935955776f1471",
+      "local_sha256": "ec022a703a377d6a0de76fc5a5c0e139324df521caaa178871fa80206f121830",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage5.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage5.png",
+      "upstream_git_blob_sha1": "40ed161b56ce21c80e4d9b61c68aba1c4f3a616c",
+      "local_git_blob_sha1": "40ed161b56ce21c80e4d9b61c68aba1c4f3a616c",
+      "local_sha256": "a3464bff3a244296258af118060700f2d5bfb2ed04f5787f83679c1fe23752a0",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage6.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage6.png",
+      "upstream_git_blob_sha1": "e8865cf66b83766df45123fe13ea81d5cc49149b",
+      "local_git_blob_sha1": "e8865cf66b83766df45123fe13ea81d5cc49149b",
+      "local_sha256": "afa877e16a65845044e2d9c7831ea46b7663fe8ad65287f2b0d76c1fe8ad92e4",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage7.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage7.png",
+      "upstream_git_blob_sha1": "dc69075167f3a1f7807a0a9aeca7f1753756662f",
+      "local_git_blob_sha1": "dc69075167f3a1f7807a0a9aeca7f1753756662f",
+      "local_sha256": "eb6c95bf26482a80010cda86efc1c465b0e4978f30a4a802066bf9a398b93bd7",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage5_2.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage5_2.png",
+      "upstream_git_blob_sha1": "c37ba99aa43123a0393f06c10f0cbe91e74c7056",
+      "local_git_blob_sha1": "c37ba99aa43123a0393f06c10f0cbe91e74c7056",
+      "local_sha256": "f9c312cdeccd1fef455b3caa5ba29e6263617e85277aca710710c9a348077456",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage6_2.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage6_2.png",
+      "upstream_git_blob_sha1": "64db168e8dd090b0310ebabaee2d043b64fb9615",
+      "local_git_blob_sha1": "64db168e8dd090b0310ebabaee2d043b64fb9615",
+      "local_sha256": "178244c1581bf5932da62e21420d5d2eeee53342adc009bd5941dc738cfe7b02",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage7_2.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/crop/houttuynia/stage7_2.png",
+      "upstream_git_blob_sha1": "9345181aea1ed704ba56ca2b4e299674b9129804",
+      "local_git_blob_sha1": "9345181aea1ed704ba56ca2b4e299674b9129804",
+      "local_sha256": "fb1e79bd45ddb57a3b42ac0d1b2386727fcdc021612e56d02c3e320b9306de06",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_log.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_log.png",
+      "upstream_git_blob_sha1": "64db84d8d5bb98629f51ac6d74c911bd2e28910c",
+      "local_git_blob_sha1": "64db84d8d5bb98629f51ac6d74c911bd2e28910c",
+      "local_sha256": "bf84ecd56d96eb7ce3dc888598916c1b21872d6fdb8c63b1326be5c5d5f33f11",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_log_top.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_log_top.png",
+      "upstream_git_blob_sha1": "292101ed2f86633161598b8ab85207b951426e4b",
+      "local_git_blob_sha1": "292101ed2f86633161598b8ab85207b951426e4b",
+      "local_sha256": "093b87c0acd4b3ab9c281da997aa16bbb814d2d7e40790ef9f7fbb1c043b8a01",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_leaves.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_leaves.png",
+      "upstream_git_blob_sha1": "83767c581f7fb42624b5bf58aba4b0b78ec8d637",
+      "local_git_blob_sha1": "83767c581f7fb42624b5bf58aba4b0b78ec8d637",
+      "local_sha256": "042009d5acac882fbd683876475f9c0be527745fb72e1b2b26afbff0f0d091c8",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_leaves_fruiting.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_leaves_fruiting.png",
+      "upstream_git_blob_sha1": "5c7de7dfbc043a292a63f6df77e3b78bcc9d217f",
+      "local_git_blob_sha1": "5c7de7dfbc043a292a63f6df77e3b78bcc9d217f",
+      "local_sha256": "bfe9d4e8090116380bbd3ab5a8fab29c5eaed2fe9a21e22ae89965c6e7b4b069",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_sapling.png",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/pepper_sapling.png",
+      "upstream_git_blob_sha1": "b0ce14cc33c0b0eabdb483c6160c8083be3251cc",
+      "local_git_blob_sha1": "b0ce14cc33c0b0eabdb483c6160c8083be3251cc",
+      "local_sha256": "e477cf0f998e875411f07d1a2f025dfaaee3edae250c007496dc84d9f0522505",
+      "representation": "binary-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/blockstates/houttuynia_crop.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/blockstates/houttuynia_crop.json",
+      "upstream_git_blob_sha1": "dbf5384b283635f91dfd9a68cf38f08437f99e16",
+      "local_git_blob_sha1": "dbf5384b283635f91dfd9a68cf38f08437f99e16",
+      "local_sha256": "6517a7d472dca530fa4f4efc4b1380fedc7607f90ad925e2ecc9925fa210d4c4",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_log.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_log.json",
+      "upstream_git_blob_sha1": "5540c080fe9e7ac1f1528bad6e47ff571f6e4bce",
+      "local_git_blob_sha1": "5540c080fe9e7ac1f1528bad6e47ff571f6e4bce",
+      "local_sha256": "20284837874a38cc696d09e9ddf4fde8b49a4eded0a50de3e9fc126fa43d5bf9",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_leaves.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_leaves.json",
+      "upstream_git_blob_sha1": "356d264f7dd308480f8609a9e566dc8f308d7a06",
+      "local_git_blob_sha1": "356d264f7dd308480f8609a9e566dc8f308d7a06",
+      "local_sha256": "1fdaa03186c8a22be6febe3fa44e7d31c0646296aad6655cab46ccf6e86cbaf1",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_sapling.json",
+      "source_url": "https://github.com/breezeth-CN/KaleidoscopeGrilling/blob/9a1acdab27698457bec16c9362678e574895a28c/common/src/main/resources/assets/kaleidoscope_grilling/blockstates/pepper_sapling.json",
+      "upstream_git_blob_sha1": "8d1291088ebe0c6db33264ca8ded1f6777bd3db5",
+      "local_git_blob_sha1": "8d1291088ebe0c6db33264ca8ded1f6777bd3db5",
+      "local_sha256": "10cc8492a6c5bb22b8e3afdfee7a90a261f8aed308f099e9e17f0e3f283e6590",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/crop.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/crop.json",
+      "upstream_git_blob_sha1": "1afe355cd203b0a6b432efd0587350bb981d3c83",
+      "local_git_blob_sha1": "1afe355cd203b0a6b432efd0587350bb981d3c83",
+      "local_sha256": "d078de149252e74ddbfa19c80300f9e627a44913266664a1b08dd25d3f558f18",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/cube_column.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/cube_column.json",
+      "upstream_git_blob_sha1": "358b9847efe8bb17811ef48eedd219d8c9b51499",
+      "local_git_blob_sha1": "358b9847efe8bb17811ef48eedd219d8c9b51499",
+      "local_sha256": "4cc89841e64bfb9be33aef096675291b585d05bae81cbbd14bf977f89aa81a6b",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/cube.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/cube.json",
+      "upstream_git_blob_sha1": "1b9780b479aee527f79bde950656b82f1524128b",
+      "local_git_blob_sha1": "1b9780b479aee527f79bde950656b82f1524128b",
+      "local_sha256": "3e4aacd02e816aeba38f83076596e18ded4cf49c01e17c62d1fce79850ffb84e",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/block.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/block.json",
+      "upstream_git_blob_sha1": "aefa892bfd7917a89c56d623aac8556cf80694ec",
+      "local_git_blob_sha1": "aefa892bfd7917a89c56d623aac8556cf80694ec",
+      "local_sha256": "3ef6c442f1ab55d2a57fa58e28bb831268159052659f12b453b637b31ded1da8",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/leaves.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/leaves.json",
+      "upstream_git_blob_sha1": "722173fdfa1ae2c081f8ac01e9c235e7057b4527",
+      "local_git_blob_sha1": "722173fdfa1ae2c081f8ac01e9c235e7057b4527",
+      "local_sha256": "fc181ca88dee45f7f3c606f2cc5158466538fe26f3a9fe40554b3c83093d1d42",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
+    },
+    {
+      "path": "common/src/main/resources/assets/minecraft/models/block/cross.json",
+      "source_url": "https://github.com/InventivetalentDev/minecraft-assets/blob/1.20.1/assets/minecraft/models/block/cross.json",
+      "upstream_git_blob_sha1": "37c8b09f251c5f319905ee14787be1442775e816",
+      "local_git_blob_sha1": "37c8b09f251c5f319905ee14787be1442775e816",
+      "local_sha256": "34c9fa7f9ff7562553ee0cb74c4f9a5d9d520189d1293d1ef6177afdf5af1640",
+      "representation": "raw-utf8-exact",
+      "upstream_byte_match": true,
+      "license": "Minecraft reference template; Mojang/Microsoft rights, not CC-BY-NC-SA"
     }
   ],
   "verification": "Aggregate ordered path + SHA256 matches delivered A1.12; individual Git blobs recomputed",

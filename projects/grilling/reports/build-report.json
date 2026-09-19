@@ -1,13 +1,13 @@
 {
-  "version": "A1.12.0",
+  "version": "A1.14.0",
   "stage": "A1-assets-only",
   "minecraft_tested": false,
   "blockbench_ui_tested": false,
   "bridge_ui_import_tested": false,
   "complete_mod_assets": false,
-  "source_files": 628,
-  "upstream_byte_matches": 627,
-  "original_png_count": 129,
+  "source_files": 669,
+  "upstream_byte_matches": 668,
+  "original_png_count": 145,
   "shape_count_definition": "Distinct element coordinates/rotations, excluding UV, texture, hand poses and repeated bottle layouts",
   "candidates": [
     {
@@ -19004,13 +19004,762 @@
       },
       "in_game_accepted": false,
       "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_0",
+      "label_zh": "魚腥草・階段 0",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage0",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_0.geo.json",
+      "editable": "editor/generated/houttuynia_stage_0.bbmodel",
+      "geometry_sha256": "e4414b89980025234779f77400cf2558ec26db086a07d89474fabd94dad8243b",
+      "atlas_sha256": "270f41c7c786e5c434cb77f95e84ded5fe7f48b555922e97ebd07752766e560f",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_0.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage0": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_1",
+      "label_zh": "魚腥草・階段 1",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage1",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_1.geo.json",
+      "editable": "editor/generated/houttuynia_stage_1.bbmodel",
+      "geometry_sha256": "0ec47d6bb98a482e19730210c0959b9a6dd16be5126271c40a5abc646b43e687",
+      "atlas_sha256": "091234e5c7f66917b8a23e779231c5d98f134d19c8a429dd806a92b2aa662af4",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_1.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage1": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_2",
+      "label_zh": "魚腥草・階段 2",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage2",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_2.geo.json",
+      "editable": "editor/generated/houttuynia_stage_2.bbmodel",
+      "geometry_sha256": "2cafaaf92aa49a30b49a0e678dde308fdc2c368dc1bc9ba72034d6c9ff2dcac8",
+      "atlas_sha256": "f0435efac7dafc55da6ea265d988ed1e677df38d25e79bbbd38111b221348f2c",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_2.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage2": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_3",
+      "label_zh": "魚腥草・階段 3",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage3",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_3.geo.json",
+      "editable": "editor/generated/houttuynia_stage_3.bbmodel",
+      "geometry_sha256": "94111c4e1bdf3b633d7c754156b8e5e0a2add59a94d835d9ac88dda4690c1746",
+      "atlas_sha256": "35890fb6a1c48d512f854626d2d382ea1f7131a25561743ad64d7a372e571816",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_3.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage3": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_4",
+      "label_zh": "魚腥草・階段 4",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage4",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_4.geo.json",
+      "editable": "editor/generated/houttuynia_stage_4.bbmodel",
+      "geometry_sha256": "3b4830105e58ccda033577d62c9bd4817e544d99aa7a76a48c1ba133b95071fa",
+      "atlas_sha256": "ea42bb0cd2d6ab657beac3bccf83f40ae605af67ecbe682c79b6aae3756714fe",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_4.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage4": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_5",
+      "label_zh": "魚腥草・階段 5",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage5",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_5.geo.json",
+      "editable": "editor/generated/houttuynia_stage_5.bbmodel",
+      "geometry_sha256": "5a6fe73632da9ead68cc0959f2d17c487c33d2d97b8c4294409cbbffdd3f3637",
+      "atlas_sha256": "615783005ceee038f2672117d12cc2c9c3fac645f274724cf38ee0c087ef1655",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_5.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage5": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_6",
+      "label_zh": "魚腥草・階段 6",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage6",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_6.geo.json",
+      "editable": "editor/generated/houttuynia_stage_6.bbmodel",
+      "geometry_sha256": "2b186de00d196de11867ff644256348b9780793f6e8fcf420bbf41b5fc865ec3",
+      "atlas_sha256": "72f7657b10cfb3020e25071ea866ee20f8066290b1e9efb2efb54f5c4d0a65e1",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_6.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage6": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_7",
+      "label_zh": "魚腥草・階段 7",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage7",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_7.geo.json",
+      "editable": "editor/generated/houttuynia_stage_7.bbmodel",
+      "geometry_sha256": "36eaba099c8ba1f88938c9d7befe8c5ca79bd898a51b5fb22488e6e0da6d8a38",
+      "atlas_sha256": "9e61d05d81add0c467f64e0c3270d1aced1e219077b1b04a6e4148409d9f6e99",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_7.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage7": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_5_2",
+      "label_zh": "魚腥草・階段 5_2",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage5_2",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_5_2.geo.json",
+      "editable": "editor/generated/houttuynia_stage_5_2.bbmodel",
+      "geometry_sha256": "0e01d8a115df6652817bbeae64f94d2fc9e2a387168c852da7282fd3f8a80710",
+      "atlas_sha256": "8f1771e939a4e66d437db31a460be88e4ab68c37ad77c60d2357f0e5a477f369",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_5_2.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage5_2": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_6_2",
+      "label_zh": "魚腥草・階段 6_2",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage6_2",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_6_2.geo.json",
+      "editable": "editor/generated/houttuynia_stage_6_2.bbmodel",
+      "geometry_sha256": "d7f20bccfeb802db15e06969cd1249f60fd01f2f70d16ae337d5159b816fd17a",
+      "atlas_sha256": "1ebedb34b2fd07a3383ca59cec7c798500eb38b695a27090ed3e8dc8089cab45",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_6_2.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage6_2": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "houttuynia_stage_7_2",
+      "label_zh": "魚腥草・階段 7_2",
+      "group": "houttuynia",
+      "source_model": "kaleidoscope_grilling:block/houttuynia_crop_stage7_2",
+      "shape_sha256": "58063af1b1af69489fcbc8eee68e9db98c79fcab079a8c7ed26a7c50e27340c7",
+      "instance_count": 1,
+      "cubes": 4,
+      "source_cuboids": 4,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/houttuynia_stage_7_2.geo.json",
+      "editable": "editor/generated/houttuynia_stage_7_2.bbmodel",
+      "geometry_sha256": "1cf9b760d26b60d3b530ba3c5adb422b410d1255dd0c0303b7ecb6d891975024",
+      "atlas_sha256": "742f4b0bb2420e2a112df90dc8dd36b7a771bea5cf25397131f4df3300a0d6d3",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 2
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 3
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/houttuynia_stage_7_2.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/crop/houttuynia/stage7_2": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "pepper_log",
+      "label_zh": "花椒原木",
+      "group": "pepper",
+      "source_model": "kaleidoscope_grilling:block/pepper_log",
+      "shape_sha256": "e0f43597b906801fc6962177d095a638850478b7169be669a7685f09cc9c083b",
+      "instance_count": 1,
+      "cubes": 1,
+      "source_cuboids": 1,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/pepper_log.geo.json",
+      "editable": "editor/generated/pepper_log.bbmodel",
+      "geometry_sha256": "206cf0618dee83fc0b0018fecb968d32e82341f8349305541f105a4f133712f6",
+      "atlas_sha256": "3e86c6422f213c8f66ef8064286b965611cbdb2a22debad663b1648597a99c98",
+      "warnings": [
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "down"
+        },
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "up"
+        },
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "north"
+        },
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "south"
+        },
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "west"
+        },
+        {
+          "code": "FULL_CUBE_IMPLICIT_UV_MATERIALIZED",
+          "element": 0,
+          "face": "east"
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/pepper_log.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/pepper_log": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "kaleidoscope_grilling:block/pepper_log_top": {
+          "x": 16,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "pepper_leaves",
+      "label_zh": "花椒樹葉・未結果",
+      "group": "pepper",
+      "source_model": "kaleidoscope_grilling:block/pepper_leaves",
+      "shape_sha256": "e0f43597b906801fc6962177d095a638850478b7169be669a7685f09cc9c083b",
+      "instance_count": 1,
+      "cubes": 1,
+      "source_cuboids": 1,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/pepper_leaves.geo.json",
+      "editable": "editor/generated/pepper_leaves.bbmodel",
+      "geometry_sha256": "4da3a0aa4d4fb6e55892a81d23689e753902e95d6c43ba632a6a335b428b0bed",
+      "atlas_sha256": "b7467e28604910fea96fdd7e8d41ca13c2d1ca78c6b44cdb5a3f9424e5fffafd",
+      "warnings": [
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "down",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "up",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "north",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "south",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "west",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "east",
+          "tintindex": 0,
+          "applied": false
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/pepper_leaves.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/pepper_leaves": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "pepper_leaves_fruiting",
+      "label_zh": "花椒樹葉・結果",
+      "group": "pepper",
+      "source_model": "kaleidoscope_grilling:block/pepper_leaves_fruiting",
+      "shape_sha256": "e0f43597b906801fc6962177d095a638850478b7169be669a7685f09cc9c083b",
+      "instance_count": 1,
+      "cubes": 1,
+      "source_cuboids": 1,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/pepper_leaves_fruiting.geo.json",
+      "editable": "editor/generated/pepper_leaves_fruiting.bbmodel",
+      "geometry_sha256": "1f0c243611fd5244826f644437106c4fd7df2773e33051fe0b1996f9091bb742",
+      "atlas_sha256": "c6db573db276188d7371722f52729b9ab4de93967d063fb06603df1d228e3f56",
+      "warnings": [
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "down",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "up",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "north",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "south",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "west",
+          "tintindex": 0,
+          "applied": false
+        },
+        {
+          "code": "SOURCE_TINT_REQUIRES_ENGINE_BINDING",
+          "element": 0,
+          "face": "east",
+          "tintindex": 0,
+          "applied": false
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/pepper_leaves_fruiting.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/pepper_leaves_fruiting": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
+    },
+    {
+      "name": "pepper_sapling",
+      "label_zh": "花椒樹苗",
+      "group": "pepper",
+      "source_model": "kaleidoscope_grilling:block/pepper_sapling",
+      "shape_sha256": "24d6e3ffde6d0a19af9ac64c58501e450154c59f35780cba584eed39f50a365d",
+      "instance_count": 1,
+      "cubes": 2,
+      "source_cuboids": 2,
+      "surface_lowering": [],
+      "uv_lowering": [],
+      "geometry": "resource_pack/models/entity/kg_a1/pepper_sapling.geo.json",
+      "editable": "editor/generated/pepper_sapling.bbmodel",
+      "geometry_sha256": "0e0f8a662e6a8dc592c473aa1974d4b9032542ee7b65aba3848fe8f178e71e64",
+      "atlas_sha256": "ddfa6ff8b669edfa497565eb692edd3134f9ffcab8a7e7811c8648f19fc978e5",
+      "warnings": [
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 0
+        },
+        {
+          "code": "PLANAR_ELEMENT_PRESERVED",
+          "element": 1
+        },
+        {
+          "code": "JAVA_RESCALE_BAKED_BEFORE_ROTATION",
+          "element": 0,
+          "factor": 1.414213562373095
+        },
+        {
+          "code": "JAVA_RESCALE_BAKED_BEFORE_ROTATION",
+          "element": 1,
+          "factor": 1.414213562373095
+        }
+      ],
+      "atlas": "resource_pack/textures/kg_a1/pepper_sapling.png",
+      "atlas_regions": {
+        "kaleidoscope_grilling:block/pepper_sapling": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      },
+      "in_game_accepted": false,
+      "runtime_wiring": "not implemented"
     }
   ],
   "blockers": [],
-  "candidate_count": 366,
-  "unique_geometry_bases": 113,
-  "atlas_count": 156,
-  "exported_cube_instances": 2067,
+  "candidate_count": 381,
+  "unique_geometry_bases": 116,
+  "atlas_count": 171,
+  "exported_cube_instances": 2116,
   "resolved_selector_edges": 277,
   "bridge_project": {
     "configuration": "config.json",
