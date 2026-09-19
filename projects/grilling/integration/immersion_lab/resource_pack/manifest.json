@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Grilling A1.15 • Immersion rehearsal RP",
+    "description": "動效驗收台；不耗材、不給食物、不取代Cookery或玩家外觀。",
+    "uuid": "155ecc22-1537-54f8-80ec-09a9cebc4c96",
+    "version": [
+      0,
+      1,
+      15
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      50
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "47e3d388-cef3-58f3-886f-f02b52c5ab2c",
+      "version": [
+        0,
+        1,
+        15
+      ]
+    }
+  ]
+}
