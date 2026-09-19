@@ -1,4 +1,3 @@
-
 // Own per-player notebook. No commands, world edits, inventory writes or global host replacement.
 export const PROPERTY = 'kg_a1:notebook_v1';
 export const BACKUP = 'kg_a1:notebook_backup_v1';
