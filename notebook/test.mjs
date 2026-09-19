@@ -1,4 +1,3 @@
-
 import assert from 'node:assert/strict';
 import {NotebookStore,PROPERTY,BACKUP,decode,searchRecipes} from './core.js';
 let checks=0;const check=(name,fn)=>{fn();checks++;console.log('PASS '+name);};
