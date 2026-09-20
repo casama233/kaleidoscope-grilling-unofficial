@@ -130,7 +130,7 @@ def main():
       'dependencies':[
         {'uuid':rp_uuid,'version':VERSION},
         {'uuid':COOKERY_BP,'version':COOKERY_VER},
-        {'module_name':'@minecraft/server','version':'2.10.0'}
+        {'module_name':'@minecraft/server','version':'2.9.0'}
       ]
     })
     write(rp/'manifest.json',{
@@ -154,7 +154,7 @@ def main():
         },
         'components':{
           'minecraft:display_name':f'tile.{NS}:grill.name',
-          'minecraft:block_entity':{'container':{'slot_count':3},'dynamic_properties':True},
+          'minecraft:block_entity':{'container':{'slot_count':3}},
           'minecraft:geometry':'geometry.kg_core.grill',
           'minecraft:material_instances':{'*':{'texture':'kg_core_grill','render_method':'alpha_test'}},
           'minecraft:collision_box':{'origin':[-8,0,-6],'size':[16,6,12]},
@@ -314,6 +314,7 @@ def main():
         'Cookery oil_pot direct integration uses temporary internal brush tools',
         'Cookery-specific status effects are reported but not silently approximated',
         'hot-food expiry and seasoning payload are written only as preliminary stack metadata',
+        'per-grill phase state is persisted through stable world dynamic properties for retail 26.51; block dynamic-properties API is intentionally not required',
         'formal bite-stage item geometry switching is not yet wired; A1.16 player bone animations are reused',
         'all skewers temporarily max_stack_size=1 so per-stack state remains available',
         'Minecraft/BDS runtime not yet tested'
