@@ -1,3 +1,3 @@
-# A2.2 Gameplay Core
+# A2.3 Gameplay Core
 
-A2.2 在 A2.1 上加入正式逐口3D串、原作咬點粒子/聲音同步、THREE_RANDOM 4.5/5秒修正、Numb四肢動作、最多4瓶的獨立調料瓶實體堆疊，以及三種油型資料契約。真自訂流體在 Bedrock 26.51 沒有公開穩定註冊API，因此未冒充完成。
+A2.3 補上 Hot Food 手動安全堆疊／儲物整理、烤爐 flat/legged + lit/unlit 四態、Dragon Blood 精確總有效+6/+10生命、Tundra/Mustard/Sulfur 更貼近 Java 的腳本語義，以及三種8級世界油流動模擬。Numb 準星仍因26.51 stable無安全per-player HUD offset而不做全局UI覆寫。

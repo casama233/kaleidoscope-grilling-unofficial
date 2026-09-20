@@ -54,3 +54,10 @@ item.kaleidoscope_grilling:totem_powder.name=Totem Powder
 item.kaleidoscope_grilling:dragon_egg_powder.name=Dragon Egg Powder
 item.kaleidoscope_grilling:pending_seasoning.name=Pending Seasoning
 tile.kaleidoscope_grilling:seasoning_bottle.name=Seasoning Bottle
+
+tile.kaleidoscope_grilling:canola_oil.name=Canola Oil
+tile.kaleidoscope_grilling:secret_chili_oil.name=Chili Oil
+tile.kaleidoscope_grilling:premium_chili_oil.name=Lava Chili Oil
+item.kaleidoscope_grilling:canola_oil_bucket.name=Canola Oil Bucket
+item.kaleidoscope_grilling:secret_chili_oil_bucket.name=Chili Oil Bucket
+item.kaleidoscope_grilling:premium_chili_oil_bucket.name=Lava Chili Oil Bucket

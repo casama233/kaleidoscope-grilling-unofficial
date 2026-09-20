@@ -54,3 +54,10 @@ item.kaleidoscope_grilling:totem_powder.name=圖騰粉
 item.kaleidoscope_grilling:dragon_egg_powder.name=龙蛋粉
 item.kaleidoscope_grilling:pending_seasoning.name=待搖調料瓶
 tile.kaleidoscope_grilling:seasoning_bottle.name=调料瓶
+
+tile.kaleidoscope_grilling:canola_oil.name=菜籽油
+tile.kaleidoscope_grilling:secret_chili_oil.name=辣椒油
+tile.kaleidoscope_grilling:premium_chili_oil.name=熔岩辣椒油
+item.kaleidoscope_grilling:canola_oil_bucket.name=菜籽油桶
+item.kaleidoscope_grilling:secret_chili_oil_bucket.name=辣椒油桶
+item.kaleidoscope_grilling:premium_chili_oil_bucket.name=熔岩辣椒油桶

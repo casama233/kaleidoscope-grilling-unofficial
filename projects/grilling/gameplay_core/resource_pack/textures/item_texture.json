@@ -160,6 +160,15 @@
     },
     "pending_seasoning": {
       "textures": "textures/items/pending_seasoning"
+    },
+    "canola_oil_bucket": {
+      "textures": "textures/items/canola_oil_bucket"
+    },
+    "secret_chili_oil_bucket": {
+      "textures": "textures/items/secret_chili_oil_bucket"
+    },
+    "premium_chili_oil_bucket": {
+      "textures": "textures/items/premium_chili_oil_bucket"
     }
   }
 }

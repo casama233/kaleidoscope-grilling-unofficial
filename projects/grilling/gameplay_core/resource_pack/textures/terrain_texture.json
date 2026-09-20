@@ -19,6 +19,21 @@
     },
     "kg_a22_seasoning_bottles_4": {
       "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a23_grill_unlit": {
+      "textures": "textures/blocks/grill_unlit"
+    },
+    "kg_a23_grill_lit": {
+      "textures": "textures/blocks/grill_lit"
+    },
+    "kg_a23_canola_oil": {
+      "textures": "textures/blocks/canola_oil"
+    },
+    "kg_a23_secret_chili_oil": {
+      "textures": "textures/blocks/secret_chili_oil"
+    },
+    "kg_a23_premium_chili_oil": {
+      "textures": "textures/blocks/premium_chili_oil"
     }
   }
 }
