@@ -2,6 +2,7 @@ export const UNFINISHED_ID='kaleidoscope_grilling:unfinished_skewer';
 export const SECRET_ID='kaleidoscope_grilling:secret_skewer';
 export const SKEWER_INGREDIENTS_KEY='kaleidoscope_grilling:skewer_ingredients';
 export const SECRET_COOKED_KEY='kaleidoscope_grilling:secret_cooked';
+export const SECRET_COOKED_INGREDIENTS_KEY='kaleidoscope_grilling:secret_cooked_ingredients';
 export const SECRET_CREATOR_KEY='kaleidoscope_grilling:secret_creator';
 export const FAT_CAPACITY=256;
 export const FLUID_CAPACITY=64;
