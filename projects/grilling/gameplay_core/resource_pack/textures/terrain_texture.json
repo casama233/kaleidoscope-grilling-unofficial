@@ -7,6 +7,18 @@
     },
     "kg_a21_seasoning_bottle": {
       "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a22_seasoning_bottles_1": {
+      "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a22_seasoning_bottles_2": {
+      "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a22_seasoning_bottles_3": {
+      "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a22_seasoning_bottles_4": {
+      "textures": "textures/blocks/seasoning_bottle"
     }
   }
 }

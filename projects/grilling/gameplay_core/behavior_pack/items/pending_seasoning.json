@@ -25,6 +25,10 @@
       },
       "minecraft:use_animation": {
         "value": "none"
+      },
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:seasoning_bottle_1",
+        "replace_block_item": true
       }
     }
   }

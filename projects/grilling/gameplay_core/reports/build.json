@@ -1,5 +1,5 @@
 {
-  "version": "A2.1.0",
+  "version": "A2.2.0",
   "java_commit": "9a1acdab27698457bec16c9362678e574895a28c",
   "cookable_fixed_skewers": 19,
   "formal_skewer_items": 41,
@@ -70,5 +70,32 @@
     "Numb tracks duration but Java-only crosshair orbit/limb sway is not yet reproduced in native HUD",
     "formal held 3D attachables use converted base geometry; bite-stage geometry switching remains pending engine-safe integration",
     "Minecraft/BDS runtime not yet tested"
+  ],
+  "bite_stage_attachables": 39,
+  "bite_stage_geometry_files": 150,
+  "bite_stage_source_map": "reports/a22-bite-stages.json",
+  "bite_timing_source": "A1.16 binding plan / Java MultiBiteSkewerItem",
+  "three_random_visual_midpoint_max_drift_ticks": 1.6666,
+  "bite_particles": "kaleidoscope_grilling:skewer_crumb",
+  "profile_eating_sound_sync": true,
+  "three_random_native_duration_fixed": true,
+  "numb_limb_animation": true,
+  "numb_crosshair_offset": false,
+  "seasoning_physical_stack_max": 4,
+  "seasoning_independent_bottle_payload": true,
+  "seasoning_stack_uses_custom_block_states": false,
+  "oil_types": [
+    "canola",
+    "secret_chili",
+    "premium_chili"
+  ],
+  "true_custom_fluids": false,
+  "true_custom_fluids_reason": "Bedrock 26.51 stable exposes built-in LiquidType values only and liquid_detection supports water; no public custom fluid registration API",
+  "a22_known_gaps": [
+    "Minecraft/BDS runtime not yet tested",
+    "THREE_RANDOM attachable geometry cannot read the server-selected branch; midpoint bite times keep maximum model-stage drift to about 1.67 ticks while logic/sound/particles use the exact branch",
+    "Numb limb motion is reproduced through player animation; Java crosshair orbit has no stable Bedrock HUD offset API and remains unresolved",
+    "No true custom oil fluid blocks: A2.2 formalizes typed container data only",
+    "four-bottle stack uses four block identifiers rather than experimental custom block states to keep the 26.51 retail/no-experiments boundary"
   ]
 }

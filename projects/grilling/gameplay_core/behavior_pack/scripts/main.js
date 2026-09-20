@@ -6,7 +6,8 @@ const REGISTRY='kaleidoscope_grilling:a2_grills';
 const ACTIVE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map();
 const MAX_GRILLS=256;
 const COOKERY_POT='kaleidoscope_cookery:oil_pot',COOKERY_FILLED='kaleidoscope_cookery:oil_pot_filled',COOKERY_OIL_KEY='kc_oil_count';
-const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle';
+const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle_1';
+const SEASONING_BLOCKS=new Set(['kaleidoscope_grilling:seasoning_bottle','kaleidoscope_grilling:seasoning_bottle_1','kaleidoscope_grilling:seasoning_bottle_2','kaleidoscope_grilling:seasoning_bottle_3','kaleidoscope_grilling:seasoning_bottle_4']);
 const SEASON_LIST_KEY='kaleidoscope_grilling:seasonings',SEASON_USES_KEY='kaleidoscope_grilling:uses',SEASON_VARIANT_KEY='kaleidoscope_grilling:variant';
 const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until',FX_KEY='kaleidoscope_grilling:a21_fx';
 const BASE_SEASONINGS=new Set(['kaleidoscope_grilling:green_chili_powder','kaleidoscope_grilling:sichuan_pepper','kaleidoscope_grilling:onion_powder']);
@@ -19,6 +20,25 @@ const SEASONING_KINDS=Object.freeze({
 const HEAT_BLOCKS=new Set(['minecraft:fire','minecraft:soul_fire','minecraft:lava','minecraft:campfire','minecraft:soul_campfire','minecraft:magma']);
 const TUNDRA_BLOCKS=new Set(['minecraft:snow','minecraft:snow_layer','minecraft:snow_block','minecraft:powder_snow','minecraft:ice','minecraft:packed_ice','minecraft:blue_ice','minecraft:frosted_ice']);
 const DANGEROUS_FOODS=new Set(['minecraft:rotten_flesh','minecraft:chicken','minecraft:poisonous_potato','minecraft:pufferfish','minecraft:spider_eye']);
+const BITE_TIMES=Object.freeze({
+ ONE:[1.16667,3.08333],TWO:[0.95833,4.0],THREE:[0.95833,2.33333,3.54167],THREE_ALT:[0.95833,2.16667,3.5],FOUR:[0.95833,2.33333,3.45833,4.08333]
+});
+const NUMB_VISUAL=new Set();
+const OIL_TYPES=Object.freeze({canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}});
+function isSeasoningBlock(id){return SEASONING_BLOCKS.has(id)}
+function soundFor(profile){return profile==='ONE'?'one_skewer_eat':profile==='TWO'?'two_skewer_eat':profile==='FOUR'?'four_skewer_eat':'three_skewer_eat'}
+function stopEatSound(player,profile){try{player.runCommand('stopsound @s kg_imm.'+soundFor(profile))}catch{}}
+function spawnBiteCrumbs(player){
+ try{
+  const h=player.getHeadLocation(),v=player.getViewDirection();
+  for(let i=0;i<5;i++)player.dimension.spawnParticle('kaleidoscope_grilling:skewer_crumb',{x:h.x+v.x*.32+(Math.random()-.5)*.14,y:h.y-.08+(Math.random()-.5)*.12,z:h.z+v.z*.32+(Math.random()-.5)*.14});
+ }catch{}
+}
+function advanceBites(player,a){
+ const elapsed=(system.currentTick-a.start)/20,times=a.biteTimes??[];
+ while((a.nextBite??0)<times.length&&elapsed+1e-6>=times[a.nextBite]){spawnBiteCrumbs(player);a.nextBite++;try{player.playSound('random.eat',{volume:.35,pitch:1.0})}catch{}}
+}
+
 
 function now(){try{return world.getAbsoluteTime()}catch{return system.currentTick}}
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
@@ -89,8 +109,8 @@ function customBreak(block,player){
  if(!creative(player))player.dimension.spawnItem(new ItemStack(GRILL_ID,1),{x:block.x+.5,y:block.y+.3,z:block.z+.5});
 }
 function cookeryOilCount(stack){if(stack?.typeId!==COOKERY_FILLED)return 0;try{const raw=stack.getDynamicProperty(COOKERY_OIL_KEY);return raw===undefined?256:Math.max(0,Math.min(256,Number(raw)|0))}catch{return 256}}
-function cookeryOilType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola')}catch{return 'canola'}}
-function heatForOil(type){return type==='premium_chili'?24000:type==='secret_chili'?12000:1200}
+function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola');return Object.hasOwn(OIL_TYPES,type)?type:'canola'}catch{return 'canola'}}
+function heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}
 function consumeCookeryOil(player,needed){
  const stack=heldMain(player);if(stack?.typeId!==COOKERY_FILLED)return {ok:false,reason:'not_pot'};
  const count=cookeryOilCount(stack);if(count<needed)return {ok:false,reason:'insufficient',count};
@@ -127,19 +147,54 @@ function handleGrill(block,player){
  if(state.phase===0&&n>0){message(player,'§e還需要刷油');return}if(state.phase===2&&!state.seasoned){message(player,'§e還需要撒料');return}
  if(canExtract(state)){const got=extract(block,player,player.isSneaking);if(got)message(player,'§a取出 '+got+' 串')}
 }
-function readBottleBlock(block){try{const raw=world.getDynamicProperty(seasoningBlockKey(block));return raw===undefined?[]:parseList(raw)}catch{return []}}
-function writeBottleBlock(block,list){world.setDynamicProperty(seasoningBlockKey(block),list.length?JSON.stringify(list.slice(0,8)):undefined)}
-function seasoningBottleItem(list){
- const pending=hasSeasoningBase(list),stack=new ItemStack(pending?PENDING_SEASONING:EMPTY_SEASONING_ID,1);setSeasonings(stack,list);
- try{if(list.length)stack.setLore(['§7Ingredients: '+list.length+'/8',pending?'§eReady to shake':'§7Missing base seasoning'])}catch{}return stack;
+function readBottleStack(block){
+ try{
+  const raw=world.getDynamicProperty(seasoningBlockKey(block));if(raw===undefined)return [];
+  const v=JSON.parse(raw);if(!Array.isArray(v))return [];
+  if(v.length&&typeof v[0]==='string'){const list=v.filter(x=>typeof x==='string').slice(0,8);return [{kind:hasSeasoningBase(list)?'pending':'empty',ingredients:list,uses:0,variant:0}]}
+  return v.slice(0,4).map(x=>({kind:['empty','pending','special'].includes(x?.kind)?x.kind:'empty',ingredients:Array.isArray(x?.ingredients)?x.ingredients.filter(y=>typeof y==='string').slice(0,8):[],uses:Math.max(0,Math.min(16,Number(x?.uses)||0)),variant:Math.max(0,Math.min(7,Number(x?.variant)||0))}));
+ }catch{return []}
+}
+function writeBottleStack(block,stack){world.setDynamicProperty(seasoningBlockKey(block),stack.length?JSON.stringify(stack.slice(0,4)):undefined)}
+function bottleDataFromItem(stack){
+ const kind=stack?.typeId===SEASONING_ID?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';
+ return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?Math.max(0,Math.min(7,Number(stack.getDynamicProperty(SEASON_VARIANT_KEY)??0)|0)):0};
+}
+function bottleItem(data){
+ const id=data.kind==='special'?SEASONING_ID:data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
+ if(data.kind==='special'){setUses(stack,data.uses??0);try{stack.setDynamicProperty(SEASON_VARIANT_KEY,data.variant??0);stack.setLore(['§7Uses: '+(16-(data.uses??0))+'/16','§7Ingredients: '+(data.ingredients?.length??0)+'/8'])}catch{}}
+ else try{if(data.ingredients?.length)stack.setLore(['§7Ingredients: '+data.ingredients.length+'/8',data.kind==='pending'?'§eReady to shake':'§7Missing base seasoning'])}catch{}
+ return stack;
+}
+function setBottleVisual(block,count){
+ const target=count>0?'kaleidoscope_grilling:seasoning_bottle_'+Math.max(1,Math.min(4,count)):'minecraft:air';
+ if(block.typeId!==target)block.setType(target);
+}
+function pushBottle(block,player,held){
+ const stack=readBottleStack(block);if(stack.length>=4){message(player,'§c最多只能堆4瓶');return false}
+ stack.push(bottleDataFromItem(held));if(!decrementMain(player))return false;writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a調料瓶堆疊 '+stack.length+'/4');return true;
 }
 function handleSeasoningBlock(block,player){
- const id=heldMain(player)?.typeId,list=readBottleBlock(block);
- if(id&&Object.hasOwn(SEASONING_KINDS,id)){if(list.length>=8){message(player,'§c調料瓶已滿 8/8');return}list.push(id);if(!decrementMain(player))return;writeBottleBlock(block,list);try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}message(player,hasSeasoningBase(list)?'§a已加入 '+list.length+'/8；基礎三料齊全，可空手取回搖勻':'§e已加入 '+list.length+'/8');return}
- if(!id){const stack=seasoningBottleItem(list);writeBottleBlock(block,[]);block.setType('minecraft:air');setMain(player,stack);message(player,hasSeasoningBase(list)?'§a取回待搖調料瓶':'§e取回調料瓶');return}
- message(player,'§7這不是可加入的調料');
+ let stack=readBottleStack(block);if(!stack.length)stack=[{kind:'empty',ingredients:[],uses:0,variant:0}];
+ const held=heldMain(player),id=held?.typeId;
+ if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||id===SEASONING_ID){pushBottle(block,player,held);return}
+ const top=stack[stack.length-1];
+ if(id&&Object.hasOwn(SEASONING_KINDS,id)){
+  if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
+  if(top.ingredients.length>=8){message(player,'§c最上層調料瓶已滿 8/8');return}
+  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);
+  try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
+  message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/8；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/8');return;
+ }
+ if(!id){
+  const out=stack.pop();setMain(player,bottleItem(out));writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/4');return;
+ }
+ message(player,'§7這不是可加入的調料或調料瓶');
 }
-function placeSeasoningState(block,player){const cached=SEASON_PLACE_CACHE.get(player.id);SEASON_PLACE_CACHE.delete(player.id);const list=cached&&system.currentTick-cached.tick<=8?cached.list:[];writeBottleBlock(block,list)}
+function placeSeasoningState(block,player){
+ const cached=SEASON_PLACE_CACHE.get(player.id);SEASON_PLACE_CACHE.delete(player.id);
+ const data=cached&&system.currentTick-cached.tick<=8?cached.data:{kind:'empty',ingredients:[],uses:0,variant:0};writeBottleStack(block,[data]);setBottleVisual(block,1);
+}
 function readFx(entity){try{const raw=entity.getDynamicProperty(FX_KEY);if(typeof raw!=='string')return {};const v=JSON.parse(raw);return v&&typeof v==='object'?v:{}}catch{return {}}}
 function writeFx(entity,fx){try{const clean={};for(const [k,v] of Object.entries(fx))if(v&&Number(v.until)>now())clean[k]={until:Number(v.until),amp:Number(v.amp)||0};entity.setDynamicProperty(FX_KEY,Object.keys(clean).length?JSON.stringify(clean):undefined)}catch{}}
 function fxGet(entity,name){const v=readFx(entity)[name];return v&&Number(v.until)>now()?v:null}
@@ -197,18 +252,20 @@ function completePending(player,stack){
 world.afterEvents.itemStartUse.subscribe(e=>{
  const id=e.itemStack?.typeId;
  if(id===PENDING_SEASONING){const hand=handFor(e.source,id)?.name??'main';try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{blendOutTime:.08})}catch{}return}
- if(!FOOD_DATA[id])return;const hand=handFor(e.source,id)?.name??'main',profile=resolvedProfile(PROFILE_BY_ITEM[id]??'THREE'),meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
- ACTIVE_EATS.set(e.source.id,{id,start:system.currentTick,profile,hand,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
- try{e.source.playAnimation('animation.kg_imm.player.eat_'+profile.toLowerCase()+'.'+hand,{blendOutTime:.12})}catch{}
+ if(!FOOD_DATA[id])return;
+ const requested=PROFILE_BY_ITEM[id]??'THREE',hand=handFor(e.source,id)?.name??'main',profile=resolvedProfile(requested),meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
+ const a={id,start:system.currentTick,requested,profile,hand,meta,biteTimes:BITE_TIMES[profile]??BITE_TIMES.THREE,nextBite:0,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined};
+ ACTIVE_EATS.set(e.source.id,a);
+ try{e.source.playAnimation('animation.kg_imm.player.eat_'+profile.toLowerCase()+'.'+hand,{blendOutTime:.12});e.source.playSound('kg_imm.'+soundFor(profile))}catch{}
 });
 world.afterEvents.itemCompleteUse.subscribe(e=>{
  const id=e.itemStack?.typeId;if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
  dangerousPreservation(e.source,id);if(!FOOD_DATA[id])return;
- const a=ACTIVE_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);
+ const a=ACTIVE_EATS.get(e.source.id)??{id,profile:PROFILE_BY_ITEM[id]??'THREE',meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);
  if(RAW_NAUSEA[id])try{e.source.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{e.source.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{e.source.addEffect('blindness',200,{showParticles:true})}catch{}
  afterCommitted(e.source,id,a.meta,a,true);
 });
-world.afterEvents.itemStopUse.subscribe(e=>{const a=ACTIVE_EATS.get(e.source.id);if(!a)return;ACTIVE_EATS.delete(e.source.id);if(SETTLED.get(e.source.id)===system.currentTick)return;const used=system.currentTick-a.start;if(used>=25&&used<profileDuration(a.profile)){if(hungerSettle(e.source,a.id,a))message(e.source,'§a在1.25秒檢查點完成進食')}try{e.source.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}});
+world.afterEvents.itemStopUse.subscribe(e=>{const a=ACTIVE_EATS.get(e.source.id);if(!a)return;ACTIVE_EATS.delete(e.source.id);stopEatSound(e.source,a.profile);if(SETTLED.get(e.source.id)===system.currentTick)return;const used=system.currentTick-a.start;if(used>=25&&used<profileDuration(a.profile)){if(hungerSettle(e.source,a.id,a))message(e.source,'§a在1.25秒檢查點完成進食')}try{e.source.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}});
 world.beforeEvents.entityHurt.subscribe(e=>{
  const target=e.hurtEntity,cause=e.damageSource?.cause;
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;system.run(()=>{try{target.dimension.playSound('random.shield_block',target.location)}catch{}});return}
@@ -216,12 +273,12 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
-world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(held?.typeId!==EMPTY_SEASONING_ID)return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,list:readSeasonings(held)})}catch{}});
-world.beforeEvents.playerInteractWithBlock.subscribe(e=>{if(e.block.typeId!==GRILL_ID&&e.block.typeId!==SEASONING_BLOCK)return;e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const block=dim.getBlock(loc);if(block?.typeId===GRILL_ID)handleGrill(block,p);else if(block?.typeId===SEASONING_BLOCK)handleSeasoningBlock(block,p)})});
-world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID){register(e.block);resetBlock(e.block,false)}else if(e.block.typeId===SEASONING_BLOCK)placeSeasoningState(e.block,e.player)});
+world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||![EMPTY_SEASONING_ID,PENDING_SEASONING,SEASONING_ID].includes(held.typeId))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
+world.beforeEvents.playerInteractWithBlock.subscribe(e=>{if(e.block.typeId!==GRILL_ID&&!isSeasoningBlock(e.block.typeId))return;e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const block=dim.getBlock(loc);if(block?.typeId===GRILL_ID)handleGrill(block,p);else if(block&&isSeasoningBlock(block.typeId))handleSeasoningBlock(block,p)})});
+world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID){register(e.block);resetBlock(e.block,false)}else if(isSeasoningBlock(e.block.typeId))placeSeasoningState(e.block,e.player)});
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(e.block.typeId===GRILL_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>customBreak(dim.getBlock(loc),p));return}
- if(e.block.typeId===SEASONING_BLOCK){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const b=dim.getBlock(loc);if(!b||b.typeId!==SEASONING_BLOCK)return;const list=readBottleBlock(b);writeBottleBlock(b,[]);b.setType('minecraft:air');if(!creative(p))b.dimension.spawnItem(seasoningBottleItem(list),{x:loc.x+.5,y:loc.y+.4,z:loc.z+.5})})}
+ if(isSeasoningBlock(e.block.typeId)){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const b=dim.getBlock(loc);if(!b||!isSeasoningBlock(b.typeId))return;const bottles=readBottleStack(b);writeBottleStack(b,[]);b.setType('minecraft:air');if(!creative(p))for(const data of bottles)b.dimension.spawnItem(bottleItem(data),{x:loc.x+.5,y:loc.y+.4,z:loc.z+.5})})}
 });
 function nearHeat(player){
  const p=player.location,d=player.dimension;for(let x=-2;x<=2;x++)for(let y=-1;y<=1;y++)for(let z=-2;z<=2;z++){try{const b=d.getBlock({x:Math.floor(p.x)+x,y:Math.floor(p.y)+y,z:Math.floor(p.z)+z});if(!b)continue;if(HEAT_BLOCKS.has(b.typeId))return true;if(b.typeId===GRILL_ID&&readState(b).lit)return true;if(['minecraft:furnace','minecraft:smoker','minecraft:blast_furnace'].includes(b.typeId)&&b.permutation.getState('lit')===true)return true}catch{}}return false;
@@ -232,6 +289,8 @@ system.runInterval(()=>{
  for(const row of rows){try{const block=world.getDimension(row.d).getBlock({x:row.x,y:row.y,z:row.z});if(!block||block.typeId!==GRILL_ID)continue;keep.push(row);let state=readState(block),before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){const count=1+Math.floor(Math.random()*2);clearContainer(block);block.dimension.spawnItem(new ItemStack('minecraft:charcoal',count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});writeState(block,state);continue}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeState(block,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch{}}
  if(keep.length!==rows.length)saveRegistry(keep);
  for(const p of world.getAllPlayers()){try{
+  const active=ACTIVE_EATS.get(p.id);
+  if(active){advanceBites(p,active);if(active.requested==='THREE_RANDOM'&&active.profile==='THREE_ALT'&&system.currentTick-active.start>=90){ACTIVE_EATS.delete(p.id);SETTLED.set(p.id,system.currentTick);stopEatSound(p,active.profile);if(hungerSettle(p,active.id,active))try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}}
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
   const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);
@@ -239,6 +298,7 @@ system.runInterval(()=>{
   if(system.currentTick%10===0&&fxGet(p,'tundra_strider')){try{const b=p.getBlockStandingOn();if(b&&TUNDRA_BLOCKS.has(b.typeId)){p.addEffect('speed',12,{amplifier:0,showParticles:false});if(b.typeId==='minecraft:powder_snow')p.applyImpulse({x:0,y:.035,z:0})}}catch{}}
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}
   if(system.currentTick%20===0){const db=fxGet(p,'dragon_blood');if(db)try{p.addEffect('health_boost',25,{amplifier:db.amp>0?1:0,showParticles:false})}catch{}}
+  const numb=fxGet(p,'numb');if(numb&&!ACTIVE_EATS.has(p.id)){if(system.currentTick%12===0)try{p.playAnimation('animation.kg_a22.player.numb',{blendOutTime:.08})}catch{};NUMB_VISUAL.add(p.id)}else if(!numb&&NUMB_VISUAL.delete(p.id)){try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}
   if(system.currentTick%20===0){const m=heldMain(p),o=heldOff(p);if(m&&hotUntil(m)>0){refreshHotLore(m);setMain(p,m)}if(o&&hotUntil(o)>0){refreshHotLore(o);setOff(p,o)}}
  }catch{}}
 },1);

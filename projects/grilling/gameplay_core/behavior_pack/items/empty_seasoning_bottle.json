@@ -19,7 +19,7 @@
       "minecraft:max_stack_size": 1,
       "minecraft:hand_equipped": true,
       "minecraft:block_placer": {
-        "block": "kaleidoscope_grilling:seasoning_bottle",
+        "block": "kaleidoscope_grilling:seasoning_bottle_1",
         "replace_block_item": true
       }
     }

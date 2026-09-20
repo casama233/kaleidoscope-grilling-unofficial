@@ -1,0 +1,22 @@
+{
+  "version": "A2.2.0",
+  "tested_commit": "61aafa0262c01c59abbcd7b2e4477dccf758cbdf",
+  "run_id": "35490588731",
+  "retail_target": "Bedrock 26.51 / content 1.26.50",
+  "server_module": "2.9.0",
+  "bite_stage_attachables": 39,
+  "bite_stage_geometry_files": 150,
+  "profile_sound_and_bite_particles": true,
+  "three_random_90_100_timing": true,
+  "seasoning_bottle_stack_max": 4,
+  "independent_bottle_payload": true,
+  "numb_limb_animation": true,
+  "numb_crosshair_offset": false,
+  "oil_type_contracts": 3,
+  "true_custom_fluids": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "99388deb3dfeeba48005e0de024f10ea58925abaf960706267c62e7c6030604c",
+  "brproject_sha256": "70e335d1d43d9b33becda9c78fcda0f16b4289464933f04ab7ebf8551d79c15e",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

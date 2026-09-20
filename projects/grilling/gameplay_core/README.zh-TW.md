@@ -1,3 +1,3 @@
-# A2.1 Gameplay Core
+# A2.2 Gameplay Core
 
-A2.1 在 A2.0 真三槽烤爐上補上 Cookery 1.0.6 油壺直連、可編配調料瓶、煙火氣到期與125%飽和度、Java Cookery 效果等價層、普通／黃金串特殊邏輯，以及39種固定串基礎3D手持 attachable。詳見 reports/a21-build.json 與 docs/STATUS-A2.1.md。
+A2.2 在 A2.1 上加入正式逐口3D串、原作咬點粒子/聲音同步、THREE_RANDOM 4.5/5秒修正、Numb四肢動作、最多4瓶的獨立調料瓶實體堆疊，以及三種油型資料契約。真自訂流體在 Bedrock 26.51 沒有公開穩定註冊API，因此未冒充完成。
