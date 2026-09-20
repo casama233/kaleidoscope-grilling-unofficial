@@ -126,7 +126,7 @@ def main():
     write(RP/'models/blocks/seasoning_bottle.geo.json',bottle_geo)
     shutil.copyfile(spice,RP/'textures/blocks/seasoning_bottle.png')
     terrain_block=load(RP/'textures/terrain_texture.json');terrain_block['texture_data']['kg_a21_seasoning_bottle']={'textures':'textures/blocks/seasoning_bottle'};write(RP/'textures/terrain_texture.json',terrain_block)
-    block={'format_version':'1.26.50','minecraft:block':{'description':{'identifier':'kaleidoscope_grilling:seasoning_bottle','menu_category':{'category':'none'}},'components':{
+    block={'format_version':'1.26.50','minecraft:block':{'description':{'identifier':'kaleidoscope_grilling:seasoning_bottle'},'components':{
       'minecraft:display_name':'tile.kaleidoscope_grilling:seasoning_bottle.name','minecraft:geometry':'geometry.kg_a21.seasoning_bottle',
       'minecraft:material_instances':{'*':{'texture':'kg_a21_seasoning_bottle','render_method':'blend'}},
       'minecraft:collision_box':{'origin':[-3,0,-3],'size':[6,12,6]},'minecraft:selection_box':{'origin':[-4,0,-4],'size':[8,13,8]},
