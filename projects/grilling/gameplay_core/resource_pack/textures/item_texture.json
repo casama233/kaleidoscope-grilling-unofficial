@@ -1,5 +1,5 @@
 {
-  "resource_pack_name": "Kaleidoscope Grilling A2",
+  "resource_pack_name": "Kaleidoscope Grilling A2.4",
   "texture_name": "atlas.items",
   "texture_data": {
     "dark_grilling": {
@@ -169,6 +169,42 @@
     },
     "premium_chili_oil_bucket": {
       "textures": "textures/items/premium_chili_oil_bucket"
+    },
+    "unfinished_skewer": {
+      "textures": "textures/items/secret_skewer_stick"
+    },
+    "secret_skewer": {
+      "textures": "textures/items/secret_skewer_stick"
+    },
+    "beef_chunks": {
+      "textures": "textures/items/beef_chunks"
+    },
+    "chicken_skin": {
+      "textures": "textures/items/chicken_skin"
+    },
+    "chicken_wing": {
+      "textures": "textures/items/chicken_wing"
+    },
+    "squid_tentacle": {
+      "textures": "textures/items/squid_tentacle"
+    },
+    "raw_sweet_potato_sheet": {
+      "textures": "textures/items/raw_sweet_potato_sheet"
+    },
+    "minced_houttuynia": {
+      "textures": "textures/items/minced_houttuynia"
+    },
+    "potato_slice": {
+      "textures": "textures/items/potato_slice"
+    },
+    "carrot_dice": {
+      "textures": "textures/items/carrot_dice"
+    },
+    "raw_mantou_slice": {
+      "textures": "textures/items/raw_mantou_slice"
+    },
+    "houttuynia": {
+      "textures": "textures/items/houttuynia"
     }
   }
 }
