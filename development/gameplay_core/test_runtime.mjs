@@ -47,6 +47,9 @@ const player={id:'p1',selectedSlotIndex:0,isSneaking:false,location:{x:0,y:64,z:
  onScreenDisplay:{setActionBar(t){player.messages.push(t)}}};
 const worldDP=new Map();
 const world={afterEvents,beforeEvents,getAllPlayers:()=>[player],getDimension:id=>dimension,getDynamicProperty:k=>worldDP.get(k),setDynamicProperty(k,v){v===undefined?worldDP.delete(k):worldDP.set(k,v)}};
+const enc=n=>n<0?'m'+Math.abs(n):'p'+n;
+const stateKey=b=>'kaleidoscope_grilling:g_'+b.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(b.x)+'_'+enc(b.y)+'_'+enc(b.z);
+const persisted=b=>JSON.parse(worldDP.get(stateKey(b)));
 const intervals=[];
 const system={currentTick:0,run(f){f()},runInterval(f,n){intervals.push({f,n})}};
 function tick(n=1){for(let i=0;i<n;i++){system.currentTick++;for(const x of intervals)if(system.currentTick%x.n===0)x.f()}}
@@ -65,29 +68,29 @@ async function linker(spec){if(spec==='@minecraft/server')return server;return m
 await modules['main.js'].link(linker);await modules['main.js'].evaluate();
 
 const a=makeBlock(0);place(a);
-check('placement registers and creates 3-slot grill',()=>{assert.equal(a._c.slots.length,3);assert.equal(a._d.get('phase'),0);assert.match(worldDP.get('kaleidoscope_grilling:a2_grills'),/"x":0/)});
-hand('minecraft:flint_and_steel');check('flint and steel lights grill',()=>{const e=interact(a);assert.equal(e.cancel,true);assert.equal(a._d.get('lit'),true)});
+check('placement registers and creates 3-slot grill',()=>{assert.equal(a._c.slots.length,3);assert.equal(persisted(a).phase,0);assert.match(worldDP.get('kaleidoscope_grilling:a2_grills'),/"x":0/)});
+hand('minecraft:flint_and_steel');check('flint and steel lights grill',()=>{const e=interact(a);assert.equal(e.cancel,true);assert.equal(persisted(a).lit,true)});
 for(const id of ['raw_beef_skewer','raw_fish_skewer','raw_lamb_skewer']){hand('kaleidoscope_grilling:'+id);interact(a)}
 check('three real container slots accept three raw skewers',()=>assert.deepEqual(a._c.slots.map(x=>x?.typeId),['kaleidoscope_grilling:raw_beef_skewer','kaleidoscope_grilling:raw_fish_skewer','kaleidoscope_grilling:raw_lamb_skewer']));
 hand('kaleidoscope_grilling:canola_oil_brush');interact(a);
-check('brush enters phase1 and stores heat',()=>{assert.equal(a._d.get('phase'),1);assert.equal(a._d.get('heat'),1200)});
+check('brush enters phase1 and stores heat',()=>{assert.equal(persisted(a).phase,1);assert.equal(persisted(a).heatTicks,1200)});
 hand();
-for(let i=1;i<=4;i++){interact(a);check('flip '+i,()=>assert.equal(a._d.get('flips'),i));if(i<4)tick(20)}
-check('four flips reach phase2',()=>assert.equal(a._d.get('phase'),2));
+for(let i=1;i<=4;i++){interact(a);check('flip '+i,()=>assert.equal(persisted(a).flips,i));if(i<4)tick(20)}
+check('four flips reach phase2',()=>assert.equal(persisted(a).phase,2));
 hand('kaleidoscope_grilling:special_seasoning');interact(a);
-check('seasoning unlocks extraction',()=>assert.equal(a._d.get('seasoned'),true));
+check('seasoning unlocks extraction',()=>assert.equal(persisted(a).seasoned,true));
 hand();player.isSneaking=true;interact(a);player.isSneaking=false;
 check('shift empty-hand extracts all as matching cooked items',()=>{
  const got=inventory.slots.filter(x=>x?.typeId?.startsWith('kaleidoscope_grilling:grilled_')).map(x=>x.typeId).sort();
  assert.deepEqual(got,['kaleidoscope_grilling:grilled_beef_skewer','kaleidoscope_grilling:grilled_fish_skewer','kaleidoscope_grilling:grilled_lamb_skewer'].sort());
- assert.equal(a._c.slots.filter(Boolean).length,0);assert.equal(a._d.get('phase'),0);
+ assert.equal(a._c.slots.filter(Boolean).length,0);assert.equal(persisted(a).phase,0);
 });
 const dark=makeBlock(2);place(dark);hand('minecraft:flint_and_steel');interact(dark);hand('kaleidoscope_grilling:raw_beef_skewer');interact(dark);hand('kaleidoscope_grilling:canola_oil_brush');interact(dark);hand();tick(800);
-check('800 lit occupied ticks become overcooked phase3',()=>assert.equal(dark._d.get('phase'),3));
+check('800 lit occupied ticks become overcooked phase3',()=>assert.equal(persisted(dark).phase,3));
 interact(dark);
 check('phase3 extraction is dark grilling',()=>assert.ok(inventory.slots.some(x=>x?.typeId==='kaleidoscope_grilling:dark_grilling')));
 const burnt=makeBlock(4);place(burnt);hand('minecraft:flint_and_steel');interact(burnt);hand('kaleidoscope_grilling:raw_fish_skewer');interact(burnt);hand('kaleidoscope_grilling:canola_oil_brush');interact(burnt);hand();tick(1200);
-check('800+400 ticks eject charcoal and clear slots',()=>{assert.ok(drops.some(x=>x.stack.typeId==='minecraft:charcoal'));assert.equal(burnt._c.slots.filter(Boolean).length,0);assert.equal(burnt._d.get('phase'),0)});
+check('800+400 ticks eject charcoal and clear slots',()=>{assert.ok(drops.some(x=>x.stack.typeId==='minecraft:charcoal'));assert.equal(burnt._c.slots.filter(Boolean).length,0);assert.equal(persisted(burnt).phase,0)});
 const partial=makeBlock(6);place(partial);hand('minecraft:flint_and_steel');interact(partial);hand('kaleidoscope_grilling:raw_beef_skewer');interact(partial);hand('kaleidoscope_grilling:canola_oil_brush');interact(partial);
 check('breaking partial process is intercepted',()=>assert.equal(breakBlock(partial).cancel,true));
 check('partial break produces mysterious skewer',()=>assert.ok(drops.some(x=>x.stack.typeId==='kaleidoscope_grilling:mysterious_skewer')));
