@@ -51,13 +51,13 @@ tick(20);
 check('first THREE bite swaps the active-hand visual',()=>assert.equal(slots[0].typeId,'kg_imm:visual_1'));
 tick(80);
 check('end restores selector and helper hand',()=>{assert.equal(slots[0].typeId,'kg_imm:eat_three_random');assert.equal(off,undefined);});
-tap(a);tick(3); // reset
-tap(a);tick(3);tap(a);tick(3);held('kg_imm:oil_brush');tap(a);tick(26);held();for(let i=0;i<4;i++){tap(a);tick(14)}held('kg_imm:seasoning_bottle');tap(a);tick(16);held();tap(a);tick(3);
+const b=entity('b');spawn(b);tick(3);
+held();held(null,'off');tap(b);tick(3);tap(b);tick(3);held('kg_imm:oil_brush');tap(b);tick(26);held();for(let i=0;i<4;i++){tap(b);tick(14)}held('kg_imm:seasoning_bottle');tap(b);tick(16);held();tap(b);tick(3);
 held('kg_imm:eat_two','off');
-check('offhand eating uses left item/arm animation',()=>{tap(a);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
-player.isSneaking=true;tap(a);player.isSneaking=false;
+check('offhand eating uses left item/arm animation',()=>{tap(b);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
+player.isSneaking=true;tap(b);player.isSneaking=false;
 check('cancel restores offhand selector',()=>assert.equal(off.typeId,'kg_imm:eat_two'));
-held('kg_imm:eat_four','main');tap(a);
+held(null,'off');held('kg_imm:eat_four','main');tap(b);
 check('restore token exists while visual replacement is active',()=>assert.equal(typeof dyn.get('kg_imm:eat_restore'),'string'));
 events.playerSpawn.emit({initialSpawn:true,player});
 check('spawn recovery restores selector without overwriting other inventory',()=>{assert.equal(slots[0].typeId,'kg_imm:eat_four');assert.equal(dyn.has('kg_imm:eat_restore'),false);});
