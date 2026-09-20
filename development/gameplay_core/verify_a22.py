@@ -36,6 +36,8 @@ def main():
   assert set(d['textures'])=={f'stage{i}' for i in range(5)}
   pre=' '.join(d['scripts']['pre_animation'])
   assert 'q.item_in_use_duration' in pre and 'v.kg_bite_stage' in pre
+  item=d['identifier'].split(':',1)[1];times=stage_map[item]['visual_bites'];last=times[-1]
+  assert f'q.item_in_use_duration >= {last:.5f} ? {len(times)} :' in pre,(item,pre)
  geos=list((RP/'models/entity/a22_bites').glob('*.geo.json'));tex=list((RP/'textures/a22_bites').glob('*.png'))
  assert len(geos)==150,len(geos);assert len(tex)==150,len(tex)
  rc=load(RP/'render_controllers/a22_bites.render_controllers.json')['render_controllers']['controller.render.kg_a22.bite']
