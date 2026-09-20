@@ -59,7 +59,7 @@ check('selector resolves occupied offhand',()=>assert.equal(sources['player_bind
 check('offhand eating uses left item/arm animation',()=>{tap(b);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
 player.isSneaking=true;tap(b);player.isSneaking=false;
 check('cancel restores offhand selector',()=>assert.equal(off.typeId,'kg_imm:eat_two'));
-held(null,'off');held('kg_imm:eat_four','main');tap(b);
+tick(3);held(null,'off');held('kg_imm:eat_four','main');tap(b);
 check('restore token exists while visual replacement is active',()=>assert.equal(typeof dyn.get('kg_imm:eat_restore'),'string'));
 events.playerSpawn.emit({initialSpawn:true,player});
 check('spawn recovery restores selector without overwriting other inventory',()=>{assert.equal(slots[0].typeId,'kg_imm:eat_four');assert.equal(dyn.has('kg_imm:eat_restore'),false);});
