@@ -69,7 +69,8 @@ function hand(id,amount=1){inventory.setItem(0,id?new ItemStack(id,amount):undef
 function interact(block){const e={block,player,cancel:false};beforeEvents.playerInteractWithBlock.emit(e);return e}
 function place(block){afterEvents.playerPlaceBlock.emit({block,player})}
 function itemComplete(stack){afterEvents.itemCompleteUse.emit({source:player,itemStack:stack})}
-const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Error,Boolean,Math});
+const math=Object.create(Math);math.random=()=>.2;
+const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Error,Boolean,Math:math});
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const mods={};
 for(const n of ['main.js','data.js','core_logic.js'])mods[n]=new vm.SourceTextModule(fs.readFileSync(new URL(n,root),'utf8'),{context,identifier:n});
