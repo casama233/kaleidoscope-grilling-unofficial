@@ -75,9 +75,10 @@ world.afterEvents.entitySpawn.subscribe(e=>watch(e.entity));
 world.afterEvents.playerInteractWithEntity.subscribe(e=>{
  if(e.target.typeId!==TYPE)return;
  watch(e.target);const row=scenes.get(e.target.id);if(!row)return;
- const now=system.currentTick;if(now-row.lastTap<3)return;row.lastTap=now;
+ const now=system.currentTick;
  try{
   if(e.player.isSneaking){
+   row.lastTap=now;
    endPerformer(row);
    const r=cancel(row.state);
    row.state=row.state.action?r.state:{...initial(),seq:row.state.seq+1};
@@ -85,6 +86,7 @@ world.afterEvents.playerInteractWithEntity.subscribe(e=>{
    e.player.onScreenDisplay.setActionBar('動作已取消或驗收台已重置；不扣材料、不回復飢餓');
    return;
   }
+  if(now-row.lastTap<3)return;row.lastTap=now;
   const action=nextAction(row.state);let hand=null,profile=null;
   if(action==='brush'){
    hand=tool(e.player,'kg_imm:oil_brush');
