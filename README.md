@@ -2,27 +2,31 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A1.14累積素材＋A1.15沉浸式動效驗收台。不是完整生存玩法。**
+**目前：A1.14累積素材＋A1.16 Cookery 依賴沉浸式玩家動畫驗收。不是完整生存玩法。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
-## A1.15：從刷油，到最後一口
+## A1.16：Cookery 依賴＋六種進食規則＋玩家主副手
 
-新增獨立BP/RP驗收台，空手互動連續查看：點火、上三串、1秒刷油、四次0.7秒拋起翻面、0.5秒倒瓶撒料、取串、四口進食展示。使用原作貼圖與OGG；聲音隨空爐、取消和實體移除停止，不每tick重疊播放。
+A1.16 不再把動效包當成獨立正式結構：BP 明確依賴 Kaleidoscope Cookery 1.0.6 的 BP，RP 明確依賴 Cookery 1.0.6 的 RP；Cookery 本體不打進本倉庫或測試包。
 
-- **[下載動效驗收包 `.mcaddon`](artifacts/Grilling_Immersion_Lab_A1.15.mcaddon)**
-- **[A1.15實際進度、操作方式與還原邊界](docs/STATUS-A1.15.md)**
-- **[獨立bridge.動效工程](projects/grilling/integration/immersion_lab/)**
-- **[逐幀／慢放／原音效檢查頁](projects/grilling/reports/immersion_a115/index.html)**：自包含HTML，保存後用瀏覽器開啟。
-- **[真正的建置、事件測試與官方Dash編譯記錄](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35455778472)**
+新增原作六種進食規則 ONE／TWO／THREE／THREE_ALT／THREE_RANDOM／FOUR。THREE_RANDOM 在開始時只決定一次 THREE 或 THREE_ALT，之後由同一 resolved profile 驅動總長、玩家骨骼、分口與音效，不會每一口重抽。
 
-![實際匯出骨骼的翻面離線預覽，非Minecraft錄影](projects/grilling/reports/immersion_a115/flip.gif)
+- **[下載 Cookery 依賴 A1.16 測試包](artifacts/Grilling_Immersion_Lab_A1.16.mcaddon)**
+- **[下載 A1.16 bridge. 工程](artifacts/Grilling_Immersion_Lab_A1.16.brproject)**
+- **[A1.16 實際進度、六種規則、測試方式與邊界](docs/STATUS-A1.16.md)**
+- **[A1.16 玩家綁定工程](projects/grilling/integration/immersion_lab/)**
+- **[成功的官方 Dash／行為驗證工作流程](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35484643707)**
 
-**工具位置與浮空分口樣本是驗收配置，不是已完成的玩家手部。** 原作六組進食規則、第一／第三人稱和雙手動作來源另附；原生骨骼與相機綁定仍待完成。沒有覆蓋player.json、沒有另加指南書、沒有改動Cookery，也沒有材料消耗或飢餓回復。
+本輪生成 16 條玩家動畫：五個 resolved 進食 profile × 主／副手、刷油 × 主／副手、撒料 × 主／副手、拿起／收回 reach × 主／副手。沒有覆寫 minecraft:player；手持物使用 attachable 綁定 rightItem／leftItem。ONE 與 THREE 會驅動第二隻手，但只有對側手為空時才暫放來源衍生咬塊，不覆蓋玩家已有物品。
 
-本批實際結果：30項流程／公式測試、16項真實適配器＋模擬事件宿主測試通過；60個翻面姿態×兩個角度共120對圖像一致。新展示BP/RP由Windows上的官方Dash v1.2.0編譯成功，RP28、BP12份檔案逐一對照實際輸出。1644份既有基線檔案保持不變。
+刷油保留原作 1 秒核心、撒料保留原作 0.5 秒核心；各自在前後新增 0.15 秒拿起／收回。操作必須靠近並面向爐心，接觸聲在拿起過渡後才觸發。進食六種規則本身不加時，咬點維持原作時間。
 
-資料與限制见`projects/grilling/reports/immersion_a115/`。**Dash、模擬宿主和離線光柵器都不能替代Minecraft／BDS實機驗收。**
+實際結果：六種規則／流程 21 項通過，實際 A1.16 adapter 在模擬事件宿主中 15 項通過；Cookery 依賴、16 條動畫、4 套 attachable 幾何及 6 個 profile selector 的結構檢查通過。Windows 上官方 bridge. Dash v1.2.0 實際編譯 77 個檔案，RP 48、BP 28 份檔案逐一和編譯輸出一致。
+
+**Minecraft 客戶端／BDS、真實 FOV／皮膚、左撇子設定和最後接觸位置仍需實機驗收。** 目前測試包不扣材料、不回復飢餓、不註冊正式配方；正式生存加工邏輯仍待接線。
+
+A1.15 的獨立驗收台及逐幀檢查頁保留為歷史動效基線：[A1.15 狀態](docs/STATUS-A1.15.md)。
 
 ## A1.14累積素材基線
 
@@ -44,7 +48,7 @@
 - **[獨立指南章節測試工程](projects/grilling/integration/cookery106/)**：我方BP/RP，不含Cookery原包。
 - **[可編輯模型](projects/grilling/editor/generated/)**、**[Bedrock幾何](projects/grilling/resource_pack/models/entity/kg_a1/)**、**[貼圖圖集](projects/grilling/resource_pack/textures/kg_a1/)**。
 - **[玩家筆記核心](notebook/)**：搜尋、收藏、有順序的自訂配方及玩家儲存適配器。
-- **[動效建置與測試來源](development/immersion/)**：與原有靜態素材建置器分開。
+- **[動效建置與測試來源](development/immersion/)**：A1.15 原始動效基線。\n- **[玩家骨骼／相機綁定建置與測試](development/player_binding/)**：A1.16 六種規則與主／副手。
 
 ## 植物離線預覽
 
@@ -57,7 +61,7 @@
 ```sh
 node notebook/test.mjs
 node development/immersion/test.mjs
-node --experimental-vm-modules development/immersion/test_runtime.mjs
+node --experimental-vm-modules development/immersion/test_runtime.mjs\nnode development/player_binding/test.mjs\nnode --experimental-vm-modules development/player_binding/test_runtime.mjs
 python -m pip install numpy==2.3.5 Pillow==12.3.0
 python projects/grilling/tools/build_assets.py
 python development/immersion/verify.py
@@ -76,13 +80,13 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 - [A1.12素材重建及集合雜湊核對](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35451900945)
 - [植物幾何及120對八角度比較](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35452356584)
 - [主RP＋指南BP/RP的真實Dash編譯](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35452461036)
-- [筆記資料核心測試](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35450471711)
+- [筆記資料核心測試](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35450471711)\n- [A1.15 沉浸動效驗收](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35455778472)\n- [A1.16 Cookery依賴＋六種玩家動畫驗收](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35484643707)
 
 `migration/bootstrap.py`與`development/run_plants.py`是一次性搬遷工具，不應在既有工程上重複執行。日常主素材重建使用`tools/build_assets.py`；動效建置器只重建獨立驗收台，不覆蓋主RP或原指南。
 
 ## 尚未完成
 
-原生玩家主副手／第一第三人稱的精確綁定、接觸動效、餐盤與擺放、自由組合串、真實流體與粒子效果、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+Minecraft實機下的最終主副手／第一第三人稱接觸精度、餐盤與擺放、自由組合串、真實流體與剩餘粒子效果、指南動態搜尋／收藏／自訂配方頁面、正式背包／營養結算、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
