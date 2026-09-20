@@ -57,7 +57,7 @@ function setSeasonings(stack,list){try{stack.setDynamicProperty(SEASON_LIST_KEY,
 function hasSeasoningBase(list){return [...BASE_SEASONINGS].every(x=>list.includes(x))}
 function getUses(stack){try{return Math.max(0,Math.min(16,Number(stack?.getDynamicProperty(SEASON_USES_KEY)??0)|0))}catch{return 0}}
 function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(0,Math.min(16,n|0)))}catch{}return stack}
-function bucketHot(until){return until-Math.floorMod(until,100)}
+function bucketHot(until){return until-(((until%100)+100)%100)}
 function setHot(stack,ticks){if(ticks<=0)return stack;try{stack.setDynamicProperty(HOT_UNTIL_KEY,bucketHot(now()+ticks))}catch{}return stack}
 function hotUntil(stack){try{return Number(stack?.getDynamicProperty(HOT_UNTIL_KEY)??0)}catch{return 0}}
 function isHot(stack){return hotUntil(stack)>now()}
