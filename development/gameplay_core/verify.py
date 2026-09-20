@@ -23,9 +23,10 @@ def main():
     assert bm['header']['version']==[2,0,0] and rm['header']['version']==[2,0,0]
     assert {'uuid':COOKERY_BP,'version':VER} in bm['dependencies']
     assert {'uuid':COOKERY_RP,'version':VER} in rm['dependencies']
+    assert {'module_name':'@minecraft/server','version':'2.9.0'} in bm['dependencies']
     block=load(BP/'blocks/grill.json')['minecraft:block']
     be=block['components']['minecraft:block_entity']
-    assert be['container']['slot_count']==3 and be['dynamic_properties'] is True
+    assert be['container']['slot_count']==3 and 'dynamic_properties' not in be
     assert block['description']['identifier']=='kaleidoscope_grilling:grill'
     assert block['components']['minecraft:geometry']=='geometry.kg_core.grill'
     items=list((BP/'items').glob('*.json'))
@@ -52,7 +53,7 @@ def main():
     raw_entries=re.findall(r'"kaleidoscope_grilling:raw_[^"]+":\s*"kaleidoscope_grilling:grilled_[^"]+"',js)
     assert len(raw_entries)==19,len(raw_entries)
     runtime=(BP/'scripts/main.js').read_text()
-    for token in ['playerInteractWithBlock','playerPlaceBlock','playerBreakBlock','itemStartUse','itemStopUse','itemCompleteUse','entityHurt','minecraft:dynamic_properties','minecraft:inventory']:
+    for token in ['playerInteractWithBlock','playerPlaceBlock','playerBreakBlock','itemStartUse','itemStopUse','itemCompleteUse','entityHurt','world.getDynamicProperty','world.setDynamicProperty','minecraft:inventory']:
         assert token in runtime,token
     assert 'FINISHED_TICKS=800' in (BP/'scripts/core_logic.js').read_text()
     assert 'BURNT_TICKS=400' in (BP/'scripts/core_logic.js').read_text()
@@ -74,7 +75,7 @@ def main():
                 else:assert p.read_bytes()==q.read_bytes(),str(q)
                 count+=1
             compiled.append({'pack':name,'compared_files':count,'matches_source':True})
-    result={'version':'A2.0.0','formal_items':46,'formal_foods':41,'cookable_fixed_skewers':19,'real_grill_block_entity_slots':3,'cookery_dependency_verified':True,'compiled':a.compiled,'compiled_packs':compiled,'minecraft_tested':False,'bds_tested':False,'block_entity_runtime_tested_in_engine':False}
+    result={'version':'A2.0.0','formal_items':46,'formal_foods':41,'cookable_fixed_skewers':19,'real_grill_block_entity_slots':3,'state_persistence':'stable world dynamic properties keyed by dimension+block coordinates','server_module':'2.9.0','cookery_dependency_verified':True,'compiled':a.compiled,'compiled_packs':compiled,'minecraft_tested':False,'bds_tested':False,'block_entity_runtime_tested_in_engine':False}
     out=P/'reports'/('dash-verification.json' if a.compiled else 'structure-verification.json')
     out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(out.read_text())
