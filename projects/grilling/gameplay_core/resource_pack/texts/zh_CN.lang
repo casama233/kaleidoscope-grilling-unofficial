@@ -45,3 +45,12 @@ item.kaleidoscope_grilling:raw_sweet_potato_sheet_skewer.name=生苕皮串
 item.kaleidoscope_grilling:secret_chili_oil_brush.name=辣椒油刷子
 item.kaleidoscope_grilling:special_seasoning.name=特制调料
 tile.kaleidoscope_grilling:grill.name=烧烤架
+
+item.kaleidoscope_grilling:green_chili_powder.name=青辣椒粉
+item.kaleidoscope_grilling:sichuan_pepper.name=花椒
+item.kaleidoscope_grilling:onion_powder.name=洋葱粉
+item.kaleidoscope_grilling:houttuynia_powder.name=折耳根粉
+item.kaleidoscope_grilling:totem_powder.name=圖騰粉
+item.kaleidoscope_grilling:dragon_egg_powder.name=龙蛋粉
+item.kaleidoscope_grilling:pending_seasoning.name=待搖調料瓶
+tile.kaleidoscope_grilling:seasoning_bottle.name=调料瓶

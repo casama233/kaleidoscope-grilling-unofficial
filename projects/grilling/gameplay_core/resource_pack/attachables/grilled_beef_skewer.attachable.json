@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grilled_beef_skewer",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/a21/grilled_beef_skewer"
+      },
+      "geometry": {
+        "default": "geometry.kg_a21.grilled_beef_skewer"
+      },
+      "render_controllers": [
+        "controller.render.kg_a21.item"
+      ]
+    }
+  }
+}

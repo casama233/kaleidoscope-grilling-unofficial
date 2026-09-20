@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grilled_fish_skewer",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/a21/grilled_fish_skewer"
+      },
+      "geometry": {
+        "default": "geometry.kg_a21.grilled_fish_skewer"
+      },
+      "render_controllers": [
+        "controller.render.kg_a21.item"
+      ]
+    }
+  }
+}

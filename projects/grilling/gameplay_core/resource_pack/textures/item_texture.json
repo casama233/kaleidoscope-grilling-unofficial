@@ -139,6 +139,27 @@
     },
     "empty_seasoning_bottle": {
       "textures": "textures/items/empty_seasoning_bottle"
+    },
+    "green_chili_powder": {
+      "textures": "textures/items/green_chili_powder"
+    },
+    "sichuan_pepper": {
+      "textures": "textures/items/sichuan_pepper"
+    },
+    "onion_powder": {
+      "textures": "textures/items/onion_powder"
+    },
+    "houttuynia_powder": {
+      "textures": "textures/items/houttuynia_powder"
+    },
+    "totem_powder": {
+      "textures": "textures/items/totem_powder"
+    },
+    "dragon_egg_powder": {
+      "textures": "textures/items/dragon_egg_powder"
+    },
+    "pending_seasoning": {
+      "textures": "textures/items/pending_seasoning"
     }
   }
 }

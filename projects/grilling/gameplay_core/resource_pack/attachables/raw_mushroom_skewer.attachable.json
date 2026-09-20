@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:raw_mushroom_skewer",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/a21/raw_mushroom_skewer"
+      },
+      "geometry": {
+        "default": "geometry.kg_a21.raw_mushroom_skewer"
+      },
+      "render_controllers": [
+        "controller.render.kg_a21.item"
+      ]
+    }
+  }
+}

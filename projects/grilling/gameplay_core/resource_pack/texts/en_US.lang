@@ -45,3 +45,12 @@ item.kaleidoscope_grilling:raw_sweet_potato_sheet_skewer.name=Raw Sweet Potato S
 item.kaleidoscope_grilling:secret_chili_oil_brush.name=Chili Oil Brush
 item.kaleidoscope_grilling:special_seasoning.name=Special Seasoning
 tile.kaleidoscope_grilling:grill.name=Grill
+
+item.kaleidoscope_grilling:green_chili_powder.name=Green Chili Powder
+item.kaleidoscope_grilling:sichuan_pepper.name=Sichuan Pepper
+item.kaleidoscope_grilling:onion_powder.name=Onion Powder
+item.kaleidoscope_grilling:houttuynia_powder.name=Houttuynia Powder
+item.kaleidoscope_grilling:totem_powder.name=Totem Powder
+item.kaleidoscope_grilling:dragon_egg_powder.name=Dragon Egg Powder
+item.kaleidoscope_grilling:pending_seasoning.name=Pending Seasoning
+tile.kaleidoscope_grilling:seasoning_bottle.name=Seasoning Bottle

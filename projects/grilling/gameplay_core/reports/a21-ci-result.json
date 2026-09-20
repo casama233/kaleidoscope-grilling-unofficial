@@ -1,0 +1,18 @@
+{
+  "version": "A2.1.0",
+  "tested_commit": "e9ab9a2f8abc681ca4ebf61cdc59edc9cd100e0c",
+  "run_id": "35489240344",
+  "retail_target": "Bedrock 26.51 / content 1.26.50",
+  "server_module": "2.9.0",
+  "cookery_1_0_6_dependency": true,
+  "cookery_oil_pot_direct": true,
+  "seasoning_payload": true,
+  "hot_food_absolute_expiry": true,
+  "semantic_effect_layer": true,
+  "held_3d_attachables": 39,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "a897348791cd7732e763d58375c68892d24243cdc984927c9c797e06512b715d",
+  "brproject_sha256": "e24e51f9622891e85c99f2ab0d43af1e5497e229dda6113ebea7eda746971fe0",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

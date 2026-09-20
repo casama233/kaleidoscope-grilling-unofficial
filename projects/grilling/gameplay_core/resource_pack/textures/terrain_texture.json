@@ -4,6 +4,9 @@
   "texture_data": {
     "kg_core_grill": {
       "textures": "textures/blocks/grill"
+    },
+    "kg_a21_seasoning_bottle": {
+      "textures": "textures/blocks/seasoning_bottle"
     }
   }
 }

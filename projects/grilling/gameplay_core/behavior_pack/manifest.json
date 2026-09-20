@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.0 Gameplay Core BP",
-    "description": "固定串與三槽烤爐可玩核心；需要 Cookery 1.0.6",
+    "name": "Kaleidoscope Grilling A2.1 Gameplay BP",
+    "description": "Cookery油壺、調味、煙火氣與效果等價層；需要 Cookery 1.0.6",
     "uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
     "version": [
       2,
-      0,
+      1,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "dcf70052-c592-56e3-84d2-2a9b86abe7ab",
       "version": [
         2,
-        0,
+        1,
         0
       ]
     },
@@ -32,7 +32,7 @@
       "uuid": "d0bb6818-8187-5d20-8e1f-a2ab7b517795",
       "version": [
         2,
-        0,
+        1,
         0
       ]
     }
@@ -42,7 +42,7 @@
       "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
       "version": [
         2,
-        0,
+        1,
         0
       ]
     },
