@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Grilling A1.15 Immersion Lab",
+  "name": "Grilling A1.16 Cookery-linked Immersion Lab",
   "targetVersion": "1.26.50",
   "namespace": "kg_imm",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "KG_Immersion_Lab_A115"
+          "packName": "KG_Immersion_Lab_A116"
         }
       ]
     ]

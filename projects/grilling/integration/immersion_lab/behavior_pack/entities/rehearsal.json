@@ -135,7 +135,7 @@
               "target": "self"
             },
             "interact_text": "action.interact.kg_imm.step",
-            "swing": true
+            "swing": false
           }
         ]
       }

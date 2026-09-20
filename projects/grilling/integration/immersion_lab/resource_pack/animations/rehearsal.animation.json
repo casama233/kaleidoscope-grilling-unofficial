@@ -14,30 +14,10 @@
           "scale": "v.held"
         },
         "brush_tool": {
-          "scale": "0.42*v.brush",
-          "position": [
-            "4*math.sin(v.t*360)",
-            10,
-            0
-          ],
-          "rotation": [
-            -24,
-            0,
-            "32+34*math.sin(v.t*360)"
-          ]
+          "scale": 0
         },
         "season_tool": {
-          "scale": "0.48*v.season",
-          "position": [
-            "1.28*math.sin(v.t*1440)",
-            "10+1.6*math.sin(v.t*360)",
-            0
-          ],
-          "rotation": [
-            "-28+42*math.sin(v.t*360)",
-            "18*math.sin(v.t*1440)",
-            "202+25*math.sin(v.t*1440)"
-          ]
+          "scale": 0
         },
         "slot0": {
           "position": [

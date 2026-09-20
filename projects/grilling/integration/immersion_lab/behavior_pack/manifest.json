@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling A1.15 • Immersion rehearsal BP",
-    "description": "動效驗收台；不耗材、不給食物、不取代Cookery或玩家外觀。",
+    "name": "Grilling A1.16 • Cookery-linked immersion BP",
+    "description": "沉浸動效驗收；需要 Kaleidoscope Cookery 1.0.6。非完整生存玩法。",
     "uuid": "696c9463-0a3d-5b00-b52f-a2476bc47821",
     "version": [
       0,
       1,
-      15
+      16
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        15
+        16
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         0,
         1,
-        15
+        16
       ]
     }
   ],
@@ -43,7 +43,15 @@
       "version": [
         0,
         1,
-        15
+        16
+      ]
+    },
+    {
+      "uuid": "10f37ae2-9ccf-435f-b34b-0eec8191cd94",
+      "version": [
+        1,
+        0,
+        6
       ]
     },
     {
