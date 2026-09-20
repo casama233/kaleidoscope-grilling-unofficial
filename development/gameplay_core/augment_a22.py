@@ -117,8 +117,8 @@ function advanceBites(player,a){
 """,
       'A2.2 constants')
     s=replace_once(s,
-      "function cookeryOilType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola')}catch{return 'canola'}}\\nfunction heatForOil(type){return type==='premium_chili'?24000:type==='secret_chili'?12000:1200}",
-      "function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola');return Object.hasOwn(OIL_TYPES,type)?type:'canola'}catch{return 'canola'}}\\nfunction heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}",
+      "function cookeryOilType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola')}catch{return 'canola'}}\nfunction heatForOil(type){return type==='premium_chili'?24000:type==='secret_chili'?12000:1200}",
+      "function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'canola');return Object.hasOwn(OIL_TYPES,type)?type:'canola'}catch{return 'canola'}}\nfunction heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}",
       'oil types')
     start=s.index("function readBottleBlock(block)")
     end=s.index("function readFx(entity)")
