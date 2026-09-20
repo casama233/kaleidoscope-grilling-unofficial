@@ -1,4 +1,5 @@
 import {world,system,ItemStack,EquipmentSlot,GameMode,BlockPermutation} from '@minecraft/server';
+import {FLUID_CAPACITY,OIL_BUCKET_POINTS} from './a24_skewering_core.js';
 
 const REG='kaleidoscope_grilling:a23_oil_sources';
 export const OIL_TYPES=Object.freeze({
@@ -87,21 +88,34 @@ function placeFromBucket(player,dim,loc,type,hand){
  if(!setOil(b,type,0))return false;registerSource(dim,loc,type);
  if(!creative(player))setHand(player,hand,new ItemStack('minecraft:bucket',1));return true;
 }
+function cookeryType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'')}catch{return ''}}
+function cookeryCount(stack){try{return Math.max(0,Math.min(FLUID_CAPACITY,Number(stack?.getDynamicProperty('kc_oil_count')??0)|0))}catch{return 0}}
 function takeSource(player,block,type,hand,toCookery=false){
  if(level(block)!==0)return false;
+ const held=hand==='off'?off(player):main(player);
+ let nextPot;
+ if(toCookery){
+  const currentType=held?.typeId===COOKERY_FILLED?cookeryType(held):'',current=held?.typeId===COOKERY_FILLED?cookeryCount(held):0;
+  if((currentType&&currentType!==type)||current+OIL_BUCKET_POINTS>FLUID_CAPACITY)return false;
+  nextPot=new ItemStack(COOKERY_FILLED,1);
+  try{
+   const next=current+OIL_BUCKET_POINTS;
+   nextPot.setLore(['§7Oil: '+next+'/'+FLUID_CAPACITY]);
+   nextPot.setDynamicProperty('kc_oil_count',next);
+   nextPot.setDynamicProperty('kaleidoscope_grilling:oil_type',type);
+  }catch{}
+ }
  const rows=readReg(),k=posKey(block.dimension.id,block.x,block.y,block.z),row=rows.find(r=>r.k===k);
  try{block.setType('minecraft:air')}catch{return false}
  if(row){clearCells(row,rows);saveReg(rows.filter(r=>r!==row))}
- if(toCookery){
-  const pot=new ItemStack(COOKERY_FILLED,1);try{pot.setDynamicProperty('kc_oil_count',256);pot.setDynamicProperty('kaleidoscope_grilling:oil_type',type);pot.setLore(['§7Oil: 256/256'])}catch{};setHand(player,hand,pot);
- }else setHand(player,hand,new ItemStack(OIL_TYPES[type].bucket,1));
+ if(toCookery)setHand(player,hand,nextPot);else setHand(player,hand,new ItemStack(OIL_TYPES[type].bucket,1));
  return true;
 }
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  const item=e.itemStack,typeFromBlock=BLOCK_TO_TYPE[e.block.typeId],bucketType=item?BUCKET_TO_TYPE[item.typeId]:undefined;
- if(typeFromBlock&&(item?.typeId==='minecraft:bucket'||item?.typeId===COOKERY_EMPTY)){
+ if(typeFromBlock&&(item?.typeId==='minecraft:bucket'||item?.typeId===COOKERY_EMPTY||item?.typeId===COOKERY_FILLED)){
   e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,hand=findHand(p,item.typeId);
-  system.run(()=>{const b=dim.getBlock(loc);if(b&&hand)takeSource(p,b,typeFromBlock,hand,item.typeId===COOKERY_EMPTY)});return;
+  system.run(()=>{const b=dim.getBlock(loc);if(b&&hand)takeSource(p,b,typeFromBlock,hand,item.typeId!== 'minecraft:bucket')});return;
  }
  if(bucketType){
   e.cancel=true;const p=e.player,loc=faceTarget(e),dim=e.block.dimension,hand=findHand(p,item.typeId);

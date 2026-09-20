@@ -1,3 +1,5 @@
-# A2.3 Gameplay Core
+# A2.4 Gameplay Core
 
-A2.3 補上 Hot Food 手動安全堆疊／儲物整理、烤爐 flat/legged + lit/unlit 四態、Dragon Blood 精確總有效+6/+10生命、Tundra/Mustard/Sulfur 更貼近 Java 的腳本語義，以及三種8級世界油流動模擬。Numb 準星仍因26.51 stable無安全per-player HUD offset而不做全局UI覆寫。
+A2.4 在 A2.3 上補回 Java 1.1.1 的手工穿串主鏈：副手木棍／未完成串 + 主手食材、20 條固定配方、三料秘制串、製作者資料、潛行拆解返還材料，以及秘制串動態營養公式。Cookery 油壺同步修正為普通脂肪 256 點、Grilling 三種流體油 64 點，每桶 8 點；固定串預設可滿飽食度進食。
+
+Bedrock stable 2.9 沒有任意 smoking recipe manager 查詢，也沒有通用「使用鍵」事件；因此秘制串烹熟食材目前完整處理原版 smoking 映射，模組食材回退原始營養；不可原生使用的食材若對空氣按使用鍵無事件，需對著方塊或實體完成穿串。這兩項列為平台差異，不冒充 Java 原生能力。

@@ -61,3 +61,6 @@ tile.kaleidoscope_grilling:premium_chili_oil.name=熔岩辣椒油
 item.kaleidoscope_grilling:canola_oil_bucket.name=菜籽油桶
 item.kaleidoscope_grilling:secret_chili_oil_bucket.name=辣椒油桶
 item.kaleidoscope_grilling:premium_chili_oil_bucket.name=熔岩辣椒油桶
+
+item.kaleidoscope_grilling:unfinished_skewer.name=未完成烤串
+item.kaleidoscope_grilling:secret_skewer.name=秘制串

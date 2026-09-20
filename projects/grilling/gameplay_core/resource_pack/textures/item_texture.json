@@ -169,6 +169,12 @@
     },
     "premium_chili_oil_bucket": {
       "textures": "textures/items/premium_chili_oil_bucket"
+    },
+    "unfinished_skewer": {
+      "textures": "textures/items/unfinished_skewer"
+    },
+    "secret_skewer": {
+      "textures": "textures/items/secret_skewer"
     }
   }
 }

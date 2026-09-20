@@ -1,0 +1,28 @@
+{
+  "version": "A2.4.0",
+  "formal_foods": 42,
+  "configured_skewer_recipes": 20,
+  "hand_threading": true,
+  "secret_dynamic_food": true,
+  "raw_disassembly": true,
+  "typed_oil_capacity": 64,
+  "fat_capacity": 256,
+  "bucket_points": 8,
+  "can_always_eat": true,
+  "server_module": "2.9.0",
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 77,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 520,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

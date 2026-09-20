@@ -61,3 +61,6 @@ tile.kaleidoscope_grilling:premium_chili_oil.name=Lava Chili Oil
 item.kaleidoscope_grilling:canola_oil_bucket.name=Canola Oil Bucket
 item.kaleidoscope_grilling:secret_chili_oil_bucket.name=Chili Oil Bucket
 item.kaleidoscope_grilling:premium_chili_oil_bucket.name=Lava Chili Oil Bucket
+
+item.kaleidoscope_grilling:unfinished_skewer.name=Unfinished Skewer
+item.kaleidoscope_grilling:secret_skewer.name=Secret Skewer

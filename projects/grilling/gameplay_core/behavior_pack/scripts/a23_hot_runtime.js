@@ -28,11 +28,13 @@ export function isHot(stack,t=now()){return hotUntil(stack)>t}
 function bucket(t){return t-(((t%100)+100)%100)}
 function setHot(stack,remaining,t=now()){
  try{
-  if(remaining>0)stack.setDynamicProperty(HOT,bucket(t+remaining));
-  else stack.setDynamicProperty(HOT,undefined);
   const lore=baseLore(stack);
   if(remaining>0){const sec=Math.max(1,Math.ceil(remaining/20)),m=Math.floor(sec/60),s=String(sec%60).padStart(2,'0');lore.push('§c🔥 煙火氣 '+m+':'+s)}
+  // Stable 2.9 ItemStack dynamic properties require a non-stackable/custom-data stack.
+  // Give the stack custom lore first, then persist HotUntil.
   stack.setLore(lore);
+  if(remaining>0)stack.setDynamicProperty(HOT,bucket(t+remaining));
+  else stack.setDynamicProperty(HOT,undefined);
  }catch{}
  return stack;
 }

@@ -1,0 +1,19 @@
+{
+  "version": "A2.4.0",
+  "java_reference": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "configured_skewer_recipes": 20,
+  "hand_threading": true,
+  "unfinished_skewer": true,
+  "secret_skewer": true,
+  "secret_creator_metadata": true,
+  "raw_skewer_disassembly": true,
+  "secret_food_formula": "Java 0.6 coefficient; duplicate ingredient x0.8; raw nutrition/saturation x0.5",
+  "secret_cooked_ingredient_resolution": "vanilla smoking map implemented; arbitrary modded smoking recipe lookup unavailable in stable Script API",
+  "secret_finish_using_item": "using_converts_to remainders emulated; arbitrary ingredient finishUsingItem callbacks unavailable",
+  "typed_oil_pot_capacity": 64,
+  "cookery_fat_capacity": 256,
+  "typed_oil_bucket_points": 8,
+  "allow_skewers_at_full_hunger": true,
+  "stateful_stack_property_order": "custom lore first, dynamic property second, to satisfy stable ItemStack stateful-stack restriction",
+  "plain_nonusable_air_threading": "stable Script API exposes successful itemUse/block/entity interaction, not a generic use-button event; non-usable ingredients can be threaded while targeting a block/entity"
+}
