@@ -401,6 +401,21 @@ def build():
     js+="export function soundFor(profile){return ({ONE:'one_skewer_eat',TWO:'two_skewer_eat',THREE:'three_skewer_eat',THREE_ALT:'three_skewer_eat',FOUR:'four_skewer_eat'})[profile];}\n"
     js+="export function stageAt(profile,seconds){let n=0;for(const t of PROFILE_RULES[profile].bites)if(seconds>=t)n++;return Math.min(4,n);}\n"
     write(LAB/'behavior_pack/scripts/profile_rules.js',js)
+    source_dir=Path(__file__).parent
+    for name in ('flow.js','player_binding.js','main.js'):
+        shutil.copyfile(source_dir/name,LAB/'behavior_pack/scripts'/name)
+    # The old fixture-local tools are hidden: A1.16 renders brush and bottle through the player's item bones.
+    scene_anim=LAB/'resource_pack/animations/rehearsal.animation.json'
+    scene=json.loads(scene_anim.read_text())
+    sb=scene['animations']['animation.kg_imm.rehearsal']['bones']
+    sb['brush_tool']={'scale':0}
+    sb['season_tool']={'scale':0}
+    write(scene_anim,scene)
+    entity_path=LAB/'behavior_pack/entities/rehearsal.json'
+    entity=json.loads(entity_path.read_text())
+    interactions=entity['minecraft:entity']['components']['minecraft:interact']['interactions']
+    for interaction in interactions: interaction['swing']=False
+    write(entity_path,entity)
     report={
         'version':'A1.16.0',
         'cookery_dependency':{'behavior_pack_uuid':COOKERY_BP,'resource_pack_uuid':COOKERY_RP,'version':COOKERY_VER},
