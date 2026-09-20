@@ -2,11 +2,28 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.1 Gameplay Core 已補上 Cookery 油壺直連、完整調料資料、煙火氣與 Java Cookery 效果等價層；仍不是 Java 全模組完整移植。**
+**目前：A2.2 Gameplay Core 已補上正式逐口3D、咬點聲音/粒子、四瓶調料堆疊與 Numb 肢體動作；仍不是 Java 全模組完整移植。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
-## A2.1：油壺＋調料＋煙火氣＋效果等價層
+## A2.2：逐口3D＋四瓶調料堆疊＋Numb動作
+
+A2.2 把固定串的「真正拿在手上吃」接回正式 Gameplay Core：39個正式 attachable 依 `query.item_in_use_duration` 在原作咬點切換完整／bite-stage 幾何，不替換邏輯 ItemStack，因此保留 A2.1 的 Hot Food、調料、25 tick 提前結算與主／副手資料。
+
+- **[A2.2 可導入 Gameplay Core mcaddon](artifacts/Kaleidoscope_Grilling_A2.2_Gameplay_Core.mcaddon)**
+- **[A2.2 bridge. 工程](artifacts/Kaleidoscope_Grilling_A2.2_Gameplay_Core.brproject)**
+- **[A2.2 完成範圍與已知引擎差異](docs/STATUS-A2.2.md)**
+- **[最終成功 CI：50項回歸／行為測試＋官方 Dash](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35490679938)**
+
+本輪生成 **39個逐口 attachable、150個真實階段幾何**；每個實際咬點同步5個食物碎屑粒子和對應原作進食音軌。THREE_RANDOM 的原生使用窗口修正為5秒；若本次選到 THREE_ALT，腳本在90 ticks精確提前結算。模型本身因 Molang 無法讀服務端選中的 branch，採兩條時間線中點，最大模型階段偏差約 **1.67 ticks**；邏輯、骨骼、聲音與粒子仍使用真分支。
+
+調料瓶現在最多物理堆 **4瓶**，每瓶獨立保存 kind／ingredients／uses／variant，取頂瓶或拆整組都不混資料。為維持26.51 retail且不開實驗，使用四個 block identifier 而非自訂 block states。
+
+Numb 的 Java 四肢異常擺動已轉成 Bedrock 玩家骨骼動畫；Java GUI Mixin 的準星繞圈沒有穩定 Bedrock HUD offset API，因此沒有偽造完成。菜籽油／辣椒油／熔岩辣椒油則先建立3種正式油型資料契約；26.51公開穩定API沒有真正自訂 FluidType 註冊能力，所以**本版沒有宣稱真自訂流體已完成**。
+
+最終驗證：A2.0 **16/16**、A2.1 state **4/4**、A2.1 runtime **18/18**、A2.2 runtime **12/12**，合計 **50/50**；官方 Dash v1.2.0 實際編譯 **570 files**，BP **65**、RP **505** 逐檔一致。
+
+## A2.1：油壺＋調料＋煙火氣＋效果等價層（歷史基線）
 
 A2.1 把 A2.0「烤得熟」推進到「**用 Cookery 油壺刷油、自己配調料、趁熱吃並得到原作語義效果**」。
 
@@ -120,6 +137,9 @@ python development/gameplay_core/augment_a21.py
 node development/gameplay_core/test_a21_core.mjs
 node --experimental-vm-modules development/gameplay_core/test_a21_runtime.mjs
 python development/gameplay_core/verify_a21.py
+python development/gameplay_core/augment_a22.py
+node --experimental-vm-modules development/gameplay_core/test_a22_runtime.mjs
+python development/gameplay_core/verify_a22.py
 python -m pip install numpy==2.3.5 Pillow==12.3.0
 python projects/grilling/tools/build_assets.py
 python development/immersion/verify.py
@@ -143,12 +163,13 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 - [A1.16 Cookery依賴＋六種玩家動畫驗收](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35484643707)
 - [A2.0 Gameplay Core 完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35487932877)
 - [A2.1 Cookery油壺／調料／煙火氣完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35489240344)
+- [A2.2 逐口3D／四瓶調料／Numb完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35490679938)
 
 `migration/bootstrap.py`與`development/run_plants.py`是一次性搬遷工具，不應在既有工程上重複執行。日常主素材重建使用`tools/build_assets.py`；動效建置器只重建獨立驗收台，不覆蓋主RP或原指南。
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity／手持3D驗收、正式逐口3D切換、Numb客戶端視覺、調料瓶四瓶物理堆疊、辣椒油／熔岩辣椒油真流體、餐盤與擺放、自由組合串、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、自由／秘制串、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
