@@ -55,7 +55,7 @@ const player={id:'p1',typeId:'minecraft:player',selectedSlotIndex:0,isSneaking:f
  getGameMode(){return GameMode.Survival},
  getComponent(id){if(id==='minecraft:inventory')return {container:inventory};if(id==='minecraft:equippable')return {getEquipment:s=>s===EquipmentSlot.Offhand?off:undefined,setEquipment(s,v){if(s===EquipmentSlot.Offhand)off=v;return true}};if(id==='minecraft:player.hunger')return hunger;if(id==='minecraft:player.saturation')return sat;if(id==='minecraft:health')return hp},
  getDynamicProperty:k=>pdp.get(k),setDynamicProperty(k,v){v===undefined?pdp.delete(k):pdp.set(k,v)},
- getEffects(){return [...effects.values()]},addEffect(id,duration,opt={}){effects.set(id,{typeId:id,duration,amplifier:opt.amplifier??0});if(id==='health_boost')hp.effectiveMax=20+(opt.amplifier??0)+1===2?28:24},removeEffect(id){effects.delete(id);if(id==='health_boost')hp.effectiveMax=20},
+ getEffects(){return [...effects.values()]},addEffect(id,duration,opt={}){effects.set(id,{typeId:id,duration,amplifier:opt.amplifier??0});if(id==='health_boost')hp.effectiveMax=(opt.amplifier??0)>0?28:24},removeEffect(id){effects.delete(id);if(id==='health_boost')hp.effectiveMax=20},
  getVelocity(){return {...this._velocity}},applyImpulse(v){impulses.push(v);this._velocity={x:this._velocity.x+(v.x??0),y:this._velocity.y+(v.y??0),z:this._velocity.z+(v.z??0)}},applyKnockback(){},
  getBlockStandingOn(){return this._standing},playAnimation(id){this.animations.push(id)},playSound(){},runCommand(){},getHeadLocation(){return {x:0,y:65.6,z:0}},getViewDirection(){return {x:0,y:0,z:1}},
  applyDamage(amount,opt){damageReplay.push({amount,opt});return true},onScreenDisplay:{setActionBar(){}}
@@ -74,7 +74,7 @@ const files=['main.js','data.js','core_logic.js','a23_hot_merge.js','a23_hot_run
 const mods={};for(const n of files)mods[n]=new vm.SourceTextModule(fs.readFileSync(new URL(n,root),'utf8'),{context,identifier:n});
 const server=new vm.SyntheticModule(['world','system','ItemStack','EquipmentSlot','GameMode','BlockPermutation'],function(){this.setExport('world',world);this.setExport('system',system);this.setExport('ItemStack',ItemStack);this.setExport('EquipmentSlot',EquipmentSlot);this.setExport('GameMode',GameMode);this.setExport('BlockPermutation',BlockPermutation)},{context,identifier:'server'});
 async function linker(spec){if(spec==='@minecraft/server')return server;return mods[spec.replace('./','')]}
-await mods.main.link(linker);await mods.main.evaluate();
+await mods['main.js'].link(linker);await mods['main.js'].evaluate();
 const hot=mods['a23_hot_runtime.js'].namespace;
 
 // Hot stack manual merge.
