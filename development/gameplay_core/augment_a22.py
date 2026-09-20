@@ -63,7 +63,7 @@ def bite_candidates(item,names):
 
 def stage_expression(times):
     expr='0'
-    for i,t in reversed(list(enumerate(times,1))):
+    for i,t in enumerate(times,1):
         expr=f'(q.item_in_use_duration >= {t:.5f} ? {i} : {expr})'
     return f'v.kg_bite_stage = q.is_using_item ? {expr} : 0;'
 
