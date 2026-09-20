@@ -160,7 +160,7 @@ function handleGrill(block,player){
   const bottle=consumeSeasoningBottle(player,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
   const result=season(state,n,bottle.ingredients);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}message(player,'§a調味完成，消耗 '+(creative(player)?0:n)+' 次')}return;
  }
- if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||(id===SECRET_ID&&!isSecretCooked(held)))){if(!state.lit){message(player,'§c需要先點火');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}const c=inv(block),slot=[0,1,2].find(i=>!c.getItem(i));if(slot===undefined)return;c.setItem(slot,new ItemStack(id,1));decrementMain(player);message(player,'§a已放入烤串 '+(slot+1)+'/3');return}
+ if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||(id===SECRET_ID&&!isSecretCooked(held)))){if(!state.lit){message(player,'§c需要先點火');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}const c=inv(block),slot=[0,1,2].find(i=>!c.getItem(i));if(slot===undefined)return;c.setItem(slot,copyOne(held));decrementMain(player);message(player,'§a已放入烤串 '+(slot+1)+'/3');return}
  if(id){message(player,'§7這個物品不能用在目前的烤爐階段');return}
  if(state.phase===1){const r=flip(state);if(r.ok){writeState(block,r.state);try{player.playAnimation('animation.kg_imm.player.reach.main',{blendOutTime:.1});block.dimension.playSound('kg_imm.grill_flip',block.location)}catch{}message(player,'§e翻面 '+r.state.flips+'/4')}else message(player,'§7翻面冷卻中');return}
  if(state.phase===0&&n>0){message(player,'§e還需要刷油');return}if(state.phase===2&&!state.seasoned){message(player,'§e還需要撒料');return}
