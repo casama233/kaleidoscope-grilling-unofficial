@@ -2,9 +2,23 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.3 Gameplay Core 已補上 Hot Food 堆疊/儲物整理、烤爐四態、效果差異收斂與三種世界油模擬；仍不是 Java 全模組完整移植。**
+**目前：A2.4 Gameplay Core 已接上 Java 1.1.1 的 20 條手工穿串規則、未完成烤串與秘制烤串核心，能從木棍＋食材一路進烤爐；仍不是 Java 全模組完整移植。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.4：手工穿串＋秘制烤串核心
+
+- **[A2.4 完成範圍、Java 差異與後續優先級](docs/STATUS-A2.4.md)**
+- **[A2.4 正式 Gameplay Core 工程](projects/grilling/gameplay_core/)**
+- A2.4 專用 CI：20 條 Java 配方規則、結構校驗、JS 語法檢查＋官方 Dash 編譯
+
+A2.4 直接對照 Java Grilling 1.1.1 的 `SkeweringHandler`、`SkewerRecipes`、`SecretSkewerItem` 與 `grilling/skewers.json`：副手木棍／未完成串、主手食材可逐份穿串；完整命中固定配方就生成固定生串，三份仍不匹配則生成秘制烤串，並保存作者。蹲下可拆回食材與木棍。
+
+固定串不是「19種」漏了一種：原作其實是 **19 組 raw→grilled + 1 個 ordinary 直接結果 = 20 條穿串規則**，Gluten 一直存在。A2.4 已把這 20 條**有序食材規則**正式接進 Gameplay Core，並補上牛肉塊、雞皮、雞翅、魷魚鬚、生苕皮、折耳根末、土豆片、胡蘿蔔粒、生饅頭片、折耳根等穿串必需物品與原版圖示。
+
+秘制串使用與 Java 相同的單一 `secret_skewer` ID，以 Dynamic Properties 保存三份食材、作者、熟／生狀態。烤爐已修正為 clone ItemStack 而不是重建 ID，因此秘制串進出爐不再丟 metadata；營養採 Java 公式：總 nutrition ×0.6，有重複食材再 ×0.8，生串再折半，saturation 依 nutrition 加權。
+
+目前 Secret Mix 仍缺 Java 的完整 per-ingredient ItemStack/NBT、任意 smoking recipe 查詢、逐份食物效果／remainder 與動態三食材拼模；串譜、餐盤、廚具架、榨油機／大缸、作物／世界生成和完整生存取得鏈仍在後續。Java Cookery 已到 1.5.0，而本 Bedrock Grilling 仍依賴 Cookery 1.0.6；這條依賴版本差異也已在 A2.4 狀態頁獨立列出。
 
 ## A2.3：Hot Food堆疊＋烤爐四態＋世界油
 
@@ -155,6 +169,8 @@ python development/gameplay_core/verify_a21.py
 python development/gameplay_core/augment_a22.py
 node --experimental-vm-modules development/gameplay_core/test_a22_runtime.mjs
 python development/gameplay_core/verify_a22.py
+node development/gameplay_core/test_a24_skewer_rules.mjs
+python development/gameplay_core/verify_a24.py
 python -m pip install numpy==2.3.5 Pillow==12.3.0
 python projects/grilling/tools/build_assets.py
 python development/immersion/verify.py
@@ -185,7 +201,7 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、自由／秘制串、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D、A2.4 穿串與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、秘制串完整 ItemStack／動態拼模語義、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、穿串原料完整生存取得鏈、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草與花椒目前仍未完成種植、採收或樹木生成。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
