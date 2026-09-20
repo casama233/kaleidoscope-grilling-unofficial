@@ -1,0 +1,15 @@
+{
+  "version": "A2.0.0",
+  "formal_items": 46,
+  "formal_foods": 41,
+  "cookable_fixed_skewers": 19,
+  "real_grill_block_entity_slots": 3,
+  "state_persistence": "stable world dynamic properties keyed by dimension+block coordinates",
+  "server_module": "2.9.0",
+  "cookery_dependency_verified": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "block_entity_runtime_tested_in_engine": false
+}

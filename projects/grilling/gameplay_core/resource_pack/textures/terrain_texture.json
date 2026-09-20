@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "Kaleidoscope Grilling A2",
+  "texture_name": "atlas.terrain",
+  "texture_data": {
+    "kg_core_grill": {
+      "textures": "textures/blocks/grill"
+    }
+  }
+}

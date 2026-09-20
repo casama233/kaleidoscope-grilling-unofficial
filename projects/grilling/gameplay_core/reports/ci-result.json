@@ -1,0 +1,15 @@
+{
+  "version": "A2.0.0",
+  "tested_commit": "aa0e116089b2312939fc28af11121b4bde05923f",
+  "run_id": "35487932877",
+  "retail_target": "Bedrock 26.51 / content 1.26.50",
+  "server_module": "2.9.0",
+  "cookery_1_0_6_dependency": true,
+  "dash_compiled_and_compared": true,
+  "core_state_tests": true,
+  "mock_runtime_tests": true,
+  "mcaddon_sha256": "a884ef3e8de58dbd4346532591e2b2ac1d0aaade2a0cec770cb9f6d79586b63f",
+  "brproject_sha256": "d917ae197db056d73aac4685e67246e7317918d4263f403583ea9d567d192851",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

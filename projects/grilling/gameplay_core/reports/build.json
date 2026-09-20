@@ -1,0 +1,36 @@
+{
+  "version": "A2.0.0",
+  "java_commit": "9a1acdab27698457bec16c9362678e574895a28c",
+  "cookable_fixed_skewers": 19,
+  "formal_skewer_items": 41,
+  "formal_support_items": 5,
+  "grill_slots": 3,
+  "finished_ticks": 800,
+  "burnt_ticks": 400,
+  "flip_count": 4,
+  "flip_cooldown": 20,
+  "cookery_dependency": {
+    "bp": "10f37ae2-9ccf-435f-b34b-0eec8191cd94",
+    "rp": "c89dc8df-c3fc-4bc8-8bd0-527abba76681",
+    "version": [
+      1,
+      0,
+      6
+    ]
+  },
+  "source_git_blobs": {
+    "forge-1.20.1/src/main/java/cn/breezeth/kaleidoscope_grilling/registry/ModItems.java": "a359de5425e3008e728e4790b7bd1b0fe92fbabf",
+    "common/src/main/resources/data/kaleidoscope_grilling/grilling/skewers.json": "2628e39468ffd8dbe1b2801051b10d0453d2b216",
+    "common/src/main/resources/assets/kaleidoscope_grilling/lang/zh_cn.json": "bbc7465f6bf6ab0c698729e9800fbc3c03ae56db",
+    "common/src/main/resources/assets/kaleidoscope_grilling/lang/en_us.json": "807c7f40618d409ca17ccb4c0a39e211a84a7b18"
+  },
+  "known_parity_gaps": [
+    "Cookery oil_pot direct integration uses temporary internal brush tools",
+    "Cookery-specific status effects are reported but not silently approximated",
+    "hot-food expiry and seasoning payload are written only as preliminary stack metadata",
+    "per-grill phase state is persisted through stable world dynamic properties for retail 26.51; block dynamic-properties API is intentionally not required",
+    "formal bite-stage item geometry switching is not yet wired; A1.16 player bone animations are reused",
+    "all skewers temporarily max_stack_size=1 so per-stack state remains available",
+    "Minecraft/BDS runtime not yet tested"
+  ]
+}
