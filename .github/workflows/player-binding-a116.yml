@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/player-binding-a116.yml'
+      - 'development/player_binding/**'
   workflow_dispatch:
 permissions:
   contents: write
