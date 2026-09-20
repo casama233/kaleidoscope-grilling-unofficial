@@ -35,7 +35,7 @@ function setHand(player,performer,id){
 }
 export function beginEat(player,hand,resolved){
  const selectorId=hand.item.typeId,requested=SELECTORS[selectorId];
- const performer={playerId:player.id,name:hand.name,slot:hand.slot,hotbar:hand.hotbar,selectorId,requested,resolved,helper:false};
+ const performer={playerId:player.id,name:hand.name,slot:hand.slot,hotbar:hand.hotbar,eq:hand.eq,selectorId,requested,resolved,helper:false};
  player.setDynamicProperty(RESTORE,JSON.stringify({name:performer.name,hotbar:performer.hotbar,selectorId}));
  if(!setHand(player,performer,VISUAL_PREFIX+'0')){player.setDynamicProperty(RESTORE);throw new Error('Could not install visual skewer');}
  if(resolved==='ONE'||resolved==='THREE'){
