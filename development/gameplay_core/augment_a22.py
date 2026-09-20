@@ -91,7 +91,8 @@ def patch_runtime():
     path=BP/'scripts/main.js'; s=path.read_text()
     s=replace_once(s,
       "const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle';",
-      "const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle_1';\\nconst SEASONING_BLOCKS=new Set(['kaleidoscope_grilling:seasoning_bottle','kaleidoscope_grilling:seasoning_bottle_1','kaleidoscope_grilling:seasoning_bottle_2','kaleidoscope_grilling:seasoning_bottle_3','kaleidoscope_grilling:seasoning_bottle_4']);",
+      """const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle_1';
+const SEASONING_BLOCKS=new Set(['kaleidoscope_grilling:seasoning_bottle','kaleidoscope_grilling:seasoning_bottle_1','kaleidoscope_grilling:seasoning_bottle_2','kaleidoscope_grilling:seasoning_bottle_3','kaleidoscope_grilling:seasoning_bottle_4']);""",
       'seasoning block constants')
     s=replace_once(s,
       "const DANGEROUS_FOODS=new Set(['minecraft:rotten_flesh','minecraft:chicken','minecraft:poisonous_potato','minecraft:pufferfish','minecraft:spider_eye']);",
