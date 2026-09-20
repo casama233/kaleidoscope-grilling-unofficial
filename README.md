@@ -2,11 +2,26 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.2 Gameplay Core 已補上正式逐口3D、咬點聲音/粒子、四瓶調料堆疊與 Numb 肢體動作；仍不是 Java 全模組完整移植。**
+**目前：A2.3 Gameplay Core 已補上 Hot Food 堆疊/儲物整理、烤爐四態、效果差異收斂與三種世界油模擬；仍不是 Java 全模組完整移植。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
-## A2.2：逐口3D＋四瓶調料堆疊＋Numb動作
+## A2.3：Hot Food堆疊＋烤爐四態＋世界油
+
+- **[A2.3 可導入 Gameplay Core mcaddon](artifacts/Kaleidoscope_Grilling_A2.3_Gameplay_Core.mcaddon)**
+- **[A2.3 bridge. 工程](artifacts/Kaleidoscope_Grilling_A2.3_Gameplay_Core.brproject)**
+- **[A2.3 完成範圍與平台差異](docs/STATUS-A2.3.md)**
+- **[成功 CI：70項回歸／行為測試＋官方 Dash](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35492689153)**
+
+41種正式食物恢復最大64堆疊；含HotUntil／seasoning的串由腳本安全合併，熱度按數量加權平均。蹲下＋空手互動 Chest／Trapped Chest／Barrel 可執行 Java OrderToCook Refrigerator 的 Normal Sort 語義（熱度差≤5分鐘才合併）。「冰箱」在 Java 原版只是 OrderToCook 可選模組的整理相容，不會延長 HotUntil。
+
+烤爐現在用同一個3槽 BlockEntity 的 custom states 在 **flat/unlit、flat/lit、legged/unlit、legged/lit** 四態切換；lit 使用原作火焰模型／貼圖，並加 face-dimming off、AO 0、light emission 13。支撐判定使用 stable Bedrock 的 `!below.isSolid` 近似 Java top-face-sturdy。
+
+Dragon Blood 總有效生命已做到 +6/+10（原生可見 +4/+8 加2點腳本傷害池）；Tundra Strider 改按雪／冰摩擦語義提供約1.30／1.11／1.1055速度因子；Mustard維持6格 flee-like，Sulfur改成水平8／垂直16範圍。Numb準星仍不覆寫全局HUD，因26.51 stable沒有安全per-player crosshair offset API。
+
+三種油現在有 **8級世界液面、向下優先／水平擴散、桶收放、Cookery油壺灌裝**；仍明確標為 scripted fluid simulation，而不是 Forge/Bedrock engine LiquidType。
+
+## A2.2：逐口3D＋四瓶調料堆疊＋Numb動作（歷史基線）
 
 A2.2 把固定串的「真正拿在手上吃」接回正式 Gameplay Core：39個正式 attachable 依 `query.item_in_use_duration` 在原作咬點切換完整／bite-stage 幾何，不替換邏輯 ItemStack，因此保留 A2.1 的 Hot Food、調料、25 tick 提前結算與主／副手資料。
 
@@ -164,6 +179,7 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 - [A2.0 Gameplay Core 完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35487932877)
 - [A2.1 Cookery油壺／調料／煙火氣完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35489240344)
 - [A2.2 逐口3D／四瓶調料／Numb完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35490679938)
+- [A2.3 Hot Food／烤爐四態／世界油完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35492689153)
 
 `migration/bootstrap.py`與`development/run_plants.py`是一次性搬遷工具，不應在既有工程上重複執行。日常主素材重建使用`tools/build_assets.py`；動效建置器只重建獨立驗收台，不覆蓋主RP或原指南。
 
