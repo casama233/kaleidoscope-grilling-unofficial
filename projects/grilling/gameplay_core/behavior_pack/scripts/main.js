@@ -317,6 +317,9 @@ function threadHeld(player){
 try{world.beforeEvents.itemUse.subscribe(e=>{
  const p=e.source;if(!p||!canThreadHeld(p,e.itemStack))return;e.cancel=true;system.run(()=>threadHeld(p));
 })}catch{}
+try{world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
+ const p=e.player;if(!p||!canThreadHeld(p,e.itemStack))return;e.cancel=true;system.run(()=>threadHeld(p));
+})}catch{}
 world.afterEvents.itemStartUse.subscribe(e=>{
  const id=e.itemStack?.typeId;
  if(id===PENDING_SEASONING){const hand=handFor(e.source,id)?.name??'main';try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{blendOutTime:.08})}catch{}return}
