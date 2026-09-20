@@ -175,6 +175,12 @@
     },
     "secret_skewer": {
       "textures": "textures/items/secret_skewer"
+    },
+    "skewer_plate": {
+      "textures": "textures/items/skewer_plate"
+    },
+    "skewer_recipe_book": {
+      "textures": "textures/items/skewer_recipe_book"
     }
   }
 }

@@ -1,0 +1,26 @@
+{
+  "version": "A2.5.0",
+  "plate_capacity": 5,
+  "plate_lifo_take": true,
+  "packed_metadata": true,
+  "highest_nutrition_eating": true,
+  "recipe_book_fixed_and_secret": true,
+  "inventory_autocraft": true,
+  "wall_recipe_block": true,
+  "server_module": "2.9.0",
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 83,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 526,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

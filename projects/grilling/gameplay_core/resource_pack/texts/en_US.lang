@@ -64,3 +64,9 @@ item.kaleidoscope_grilling:premium_chili_oil_bucket.name=Lava Chili Oil Bucket
 
 item.kaleidoscope_grilling:unfinished_skewer.name=Unfinished Skewer
 item.kaleidoscope_grilling:secret_skewer.name=Secret Skewer
+
+item.kaleidoscope_grilling:skewer_plate.name=Plate of Skewers
+tile.kaleidoscope_grilling:skewer_plate.name=Skewer Plate
+tile.kaleidoscope_grilling:skewer_plate_block.name=Skewer Plate
+item.kaleidoscope_grilling:skewer_recipe_book.name=Skewer Recipe Book
+tile.kaleidoscope_grilling:skewer_recipe.name=Skewer Recipe

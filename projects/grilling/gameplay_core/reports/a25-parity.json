@@ -1,0 +1,28 @@
+{
+  "version": "A2.5.0",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "scope": [
+    "SkewerPlateBlock",
+    "SkewerPlateBlockEntity",
+    "SkewerPlateItem",
+    "SkewerPlatePlacement",
+    "SkewerRecipeBookItem",
+    "SkewerRecipeBlock",
+    "SkewerRecipeBlockEntity"
+  ],
+  "plate_capacity": 5,
+  "plate_lifo_take": true,
+  "packed_metadata": true,
+  "plate_highest_nutrition_eating": true,
+  "recipe_book_fixed_and_secret_recording": true,
+  "recipe_book_inventory_autocraft": true,
+  "wall_recipe_block": true,
+  "bedrock_internal_plate_block_id": "kaleidoscope_grilling:skewer_plate_block",
+  "known_platform_substitutions": [
+    "Java BlockItem cannot be both an edible custom item and a Bedrock custom block with the same runtime identifier, so the world block uses an internal _block id.",
+    "Java shapeless NBT recipe recording is represented by a stable two-hand recording action; Cookery recipe item + recorded raw skewer is also intercepted when available.",
+    "Plate base and recipe paper use pinned upstream textures; arbitrary per-skewer block-entity rendering remains a static plate visual until a Bedrock renderer equivalent is added."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -34,6 +34,12 @@
     },
     "kg_a23_premium_chili_oil": {
       "textures": "textures/blocks/premium_chili_oil"
+    },
+    "kg_a25_plate": {
+      "textures": "textures/blocks/skewer_plate"
+    },
+    "kg_a25_recipe": {
+      "textures": "textures/blocks/skewer_recipe"
     }
   }
 }

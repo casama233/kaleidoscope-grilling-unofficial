@@ -64,3 +64,9 @@ item.kaleidoscope_grilling:premium_chili_oil_bucket.name=熔岩辣椒油桶
 
 item.kaleidoscope_grilling:unfinished_skewer.name=未完成烤串
 item.kaleidoscope_grilling:secret_skewer.name=秘制串
+
+item.kaleidoscope_grilling:skewer_plate.name=有烤串的盘子
+tile.kaleidoscope_grilling:skewer_plate.name=烤串盘
+tile.kaleidoscope_grilling:skewer_plate_block.name=烤串盘
+item.kaleidoscope_grilling:skewer_recipe_book.name=串谱
+tile.kaleidoscope_grilling:skewer_recipe.name=串谱
