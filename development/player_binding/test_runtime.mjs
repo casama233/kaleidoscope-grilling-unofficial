@@ -40,7 +40,7 @@ held('kg_imm:oil_brush','off');
 check('offhand brush is accepted only in calibrated stance',()=>{tap(a);assert.equal(a.props.get('kg_imm:action'),1);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.brush.off'));});
 tick(3);
 check('brush contact cue is delayed until pickup finishes',()=>assert.ok(player.sounds.some(x=>x.id==='kg_imm.grill_flip'&&x.tick>=9)));
-tick(23);held();
+tick(23);held();held(null,'off');
 for(let i=0;i<4;i++){tap(a);tick(14)}
 held('kg_imm:seasoning_bottle','main');
 check('mainhand seasoning binding runs',()=>{tap(a);assert.equal(a.props.get('kg_imm:action'),3);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.season.main'));});
