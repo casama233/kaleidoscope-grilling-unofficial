@@ -20,7 +20,7 @@ const player={id:'player1',isSneaking:false,selectedSlotIndex:0,dimension,locati
 };
 const world={afterEvents:events,getAllPlayers:()=>[player],getDimension:()=>dimension};
 const system={currentTick:0,run(f){f()},runInterval(f,interval){intervals.push({f,interval})}};
-function entity(id,z=1){const data=new Map(),props=new Map();return {id,typeId:'kg_imm:rehearsal',isValid:true,location:{x:0,y:0,z},dimension,props,getDynamicProperty:k=>data.get(k),setDynamicProperty:(k,v)=>data.set(k,v),setProperty:(k,v)=>props.set(k,v)}}
+function entity(id,z=1){const data=new Map(),props=new Map();return {id,typeId:'kg_imm:rehearsal',isValid:true,location:{x:0,y:0,z},dimension,props,data,getDynamicProperty:k=>data.get(k),setDynamicProperty:(k,v)=>data.set(k,v),setProperty:(k,v)=>props.set(k,v)}}
 const math=Object.create(Math);math.random=()=>.2;
 const ctx=vm.createContext({console:{warn:(...x)=>warnings.push(x)},Math:math,JSON,Map,Set,Object,Array,Number,String,Error,Boolean});
 const root=new URL('../../projects/grilling/integration/immersion_lab/behavior_pack/scripts/',import.meta.url);
@@ -54,6 +54,8 @@ check('end restores selector and helper hand',()=>{assert.equal(slots[0].typeId,
 const b=entity('b');spawn(b);tick(3);
 held();held(null,'off');tap(b);tick(3);tap(b);tick(3);held('kg_imm:oil_brush');tap(b);tick(26);held();for(let i=0;i<4;i++){tap(b);tick(14)}held('kg_imm:seasoning_bottle');tap(b);tick(16);held();tap(b);tick(3);
 held('kg_imm:eat_two','off');
+check('fresh stand reached taken phase',()=>assert.equal(JSON.parse(b.data.get('kg_imm:rehearsal_state')).phase,'taken'));
+check('selector resolves occupied offhand',()=>assert.equal(sources['player_binding.js'].namespace.selector(player).name,'off'));
 check('offhand eating uses left item/arm animation',()=>{tap(b);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
 player.isSneaking=true;tap(b);player.isSneaking=false;
 check('cancel restores offhand selector',()=>assert.equal(off.typeId,'kg_imm:eat_two'));
