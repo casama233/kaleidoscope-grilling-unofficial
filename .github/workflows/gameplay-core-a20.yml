@@ -1,9 +1,5 @@
 name: A2.0 Gameplay Core
 on:
-  push:
-    paths:
-      - '.github/workflows/gameplay-core-a20.yml'
-      - 'development/gameplay_core/**'
   workflow_dispatch:
 permissions:
   contents: write
