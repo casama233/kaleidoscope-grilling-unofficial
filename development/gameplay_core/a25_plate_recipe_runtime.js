@@ -176,15 +176,15 @@ function consumePlan(player,plan){
  for(const x of plan){const s=c.getItem(x.slot);if(!s||s.amount<x.count)return false}
  for(const x of plan){const s=c.getItem(x.slot);if(s.amount===x.count)c.setItem(x.slot,undefined);else{s.amount-=x.count;c.setItem(x.slot,s)}}return true;
 }
-function craftFromBook(player,book){
+function craftFromBook(player,book,stickHand='off'){
  const record=readBookRecord(book);if(!record){message(player,'§7這本烤串食譜尚未記錄配方');return false}
- const stick=heldOff(player);if(stick?.typeId!=='minecraft:stick'){message(player,'§e副手需要木棍');return false}
+ const stick=stickHand==='main'?heldMain(player):heldOff(player);if(stick?.typeId!=='minecraft:stick'){message(player,stickHand==='main'?'§e主手需要木棍':'§e副手需要木棍');return false}
  const slots=bookIngredientSlots(record);if(!slots)return false;
  const c=mainContainer(player),inventory=[];if(!c)return false;
  for(let i=0;i<c.size;i++){const s=c.getItem(i);inventory.push(s?{id:s.typeId,count:s.amount}:null)}
  const planned=planInventoryConsumption(inventory,slots,[player.selectedSlotIndex]);
  if(!planned.ok){message(player,'§c缺少配方材料：'+(planned.missing??[]).join('/'));return false}
- if(!consumePlan(player,planned.plan)||!decrementOff(player,1))return false;
+ if(!consumePlan(player,planned.plan)||!(stickHand==='main'?decrementMain(player,1):decrementOff(player,1)))return false;
  let output;
  if(record.resultId===SECRET_ID&&record.recordedStack){
   output=restoreStack(record.recordedStack);
@@ -221,7 +221,7 @@ function placeRecipeBlock(support,face,player,book){
 function handleRecipeBlock(block,player){
  if(!block||block.typeId!==RECIPE_BLOCK_ID)return;
  const row=readRecipeBlock(block),book=restoreStack(row),held=heldMain(player);
- if(held?.typeId==='minecraft:stick'&&book){craftFromBook(player,book);return}
+ if(held?.typeId==='minecraft:stick'&&book){craftFromBook(player,book,'main');return}
  if(held)return;
  clearRecipeBlock(block);block.setType('minecraft:air');if(book)give(player,book);
  try{block.dimension.playSound('random.pop',block.location,{volume:.6,pitch:.9})}catch{}
@@ -232,7 +232,12 @@ function breakRecipe(block,player){
 }
 
 world.beforeEvents.itemUse.subscribe(e=>{
- try{if(e.itemStack?.typeId!==BOOK_ID)return;e.cancel=true;const p=e.source,item=cloneOne(e.itemStack);system.run(()=>handleBookAir(p,item))}catch{}
+ try{
+  const id=e.itemStack?.typeId;
+  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(e.source,'§7空烤串盤不能食用');return}
+  if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(e.source))){e.cancel=true;const p=e.source;system.run(()=>convertCookeryRecipe(p));return}
+  if(id!==BOOK_ID)return;e.cancel=true;const p=e.source,item=cloneOne(e.itemStack);system.run(()=>handleBookAir(p,item));
+ }catch{}
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
@@ -258,6 +263,26 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  try{
   if(e.block.typeId===PLATE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakPlate(dim.getBlock(loc),p));return}
   if(e.block.typeId===RECIPE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakRecipe(dim.getBlock(loc),p));return}
+ }catch{}
+});
+function recipeSupport(block){
+ try{
+  const f=String(block.permutation.getState('minecraft:cardinal_direction')??'').toLowerCase(),op={north:{x:0,y:0,z:1},south:{x:0,y:0,z:-1},west:{x:1,y:0,z:0},east:{x:-1,y:0,z:0}}[f];
+  return op?blockAtOffset(block,op):undefined;
+ }catch{return undefined}
+}
+function detachUnsupportedRecipe(block){
+ if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const support=recipeSupport(block);if(support?.isSolid)return;
+ const row=readRecipeBlock(block),book=restoreStack(row),dim=block.dimension,loc={x:block.x+.5,y:block.y+.5,z:block.z+.5};
+ clearRecipeBlock(block);block.setType('minecraft:air');if(book)dim.spawnItem(book,loc);
+}
+world.afterEvents.playerBreakBlock.subscribe(e=>{
+ try{
+  const dim=e.block.dimension,loc={...e.block.location};system.run(()=>{
+   for(const off of [{x:1,y:0,z:0},{x:-1,y:0,z:0},{x:0,y:0,z:1},{x:0,y:0,z:-1}]){
+    const b=dim.getBlock({x:loc.x+off.x,y:loc.y,z:loc.z+off.z});if(b?.typeId===RECIPE_BLOCK_ID)detachUnsupportedRecipe(b);
+   }
+  });
  }catch{}
 });
 
