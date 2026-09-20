@@ -2,11 +2,35 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.0 Gameplay Core 已建立第一條正式可玩閉環；仍不是 Java 全模組完整移植。**
+**目前：A2.1 Gameplay Core 已補上 Cookery 油壺直連、完整調料資料、煙火氣與 Java Cookery 效果等價層；仍不是 Java 全模組完整移植。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
-## A2.0：正式 Gameplay Core
+## A2.1：油壺＋調料＋煙火氣＋效果等價層
+
+A2.1 把 A2.0「烤得熟」推進到「**用 Cookery 油壺刷油、自己配調料、趁熱吃並得到原作語義效果**」。
+
+- **[A2.1 可導入 Gameplay Core mcaddon](artifacts/Kaleidoscope_Grilling_A2.1_Gameplay_Core.mcaddon)**
+- **[A2.1 bridge. 工程](artifacts/Kaleidoscope_Grilling_A2.1_Gameplay_Core.brproject)**
+- **[A2.1 完成範圍、效果等價與差異](docs/STATUS-A2.1.md)**
+- **[成功 CI：38項行為驗證＋官方 Dash](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35489240344)**
+
+核心新增：
+
+- 直接識別 Cookery 1.0.6 的 `kaleidoscope_cookery:oil_pot_filled` 與 `kc_oil_count`，**每根串消耗1點油**。
+- 正式調料瓶方塊與六種調料材料；最多8份配料，基礎三料齊全後取回，**搖80 ticks**成 Special Seasoning。
+- Special Seasoning 共16次使用；爐上3串一次撒料就**消耗3次**，完整配料列表跟著熟串保存。
+- Hot Food 使用 `world.getAbsoluteTime()` 與100 tick分桶；熱著吃時**新Buff時長×2、飽和度×125%**，調料效果不再被二次翻倍。
+- Java Cookery 在 Bedrock 宿主中不存在的 Vigor / Warmth / Flatulence / Hinder / Projectile Dodge / Tundra Strider / Mustard / Sulfur / Preservation，按 Java 源碼做 Bedrock 語義等價層。
+- Heavy Metal、Heavy Metal Poisoning、Dragon Blood、Numb 調料進階效果開始工作。
+- 黃金串 Invincible 改用世界絕對時間；普通串恢復「消耗無敵＋50%格擋，否則致死」核心規則。
+- 19生＋19熟＋普通串，共 **39個正式3D手持 attachable**，不再只有GUI圖示。
+
+驗證：A2.0回歸 **16/16**、A2.1狀態 **4/4**、A2.1完整模擬 **18/18**，總計 **38/38**；官方 bridge. Dash v1.2.0 實際編譯 **257 files**，BP **60**、RP **197** 逐檔與真實輸出一致。
+
+**仍未做 Minecraft 26.51 客戶端／BDS 實機驗收。** Tundra Strider、Mustard、Sulfur、Dragon Blood、Numb 有明確的 Bedrock 引擎差異；詳細邊界見 A2.1 狀態頁。
+
+## A2.0：正式 Gameplay Core（歷史基線）
 
 A2.0 不再以 `kg_imm` 測試物代表玩法。新增正式 `kaleidoscope_grilling` BP/RP，以及真正具有 **3 個 BlockEntity 容器槽**的 `kaleidoscope_grilling:grill`。
 
@@ -92,6 +116,10 @@ node development/gameplay_core/test_core.mjs
 python development/gameplay_core/build.py
 node --experimental-vm-modules development/gameplay_core/test_runtime.mjs
 python development/gameplay_core/verify.py
+python development/gameplay_core/augment_a21.py
+node development/gameplay_core/test_a21_core.mjs
+node --experimental-vm-modules development/gameplay_core/test_a21_runtime.mjs
+python development/gameplay_core/verify_a21.py
 python -m pip install numpy==2.3.5 Pillow==12.3.0
 python projects/grilling/tools/build_assets.py
 python development/immersion/verify.py
@@ -114,12 +142,13 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 - [A1.15 沉浸動效驗收](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35455778472)
 - [A1.16 Cookery依賴＋六種玩家動畫驗收](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35484643707)
 - [A2.0 Gameplay Core 完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35487932877)
+- [A2.1 Cookery油壺／調料／煙火氣完整CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/35489240344)
 
 `migration/bootstrap.py`與`development/run_plants.py`是一次性搬遷工具，不應在既有工程上重複執行。日常主素材重建使用`tools/build_assets.py`；動效建置器只重建獨立驗收台，不覆蓋主RP或原指南。
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity 驗收、Cookery油壺與專屬效果、熱食與完整調味、餐盤與擺放、自由組合串、榨油／大缸／厨具架、真實流體與剩餘粒子效果、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+Minecraft實機下的 A2 烤爐／BlockEntity／手持3D驗收、正式逐口3D切換、Numb客戶端視覺、調料瓶四瓶物理堆疊、辣椒油／熔岩辣椒油真流體、餐盤與擺放、自由組合串、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
