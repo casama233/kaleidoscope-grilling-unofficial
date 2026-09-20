@@ -56,7 +56,7 @@ held();held(null,'off');tap(b);tick(3);tap(b);tick(3);held('kg_imm:oil_brush');t
 held('kg_imm:eat_two','off');
 check('fresh stand reached taken phase',()=>assert.equal(JSON.parse(b.data.get('kg_imm:rehearsal_state')).phase,'taken'));
 check('selector resolves occupied offhand',()=>assert.equal(sources['player_binding.js'].namespace.selector(player).name,'off'));
-check('offhand eating uses left item/arm animation',()=>{tap(b);if(!player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'))console.log('DIAG',JSON.stringify({warnings,state:JSON.parse(b.data.get('kg_imm:rehearsal_state')),off:off?.typeId,animations:player.animations.slice(-5)}));assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
+check('offhand eating uses left item/arm animation',()=>{tap(b);assert.ok(player.animations.some(x=>x.id==='animation.kg_imm.player.eat_two.off'));assert.equal(off.typeId,'kg_imm:visual_0');});
 player.isSneaking=true;tap(b);player.isSneaking=false;
 check('cancel restores offhand selector',()=>assert.equal(off.typeId,'kg_imm:eat_two'));
 held(null,'off');held('kg_imm:eat_four','main');tap(b);
