@@ -12,7 +12,7 @@ VERSION=[2,4,0]
 UP='https://raw.githubusercontent.com/breezeth-CN/KaleidoscopeGrilling/9a1acdab27698457bec16c9362678e574895a28c/'
 SECRET_TEXTURE=('common/src/main/resources/assets/kaleidoscope_grilling/textures/item/secret_skewer_stick.png','77321e269c440f5844cc48fe6456f92e0544d8ab')
 
-def blob(v):return hashlib.sha1(b'blob '+str(len(v)).encode()+b'\\0'+v).hexdigest()
+def blob(v):return hashlib.sha1(b'blob '+str(len(v)).encode()+bytes([0])+v).hexdigest()
 def fetch(path,sha):
     req=urllib.request.Request(UP+path,headers={'User-Agent':'Grilling-A2.4/1'})
     with urllib.request.urlopen(req,timeout=90) as r:v=r.read()
