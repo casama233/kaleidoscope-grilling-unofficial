@@ -1,5 +1,5 @@
 from __future__ import annotations
-import json, shutil
+import hashlib,json,shutil,urllib.request
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -9,6 +9,15 @@ BP=P/'behavior_pack'
 RP=P/'resource_pack'
 DEV=Path(__file__).parent
 VERSION=[2,4,0]
+UP='https://raw.githubusercontent.com/breezeth-CN/KaleidoscopeGrilling/9a1acdab27698457bec16c9362678e574895a28c/'
+SECRET_TEXTURE=('common/src/main/resources/assets/kaleidoscope_grilling/textures/item/secret_skewer_stick.png','77321e269c440f5844cc48fe6456f92e0544d8ab')
+
+def blob(v):return hashlib.sha1(b'blob '+str(len(v)).encode()+b'\\0'+v).hexdigest()
+def fetch(path,sha):
+    req=urllib.request.Request(UP+path,headers={'User-Agent':'Grilling-A2.4/1'})
+    with urllib.request.urlopen(req,timeout=90) as r:v=r.read()
+    if blob(v)!=sha:raise RuntimeError('pinned upstream mismatch '+path)
+    return v
 
 def load(path):
     return json.loads(path.read_text(encoding='utf-8-sig'))
@@ -87,10 +96,9 @@ def patch_items_and_assets():
     tex['texture_data']['unfinished_skewer']={'textures':'textures/items/unfinished_skewer'}
     tex['texture_data']['secret_skewer']={'textures':'textures/items/secret_skewer'}
     write(RP/'textures/item_texture.json',tex)
-    source=SRC/'source_snapshots/common/src/main/resources/assets/kaleidoscope_grilling/textures/item/secret_skewer_stick.png'
-    if not source.exists(): raise RuntimeError('pinned secret_skewer_stick texture missing')
+    texture_path,texture_sha=SECRET_TEXTURE;raw=fetch(texture_path,texture_sha)
     for name in ('unfinished_skewer','secret_skewer'):
-        shutil.copyfile(source,RP/f'textures/items/{name}.png')
+        (RP/f'textures/items/{name}.png').write_bytes(raw)
 
     labels={
         'zh_TW':('未完成烤串','秘制串'),
