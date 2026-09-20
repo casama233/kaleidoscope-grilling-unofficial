@@ -220,7 +220,8 @@ function placeSeasoningState(block,player){
     old=r""" if(e.block.typeId===SEASONING_BLOCK){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const b=dim.getBlock(loc);if(!b||b.typeId!==SEASONING_BLOCK)return;const list=readBottleBlock(b);writeBottleBlock(b,[]);b.setType('minecraft:air');if(!creative(p))b.dimension.spawnItem(seasoningBottleItem(list),{x:loc.x+.5,y:loc.y+.4,z:loc.z+.5})})}"""
     new=r""" if(isSeasoningBlock(e.block.typeId)){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const b=dim.getBlock(loc);if(!b||!isSeasoningBlock(b.typeId))return;const bottles=readBottleStack(b);writeBottleStack(b,[]);b.setType('minecraft:air');if(!creative(p))for(const data of bottles)b.dimension.spawnItem(bottleItem(data),{x:loc.x+.5,y:loc.y+.4,z:loc.z+.5})})}"""
     s=replace_once(s,old,new,'break bottle stack')
-    old=" for(const p of world.getAllPlayers()){try{\\n  writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');"
+    old=""" for(const p of world.getAllPlayers()){try{
+  writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');"""
     new=""" for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
   if(active){advanceBites(p,active);if(active.requested==='THREE_RANDOM'&&active.profile==='THREE_ALT'&&system.currentTick-active.start>=90){ACTIVE_EATS.delete(p.id);SETTLED.set(p.id,system.currentTick);stopEatSound(p,active.profile);if(hungerSettle(p,active.id,active))try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}}
