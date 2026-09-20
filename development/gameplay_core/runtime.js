@@ -8,21 +8,18 @@ const SETTLED=new Map();
 const MAX_GRILLS=256;
 
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
-function dyn(block){return block.getComponent('minecraft:dynamic_properties')}
+function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
+function stateKey(block){return 'kaleidoscope_grilling:g_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
 function inv(block){return block.getComponent('minecraft:inventory')?.container}
 function occupied(block){const c=inv(block);if(!c)return 0;let n=0;for(let i=0;i<3;i++)if(c.getItem(i))n++;return n}
 function readState(block){
- const d=dyn(block);if(!d)return initialState();
- const s=initialState();
- const fields={phase:'phase',phaseTicks:'ticks',flips:'flips',flipCooldown:'cooldown',seasoned:'seasoned',failed:'failed',heatTicks:'heat',lit:'lit'};
- for(const [field,key] of Object.entries(fields)){const v=d.get(key);if(v!==undefined)s[field]=v}
- return s;
+ const raw=world.getDynamicProperty(stateKey(block));if(raw===undefined)return initialState();
+ if(typeof raw!=='string')throw new Error('invalid persisted grill state');
+ const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('invalid persisted grill state');
+ return {...initialState(),...s};
 }
-function writeState(block,s){
- const d=dyn(block);if(!d)throw new Error('grill missing dynamic-properties component');
- d.set('phase',s.phase);d.set('ticks',s.phaseTicks);d.set('flips',s.flips);d.set('cooldown',s.flipCooldown);
- d.set('seasoned',s.seasoned);d.set('failed',s.failed);d.set('heat',s.heatTicks);d.set('lit',s.lit);
-}
+function writeState(block,s){world.setDynamicProperty(stateKey(block),JSON.stringify(s))}
+function clearState(block){world.setDynamicProperty(stateKey(block))}
 function key(block){const p=block.location;return [block.dimension.id,p.x,p.y,p.z].join('|')}
 function readRegistry(){try{const raw=world.getDynamicProperty(REGISTRY);return typeof raw==='string'?JSON.parse(raw):[]}catch{return []}}
 function saveRegistry(rows){world.setDynamicProperty(REGISTRY,JSON.stringify(rows.slice(0,MAX_GRILLS)))}
@@ -85,7 +82,7 @@ function customBreak(block,player){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;
  const state=readState(block),kind=breakDisposition(state),c=inv(block);
  if(c)for(let i=0;i<3;i++){const raw=c.getItem(i);if(raw)player.dimension.spawnItem(outputFor(raw,state,kind),{x:block.x+.5,y:block.y+.4,z:block.z+.5})}
- clearContainer(block);block.setType('minecraft:air');
+ clearContainer(block);clearState(block);block.setType('minecraft:air');
  if(!creative(player))player.dimension.spawnItem(new ItemStack(GRILL_ID,1),{x:block.x+.5,y:block.y+.3,z:block.z+.5});
 }
 function seasoningUse(player){
