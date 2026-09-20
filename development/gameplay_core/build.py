@@ -219,9 +219,10 @@ def main():
           'minecraft:max_stack_size':1,
           'minecraft:allow_off_hand':True,
           'minecraft:hand_equipped':True,
-          'minecraft:use_modifiers':{'use_duration':use_seconds,'movement_modifier':0.35},
+          'minecraft:use_modifiers':{'start_using':'always','use_duration':use_seconds,'movement_modifier':0.35},
           'minecraft:food':{'can_always_eat':item_id=='ordinary_skewer','nutrition':meta['nutrition'],'saturation_modifier':meta['saturation']},
-          'minecraft:use_animation':'eat'
+          'minecraft:use_animation':{'value':'eat'},
+          'minecraft:tags':{'tags':['minecraft:is_food']}
         }
         write(item_dir/f'{item_id}.json',{
           'format_version':'1.26.30',
