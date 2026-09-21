@@ -7,7 +7,7 @@ export const MAX_AGE=7;
 export const FARMLAND_MIN_SURVIVAL_LIGHT=8;
 export const MIN_GROWTH_LIGHT=9;
 export const RED_PLACEMENT_CHANCE=0.3;
-export const MATURE_BONUS_PROBABILITY=4/7;
+export const MATURE_BONUS_PROBABILITY=0.5714286;
 
 function clamp01(v){
  const n=Number(v);
