@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.2 Gameplay",
+  "name": "Kaleidoscope Grilling A2.7.3 Render/Runtime Stabilization",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_2"
+          "packName": "Kaleidoscope_Grilling_A2_7_3_Stabilized"
         }
       ]
     ]

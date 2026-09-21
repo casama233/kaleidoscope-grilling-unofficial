@@ -1,0 +1,86 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grill_legs",
+      "states": {
+        "kaleidoscope_grilling:direction": [
+          "north",
+          "south",
+          "west",
+          "east"
+        ]
+      }
+    },
+    "components": {
+      "minecraft:geometry": "geometry.kg_a273.grill_legs",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kg_a23_grill_unlit",
+          "render_method": "alpha_test",
+          "ambient_occlusion": 1.0,
+          "face_dimming": true
+        }
+      },
+      "minecraft:collision_box": false,
+      "minecraft:selection_box": false,
+      "minecraft:replaceable": {},
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.05
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 0
+      }
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:direction') == 'north'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:direction') == 'south'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              180,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:direction') == 'west'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              90,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:direction') == 'east'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              270,
+              0
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

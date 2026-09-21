@@ -11,6 +11,7 @@ import './a271_sweet_potato_runtime.js';
 import './a272_cookery_processing_runtime.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
+const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
 const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();
 const MAX_GRILLS=256;
 const COOKERY_POT='kaleidoscope_cookery:oil_pot',COOKERY_FILLED='kaleidoscope_cookery:oil_pot_filled',COOKERY_OIL_KEY='kc_oil_count';
@@ -62,9 +63,27 @@ function readState(block){
  if(typeof raw!=='string')throw new Error('invalid persisted grill state');
  return normalizeState(JSON.parse(raw));
 }
+function grillDirection(block){
+ try{const d=String(block.permutation.getState('minecraft:cardinal_direction')??'north');return ['north','south','west','east'].includes(d)?d:'north'}catch{return 'north'}
+}
+function removeGrillLegs(block){
+ try{const below=block.below();if(below?.typeId===GRILL_LEGS_ID)below.setType('minecraft:air')}catch{}
+}
+function ensureGrillLegs(block){
+ try{
+  const below=block.below();if(!below)return false;
+  if(below.typeId!==GRILL_LEGS_ID&&below.typeId!=='minecraft:air')return false;
+  if(below.typeId==='minecraft:air')below.setType(GRILL_LEGS_ID);
+  let p=below.permutation,dir=grillDirection(block);
+  if(p.getState('kaleidoscope_grilling:direction')!==dir)p=p.withState('kaleidoscope_grilling:direction',dir);
+  below.setPermutation(p);return true;
+ }catch{return false}
+}
 function syncGrillPermutation(block,state){
  try{
-  let perm=block.permutation,below=block.below(),legged=!(below?.isSolid??false),lit=!!state.lit;
+  let below=block.below(),helper=below?.typeId===GRILL_LEGS_ID,supported=!helper&&(below?.isSolid??false),legged=!supported,lit=!!state.lit;
+  if(legged)ensureGrillLegs(block);else removeGrillLegs(block);
+  let perm=block.permutation;
   if(perm.getState('kaleidoscope_grilling:legged')!==legged)perm=perm.withState('kaleidoscope_grilling:legged',legged);
   if(perm.getState('kaleidoscope_grilling:lit')!==lit)perm=perm.withState('kaleidoscope_grilling:lit',lit);
   block.setPermutation(perm);
@@ -241,7 +260,7 @@ function extract(block,player,all=false){
 function customBreak(block,player){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;const state=readState(block),kind=breakDisposition(state),c=inv(block);
  if(c)for(let i=0;i<3;i++){const raw=c.getItem(i);if(raw)player.dimension.spawnItem(outputFor(raw,state,kind),{x:block.x+.5,y:block.y+.4,z:block.z+.5})}
- clearContainer(block);clearState(block);block.setType('minecraft:air');
+ clearContainer(block);clearState(block);removeGrillLegs(block);block.setType('minecraft:air');
  if(!creative(player))player.dimension.spawnItem(new ItemStack(GRILL_ID,1),{x:block.x+.5,y:block.y+.3,z:block.z+.5});
 }
 function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'');return Object.hasOwn(OIL_TYPES,type)?type:''}catch{return ''}}
@@ -484,7 +503,7 @@ function repelPhantoms(player){
 function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecraft:ice','minecraft:packed_ice','minecraft:frosted_ice'].includes(id))return 1.11;return 1.3}
 system.runInterval(()=>{
  const rows=readRegistry(),keep=[];
- for(const row of rows){try{const block=world.getDimension(row.d).getBlock({x:row.x,y:row.y,z:row.z});if(!block||block.typeId!==GRILL_ID)continue;keep.push(row);let state=readState(block),before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){const count=1+Math.floor(Math.random()*2);clearContainer(block);block.dimension.spawnItem(new ItemStack('minecraft:charcoal',count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});writeState(block,state);continue}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeState(block,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch{}}
+ for(const row of rows){try{const dim=world.getDimension(row.d),block=dim.getBlock({x:row.x,y:row.y,z:row.z});if(!block||block.typeId!==GRILL_ID){const helper=dim.getBlock({x:row.x,y:row.y-1,z:row.z});if(helper?.typeId===GRILL_LEGS_ID)helper.setType('minecraft:air');continue}keep.push(row);let state=readState(block),before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){const count=1+Math.floor(Math.random()*2);clearContainer(block);block.dimension.spawnItem(new ItemStack('minecraft:charcoal',count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});writeState(block,state);continue}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeState(block,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch{}}
  if(keep.length!==rows.length)saveRegistry(keep);
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);

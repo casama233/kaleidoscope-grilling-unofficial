@@ -107,7 +107,7 @@
       {
         "condition": "q.block_state('kaleidoscope_grilling:legged') == true && q.block_state('kaleidoscope_grilling:lit') == false",
         "components": {
-          "minecraft:geometry": "geometry.kg_a23.grill_legged",
+          "minecraft:geometry": "geometry.kg_a23.grill_flat",
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_unlit",
@@ -122,7 +122,7 @@
       {
         "condition": "q.block_state('kaleidoscope_grilling:legged') == true && q.block_state('kaleidoscope_grilling:lit') == true",
         "components": {
-          "minecraft:geometry": "geometry.kg_a23.grill_legged_lit",
+          "minecraft:geometry": "geometry.kg_a23.grill_flat_lit",
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_lit",

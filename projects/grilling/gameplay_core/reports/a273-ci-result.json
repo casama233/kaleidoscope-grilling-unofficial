@@ -1,0 +1,13 @@
+{
+  "version": "A2.7.3",
+  "tested_commit": "a15eed5dc34ad1838f7acb9dccee1fc26e790fc5",
+  "run_id": "35558635491",
+  "scope": "render/runtime stabilization after user engine screenshots",
+  "formal_ui_icons": 41,
+  "grill_helper_block": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "74aeb7fe845f8d0de51c75bc56aa7c2ff36550fcf2551bb1df302f9b381a88f7",
+  "brproject_sha256": "0d83b672a1ae2d7594fa07cab528a023bb4b23c7b762f31468abd591bd9d0ae3",
+  "minecraft_tested_after_fix": false,
+  "bds_tested_after_fix": false
+}
