@@ -1,8 +1,8 @@
-import {system,ItemStack,EquipmentSlot} from '@minecraft/server';
+import {system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
 import {
  CROP_ID,HOUTTUYNIA_ID,COMPONENT_ID,AGE_STATE,RED_STATE,MAX_AGE,
  placementRedVariant,canCropSurvive,bonemealAgeIncrease,
- javaCropGrowthSpeed,shouldAdvanceAge
+ javaCropGrowthSpeed,shouldAdvanceAge,matureBonusCount
 } from './a2714_houttuynia_crop_core.js';
 
 function at(dimension,location,dx=0,dy=0,dz=0){
@@ -57,7 +57,7 @@ function boneMealSlot(player){
  return undefined;
 }
 function creative(player){
- try{return String(player.getGameMode?.()??'').toLowerCase().includes('creative')}catch{return false}
+ try{return player.getGameMode?.()===GameMode.Creative}catch{return false}
 }
 function consumeBoneMeal(player,entry){
  if(!entry||creative(player))return;
@@ -84,8 +84,10 @@ system.beforeEvents.startup.subscribe(init=>{
     const block=event.block,below=at(event.dimension,block.location,0,-1,0);
     const light=lightAt(event.dimension,block.location);
     if(!canCropSurvive(below?.typeId??'',light)){
+     const age=Number(state(block,AGE_STATE,0))||0;
+     const count=age>=MAX_AGE?1+matureBonusCount(0,[Math.random()]):1;
      event.dimension.setBlockType(block.location,'minecraft:air');
-     event.dimension.spawnItem(new ItemStack(HOUTTUYNIA_ID,1),{x:block.location.x+.5,y:block.location.y+.25,z:block.location.z+.5});
+     event.dimension.spawnItem(new ItemStack(HOUTTUYNIA_ID,count),{x:block.location.x+.5,y:block.location.y+.25,z:block.location.z+.5});
      return;
     }
     const age=Number(state(block,AGE_STATE,0))||0;
