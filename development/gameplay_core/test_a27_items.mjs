@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {A27_ITEMS,itemIds,foodSpec,effectsFor,stackSizeFor,qualityAware,kneadResult,deferredPlantBlock} from './a27_items_core.js';
+import {A27_ITEMS,itemIds,foodSpec,effectsFor,stackSizeFor,qualityAware,kneadResult,deferredPlantBlock,qualityRatioFromId,qualityFood} from './a27_items_core.js';
 let n=0;const t=(name,fn)=>{fn();n++;console.log('PASS',name)};
 
 t('exactly 27 missing Java registry items are covered',()=>assert.equal(A27_ITEMS.length,27));
@@ -33,6 +33,11 @@ t('quality-aware cuisine scales effect duration, wedding candy does not',()=>{
  assert.equal(effectsFor('kaleidoscope_grilling:wedding_candy',2)[0].ticks,300);
 });
 t('eleven Java CuisineQualitySupport items are marked',()=>assert.equal(itemIds().filter(qualityAware).length,11));
+t('Cookery Java quality IDs map to exact ratios',()=>assert.deepEqual([0,1,2,3].map(qualityRatioFromId),[1.2,.9,.6,.3]));
+t('quality scales both nutrition and saturation modifier',()=>{
+ assert.deepEqual(qualityFood('kaleidoscope_grilling:pepper_honey',0),{nutrition:5,saturation:.3});
+ assert.deepEqual(qualityFood('kaleidoscope_grilling:pepper_honey',3),{nutrition:1,saturation:.075});
+});
 t('sweet potato powder kneads the entire stack after 30 ticks',()=>assert.deepEqual(kneadResult('kaleidoscope_grilling:sweet_potato_powder',17),{id:'kaleidoscope_grilling:raw_sweet_potato_sheet',count:17,ticks:30,animation:'bow'}));
 t('crop-linked items are explicit but planting is deferred to A2.8',()=>{
  assert.equal(deferredPlantBlock('kaleidoscope_grilling:canola_seeds'),'kaleidoscope_grilling:canola_crop');
