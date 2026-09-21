@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.22",
+  "tested_commit": "74c02cc80b0d04ca6a32c4e6fdfe1c960a2ad16f",
+  "run_id": "35598009706",
+  "incremental_from_published_a2721": true,
+  "cold_houttuynia_item": true,
+  "scripted_crafting_equivalent": true,
+  "houttuynia_used": 3,
+  "premium_chili_oil_points_used": 2,
+  "base_fire_resistance_ticks": 1200,
+  "crafting_grid_surface_exact": false,
+  "cuisine_quality_scaling_ported": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "d2b6b2c6abcf6b4c5d95a76bc582c9d9f2807e72afee7a401e13ac745b7f4672",
+  "brproject_sha256": "2cba6672d8d6f11efdcfff2f6bdf0fc2a56711663bb00788ec52116eae32fd43",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -238,6 +238,9 @@
     },
     "roasted_chicken_wing": {
       "textures": "textures/items/roasted_chicken_wing"
+    },
+    "cold_houttuynia": {
+      "textures": "textures/items/cold_houttuynia"
     }
   }
 }

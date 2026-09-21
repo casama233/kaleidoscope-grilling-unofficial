@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.21 Roasted Chicken Wing",
+  "name": "Kaleidoscope Grilling A2.7.22 Cold Houttuynia",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_21_Roasted_Chicken_Wing"
+          "packName": "Kaleidoscope_Grilling_A2_7_22_Cold_Houttuynia"
         }
       ]
     ]

@@ -1,0 +1,45 @@
+{
+  "version": "A2.7.22",
+  "scope": "Cold Houttuynia item + exact ingredient/oil semantics + Fire Resistance",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:cold_houttuynia",
+    "nutrition": 6,
+    "saturation_modifier": 1.0,
+    "base_effect": "minecraft:fire_resistance",
+    "base_effect_ticks": 1200,
+    "texture_git_blob_sha1": "98d59596cc06892e78d6d90d3e8ed2303151f841"
+  },
+  "java_recipe": {
+    "custom_serializer": "kaleidoscope_grilling:cold_houttuynia",
+    "houttuynia_tag_resolves_to": [
+      "kaleidoscope_grilling:houttuynia"
+    ],
+    "houttuynia_count": 3,
+    "oil_type": "premium_chili",
+    "oil_points": 2,
+    "occupied_slots": 4
+  },
+  "bedrock_recipe_equivalent": {
+    "surface": "sneak + interact crafting table; main hand >=3 Houttuynia; offhand Cookery premium chili oil pot",
+    "native_recipe_json_used": false,
+    "ingredient_count_exact": true,
+    "oil_type_exact": true,
+    "partial_oil_consumption_exact": true,
+    "zero_oil_returns_empty_pot": true,
+    "crafting_grid_surface_exact": false
+  },
+  "effect": {
+    "native_food_consumption_preserved": true,
+    "base_fire_resistance_1200_ticks": true,
+    "cuisine_quality_duration_scaling_ported": false,
+    "maxim_tooltip_ported": false
+  },
+  "survival_chain": {
+    "houttuynia_crop_and_processing": "A2.7.13-A2.7.14",
+    "premium_chili_oil_world_and_pot_support": "A2.3/A2.6",
+    "cold_houttuynia_obtainable_in_survival": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}
