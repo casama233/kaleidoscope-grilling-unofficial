@@ -1,8 +1,8 @@
-// Generated A1.13 player-facing Cookery guide extension.
+// Generated A1.14 localized Cookery guide extension.
 export const GUIDE_PAYLOAD = {
   "api": 1,
   "id": "kg_a1:grilling",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "order": 300,
   "icon": "textures/ui/kg_grilling/guide_grill",
   "titleKey": "title",
@@ -43,8 +43,8 @@ export const GUIDE_PAYLOAD = {
       "kinds": [],
       "mechanics": [
         "燒烤架一次最多放 3 串。先點火，再放入生串。",
-        "刷油後翻面 4 次；需要調料時，在出爐前把特製調料撒到烤串上。",
-        "烤好後要及時取出；放太久會先過熟，繼續加熱最後會燒成木炭。"
+        "刷油後翻面 4 次；需要調料時，在出爐前撒上特製調料。",
+        "烤好後及時取出；繼續加熱會過熟，最後會燒成木炭。"
       ]
     },
     {
@@ -53,8 +53,8 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_threading",
       "kinds": [],
       "mechanics": [
-        "副手拿木棍或未完成烤串，主手拿可穿串的食材，使用即可逐份穿入。",
-        "每串最多 3 份食材；符合固定配方時會完成對應生串，否則可做成秘製烤串。",
+        "副手拿木棍或未完成烤串，主手拿可穿串食材，使用即可逐份穿入。",
+        "每串最多 3 份食材；固定組合會完成對應生串，否則可做成秘製烤串。",
         "潛行時可拆解尚未烤熟的手工串，取回食材與木棍。"
       ]
     },
@@ -66,7 +66,7 @@ export const GUIDE_PAYLOAD = {
       "mechanics": [
         "烤串盤最多收納 5 串。手持烤串對盤使用可放入，空手使用會取回最後放入的一串。",
         "手持有內容的盤子潛行放置，可把整盤擺到實心方塊或森羅物語桌子上。",
-        "直接食用盤子時會先吃掉盤中飽食度最高的一串；剩餘內容會繼續保存在盤中。"
+        "直接食用盤子時會先吃掉盤中飽食度最高的一串。"
       ]
     },
     {
@@ -75,8 +75,8 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_crops",
       "kinds": [],
       "mechanics": [
-        "目前可種植並採收油菜、魚腥草、洋蔥與紅薯；成熟作物可接到各自加工鏈。",
-        "油菜可製油餅並榨成菜籽油；魚腥草、洋蔥與紅薯可繼續切碎、研磨或烹調。",
+        "可種植並採收油菜、折耳根、洋蔥與番薯；成熟作物可繼續進入加工鏈。",
+        "油菜可製油餅並榨成菜籽油；折耳根、洋蔥與番薯可繼續切碎、研磨或烹調。",
         "Cookery 的紅辣椒可用磨石加工成紅辣椒粉，再用於製作辣椒油。"
       ]
     },
@@ -86,8 +86,8 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_oil",
       "kinds": [],
       "mechanics": [
-        "榨油器最多放 4 個油餅。裝滿後用鐵砧或可壓榨石反覆敲擊，進度完成會輸出菜籽油與油渣。",
-        "附近有可接收的大缸時，菜籽油會優先灌入大缸；大缸容量為 8 桶，同一時間只保存一種流體。",
+        "榨油器最多放 4 個油餅。裝滿後用鐵砧或可壓榨石反覆敲擊，完成後輸出菜籽油與油渣。",
+        "附近有可接收的大缸時，菜籽油會優先灌入大缸；大缸容量為 8 桶且一次只保存一種流體。",
         "大缸可保存水、熔岩與三種煙火油，也能把煙火油直接灌入 Cookery 油壺。"
       ]
     },
@@ -97,9 +97,9 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_recipe_book",
       "kinds": [],
       "mechanics": [
-        "主手拿空串譜、副手拿完整生串，使用即可記錄該串配方；被記錄的生串不會被消耗。",
+        "主手拿空串譜、副手拿完整生串，使用即可記錄該配方；生串不會被消耗。",
         "已記錄的串譜配合副手木棍使用，會從背包按配方取料並自動製作。",
-        "已記錄的串譜還可以貼到方塊側面；拿木棍對牆上的串譜使用也能快速製作。"
+        "已記錄的串譜也可貼到方塊側面；拿木棍對牆上的串譜使用即可快速製作。"
       ]
     },
     {
@@ -309,7 +309,7 @@ export const GUIDE_PAYLOAD = {
       "kinds": [],
       "mechanics": [
         "特製調料的基礎三料是青辣椒粉、花椒與洋蔥粉；三種都放入後才能搖勻完成。",
-        "調料瓶最多記錄 8 份材料，完成後可使用 16 次；不同附加材料會改變趁熱食用時得到的效果。"
+        "調料瓶最多記錄 8 份材料，完成後可使用 16 次。"
       ]
     },
     {
@@ -318,7 +318,7 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/items/redstone_dust",
       "kinds": [],
       "mechanics": [
-        "紅石提供速度效果；同種材料堆得更多時，效果強度會提升。"
+        "紅石提供速度效果；堆疊更多同種材料時強度會提升。"
       ]
     },
     {
@@ -327,7 +327,7 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/items/gunpowder",
       "kinds": [],
       "mechanics": [
-        "火藥提供力量效果；同種材料堆得更多時，效果強度會提升。"
+        "火藥提供力量效果；堆疊更多同種材料時強度會提升。"
       ]
     },
     {
@@ -336,7 +336,7 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_houttuynia_powder",
       "kinds": [],
       "mechanics": [
-        "魚腥草粉用來延長調料效果時間；加入 1 份會延長，加入 4 份以上時延長幅度更高。"
+        "折耳根粉用於延長調料效果時間；加入 1 份會延長，加入 4 份以上時延長幅度更高。"
       ]
     },
     {
@@ -345,13 +345,13 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_totem_powder",
       "kinds": [],
       "mechanics": [
-        "圖騰粉提供一次重金屬保命效果；受到致命傷時可保住生命，之後會進入重金屬中毒狀態。"
+        "不死圖騰粉提供一次重金屬保命效果；受到致命傷時可保住生命，之後會進入重金屬中毒狀態。"
       ]
     },
     {
       "id": "kg_a1:guide_seasoning_dragon",
       "category": "seasonings",
-      "icon": "textures/ui/kg_grilling/guide_dragon_egg_powder",
+      "icon": "textures/ui/kg_grilling/guide_dragon_powder",
       "kinds": [],
       "mechanics": [
         "龍蛋粉提供龍血效果，提高生命上限並提供額外傷害吸收。"
@@ -363,7 +363,7 @@ export const GUIDE_PAYLOAD = {
       "icon": "textures/ui/kg_grilling/guide_sichuan_pepper",
       "kinds": [],
       "mechanics": [
-        "花椒同時是基礎三料之一；花椒累積到 4 份以上時，趁熱食用會觸發麻木效果。"
+        "花椒也是基礎三料之一；花椒累積到 4 份以上時，趁熱食用會觸發麻木效果。"
       ]
     }
   ],
@@ -375,13 +375,6 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_crops": "作物与加工",
       "kg_a1:guide_oil": "榨油器与大缸",
       "kg_a1:guide_recipe_book": "串谱与快速制作",
-      "kg_a1:guide_seasoning_base": "特制调料基础",
-      "kg_a1:guide_seasoning_redstone": "红石",
-      "kg_a1:guide_seasoning_gunpowder": "火药",
-      "kg_a1:guide_seasoning_houttuynia": "鱼腥草粉",
-      "kg_a1:guide_seasoning_totem": "图腾粉",
-      "kg_a1:guide_seasoning_dragon": "龙蛋粉",
-      "kg_a1:guide_seasoning_pepper": "花椒",
       "kg_a1:guide_recipe_beef": "牛肉串",
       "kg_a1:guide_recipe_pork_belly": "五花肉串",
       "kg_a1:guide_recipe_chicken_skin": "鸡皮串",
@@ -401,7 +394,14 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_recipe_gluten": "面筋串",
       "kg_a1:guide_recipe_lamb": "羊肉串",
       "kg_a1:guide_recipe_golden": "黄金烤串",
-      "kg_a1:guide_recipe_ordinary": "“普通”烤串"
+      "kg_a1:guide_recipe_ordinary": "“普通”烤串",
+      "kg_a1:guide_seasoning_base": "特制调料基础",
+      "kg_a1:guide_seasoning_redstone": "红石",
+      "kg_a1:guide_seasoning_gunpowder": "火药",
+      "kg_a1:guide_seasoning_houttuynia": "折耳根粉",
+      "kg_a1:guide_seasoning_totem": "不死图腾粉",
+      "kg_a1:guide_seasoning_dragon": "龙蛋粉",
+      "kg_a1:guide_seasoning_pepper": "花椒"
     },
     "zh_TW": {
       "kg_a1:guide_grill": "燒烤架",
@@ -410,33 +410,33 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_crops": "作物與加工",
       "kg_a1:guide_oil": "榨油器與大缸",
       "kg_a1:guide_recipe_book": "串譜與快速製作",
-      "kg_a1:guide_seasoning_base": "特製調料基礎",
-      "kg_a1:guide_seasoning_redstone": "紅石",
-      "kg_a1:guide_seasoning_gunpowder": "火藥",
-      "kg_a1:guide_seasoning_houttuynia": "魚腥草粉",
-      "kg_a1:guide_seasoning_totem": "圖騰粉",
-      "kg_a1:guide_seasoning_dragon": "龍蛋粉",
-      "kg_a1:guide_seasoning_pepper": "花椒",
       "kg_a1:guide_recipe_beef": "牛肉串",
       "kg_a1:guide_recipe_pork_belly": "五花肉串",
-      "kg_a1:guide_recipe_chicken_skin": "鸡皮串",
+      "kg_a1:guide_recipe_chicken_skin": "雞皮串",
       "kg_a1:guide_recipe_mid_wing": "中翅串",
-      "kg_a1:guide_recipe_squid_tentacle": "鱿鱼须串",
-      "kg_a1:guide_recipe_fish": "鱼串",
+      "kg_a1:guide_recipe_squid_tentacle": "魷魚鬚串",
+      "kg_a1:guide_recipe_fish": "魚串",
       "kg_a1:guide_recipe_sweet_potato_sheet": "苕皮串",
-      "kg_a1:guide_recipe_potato_slice": "土豆片串",
-      "kg_a1:guide_recipe_caterpillar": "猪儿虫串",
+      "kg_a1:guide_recipe_potato_slice": "馬鈴薯片串",
+      "kg_a1:guide_recipe_caterpillar": "豬兒蟲串",
       "kg_a1:guide_recipe_mushroom": "蘑菇串",
-      "kg_a1:guide_recipe_bun_slice": "馒头片串",
+      "kg_a1:guide_recipe_bun_slice": "饅头片串",
       "kg_a1:guide_recipe_ender_pearl": "末影珍珠串",
       "kg_a1:guide_recipe_meatball": "丸子串",
       "kg_a1:guide_recipe_slime": "黏液串",
-      "kg_a1:guide_recipe_meat_and_bone": "骨肉相连串",
+      "kg_a1:guide_recipe_meat_and_bone": "骨肉相連串",
       "kg_a1:guide_recipe_fried_egg": "煎蛋串",
-      "kg_a1:guide_recipe_gluten": "面筋串",
+      "kg_a1:guide_recipe_gluten": "麵筋串",
       "kg_a1:guide_recipe_lamb": "羊肉串",
-      "kg_a1:guide_recipe_golden": "黄金烤串",
-      "kg_a1:guide_recipe_ordinary": "“普通”烤串"
+      "kg_a1:guide_recipe_golden": "黃金烤串",
+      "kg_a1:guide_recipe_ordinary": "“普通”烤串",
+      "kg_a1:guide_seasoning_base": "特製調料基礎",
+      "kg_a1:guide_seasoning_redstone": "紅石",
+      "kg_a1:guide_seasoning_gunpowder": "火藥",
+      "kg_a1:guide_seasoning_houttuynia": "折耳根粉",
+      "kg_a1:guide_seasoning_totem": "不死圖騰粉",
+      "kg_a1:guide_seasoning_dragon": "龍蛋粉",
+      "kg_a1:guide_seasoning_pepper": "花椒"
     },
     "en_US": {
       "kg_a1:guide_grill": "Grill",
@@ -445,13 +445,6 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_crops": "Crops & processing",
       "kg_a1:guide_oil": "Oil press & large vat",
       "kg_a1:guide_recipe_book": "Skewer recipe book",
-      "kg_a1:guide_seasoning_base": "Special seasoning basics",
-      "kg_a1:guide_seasoning_redstone": "Redstone",
-      "kg_a1:guide_seasoning_gunpowder": "Gunpowder",
-      "kg_a1:guide_seasoning_houttuynia": "Houttuynia Powder",
-      "kg_a1:guide_seasoning_totem": "Totem Powder",
-      "kg_a1:guide_seasoning_dragon": "Dragon Egg Powder",
-      "kg_a1:guide_seasoning_pepper": "Sichuan Pepper",
       "kg_a1:guide_recipe_beef": "Beef Skewer",
       "kg_a1:guide_recipe_pork_belly": "Pork Belly Skewer",
       "kg_a1:guide_recipe_chicken_skin": "Chicken Skin Skewer",
@@ -471,7 +464,14 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_recipe_gluten": "Gluten Skewer",
       "kg_a1:guide_recipe_lamb": "Lamb Skewer",
       "kg_a1:guide_recipe_golden": "Golden Skewer",
-      "kg_a1:guide_recipe_ordinary": "\"Ordinary\" Skewer"
+      "kg_a1:guide_recipe_ordinary": "\"Ordinary\" Skewer",
+      "kg_a1:guide_seasoning_base": "Special seasoning basics",
+      "kg_a1:guide_seasoning_redstone": "Redstone",
+      "kg_a1:guide_seasoning_gunpowder": "Gunpowder",
+      "kg_a1:guide_seasoning_houttuynia": "Houttuynia Powder",
+      "kg_a1:guide_seasoning_totem": "Totem Powder",
+      "kg_a1:guide_seasoning_dragon": "Dragon Egg Powder",
+      "kg_a1:guide_seasoning_pepper": "Sichuan Pepper"
     }
   },
   "text": {
@@ -481,7 +481,7 @@ export const GUIDE_PAYLOAD = {
       "all": "全部条目",
       "select": "选择一个主题。",
       "back": "返回",
-      "language_note": "不同烤串、油料与调料会有不同效果。",
+      "language_note": "语言会跟随森罗物语指南设置。",
       "how_to": "玩法与取得方式",
       "recipes": "烤串食谱",
       "seasonings": "调料与效果"
@@ -492,7 +492,7 @@ export const GUIDE_PAYLOAD = {
       "all": "全部條目",
       "select": "選擇一個主題。",
       "back": "返回",
-      "language_note": "不同烤串、油料與調料會有不同效果。",
+      "language_note": "語言會跟隨森羅物語指南設定。",
       "how_to": "玩法與取得方式",
       "recipes": "烤串食譜",
       "seasonings": "調料與效果"
@@ -503,7 +503,7 @@ export const GUIDE_PAYLOAD = {
       "all": "All entries",
       "select": "Choose a topic.",
       "back": "Back",
-      "language_note": "Different skewers, oils, and seasonings have different effects.",
+      "language_note": "Language follows the Kaleidoscope Cookery guide setting.",
       "how_to": "Getting started",
       "recipes": "Skewer recipes",
       "seasonings": "Seasonings & effects"

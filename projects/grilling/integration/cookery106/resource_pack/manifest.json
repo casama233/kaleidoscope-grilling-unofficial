@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A1.13 — PLAYER GUIDE RP",
-    "description": "Player-facing Grilling guide icons for the existing Cookery 1.0.6 guidebook.",
+    "name": "Grilling Guide A1.14 — LOCALIZED GUIDE RP",
+    "description": "Language source files and guide icons for the existing Cookery 1.0.6 guidebook.",
     "uuid": "32baef08-6b04-5115-9d5b-2d4ba2d3a7b4",
     "version": [
       0,
       1,
-      13
+      14
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        13
+        14
       ]
     }
   ],

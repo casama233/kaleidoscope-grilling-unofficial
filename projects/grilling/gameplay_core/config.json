@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.27 Cookery Host Reuse",
+  "name": "Kaleidoscope Grilling A2.7.28 Localization",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_27_Cookery_Host_Reuse"
+          "packName": "Kaleidoscope_Grilling_A2_7_28_Localization"
         }
       ]
     ]

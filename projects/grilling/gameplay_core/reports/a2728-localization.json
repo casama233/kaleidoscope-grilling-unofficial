@@ -1,0 +1,27 @@
+{
+  "version": "A2.7.28",
+  "scope": "language file normalization only",
+  "language_keys": 96,
+  "languages": [
+    "zh_CN",
+    "zh_TW",
+    "en_US"
+  ],
+  "equal_key_sets": true,
+  "zh_cn_java_terminology_fixes": [
+    "绿辣椒粉",
+    "折耳根粉",
+    "不死图腾粉",
+    "折耳根"
+  ],
+  "zh_tw_generated_from_corrected_zh_cn_then_overridden": true,
+  "zh_tw_semantic_overrides": [
+    "馬鈴薯片",
+    "番薯",
+    "不死圖騰粉",
+    "青辣椒粉"
+  ],
+  "gameplay_logic_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

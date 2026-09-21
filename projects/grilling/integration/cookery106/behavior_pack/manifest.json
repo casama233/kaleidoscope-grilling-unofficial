@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A1.13 — PLAYER GUIDE BP",
-    "description": "Adds the player-facing Kaleidoscope Grilling chapter to the existing Cookery 1.0.6 guidebook.",
+    "name": "Grilling Guide A1.14 — LOCALIZED GUIDE BP",
+    "description": "Localized Grilling chapter for the existing Cookery 1.0.6 guidebook.",
     "uuid": "f8c367c2-84d6-5bf6-b5a8-1bbe6cdb93ab",
     "version": [
       0,
       1,
-      13
+      14
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        13
+        14
       ],
       "language": "javascript",
       "entry": "scripts/main.js"
@@ -44,7 +44,7 @@
       "version": [
         0,
         1,
-        13
+        14
       ]
     }
   ]

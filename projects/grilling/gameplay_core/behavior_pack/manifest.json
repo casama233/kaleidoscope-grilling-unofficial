@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.7.27 Cookery Host Reuse BP",
+    "name": "Kaleidoscope Grilling A2.7.28 Localization BP",
     "description": "逐口3D、四瓶調料堆疊與Numb動作；需要 Cookery 1.0.6",
     "uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
     "version": [
       2,
       7,
-      27
+      28
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         7,
-        27
+        28
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         2,
         7,
-        27
+        28
       ]
     }
   ],
@@ -43,7 +43,7 @@
       "version": [
         2,
         7,
-        27
+        28
       ]
     },
     {
