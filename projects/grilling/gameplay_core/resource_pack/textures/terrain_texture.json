@@ -40,6 +40,18 @@
     },
     "kg_a25_recipe": {
       "textures": "textures/blocks/skewer_recipe"
+    },
+    "kg_a26_oil_press": {
+      "textures": "textures/blocks/oil_press"
+    },
+    "kg_a26_big_vat": {
+      "textures": "textures/blocks/big_vat"
+    },
+    "kg_a26_water": {
+      "textures": "textures/blocks/water_still_grey"
+    },
+    "kg_a26_lava": {
+      "textures": "textures/blocks/lava_still"
     }
   }
 }

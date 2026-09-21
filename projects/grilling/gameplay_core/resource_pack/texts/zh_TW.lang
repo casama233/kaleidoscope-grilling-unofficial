@@ -70,3 +70,9 @@ tile.kaleidoscope_grilling:skewer_plate.name=烤串盤
 tile.kaleidoscope_grilling:skewer_plate_block.name=烤串盤
 item.kaleidoscope_grilling:skewer_recipe_book.name=串譜
 tile.kaleidoscope_grilling:skewer_recipe.name=串譜
+
+item.kaleidoscope_grilling:canola_powder.name=菜籽粉
+item.kaleidoscope_grilling:oil_cake.name=油餅
+item.kaleidoscope_grilling:oil_residue.name=油渣
+tile.kaleidoscope_grilling:oil_press.name=榨油器
+tile.kaleidoscope_grilling:big_vat.name=大缸

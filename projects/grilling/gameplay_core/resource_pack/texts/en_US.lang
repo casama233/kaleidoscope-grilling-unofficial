@@ -70,3 +70,9 @@ tile.kaleidoscope_grilling:skewer_plate.name=Skewer Plate
 tile.kaleidoscope_grilling:skewer_plate_block.name=Skewer Plate
 item.kaleidoscope_grilling:skewer_recipe_book.name=Skewer Recipe Book
 tile.kaleidoscope_grilling:skewer_recipe.name=Skewer Recipe
+
+item.kaleidoscope_grilling:canola_powder.name=Canola Powder
+item.kaleidoscope_grilling:oil_cake.name=Oil Cake
+item.kaleidoscope_grilling:oil_residue.name=Oil Residue
+tile.kaleidoscope_grilling:oil_press.name=Wooden Oil Press
+tile.kaleidoscope_grilling:big_vat.name=Big Vat

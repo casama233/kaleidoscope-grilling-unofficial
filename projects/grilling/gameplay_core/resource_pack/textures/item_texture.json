@@ -181,6 +181,15 @@
     },
     "skewer_recipe_book": {
       "textures": "textures/items/skewer_recipe_book"
+    },
+    "canola_powder": {
+      "textures": "textures/items/canola_powder"
+    },
+    "oil_cake": {
+      "textures": "textures/items/oil_cake"
+    },
+    "oil_residue": {
+      "textures": "textures/items/oil_residue"
     }
   }
 }

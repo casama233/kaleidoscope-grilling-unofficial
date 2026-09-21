@@ -1,0 +1,181 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:oil_press",
+      "menu_category": {
+        "category": "items"
+      },
+      "states": {
+        "kaleidoscope_grilling:cake_count": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "kaleidoscope_grilling:press_stage": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "traits": {
+        "minecraft:placement_direction": {
+          "enabled_states": [
+            "minecraft:cardinal_direction"
+          ],
+          "y_rotation_offset": 180.0
+        }
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.kaleidoscope_grilling:oil_press.name",
+      "minecraft:geometry": "geometry.kg_a26.oil_press_c0_s0",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kg_a26_oil_press",
+          "render_method": "alpha_test",
+          "ambient_occlusion": 1.0,
+          "face_dimming": true
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.5
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 3.0
+      }
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 0 && q.block_state('kaleidoscope_grilling:cake_count') == 0",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c0_s0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 0 && q.block_state('kaleidoscope_grilling:cake_count') == 1",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c1_s0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 0 && q.block_state('kaleidoscope_grilling:cake_count') == 2",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c2_s0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 0 && q.block_state('kaleidoscope_grilling:cake_count') == 3",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c3_s0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 0 && q.block_state('kaleidoscope_grilling:cake_count') == 4",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c4_s0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 1",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c4_s1"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 2",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c4_s2"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 3",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c4_s3"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:press_stage') == 4",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.oil_press_c4_s4"
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              180,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              90,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              270,
+              0
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

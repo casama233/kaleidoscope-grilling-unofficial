@@ -112,6 +112,7 @@ function takeSource(player,block,type,hand,toCookery=false){
  return true;
 }
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
+ if(e.block.typeId==='kaleidoscope_grilling:big_vat')return;
  const item=e.itemStack,typeFromBlock=BLOCK_TO_TYPE[e.block.typeId],bucketType=item?BUCKET_TO_TYPE[item.typeId]:undefined;
  if(typeFromBlock&&(item?.typeId==='minecraft:bucket'||item?.typeId===COOKERY_EMPTY||item?.typeId===COOKERY_FILLED)){
   e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,hand=findHand(p,item.typeId);
