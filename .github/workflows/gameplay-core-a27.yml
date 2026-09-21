@@ -165,6 +165,7 @@ jobs:
             'retail_target':'Bedrock 26.51 / content 1.26.50','server_module':'2.9.0',
             'oil_press':True,'press_max_cakes':4,'press_progress':16,'impact_tick':6,'completion_delay':10,
             'big_vat':True,'vat_capacity':8,'vat_supported':['water','lava','canola','secret_chili','premium_chili'],
+            'a27_items':27,'a27_foods':15,'a27_recipe_mappings':25,'a27_workstation_fallbacks':17,
             'dash_compiled_and_compared':True,
             'mcaddon_sha256':hashlib.sha256(mc.read_bytes()).hexdigest(),
             'brproject_sha256':hashlib.sha256(br.read_bytes()).hexdigest(),
@@ -185,7 +186,7 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7_Gameplay_Core."); assert p and all(x.startswith(ok) for x in p)'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'feat: publish A2.7 oil press and big vat'
+          git commit -m 'feat: publish A2.7 content and recipe reconciliation'
           AUTH=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
           git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $AUTH" push origin HEAD:main
           unset AUTH
