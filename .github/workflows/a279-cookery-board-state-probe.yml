@@ -1,0 +1,52 @@
+name: A2.7.9 Cookery Board State Probe
+on:
+  push:
+    branches: [a279-beef-board-override]
+    paths:
+      - '.github/workflows/a279-cookery-board-state-probe.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect exact Cookery 1.0.6 chopping-board state contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351'
+          url='https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon'
+          curl --retry 2 -fL --connect-timeout 15 --max-time 120 "$url" -o cookery.mcaddon
+          test "$(sha256sum cookery.mcaddon | awk '{print $1}')" = "$expected"
+          python - <<'PY'
+          import io,zipfile,re
+          with zipfile.ZipFile('cookery.mcaddon') as outer:
+              bp=next(n for n in outer.namelist() if n.endswith('[BP].mcpack'))
+              with zipfile.ZipFile(io.BytesIO(outer.read(bp))) as z:
+                  p='scripts/custom_components/blocks/directStation.js'
+                  s=z.read(p).decode('utf-8')
+                  pats=[
+                    r'const BOARD_MODEL_INDEX',
+                    r'function key\(',
+                    r'function load\(',
+                    r'function save\(',
+                    r'function syncBoardVisual\(',
+                    r'function boardInteract\(',
+                    r'export const directStation',
+                    r'onPlayerInteract',
+                    r'onTick',
+                  ]
+                  lines=s.splitlines()
+                  marks=set()
+                  for pat in pats:
+                      rx=re.compile(pat)
+                      for i,line in enumerate(lines):
+                          if rx.search(line):
+                              for j in range(max(0,i-35),min(len(lines),i+90)):marks.add(j)
+                  last=-2
+                  for i in sorted(marks):
+                      if i>last+1:print('\n--- GAP ---')
+                      print(f'{i+1:04d}: {lines[i]}')
+                      last=i
+          PY
