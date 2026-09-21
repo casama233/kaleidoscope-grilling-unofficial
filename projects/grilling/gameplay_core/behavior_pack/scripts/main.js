@@ -9,6 +9,7 @@ import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runt
 import './a26_oil_machine_runtime.js';
 import './a271_sweet_potato_runtime.js';
 import './a272_cookery_processing_runtime.js';
+import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
@@ -104,6 +105,17 @@ function handFor(player,id){const m=heldMain(player);if(m?.typeId===id)return {n
 function setHand(player,hand,stack){if(hand==='off')return setOff(player,stack);return setMain(player,stack)}
 function creative(player){try{return player.getGameMode()===GameMode.Creative}catch{return false}}
 function decrementMain(player,count=1){if(creative(player))return true;const s=heldMain(player);if(!s||s.amount<count)return false;if(s.amount===count)setMain(player,undefined);else{s.amount-=count;setMain(player,s)}return true}
+function damageMainTool(player,amount=1){
+ if(creative(player))return false;
+ const stack=heldMain(player);if(!stack)return false;
+ try{
+  const durability=stack.getComponent('minecraft:durability');if(!durability)return false;
+  const next=nextDurability(durability.damage,durability.maxDurability,amount,!!durability.unbreakable);
+  if(next.broken){setMain(player,undefined);try{player.playSound('random.break',{volume:.8,pitch:1})}catch{};return true}
+  if(next.damage!==durability.damage){durability.damage=next.damage;setMain(player,stack)}
+  return false;
+ }catch{return false}
+}
 function give(player,stack){const c=mainContainer(player);if(!c)return;const rem=mergeIntoContainer(c,stack);if(rem)player.dimension.spawnItem(rem,player.location)}
 function copyOne(stack){const out=stack.clone();out.amount=1;return out}
 function copyCustomData(from,to){
@@ -287,9 +299,15 @@ function consumeSeasoningBottle(player,needed){
 }
 function handleGrill(block,player){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;register(block);let state=readState(block);const held=heldMain(player),id=held?.typeId,n=occupied(block);
- if(id==='minecraft:flint_and_steel'){if(!state.lit){state=light(state,true);writeState(block,state);try{block.dimension.playSound('fire.ignite',block.location)}catch{}message(player,'§6烤爐已點火')}return}
+ if(id==='minecraft:flint_and_steel'){
+  if(!state.lit){state=light(state,true);writeState(block,state);damageMainTool(player,1);try{block.dimension.playSound('fire.ignite',block.location)}catch{}message(player,'§6烤爐已點火')}
+  return
+ }
+ if(isExtinguishTool(id)&&state.lit){
+  state=light(state,false);writeState(block,state);try{block.dimension.playSound('random.fizz',block.location)}catch{}message(player,'§7烤爐已熄滅');return
+ }
  if(id===COOKERY_FILLED){
-  if(state.phase!==0||n<1||!state.lit){message(player,state.lit?'§7現在不能刷油':'§c烤爐尚未點火');return}
+  if(state.phase!==0||n<1){message(player,'§7現在不能刷油');return}
   const oil=consumeCookeryOil(player,n);if(!oil.ok){message(player,oil.reason==='insufficient'?'§c油量不足：需要 '+n+'，目前 '+oil.count:'§7需要森羅物語裝油的油壺');return}
   const result=brush(state,n,oil.heat);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.brush.main',{blendOutTime:.12})}catch{}message(player,'§e刷油完成，消耗 '+(creative(player)?0:n)+' 點油')}return;
  }
@@ -479,12 +497,16 @@ world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
 });
 world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||![EMPTY_SEASONING_ID,PENDING_SEASONING,SEASONING_ID].includes(held.typeId))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
- const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));if(skewerInput){e.cancel=true;scheduleSkewerAction(e.player,skewerInput);return}
- if(e.player.isSneaking&&!e.itemStack&&STORAGE_SORT_BLOCKS.has(e.block.typeId)){
+ const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));
+ if(skewerInput){e.cancel=true;if(isInitialBlockPress(e.isFirstEvent))scheduleSkewerAction(e.player,skewerInput);return}
+ const customTarget=e.block.typeId===GRILL_ID||isSeasoningBlock(e.block.typeId);
+ const sortTarget=e.player.isSneaking&&!e.itemStack&&STORAGE_SORT_BLOCKS.has(e.block.typeId);
+ if(!isInitialBlockPress(e.isFirstEvent)){if(customTarget||sortTarget)e.cancel=true;return}
+ if(sortTarget){
   e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;
   system.run(()=>{const b=dim.getBlock(loc),c=b?.getComponent('minecraft:inventory')?.container;if(!c)return;const r=compactSkewerContainer(c,false);message(p,r.changed?'§b已整理串類：熱度差≤5分鐘的熱串按數量加權合併':'§7沒有可整理的串類')});return;
  }
- if(e.block.typeId!==GRILL_ID&&!isSeasoningBlock(e.block.typeId))return;e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const block=dim.getBlock(loc);if(block?.typeId===GRILL_ID)handleGrill(block,p);else if(block&&isSeasoningBlock(block.typeId))handleSeasoningBlock(block,p)});
+ if(!customTarget)return;e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const block=dim.getBlock(loc);if(block?.typeId===GRILL_ID)handleGrill(block,p);else if(block&&isSeasoningBlock(block.typeId))handleSeasoningBlock(block,p)});
 });
 world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID){register(e.block);resetBlock(e.block,false)}else if(isSeasoningBlock(e.block.typeId))placeSeasoningState(e.block,e.player)});
 world.beforeEvents.playerBreakBlock.subscribe(e=>{

@@ -36,7 +36,7 @@ export function light(state,on=true){
 }
 export function brush(state,occupied,heatTicks){
   state=normalizeState(state);
-  if(!validState(state)||state.phase!==0||occupied<1||!state.lit||!Number.isInteger(heatTicks)||heatTicks<1)return {ok:false,state};
+  if(!validState(state)||state.phase!==0||occupied<1||!Number.isInteger(heatTicks)||heatTicks<1)return {ok:false,state};
   return {ok:true,state:{...state,seasonings:[...state.seasonings],phase:1,phaseTicks:0,heatTicks}};
 }
 export function flip(state){

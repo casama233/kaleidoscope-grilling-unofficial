@@ -1,0 +1,42 @@
+{
+  "version": "A2.7.5",
+  "scope": "grill input hardening only; no new food/recipe content",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "bedrock_api": "@minecraft/server 2.9.0",
+  "fixes": {
+    "held_block_interaction_repeat": {
+      "status": "fixed",
+      "mechanism": "PlayerInteractWithBlockBeforeEvent.isFirstEvent; repeated hold events are cancelled for Grilling custom targets and threading/sort actions"
+    },
+    "extinguish": {
+      "status": "ported",
+      "java_selector": "#kaleidoscope_cookery:extinguish_stove = #minecraft:shovels plus Cookery kitchen shovel",
+      "bedrock_ids": [
+        "minecraft:wooden_shovel",
+        "minecraft:stone_shovel",
+        "minecraft:iron_shovel",
+        "minecraft:golden_shovel",
+        "minecraft:diamond_shovel",
+        "minecraft:netherite_shovel",
+        "kaleidoscope_cookery:kitchen_shovel",
+        "kaleidoscope_cookery:oiled_kitchen_shovel"
+      ]
+    },
+    "oil_before_ignition": {
+      "status": "fixed",
+      "java_behavior": "GrillAutomationApi.brushOil checks phase/occupancy/oil but not LIT"
+    },
+    "flint_and_steel_durability": {
+      "status": "fixed",
+      "java_behavior": "ignite hurts flint and steel by 1 outside creative",
+      "bedrock_component": "minecraft:durability"
+    }
+  },
+  "known_boundaries": [
+    "Cookery Bedrock oiled-kitchen-shovel internal oil metadata is not mutated because no public host API for that private state is used; both visible shovel ids can extinguish.",
+    "PlayerInteractWithEntityBeforeEvent has no isFirstEvent property in stable docs, so this slice only hardens repeated block interactions.",
+    "Minecraft/BDS engine acceptance remains required."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

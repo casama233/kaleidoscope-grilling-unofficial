@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.5",
+  "tested_commit": "cb858c7e321ba96d4cd31d59606d7bbeb55ffbfe",
+  "run_id": "35560611874",
+  "repeat_block_input_suppressed": true,
+  "shovel_extinguish": true,
+  "oil_before_ignition": true,
+  "flint_and_steel_durability": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "2958d54a1f5c6650692e10e4375377e1bfcbf4633092d0a1453636ac31b2944b",
+  "brproject_sha256": "f4bff697f7e05133362a538de379928ecff8e922dd11ceb88c0104780e5b0755",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
