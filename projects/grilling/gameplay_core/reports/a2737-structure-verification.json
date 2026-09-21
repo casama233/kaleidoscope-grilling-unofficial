@@ -1,0 +1,13 @@
+{
+  "version": "A2.7.37",
+  "offhand_oil_pot_item_fill": true,
+  "reuses_oil_registry": true,
+  "reuses_a2734_adapter": true,
+  "reuses_a2735_player_io": true,
+  "bucket_points": 8,
+  "typed_capacity": 64,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

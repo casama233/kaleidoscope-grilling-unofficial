@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.36 Typed Cookery Oil Pot Block",
+  "name": "Kaleidoscope Grilling A2.7.37 Offhand Oil Pot Fill",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_36_Typed_Cookery_Oil_Pot_Block"
+          "packName": "Kaleidoscope_Grilling_A2_7_37_Offhand_Oil_Pot_Fill"
         }
       ]
     ]
