@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.29 Language Hotfix",
+  "name": "Kaleidoscope Grilling A2.7.30 Cookery Oil Pot Adapter",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_29_Language_Hotfix"
+          "packName": "Kaleidoscope_Grilling_A2_7_30_Cookery_Oil_Pot_Adapter"
         }
       ]
     ]

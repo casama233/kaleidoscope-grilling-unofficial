@@ -6,14 +6,13 @@ import {
  toolProgress,pressVisualStage,normalizePress,pressAddCake,impactPress,finishPressTransfer,
  normalizeVat,vatVisualLevel,vatInsert,vatExtract,potFillPlan,nearbyOffsets
 } from './a26_oil_machine_core.js';
+import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,readCookeryOilPot,buildCookeryOilPot} from './a2730_cookery_oil_pot_adapter.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';
 const PRESS_REG='kaleidoscope_grilling:a26_press_registry';
 const VAT_ITEM_TYPE='kaleidoscope_grilling:vat_type';
 const VAT_ITEM_BUCKETS='kaleidoscope_grilling:vat_buckets';
-const COOKERY_EMPTY='kaleidoscope_cookery:oil_pot';
-const COOKERY_FILLED='kaleidoscope_cookery:oil_pot_filled';
 const OIL_BUCKETS=Object.freeze({
  'kaleidoscope_grilling:canola_oil_bucket':'canola',
  'kaleidoscope_grilling:secret_chili_oil_bucket':'secret_chili',
@@ -113,13 +112,6 @@ function vatItem(v){
  }catch{}
  return out;
 }
-function potType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'')}catch{return ''}}
-function potCount(stack){try{return Math.max(0,Math.min(OIL_POT_CAPACITY,Number(stack?.getDynamicProperty('kc_oil_count')??0)|0))}catch{return 0}}
-function filledPot(type,count){
- let out;try{out=new ItemStack(COOKERY_FILLED,1)}catch{return undefined}
- try{out.setLore(['§7Oil: '+count+'/'+OIL_POT_CAPACITY]);out.setDynamicProperty('kaleidoscope_grilling:oil_type',type);out.setDynamicProperty('kc_oil_count',count)}catch{}
- return out;
-}
 function bucketType(id){return OIL_BUCKETS[id]??VANILLA_BUCKETS[id]??null}
 
 function fillVatFromBucket(block,p,hand,item){
@@ -139,10 +131,10 @@ function takeVatBucket(block,p,hand){
 }
 function fillPotFromVat(block,p,hand,item){
  const v=readVat(block);if(!['canola','secret_chili','premium_chili'].includes(v.type))return false;
- const type=item.typeId===COOKERY_FILLED?potType(item):'',count=item.typeId===COOKERY_FILLED?potCount(item):0;
+ const oil=readCookeryOilPot(item),type=item.typeId===COOKERY_FILLED?oil.type:'',count=item.typeId===COOKERY_FILLED?oil.count:0;
  const plan=potFillPlan(v,type,count);if(!plan.ok){msg(p,'§c大缸已滿、油壺已滿或油種不同');return true}
  const next=vatExtract(v,v.type,plan.buckets);if(!next.ok)return true;
- const pot=filledPot(plan.type,plan.nextCount);if(pot)setHand(p,hand,pot);writeVat(block,next.state);return true;
+ const pot=buildCookeryOilPot(plan.type,plan.nextCount,item);if(pot)setHand(p,hand,pot);writeVat(block,next.state);return true;
 }
 function vatStatus(block,p){const v=readVat(block);msg(p,'§7大缸：'+(v.type||'empty')+' '+v.buckets+'/'+VAT_CAPACITY_BUCKETS+' 桶')}
 

@@ -1,0 +1,46 @@
+{
+  "version": "A2.7.30",
+  "scope": "centralize Cookery oil-pot state access for all active Grilling consumers",
+  "cookery_host": {
+    "version": "1.0.6",
+    "curseforge_project_id": 1673664,
+    "file_id": 8908596,
+    "archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "empty_item": "kaleidoscope_cookery:oil_pot",
+    "filled_item": "kaleidoscope_cookery:oil_pot_filled",
+    "host_count_key": "kc_oil_count",
+    "native_fat_capacity": 256
+  },
+  "grilling_extension": {
+    "type_key": "kaleidoscope_grilling:oil_type",
+    "typed_capacity": 64,
+    "types": [
+      "canola",
+      "secret_chili",
+      "premium_chili"
+    ]
+  },
+  "active_consumers": [
+    "main.js grill brushing",
+    "a26_oil_machine_runtime.js Big Vat filling",
+    "a2722_cold_houttuynia_runtime.js premium chili consumption"
+  ],
+  "before": {
+    "independent_oil_pot_readers": 3,
+    "independent_oil_pot_builders_or_consumers": 3
+  },
+  "after": {
+    "shared_adapter_modules": 1,
+    "consumer_direct_host_key_access": 0,
+    "consumer_direct_host_item_id_literals": 0
+  },
+  "behavior": {
+    "untyped_host_fat_capacity": 256,
+    "typed_grilling_oil_capacity": 64,
+    "missing_count_fallback_uses_capacity": true,
+    "zero_remaining_returns_empty_host_pot": true,
+    "existing_filled_stack_metadata_preserved_by_clone": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -8,6 +8,7 @@ import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
 import './a26_oil_machine_runtime.js';
 import './a2727_cookery_host_recipes_runtime.js';
+import {COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryOilPotConsumption} from './a2730_cookery_oil_pot_adapter.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
@@ -26,7 +27,6 @@ const REGISTRY='kaleidoscope_grilling:a2_grills';
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
 const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();
 const MAX_GRILLS=256;
-const COOKERY_POT='kaleidoscope_cookery:oil_pot',COOKERY_FILLED='kaleidoscope_cookery:oil_pot_filled',COOKERY_OIL_KEY='kc_oil_count';
 const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle_1';
 const SEASONING_BLOCKS=new Set(['kaleidoscope_grilling:seasoning_bottle','kaleidoscope_grilling:seasoning_bottle_1','kaleidoscope_grilling:seasoning_bottle_2','kaleidoscope_grilling:seasoning_bottle_3','kaleidoscope_grilling:seasoning_bottle_4']);
 const SEASON_LIST_KEY='kaleidoscope_grilling:seasonings',SEASON_USES_KEY='kaleidoscope_grilling:uses',SEASON_VARIANT_KEY='kaleidoscope_grilling:variant';
@@ -362,20 +362,13 @@ function customBreak(block,player){
   removeEscrow(escrow);restoreBrokenGrill(dim,loc,permutation,state,raws);message(player,'§c拆除失敗，烤架內容已嘗試回滾');
  }
 }
-function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'');return Object.hasOwn(OIL_TYPES,type)?type:''}catch{return ''}}
-function cookeryOilCount(stack){
- if(stack?.typeId!==COOKERY_FILLED)return 0;const type=cookeryOilType(stack),cap=type?FLUID_CAPACITY:256;
- try{const raw=stack.getDynamicProperty(COOKERY_OIL_KEY);return raw===undefined?cap:Math.max(0,Math.min(cap,Number(raw)|0))}catch{return cap}
-}
 function heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}
 function planCookeryOil(player,hand,needed){
- const stack=heldByHand(player,hand);if(stack?.typeId!==COOKERY_FILLED)return {ok:false,reason:'not_pot'};
- const count=cookeryOilCount(stack);if(count<needed)return {ok:false,reason:'insufficient',count};
- const type=cookeryOilType(stack),before=stack.clone(),heat=heatForOil(type);
- if(creative(player))return {ok:true,heat,remaining:count,before,next:before.clone(),mutate:false};
- const remaining=count-needed,next=new ItemStack(remaining>0?COOKERY_FILLED:COOKERY_POT,1),cap=type?FLUID_CAPACITY:256;
- if(remaining>0){try{next.setLore(['§7Oil: '+remaining+'/'+cap]);next.setDynamicProperty(COOKERY_OIL_KEY,remaining);if(type)next.setDynamicProperty('kaleidoscope_grilling:oil_type',type)}catch{}}
- return {ok:true,heat,remaining,before,next,mutate:true};
+ const stack=heldByHand(player,hand),oil=planCookeryOilPotConsumption(stack,needed);
+ if(!oil.ok)return oil;
+ const heat=heatForOil(oil.type);
+ if(creative(player))return {...oil,heat,remaining:oil.count,next:oil.before.clone(),mutate:false};
+ return {...oil,heat,mutate:true};
 }
 function planSeasoningBottle(player,hand,needed){
  const stack=heldByHand(player,hand);if(stack?.typeId!==SEASONING_ID)return {ok:false,reason:'not_seasoning'};
