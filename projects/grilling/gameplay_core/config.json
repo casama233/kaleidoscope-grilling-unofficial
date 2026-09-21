@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.26 Seasoning Bottle Render",
+  "name": "Kaleidoscope Grilling A2.7.27 Cookery Host Reuse",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_26_Seasoning_Bottle_Render"
+          "packName": "Kaleidoscope_Grilling_A2_7_27_Cookery_Host_Reuse"
         }
       ]
     ]

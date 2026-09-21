@@ -1,0 +1,44 @@
+{
+  "version": "A2.7.27",
+  "scope": "consolidate Cookery-hosted recipe registration and remove duplicated active listeners",
+  "cookery_host": {
+    "bedrock_reference": "Kaleidoscope Cookery v1.0.6 (Unofficial)",
+    "curseforge_project_id": 1673664,
+    "archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "public_extension_api": 1,
+    "events": [
+      "kaleidoscope_cookery:api_ready",
+      "kaleidoscope_cookery:api_ping",
+      "kaleidoscope_cookery:register_recipe"
+    ],
+    "host_owned_station_mechanics": [
+      "chopping_board",
+      "millstone"
+    ]
+  },
+  "before": {
+    "active_recipe_runtime_modules": 7,
+    "startup_api_pings": 2,
+    "ready_listeners": 7
+  },
+  "after": {
+    "active_recipe_runtime_modules": 1,
+    "startup_api_pings": 1,
+    "ready_listeners": 1,
+    "hosted_recipe_rows": 9,
+    "chopping_board_rows": 5,
+    "millstone_rows": 4
+  },
+  "historical_modules_retained_for_slice_rebuilds": true,
+  "beef_board_override_retained": true,
+  "beef_board_reason": "Cookery 1.0.6 resolves BOARD_RECIPES[id] before getExtensionBoardRecipe(id), so minecraft:beef cannot be overridden through the public extension API.",
+  "guide_already_uses_cookery_host_api": true,
+  "next_reuse_targets": [
+    "centralize Cookery oil-pot compatibility used by main.js and a26_oil_machine_runtime.js",
+    "replace canola/onion/sweet-potato duplicate crop runtimes with a data-driven crop host",
+    "replace per-food itemCompleteUse listeners with one food-effect table and handler",
+    "replace future per-slice CI boilerplate with shared helpers while retaining old rebuild inputs"
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
