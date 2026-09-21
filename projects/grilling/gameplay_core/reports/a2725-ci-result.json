@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.25",
+  "tested_commit": "ae2a0b25526c4bab4ea6d86b87b5e77dc553c635",
+  "run_id": "35600448513",
+  "incremental_from_published_a2724": true,
+  "skewer_attachables": 39,
+  "shared_hold_animation": true,
+  "hand_offset": [
+    0,
+    7,
+    2
+  ],
+  "bite_stage_logic_preserved": true,
+  "geometry_rebaked": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "8d17a6fdc2d38feac3bc93569299860382854c77626db9b64319cb3210b0c62c",
+  "brproject_sha256": "7307eac47f787a867c795b5a5841cad4222e4d2c21779d19b98464229c04dcd3",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

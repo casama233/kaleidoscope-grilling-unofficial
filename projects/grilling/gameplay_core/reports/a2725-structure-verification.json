@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.25",
+  "skewer_attachables": 39,
+  "shared_hold_animation": true,
+  "hand_offset": [
+    0,
+    7,
+    2
+  ],
+  "bite_stage_logic_preserved": true,
+  "geometry_rebaked": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
