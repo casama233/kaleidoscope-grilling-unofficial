@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.3 Render/Runtime Stabilization",
+  "name": "Kaleidoscope Grilling A2.7.4 Java GUI Icon Parity",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_3_Stabilized"
+          "packName": "Kaleidoscope_Grilling_A2_7_4_Java_GUI"
         }
       ]
     ]

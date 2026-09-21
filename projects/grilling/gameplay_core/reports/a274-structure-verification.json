@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.4",
+  "exact_java_default_icons": 39,
+  "exact_java_frame0_icons": 2,
+  "total_formal_icons": 41,
+  "all_icon_git_blobs_match_upstream": true,
+  "icon_size": [
+    16,
+    16
+  ],
+  "slime_gui_animation_exact": false,
+  "mysterious_gui_animation_exact": false,
+  "a273_grill_stabilization_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.4",
+  "tested_commit": "055cf19cc67f07f2b2e3453e0243a0df517c40d6",
+  "run_id": "35559650744",
+  "exact_java_static_icons": 39,
+  "exact_java_frame0_icons": 2,
+  "total_icons": 41,
+  "slime_gui_animation_exact": false,
+  "mysterious_gui_animation_exact": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "a63d803c7874f6ab43779cb92f5d400b78067ec0391ef2731817709a540aca9e",
+  "brproject_sha256": "1ffbcada950d1e757d9fae86c6cbcd21219453f51bb69585820ab24928b90980",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
