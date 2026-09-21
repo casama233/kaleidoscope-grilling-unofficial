@@ -11,10 +11,19 @@ THIRD='animation.kaleidoscope_grilling.a2725.skewer_hold_third_person'
 
 def load(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
-def find_bone(doc,suffix):
- geos=doc['minecraft:geometry'];assert len(geos)==1
- rows=[b for b in geos[0]['bones'] if b['name'].endswith(suffix)]
- assert len(rows)==1,(suffix,[b['name'] for b in rows])
+def geometry(doc,identifier=None):
+ geos=doc['minecraft:geometry']
+ if identifier is None:
+  assert len(geos)==1
+  return geos[0]
+ rows=[g for g in geos if g.get('description',{}).get('identifier')==identifier]
+ assert len(rows)==1,(identifier,[g.get('description',{}).get('identifier') for g in geos])
+ return rows[0]
+
+def find_bone(doc,suffix,identifier=None):
+ geo=geometry(doc,identifier)
+ rows=[b for b in geo['bones'] if b['name'].endswith(suffix)]
+ assert len(rows)==1,(suffix,[b['name'] for b in geo['bones']])
  return rows[0]
 
 def sub(a,b):return [round(a[i]-b[i],6) for i in range(3)]
@@ -52,8 +61,10 @@ def main():
  # unchanged and apply that missing offset at the bound root through animation.
  stage=load(RP/'models/entity/a22_bites/raw_beef_skewer_stage0.geo.json')
  proto=load(ROOT/'projects/grilling/integration/immersion_lab/resource_pack/models/entity/hand_props.geo.json')
- swood=find_bone(stage,'wood_0');pwood=find_bone(proto,'held0_instance_0_wood_0')
- sfood=find_bone(stage,'food3_1');pfood=find_bone(proto,'held0_instance_0_food3_1')
+ swood=find_bone(stage,'wood_0')
+ pwood=find_bone(proto,'held0_instance_0_wood_0','geometry.kg_imm.hand_skewer')
+ sfood=find_bone(stage,'food3_1')
+ pfood=find_bone(proto,'held0_instance_0_food3_1','geometry.kg_imm.hand_skewer')
  assert sub(pwood['cubes'][0]['origin'],swood['cubes'][0]['origin'])==OFFSET
  assert sub(pfood['cubes'][0]['origin'],sfood['cubes'][0]['origin'])==OFFSET
  root=stage['minecraft:geometry'][0]['bones'][0]
