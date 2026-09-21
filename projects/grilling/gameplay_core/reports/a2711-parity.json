@@ -1,0 +1,38 @@
+{
+  "version": "A2.7.11",
+  "scope": "raw_mantou_slice item plus conflict-free Cookery mantou chopping recipe",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_recipe": {
+    "id": "kaleidoscope_grilling:chopping_board/raw_mantou_slice",
+    "input": "kaleidoscope_cookery:mantou",
+    "cuts": 4,
+    "model_id": "kaleidoscope_grilling:raw_mantou_slice",
+    "result": "kaleidoscope_grilling:raw_mantou_slice",
+    "count": 3
+  },
+  "raw_mantou_slice": {
+    "plain_item": true,
+    "max_stack_size": 64,
+    "texture_git_blob_sha1": "c89c916e0611d7de9d821e122b2d88c099809cbf"
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_api": 1,
+    "built_in_mantou_board_recipe": false,
+    "registration": "public register_recipe event, gated by chopping_board capability",
+    "initial_ping_owner": "A2.7.8 runtime; A2.7.11 only adds an api_ready listener to avoid duplicate pings"
+  },
+  "downstream": {
+    "raw_bun_slice_skewer_recipe_already_exists": true,
+    "required_raw_mantou_slices": 3,
+    "mantou_to_fixed_bun_skewer_chain_reachable": true
+  },
+  "visual_difference": {
+    "java_model_id": "kaleidoscope_grilling:raw_mantou_slice",
+    "bedrock": "Cookery extension recipe uses its generic foreign-item board display fallback.",
+    "exact_java_staged_board_visual": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -214,6 +214,9 @@
     },
     "chicken_wing": {
       "textures": "textures/items/chicken_wing"
+    },
+    "raw_mantou_slice": {
+      "textures": "textures/items/raw_mantou_slice"
     }
   }
 }

@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.11",
+  "tested_commit": "4f885e9f764e2a3e1e62f8bebb467f548f3c574b",
+  "run_id": "35571399027",
+  "raw_mantou_slice_item": true,
+  "mantou_chopping_registered": true,
+  "cuts": 4,
+  "output_count": 3,
+  "bun_slice_chain_reachable": true,
+  "exact_java_staged_board_visual": false,
+  "a2710_chicken_acquisition_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "74f729fa81d8b463c49be4bad3b6a4b8d19dc156e5b24c6eb9eb2cb6ec305c21",
+  "brproject_sha256": "41374b67419c00d5ece7bc4557aa6d4341929d3c42346e41462680abe7c01d57",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
