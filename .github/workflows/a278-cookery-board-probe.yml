@@ -1,0 +1,55 @@
+name: A2.7.8 Cookery Board Probe
+on:
+  push:
+    branches: [a278-basic-chopping-1]
+    paths:
+      - '.github/workflows/a278-cookery-board-probe.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect exact public Cookery 1.0.6 board data
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected='c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351'
+          urls=(
+            'https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon'
+            'https://media.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon'
+            'https://edge.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon'
+          )
+          ok=0
+          for u in "${urls[@]}"; do
+            rm -f cookery.mcaddon
+            if curl --retry 2 -fL --connect-timeout 15 --max-time 120 "$u" -o cookery.mcaddon; then
+              got=$(sha256sum cookery.mcaddon | awk '{print $1}')
+              echo "sha256=$got"
+              if [ "$got" = "$expected" ]; then ok=1; break; fi
+            fi
+          done
+          test "$ok" = 1
+          python - <<'PY'
+          import io,zipfile
+          needles=(b'minecraft:beef',b'minecraft:carrot',b'minecraft:potato',b'raw_cow_offal')
+          hits=[]
+          def scan(z,prefix=''):
+              for n in z.namelist():
+                  data=z.read(n)
+                  if n.lower().endswith(('.mcpack','.zip')):
+                      try: scan(zipfile.ZipFile(io.BytesIO(data)),prefix+n+'!')
+                      except zipfile.BadZipFile: pass
+                  if not n.lower().endswith(('.js','.json','.md','.txt')): continue
+                  if any(k in data for k in needles):
+                      text=data.decode('utf-8','replace')
+                      lines=text.splitlines()
+                      for i,line in enumerate(lines):
+                          if any(k.decode() in line for k in needles):
+                              hits.append((prefix+n,i+1,'\n'.join(lines[max(0,i-4):i+6])))
+          with zipfile.ZipFile('cookery.mcaddon') as z:scan(z)
+          for p,line,snip in hits:
+              print(f'\n===== {p}:{line} =====\n{snip}')
+          print(f'\nTOTAL_HITS={len(hits)}')
+          PY
