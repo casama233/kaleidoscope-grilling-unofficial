@@ -63,7 +63,6 @@ world.beforeEvents.playerInteractWithBlock.subscribe(watchChickenSkin);
 world.afterEvents.entityDie.subscribe(event=>{
  try{
   const dead=event.deadEntity;if(dead?.typeId!==CHICKEN_ID)return;
-  if(event.damageSource?.damagingProjectile)return;
   const killer=event.damageSource?.damagingEntity;if(killer?.typeId!=='minecraft:player')return;
   const weapon=mainHand(killer);if(!isKitchenKnife(weapon?.typeId))return;
   const count=chickenWingDropCount(Math.random(),Math.random(),lootingLevel(weapon));
