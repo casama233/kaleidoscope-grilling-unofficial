@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A1.15 — COMPLETE LANGUAGE FILES BP",
-    "description": "Localized Grilling chapter with complete zh_CN/zh_TW/en_US language-source files.",
+    "name": "Grilling Guide A1.16 — PER-PLAYER LOCALIZED BODY BP",
+    "description": "Grilling guide extension with zh_CN/zh_TW/en_US per-player body localization for the Cookery 1.0.6 locale-compat host.",
     "uuid": "f8c367c2-84d6-5bf6-b5a8-1bbe6cdb93ab",
     "version": [
       0,
       1,
-      15
+      16
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        15
+        16
       ],
       "language": "javascript",
       "entry": "scripts/main.js"
@@ -44,7 +44,7 @@
       "version": [
         0,
         1,
-        15
+        16
       ]
     }
   ]
