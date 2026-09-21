@@ -21,6 +21,7 @@ import './a2716_canola_processing_runtime.js';
 import './a2717_onion_crop_runtime.js';
 import './a2718_onion_processing_runtime.js';
 import './a2719_sweet_potato_crop_runtime.js';
+import './a2720_roasted_sweet_potato_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';

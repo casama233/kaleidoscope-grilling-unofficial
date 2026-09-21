@@ -1,0 +1,53 @@
+{
+  "version": "A2.7.20",
+  "scope": "Roasted Sweet Potato item + native cooking + base Warmth",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:roasted_sweet_potato",
+    "nutrition": 6,
+    "saturation_modifier": 0.2,
+    "base_effect": "kaleidoscope_cookery:warmth",
+    "base_effect_ticks": 600,
+    "texture_git_blob_sha1": "cc8bda808a99d38ecdae90a78a3acf6b7c0dea9a"
+  },
+  "recipes": {
+    "input": "kaleidoscope_grilling:sweet_potato",
+    "output": "kaleidoscope_grilling:roasted_sweet_potato",
+    "java": {
+      "furnace": {
+        "cookingtime": 200,
+        "experience": 0.35
+      },
+      "smoker": {
+        "cookingtime": 100,
+        "experience": 0.35
+      },
+      "campfire": {
+        "cookingtime": 600,
+        "experience": 0.35
+      }
+    },
+    "bedrock_station_tags": [
+      "furnace",
+      "smoker",
+      "campfire",
+      "soul_campfire"
+    ],
+    "station_access_parity": true,
+    "explicit_cookingtime_field_available": false,
+    "explicit_experience_field_available": false,
+    "java_experience_0_35_exact": false
+  },
+  "effect": {
+    "native_food_consumption_preserved": true,
+    "existing_a21_fx_warmth_state_reused": true,
+    "base_600_tick_duration": true,
+    "cuisine_quality_duration_scaling_ported": false
+  },
+  "survival_chain": {
+    "sweet_potato_acquisition_crop": "A2.7.19",
+    "roasted_sweet_potato_obtainable_in_survival": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

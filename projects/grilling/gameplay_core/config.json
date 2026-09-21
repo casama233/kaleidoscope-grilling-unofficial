@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.19 Sweet Potato Crop",
+  "name": "Kaleidoscope Grilling A2.7.20 Roasted Sweet Potato",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_19_Sweet_Potato_Crop"
+          "packName": "Kaleidoscope_Grilling_A2_7_20_Roasted_Sweet_Potato"
         }
       ]
     ]

@@ -106,3 +106,5 @@ item.kaleidoscope_grilling:onion.name=洋葱
 tile.kaleidoscope_grilling:onion_crop.name=洋葱
 
 tile.kaleidoscope_grilling:sweet_potato_crop.name=红薯
+
+item.kaleidoscope_grilling:roasted_sweet_potato.name=烤红薯

@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.20",
+  "roasted_sweet_potato_item": true,
+  "native_cooking_recipe": true,
+  "station_tags": [
+    "furnace",
+    "smoker",
+    "campfire",
+    "soul_campfire"
+  ],
+  "warmth_base_ticks": 600,
+  "native_food_consumption": true,
+  "java_experience_0_35_exact": false,
+  "cuisine_quality_scaling_ported": false,
+  "a2719_sweet_potato_crop_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

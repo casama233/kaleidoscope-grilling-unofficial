@@ -232,6 +232,9 @@
     },
     "onion": {
       "textures": "textures/items/onion"
+    },
+    "roasted_sweet_potato": {
+      "textures": "textures/items/roasted_sweet_potato"
     }
   }
 }
