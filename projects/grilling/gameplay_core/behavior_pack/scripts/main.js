@@ -17,6 +17,7 @@ import './a2712_remaining_knife_drops_runtime.js';
 import './a2713_houttuynia_processing_runtime.js';
 import './a2714_houttuynia_crop_runtime.js';
 import './a2715_canola_crop_runtime.js';
+import './a2716_canola_processing_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';

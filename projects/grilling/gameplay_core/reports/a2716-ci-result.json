@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.16",
+  "tested_commit": "e09333ae0d3fe3592c980172569967c2115a8285",
+  "run_id": "35586740925",
+  "canola_millstone_registered": true,
+  "output_count": 1,
+  "output_chance": 1.0,
+  "additional_api_ping": false,
+  "canola_oil_survival_chain_complete": true,
+  "a2715_canola_crop_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "97ecb5bd471438a3ce5a489400cf11afad2948b7d7dfcfe97acf7dc4aea893a1",
+  "brproject_sha256": "930a8d7c86637107cdc1a7eae22ff4e6dd460c63b2952480bbb105b23b1492ab",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

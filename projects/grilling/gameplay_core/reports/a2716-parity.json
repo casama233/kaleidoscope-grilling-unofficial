@@ -1,0 +1,40 @@
+{
+  "version": "A2.7.16",
+  "scope": "canola seeds -> Cookery Millstone -> canola powder",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_recipe": {
+    "id": "kaleidoscope_grilling:millstone/canola_powder",
+    "type": "kaleidoscope_cookery:millstone",
+    "input_tag": "kaleidoscope_grilling:ingredients/canola_seeds",
+    "resolved_input": "kaleidoscope_grilling:canola_seeds",
+    "tag_values": [
+      "kaleidoscope_grilling:canola_seeds"
+    ],
+    "result": "kaleidoscope_grilling:canola_powder",
+    "count": 1,
+    "chance": 1.0
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_api": 1,
+    "registration": "public register_recipe event, gated by millstone capability",
+    "additional_api_ping": false,
+    "private_scripts_modified": false
+  },
+  "chain": {
+    "straw_hat_short_grass_to_canola_seeds": "A2.7.15",
+    "canola_crop_reproduction": "A2.7.15",
+    "canola_seeds_to_powder": "A2.7.16",
+    "oil_cake_recipe": "8 canola_powder + 1 wheat -> oil_cake",
+    "oil_press_big_vat": "A2.6",
+    "canola_oil_survival_chain_complete": true
+  },
+  "create_optional_processing": {
+    "crushing_milling_java_recipes_exist": true,
+    "bedrock_create_ported": false,
+    "required_for_survival_chain": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}
