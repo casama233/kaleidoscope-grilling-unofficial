@@ -1,0 +1,40 @@
+{
+  "version": "A2.7.36",
+  "scope": "reuse Cookery oil-pot block while preserving Java Grilling typed-oil block lifecycle semantics",
+  "java_1_1_1": {
+    "placement_copies_oil_type": true,
+    "block_entity_persists_oil_type": true,
+    "typed_capacity": 64,
+    "typed_pot_blocks_empty_hand_extraction": true,
+    "typed_pot_blocks_cookery_fat_insertion": true,
+    "drops_copy_oil_type": true,
+    "typed_bucket_points": 8
+  },
+  "bedrock_host_1_0_6": {
+    "block_id": "kaleidoscope_cookery:oil_pot",
+    "block_count_prefix": "kc_oilpot:",
+    "host_capacity": 256,
+    "host_item_count_key": "kc_oil_count",
+    "host_has_oil_state": "kaleidoscope_cookery:has_oil",
+    "player_break_drop_event": "afterEvents.playerBreakBlock",
+    "explosion_drop_event": "afterEvents.blockExplode"
+  },
+  "reuse": {
+    "a2734_oil_adapter": true,
+    "a2735_shared_player_io": true,
+    "new_grilling_oil_pot_block": false
+  },
+  "after": {
+    "uses_host_block": true,
+    "placement_type_bridge": true,
+    "typed_capacity_clamped_to_64": true,
+    "native_fat_and_empty_hand_blocked_when_typed": true,
+    "placed_bucket_fill": true,
+    "player_break_preserves_type": true,
+    "explosion_preserves_type": true,
+    "host_duplicate_drop_avoided": true
+  },
+  "known_visual_gap": "Cookery Bedrock block schema has no Grilling oil-type visual state; semantic lifecycle is ported but placed oil color/model parity remains separate",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

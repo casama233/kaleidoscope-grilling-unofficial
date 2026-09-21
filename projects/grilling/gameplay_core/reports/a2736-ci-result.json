@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.36",
+  "tested_commit": "2520174db15633ae3dc9b5dce609df2c93c3f3bc",
+  "run_id": "35615452722",
+  "incremental_from_published_a2735": true,
+  "typed_oil_pot_block_bridge": true,
+  "uses_cookery_host_block": true,
+  "reuses_a2735_player_io": true,
+  "typed_capacity": 64,
+  "bucket_points": 8,
+  "player_break_preserves_type": true,
+  "explosion_preserves_type": true,
+  "host_duplicate_drop_avoided": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "ea39affd510e9b961fdd76905f27f53588e607ac65aa0599f505aefc19ab7df1",
+  "brproject_sha256": "2369859de948afe1e51f84618d3a5d79d172a739c5f28843abfcaf7bd1104844",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
