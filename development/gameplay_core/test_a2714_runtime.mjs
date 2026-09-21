@@ -12,12 +12,13 @@ const startup=[],drops=[],randoms=[];
 const math=Object.create(Math);math.random=()=>randoms.length?randoms.shift():0;
 const system={beforeEvents:{startup:{subscribe(fn){startup.push(fn)}}}};
 const EquipmentSlot={Mainhand:'main',Offhand:'off'};
+const GameMode={Creative:'Creative',Survival:'Survival'};
 const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Boolean,Error,Math:math});
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const core=new vm.SourceTextModule(fs.readFileSync(new URL('a2714_houttuynia_crop_core.js',root),'utf8'),{context,identifier:'core'});
 const rt=new vm.SourceTextModule(fs.readFileSync(new URL('a2714_houttuynia_crop_runtime.js',root),'utf8'),{context,identifier:'runtime'});
-const server=new vm.SyntheticModule(['system','ItemStack','EquipmentSlot'],function(){
- this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',EquipmentSlot);
+const server=new vm.SyntheticModule(['system','ItemStack','EquipmentSlot','GameMode'],function(){
+ this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',EquipmentSlot);this.setExport('GameMode',GameMode);
 },{context,identifier:'server'});
 await rt.link(async spec=>spec==='@minecraft/server'?server:core);await rt.evaluate();
 assert.equal(startup.length,1);
@@ -82,7 +83,15 @@ drops.length=0;
  const w=makeWorld({ground:'minecraft:farmland',light:7,age:3});
  component.onRandomTick({block:w.block,dimension:w.dimension});
  assert.equal(w.block.typeId,'minecraft:air');
- assert.equal(drops.length,1);assert.equal(drops[0].stack.typeId,'kaleidoscope_grilling:houttuynia');
+ assert.equal(drops.length,1);assert.equal(drops[0].stack.typeId,'kaleidoscope_grilling:houttuynia');assert.equal(drops[0].stack.amount,1);
+}
+
+drops.length=0;randoms.push(0);
+{
+ const w=makeWorld({ground:'minecraft:farmland',light:7,age:7});
+ component.onRandomTick({block:w.block,dimension:w.dimension});
+ assert.equal(w.block.typeId,'minecraft:air');
+ assert.equal(drops.length,1);assert.equal(drops[0].stack.amount,3);
 }
 
 randoms.push(.999);
@@ -90,11 +99,22 @@ randoms.push(.999);
  const w=makeWorld({ground:'minecraft:farmland',light:15,age:2,red:true});
  let hand=new Stack('minecraft:bone_meal',2);
  const slot={hasItem(){return !!hand},getItem(){return hand},setItem(v){hand=v}};
- const player={getGameMode(){return 'Survival'},getComponent(id){if(id==='minecraft:equippable')return{getEquipmentSlot(h){return h==='main'?slot:{hasItem(){return false}}}}}};
+ const player={getGameMode(){return GameMode.Survival},getComponent(id){if(id==='minecraft:equippable')return{getEquipmentSlot(h){return h==='main'?slot:{hasItem(){return false}}}}}};
  component.onPlayerInteract({block:w.block,dimension:w.dimension,player});
  assert.equal(w.block.permutation.getState('kaleidoscope_grilling:age'),7);
  assert.equal(w.block.permutation.getState('kaleidoscope_grilling:red_variant'),true);
  assert.equal(hand.amount,1);
 }
 
-console.log(JSON.stringify({passed:6,failed:0,scope:'A2.7.14 houttuynia crop runtime'}));
+randoms.push(0);
+{
+ const w=makeWorld({ground:'minecraft:farmland',light:15,age:0});
+ let hand=new Stack('minecraft:bone_meal',1);
+ const slot={hasItem(){return !!hand},getItem(){return hand},setItem(v){hand=v}};
+ const player={getGameMode(){return GameMode.Creative},getComponent(id){if(id==='minecraft:equippable')return{getEquipmentSlot(h){return h==='main'?slot:{hasItem(){return false}}}}}};
+ component.onPlayerInteract({block:w.block,dimension:w.dimension,player});
+ assert.equal(w.block.permutation.getState('kaleidoscope_grilling:age'),2);
+ assert.equal(hand.amount,1);
+}
+
+console.log(JSON.stringify({passed:8,failed:0,scope:'A2.7.14 houttuynia crop runtime'}));
