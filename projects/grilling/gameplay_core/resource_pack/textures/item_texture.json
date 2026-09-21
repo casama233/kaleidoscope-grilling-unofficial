@@ -241,6 +241,9 @@
     },
     "cold_houttuynia": {
       "textures": "textures/items/cold_houttuynia"
+    },
+    "red_chili_powder": {
+      "textures": "textures/items/red_chili_powder"
     }
   }
 }

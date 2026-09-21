@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.24",
+  "red_chili_powder_item": true,
+  "cookery_millstone_registered": true,
+  "secret_chili_oil_native_recipe": true,
+  "powder_per_bucket": 3,
+  "creative_catalog_entries": 77,
+  "secret_chili_oil_survival_entry_complete": true,
+  "additional_api_ping": false,
+  "a2723_creative_catalog_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
