@@ -30,12 +30,13 @@ world.afterEvents.entityDie.subscribe(event=>{
   const killer=event.damageSource?.damagingEntity;if(killer?.typeId!=='minecraft:player')return;
   const weapon=mainHand(killer);if(!isKitchenKnife(weapon?.typeId))return;
   const looting=lootingLevel(weapon);
+  const baseRandom=Math.random();
   const bonusRandom=looting>0?Math.random():0;
   if(dead.typeId===COW_ID){
-   spawn(dead,RAW_COW_OFFAL_ID,cowOffalDropCount(Math.random(),bonusRandom,looting));
+   spawn(dead,RAW_COW_OFFAL_ID,cowOffalDropCount(baseRandom,bonusRandom,looting));
    return;
   }
-  const count=squidTentacleDropCount(Math.random(),bonusRandom,looting);
+  const count=squidTentacleDropCount(baseRandom,bonusRandom,looting);
   if(!squidTentacleShouldDrop(Math.random()))return;
   spawn(dead,SQUID_TENTACLE_ID,count);
  }catch{}
