@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A1.14 — LOCALIZED GUIDE RP",
-    "description": "Language source files and guide icons for the existing Cookery 1.0.6 guidebook.",
+    "name": "Grilling Guide A1.15 — COMPLETE LANGUAGE FILES RP",
+    "description": "Complete guide UI, entry-name, and body language files for zh_CN/zh_TW/en_US.",
     "uuid": "32baef08-6b04-5115-9d5b-2d4ba2d3a7b4",
     "version": [
       0,
       1,
-      14
+      15
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        14
+        15
       ]
     }
   ],

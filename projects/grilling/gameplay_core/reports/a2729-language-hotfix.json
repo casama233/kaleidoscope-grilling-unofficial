@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.29",
+  "scope": "Traditional Chinese residual-character hotfix only",
+  "fixed_character": "头 → 頭",
+  "fixed_occurrences": 3,
+  "affected_terms": [
+    "烤饅頭片串",
+    "生饅頭片串",
+    "生饅頭片"
+  ],
+  "languages": [
+    "zh_CN",
+    "zh_TW",
+    "en_US"
+  ],
+  "language_key_count": 96,
+  "gameplay_logic_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

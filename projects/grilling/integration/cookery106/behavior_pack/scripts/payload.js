@@ -1,8 +1,8 @@
-// Generated A1.14 localized Cookery guide extension.
+// Generated A1.15 complete-language-file Cookery guide extension.
 export const GUIDE_PAYLOAD = {
   "api": 1,
   "id": "kg_a1:grilling",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "order": 300,
   "icon": "textures/ui/kg_grilling/guide_grill",
   "titleKey": "title",
@@ -420,7 +420,7 @@ export const GUIDE_PAYLOAD = {
       "kg_a1:guide_recipe_potato_slice": "馬鈴薯片串",
       "kg_a1:guide_recipe_caterpillar": "豬兒蟲串",
       "kg_a1:guide_recipe_mushroom": "蘑菇串",
-      "kg_a1:guide_recipe_bun_slice": "饅头片串",
+      "kg_a1:guide_recipe_bun_slice": "饅頭片串",
       "kg_a1:guide_recipe_ender_pearl": "末影珍珠串",
       "kg_a1:guide_recipe_meatball": "丸子串",
       "kg_a1:guide_recipe_slime": "黏液串",

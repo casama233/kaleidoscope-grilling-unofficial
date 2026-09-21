@@ -1,7 +1,7 @@
 {
   "type": "minecraftBedrock",
-  "name": "Grilling Guide — Cookery 1.0.6 localized A1.14",
-  "description": "Localized Grilling entry inside the existing Cookery guidebook; no extra physical guidebook.",
+  "name": "Grilling Guide — Cookery 1.0.6 complete languages A1.15",
+  "description": "Complete zh_CN / zh_TW / en_US guide language sources; one entry inside the existing Cookery guidebook.",
   "authors": [
     "cary — 素材移植工程"
   ],
@@ -23,7 +23,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "KG_Grilling_Guide_A114_Localized"
+          "packName": "KG_Grilling_Guide_A115_Languages"
         }
       ]
     ]

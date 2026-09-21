@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.28 Localization",
+  "name": "Kaleidoscope Grilling A2.7.29 Language Hotfix",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_28_Localization"
+          "packName": "Kaleidoscope_Grilling_A2_7_29_Language_Hotfix"
         }
       ]
     ]
