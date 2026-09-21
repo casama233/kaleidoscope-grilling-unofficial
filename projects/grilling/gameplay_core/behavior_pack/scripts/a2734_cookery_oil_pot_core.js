@@ -1,24 +1,17 @@
+import {
+ HOST_FAT_CAPACITY,GRILLING_FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS,
+ GRILLING_OIL_TYPES,normalizeOilType,oilCapacity,oilTypeForBucketId
+} from './a2738_oil_contract_core.js';
+
+export {
+ HOST_FAT_CAPACITY,GRILLING_FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS,
+ GRILLING_OIL_TYPES,normalizeOilType,oilCapacity,oilTypeForBucketId
+};
+
 export const COOKERY_EMPTY_ID='kaleidoscope_cookery:oil_pot';
 export const COOKERY_FILLED_ID='kaleidoscope_cookery:oil_pot_filled';
 export const HOST_COUNT_KEY='kc_oil_count';
 export const GRILLING_TYPE_KEY='kaleidoscope_grilling:oil_type';
-export const HOST_FAT_CAPACITY=256;
-export const GRILLING_FLUID_CAPACITY=64;
-
-export const GRILLING_OIL_TYPES=Object.freeze([
- 'canola','secret_chili','premium_chili'
-]);
-
-const GRILLING_TYPES=new Set(GRILLING_OIL_TYPES);
-
-export function normalizeOilType(value){
- const type=String(value??'');
- return GRILLING_TYPES.has(type)?type:'';
-}
-
-export function oilCapacity(type){
- return normalizeOilType(type)?GRILLING_FLUID_CAPACITY:HOST_FAT_CAPACITY;
-}
 
 export function normalizeOilCount({
  filled=false,type='',raw=undefined,hasRaw=false,legacyPlacementFallback=false

@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.37 Offhand Oil Pot Fill",
+  "name": "Kaleidoscope Grilling A2.7.38 Shared Oil Contract",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_37_Offhand_Oil_Pot_Fill"
+          "packName": "Kaleidoscope_Grilling_A2_7_38_Shared_Oil_Contract"
         }
       ]
     ]

@@ -1,0 +1,38 @@
+{
+  "version": "A2.7.38",
+  "scope": "remove duplicate typed-oil constants and bucket registries while auditing Java display parity",
+  "shared_contract": {
+    "host_fat_capacity": 256,
+    "typed_fluid_capacity": 64,
+    "bucket_points": 8,
+    "typed_oils": [
+      "canola",
+      "secret_chili",
+      "premium_chili"
+    ],
+    "consumers": [
+      "a24_skewering_core",
+      "a2734_cookery_oil_pot_core",
+      "a2736_typed_oil_pot_block",
+      "a2737_offhand_oil_fill"
+    ]
+  },
+  "reuse": {
+    "a23_oil_world_registry_reused_by_a2736": true,
+    "a2736_private_bucket_registry_removed": true,
+    "a2734_duplicate_capacity_and_type_contract_removed": true,
+    "a2736_duplicate_bucket_points_removed": true,
+    "a2737_duplicate_bucket_points_and_lookup_removed": true
+  },
+  "java_display_audit": {
+    "item_model_uses_java_item_property": true,
+    "placed_block_uses_injected_oil_type_state": true,
+    "crosshair_hud_exists": true,
+    "bedrock_can_append_state_to_foreign_block": false,
+    "duplicate_host_block_created": false,
+    "visual_state_deferred_to_shared_host_visual_adapter": true,
+    "hud_deferred_to_shared_hud_adapter": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

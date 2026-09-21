@@ -1,12 +1,11 @@
+import {HOST_FAT_CAPACITY as FAT_CAPACITY,GRILLING_FLUID_CAPACITY as FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS as OIL_BUCKET_POINTS} from './a2738_oil_contract_core.js';
 export const UNFINISHED_ID='kaleidoscope_grilling:unfinished_skewer';
 export const SECRET_ID='kaleidoscope_grilling:secret_skewer';
 export const SKEWER_INGREDIENTS_KEY='kaleidoscope_grilling:skewer_ingredients';
 export const SECRET_COOKED_KEY='kaleidoscope_grilling:secret_cooked';
 export const SECRET_COOKED_INGREDIENTS_KEY='kaleidoscope_grilling:secret_cooked_ingredients';
 export const SECRET_CREATOR_KEY='kaleidoscope_grilling:secret_creator';
-export const FAT_CAPACITY=256;
-export const FLUID_CAPACITY=64;
-export const OIL_BUCKET_POINTS=8;
+export {FAT_CAPACITY,FLUID_CAPACITY,OIL_BUCKET_POINTS};
 
 const RECIPES=Object.freeze([
  {id:'kaleidoscope_grilling:raw_beef_skewer',cooked:'kaleidoscope_grilling:grilled_beef_skewer',slots:[['kaleidoscope_grilling:beef_chunks'],['kaleidoscope_cookery:red_chili'],['kaleidoscope_grilling:beef_chunks']]},

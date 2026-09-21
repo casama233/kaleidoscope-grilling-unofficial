@@ -1,4 +1,6 @@
 import {world,system,ItemStack} from '@minecraft/server';
+import {OIL_TYPES} from './a23_oil_world.js';
+import {GRILLING_FLUID_CAPACITY,oilTypeForBucketId} from './a2738_oil_contract_core.js';
 import {
  COOKERY_FILLED_ID,readCookeryOilPotForPlacement,buildCookeryOilPot
 } from './a2734_cookery_oil_pot_adapter.js';
@@ -7,12 +9,6 @@ import {
  HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,hostBlockCountKey,typedOilBlockKey,
  placementCandidateLocations,normalizePlacedOilCount,planPlacedTypedOilAddition,blocksNativeCookeryInteraction
 } from './a2736_typed_oil_pot_block_core.js';
-
-const BUCKET_TO_TYPE=Object.freeze({
- 'kaleidoscope_grilling:canola_oil_bucket':'canola',
- 'kaleidoscope_grilling:secret_chili_oil_bucket':'secret_chili',
- 'kaleidoscope_grilling:premium_chili_oil_bucket':'premium_chili'
-});
 
 function blockLoc(block){return {x:block.x,y:block.y,z:block.z}}
 function typeKeyAt(d,l){return typedOilBlockKey(d.id,l.x,l.y,l.z)}
@@ -34,7 +30,7 @@ function writeAt(block,type,count){
  return true;
 }
 function mismatch(p){try{p.onScreenDisplay.setActionBar('§c油壺內已有不同內容')}catch{}}
-function playPour(p,type,count){try{p.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*Math.min(64,count)/64})}catch{}}
+function playPour(p,type,count){try{p.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*Math.min(GRILLING_FLUID_CAPACITY,count)/GRILLING_FLUID_CAPACITY})}catch{}}
 
 function scheduleTypedPlacement(e){
  if(e.isFirstEvent===false||e.block.typeId===HOST_BLOCK_ID)return;
@@ -79,7 +75,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{scheduleTypedPlacement(e)}catch{}
  if(e.block.typeId!==HOST_BLOCK_ID)return;
  const d=e.block.dimension,l=blockLoc(e.block),type=readTypeAt(d,l),itemId=e.itemStack?.typeId;
- const incoming=BUCKET_TO_TYPE[itemId];
+ const incoming=oilTypeForBucketId(itemId,OIL_TYPES);
  if(incoming){
   e.cancel=true;if(e.isFirstEvent===false)return;
   const p=e.player,hand=findHand(p,itemId);

@@ -45,8 +45,8 @@ function fillOffhandPot(player,expectedBucketId){
   message(player,'§c油壺更新驗證失敗，已嘗試回滾');return true;
  }
 
- try{player.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*plan.nextCount/64})}catch{}
- message(player,'§a已向油壺加入 '+ITEM_FILL_POINTS+' 點油（'+plan.nextCount+'/64）');
+ try{player.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*plan.nextCount/plan.capacity})}catch{}
+ message(player,'§a已向油壺加入 '+ITEM_FILL_POINTS+' 點油（'+plan.nextCount+'/'+plan.capacity+'）');
  return true;
 }
 

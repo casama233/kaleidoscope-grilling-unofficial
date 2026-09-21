@@ -1,12 +1,12 @@
 import {
- HOST_FAT_CAPACITY,GRILLING_FLUID_CAPACITY,normalizeOilType,planTypedOilAddition
+ HOST_FAT_CAPACITY,GRILLING_FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS,normalizeOilType,planTypedOilAddition
 } from './a2734_cookery_oil_pot_core.js';
 
 export const HOST_BLOCK_ID='kaleidoscope_cookery:oil_pot';
 export const HOST_FAT_ITEM_ID='kaleidoscope_cookery:oil';
 export const HOST_BLOCK_COUNT_PREFIX='kc_oilpot:';
 export const TYPE_KEY_PREFIX='kaleidoscope_grilling:a2736_oilpot_type_';
-export const OIL_BUCKET_POINTS=8;
+export const OIL_BUCKET_POINTS=GRILLING_OIL_BUCKET_POINTS;
 
 const FACE_OFFSET=Object.freeze({
  Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,-1],South:[0,0,1]

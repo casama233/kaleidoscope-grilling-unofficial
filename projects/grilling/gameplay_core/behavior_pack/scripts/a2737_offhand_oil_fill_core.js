@@ -1,15 +1,10 @@
 import {
  COOKERY_EMPTY_ID,COOKERY_FILLED_ID,planTypedOilAddition
 } from './a2734_cookery_oil_pot_core.js';
+import {GRILLING_OIL_BUCKET_POINTS,oilTypeForBucketId} from './a2738_oil_contract_core.js';
 
-export const ITEM_FILL_POINTS=8;
-
-export function oilTypeForBucketId(itemId,oilTypes={}){
- for(const [type,row] of Object.entries(oilTypes??{})){
-  if(row?.bucket===itemId)return type;
- }
- return '';
-}
+export const ITEM_FILL_POINTS=GRILLING_OIL_BUCKET_POINTS;
+export {oilTypeForBucketId};
 
 export function isCookeryOilPotItemId(itemId){
  return itemId===COOKERY_EMPTY_ID||itemId===COOKERY_FILLED_ID;
