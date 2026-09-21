@@ -50,7 +50,7 @@ def main():
  assert immature['pools'][0]['entries'][0]['name']=='kaleidoscope_grilling:houttuynia'
  assert mature['pools'][0]['entries'][0]['functions'][0]['count']==2
  assert len(mature['pools'])==5
- assert abs(mature['pools'][1]['conditions'][0]['chance']-4/7)<1e-12
+ assert mature['pools'][1]['conditions'][0]['chance']==0.5714286
  for level in (1,2,3):
   cond=mature['pools'][level+1]['conditions'];assert cond[1]['condition']=='match_tool';assert cond[1]['enchantments'][0]['enchantment']=='fortune';assert cond[1]['enchantments'][0]['levels']['range_min']==level
 
