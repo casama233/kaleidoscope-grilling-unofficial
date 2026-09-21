@@ -1,0 +1,25 @@
+{
+  "version": "A2.7.34",
+  "cookery_oil_contract_fix": true,
+  "active_consumers": 4,
+  "consumer_direct_host_key_access": 0,
+  "normal_missing_count": 0,
+  "legacy_placement_missing_count": 256,
+  "native_fat_retyping_blocked": true,
+  "a2733_seasoning_corrective_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 175,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 610,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

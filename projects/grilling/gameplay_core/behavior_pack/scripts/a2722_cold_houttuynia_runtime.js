@@ -5,7 +5,7 @@ import {
 } from './a2722_cold_houttuynia_core.js';
 import {
  COOKERY_FILLED_ID,readCookeryOilPot,buildCookeryOilPot
-} from './a2730_cookery_oil_pot_adapter.js';
+} from './a2734_cookery_oil_pot_adapter.js';
 
 function inventory(player){return player.getComponent('minecraft:inventory')?.container}
 function main(player){return inventory(player)?.getItem(player.selectedSlotIndex)}

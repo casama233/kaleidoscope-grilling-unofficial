@@ -1,0 +1,43 @@
+{
+  "version": "A2.7.34",
+  "scope": "correct Cookery oil-pot read modes and route the missed world-oil consumer through one adapter",
+  "audit_finding": {
+    "a2730_claimed_active_consumers": 3,
+    "actual_active_consumers_before_a2734": 4,
+    "missed_consumer": "a23_oil_world.js",
+    "a2730_conflated_normal_item_read_with_legacy_placement_fallback": true
+  },
+  "cookery_bedrock_1_0_6": {
+    "normal_item_read_missing_count": 0,
+    "legacy_filled_item_placement_missing_count": 256,
+    "native_capacity": 256,
+    "host_count_key": "kc_oil_count"
+  },
+  "java_1_1_1": {
+    "get_count_missing_component": 0,
+    "fat_capacity": 256,
+    "typed_fluid_capacity": 64
+  },
+  "active_consumers_after": [
+    "main.js grill brushing",
+    "a26_oil_machine_runtime.js Big Vat filling",
+    "a2722_cold_houttuynia_runtime.js premium chili consumption",
+    "a23_oil_world.js source pickup into Cookery pot"
+  ],
+  "after": {
+    "active_adapter": "a2734_cookery_oil_pot_adapter.js",
+    "active_consumers": 4,
+    "consumer_direct_host_key_access": 0,
+    "consumer_direct_host_item_id_literals": 0,
+    "normal_missing_count_fallback": 0,
+    "legacy_placement_fallback_exposed_separately": true,
+    "native_fat_retyping_blocked": true
+  },
+  "remaining_infrastructure_duplicates": [
+    "player hand/inventory/creative helpers across active runtimes",
+    "face/offset and coordinate-key helpers",
+    "per-slice manifest/version/package CI boilerplate"
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

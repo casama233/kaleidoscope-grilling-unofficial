@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.34",
+  "tested_commit": "d5287db8b50c192b90b3434fcb67d7f16a591901",
+  "run_id": "35613316864",
+  "incremental_from_published_a2733": true,
+  "cookery_oil_contract_fix": true,
+  "active_consumers": 4,
+  "consumer_direct_host_key_access": 0,
+  "normal_missing_count": 0,
+  "legacy_placement_missing_count": 256,
+  "native_fat_retyping_blocked": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "7cc41dc41a09d3b14288a1d5f79779abd3b0e57368fdbd7489810326d1ab56c9",
+  "brproject_sha256": "373ece3b0fe95b5065f91bc3fd0a629c1a0d763b2cda3503d7f8fa4a98c87384",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

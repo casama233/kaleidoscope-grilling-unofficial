@@ -6,7 +6,7 @@ import {
  toolProgress,pressVisualStage,normalizePress,pressAddCake,impactPress,finishPressTransfer,
  normalizeVat,vatVisualLevel,vatInsert,vatExtract,potFillPlan,nearbyOffsets
 } from './a26_oil_machine_core.js';
-import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,readCookeryOilPot,buildCookeryOilPot} from './a2730_cookery_oil_pot_adapter.js';
+import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,readCookeryOilPot,buildCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';

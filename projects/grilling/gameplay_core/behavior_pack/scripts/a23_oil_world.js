@@ -1,5 +1,6 @@
 import {world,system,ItemStack,EquipmentSlot,GameMode,BlockPermutation} from '@minecraft/server';
-import {FLUID_CAPACITY,OIL_BUCKET_POINTS} from './a24_skewering_core.js';
+import {OIL_BUCKET_POINTS} from './a24_skewering_core.js';
+import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
 
 const REG='kaleidoscope_grilling:a23_oil_sources';
 export const OIL_TYPES=Object.freeze({
@@ -9,7 +10,6 @@ export const OIL_TYPES=Object.freeze({
 });
 const BLOCK_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.block,k])));
 const BUCKET_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.bucket,k])));
-const COOKERY_EMPTY='kaleidoscope_cookery:oil_pot',COOKERY_FILLED='kaleidoscope_cookery:oil_pot_filled';
 const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,1],South:[0,0,-1]};
 const HORIZ=[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
 const MAX_SOURCES=64,MAX_CELLS=160,MAX_DROP=16;
@@ -88,22 +88,14 @@ function placeFromBucket(player,dim,loc,type,hand){
  if(!setOil(b,type,0))return false;registerSource(dim,loc,type);
  if(!creative(player))setHand(player,hand,new ItemStack('minecraft:bucket',1));return true;
 }
-function cookeryType(stack){try{return String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'')}catch{return ''}}
-function cookeryCount(stack){try{return Math.max(0,Math.min(FLUID_CAPACITY,Number(stack?.getDynamicProperty('kc_oil_count')??0)|0))}catch{return 0}}
 function takeSource(player,block,type,hand,toCookery=false){
  if(level(block)!==0)return false;
  const held=hand==='off'?off(player):main(player);
  let nextPot;
  if(toCookery){
-  const currentType=held?.typeId===COOKERY_FILLED?cookeryType(held):'',current=held?.typeId===COOKERY_FILLED?cookeryCount(held):0;
-  if((currentType&&currentType!==type)||current+OIL_BUCKET_POINTS>FLUID_CAPACITY)return false;
-  nextPot=new ItemStack(COOKERY_FILLED,1);
-  try{
-   const next=current+OIL_BUCKET_POINTS;
-   nextPot.setLore(['§7Oil: '+next+'/'+FLUID_CAPACITY]);
-   nextPot.setDynamicProperty('kc_oil_count',next);
-   nextPot.setDynamicProperty('kaleidoscope_grilling:oil_type',type);
-  }catch{}
+  const plan=planCookeryTypedOilAddition(held,type,OIL_BUCKET_POINTS);
+  if(!plan.ok)return false;
+  nextPot=plan.next;
  }
  const rows=readReg(),k=posKey(block.dimension.id,block.x,block.y,block.z),row=rows.find(r=>r.k===k);
  try{block.setType('minecraft:air')}catch{return false}
