@@ -31,7 +31,7 @@ def main():
  core=(BP/'scripts/a272_cookery_processing_core.js').read_text(encoding='utf-8')
  for token in ("KC_API=1","BOARD_CUTS=4","kind:'chopping_board'","kind:'millstone'","SWEET_POTATO_ID='kaleidoscope_grilling:sweet_potato'"):assert token in core,token
  rt=(BP/'scripts/a272_cookery_processing_runtime.js').read_text(encoding='utf-8')
- for token in ('kaleidoscope_cookery:api_ready','KC_REGISTER_EVENT','recipesForReady','sendScriptEvent'):assert token in rt,token
+ for token in ('KC_READY_EVENT','KC_REGISTER_EVENT','recipesForReady','sendScriptEvent'):assert token in rt,token
  main=(BP/'scripts/main.js').read_text(encoding='utf-8');assert "import './a272_cookery_processing_runtime.js';" in main
 
  for p in (BP/'scripts').glob('*.js'):subprocess.run(['node','--check',str(p)],check=True)
