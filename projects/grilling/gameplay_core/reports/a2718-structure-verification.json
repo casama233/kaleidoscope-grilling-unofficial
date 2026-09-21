@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.18",
+  "onion_millstone_registered": true,
+  "output_count": 1,
+  "output_chance": 1.0,
+  "additional_api_ping": false,
+  "locked_baseline_onion_input_exact": true,
+  "third_party_common_tag_expansion": false,
+  "survival_onion_processing_chain_complete": true,
+  "a2717_onion_crop_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
