@@ -46,9 +46,9 @@ if artifact is None:
     artifact = max(candidates, key=ver)
 ART = Path(artifact)
 if version is None:
-    m = re.search(r'A2\.(\d+)\.(\d+)', ART.name)
+    m = re.search(r'A2\.(?P<major>\d+)\.(?P<minor>\d+)', ART.name)
     assert m, ART.name
-    version = f'{m.group(1)}.{m.group(2)}'
+    version = f'2.{m.group("major")}.{m.group("minor")}'
 
 if out.exists(): shutil.rmtree(out)
 out.mkdir(parents=True)
@@ -88,6 +88,7 @@ ITEM_VARS = {
     'a25_plate_recipe_runtime.js': ['stack', 'out', 'output', 'book'],
     'a26_oil_machine_runtime.js': ['out', 'stack'],
     'a279_beef_board_runtime.js': ['stack'],
+    'a2730_cookery_oil_pot_adapter.js': ['out', 'stack'],
 }
 rewritten = {}
 for name, vars_ in ITEM_VARS.items():
@@ -199,18 +200,20 @@ for p in sorted((bp / 'blocks').glob('*.json')):
 assert tagged, 'no crop tag removed'
 print('tag:minecraft:crop removed from:', tagged)
 
-# 9. recipes: unlock data
-UNLOCK = {'oil_press.json': 'minecraft:iron_ingot', 'oil_cake.json': 'kaleidoscope_grilling:canola_powder',
-          'big_vat.json': 'minecraft:brick_block'}
-for name, gate in UNLOCK.items():
-    p = bp / 'recipes' / name
-    if not p.exists(): continue
+# 9. recipes: unlock data (1.20+ crafting recipes are rejected without it;
+# furnace recipes do not need any)
+PREFERENCE = ['minecraft:iron_ingot', 'minecraft:brick_block', 'minecraft:bucket']
+for p in sorted((bp / 'recipes').glob('*.json')):
     j = json.loads(p.read_text(encoding='utf-8'))
-    r = j.get('minecraft:recipe_shaped')
+    r = j.get('minecraft:recipe_shaped') or j.get('minecraft:recipe_shapeless')
     if r is None or 'unlock' in r: continue
+    items = [v.get('item') for v in r.get('key', {}).values() if isinstance(v, dict) and v.get('item')]
+    items += [i.get('item') for i in r.get('ingredients', []) if isinstance(i, dict) and i.get('item')]
+    assert items, p.name
+    gate = next((w for w in PREFERENCE if w in items), items[0])
     r['unlock'] = [{'item': gate}]
     p.write_text(json.dumps(j, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-    print(name, 'unlock ->', gate)
+    print(p.name, 'unlock ->', gate)
 
 # 10. guide payload
 ICON = 'textures/items/grilled_beef_skewer'
