@@ -1,6 +1,7 @@
 from __future__ import annotations
 import hashlib,json,shutil,urllib.request
 from pathlib import Path
+from a27_recipe_build import build_all as build_recipes
 
 ROOT=Path(__file__).resolve().parents[2]
 P=ROOT/'projects/grilling/gameplay_core';BP=P/'behavior_pack';RP=P/'resource_pack';DEV=Path(__file__).parent
@@ -104,9 +105,11 @@ def add_items():
 def patch_scripts():
  shutil.copy2(DEV/'a27_items_core.js',BP/'scripts/a27_items_core.js')
  shutil.copy2(DEV/'a27_food_runtime.js',BP/'scripts/a27_food_runtime.js')
+ shutil.copy2(DEV/'a27_recipe_core.js',BP/'scripts/a27_recipe_core.js')
+ shutil.copy2(DEV/'a27_dynamic_recipe_runtime.js',BP/'scripts/a27_dynamic_recipe_runtime.js')
  p=BP/'scripts/main.js';s=p.read_text(encoding='utf-8')
  anchor="import './a26_oil_machine_runtime.js';"
- s=replace_once(s,anchor,anchor+"\nimport './a27_food_runtime.js';",'A2.7 food runtime import')
+ s=replace_once(s,anchor,anchor+"\nimport './a27_food_runtime.js';\nimport './a27_dynamic_recipe_runtime.js';",'A2.7 runtime imports')
  p.write_text(s,encoding='utf-8')
 
 def report():
@@ -129,5 +132,5 @@ def report():
 
 def main():
  if load(BP/'manifest.json')['header']['version']!=[2,6,0]:raise RuntimeError('A2.7 must augment verified A2.6')
- patch_manifest();add_items();patch_scripts();report();print('A2.7 item augmentation complete')
+ patch_manifest();add_items();patch_scripts();build_recipes(DEV,BP,P);report();print('A2.7 item + recipe augmentation complete')
 if __name__=='__main__':main()
