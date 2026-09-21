@@ -80,16 +80,16 @@ function deliverExtractOutput(player,stack){
  player.dimension.spawnItem(stack,player.location);return true;
 }
 function extract(block,player,all=false){
- const state=readState(block);if(!canExtract(state))return 0;const c=inv(block);if(!c)return 0;let count=0;
+ const state=readState(block);if(!canExtract(state))return 0;const c=inv(block);if(!c)return 0;let count=0,aborted=false;
  for(let i=0;i<3;i++){
   const raw=c.getItem(i);if(!raw)continue;
-  let output;try{output=outputFor(raw,state,outputKind(state))}catch{break}
-  try{c.setItem(i,undefined)}catch{break}
+  let output;try{output=outputFor(raw,state,outputKind(state))}catch{aborted=true;break}
+  try{c.setItem(i,undefined)}catch{aborted=true;break}
   try{deliverExtractOutput(player,output)}
-  catch{try{c.setItem(i,raw)}catch{};message(player,'§c取串失敗，原串已嘗試回滾');break}
+  catch{try{c.setItem(i,raw)}catch{};message(player,'§c取串失敗，原串已嘗試回滾');aborted=true;break}
   count++;if(!all)break;
  }
- if(occupied(block)===0)resetBlock(block,state.lit);
+ if(!aborted&&occupied(block)===0)resetBlock(block,state.lit);
  if(count)try{block.dimension.playSound('random.pop',block.location)}catch{}
  return count;
 }
