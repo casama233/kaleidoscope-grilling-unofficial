@@ -145,7 +145,7 @@ function planSeasoningBottle(player,hand,needed){
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 """
- s=replace_between(s,'function consumeCookeryOil(player,hand,needed){','function handleGrill(block,player,hand=',new_plans+'function handleGrill(block,player,hand=','resource planning')
+ s=replace_between(s,'function consumeCookeryOil(player,hand,needed){','function handleGrill(block,player,hand=',new_plans,'resource planning')
 
  old_flint="""if(id==='minecraft:flint_and_steel'){
   if(!state.lit){state=light(state,true);writeState(block,state);damageHandTool(player,hand,1);try{block.dimension.playSound('fire.ignite',block.location)}catch{}message(player,'§6烤爐已點火')}
