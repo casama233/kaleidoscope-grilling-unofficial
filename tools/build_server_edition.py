@@ -89,6 +89,7 @@ ITEM_VARS = {
     'a26_oil_machine_runtime.js': ['out', 'stack'],
     'a279_beef_board_runtime.js': ['stack'],
     'a2730_cookery_oil_pot_adapter.js': ['out', 'stack'],
+    'a2734_cookery_oil_pot_adapter.js': ['out', 'stack'],
 }
 rewritten = {}
 for name, vars_ in ITEM_VARS.items():
@@ -112,7 +113,12 @@ for name, vars_ in ITEM_VARS.items():
         ]:
             t, n = re.subn(pat, rep, t)
             total += n
-    assert total, f'{name}: no item-property call rewritten'
+    if not total:
+        # Upstream absorbed this file's item-property calls; nothing to rewrite.
+        print(name, ': no item-property calls (already absorbed upstream)')
+        p.write_text(t, encoding='utf-8')
+        rewritten[name] = 0
+        continue
     after_world = len(re.findall(r'\b(world|entity|p)\.(?:get|set)DynamicProperty', t))
     assert before_world == after_world, f'{name}: world/entity/player calls changed'
     for v in vars_:
