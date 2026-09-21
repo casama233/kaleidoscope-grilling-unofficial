@@ -104,14 +104,3 @@ system.beforeEvents.startup.subscribe(init=>{
  });
 });
 
-world.afterEvents.playerBreakBlock.subscribe(event=>{
- try{
-  if(event.brokenBlockPermutation?.type?.id!=='minecraft:short_grass')return;
-  const player=event.player;if(!player||creative(player))return;
-  if(!STRAW_HATS.includes(headItem(player)?.typeId??''))return;
-  const fortune=fortuneLevel(event.itemStackBeforeBreak);
-  const count=onionAcquisitionCount(Math.random(),fortune);
-  if(!shouldDropOnionAcquisition(Math.random()))return;
-  dropAt(event.block,ONION_ID,count);
- }catch{}
-});

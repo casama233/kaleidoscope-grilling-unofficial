@@ -104,16 +104,5 @@ system.beforeEvents.startup.subscribe(init=>{
  });
 });
 
-world.afterEvents.playerBreakBlock.subscribe(event=>{
- try{
-  if(event.brokenBlockPermutation?.type?.id!=='minecraft:short_grass')return;
-  const player=event.player;if(!player||creative(player))return;
-  if(!STRAW_HATS.includes(headItem(player)?.typeId??''))return;
-  const fortune=fortuneLevel(event.itemStackBeforeBreak);
-  const count=acquisitionSeedCount(Math.random(),fortune);
-  if(!shouldDropAcquisition(Math.random()))return;
-  dropAt(event.block,SEEDS_ID,count);
- }catch{}
-});
 
 export const a2715StrawHatIds=STRAW_HATS;

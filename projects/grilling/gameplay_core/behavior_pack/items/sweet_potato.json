@@ -19,7 +19,7 @@
       "minecraft:max_stack_size": 64,
       "minecraft:allow_off_hand": true,
       "minecraft:use_modifiers": {
-        "start_using": "always",
+        "start_using": "if_first",
         "use_duration": 1.6,
         "movement_modifier": 0.35
       },
@@ -35,6 +35,16 @@
         "tags": [
           "minecraft:is_food"
         ]
+      },
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:sweet_potato_crop",
+        "use_on": [
+          "minecraft:farmland"
+        ],
+        "replace_block_item": false
+      },
+      "minecraft:compostable": {
+        "composting_chance": 65
       }
     }
   }

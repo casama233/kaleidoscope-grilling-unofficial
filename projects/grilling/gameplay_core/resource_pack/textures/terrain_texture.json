@@ -133,6 +133,30 @@
     },
     "onion_stage7": {
       "textures": "textures/blocks/crop/onion/stage7"
+    },
+    "sweet_potato_stage0": {
+      "textures": "textures/blocks/crop/sweet_potato/stage0"
+    },
+    "sweet_potato_stage1": {
+      "textures": "textures/blocks/crop/sweet_potato/stage1"
+    },
+    "sweet_potato_stage2": {
+      "textures": "textures/blocks/crop/sweet_potato/stage2"
+    },
+    "sweet_potato_stage3": {
+      "textures": "textures/blocks/crop/sweet_potato/stage3"
+    },
+    "sweet_potato_stage4": {
+      "textures": "textures/blocks/crop/sweet_potato/stage4"
+    },
+    "sweet_potato_stage5": {
+      "textures": "textures/blocks/crop/sweet_potato/stage5"
+    },
+    "sweet_potato_stage6": {
+      "textures": "textures/blocks/crop/sweet_potato/stage6"
+    },
+    "sweet_potato_stage7": {
+      "textures": "textures/blocks/crop/sweet_potato/stage7"
     }
   }
 }

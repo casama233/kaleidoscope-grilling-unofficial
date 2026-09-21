@@ -1,0 +1,82 @@
+{
+  "version": "A2.7.19",
+  "scope": "Sweet Potato crop + complete Java-order straw-hat CropDropHandler",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:sweet_potato",
+    "food": true,
+    "nutrition": 3,
+    "saturation_modifier": 0.1,
+    "plants": "kaleidoscope_grilling:sweet_potato_crop",
+    "plantable_on": [
+      "minecraft:farmland"
+    ],
+    "planting_priority": "minecraft:use_modifiers.start_using=if_first",
+    "composting_chance_percent": 65,
+    "texture_git_blob_sha1": "6761c2d89d46df2e536dd6df3fe9fdb7c2262259"
+  },
+  "crop": {
+    "ages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_age": 7,
+    "farmland_only": true,
+    "farmland_survival_min_light": 8,
+    "growth_min_light": 9,
+    "bonemeal_age_increase": [
+      2,
+      5
+    ],
+    "java_block_properties_source": "minecraft:beetroots",
+    "growth_math": "standard CropBlock helper",
+    "texture_git_blob_sha1": {
+      "stage0": "608a3eefe99930634897aee339356fd4d87a3829",
+      "stage1": "22f4433daf385c206e6da0e4860c5877c3ddbb66",
+      "stage2": "22f4433daf385c206e6da0e4860c5877c3ddbb66",
+      "stage3": "7b8349e033f88b4f5e79a55e258da8e38a1ccee7",
+      "stage4": "7b8349e033f88b4f5e79a55e258da8e38a1ccee7",
+      "stage5": "bec26da1ffb404891263206e4918de9e80fa19a8",
+      "stage6": "bec26da1ffb404891263206e4918de9e80fa19a8",
+      "stage7": "1c4f02073284ed2efb738bd69d090750a38ff75e"
+    }
+  },
+  "drops": {
+    "immature": "1 sweet_potato",
+    "mature": "3 + Binomial(Fortune+3, 0.5714286) sweet_potato; exact for vanilla Fortune 0..3",
+    "overleveled_fortune_exact": false
+  },
+  "initial_acquisition": {
+    "trigger": "successful minecraft:short_grass break",
+    "creative": false,
+    "required_head": [
+      "kaleidoscope_cookery:straw_hat",
+      "kaleidoscope_cookery:straw_hat_flower"
+    ],
+    "each_branch_chance": 0.125,
+    "each_branch_count": "1 + random(0..Fortune level)",
+    "java_branch_order": [
+      "kaleidoscope_grilling:canola_seeds",
+      "kaleidoscope_grilling:sweet_potato",
+      "kaleidoscope_grilling:onion"
+    ],
+    "single_unified_subscriber": true,
+    "java_branch_draw_order_complete": true,
+    "java_rng_algorithm_identical": false,
+    "reason": "Bedrock Script uses Math.random rather than Java RandomSource; branch/count/chance call order and distributions are matched, not the PRNG algorithm."
+  },
+  "downstream": {
+    "sweet_potato_to_powder_millstone": "A2.7.2",
+    "powder_kneading": "A2.7.1",
+    "powder_chopping_board": "A2.7.2",
+    "survival_acquisition_and_processing_to_sheet_complete": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}
