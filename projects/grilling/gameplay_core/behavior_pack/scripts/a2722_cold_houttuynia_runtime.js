@@ -1,6 +1,6 @@
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {
- COLD_ID,HOUTTUYNIA_ID,CRAFTING_TABLE_ID,REQUIRED_OIL_TYPE,FIRE_RESISTANCE_TICKS,
+ COLD_ID,HOUTTUYNIA_ID,CRAFTING_TABLE_ID,REQUIRED_OIL_TYPE,
  planColdHouttuynia
 } from './a2722_cold_houttuynia_core.js';
 import {
@@ -67,7 +67,3 @@ world.beforeEvents.playerInteractWithBlock.subscribe(ev=>{
  system.run(()=>{try{tryCraftColdHouttuynia(player)}catch{}});
 });
 
-world.afterEvents.itemCompleteUse.subscribe(ev=>{
- if(ev.itemStack?.typeId!==COLD_ID)return;
- try{ev.source.addEffect('fire_resistance',FIRE_RESISTANCE_TICKS,{showParticles:true})}catch{}
-});

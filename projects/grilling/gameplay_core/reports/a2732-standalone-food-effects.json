@@ -1,0 +1,33 @@
+{
+  "version": "A2.7.32",
+  "scope": "consolidate standalone non-skewer food completion effects into one registry/handler",
+  "existing_main_skewer_effect_registry_preserved": true,
+  "standalone_foods": [
+    {
+      "item": "kaleidoscope_grilling:roasted_sweet_potato",
+      "effect": "persistent warmth",
+      "ticks": 600,
+      "stacking": "max(current_until, now+600)"
+    },
+    {
+      "item": "kaleidoscope_grilling:cold_houttuynia",
+      "effect": "minecraft fire_resistance",
+      "ticks": 1200
+    }
+  ],
+  "before": {
+    "standalone_food_effect_runtime_modules": 2,
+    "standalone_item_complete_use_subscribers": 2
+  },
+  "after": {
+    "standalone_food_effect_runtime_modules": 1,
+    "standalone_item_complete_use_subscribers": 1,
+    "registry_rows": 2
+  },
+  "cold_houttuynia_crafting_runtime_retained": true,
+  "old_roasted_runtime_retained_for_historical_slice_rebuilds": true,
+  "old_cold_source_retained_in_development_history": true,
+  "future_ready_for_multi_effect_foods": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

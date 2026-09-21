@@ -15,7 +15,7 @@ import './a2710_chicken_acquisition_runtime.js';
 import './a2712_remaining_knife_drops_runtime.js';
 import './a2714_houttuynia_crop_runtime.js';
 import './a2731_farmland_crop_host_runtime.js';
-import './a2720_roasted_sweet_potato_runtime.js';
+import './a2732_standalone_food_effect_runtime.js';
 import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
