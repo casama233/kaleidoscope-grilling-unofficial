@@ -1,6 +1,7 @@
-# A2.7.14 伺服器版（Senluo 部署）— 差異與引擎除錯紀錄
+# A2.7.x 伺服器版（Senluo 部署）— 差異與引擎除錯紀錄
 
-> 基準產物：`artifacts/Kaleidoscope_Grilling_A2.7.14_Houttuynia_Crop.mcaddon`（上游建置，未修改上游檔案）。
+> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.20_Roasted_Sweet_Potato.mcaddon`（上游建置，未修改上游檔案）。
+> 首輪為 A2.7.14（同一組差異，已在隔離引擎與正式服各驗證一次）；差異表與工具以最新產物為準，兩版輸入差異見 §7。
 > 部署對象：實際運營的 Bedrock 專用伺服器 1.26.51.1，與森羅物語：廚房 1.0.6 併用。
 > 本文件只記錄「伺服器版相對上游產物的差異」與「以伺服器自帶 Content Log／腳本除錯得到的結果」。
 
@@ -60,4 +61,18 @@
 
 ## 6. 重現
 
-`tools/build_server_edition.py` 以倉庫內的 A2.7.14 產物為輸入，依上表逐項套用差異並自我檢查（每個取代都要求命中次數相符），輸出可直接部署的 `BP/`＋`RP/` 目錄。
+`tools/build_server_edition.py` 以倉庫內最新的 A2.7 產物為輸入，依上表逐項套用差異並自我檢查（每個取代都要求命中次數相符、且不得動到 `world`／`entity`／玩家的屬性呼叫），輸出可直接部署的 `BP/`＋`RP/` 目錄：
+
+```
+python tools/build_server_edition.py [--artifact PATH] [--version X.Y.Z] [OUT_DIR]
+```
+
+## 7. A2.7.20 追加處理
+
+A2.7.15–A2.7.20 新增油菜／洋蔥／甘薯作物與烤甘薯，問題類別相同，工具已一併涵蓋：
+
+- 新增 4 個作物方塊的 `tag:minecraft:crop` 移除（`canola_crop`／`onion_crop`／`houttuynia_crop`／`sweet_potato_crop`）。
+- `ambient_occlusion` 布林值共 40 處改為數值。
+- 新配方 `roasted_sweet_potato` 為熔爐配方，不需要 `unlock`（1.20+ 只要求工作台配方）。
+- `main.js` 物品屬性呼叫點由 37 處增至 47 處，改寫改以「物品變數名」為準，並斷言世界／實體／玩家的同名呼叫數量不變。
+- 引擎複驗（隔離 BDS）：指南入口仍為 9 個條目並由廚房宿主註冊；大缸放置與空桶往返透過。
