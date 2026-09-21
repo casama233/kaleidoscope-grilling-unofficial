@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.31",
+  "farmland_crop_host": true,
+  "hosted_crops": 3,
+  "active_ordinary_crop_runtime_modules": 1,
+  "grass_acquisition_subscribers": 1,
+  "houttuynia_special_runtime_retained": true,
+  "component_ids_unchanged": true,
+  "a2730_oil_adapter_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

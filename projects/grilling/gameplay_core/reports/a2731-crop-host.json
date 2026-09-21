@@ -1,0 +1,39 @@
+{
+  "version": "A2.7.31",
+  "scope": "consolidate ordinary Grilling farmland crop runtimes without changing crop semantics",
+  "design_reference": {
+    "cookery_java_base_crop_block_blob": "fd8c6aa62714043c42535027818ce6dd03b48b84",
+    "principle": "share crop lifecycle machinery; keep per-crop data/overrides separate",
+    "behavior_copied_from_cookery_base_crop_block": false,
+    "reason": "Java Grilling canola/onion/sweet-potato classes extend vanilla CropBlock, so Cookery mature right-click harvest semantics must not be imported."
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "public_crop_extension_detected": false
+  },
+  "before": {
+    "ordinary_farmland_runtime_modules": 3,
+    "ordinary_farmland_startup_subscribers": 3,
+    "duplicated_helper_sets": 3,
+    "grass_acquisition_subscribers": 1
+  },
+  "after": {
+    "ordinary_farmland_runtime_modules": 1,
+    "ordinary_farmland_startup_subscribers": 1,
+    "shared_helper_sets": 1,
+    "registered_crop_components": 3,
+    "grass_acquisition_subscribers": 1
+  },
+  "hosted_crops": [
+    "canola",
+    "onion",
+    "sweet_potato"
+  ],
+  "houttuynia_special_runtime_retained": true,
+  "component_ids_unchanged": true,
+  "block_json_unchanged": true,
+  "old_runtime_files_retained_for_historical_slice_rebuilds": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

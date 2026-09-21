@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.30 Cookery Oil Pot Adapter",
+  "name": "Kaleidoscope Grilling A2.7.31 Farmland Crop Host",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_30_Cookery_Oil_Pot_Adapter"
+          "packName": "Kaleidoscope_Grilling_A2_7_31_Farmland_Crop_Host"
         }
       ]
     ]
