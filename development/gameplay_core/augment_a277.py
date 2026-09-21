@@ -63,8 +63,8 @@ function commitGrillAndHand(block,beforeState,nextState,player,hand,beforeStack,
   ()=>writeState(block,nextState),
   ()=>{if(mutateHand&&!creative(player))setHand(player,hand,nextStack)},
   ()=>writeState(block,beforeState),
-  ()=>{if(mutateHand&&!creative(player))setHand(player,hand,beforeStack)
- });
+  ()=>{if(mutateHand&&!creative(player))setHand(player,hand,beforeStack)}
+ );
  return r.ok;
 }"""
  s=replace_once(s,old,new,'state/resource transaction helper')
