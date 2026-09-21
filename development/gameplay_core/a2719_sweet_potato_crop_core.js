@@ -1,6 +1,6 @@
 import {
  MAX_AGE as VANILLA_MAX_AGE,FARMLAND_MIN_SURVIVAL_LIGHT,MIN_GROWTH_LIGHT,
- ACQUISITION_CHANCE,MATURE_BONUS_PROBABILITY,STRAW_HATS,CANOLA_SEEDS_ID,
+ ACQUISITION_CHANCE,MATURE_BONUS_PROBABILITY,STRAW_HATS,SEEDS_ID as CANOLA_SEEDS_ID,
  acquisitionSeedCount,shouldDropAcquisition,
  selectionHeight,bonemealAgeIncrease,javaCropGrowthSpeed,javaCropGrowthChance,shouldAdvanceAge
 } from './a2715_canola_crop_core.js';
