@@ -28,7 +28,7 @@ def main():
   'is(Blocks.SOUL_SAND)',
   'random.nextFloat() < 0.3F',
   'getRawBrightness(pos, 0) >= 8',
-  'ground.getBlock() instanceof FarmBlock || state.is(Blocks.SOUL_SAND)'
+  'state.getBlock() instanceof FarmBlock || state.is(Blocks.SOUL_SAND)'
  ):assert token in crop,token
 
  repl=fetch(next(p for p in FILES if p.endswith('FortressWartReplacementHandler.java'))).decode()
