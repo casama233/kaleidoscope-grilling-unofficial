@@ -42,7 +42,8 @@ world.afterEvents.itemStartUse.subscribe(e=>{
 });
 
 world.afterEvents.itemStopUse.subscribe(e=>{
- if(e.itemStack?.typeId===POWDER_ID||ACTIVE_KNEADS.has(e.source.id))clear(e.source.id);
+ if(e.itemStack?.typeId!==POWDER_ID&&!ACTIVE_KNEADS.has(e.source.id))return;
+ if((Number(e.useDuration)||0)>0)clear(e.source.id);
 });
 
 world.afterEvents.itemCompleteUse.subscribe(e=>{
