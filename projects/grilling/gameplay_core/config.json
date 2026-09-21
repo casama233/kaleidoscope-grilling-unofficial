@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.11 Mantou Chopping",
+  "name": "Kaleidoscope Grilling A2.7.12 Remaining Knife Drops",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_11_Mantou_Chopping"
+          "packName": "Kaleidoscope_Grilling_A2_7_12_Remaining_Knife_Drops"
         }
       ]
     ]

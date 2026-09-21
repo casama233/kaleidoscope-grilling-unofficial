@@ -217,6 +217,9 @@
     },
     "raw_mantou_slice": {
       "textures": "textures/items/raw_mantou_slice"
+    },
+    "squid_tentacle": {
+      "textures": "textures/items/squid_tentacle"
     }
   }
 }

@@ -13,6 +13,7 @@ import './a278_basic_chopping_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
 import './a2711_mantou_chopping_runtime.js';
+import './a2712_remaining_knife_drops_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
