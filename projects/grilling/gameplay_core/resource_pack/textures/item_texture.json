@@ -190,6 +190,12 @@
     },
     "oil_residue": {
       "textures": "textures/items/oil_residue"
+    },
+    "sweet_potato_powder": {
+      "textures": "textures/items/sweet_potato_powder"
+    },
+    "raw_sweet_potato_sheet": {
+      "textures": "textures/items/raw_sweet_potato_sheet"
     }
   }
 }

@@ -7,6 +7,7 @@ import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_
 import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
 import './a26_oil_machine_runtime.js';
+import './a271_sweet_potato_runtime.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
 const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();
@@ -143,7 +144,7 @@ function cookedIngredientRows(rows){
 }
 function setCookedIngredientRows(stack,rows){try{stack.setDynamicProperty(SECRET_COOKED_INGREDIENTS_KEY,JSON.stringify(cookedIngredientRows(rows)))}catch{}return stack}
 function dynamicFood(stack){return stack?.typeId===SECRET_ID?secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack)):FOOD_DATA[stack?.typeId]}
-function isEdible(stack){try{return !!stack?.getComponent('minecraft:food')}catch{return false}}
+function isEdible(stack){if(stack?.typeId==='kaleidoscope_grilling:sweet_potato_powder')return false;try{return !!stack?.getComponent('minecraft:food')}catch{return false}}
 function threadOutcome(player){
  const food=heldMain(player),off=heldOff(player);if(!food||!off||player.isSneaking)return null;
  if(off.typeId!=='minecraft:stick'&&off.typeId!==UNFINISHED_ID&&!(off.typeId===SECRET_ID&&!isSecretCooked(off)))return null;

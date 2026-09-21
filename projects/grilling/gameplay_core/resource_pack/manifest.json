@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.6 Gameplay RP",
+    "name": "Kaleidoscope Grilling A2.7.1 Gameplay RP",
     "description": "逐口3D與四瓶調料外觀；需要 Cookery 1.0.6",
     "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
     "version": [
       2,
-      6,
-      0
+      7,
+      1
     ],
     "min_engine_version": [
       1,
@@ -21,8 +21,8 @@
       "uuid": "e7d592db-f4a0-53ce-8b0a-cab7a0cee8d7",
       "version": [
         2,
-        6,
-        0
+        7,
+        1
       ]
     }
   ],

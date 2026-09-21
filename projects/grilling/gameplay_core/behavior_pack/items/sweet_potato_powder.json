@@ -1,0 +1,36 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:sweet_potato_powder",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "item.kaleidoscope_grilling:sweet_potato_powder.name"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "sweet_potato_powder"
+        }
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:allow_off_hand": true,
+      "minecraft:use_modifiers": {
+        "start_using": "always",
+        "use_duration": 1.5,
+        "movement_modifier": 0.2
+      },
+      "minecraft:food": {
+        "can_always_eat": true,
+        "nutrition": 0,
+        "saturation_modifier": 0.0
+      },
+      "minecraft:use_animation": {
+        "value": "bow"
+      }
+    }
+  }
+}

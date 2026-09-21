@@ -1,0 +1,33 @@
+{
+  "version": "A2.7.1",
+  "scope": "sweet potato powder direct kneading only; this is not the full A2.7 recipe reconciliation",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "items": [
+    "kaleidoscope_grilling:sweet_potato_powder",
+    "kaleidoscope_grilling:raw_sweet_potato_sheet"
+  ],
+  "direct_knead": {
+    "duration_ticks": 30,
+    "duration_seconds": 1.5,
+    "use_animation": "bow",
+    "transforms_entire_starting_stack": true,
+    "completion_sound": "armor.equip_leather",
+    "volume": 0.8,
+    "pitch": 1.1
+  },
+  "java_alternate_processing": {
+    "cookery_chopping_board": {
+      "cut_count": 4,
+      "ported_in_this_slice": false
+    },
+    "cookery_millstone_sweet_potato_to_powder": false,
+    "create_milling_sweet_potato_to_powder": false
+  },
+  "known_platform_substitutions": [
+    "Bedrock retail needs a native use-capable component to emit start/complete-use events. The powder uses a zero-nutrition always-usable food component only as an input shim, while the script performs the Java full-stack transformation.",
+    "The pseudo-food input shim is explicitly excluded from Secret Skewer ingredient eligibility.",
+    "Cookery chopping-board and millstone integration are intentionally deferred to the next small A2.7 processing slice instead of being reported as complete."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
