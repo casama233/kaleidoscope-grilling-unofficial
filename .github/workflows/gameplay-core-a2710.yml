@@ -192,13 +192,13 @@ jobs:
               src=p/name;uid=load(src/'manifest.json')['header']['uuid']
               found=[x.parent for x in (p/'builds/dist').rglob('manifest.json') if load(x).get('header',{}).get('uuid')==uid]
               assert len(found)==1,(name,found);packs[name]=found[0]
-          mc=art/'Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.mcaddon'
+          mc=art/'Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.mcaddon'
           with zipfile.ZipFile(mc,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for name,pack in packs.items():
                   for f in sorted(pack.rglob('*')):
                       if f.is_file():z.write(f,name+'/'+f.relative_to(pack).as_posix())
           with zipfile.ZipFile(mc) as z:assert z.testzip() is None
-          br=art/'Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.brproject'
+          br=art/'Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.brproject'
           with zipfile.ZipFile(br,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for f in sorted(p.rglob('*')):
                   rel=f.relative_to(p)
@@ -224,11 +224,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.brproject
-          git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override."); assert p and all(x.startswith(ok) for x in p)'
+          git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.brproject
+          git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping."); assert p and all(x.startswith(ok) for x in p)'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'feat: publish A2.7.10 beef board override'
+          git commit -m 'feat: publish A2.7.10 mantou chopping'
           AUTH=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
           git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $AUTH" push origin HEAD:main
           unset AUTH
@@ -236,10 +236,10 @@ jobs:
       - name: Upload A2.7.10 review artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: Kaleidoscope-Grilling-A2.7.10-Beef-Board-Override
+          name: Kaleidoscope-Grilling-A2.7.10-Mantou-Chopping
           path: |
-            artifacts/Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.mcaddon
-            artifacts/Kaleidoscope_Grilling_A2.7.10_Beef_Board_Override.brproject
+            artifacts/Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.mcaddon
+            artifacts/Kaleidoscope_Grilling_A2.7.10_Mantou_Chopping.brproject
             projects/grilling/gameplay_core/reports/
           retention-days: 14
           if-no-files-found: error
