@@ -155,6 +155,7 @@ jobs:
           Invoke-WebRequest 'https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon' -OutFile $cookery
           if ((Get-FileHash $cookery -Algorithm SHA256).Hash.ToLower() -ne 'c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351') { throw 'Cookery checksum mismatch' }
           python development/gameplay_core/verify_a279_cookery_contract.py $cookery
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python development/gameplay_core/verify_a2710_cookery_contract.py $cookery
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
