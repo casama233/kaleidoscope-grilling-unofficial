@@ -9,7 +9,7 @@ const world={
 };
 const system={get currentTick(){return tick}};
 const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Boolean,Error,Math});
-const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
+const root=new URL('./',import.meta.url);
 
 const sources={
  roasted:new URL('a2720_roasted_sweet_potato_core.js',root),
