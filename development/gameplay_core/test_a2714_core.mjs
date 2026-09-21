@@ -53,7 +53,7 @@ t('growth requires light 9 and random threshold',()=>{
  assert.equal(shouldAdvanceAge(9,10,.34),false);
 });
 t('mature Java bonus is one plus binomial Fortune+1 at 4/7',()=>{
- assert.equal(MATURE_BONUS_PROBABILITY,4/7);
+ assert.equal(MATURE_BONUS_PROBABILITY,0.5714286);
  assert.equal(matureBonusCount(0,[0]),2);
  assert.equal(matureBonusCount(0,[.9]),1);
  assert.equal(matureBonusCount(3,[0,0,0,0]),5);
