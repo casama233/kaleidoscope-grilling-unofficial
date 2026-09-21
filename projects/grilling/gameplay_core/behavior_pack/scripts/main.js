@@ -11,6 +11,7 @@ import './a271_sweet_potato_runtime.js';
 import './a272_cookery_processing_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
+import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
@@ -111,16 +112,26 @@ function decrementHand(player,hand,count=1){
  if(s.amount===count)setHand(player,hand,undefined);else{s.amount-=count;setHand(player,hand,s)}return true;
 }
 function decrementMain(player,count=1){return decrementHand(player,'main',count)}
-function damageHandTool(player,hand,amount=1){
- if(creative(player))return false;
- const stack=heldByHand(player,hand);if(!stack)return false;
+function planDamagedHand(player,hand,amount=1){
+ const stack=heldByHand(player,hand);if(!stack)return {ok:false,reason:'missing'};
+ const before=stack.clone();
+ if(creative(player))return {ok:true,before,next:before.clone(),mutate:false,broken:false};
  try{
-  const durability=stack.getComponent('minecraft:durability');if(!durability)return false;
-  const next=nextDurability(durability.damage,durability.maxDurability,amount,!!durability.unbreakable);
-  if(next.broken){setHand(player,hand,undefined);try{player.playSound('random.break',{volume:.8,pitch:1})}catch{};return true}
-  if(next.damage!==durability.damage){durability.damage=next.damage;setHand(player,hand,stack)}
-  return false;
- }catch{return false}
+  const durability=stack.getComponent('minecraft:durability');if(!durability)return {ok:false,reason:'not_durable'};
+  const plan=nextDurability(durability.damage,durability.maxDurability,amount,!!durability.unbreakable);
+  if(plan.broken)return {ok:true,before,next:undefined,mutate:true,broken:true};
+  const next=stack.clone(),d=next.getComponent('minecraft:durability');if(!d)return {ok:false,reason:'not_durable'};
+  d.damage=plan.damage;return {ok:true,before,next,mutate:true,broken:false};
+ }catch{return {ok:false,reason:'durability_error'}}
+}
+function commitGrillAndHand(block,beforeState,nextState,player,hand,beforeStack,nextStack,mutateHand=true){
+ const r=commitTwoParty(
+  ()=>writeState(block,nextState),
+  ()=>{if(mutateHand&&!creative(player))setHand(player,hand,nextStack)},
+  ()=>writeState(block,beforeState),
+  ()=>{if(mutateHand&&!creative(player))setHand(player,hand,beforeStack)}
+ );
+ return r.ok;
 }
 function give(player,stack){const c=mainContainer(player);if(!c)return;const rem=mergeIntoContainer(c,stack);if(rem)player.dimension.spawnItem(rem,player.location)}
 function copyOne(stack){const out=stack.clone();out.amount=1;return out}
@@ -289,16 +300,58 @@ function cookedStack(raw,state){
 }
 function failedStack(raw,id){const stack=new ItemStack(id,1);return copyCustomData(raw,stack)}
 function outputFor(raw,state,kind){if(kind==='raw')return copyOne(raw);if(kind==='dark')return failedStack(raw,DARK_ID);if(kind==='mysterious')return failedStack(raw,MYSTERIOUS_ID);return cookedStack(raw,state)}
+function firstEmptyPlayerSlot(player){
+ const c=mainContainer(player);if(!c)return -1;
+ for(let i=0;i<c.size;i++)if(!c.getItem(i))return i;
+ return -1;
+}
+function deliverExtractOutput(player,stack){
+ const c=mainContainer(player),plan=chooseExtractDelivery(firstEmptyPlayerSlot(player));
+ if(plan.kind==='inventory'&&c){c.setItem(plan.slot,stack);return true}
+ player.dimension.spawnItem(stack,player.location);return true;
+}
 function extract(block,player,all=false){
- const state=readState(block);if(!canExtract(state))return 0;const c=inv(block);if(!c)return 0;let count=0;
- for(let i=0;i<3;i++){const raw=c.getItem(i);if(!raw)continue;give(player,outputFor(raw,state,outputKind(state)));c.setItem(i,undefined);count++;if(!all)break}
- if(occupied(block)===0)resetBlock(block,state.lit);if(count)try{block.dimension.playSound('random.pop',block.location)}catch{}return count;
+ const state=readState(block);if(!canExtract(state))return 0;const c=inv(block);if(!c)return 0;let count=0,aborted=false;
+ for(let i=0;i<3;i++){
+  const raw=c.getItem(i);if(!raw)continue;
+  let output;try{output=outputFor(raw,state,outputKind(state))}catch{aborted=true;break}
+  try{c.setItem(i,undefined)}catch{aborted=true;break}
+  try{deliverExtractOutput(player,output)}
+  catch{try{c.setItem(i,raw)}catch{};message(player,'§c取串失敗，原串已嘗試回滾');aborted=true;break}
+  count++;if(!all)break;
+ }
+ if(!aborted&&occupied(block)===0)resetBlock(block,state.lit);
+ if(count)try{block.dimension.playSound('random.pop',block.location)}catch{}
+ return count;
+}
+function removeEscrow(entities){for(const e of entities)try{e?.remove()}catch{}}
+function restoreBrokenGrill(dim,loc,permutation,state,raws){
+ try{
+  let b=dim.getBlock(loc);if(!b)return;
+  b.setPermutation(permutation);b=dim.getBlock(loc)??b;
+  const c=inv(b);if(c)for(let i=0;i<3;i++)c.setItem(i,raws[i]);
+  writeState(b,state);
+ }catch{}
 }
 function customBreak(block,player){
- if(!block?.isValid||block.typeId!==GRILL_ID)return;const state=readState(block),kind=breakDisposition(state),c=inv(block);
- if(c)for(let i=0;i<3;i++){const raw=c.getItem(i);if(raw)player.dimension.spawnItem(outputFor(raw,state,kind),{x:block.x+.5,y:block.y+.4,z:block.z+.5})}
- clearContainer(block);clearState(block);removeGrillLegs(block);block.setType('minecraft:air');
- if(!creative(player))player.dimension.spawnItem(new ItemStack(GRILL_ID,1),{x:block.x+.5,y:block.y+.3,z:block.z+.5});
+ if(!block?.isValid||block.typeId!==GRILL_ID)return;
+ const state=readState(block),kind=breakDisposition(state),c=inv(block),dim=block.dimension,loc={...block.location},permutation=block.permutation;
+ const raws=[0,1,2].map(i=>c?.getItem(i)),drops=[];
+ try{
+  for(const raw of raws)if(raw)drops.push(outputFor(raw,state,kind));
+  if(!creative(player))drops.push(new ItemStack(GRILL_ID,1));
+ }catch{message(player,'§c拆除失敗：無法建立掉落物');return}
+ const escrow=[];
+ try{
+  for(let i=0;i<drops.length;i++)escrow.push(dim.spawnItem(drops[i],{x:loc.x+.5,y:loc.y+(i===drops.length-1&&!creative(player)?.3:.4),z:loc.z+.5}));
+ }catch{
+  removeEscrow(escrow);message(player,'§c拆除失敗：掉落物生成失敗');return;
+ }
+ try{
+  clearContainer(block);clearState(block);removeGrillLegs(block);block.setType('minecraft:air');
+ }catch{
+  removeEscrow(escrow);restoreBrokenGrill(dim,loc,permutation,state,raws);message(player,'§c拆除失敗，烤架內容已嘗試回滾');
+ }
 }
 function cookeryOilType(stack){try{const type=String(stack?.getDynamicProperty('kaleidoscope_grilling:oil_type')??'');return Object.hasOwn(OIL_TYPES,type)?type:''}catch{return ''}}
 function cookeryOilCount(stack){
@@ -306,26 +359,35 @@ function cookeryOilCount(stack){
  try{const raw=stack.getDynamicProperty(COOKERY_OIL_KEY);return raw===undefined?cap:Math.max(0,Math.min(cap,Number(raw)|0))}catch{return cap}
 }
 function heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}
-function consumeCookeryOil(player,hand,needed){
+function planCookeryOil(player,hand,needed){
  const stack=heldByHand(player,hand);if(stack?.typeId!==COOKERY_FILLED)return {ok:false,reason:'not_pot'};
  const count=cookeryOilCount(stack);if(count<needed)return {ok:false,reason:'insufficient',count};
- const type=cookeryOilType(stack);if(creative(player))return {ok:true,heat:heatForOil(type),remaining:count};
+ const type=cookeryOilType(stack),before=stack.clone(),heat=heatForOil(type);
+ if(creative(player))return {ok:true,heat,remaining:count,before,next:before.clone(),mutate:false};
  const remaining=count-needed,next=new ItemStack(remaining>0?COOKERY_FILLED:COOKERY_POT,1),cap=type?FLUID_CAPACITY:256;
  if(remaining>0){try{next.setLore(['§7Oil: '+remaining+'/'+cap]);next.setDynamicProperty(COOKERY_OIL_KEY,remaining);if(type)next.setDynamicProperty('kaleidoscope_grilling:oil_type',type)}catch{}}
- setHand(player,hand,next);return {ok:true,heat:heatForOil(type),remaining};
+ return {ok:true,heat,remaining,before,next,mutate:true};
 }
-function consumeSeasoningBottle(player,hand,needed){
+function planSeasoningBottle(player,hand,needed){
  const stack=heldByHand(player,hand);if(stack?.typeId!==SEASONING_ID)return {ok:false,reason:'not_seasoning'};
  const uses=getUses(stack),remaining=16-uses;if(remaining<needed)return {ok:false,reason:'insufficient',remaining};
- const ingredients=readSeasonings(stack);if(creative(player))return {ok:true,ingredients,uses};
- const next=uses+needed;if(next>=16)setHand(player,hand,new ItemStack(EMPTY_SEASONING_ID,1));
- else{setUses(stack,next);try{stack.setLore(['§7Uses: '+(16-next)+'/16'])}catch{}setHand(player,hand,stack)}
- return {ok:true,ingredients,uses:next};
+ const ingredients=readSeasonings(stack),before=stack.clone();
+ if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
+ const nextUses=uses+needed;
+ if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
+ const next=stack.clone();setUses(next,nextUses);try{next.setLore(['§7Uses: '+(16-nextUses)+'/16'])}catch{}
+ return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 function handleGrill(block,player,hand='main'){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;register(block);let state=readState(block);const held=heldByHand(player,hand),id=held?.typeId,n=occupied(block);
  if(id==='minecraft:flint_and_steel'){
-  if(!state.lit){state=light(state,true);writeState(block,state);damageHandTool(player,hand,1);try{block.dimension.playSound('fire.ignite',block.location)}catch{}message(player,'§6烤爐已點火')}
+  if(!state.lit){
+   const tool=planDamagedHand(player,hand,1),nextState=light(state,true);
+   if(!tool.ok){message(player,'§c點火失敗：打火石狀態無法提交');return}
+   if(!commitGrillAndHand(block,state,nextState,player,hand,tool.before,tool.next,tool.mutate)){message(player,'§c點火交易失敗，已嘗試回滾');return}
+   if(tool.broken)try{player.playSound('random.break',{volume:.8,pitch:1})}catch{}
+   try{block.dimension.playSound('fire.ignite',block.location)}catch{}message(player,'§6烤爐已點火')
+  }
   return
  }
  if(isExtinguishTool(id)&&state.lit){
@@ -333,14 +395,22 @@ function handleGrill(block,player,hand='main'){
  }
  if(id===COOKERY_FILLED){
   if(state.phase!==0||n<1){message(player,'§7現在不能刷油');return}
-  const oil=consumeCookeryOil(player,hand,n);if(!oil.ok){message(player,oil.reason==='insufficient'?'§c油量不足：需要 '+n+'，目前 '+oil.count:'§7需要森羅物語裝油的油壺');return}
-  const result=brush(state,n,oil.heat);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§e刷油完成，消耗 '+(creative(player)?0:n)+' 點油')}return;
+  const oil=planCookeryOil(player,hand,n);if(!oil.ok){message(player,oil.reason==='insufficient'?'§c油量不足：需要 '+n+'，目前 '+oil.count:'§7需要森羅物語裝油的油壺');return}
+  const result=brush(state,n,oil.heat);
+  if(result.ok){
+   if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
+   try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§e刷油完成，消耗 '+(creative(player)?0:n)+' 點油')
+  }return;
  }
  if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§8相容刷具：已刷油；正式流程請使用 Cookery 油壺')}return}
  if(id===SEASONING_ID){
   if(state.phase!==2||state.seasoned||n<1){message(player,'§7現在不能撒料');return}
-  const bottle=consumeSeasoningBottle(player,hand,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
-  const result=season(state,n,bottle.ingredients);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}message(player,'§a調味完成，消耗 '+(creative(player)?0:n)+' 次')}return;
+  const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
+  const result=season(state,n,bottle.ingredients);
+  if(result.ok){
+   if(!commitGrillAndHand(block,state,result.state,player,hand,bottle.before,bottle.next,bottle.mutate)){message(player,'§c撒料交易失敗，調料與烤架已嘗試回滾');return}
+   try{player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}message(player,'§a調味完成，消耗 '+(creative(player)?0:n)+' 次')
+  }return;
  }
  if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||(id===SECRET_ID&&!isSecretCooked(held)&&readSkewerRows(held).length===3))){
   if(!state.lit){message(player,'§c需要先點火');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}

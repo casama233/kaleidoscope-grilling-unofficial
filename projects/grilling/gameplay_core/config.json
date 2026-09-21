@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.6 Grill Intent Hand Parity",
+  "name": "Kaleidoscope Grilling A2.7.7 Transaction Rollback",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_6_Grill_Intent"
+          "packName": "Kaleidoscope_Grilling_A2_7_7_Transaction_Rollback"
         }
       ]
     ]

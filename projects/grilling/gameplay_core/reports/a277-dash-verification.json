@@ -1,10 +1,12 @@
 {
-  "version": "A2.7.6",
-  "deferred_intent_snapshot": true,
-  "main_offhand_grill_transactions": true,
-  "stale_intent_aborts": true,
-  "insert_rollback_on_decrement_failure": true,
-  "identical_two_hand_ambiguity_fallback": "main",
+  "version": "A2.7.7",
+  "state_resource_rollback": true,
+  "extract_source_first_delivery": true,
+  "extract_delivery_rollback": true,
+  "break_drop_escrow": true,
+  "break_snapshot_restore": true,
+  "entity_remove_cleanup": true,
+  "a276_intent_hand_preserved": true,
   "a275_input_hardening_preserved": true,
   "a274_java_icons_preserved": true,
   "a273_grill_helper_preserved": true,
@@ -12,7 +14,7 @@
   "compiled_packs": [
     {
       "pack": "behavior_pack",
-      "compared_files": 103,
+      "compared_files": 104,
       "matches_source": true
     },
     {
