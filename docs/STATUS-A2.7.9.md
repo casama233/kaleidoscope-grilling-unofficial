@@ -143,3 +143,5 @@ A2.7.9 除完整重建 A2.0 → A2.7.8 外，還會下載**精確 SHA-256 的 Co
 - `minecraft_tested=false`
 - `bds_tested=false`
 - `engine_rendering_verified=false`
+
+臨時用來反查 Cookery 1.0.6 state contract 的 probe workflow 不屬於交付物，正式 PR 只保留 checksum-pinned contract verifier。
