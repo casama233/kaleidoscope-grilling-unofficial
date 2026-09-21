@@ -176,7 +176,8 @@ def patch_recipes():
   ('roasted_sweet_potato',f'{NS}:sweet_potato',f'{NS}:roasted_sweet_potato')):
   for suffix,tag in (('smelting','furnace'),('smoking','smoker'),('campfire','campfire')):
    name=f'a27_{stem}_{suffix}';write(recipes/f'{name}.json',furnace(name,tag,input_id,output_id))
-   modes.append({'source':f'{stem}_{"" if suffix=="smelting" else suffix}.json'.replace('__','_'),'mode':'native_furnace','result':output_id})
+   source_name=f'{stem}.json' if suffix=='smelting' else f'{stem}_{suffix}.json'
+   modes.append({'source':source_name,'mode':'native_furnace','result':output_id})
  write(P/'reports/a27-recipe-catalog.json',{'java_baseline':'9a1acdab27698457bec16c9362678e574895a28c','mapped':modes,
    'dynamic_deferred':[{'recipe':'cold_houttuynia','reason':'Java consumes exactly 2 premium_chili points from stateful Cookery oil pot and returns the pot.'}],
    'optional_deferred':[{'recipe':'sour_spicy_noodles','reason':'Java recipe is conditional on optional kaleidoscope_tavern; Bedrock has no safe pack-load conditional for an unknown item id.'}],
