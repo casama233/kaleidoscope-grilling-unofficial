@@ -1,16 +1,18 @@
 {
-  "version": "A2.7.5",
-  "repeat_block_input_suppressed": true,
-  "java_shovel_extinguish_ported": true,
-  "oil_before_ignition_allowed": true,
-  "flint_and_steel_durability": true,
+  "version": "A2.7.6",
+  "deferred_intent_snapshot": true,
+  "main_offhand_grill_transactions": true,
+  "stale_intent_aborts": true,
+  "insert_rollback_on_decrement_failure": true,
+  "identical_two_hand_ambiguity_fallback": "main",
+  "a275_input_hardening_preserved": true,
   "a274_java_icons_preserved": true,
   "a273_grill_helper_preserved": true,
   "compiled": true,
   "compiled_packs": [
     {
       "pack": "behavior_pack",
-      "compared_files": 102,
+      "compared_files": 103,
       "matches_source": true
     },
     {

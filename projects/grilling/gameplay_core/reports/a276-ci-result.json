@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.6",
+  "tested_commit": "47e3fcaa1721d61abccf0bda036d362bd1e14574",
+  "run_id": "35561330351",
+  "deferred_intent_snapshot": true,
+  "main_offhand_grill_transactions": true,
+  "stale_intent_aborts": true,
+  "insert_rollback_on_decrement_failure": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "10ca32e9e9e95d0b2143a9c7ec0f32b3e841fd5108ea995f827755c9f1b574f8",
+  "brproject_sha256": "398d8d33ed4e6b89df5af47c877f9e3f5c1232621b03b2bc8a77a38947f49157",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,40 @@
+{
+  "version": "A2.7.6",
+  "scope": "deferred grill intent stability and Java InteractionHand parity only; no new content",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "fixes": {
+    "deferred_toctou": {
+      "status": "fixed",
+      "before": "system.run callback re-read whatever happened to be in main hand",
+      "after": "capture used-hand signature at before-event time; abort if selected main slot or used stack changes before deferred callback"
+    },
+    "interaction_hand": {
+      "status": "ported_with_ambiguity_fallback",
+      "java": "GrillBlock.use receives InteractionHand and consumes/animates that hand",
+      "bedrock": "infer used hand from PlayerInteractWithBlockBeforeEvent.itemStack versus main/offhand signatures; identical ambiguous stacks deterministically fall back to main"
+    },
+    "hand_transactions": {
+      "status": "fixed",
+      "covers": [
+        "flint_and_steel durability",
+        "shovel extinguish",
+        "Cookery oil consumption",
+        "compat oil brush",
+        "seasoning use",
+        "raw skewer insertion",
+        "flip animation"
+      ]
+    },
+    "insert_rollback": {
+      "status": "fixed",
+      "behavior": "if held-stack decrement unexpectedly fails after slot insertion, inserted slot is cleared immediately"
+    }
+  },
+  "known_boundaries": [
+    "Bedrock stable event has no explicit InteractionHand field; if both hands contain byte-equivalent stacks, hand inference falls back to main.",
+    "Seasoning-bottle world block interaction remains main-hand-oriented and is outside this grill-only slice.",
+    "Minecraft/BDS engine acceptance remains required."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
