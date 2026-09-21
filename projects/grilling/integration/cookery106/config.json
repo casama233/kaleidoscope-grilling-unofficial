@@ -1,7 +1,7 @@
 {
   "type": "minecraftBedrock",
-  "name": "Grilling Guide — Cookery 1.0.6 integration test A1.12",
-  "description": "Separate guide-only preview. Requires Cookery installed by the user; no gameplay.",
+  "name": "Grilling Guide — Cookery 1.0.6 player guide A1.13",
+  "description": "One player-facing Grilling entry inside the existing Cookery guidebook; no extra physical guidebook.",
   "authors": [
     "cary — 素材移植工程"
   ],
@@ -23,7 +23,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "KG_Guide_Test_A112"
+          "packName": "KG_Grilling_Guide_A113"
         }
       ]
     ]
