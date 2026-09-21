@@ -56,6 +56,14 @@ def seed_item():
   }
  }}
 
+def canola_geometry():
+ face={'uv':[0,0],'uv_size':[16,28]}
+ plane=lambda rot:{'origin':[-8,-1,0],'size':[16,16,0],'pivot':[0,-1,0],'rotation':[0,rot,0],'uv':{'north':dict(face),'south':dict(face)}}
+ return {'format_version':'1.21.10','minecraft:geometry':[{'description':{
+  'identifier':'geometry.kaleidoscope_grilling.canola_crop','texture_width':16,'texture_height':28,
+  'visible_bounds_width':2,'visible_bounds_height':2,'visible_bounds_offset':[0,0,0]},
+  'bones':[{'name':'world','pivot':[0,0,0],'cubes':[plane(45),plane(-45)]}]}]}
+
 def mat(stage):return {'minecraft:material_instances':{'*':{'texture':'canola_'+stage,'render_method':'alpha_test','face_dimming':False,'ambient_occlusion':False}}}
 def selection(age):return {'minecraft:selection_box':{'origin':[-8,0,-8],'size':[16,min(16,2+age*2),16]}}
 
@@ -69,7 +77,7 @@ def crop_block():
   'description':{'identifier':'kaleidoscope_grilling:canola_crop','states':{'kaleidoscope_grilling:age':list(range(8))}},
   'permutations':perms,
   'components':{
-   'minecraft:geometry':'geometry.kaleidoscope_grilling.houttuynia_crop',
+   'minecraft:geometry':'geometry.kaleidoscope_grilling.canola_crop',
    'minecraft:material_instances':{'*':{'texture':'canola_stage0','render_method':'alpha_test','face_dimming':False,'ambient_occlusion':False}},
    'minecraft:destructible_by_mining':{'seconds_to_destroy':0},
    'minecraft:collision_box':False,'minecraft:light_dampening':0,
@@ -97,7 +105,7 @@ def patch_assets():
  write(BP/'blocks/canola_crop.json',crop_block())
  write(BP/'loot_tables/blocks/canola_crop.json',immature_loot())
  write(BP/'loot_tables/blocks/canola_crop_mature.json',mature_loot())
- if not (RP/'models/blocks/houttuynia_crop.geo.json').is_file():raise RuntimeError('A2.7.15 reuses the A2.7.14 official-pattern cross crop geometry')
+ write(RP/'models/blocks/canola_crop.geo.json',canola_geometry())
  seed_out=RP/'textures/items/canola_seeds.png';seed_out.parent.mkdir(parents=True,exist_ok=True);seed_out.write_bytes(fetch(*SEED_TEX))
  item_atlas=load(RP/'textures/item_texture.json');item_atlas['texture_data']['canola_seeds']={'textures':'textures/items/canola_seeds'};write(RP/'textures/item_texture.json',item_atlas)
  terrain=load(RP/'textures/terrain_texture.json')
@@ -138,7 +146,7 @@ def report():
    'ages':[0,1,2,3,4,5,6,7],'max_age':7,'farmland_only':True,
    'farmland_survival_min_light':8,'growth_min_light':9,'bonemeal_age_increase':[2,5],
    'growth_speed':'reuses A2.7.14 Java CropBlock 3x3 farmland weighting + crowding helper',
-   'cross_geometry':'reuses A2.7.14 official Microsoft custom-crop-pattern geometry',
+   'cross_geometry':'dedicated 16x16 world-space cross planes with explicit 16x28 full-sprite UV mapping; no crop/rescale of Java source art',
    'texture_git_blob_sha1':TEX
   },
   'drops':{
