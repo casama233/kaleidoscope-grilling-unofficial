@@ -10,24 +10,10 @@
         "default": "textures/blocks/seasoning_bottle"
       },
       "geometry": {
-        "default": "geometry.kg_a2726.seasoning_bottle_hand"
-      },
-      "animations": {
-        "hold_first_person": "animation.kaleidoscope_grilling.a2726.seasoning_bottle_hold_first_person",
-        "hold_third_person": "animation.kaleidoscope_grilling.a2726.seasoning_bottle_hold_third_person"
-      },
-      "scripts": {
-        "animate": [
-          {
-            "hold_first_person": "context.is_first_person == 1.0"
-          },
-          {
-            "hold_third_person": "context.is_first_person == 0.0"
-          }
-        ]
+        "default": "geometry.kg_a2733.seasoning_bottle_hand"
       },
       "render_controllers": [
-        "controller.render.item_default"
+        "controller.render.kg_a2733.seasoning_bottle_hand"
       ]
     }
   }

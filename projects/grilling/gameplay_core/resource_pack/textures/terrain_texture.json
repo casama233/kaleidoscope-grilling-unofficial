@@ -157,6 +157,9 @@
     },
     "sweet_potato_stage7": {
       "textures": "textures/blocks/crop/sweet_potato/stage7"
+    },
+    "kg_a2733_seasoning_bottle": {
+      "textures": "textures/blocks/seasoning_bottle"
     }
   }
 }

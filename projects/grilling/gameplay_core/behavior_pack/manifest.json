@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.7.32 Standalone Food Effects BP",
+    "name": "Kaleidoscope Grilling A2.7.33 Seasoning Bottle Corrective BP",
     "description": "逐口3D、四瓶調料堆疊與Numb動作；需要 Cookery 1.0.6",
     "uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
     "version": [
       2,
       7,
-      32
+      33
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         7,
-        32
+        33
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         2,
         7,
-        32
+        33
       ]
     }
   ],
@@ -43,7 +43,7 @@
       "version": [
         2,
         7,
-        32
+        33
       ]
     },
     {

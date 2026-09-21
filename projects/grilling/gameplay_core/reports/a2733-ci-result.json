@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.33",
+  "tested_commit": "9b02af4e7acacc338256841131e3f04991dd15fe",
+  "run_id": "35611190919",
+  "incremental_from_published_a2732": true,
+  "held_root_animation_removed": true,
+  "held_geometry_verified_against_immersion_lab": true,
+  "placed_variants": 5,
+  "fresh_geometry_identifiers": true,
+  "fresh_terrain_texture_key": true,
+  "no_full_block_geometry": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "b0099cf99b6b2d15f1a3fd135d413169d37da3d889194f7abf7c4ca2315386f0",
+  "brproject_sha256": "2948b940592066827d4a4494af37c620eb70155bb066cfb5f5d71e3e81021430",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

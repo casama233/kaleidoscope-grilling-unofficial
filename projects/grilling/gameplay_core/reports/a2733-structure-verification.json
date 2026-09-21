@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.33",
+  "held_items": 3,
+  "held_root_animation_removed": true,
+  "held_geometry_verified_against_immersion_lab": true,
+  "placed_variants": 5,
+  "fresh_geometry_identifiers": true,
+  "fresh_terrain_texture_key": true,
+  "positive_placed_cubes": 99,
+  "no_full_block_geometry": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

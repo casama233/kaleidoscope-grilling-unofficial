@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.32 Standalone Food Effects",
+  "name": "Kaleidoscope Grilling A2.7.33 Seasoning Bottle Corrective",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_32_Standalone_Food_Effects"
+          "packName": "Kaleidoscope_Grilling_A2_7_33_Seasoning_Bottle_Corrective"
         }
       ]
     ]
