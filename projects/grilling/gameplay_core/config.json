@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.14 Houttuynia Crop",
+  "name": "Kaleidoscope Grilling A2.7.15 Canola Crop",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_14_Houttuynia_Crop"
+          "packName": "Kaleidoscope_Grilling_A2_7_15_Canola_Crop"
         }
       ]
     ]

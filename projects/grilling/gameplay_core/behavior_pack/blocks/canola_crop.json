@@ -1,0 +1,266 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:canola_crop",
+      "states": {
+        "kaleidoscope_grilling:age": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    },
+    "permutations": [
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 0",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage0",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              2,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 1",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage1",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              4,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 2",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage2",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              6,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 3",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage3",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              8,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 4",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage4",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              10,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 5",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage5",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              12,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 6",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage6",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              14,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('kaleidoscope_grilling:age') == 7",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "canola_stage7",
+              "render_method": "alpha_test",
+              "face_dimming": false,
+              "ambient_occlusion": false
+            }
+          },
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              16
+            ]
+          },
+          "minecraft:loot": "loot_tables/blocks/canola_crop_mature.json"
+        }
+      }
+    ],
+    "components": {
+      "minecraft:geometry": "geometry.kaleidoscope_grilling.canola_crop",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "canola_stage0",
+          "render_method": "alpha_test",
+          "face_dimming": false,
+          "ambient_occlusion": false
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0
+      },
+      "minecraft:collision_box": false,
+      "minecraft:light_dampening": 0,
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          2,
+          16
+        ]
+      },
+      "minecraft:placement_filter": {
+        "conditions": [
+          {
+            "allowed_faces": [
+              "up"
+            ],
+            "block_filter": [
+              "minecraft:farmland"
+            ]
+          }
+        ]
+      },
+      "minecraft:loot": "loot_tables/blocks/canola_crop.json",
+      "tag:minecraft:crop": {},
+      "kaleidoscope_grilling:canola_crop_logic": {}
+    }
+  }
+}

@@ -226,6 +226,9 @@
     },
     "minced_houttuynia": {
       "textures": "textures/items/minced_houttuynia"
+    },
+    "canola_seeds": {
+      "textures": "textures/items/canola_seeds"
     }
   }
 }

@@ -98,3 +98,6 @@ item.kaleidoscope_grilling:houttuynia.name=折耳根
 item.kaleidoscope_grilling:minced_houttuynia.name=折耳根沫
 
 tile.kaleidoscope_grilling:houttuynia_crop.name=折耳根作物
+
+item.kaleidoscope_grilling:canola_seeds.name=油菜籽
+tile.kaleidoscope_grilling:canola_crop.name=油菜

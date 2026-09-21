@@ -85,6 +85,30 @@
     },
     "houttuynia_stage7_2": {
       "textures": "textures/blocks/crop/houttuynia/stage7_2"
+    },
+    "canola_stage0": {
+      "textures": "textures/blocks/crop/canola/stage0"
+    },
+    "canola_stage1": {
+      "textures": "textures/blocks/crop/canola/stage1"
+    },
+    "canola_stage2": {
+      "textures": "textures/blocks/crop/canola/stage2"
+    },
+    "canola_stage3": {
+      "textures": "textures/blocks/crop/canola/stage3"
+    },
+    "canola_stage4": {
+      "textures": "textures/blocks/crop/canola/stage4"
+    },
+    "canola_stage5": {
+      "textures": "textures/blocks/crop/canola/stage5"
+    },
+    "canola_stage6": {
+      "textures": "textures/blocks/crop/canola/stage6"
+    },
+    "canola_stage7": {
+      "textures": "textures/blocks/crop/canola/stage7"
     }
   }
 }

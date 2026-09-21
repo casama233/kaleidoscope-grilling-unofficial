@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.15",
+  "canola_seed_item": true,
+  "canola_crop": true,
+  "ages": 8,
+  "straw_hat_acquisition": true,
+  "compostable_30_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "canola_seed_to_powder_processing_complete": false,
+  "a2714_houttuynia_crop_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -98,3 +98,6 @@ item.kaleidoscope_grilling:houttuynia.name=Houttuynia
 item.kaleidoscope_grilling:minced_houttuynia.name=Minced Houttuynia
 
 tile.kaleidoscope_grilling:houttuynia_crop.name=Houttuynia Crop
+
+item.kaleidoscope_grilling:canola_seeds.name=Canola Seeds
+tile.kaleidoscope_grilling:canola_crop.name=Canola Crop

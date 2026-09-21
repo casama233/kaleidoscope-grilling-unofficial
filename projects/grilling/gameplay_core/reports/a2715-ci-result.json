@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.15",
+  "tested_commit": "774f614598535f703218e46f8d5fecdd85c16512",
+  "run_id": "35583504750",
+  "canola_seed_item": true,
+  "canola_crop": true,
+  "ages": 8,
+  "straw_hat_acquisition": true,
+  "compostable_30_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "canola_seed_to_powder_processing_complete": false,
+  "a2714_houttuynia_crop_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "2fe67904bd210f4cb466f9df8bd96ab2c267e318b0ab5c690907558f4a19910b",
+  "brproject_sha256": "95d7e4cda0121239e299dc9e14dcefc047d492c75e691da154ebaed2b5ae2018",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
