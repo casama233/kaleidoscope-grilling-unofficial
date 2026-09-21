@@ -74,7 +74,7 @@ Java `CanolaCropBlock` 沒有自訂生長公式，而是標準 `CropBlock`：
 
 A2.7.15 直接重用 A2.7.14 已測好的 CropBlock 純函式，不另寫第二套生長公式。custom component 仍用 `system.beforeEvents.startup` 註冊，不做全局 runInterval crop scan。
 
-視覺使用 A2.7.14 已有的官方 Microsoft custom-crop-pattern 交叉幾何，只換 Java canola stage0..7 貼圖。
+Java 的八張油菜貼圖不是 16×16，而是 **16×28**；有效 alpha 也確實延伸到第 28 列，不能裁圖。A2.7.15 因此建立獨立的 `geometry.kaleidoscope_grilling.canola_crop`：世界空間仍是兩張 ±45°、16×16 高的 crop 平面，但 geometry `texture_height=28`，north/south face 明確使用 `uv_size=[16,28]` 映射整張 Java sprite。這保留 Java 原圖與 Git blob，不做裁切/縮圖，也避免沿用 Houttuynia 16×16 geometry 時只取到部分 UV。
 
 8 張 Java texture SHA：
 
