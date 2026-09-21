@@ -196,6 +196,9 @@
     },
     "raw_sweet_potato_sheet": {
       "textures": "textures/items/raw_sweet_potato_sheet"
+    },
+    "sweet_potato": {
+      "textures": "textures/items/sweet_potato"
     }
   }
 }

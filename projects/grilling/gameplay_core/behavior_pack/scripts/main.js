@@ -8,6 +8,7 @@ import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
 import './a26_oil_machine_runtime.js';
 import './a271_sweet_potato_runtime.js';
+import './a272_cookery_processing_runtime.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
 const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();
