@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 GUIDE=ROOT/'projects/grilling/integration/cookery106';BP=GUIDE/'behavior_pack';RP=GUIDE/'resource_pack'
 PREFIX='// Generated A1.15 complete-language-file Cookery guide extension.\nexport const GUIDE_PAYLOAD = '
 CN_BAD='鱈鮭熱帶頭團'
-TW_BAD='烧馒猪儿鸡鱼鱿须黄连调制摇盘谱饼红萝块葱凉图龙绿发后里这头种与为开关处过复气区对应该显条数类别样时间满还从实体储备传页简选择进词义虫面罗语烟'
+TW_BAD='烧馒猪儿鸡鱼鱿须黄连调制摇盘谱饼红萝块葱凉图龙绿发后里这头种与为开关处过复气区对应该显条数类别样时间满还从实体储备传页简选择进词义虫罗语烟'
 
 def load(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 def lang(p):
