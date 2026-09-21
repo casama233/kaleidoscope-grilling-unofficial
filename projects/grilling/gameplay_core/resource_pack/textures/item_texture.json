@@ -205,6 +205,9 @@
     },
     "potato_slice": {
       "textures": "textures/items/potato_slice"
+    },
+    "beef_chunks": {
+      "textures": "textures/items/beef_chunks"
     }
   }
 }

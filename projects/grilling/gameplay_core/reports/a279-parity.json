@@ -1,0 +1,51 @@
+{
+  "version": "A2.7.9",
+  "scope": "beef_chunks item plus Java-compatible Cookery beef chopping-board override",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_recipe": {
+    "recipe_namespace": "kaleidoscope_cookery",
+    "input": "minecraft:beef",
+    "cuts": 4,
+    "model_id": "kaleidoscope_cookery:raw_cow_offal",
+    "result": "kaleidoscope_grilling:beef_chunks",
+    "count": 2
+  },
+  "beef_chunks": {
+    "plain_item": true,
+    "max_stack_size": 64,
+    "texture_git_blob_sha1": "6b9a7d3f3b153ab42c0f725abc34b4b56003c5e1"
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "builtin": "minecraft:beef -> kaleidoscope_cookery:raw_cow_offal x2, 4 cuts",
+    "lookup_priority": "BOARD_RECIPES[id] || getExtensionBoardRecipe(id)",
+    "override_strategy": "cancel first empty-board beef interaction in Grilling before-event handler, then write Cookery canonical station state in system.run",
+    "station_key": "kc_station:<dimension>:<x>,<y>,<z>",
+    "native_beef_board_model": 0,
+    "cookery_private_scripts_modified": false
+  },
+  "behavior": {
+    "new_insert": {
+      "result": "beef_chunks x2",
+      "cuts": 4,
+      "survival_consumes_beef": 1,
+      "creative_consumes_beef": 0
+    },
+    "in_progress_migration": "built-in beef states retain current cuts and replace only result contract; first migration interaction is intentionally consumed",
+    "stale_hand_guard": true,
+    "transaction_rollback": "station raw state + block permutation + main hand restored best-effort on commit exception"
+  },
+  "visual_parity": {
+    "java_model_id": "kaleidoscope_cookery:raw_cow_offal",
+    "bedrock_reuses_cookery_native_beef_model": true,
+    "structural_model_mapping_verified": true,
+    "engine_rendering_verified": false
+  },
+  "downstream": {
+    "raw_beef_skewer_recipe_already_references_beef_chunks": true,
+    "fixed_skewer_chain_becomes_obtainable_when_red_chili_is_available": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -10,6 +10,7 @@ import './a26_oil_machine_runtime.js';
 import './a271_sweet_potato_runtime.js';
 import './a272_cookery_processing_runtime.js';
 import './a278_basic_chopping_runtime.js';
+import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
@@ -596,6 +597,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
 });
 world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||![EMPTY_SEASONING_ID,PENDING_SEASONING,SEASONING_ID].includes(held.typeId))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
+ if(tryScheduleBeefBoardOverride(e))return;
  const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));
  if(skewerInput){e.cancel=true;if(isInitialBlockPress(e.isFirstEvent))scheduleSkewerAction(e.player,skewerInput);return}
  const grillTarget=e.block.typeId===GRILL_ID,customTarget=grillTarget||isSeasoningBlock(e.block.typeId);
