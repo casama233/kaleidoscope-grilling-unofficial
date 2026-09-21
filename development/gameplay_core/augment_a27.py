@@ -81,6 +81,7 @@ def item_doc(spec):
  }
  if 'food' in spec:
   n,s=spec['food'];c['minecraft:food']={'can_always_eat':bool(spec.get('always',False)),'nutrition':n,'saturation_modifier':s}
+  c['minecraft:use_modifiers']={'start_using':'always','use_duration':1.6,'movement_modifier':0.35}
   c['minecraft:use_animation']={'value':'eat'}
   c['minecraft:tags']={'tags':['minecraft:is_food']}
  if spec.get('use'):
