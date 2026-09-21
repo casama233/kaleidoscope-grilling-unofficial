@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.8",
+  "tested_commit": "2417c335dd7e69f6cefc96f54b070c38b6218557",
+  "run_id": "35564419882",
+  "carrot_dice_item": true,
+  "potato_slice_item": true,
+  "carrot_chopping_registered": true,
+  "potato_chopping_registered": true,
+  "beef_chunks_deferred_due_builtin_priority": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "ffdb4061230e7dc3724ebbcf2ce3784c69472dedc7646db465ca9810ffc50350",
+  "brproject_sha256": "a1b48872066178d5b2cee2383e3936b0ab4dbea6002f288bddf1aec672994bb1",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

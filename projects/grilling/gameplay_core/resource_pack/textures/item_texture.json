@@ -199,6 +199,12 @@
     },
     "sweet_potato": {
       "textures": "textures/items/sweet_potato"
+    },
+    "carrot_dice": {
+      "textures": "textures/items/carrot_dice"
+    },
+    "potato_slice": {
+      "textures": "textures/items/potato_slice"
     }
   }
 }

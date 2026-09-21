@@ -1,0 +1,57 @@
+{
+  "version": "A2.7.8",
+  "scope": "first conflict-free basic chopping slice: carrot_dice + potato_slice",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_api": 1,
+    "lookup_priority_observed": "BOARD_RECIPES[input] || getExtensionBoardRecipe(input)"
+  },
+  "items": {
+    "carrot_dice": {
+      "plain_item": true,
+      "max_stack_size": 64,
+      "texture_git_blob_sha1": "c5359f186611411d51f1fe55077357d2c16efa61"
+    },
+    "potato_slice": {
+      "plain_item": true,
+      "max_stack_size": 64,
+      "texture_git_blob_sha1": "9562676753ad5e32ea0e1345236e314ad4767b85"
+    }
+  },
+  "recipes": {
+    "carrot_dice": {
+      "input": "minecraft:carrot",
+      "result": "kaleidoscope_grilling:carrot_dice",
+      "count": 3,
+      "cuts": 4,
+      "registered_through_public_api": true
+    },
+    "potato_slice": {
+      "input": "minecraft:potato",
+      "result": "kaleidoscope_grilling:potato_slice",
+      "count": 3,
+      "cuts": 4,
+      "registered_through_public_api": true
+    }
+  },
+  "explicitly_deferred_conflict": {
+    "beef_chunks": {
+      "java_grilling": "minecraft:beef -> kaleidoscope_grilling:beef_chunks x2, 4 cuts",
+      "cookery_bedrock_builtin": "minecraft:beef -> kaleidoscope_cookery:raw_cow_offal x2",
+      "reason": "Cookery 1.0.6 directStation checks built-in BOARD_RECIPES before extension recipes, so public recipe registration cannot override this input.",
+      "planned_slice": "A2.7.9"
+    }
+  },
+  "visual_difference": {
+    "java_model_ids": [
+      "kaleidoscope_grilling:carrot_dice",
+      "kaleidoscope_grilling:potato_slice"
+    ],
+    "bedrock": "Cookery public recipe API uses generic foreign-item display fallback unless an addon separately supplies board display/native-model assets.",
+    "exact_java_staged_board_visual": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

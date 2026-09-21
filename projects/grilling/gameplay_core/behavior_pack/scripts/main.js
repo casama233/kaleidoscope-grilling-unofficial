@@ -9,6 +9,7 @@ import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runt
 import './a26_oil_machine_runtime.js';
 import './a271_sweet_potato_runtime.js';
 import './a272_cookery_processing_runtime.js';
+import './a278_basic_chopping_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';

@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.8",
+  "carrot_dice_item": true,
+  "potato_slice_item": true,
+  "carrot_chopping_registered": true,
+  "potato_chopping_registered": true,
+  "cuts": 4,
+  "beef_chunks_deferred_due_builtin_priority": true,
+  "exact_java_staged_board_visual": false,
+  "a277_transactions_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 108,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 552,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
