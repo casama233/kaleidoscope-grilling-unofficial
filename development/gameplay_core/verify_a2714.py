@@ -30,6 +30,7 @@ def main():
  assert d['states']['kaleidoscope_grilling:red_variant']==[False,True]
  assert bc['kaleidoscope_grilling:houttuynia_crop_logic']=={}
  assert bc['minecraft:collision_box'] is False
+ assert bc['minecraft:light_dampening']==0
  assert bc['minecraft:placement_filter']['conditions'][0]['block_filter']==['minecraft:farmland','minecraft:soul_sand']
  assert bc['minecraft:loot']=='loot_tables/blocks/houttuynia_crop.json'
  assert len(block['permutations'])==11
@@ -56,7 +57,7 @@ def main():
  core=(BP/'scripts/a2714_houttuynia_crop_core.js').read_text(encoding='utf-8')
  runtime=(BP/'scripts/a2714_houttuynia_crop_runtime.js').read_text(encoding='utf-8')
  for token in ("MAX_AGE=7","RED_PLACEMENT_CHANCE=0.3","FARMLAND_MIN_SURVIVAL_LIGHT=8","MIN_GROWTH_LIGHT=9",'javaCropGrowthSpeed','bonemealAgeIncrease','wartAgeToCropAge'):assert token in core,token
- for token in ('system.beforeEvents.startup.subscribe','registerCustomComponent(COMPONENT_ID','beforeOnPlayerPlace','onRandomTick','onPlayerInteract','getLightLevel'):assert token in runtime,token
+ for token in ('system.beforeEvents.startup.subscribe','registerCustomComponent(COMPONENT_ID','beforeOnPlayerPlace','onRandomTick','onPlayerInteract','getLightLevel','GameMode.Creative','matureBonusCount'):assert token in runtime,token
  assert 'runInterval' not in runtime
  main=(BP/'scripts/main.js').read_text(encoding='utf-8')
  assert "import './a2713_houttuynia_processing_runtime.js';" in main and "import './a2714_houttuynia_crop_runtime.js';" in main
