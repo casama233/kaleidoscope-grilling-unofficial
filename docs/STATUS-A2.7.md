@@ -114,17 +114,16 @@ The Java `crushing`, `millstone`, `filling`, and `mixing` recipe families remain
 
 ### A2.8 — crops and world generation
 
-- `canola_crop`
-- `onion_crop`
-- `sweet_potato_crop`
-- `houttuynia_crop`
-- seed placement / growth / harvest / drops
-- `pepper_log`
-- `pepper_leaves`
-- `pepper_sapling`
-- pepper-tree generation and biome/world placement
+- `canola_crop`, `onion_crop`, `sweet_potato_crop`: age 0–7 farmland growth, placement, harvest and Java loot behavior.
+- `houttuynia_crop`: age 0–7 plus the persistent red variant; normal placement has a 30% red chance, Soul Sand forces red, and Soul Sand permits Nether growth without the farmland-light rule.
+- `pepper_log`, `pepper_leaves`, `pepper_sapling`: block behavior, log axis/stripping, sapling two-stage growth, leaf pepper regrowth, harvesting and contact sting behavior.
+- Pepper trees: Java places them in `#minecraft:is_forest` at rarity 1/16; height is 2–3 plus the authored crown and each generated leaf has a 25% initial pepper chance.
+- Village chest integration: every vanilla `chests/village/*` table gets a 40% Sichuan-pepper roll (3–10) and a separate 20% pepper-sapling roll.
+- Nether fortress chest integration: `chests/nether_bridge` gets a 65% Houttuynia pool with 1–2 rolls of 1–3 items.
+- New Nether-fortress chunks: Java deterministically replaces 25% of Nether Wart inside fortress bounds with red Houttuynia, mapping wart ages 0/1/2–3 to crop ages 0/3/7.
+- Java composter entries for onion, sweet potato and Houttuynia (0.65) and pepper leaves/sapling (0.30).
 
-The A1 plant geometry/textures already exist; the missing part is gameplay/world behavior.
+The A1 plant geometry/textures already exist; the missing part is wiring these exact gameplay/world rules into the retail Bedrock pack.
 
 ### A2.9 — remaining blocks and meta systems
 
