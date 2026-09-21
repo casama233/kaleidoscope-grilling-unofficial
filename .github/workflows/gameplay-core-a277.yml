@@ -1,33 +1,33 @@
-name: A2.7.8 Temporary PR Gate
+name: A2.7.7 Grill Transaction Rollback
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/gameplay-core-a277.yml'
-      - 'development/gameplay_core/a278_*'
-      - 'development/gameplay_core/augment_a278.py'
-      - 'development/gameplay_core/test_a278_*'
-      - 'development/gameplay_core/verify_a278.py'
-      - 'docs/STATUS-A2.7.8.md'
+      - 'development/gameplay_core/a277_*'
+      - 'development/gameplay_core/augment_a277.py'
+      - 'development/gameplay_core/test_a277_*'
+      - 'development/gameplay_core/verify_a277.py'
+      - 'docs/STATUS-A2.7.7.md'
   pull_request:
     paths:
       - '.github/workflows/gameplay-core-a277.yml'
-      - 'development/gameplay_core/a278_*'
-      - 'development/gameplay_core/augment_a278.py'
-      - 'development/gameplay_core/test_a278_*'
-      - 'development/gameplay_core/verify_a278.py'
-      - 'docs/STATUS-A2.7.8.md'
+      - 'development/gameplay_core/a277_*'
+      - 'development/gameplay_core/augment_a277.py'
+      - 'development/gameplay_core/test_a277_*'
+      - 'development/gameplay_core/verify_a277.py'
+      - 'docs/STATUS-A2.7.7.md'
   workflow_dispatch:
 permissions:
   contents: write
 concurrency:
-  group: grilling-gameplay-core-a278-${{ github.ref }}
+  group: grilling-gameplay-core-a277-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  a278:
+  a277:
     if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
     runs-on: windows-latest
-    timeout-minutes: 85
+    timeout-minutes: 80
     env:
       PYTHONUTF8: '1'
     steps:
@@ -115,20 +115,12 @@ jobs:
           python development/gameplay_core/verify_a276.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Rebuild A2.7.7 transaction rollback
+      - name: Apply A2.7.7 transaction rollback
         shell: pwsh
         run: |
           node development/gameplay_core/test_a277_core.mjs
           python development/gameplay_core/augment_a277.py
           python development/gameplay_core/verify_a277.py
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Apply A2.7.8 conflict-free basic chopping I
-        shell: pwsh
-        run: |
-          node development/gameplay_core/test_a278_core.mjs
-          python development/gameplay_core/augment_a278.py
-          python development/gameplay_core/verify_a278.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Download checksum-pinned official bridge Dash v1.2.0
@@ -139,7 +131,7 @@ jobs:
           Invoke-WebRequest 'https://github.com/bridge-core/deno-dash-compiler/releases/download/v1.2.0/dash.exe' -OutFile $dash
           if ((Get-FileHash $dash -Algorithm SHA256).Hash.ToLower() -ne '00bb6d984f0ffb819e2fb26c1eda5768db2d6e07a979712e34e1c76c2b7594de') { throw 'Dash checksum mismatch' }
 
-      - name: Compile A2.7.8 with official Dash
+      - name: Compile A2.7.7 with official Dash
         working-directory: projects/grilling/gameplay_core
         shell: pwsh
         run: |
@@ -149,10 +141,10 @@ jobs:
       - name: Compare real Dash outputs
         shell: pwsh
         run: |
-          python development/gameplay_core/verify_a278.py --compiled
+          python development/gameplay_core/verify_a277.py --compiled
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Package A2.7.8 addon
+      - name: Package A2.7.7 addon
         shell: pwsh
         run: |
           @'
@@ -165,54 +157,54 @@ jobs:
               src=p/name;uid=load(src/'manifest.json')['header']['uuid']
               found=[x.parent for x in (p/'builds/dist').rglob('manifest.json') if load(x).get('header',{}).get('uuid')==uid]
               assert len(found)==1,(name,found);packs[name]=found[0]
-          mc=art/'Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.mcaddon'
+          mc=art/'Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.mcaddon'
           with zipfile.ZipFile(mc,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for name,pack in packs.items():
                   for f in sorted(pack.rglob('*')):
                       if f.is_file():z.write(f,name+'/'+f.relative_to(pack).as_posix())
           with zipfile.ZipFile(mc) as z:assert z.testzip() is None
-          br=art/'Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.brproject'
+          br=art/'Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.brproject'
           with zipfile.ZipFile(br,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for f in sorted(p.rglob('*')):
                   rel=f.relative_to(p)
                   if f.is_file() and 'builds' not in rel.parts and '.bridge' not in rel.parts:z.write(f,rel.as_posix())
           result={
-            'version':'A2.7.8','tested_commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
-            'carrot_dice_item':True,'potato_slice_item':True,
-            'carrot_chopping_registered':True,'potato_chopping_registered':True,'beef_chunks_deferred_due_builtin_priority':True,
+            'version':'A2.7.7','tested_commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
+            'state_resource_rollback':True,'extract_source_first_delivery':True,
+            'extract_delivery_rollback':True,'break_drop_escrow':True,'break_snapshot_restore':True,
             'dash_compiled_and_compared':True,
             'mcaddon_sha256':hashlib.sha256(mc.read_bytes()).hexdigest(),
             'brproject_sha256':hashlib.sha256(br.read_bytes()).hexdigest(),
             'minecraft_tested':False,'bds_tested':False
           }
-          (p/'reports'/'a278-ci-result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+          (p/'reports'/'a277-ci-result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
           for q in (p/'builds',p/'.bridge'):
               if q.exists():shutil.rmtree(q)
           '@ | python -
 
-      - name: Publish A2.7.8 generated project and artifacts
+      - name: Publish A2.7.7 generated project and artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.brproject
-          git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I."); assert p and all(x.startswith(ok) for x in p)'
+          git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.brproject
+          git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback."); assert p and all(x.startswith(ok) for x in p)'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'feat: publish A2.7.8 basic chopping I'
+          git commit -m 'fix: publish A2.7.7 transaction rollback'
           AUTH=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
           git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $AUTH" push origin HEAD:main
           unset AUTH
 
-      - name: Upload A2.7.8 review artifact
+      - name: Upload A2.7.7 review artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: Kaleidoscope-Grilling-A2.7.8-Basic-Chopping-I
+          name: Kaleidoscope-Grilling-A2.7.7-Transaction-Rollback
           path: |
-            artifacts/Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.mcaddon
-            artifacts/Kaleidoscope_Grilling_A2.7.8_Basic_Chopping_I.brproject
+            artifacts/Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.mcaddon
+            artifacts/Kaleidoscope_Grilling_A2.7.7_Transaction_Rollback.brproject
             projects/grilling/gameplay_core/reports/
           retention-days: 14
           if-no-files-found: error
