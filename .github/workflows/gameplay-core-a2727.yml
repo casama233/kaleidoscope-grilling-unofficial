@@ -21,7 +21,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: grilling-gameplay-core-a2727-\${{ github.ref }}
+  group: grilling-gameplay-core-a2727-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Read exact confirmed repository commit
         shell: bash
         env:
-          EXPECTED_SHA: \${{ github.sha }}
+          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
@@ -142,7 +142,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.27_Cookery_Host_Reuse.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.27_Cookery_Host_Reuse.brproject
