@@ -52,7 +52,7 @@ item.kaleidoscope_grilling:onion_powder.name=洋蔥粉
 item.kaleidoscope_grilling:houttuynia_powder.name=魚腥草粉
 item.kaleidoscope_grilling:totem_powder.name=圖騰粉
 item.kaleidoscope_grilling:dragon_egg_powder.name=龍蛋粉
-item.kaleidoscope_grilling:pending_seasoning.name=待搖調料瓶
+item.kaleidoscope_grilling:pending_seasoning.name=待搖晃的調料
 tile.kaleidoscope_grilling:seasoning_bottle.name=調料瓶
 
 tile.kaleidoscope_grilling:canola_oil.name=菜籽油
@@ -63,7 +63,7 @@ item.kaleidoscope_grilling:secret_chili_oil_bucket.name=辣椒油桶
 item.kaleidoscope_grilling:premium_chili_oil_bucket.name=熔岩辣椒油桶
 
 item.kaleidoscope_grilling:unfinished_skewer.name=未完成烤串
-item.kaleidoscope_grilling:secret_skewer.name=秘制串
+item.kaleidoscope_grilling:secret_skewer.name=秘製烤串
 
 item.kaleidoscope_grilling:skewer_plate.name=有烤串的盤子
 tile.kaleidoscope_grilling:skewer_plate.name=烤串盤
@@ -112,3 +112,4 @@ item.kaleidoscope_grilling:roasted_sweet_potato.name=烤番薯
 item.kaleidoscope_grilling:roasted_chicken_wing.name=烤雞翅
 
 item.kaleidoscope_grilling:cold_houttuynia.name=涼拌折耳根
+kaleidoscope_grilling:itemGroup.main=森羅物語：煙火

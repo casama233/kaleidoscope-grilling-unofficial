@@ -52,7 +52,7 @@ item.kaleidoscope_grilling:onion_powder.name=Onion Powder
 item.kaleidoscope_grilling:houttuynia_powder.name=Houttuynia Powder
 item.kaleidoscope_grilling:totem_powder.name=Totem Powder
 item.kaleidoscope_grilling:dragon_egg_powder.name=Dragon Egg Powder
-item.kaleidoscope_grilling:pending_seasoning.name=Pending Seasoning
+item.kaleidoscope_grilling:pending_seasoning.name=Seasoning to Be Shaken
 tile.kaleidoscope_grilling:seasoning_bottle.name=Seasoning Bottle
 
 tile.kaleidoscope_grilling:canola_oil.name=Canola Oil
@@ -63,7 +63,7 @@ item.kaleidoscope_grilling:secret_chili_oil_bucket.name=Chili Oil Bucket
 item.kaleidoscope_grilling:premium_chili_oil_bucket.name=Lava Chili Oil Bucket
 
 item.kaleidoscope_grilling:unfinished_skewer.name=Unfinished Skewer
-item.kaleidoscope_grilling:secret_skewer.name=Secret Skewer
+item.kaleidoscope_grilling:secret_skewer.name=Secret Mix Skewer
 
 item.kaleidoscope_grilling:skewer_plate.name=Plate of Skewers
 tile.kaleidoscope_grilling:skewer_plate.name=Skewer Plate
@@ -112,3 +112,4 @@ item.kaleidoscope_grilling:roasted_sweet_potato.name=Roasted Sweet Potato
 item.kaleidoscope_grilling:roasted_chicken_wing.name=Roasted Chicken Wing
 
 item.kaleidoscope_grilling:cold_houttuynia.name=Dressed Houttuynia
+kaleidoscope_grilling:itemGroup.main=Kaleidoscope Grilling

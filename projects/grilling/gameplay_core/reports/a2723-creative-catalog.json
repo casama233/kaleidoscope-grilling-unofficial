@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.23",
+  "scope": "creative inventory parity and internal-state hiding",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_creative_tab": "itemGroup.kaleidoscope_grilling.main",
+  "bedrock_equivalent": {
+    "surface": "items category / one collapsible custom group",
+    "group_key": "kaleidoscope_grilling:itemGroup.main",
+    "group_icon": "kaleidoscope_grilling:grill",
+    "catalog_entry_count": 76,
+    "exact_custom_top_level_tab_possible": false
+  },
+  "hidden_internal_items": [
+    "unfinished_skewer",
+    "secret_skewer",
+    "pending_seasoning",
+    "skewer_plate",
+    "canola_oil_brush",
+    "secret_chili_oil_brush",
+    "premium_chili_oil_brush"
+  ],
+  "java_order_preserved_for_existing_static_content": true,
+  "omitted_java_dynamic_previews": [
+    "configured beef skewer recipe book stack",
+    "dynamic secret-skewer preview",
+    "metadata-bearing mysterious/dark preview variants",
+    "Cookery filled oil pots"
+  ],
+  "missing_java_content_not_faked": [
+    "advanced_rack"
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
