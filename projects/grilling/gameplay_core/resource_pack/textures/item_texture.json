@@ -235,6 +235,9 @@
     },
     "roasted_sweet_potato": {
       "textures": "textures/items/roasted_sweet_potato"
+    },
+    "roasted_chicken_wing": {
+      "textures": "textures/items/roasted_chicken_wing"
     }
   }
 }

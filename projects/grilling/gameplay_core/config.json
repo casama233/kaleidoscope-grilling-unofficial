@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.20 Roasted Sweet Potato",
+  "name": "Kaleidoscope Grilling A2.7.21 Roasted Chicken Wing",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_20_Roasted_Sweet_Potato"
+          "packName": "Kaleidoscope_Grilling_A2_7_21_Roasted_Chicken_Wing"
         }
       ]
     ]
