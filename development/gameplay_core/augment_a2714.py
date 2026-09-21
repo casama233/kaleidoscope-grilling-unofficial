@@ -100,7 +100,7 @@ def immature_loot():
 
 def mature_loot():
  pools=[{'rolls':1,'entries':[{'type':'item','name':'kaleidoscope_grilling:houttuynia','weight':1,'functions':[{'function':'set_count','count':2}]}]}]
- p=4/7
+ p=0.5714286
  pools.append({'rolls':1,'conditions':[{'condition':'random_chance','chance':p}],'entries':[{'type':'item','name':'kaleidoscope_grilling:houttuynia','weight':1}]})
  for level in (1,2,3):
   pools.append({'rolls':1,'conditions':[{'condition':'random_chance','chance':p},{'condition':'match_tool','enchantments':[{'enchantment':'fortune','levels':{'range_min':level}}]}],'entries':[{'type':'item','name':'kaleidoscope_grilling:houttuynia','weight':1}]})
@@ -147,7 +147,7 @@ def report():
   'visuals':{'java_texture_blob_sha1':TEX,'cross_geometry':'adapted from Microsoft official custom crop sample pattern','red_variant_texture_starts_at_age':5},
   'drops':{
    'immature':'1 houttuynia',
-   'mature':'2 + Binomial(Fortune+1, 4/7) houttuynia; Bedrock table exact for vanilla Fortune 0..3',
+   'mature':'2 + Binomial(Fortune+1, 0.5714286) houttuynia; Bedrock table exact for vanilla Fortune 0..3',
    'overleveled_fortune_exact':False
   },
   'item':{'same_houttuynia_food_item_places_crop':True,'use_on':['minecraft:farmland','minecraft:soul_sand'],'use_modifiers_start_using':'if_first'},
