@@ -35,9 +35,9 @@ def main():
 
  mainjs=(BP/'scripts/main.js').read_text(encoding='utf-8');assert "import './a27_food_runtime.js';" in mainjs
  rt=(BP/'scripts/a27_food_runtime.js').read_text(encoding='utf-8')
- for token in ("wedding_candy","sweet_potato_powder","kc_oil_count" if False else "A27_EFFECTS","itemCompleteUse"):assert token in rt,token
+ for token in ("A27_EFFECTS","sweet_potato_powder","itemCompleteUse","kaleidoscope_grilling:a21_fx"):assert token in rt,token
  core=(BP/'scripts/a27_content_core.js').read_text(encoding='utf-8')
- assert "ticks:300" in core and "ticks:1200" in core and "compatibilityFallback:17" in core
+ for token in ("wedding_candy","ticks:300","ticks:1200","compatibilityFallback:17"):assert token in core,token
 
  catalog=load(P/'reports/a27-recipe-catalog.json')
  assert len(catalog['mapped'])==25
