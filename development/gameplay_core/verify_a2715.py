@@ -40,16 +40,25 @@ def main():
  assert d['identifier']=='kaleidoscope_grilling:canola_crop'
  assert d['states']['kaleidoscope_grilling:age']==list(range(8))
  assert len(block['permutations'])==8
- assert bc['minecraft:geometry']=='geometry.kaleidoscope_grilling.houttuynia_crop'
+ assert bc['minecraft:geometry']=='geometry.kaleidoscope_grilling.canola_crop'
  assert bc['minecraft:collision_box'] is False and bc['minecraft:light_dampening']==0
  assert bc['minecraft:placement_filter']['conditions'][0]['block_filter']==['minecraft:farmland']
  assert bc['kaleidoscope_grilling:canola_crop_logic']=={}
  assert block['permutations'][7]['components']['minecraft:loot']=='loot_tables/blocks/canola_crop_mature.json'
 
+ geo=load(RP/'models/blocks/canola_crop.geo.json')['minecraft:geometry'][0]
+ gd=geo['description'];assert gd['identifier']=='geometry.kaleidoscope_grilling.canola_crop'
+ assert gd['texture_width']==16 and gd['texture_height']==28
+ cubes=geo['bones'][0]['cubes'];assert len(cubes)==2
+ for cube in cubes:
+  assert cube['size']==[16,16,0]
+  assert cube['uv']['north']=={'uv':[0,0],'uv_size':[16,28]}
+  assert cube['uv']['south']=={'uv':[0,0],'uv_size':[16,28]}
+
  terrain=load(RP/'textures/terrain_texture.json')['texture_data']
  for name,sha in TEX.items():
   p=RP/f'textures/blocks/crop/canola/{name}.png';assert p.is_file() and blob(p)==sha,(name,blob(p),sha)
-  with Image.open(p) as im:assert im.size==(16,16),(name,im.size)
+  with Image.open(p) as im:assert im.size==(16,28),(name,im.size)
   assert terrain['canola_'+name]['textures']==f'textures/blocks/crop/canola/{name}'
 
  immature=load(BP/'loot_tables/blocks/canola_crop.json');mature=load(BP/'loot_tables/blocks/canola_crop_mature.json')
