@@ -123,7 +123,7 @@ jobs:
           python development/gameplay_core/verify_a277.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Apply A2.7.8 basic chopping I
+      - name: Apply A2.7.8 conflict-free basic chopping I
         shell: pwsh
         run: |
           node development/gameplay_core/test_a278_core.mjs
