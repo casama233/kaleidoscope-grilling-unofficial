@@ -29,6 +29,13 @@ export const A27_ITEMS=Object.freeze([
 ]);
 
 const BY_ID=Object.freeze(Object.fromEntries(A27_ITEMS.map(x=>['kaleidoscope_grilling:'+x.id,x])));
+export const COOKERY_QUALITY_RATIOS=Object.freeze({0:1.2,1:.9,2:.6,3:.3});
+export function qualityRatioFromId(id){const n=Number(id);return Object.hasOwn(COOKERY_QUALITY_RATIOS,n)?COOKERY_QUALITY_RATIOS[n]:1}
+export function qualityFood(id,qualityId){
+ const raw=foodSpec(id);if(!raw)return null;if(!qualityAware(id))return {...raw};
+ const ratio=qualityRatioFromId(qualityId);
+ return {...raw,nutrition:Math.round(raw.nutrition*ratio),saturation:raw.saturation*ratio};
+}
 export function itemSpec(id){return BY_ID[String(id??'')]??null}
 export function itemIds(){return A27_ITEMS.map(x=>'kaleidoscope_grilling:'+x.id)}
 export function foodSpec(id){return itemSpec(id)?.food??null}
