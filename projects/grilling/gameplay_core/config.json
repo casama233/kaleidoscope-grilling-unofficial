@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.25 Skewer Hand Anchor",
+  "name": "Kaleidoscope Grilling A2.7.26 Seasoning Bottle Render",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_25_Skewer_Hand_Anchor"
+          "packName": "Kaleidoscope_Grilling_A2_7_26_Seasoning_Bottle_Render"
         }
       ]
     ]

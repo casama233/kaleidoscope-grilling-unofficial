@@ -6,11 +6,13 @@
     },
     "components": {
       "minecraft:display_name": "tile.kaleidoscope_grilling:seasoning_bottle.name",
-      "minecraft:geometry": "geometry.kg_a22.seasoning_bottles_1",
+      "minecraft:geometry": "geometry.kg_a2726.seasoning_bottles_1",
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a22_seasoning_bottles_1",
-          "render_method": "blend"
+          "render_method": "blend",
+          "ambient_occlusion": 0.0,
+          "face_dimming": false
         }
       },
       "minecraft:collision_box": {
