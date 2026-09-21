@@ -107,7 +107,15 @@ jobs:
           python development/gameplay_core/verify_a275.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Apply A2.7.6 intent and hand parity
+      - name: Rebuild A2.7.6 intent and hand parity
+        shell: pwsh
+        run: |
+          node development/gameplay_core/test_a276_core.mjs
+          python development/gameplay_core/augment_a276.py
+          python development/gameplay_core/verify_a276.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Apply A2.7.7 transaction rollback
         shell: pwsh
         run: |
           node development/gameplay_core/test_a277_core.mjs
