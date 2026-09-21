@@ -1,6 +1,7 @@
 # A2.7.x 伺服器版（Senluo 部署）— 差異與引擎除錯紀錄
 
-> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.20_Roasted_Sweet_Potato.mcaddon`（上游建置，未修改上游檔案）。
+> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.21_Roasted_Chicken_Wing.mcaddon`（上游建置，未修改上游檔案）。
+> 上游發布節奏很快（本次工作期間由 A2.7.14 推進到 A2.7.21），工具預設挑最新 A2.7 產物，重跑即可跟上。
 > 首輪為 A2.7.14（同一組差異，已在隔離引擎與正式服各驗證一次）；差異表與工具以最新產物為準，兩版輸入差異見 §7。
 > 部署對象：實際運營的 Bedrock 專用伺服器 1.26.51.1，與森羅物語：廚房 1.0.6 併用。
 > 本文件只記錄「伺服器版相對上游產物的差異」與「以伺服器自帶 Content Log／腳本除錯得到的結果」。
