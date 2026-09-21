@@ -1,4 +1,4 @@
-import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
+import {world,system,ItemStack} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';
 import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,canExtract,breakDisposition,outputKind} from './core_logic.js';
 import {mergeIntoContainer,compactSkewerContainer} from './a23_hot_runtime.js';
@@ -9,6 +9,7 @@ import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runt
 import './a26_oil_machine_runtime.js';
 import './a2727_cookery_host_recipes_runtime.js';
 import {COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryOilPotConsumption} from './a2734_cookery_oil_pot_adapter.js';
+import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,findHandEntry as handFor,setHand,isCreative as creative} from './a2735_player_io.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
@@ -105,15 +106,6 @@ function key(block){const p=block.location;return [block.dimension.id,p.x,p.y,p.
 function readRegistry(){try{const raw=world.getDynamicProperty(REGISTRY);return typeof raw==='string'?JSON.parse(raw):[]}catch{return []}}
 function saveRegistry(rows){world.setDynamicProperty(REGISTRY,JSON.stringify(rows.slice(0,MAX_GRILLS)))}
 function register(block){const k=key(block),rows=readRegistry();if(rows.some(x=>x.k===k)||rows.length>=MAX_GRILLS)return;rows.push({k,d:block.dimension.id,x:block.x,y:block.y,z:block.z});saveRegistry(rows)}
-function mainContainer(player){return player.getComponent('minecraft:inventory')?.container}
-function heldMain(player){return mainContainer(player)?.getItem(player.selectedSlotIndex)}
-function setMain(player,stack){mainContainer(player)?.setItem(player.selectedSlotIndex,stack)}
-function heldOff(player){return player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function setOff(player,stack){return player.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,stack)}
-function heldByHand(player,hand){return hand==='off'?heldOff(player):heldMain(player)}
-function handFor(player,id){const m=heldMain(player);if(m?.typeId===id)return {name:'main',stack:m};const o=heldOff(player);if(o?.typeId===id)return {name:'off',stack:o};return null}
-function setHand(player,hand,stack){if(hand==='off')return setOff(player,stack);return setMain(player,stack)}
-function creative(player){try{return player.getGameMode()===GameMode.Creative}catch{return false}}
 function decrementHand(player,hand,count=1){
  if(creative(player))return true;const s=heldByHand(player,hand);if(!s||s.amount<count)return false;
  if(s.amount===count)setHand(player,hand,undefined);else{s.amount-=count;setHand(player,hand,s)}return true;

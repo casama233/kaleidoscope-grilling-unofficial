@@ -1,4 +1,4 @@
-import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
+import {world,system,ItemStack} from '@minecraft/server';
 import {
  SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
 } from './a24_skewering_core.js';
@@ -6,6 +6,7 @@ import {
  PLATE_ID,PLATE_BLOCK_ID,BOOK_ID,RECIPE_BLOCK_ID,PLATE_SKEWERS_KEY,BOOK_RECORD_KEY,PLATE_CAPACITY,
  normalizePlateRows,plateAdd,plateRemoveLast,isRecordableRecipe,makeBookRecord,bookIngredientSlots,planInventoryConsumption
 } from './a25_plate_recipe_core.js';
+import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,isCreative as creative} from './a2735_player_io.js';
 
 const COOKERY_RECIPE_ITEMS=new Set([
  'kaleidoscope_cookery:recipe_block',
@@ -21,12 +22,6 @@ for(const id of ['kaleidoscope_grilling:mysterious_skewer','kaleidoscope_grillin
 
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
 function posKey(prefix,block){return prefix+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
-function mainContainer(player){return player.getComponent('minecraft:inventory')?.container}
-function heldMain(player){return mainContainer(player)?.getItem(player.selectedSlotIndex)}
-function setMain(player,stack){mainContainer(player)?.setItem(player.selectedSlotIndex,stack)}
-function heldOff(player){return player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function setOff(player,stack){return player.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,stack)}
-function creative(player){try{return player.getGameMode()===GameMode.Creative}catch{return false}}
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
 function cloneOne(stack){const out=stack.clone();out.amount=1;return out}
 function decrementMain(player,count=1){

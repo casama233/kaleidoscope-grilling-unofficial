@@ -1,4 +1,4 @@
-import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
+import {world,system,ItemStack} from '@minecraft/server';
 import {
  COLD_ID,HOUTTUYNIA_ID,CRAFTING_TABLE_ID,REQUIRED_OIL_TYPE,
  planColdHouttuynia
@@ -6,12 +6,8 @@ import {
 import {
  COOKERY_FILLED_ID,readCookeryOilPot,buildCookeryOilPot
 } from './a2734_cookery_oil_pot_adapter.js';
+import {playerInventory as inventory,getMainHand as main,getOffHand as off,setMainHand as setMain,setOffHand as setOff} from './a2735_player_io.js';
 
-function inventory(player){return player.getComponent('minecraft:inventory')?.container}
-function main(player){return inventory(player)?.getItem(player.selectedSlotIndex)}
-function off(player){return player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function setMain(player,stack){inventory(player)?.setItem(player.selectedSlotIndex,stack)}
-function setOff(player,stack){player.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,stack)}
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
 function give(player,stack){
  const c=inventory(player);

@@ -1,6 +1,7 @@
-import {world,system,ItemStack,EquipmentSlot,GameMode,BlockPermutation} from '@minecraft/server';
+import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {OIL_BUCKET_POINTS} from './a24_skewering_core.js';
 import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
+import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,findHand,setHand,isCreative as creative} from './a2735_player_io.js';
 
 const REG='kaleidoscope_grilling:a23_oil_sources';
 export const OIL_TYPES=Object.freeze({
@@ -29,12 +30,6 @@ function canFlowInto(block,type,source=false){
  if(block.typeId===OIL_TYPES[type].block)return !source||level(block)>0;
  return false;
 }
-function playerContainer(p){return p.getComponent('minecraft:inventory')?.container}
-function main(p){return playerContainer(p)?.getItem(p.selectedSlotIndex)}
-function off(p){return p.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function findHand(p,id){const m=main(p);if(m?.typeId===id)return 'main';const o=off(p);if(o?.typeId===id)return 'off';return null}
-function setHand(p,hand,stack){if(hand==='off')return p.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,stack);return playerContainer(p)?.setItem(p.selectedSlotIndex,stack)}
-function creative(p){try{return p.getGameMode()===GameMode.Creative}catch{return false}}
 function addItem(p,stack){const c=playerContainer(p);if(!c)return;const rem=c.addItem(stack);if(rem)p.dimension.spawnItem(rem,p.location)}
 function sourceRow(dim,loc,type){return {k:posKey(dim.id,loc.x,loc.y,loc.z),d:dim.id,x:loc.x,y:loc.y,z:loc.z,type,cells:[]}}
 function registerSource(dim,loc,type){

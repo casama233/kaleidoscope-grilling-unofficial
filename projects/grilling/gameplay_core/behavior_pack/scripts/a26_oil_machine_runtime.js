@@ -1,4 +1,4 @@
-import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
+import {world,system,ItemStack} from '@minecraft/server';
 import {
  PRESS_MAX_CAKES,PRESS_REQUIRED_PROGRESS,PRESS_COOLDOWN_TICKS,PRESS_IMPACT_TICK,PRESS_COMPLETION_DELAY,
  PRESS_OUTPUT_BUCKETS,VAT_CAPACITY_BUCKETS,OIL_POT_CAPACITY,OIL_BUCKET_POINTS,
@@ -7,6 +7,7 @@ import {
  normalizeVat,vatVisualLevel,vatInsert,vatExtract,potFillPlan,nearbyOffsets
 } from './a26_oil_machine_core.js';
 import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,readCookeryOilPot,buildCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
+import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,setMainHand as setMain,setOffHand as setOff,findHand as handFor,getHand as held,setHand,isCreative as creative} from './a2735_player_io.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';
@@ -38,15 +39,6 @@ function registerPress(block){
  rows.push({k,d:block.dimension.id,x:block.x,y:block.y,z:block.z});saveReg(rows);
 }
 function removePressReg(block){const k=regKey(block),rows=readReg().filter(x=>x.k!==k);saveReg(rows)}
-function playerContainer(p){return p.getComponent('minecraft:inventory')?.container}
-function main(p){return playerContainer(p)?.getItem(p.selectedSlotIndex)}
-function off(p){return p.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function setMain(p,s){playerContainer(p)?.setItem(p.selectedSlotIndex,s)}
-function setOff(p,s){p.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,s)}
-function handFor(p,id){if(main(p)?.typeId===id)return 'main';if(off(p)?.typeId===id)return 'off';return null}
-function held(p,hand){return hand==='off'?off(p):main(p)}
-function setHand(p,hand,s){return hand==='off'?setOff(p,s):setMain(p,s)}
-function creative(p){try{return p.getGameMode()===GameMode.Creative}catch{return false}}
 function decHand(p,hand,count=1){
  if(creative(p))return true;const s=held(p,hand);if(!s||s.amount<count)return false;
  if(s.amount===count)setHand(p,hand,undefined);else{s.amount-=count;setHand(p,hand,s)}return true;
