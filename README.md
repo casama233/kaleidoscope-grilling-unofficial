@@ -2,9 +2,20 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.3 Gameplay Core 已補上 Hot Food 堆疊/儲物整理、烤爐四態、效果差異收斂與三種世界油模擬；仍不是 Java 全模組完整移植。**
+**目前：A2.7 開發分支已在 A2.6 Oil Press + Big Vat 基線上補齊 27 個基礎/加工物品與菜品、15 個 Java 食物數值/效果，並開始完整 recipe reconciliation；仍不是 Java 全模組完整移植。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.7：基礎／加工物品＋菜品＋配方對帳（目前開發批次）
+
+- **[A2.7 完成範圍、配方替代與剩餘 Java 差異](docs/STATUS-A2.7.md)**
+- Java 基線仍是 1.1.1 / `9a1acdab27698457bec16c9362678e574895a28c`；目前上游 `main` 與此提交一致。
+- 新增 27 個此前缺失的基礎／加工物品與菜品，15 個可食用物件按 Java 原值保留營養、飽和、堆疊與特殊效果。
+- `sweet_potato_powder` 保留 Java 30 tick 揉製後整疊 1:1 轉為 `raw_sweet_potato_sheet`。
+- 已映射 25 條配方：8 條可直接用 Bedrock 原生配方表示，17 條 Cookery／Create 自訂 RecipeType 先提供相同材料成本與輸出的生存 fallback。
+- 不偽造兩個關鍵邊界：涼拌折耳根仍需「premium_chili 油壺只扣 2 點」的有狀態配方層；酸辣粉仍需可選 Tavern 相容層。
+
+A2.4～A2.6 已完成自由／秘制串、餐盤／串譜，以及 Oil Press + Big Vat；詳見對應 `docs/STATUS-A2.4.md` ～ `STATUS-A2.6.md`。A2.7 CI 會重建 A2.0→A2.7、跑結構／行為測試、使用官方 Dash 編譯並逐檔比較；只有合併到 `main` 後才會發布 A2.7 生成包。
 
 ## A2.3：Hot Food堆疊＋烤爐四態＋世界油
 
@@ -185,7 +196,7 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、自由／秘制串、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+目前主要剩餘：四種作物的種植／成熟／採收、花椒樹苗／原木／樹葉與世界生成、Advanced Rack、Java advancement 對應、指南動態內容、餐盤最終 per-skewer 3D renderer、涼拌折耳根有狀態油壺配方、可選 Tavern／Create 相容層，以及 Minecraft 26.51／BDS／多人／重載持久化實機驗收。魚腥草與花椒現有靜態素材仍需在 A2.8 接上世界玩法。Numb 準星與真正第三方自訂流體仍受 stable Bedrock API 能力限制。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
