@@ -93,8 +93,10 @@ reset();
  const dimension={spawnItem(stack,location){drops.push({stack,location})}};
  const dead={typeId:'minecraft:chicken',location:{x:0,y:0,z:0},dimension};
  const killer=playerWith(new Stack('kaleidoscope_cookery:iron_kitchen_knife'));
+ randoms.push(0,0);
  dieListeners[0]({deadEntity:dead,damageSource:{damagingEntity:killer,damagingProjectile:{typeId:'minecraft:arrow'}}});
- assert.equal(drops.length,0);
+ assert.equal(drops.length,1);assert.equal(drops[0].stack.typeId,'kaleidoscope_grilling:chicken_wing');
+ drops.length=0;
  killer.getComponent=()=>({getEquipmentSlot(){return{hasItem(){return true},getItem(){return new Stack('minecraft:diamond_sword')}}}});
  dieListeners[0]({deadEntity:dead,damageSource:{damagingEntity:killer}});assert.equal(drops.length,0);
 }
