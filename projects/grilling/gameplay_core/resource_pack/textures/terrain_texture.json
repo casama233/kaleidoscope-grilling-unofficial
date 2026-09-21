@@ -52,6 +52,39 @@
     },
     "kg_a26_lava": {
       "textures": "textures/blocks/lava_still"
+    },
+    "houttuynia_stage0": {
+      "textures": "textures/blocks/crop/houttuynia/stage0"
+    },
+    "houttuynia_stage1": {
+      "textures": "textures/blocks/crop/houttuynia/stage1"
+    },
+    "houttuynia_stage2": {
+      "textures": "textures/blocks/crop/houttuynia/stage2"
+    },
+    "houttuynia_stage3": {
+      "textures": "textures/blocks/crop/houttuynia/stage3"
+    },
+    "houttuynia_stage4": {
+      "textures": "textures/blocks/crop/houttuynia/stage4"
+    },
+    "houttuynia_stage5": {
+      "textures": "textures/blocks/crop/houttuynia/stage5"
+    },
+    "houttuynia_stage5_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage5_2"
+    },
+    "houttuynia_stage6": {
+      "textures": "textures/blocks/crop/houttuynia/stage6"
+    },
+    "houttuynia_stage6_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage6_2"
+    },
+    "houttuynia_stage7": {
+      "textures": "textures/blocks/crop/houttuynia/stage7"
+    },
+    "houttuynia_stage7_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage7_2"
     }
   }
 }
