@@ -1,0 +1,55 @@
+{
+  "version": "A2.7.10",
+  "scope": "chicken_skin and chicken_wing survival acquisition parity",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_sources": {
+    "chopping_board_mixin_blob_sha1": "3b201faf83c2b8aa29008d1d63185d7738f6a2f1",
+    "knife_drop_handler_blob_sha1": "8a6e2705d46ec9535dc35b8baf203d3411c84e6e"
+  },
+  "items": {
+    "chicken_skin": {
+      "plain_item": true,
+      "max_stack_size": 64,
+      "texture_git_blob_sha1": "5a8517468ed9da877b219047e1032d3a4c728bfc"
+    },
+    "chicken_wing": {
+      "food": true,
+      "max_stack_size": 64,
+      "nutrition": 2,
+      "saturation_modifier": 0.06,
+      "texture_git_blob_sha1": "4adb1a131eb7f0dda0ed43f616e1dd561c7b3e71"
+    }
+  },
+  "chicken_skin": {
+    "cookery_base_recipe": "minecraft:chicken -> kaleidoscope_cookery:raw_cut_small_meats x2, 4 cuts",
+    "java_extra_drop": "on successful release action when current cuts >= max: chicken_skin x(1..3)",
+    "bedrock_strategy": "observe first knife interaction at completed Cookery chicken-board state; after Cookery clears/advances state, spawn bonus skin without replacing Cookery output",
+    "duplicate_guard": "one pending completion watch per station key per callback window"
+  },
+  "chicken_wing": {
+    "java_drop": "when DamageSource causing entity is Player and player current main hand is in kaleidoscope_cookery:kitchen_knife tag",
+    "chance": 1.0,
+    "base_count": "1 + random(0..1)",
+    "looting_bonus": "random(0..Looting level)",
+    "bedrock_knife_ids": [
+      "kaleidoscope_cookery:iron_kitchen_knife",
+      "kaleidoscope_cookery:gold_kitchen_knife",
+      "kaleidoscope_cookery:diamond_kitchen_knife",
+      "kaleidoscope_cookery:netherite_kitchen_knife"
+    ],
+    "projectile_note": "no explicit projectile rejection, mirroring Java causing-player/current-main-hand implementation"
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "chicken_board_model": 2,
+    "private_scripts_modified": false
+  },
+  "downstream": {
+    "raw_chicken_skin_skewer_recipe_already_references_chicken_skin": true,
+    "raw_mid_wing_skewer_recipe_already_references_chicken_wing": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "engine_rendering_verified": false
+}

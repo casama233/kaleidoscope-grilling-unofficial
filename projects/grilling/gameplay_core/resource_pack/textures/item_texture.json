@@ -208,6 +208,12 @@
     },
     "beef_chunks": {
       "textures": "textures/items/beef_chunks"
+    },
+    "chicken_skin": {
+      "textures": "textures/items/chicken_skin"
+    },
+    "chicken_wing": {
+      "textures": "textures/items/chicken_wing"
     }
   }
 }

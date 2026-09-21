@@ -1,0 +1,22 @@
+{
+  "version": "A2.7.10",
+  "tested_commit": "ad92892a830a3b24aaebe0bc709d1c7956f72b46",
+  "run_id": "35570873125",
+  "chicken_skin_item": true,
+  "chicken_wing_item": true,
+  "chicken_skin_board_bonus": true,
+  "chicken_wing_knife_kill_drop": true,
+  "skin_count_range": [
+    1,
+    3
+  ],
+  "wing_base_count_range": [
+    1,
+    2
+  ],
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "390b4db1be8560f6f6dba7342c00487909d4c0f88fd104e0fb89081bd26813ef",
+  "brproject_sha256": "0725db09e049ec277691ae20c56ea05e0c08975a24b5b6e303a6ebdcb3fc8682",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
