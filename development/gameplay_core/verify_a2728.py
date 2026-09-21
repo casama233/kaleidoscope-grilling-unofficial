@@ -33,7 +33,7 @@ def lang(p):
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
  bm,rm=load(BP/'manifest.json'),load(RP/'manifest.json')
- assert bm['header']['version']==[2,7,28] and rm['header']['version']==[2,7,27]
+ assert bm['header']['version']==[2,7,28] and rm['header']['version']==[2,7,28]
  assert bm['header']['name']=='Kaleidoscope Grilling A2.7.28 Localization BP'
  assert load(RP/'texts/languages.json')==['zh_CN','zh_TW','en_US']
  cn,co=lang(RP/'texts/zh_CN.lang');tw,to=lang(RP/'texts/zh_TW.lang');en,eo=lang(RP/'texts/en_US.lang')
