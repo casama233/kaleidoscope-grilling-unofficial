@@ -4,6 +4,9 @@ on:
     branches: [a279-beef-board-override]
     paths:
       - '.github/workflows/a279-cookery-board-state-probe.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/a279-cookery-board-state-probe.yml'
 permissions:
   contents: read
 jobs:
