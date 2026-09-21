@@ -109,6 +109,30 @@
     },
     "canola_stage7": {
       "textures": "textures/blocks/crop/canola/stage7"
+    },
+    "onion_stage0": {
+      "textures": "textures/blocks/crop/onion/stage0"
+    },
+    "onion_stage1": {
+      "textures": "textures/blocks/crop/onion/stage1"
+    },
+    "onion_stage2": {
+      "textures": "textures/blocks/crop/onion/stage2"
+    },
+    "onion_stage3": {
+      "textures": "textures/blocks/crop/onion/stage3"
+    },
+    "onion_stage4": {
+      "textures": "textures/blocks/crop/onion/stage4"
+    },
+    "onion_stage5": {
+      "textures": "textures/blocks/crop/onion/stage5"
+    },
+    "onion_stage6": {
+      "textures": "textures/blocks/crop/onion/stage6"
+    },
+    "onion_stage7": {
+      "textures": "textures/blocks/crop/onion/stage7"
     }
   }
 }

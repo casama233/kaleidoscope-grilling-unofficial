@@ -1,0 +1,32 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:onion",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "item.kaleidoscope_grilling:onion.name"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "onion"
+        }
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:onion_crop",
+        "use_on": [
+          "minecraft:farmland"
+        ],
+        "replace_block_item": false
+      },
+      "minecraft:compostable": {
+        "composting_chance": 65
+      }
+    }
+  }
+}

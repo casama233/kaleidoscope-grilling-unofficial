@@ -101,3 +101,6 @@ tile.kaleidoscope_grilling:houttuynia_crop.name=Houttuynia Crop
 
 item.kaleidoscope_grilling:canola_seeds.name=Canola Seeds
 tile.kaleidoscope_grilling:canola_crop.name=Canola Crop
+
+item.kaleidoscope_grilling:onion.name=Onion
+tile.kaleidoscope_grilling:onion_crop.name=Onion Crop

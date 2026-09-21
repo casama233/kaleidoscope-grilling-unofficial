@@ -101,3 +101,6 @@ tile.kaleidoscope_grilling:houttuynia_crop.name=折耳根作物
 
 item.kaleidoscope_grilling:canola_seeds.name=油菜籽
 tile.kaleidoscope_grilling:canola_crop.name=油菜
+
+item.kaleidoscope_grilling:onion.name=洋葱
+tile.kaleidoscope_grilling:onion_crop.name=洋葱

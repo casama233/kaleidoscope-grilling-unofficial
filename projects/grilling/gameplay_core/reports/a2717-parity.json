@@ -1,0 +1,76 @@
+{
+  "version": "A2.7.17",
+  "scope": "Onion item + 8-age crop + straw-hat short-grass acquisition",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:onion",
+    "plain_crop_item": true,
+    "max_stack_size": 64,
+    "food": false,
+    "plants": "kaleidoscope_grilling:onion_crop",
+    "plantable_on": [
+      "minecraft:farmland"
+    ],
+    "composting_chance_percent": 65,
+    "texture_git_blob_sha1": "103aa78661bf35aa6b3a42989a398573056faff1"
+  },
+  "crop": {
+    "ages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_age": 7,
+    "farmland_only": true,
+    "farmland_survival_min_light": 8,
+    "growth_min_light": 9,
+    "bonemeal_age_increase": [
+      2,
+      5
+    ],
+    "growth_speed": "reuses tested Java CropBlock 3x3 farmland weighting + crowding helper",
+    "cross_geometry": "reuses A2.7.14 verified 16x16 crop geometry",
+    "texture_git_blob_sha1": {
+      "stage0": "490cd255f3e94a82844e5c0dd4fbc0f39e7ed851",
+      "stage1": "27e70b8e92331894e46926a1a9acd19b77a7329d",
+      "stage2": "22f7dd1f49602fce4cce32046bc2b70140b2cb7f",
+      "stage3": "8963fc4f952806dc0833eb19a4fbe1b831a3eb74",
+      "stage4": "348515d3f3c59a5a06a4d366f831b676e71f16b4",
+      "stage5": "5a4631796be63179bcf796359eeba00a5986e04c",
+      "stage6": "e8badfe410205c7d82745124cec24c5a93802208",
+      "stage7": "857cddb6802c9cf63f32d4ff799fd799beb753ff"
+    }
+  },
+  "drops": {
+    "immature": "1 onion",
+    "mature": "2 + Binomial(Fortune+2, 0.5714286) onion; exact for vanilla Fortune 0..3",
+    "overleveled_fortune_exact": false
+  },
+  "initial_acquisition": {
+    "trigger": "successful minecraft:short_grass break",
+    "creative": false,
+    "required_head": [
+      "kaleidoscope_cookery:straw_hat",
+      "kaleidoscope_cookery:straw_hat_flower"
+    ],
+    "chance": 0.125,
+    "count": "1 + random(0..Fortune level)",
+    "fortune_source": "itemStackBeforeBreak",
+    "per_branch_probability_count_exact": true,
+    "full_java_rng_call_order_complete": false,
+    "reason": "Java calls Canola, Sweet Potato, then Onion tryDrop in one handler; Sweet Potato branch remains deferred, so raw RNG stream order is not byte-for-byte identical yet."
+  },
+  "downstream": {
+    "onion_powder_item_already_present": true,
+    "onion_to_powder_processing_complete": false,
+    "next_gap": "Cookery millstone: onion tag -> onion_powder x1"
+  },
+  "survival_onion_acquisition_complete": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

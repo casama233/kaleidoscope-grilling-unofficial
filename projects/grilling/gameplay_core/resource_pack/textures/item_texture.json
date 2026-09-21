@@ -229,6 +229,9 @@
     },
     "canola_seeds": {
       "textures": "textures/items/canola_seeds"
+    },
+    "onion": {
+      "textures": "textures/items/onion"
     }
   }
 }
