@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.12 Remaining Knife Drops",
+  "name": "Kaleidoscope Grilling A2.7.13 Houttuynia Processing",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_12_Remaining_Knife_Drops"
+          "packName": "Kaleidoscope_Grilling_A2_7_13_Houttuynia_Processing"
         }
       ]
     ]

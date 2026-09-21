@@ -220,6 +220,12 @@
     },
     "squid_tentacle": {
       "textures": "textures/items/squid_tentacle"
+    },
+    "houttuynia": {
+      "textures": "textures/items/houttuynia"
+    },
+    "minced_houttuynia": {
+      "textures": "textures/items/minced_houttuynia"
     }
   }
 }

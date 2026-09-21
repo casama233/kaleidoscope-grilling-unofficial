@@ -1,0 +1,27 @@
+{
+  "version": "A2.7.13",
+  "houttuynia_item": true,
+  "minced_houttuynia_item": true,
+  "houttuynia_chopping_registered": true,
+  "cuts": 4,
+  "output_count": 1,
+  "survival_houttuynia_acquisition_complete": false,
+  "fortress_chest_override_avoided": true,
+  "crop_worldgen_deferred": true,
+  "a2712_remaining_knife_drops_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 125,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 559,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
