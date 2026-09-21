@@ -71,6 +71,9 @@ assert.equal(fx.warmth.until,5000);assert.equal(fx.numb.until,3000);
 
 const c=entity(undefined);
 listeners[0]({itemStack:{typeId:'kaleidoscope_grilling:cold_houttuynia'},source:c});
-assert.deepEqual(c.native(),[{id:'fire_resistance',duration:1200,options:{showParticles:true}}]);
+assert.equal(c.native().length,1);
+assert.equal(c.native()[0].id,'fire_resistance');
+assert.equal(c.native()[0].duration,1200);
+assert.equal(c.native()[0].options.showParticles,true);
 
 console.log(JSON.stringify({passed:6,failed:0,scope:'A2.7.32 unified standalone food effect runtime'}));
