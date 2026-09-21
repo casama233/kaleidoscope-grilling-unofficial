@@ -86,6 +86,7 @@ def crop_block():
    'minecraft:material_instances':{'*':{'texture':'houttuynia_stage0','render_method':'alpha_test','face_dimming':False,'ambient_occlusion':False}},
    'minecraft:destructible_by_mining':{'seconds_to_destroy':0},
    'minecraft:collision_box':False,
+   'minecraft:light_dampening':0,
    'minecraft:selection_box':{'origin':[-8,0,-8],'size':[16,2,16]},
    'minecraft:placement_filter':{'conditions':[{'allowed_faces':['up'],'block_filter':['minecraft:farmland','minecraft:soul_sand']}]},
    'minecraft:loot':'loot_tables/blocks/houttuynia_crop.json',
@@ -140,7 +141,8 @@ def report():
    'farmland_survival_min_light':8,'growth_min_light':9,'soul_sand_forces_red':True,'farmland_red_placement_chance':0.3,
    'red_variant_preserved_through_growth':True,'bonemeal_age_increase':[2,5],
    'growth_speed':'Java CropBlock 3x3 farmland weighting + adjacency crowding penalty',
-   'runtime':'BlockCustomComponent registered from system.beforeEvents.startup; no global crop scan'
+   'runtime':'BlockCustomComponent registered from system.beforeEvents.startup; no global crop scan',
+   'support_loss':'mature support-loss drop uses Fortune-0 Java formula instead of collapsing to one item'
   },
   'visuals':{'java_texture_blob_sha1':TEX,'cross_geometry':'adapted from Microsoft official custom crop sample pattern','red_variant_texture_starts_at_age':5},
   'drops':{
