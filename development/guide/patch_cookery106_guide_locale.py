@@ -56,7 +56,7 @@ def main():
         patched = reg_text.replace(OLD, NEW, 1)
         assert OLD not in patched and patched.count(NEW) == 1
 
-        note_path = reg.rsplit("/", 2)[0] + "/documentation/" + NOTE_NAME
+        note_path = reg.split("/scripts/", 1)[0] + "/documentation/" + NOTE_NAME
         out.parent.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(out, "w") as zout:
             for info in infos:
