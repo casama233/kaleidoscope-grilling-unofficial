@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.54",
+  "tested_commit": "d01748a597969b620cd52ebc0e2e9cdbec97f5e3",
+  "run_id": "35696199929",
+  "incremental_from_published_a2753": true,
+  "village_pepper_loot": true,
+  "village_tables": 15,
+  "mojang_baseline": "1.26.50.4",
+  "wrapper_strategy": true,
+  "shared_bonus_table": true,
+  "village_bundle_overridden": false,
+  "new_script_runtime": false,
+  "loot_override_compatibility_risk": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "58e9acae936855818530ea1eef487b6901d8b120d9e5d8439a37cc999b1ce042",
+  "brproject_sha256": "33cf7240ac8acc93cc2ade1fe5352a50f75b3e28d53a61dceb0377265f34db42",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
