@@ -150,10 +150,20 @@ function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(
   'bottle visual count')
  s=replace_once(s,"stack.length>=4","stack.length>=SEASONING_MAX_BOTTLES",'stack capacity check')
  s=replace_once(s,"message(player,'§c最多只能堆4瓶')","message(player,'§c最多只能堆'+SEASONING_MAX_BOTTLES+'瓶')",'stack capacity message')
- s=s.replace("stack.length+'/4'","stack.length+'/'+SEASONING_MAX_BOTTLES")
+ s=replace_once(s,
+  "message(player,'§a調料瓶堆疊 '+stack.length+'/4');return true;",
+  "message(player,'§a調料瓶堆疊 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return true;",
+  'stack count success message')
+ s=replace_once(s,
+  "message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/4');return;",
+  "message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return;",
+  'stack count pop message')
  s=replace_once(s,"top.ingredients.length>=8","top.ingredients.length>=SEASONING_CAPACITY",'ingredient capacity check')
  s=replace_once(s,"message(player,'§c最上層調料瓶已滿 8/8')","message(player,'§c最上層調料瓶已滿 '+SEASONING_CAPACITY+'/'+SEASONING_CAPACITY)",'ingredient full message')
- s=s.replace("top.ingredients.length+'/8","top.ingredients.length+'/'+SEASONING_CAPACITY")
+ s=replace_once(s,
+  "message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/8；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/8');return;",
+  "message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY+'；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY);return;",
+  'ingredient progress message')
  s=replace_once(s,"Math.floor(Math.random()*8)","Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1))",'variant random range')
  s=replace_once(s,
   "out.setLore(['§7Uses: 16/16','§7Ingredients: '+list.length+'/8'])",
