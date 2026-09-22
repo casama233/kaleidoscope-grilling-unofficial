@@ -1,6 +1,6 @@
 # A2.7.x 伺服器版（Senluo 部署）— 差異與引擎除錯紀錄
 
-> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.46_Advanced_Rack.mcaddon`（上游建置，未修改上游檔案）。
+> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.58_Challenge_Advancement_Parity.mcaddon`（上游建置，未修改上游檔案）。
 > 上游發布節奏很快（本次工作期間由 A2.7.14 推進到 A2.7.21），工具預設挑最新 A2.7 產物，重跑即可跟上。
 > 首輪為 A2.7.14（同一組差異，已在隔離引擎與正式服各驗證一次）；差異表與工具以最新產物為準，兩版輸入差異見 §7。
 > 部署對象：實際運營的 Bedrock 專用伺服器 1.26.51.1，與森羅物語：廚房 1.0.6 併用。
@@ -101,3 +101,14 @@ A2.7.15–A2.7.20 新增油菜／洋蔥／甘薯作物與烤甘薯，問題類�
 - 其餘差異與 A2.7.37 相同一組，工具無須其他改動。
 
 正式服部署後：兩包內容日誌 0 錯誤；日誌比對無新增問題。
+
+## 10. A2.7.58 同步（2026-09-22 部署）
+
+上游推進到 A2.7.58（A2.7.47–58：村莊花椒與要塞魚腥草戰利品、事件／挑戰進度、A2.7.57 以官方模式加固 Cookery metadata、A2.7.58 進度同步）。伺服器版差異：
+
+- 新檔 `a2750_cookery_cuisine_runtime.js`（`stack`／`next`）與 `a2750_food_state_adapter.js`（`stack`）直接讀寫物品屬性，已納入 itemData 改寫。
+- 配方 unlock 通用推導自動涵蓋新配方（`pepper_honey`、`sugared_tomato` 等）。
+- **修正上游 A2.7.58 的世界生成缺陷**：`features/pepper_tree_worldgen.json` 的 `acacia_trunk.trunk_lean` 缺少本版 BDS 必填的 `lean_height` 與 `lean_steps`，導致整個特徵無法註冊（Content Log：`No definition found for feature 'kaleidoscope_grilling:pepper_tree_worldgen'`）。建置程序補上這兩個子物件（`base:1, intervals:[1]`）。
+- 其餘差異與 A2.7.46 相同一組。
+
+正式服部署後：兩包內容日誌 0 錯誤。

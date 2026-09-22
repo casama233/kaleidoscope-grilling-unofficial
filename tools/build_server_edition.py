@@ -91,6 +91,8 @@ ITEM_VARS = {
     'a2730_cookery_oil_pot_adapter.js': ['out', 'stack'],
     'a2734_cookery_oil_pot_adapter.js': ['out', 'stack'],
     'a2746_rack_item_codec.js': ['stack'],
+    'a2750_cookery_cuisine_runtime.js': ['stack', 'next'],
+    'a2750_food_state_adapter.js': ['stack'],
 }
 rewritten = {}
 for name, vars_ in ITEM_VARS.items():
@@ -206,6 +208,20 @@ for p in sorted((bp / 'blocks').glob('*.json')):
     json.loads(t); p.write_text(t, encoding='utf-8'); tagged.append(p.name)
 assert tagged, 'no crop tag removed'
 print('tag:minecraft:crop removed from:', tagged)
+
+# 8b. The A2.7.58 pepper-tree worldgen ships an acacia_trunk whose trunk_lean is
+# missing the two children this BDS requires (lean_height, lean_steps), so the
+# whole feature fails to register and the rule reports "No definition found".
+for p in sorted((bp / 'features').glob('*.json')):
+    j = json.loads(p.read_text(encoding='utf-8'))
+    trunk = j.get('minecraft:tree_feature', {}).get('acacia_trunk', {}).get('trunk_lean')
+    if not isinstance(trunk, dict): continue
+    missing = [k for k in ('lean_height', 'lean_steps') if k not in trunk]
+    if not missing: continue
+    trunk.setdefault('lean_height', {'base': 1, 'intervals': [1], 'min_height_for_canopy': 2})
+    trunk.setdefault('lean_steps', {'base': 1, 'intervals': [1]})
+    p.write_text(json.dumps(j, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(p.name, 'trunk_lean completed:', missing)
 
 # 9. recipes: unlock data (1.20+ crafting recipes are rejected without it;
 # furnace recipes do not need any)
