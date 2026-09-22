@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.53",
+  "tested_commit": "6d0333b9f023a76f5fea9b8be3ab9264208808c7",
+  "run_id": "35695594245",
+  "incremental_from_published_a2752": true,
+  "mountain_fragrance_advancement": true,
+  "xp_reward": 25,
+  "once_per_player": true,
+  "chat_announcement": true,
+  "shared_advancement_adapter": true,
+  "new_event_listener": false,
+  "native_java_advancement_ui": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "b4975f09ef5e7d3c8df6b2115a2769b79612a86099bfb5ab10e192144689ecf8",
+  "brproject_sha256": "de69705abb344803f990ba92eff74941cc55b613454c0e5b7733435499275288",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

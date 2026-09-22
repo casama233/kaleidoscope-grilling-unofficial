@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.52 Cookery Stockpot Cuisine",
+  "name": "Kaleidoscope Grilling A2.7.53 Mountain Fragrance Advancement",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_51_Cookery_Stockpot_Cuisine"
+          "packName": "Kaleidoscope_Grilling_A2_7_53_Mountain_Fragrance_Advancement"
         }
       ]
     ]

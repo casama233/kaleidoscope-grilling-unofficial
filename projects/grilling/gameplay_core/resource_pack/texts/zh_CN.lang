@@ -187,3 +187,7 @@ item.kaleidoscope_grilling:red_sweet_potato_porridge.name=红苕稀饭
 tooltip.kaleidoscope_grilling.red_sweet_potato_porridge.maxim=特别顶饿，但没营养，还是少涨点吧
 item.kaleidoscope_grilling:sour_spicy_noodles.name=酸辣粉
 tooltip.kaleidoscope_grilling.sour_spicy_noodles.maxim=酸得醒神，辣得冒汗，嗦一口就停不下来。
+advancement.kaleidoscope_grilling.mountain_fragrance.title=山野麻香
+advancement.kaleidoscope_grilling.mountain_fragrance.description=从花椒树上摘得花椒。
+message.kaleidoscope_grilling.advancement.goal_announce= 完成目标：
+message.kaleidoscope_grilling.advancement.goal_self=§6目标达成：§r

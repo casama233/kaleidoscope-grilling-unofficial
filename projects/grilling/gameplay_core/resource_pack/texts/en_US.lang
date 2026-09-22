@@ -208,3 +208,7 @@ item.kaleidoscope_grilling:red_sweet_potato_porridge.name=Sweet Potato Rice Porr
 tooltip.kaleidoscope_grilling.red_sweet_potato_porridge.maxim=Very filling, but not very nutritious. Better take it easy.
 item.kaleidoscope_grilling:sour_spicy_noodles.name=Sour and Spicy Noodles
 tooltip.kaleidoscope_grilling.sour_spicy_noodles.maxim=Sour enough to wake you, hot enough to make you sweat, and impossible to stop slurping.
+advancement.kaleidoscope_grilling.mountain_fragrance.title=Mountain Fragrance
+advancement.kaleidoscope_grilling.mountain_fragrance.description=Pick Sichuan pepper from a pepper tree.
+message.kaleidoscope_grilling.advancement.goal_announce= completed the goal: 
+message.kaleidoscope_grilling.advancement.goal_self=§6Goal complete: §r

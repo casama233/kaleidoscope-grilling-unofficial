@@ -7,6 +7,7 @@ import {
  shouldFruitPepperLeaf,harvestedPepperCount,saplingBonemealSucceeds,saplingRandomTickSucceeds,
  nextSaplingAction,pepperTreeHeight,pepperLogAxis,pepperLeafBreakPlan,pepperTreePlan
 } from './a2748_pepper_tree_core.js';
+import {awardMountainFragrance} from './a2753_advancement_runtime.js';
 
 const STING_UNTIL='kaleidoscope_grilling:pepper_sting_until';
 const REPLACEABLE=new Set(['minecraft:air','minecraft:short_grass','minecraft:tall_grass','minecraft:snow_layer','minecraft:vine']);
@@ -159,6 +160,7 @@ system.beforeEvents.startup.subscribe(init=>{
     const block=event.block,player=event.player;if(!player||getMainHand(player))return;
     if(!state(block,HAS_PEPPER_STATE,false))return;
     drop(block,SICHUAN_PEPPER_ID,harvestedPepperCount(Math.random()));
+    awardMountainFragrance(player);
     setState(block,HAS_PEPPER_STATE,false);
     block.dimension.playSound('block.sweet_berry_bush.pick',block.location,{volume:1,pitch:.8+Math.random()*.4});
    }catch{}
