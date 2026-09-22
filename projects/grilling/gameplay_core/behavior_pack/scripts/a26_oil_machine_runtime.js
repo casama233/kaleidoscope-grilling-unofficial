@@ -266,5 +266,6 @@ system.runInterval(()=>{
 },1);
 
 export function a26ReadPress(block){return readPress(block)}
+export function a26ProbePressContainer(block){return scanVat(block)}
 export function a26ReadVat(block){return readVat(block)}
 export function a26VatItem(v){return vatItem(v)}

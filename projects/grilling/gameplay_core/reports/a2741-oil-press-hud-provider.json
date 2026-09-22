@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.41",
+  "scope": "attach Oil Press to the shared crosshair HUD using existing A2.6 press/vat state and scan logic",
+  "java_contract": {
+    "max_cakes": 4,
+    "required_progress": 16,
+    "vat_capacity_buckets": 8,
+    "hud": [
+      "cakes",
+      "progress",
+      "vat_none",
+      "vat_incompatible",
+      "vat_full",
+      "vat_ready"
+    ]
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "press_state_reader": "a26ReadPress",
+    "vat_state_reader": "a26ReadVat",
+    "container_probe": "a26ProbePressContainer -> existing scanVat",
+    "single_poll_loop": true,
+    "duplicate_nearby_scan": false,
+    "duplicate_press_state_parser": false
+  },
+  "parity_boundary": {
+    "big_vat": true,
+    "generic_fluid_handler": false,
+    "create_tank": false,
+    "reason": "Bedrock A2.6 currently implements Big Vat as the press output host; do not invent a second fake fluid API in HUD"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

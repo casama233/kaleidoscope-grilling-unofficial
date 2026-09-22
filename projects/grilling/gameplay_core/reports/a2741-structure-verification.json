@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.41",
+  "oil_press_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_press_vat_probe_reused": true,
+  "single_poll_loop": true,
+  "duplicate_nearby_scan": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

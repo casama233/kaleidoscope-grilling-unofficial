@@ -16,6 +16,7 @@ import './a2737_offhand_oil_fill_runtime.js';
 import './a2739_crosshair_hud_runtime.js';
 import './a2739_oil_pot_hud_provider.js';
 import './a2740_grill_hud_provider.js';
+import './a2741_oil_press_hud_provider.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
