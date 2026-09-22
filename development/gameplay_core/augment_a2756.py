@@ -89,8 +89,8 @@ def patch_scripts():
  if s.count(old)!=1:raise RuntimeError('A2.7.56 Cookery oil award anchor drift')
  s=s.replace(old,new,1)
 
- old="  if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}"
- new="  if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}"
+ old=" if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);"
+ new=old+"awardGleamingWithOil(player);"
  if s.count(old)!=1:raise RuntimeError('A2.7.56 compatibility oil award anchor drift')
  s=s.replace(old,new,1)
 
