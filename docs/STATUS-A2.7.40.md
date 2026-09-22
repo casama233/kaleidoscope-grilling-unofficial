@@ -29,7 +29,7 @@ Jade 還提供狀態：
 - ready
 - burning
 
-Bedrock A2.7.40 把兩組資訊收進同一個 provider。
+Bedrock A2.7.40 把兩組資訊收進同一個 provider。內部狀態仍保留 Java Jade 的 `jade...grill.ready`；actionbar 在該狀態顯示 Java Machine HUD 的 `grill_ready_to_take` 文案，避免把兩套語義混成一個鍵。
 
 ## 不重複讀 Grill state
 
