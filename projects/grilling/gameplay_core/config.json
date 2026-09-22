@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.58 Challenge Advancement Parity",
+  "name": "Kaleidoscope Grilling A2.7.59 P1 Completion",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_58_Challenge_Advancement_Parity"
+          "packName": "Kaleidoscope_Grilling_A2_7_59_P1_Completion"
         }
       ]
     ]

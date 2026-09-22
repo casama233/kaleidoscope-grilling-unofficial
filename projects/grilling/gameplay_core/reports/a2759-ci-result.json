@@ -1,0 +1,23 @@
+{
+  "version": "A2.7.59",
+  "tested_commit": "e21d1471262d7da74a560fb59cf1e4a7d8e6a8ee",
+  "run_id": "35728529031",
+  "incremental_from_published_a2758": true,
+  "p1_actionable_complete": true,
+  "advanced_rack_complete": true,
+  "pepper_tree_complete": true,
+  "worldgen_initial_fruiting_probability": 0.25,
+  "worldgen_leaf_weights": [
+    3,
+    1
+  ],
+  "worldgen_bridge_internal": true,
+  "worldgen_bridge_one_shot_tick": true,
+  "entity_inside_platform_limit": true,
+  "global_entity_leaf_polling_added": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "fa218962161a5fdde669344ee8be770cf6e00c890deb525808e92d88c806cb5e",
+  "brproject_sha256": "fad15a07b6a878a08ebf805ab0cf236592444c6430e405176c713b81e74a4c5c",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

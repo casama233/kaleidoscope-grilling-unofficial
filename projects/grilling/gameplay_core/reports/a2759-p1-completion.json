@@ -1,0 +1,43 @@
+{
+  "version": "A2.7.59",
+  "scope": "close remaining actionable P1 parity after auditing Advanced Rack and Pepper Tree",
+  "advanced_rack": {
+    "complete": true,
+    "version": "A2.7.46",
+    "compartments": 9,
+    "seasoning_slots": 5,
+    "tool_slots": 4,
+    "persistent_filters": true,
+    "deposit_matching": true,
+    "hotbar_binding": true,
+    "break_preserves_contents": true,
+    "automation_borrow_return": true,
+    "bedrock_equivalent_ui": "ActionFormData + namespaced nearby-rack command"
+  },
+  "pepper_tree": {
+    "lifecycle_complete": true,
+    "lifecycle_version": "A2.7.48",
+    "forest_worldgen": true,
+    "worldgen_version": "A2.7.51",
+    "village_acquisition": true,
+    "village_version": "A2.7.54",
+    "pepper_picked_advancement": true,
+    "advancement_version": "A2.7.53",
+    "worldgen_initial_fruiting_probability": 0.25,
+    "worldgen_leaf_weights": [
+      3,
+      1
+    ],
+    "worldgen_bridge_is_internal": true,
+    "worldgen_bridge_canonicalizes_after_ticks": 1
+  },
+  "platform_limit": {
+    "java_entity_inside_continuous_leaf_sting": true,
+    "bedrock_stable_on_entity_inside": false,
+    "bedrock_mapping": "onStepOn + short slowness + 20-tick damage throttle",
+    "global_entity_leaf_polling_added": false
+  },
+  "p1_actionable_complete": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

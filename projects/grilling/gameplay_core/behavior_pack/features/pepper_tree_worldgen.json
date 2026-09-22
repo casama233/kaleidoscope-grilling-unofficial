@@ -23,12 +23,11 @@
       "canopy_radius": 1,
       "leaf_placement_attempts": 18,
       "leaf_blocks": [
-        ["kaleidoscope_grilling:pepper_leaves", 1]
+        ["kaleidoscope_grilling:pepper_leaves", 3],
+        ["kaleidoscope_grilling:pepper_leaves_fruiting_bridge", 1]
       ]
     },
-    "base_block": [
-      "minecraft:dirt"
-    ],
+    "base_block": ["minecraft:dirt"],
     "may_grow_on": [
       "minecraft:dirt",
       "minecraft:grass_block",

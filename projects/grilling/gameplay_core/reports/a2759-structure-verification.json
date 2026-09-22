@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.59",
+  "p1_actionable_complete": true,
+  "advanced_rack_complete": true,
+  "pepper_tree_complete": true,
+  "worldgen_initial_fruiting_probability": 0.25,
+  "worldgen_leaf_weights": [
+    3,
+    1
+  ],
+  "worldgen_bridge_internal": true,
+  "worldgen_bridge_one_shot_tick": true,
+  "entity_inside_platform_limit": true,
+  "global_entity_leaf_polling_added": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
