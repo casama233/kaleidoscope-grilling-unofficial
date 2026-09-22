@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.54 Village Pepper Loot",
+  "name": "Kaleidoscope Grilling A2.7.55 Fortress Houttuynia Loot",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_54_Village_Pepper_Loot"
+          "packName": "Kaleidoscope_Grilling_A2_7_55_Fortress_Houttuynia_Loot"
         }
       ]
     ]

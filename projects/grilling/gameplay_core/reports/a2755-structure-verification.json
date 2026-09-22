@@ -1,0 +1,21 @@
+{
+  "version": "A2.7.55",
+  "fortress_houttuynia_loot": true,
+  "mojang_baseline": "1.26.50.4",
+  "wrapper_strategy_reused": true,
+  "chance": 0.65,
+  "rolls": {
+    "min": 1,
+    "max": 2
+  },
+  "count": {
+    "min": 1,
+    "max": 3
+  },
+  "new_script_runtime": false,
+  "loot_override_compatibility_risk": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
