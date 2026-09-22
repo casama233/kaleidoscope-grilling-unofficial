@@ -190,7 +190,7 @@ function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(
 """
  s=s[:start]+keep+s[end:]
 
- start_hook="  if(!FOOD_DATA[id]&&id!==SECRET_ID)return;\n  const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM'"
+ start_hook=" if(!FOOD_DATA[id]&&id!==SECRET_ID)return;\n const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM'"
  start_repl="""  if(WOK_FOOD_SET.has(id)){
    const meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
    WOK_EATS.set(e.source.id,{id,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
@@ -200,7 +200,7 @@ function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(
   const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM'"""
  s=replace_once(s,start_hook,start_repl,'Wok itemStartUse')
 
- complete_hook="  dangerousPreservation(e.source,id);if(!FOOD_DATA[id]&&id!==SECRET_ID)return;"
+ complete_hook=" dangerousPreservation(e.source,id);if(!FOOD_DATA[id]&&id!==SECRET_ID)return;"
  complete_repl="""  dangerousPreservation(e.source,id);
   if(WOK_FOOD_SET.has(id)){
    const a=WOK_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};
