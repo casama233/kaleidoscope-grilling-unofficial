@@ -1,0 +1,63 @@
+name: A2.7.58 Cookery Wok HUD Host Probe
+on:
+  push:
+    branches: [a2758-cookery-wok-hud]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download pinned Cookery and mature Chinese Food addon
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 'https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon' -o /tmp/cookery.mcaddon
+          echo "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351  /tmp/cookery.mcaddon" | sha256sum -c -
+          curl -L --fail --retry 3 'https://mediafilez.forgecdn.net/files/8908/581/Kaleidoscope%20Chinese%20Food%20v1.0.2.mcaddon' -o /tmp/chinese.mcaddon
+          sha256sum /tmp/chinese.mcaddon
+          python - <<'PY'
+          import zipfile,re,hashlib
+          def inspect(path,label):
+              print(f'\n===== {label} =====')
+              with zipfile.ZipFile(path) as z:
+                  names=z.namelist()
+                  print('files',len(names))
+                  print('--- relevant paths ---')
+                  for n in names:
+                      low=n.lower()
+                      if '[bp]/' in low and any(x in low for x in ('pot','stockpot','extension','station','recipe','script')):
+                          if n.endswith('/') or any(x in low for x in ('texture','animation','geometry')): continue
+                          print(n)
+                  print('--- relevant text snippets ---')
+                  targets=[]
+                  for n in names:
+                      low=n.lower()
+                      if not '[bp]/' in low: continue
+                      if n.endswith('.js') or n.endswith('.json') or n.endswith('.md'):
+                          if any(x in low for x in ('pot','stockpot','extensionregistry','directstation','recipe')):
+                              targets.append(n)
+                  for n in targets:
+                      try:s=z.read(n).decode('utf-8')
+                      except:continue
+                      hits=[]
+                      for pat in (
+                          'has_oil','kc_station:','status','ingredients','getDynamicProperty',
+                          'setDynamicProperty','register_recipe','api_ready','wok','stockpot',
+                          'scriptEventReceive','playerInteractWithBlock'
+                      ):
+                          if pat in s:hits.append(pat)
+                      if not hits: continue
+                      print(f'\n### {n} hits={hits}')
+                      lines=s.splitlines()
+                      for i,line in enumerate(lines):
+                          if any(p in line for p in hits):
+                              lo=max(0,i-3);hi=min(len(lines),i+6)
+                              print('\n'.join(f'{j+1}: {lines[j]}' for j in range(lo,hi)))
+                              print('---')
+          inspect('/tmp/cookery.mcaddon','Cookery 1.0.6')
+          inspect('/tmp/chinese.mcaddon','Chinese Food 1.0.2')
+          PY
