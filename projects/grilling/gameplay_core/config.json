@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.49 Sugared Tomato + Pepper Honey",
+  "name": "Kaleidoscope Grilling A2.7.50 Cookery Wok Cuisine",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_49_Sugared_Tomato_Pepper_Honey"
+          "packName": "Kaleidoscope_Grilling_A2_7_50_Cookery_Wok_Cuisine"
         }
       ]
     ]

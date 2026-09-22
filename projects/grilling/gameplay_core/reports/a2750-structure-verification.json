@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.50",
+  "cookery_wok_cuisine": true,
+  "wok_foods": 3,
+  "single_recipe_publisher": true,
+  "shared_food_state_adapter": true,
+  "private_host_state_access": false,
+  "wok_flex_faked": false,
+  "wedding_candy_preserved": true,
+  "pepper_honey_preserved": true,
+  "pepper_tree_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

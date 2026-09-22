@@ -1,3 +1,5 @@
+import {wokRecipes} from './a2750_wok_food_core.js';
+
 export const KC_API=1;
 export const KC_READY_EVENT='kaleidoscope_cookery:api_ready';
 export const KC_PING_EVENT='kaleidoscope_cookery:api_ping';
@@ -26,6 +28,19 @@ function millstone(id,input,result,count=1,chance=1.0){
  });
 }
 
+function wok(recipe){
+ return Object.freeze({
+  capability:'wok',
+  payload:Object.freeze({
+   api:KC_API,kind:'wok',source:SOURCE,
+   recipe:Object.freeze({
+    id:recipe.id,ingredients:Object.freeze([...recipe.ingredients]),
+    result:recipe.result,count:recipe.count,carrier:recipe.carrier,time:recipe.time
+   })
+  })
+ });
+}
+
 const RECIPES=Object.freeze([
  board('kaleidoscope_grilling:chopping_board/raw_sweet_potato_sheet',
   'kaleidoscope_grilling:sweet_potato_powder','kaleidoscope_grilling:raw_sweet_potato_sheet',1,4),
@@ -45,6 +60,7 @@ const RECIPES=Object.freeze([
   'kaleidoscope_grilling:onion','kaleidoscope_grilling:onion_powder',1,1.0),
  millstone('kaleidoscope_grilling:millstone/red_chili_powder',
   'kaleidoscope_cookery:red_chili','kaleidoscope_grilling:red_chili_powder',1,1.0),
+ ...wokRecipes().map(wok),
 ]);
 
 export function recipeTable(){

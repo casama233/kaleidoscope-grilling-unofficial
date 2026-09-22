@@ -256,6 +256,15 @@
     },
     "pepper_honey": {
       "textures": "textures/items/pepper_honey"
+    },
+    "houttuynia_stir_fried_pork": {
+      "textures": "textures/items/houttuynia_stir_fried_pork"
+    },
+    "green_pepper_squid_tentacles": {
+      "textures": "textures/items/green_pepper_squid_tentacles"
+    },
+    "braised_chicken_wings": {
+      "textures": "textures/items/braised_chicken_wings"
     }
   }
 }

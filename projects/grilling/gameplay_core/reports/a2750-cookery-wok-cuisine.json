@@ -1,0 +1,37 @@
+{
+  "version": "A2.7.50",
+  "scope": "three Java strict Pot dishes through Cookery v1 Wok host + shared Grilling food metadata bridge",
+  "foods": [
+    "houttuynia_stir_fried_pork",
+    "green_pepper_squid_tentacles",
+    "braised_chicken_wings"
+  ],
+  "java_recipes": {
+    "houttuynia_stir_fried_pork": "3x houttuynia + 3x porkchop",
+    "green_pepper_squid_tentacles": "2x green_chili + 2x squid_tentacle + onion",
+    "braised_chicken_wings": "3x chicken_wing + 3x sugar"
+  },
+  "cookery_host": {
+    "version": "1.0.6",
+    "public_wok_extension_api": true,
+    "single_recipe_publisher": "a2727_cookery_host_recipes_runtime.js",
+    "private_kc_station_access": false,
+    "duplicate_wok_station": false,
+    "java_flex_wok_exactly_available": false
+  },
+  "shared_state": {
+    "food_state_adapter": "a2750_food_state_adapter.js",
+    "main_local_hot_parser_removed": true,
+    "main_local_seasoning_parser_removed": true,
+    "wok_output_metadata_bridge": "a2750_cookery_cuisine_runtime.js",
+    "typed_oil_tracking": true,
+    "special_seasoning": true,
+    "hot_saturation_and_seasoning_eat_path_reused": true,
+    "new_item_complete_use_listener": false
+  },
+  "catalog_registered": true,
+  "maxim_translation_keys_present": true,
+  "maxim_tooltip_runtime_binding_ported": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

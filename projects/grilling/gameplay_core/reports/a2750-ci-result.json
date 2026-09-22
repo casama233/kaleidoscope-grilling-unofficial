@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.50",
+  "tested_commit": "8cf0a3453722a8337ef5f720cd6923266649cf4e",
+  "run_id": "35689334889",
+  "incremental_from_published_a2749": true,
+  "cookery_wok_cuisine": true,
+  "wok_foods": 3,
+  "single_recipe_publisher": true,
+  "shared_food_state_adapter": true,
+  "private_host_state_access": false,
+  "wok_flex_faked": false,
+  "wedding_candy_preserved": true,
+  "pepper_honey_preserved": true,
+  "pepper_tree_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "c58128e11abb23182799ef457e6151cd0b49b9e6f15bc328f8fc1963d3cebf28",
+  "brproject_sha256": "0c16fd38594de3488e76b88adafc13a62f2038a4fcbc9ad505bc0dc99d35c9cf",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
