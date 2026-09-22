@@ -8,6 +8,12 @@ function timerMax(state){
  return state.phase<=2?FINISHED_TICKS:BURNT_TICKS;
 }
 
+function statusMessage(status,state){
+ return status==='jade.kaleidoscope_grilling.grill.flipping'
+  ?{translate:status,with:[String(state.flips),String(REQUIRED_FLIPS)]}
+  :{translate:status};
+}
+
 export function grillHudStatusKey(state={},occupied=0){
  const s=normalizeState(state),n=Math.max(0,Math.floor(Number(occupied)||0));
  if(!s.lit)return 'jade.kaleidoscope_grilling.grill.need_heat';
@@ -32,12 +38,9 @@ export function grillHudView(state={},occupied=0){
   {text:'§c'},
   {translate:'hud.kaleidoscope_grilling.grill.title'},
   {text:'§r §8| §f'},
-  {translate:status}
+  statusMessage(status,s)
  ];
  if(n>0){
-  if(status==='jade.kaleidoscope_grilling.grill.flipping'){
-   rawtext.push({text:' §8| §7'},{translate:status,with:[String(s.flips),String(REQUIRED_FLIPS)]});
-  }
   rawtext.push(
    {text:' §8| §7'},
    {translate:'hud.kaleidoscope_grilling.grill.timer',with:[String(shownTicks),String(max)]}
