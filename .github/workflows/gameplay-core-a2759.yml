@@ -56,19 +56,19 @@ jobs:
           $version = python -c "import json; print('.'.join(map(str,json.load(open('projects/grilling/gameplay_core/behavior_pack/manifest.json',encoding='utf-8-sig'))['header']['version'])))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ($version -eq '2.7.58') { $mode='source' }
-          elseif ($version -eq '2.7.58') { $mode='published' }
+          elseif ($version -eq '2.7.59') { $mode='published' }
           else { throw "Unsupported A2.7.59 workflow baseline: $version" }
           "value=$mode" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "A2.7.59 workflow mode: $mode ($version)"
 
-      - name: Verify published A2.7.57 baseline
+      - name: Verify published A2.7.58 baseline
         if: steps.mode.outputs.value == 'source'
         shell: pwsh
         run: |
-          python development/gameplay_core/verify_a2757.py
+          python development/gameplay_core/verify_a2758.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Verify pinned Java challenge advancement contract
+      - name: Verify pinned Java Fireworks Feast and Microsoft player-state contracts
         shell: pwsh
         run: |
           python development/gameplay_core/verify_a2759_contracts.py
