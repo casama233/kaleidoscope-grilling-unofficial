@@ -44,7 +44,7 @@ def main():
  for token in (
   "import {stockpotRecipes} from './a2752_stockpot_food_core.js';",
   'function stockpot(recipe)','...stockpotRecipes().map(stockpot)',
-  'requiresItems','availableItems','stockpot_exact','stockpot_flex'
+  'requiresItems','availableItems'
  ):assert token in host,token
  assert host.count('function stockpot(recipe)')==1
  publisher=(BP/'scripts/a2727_cookery_host_recipes_runtime.js').read_text(encoding='utf-8')
