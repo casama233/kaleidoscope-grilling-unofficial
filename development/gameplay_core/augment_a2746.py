@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 P=ROOT/'projects/grilling/gameplay_core';BP=P/'behavior_pack';RP=P/'resource_pack';DEV=Path(__file__).parent
 SRC=ROOT/'projects/grilling/resource_pack'
-VERSION=[2,7,45]
+VERSION=[2,7,46]
 SCRIPTS=(
  'a2746_advanced_rack_core.js','a2746_rack_item_codec.js','a2746_rack_state_adapter.js',
  'a2746_rack_automation_api.js','a2746_advanced_rack_runtime.js'
@@ -102,6 +102,6 @@ def report():
   'minecraft_tested':False,'bds_tested':False})
 
 def main():
- if load(BP/'manifest.json')['header']['version']!=[2,7,45]:raise RuntimeError('A2.7.46 must augment published A2.7.44')
+ if load(BP/'manifest.json')['header']['version']!=[2,7,45]:raise RuntimeError('A2.7.46 must augment published A2.7.45')
  patch_scripts();patch_content();patch_lang();patch_versions();report();print('A2.7.46 Advanced Rack complete')
 if __name__=='__main__':main()
