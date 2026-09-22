@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.45",
+  "tested_commit": "5c2b2b78e9094bb99b72950e99c4845fa438bbef",
+  "run_id": "35676979437",
+  "incremental_from_published_a2744": true,
+  "skewer_recipe_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_recipe_chain_reused": true,
+  "single_poll_loop": true,
+  "duplicate_recipe_state_parser": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "78aac92bde3490651f477b03fffd390412b74db9fabdbd32bb981c58bd11fcb2",
+  "brproject_sha256": "85aa9569fc2f8a1d777cb13888908660fdb30f547e1197e5d34c772fb2c090b2",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

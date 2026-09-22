@@ -151,3 +151,6 @@ jade.kaleidoscope_grilling.skewer_plate.count=已放置烤串：%1$s/%2$s
 jade.kaleidoscope_grilling.skewer_plate.empty=空盘，手持烤串右键放入
 jade.kaleidoscope_grilling.skewer_plate.take=空手右键取回最后放入的烤串
 jade.kaleidoscope_grilling.skewer_plate.pack=左键破坏，整体打包携带
+jade.kaleidoscope_grilling.skewer_recipe.record=记录串类：
+jade.kaleidoscope_grilling.skewer_recipe.ingredients=所需食材：
+tooltip.kaleidoscope_grilling.recipe_book.wall_usage=可以直接用木棍右键挂墙串谱，快速串签

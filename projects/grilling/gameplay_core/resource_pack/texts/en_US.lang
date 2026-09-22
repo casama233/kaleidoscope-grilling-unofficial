@@ -172,3 +172,6 @@ jade.kaleidoscope_grilling.skewer_plate.count=Skewers placed: %1$s/%2$s
 jade.kaleidoscope_grilling.skewer_plate.empty=Empty plate; right-click with a skewer to add it
 jade.kaleidoscope_grilling.skewer_plate.take=Right-click with an empty hand to take the last skewer
 jade.kaleidoscope_grilling.skewer_plate.pack=Break to pack and carry the whole plate
+jade.kaleidoscope_grilling.skewer_recipe.record=Recorded skewer:
+jade.kaleidoscope_grilling.skewer_recipe.ingredients=Required ingredients:
+tooltip.kaleidoscope_grilling.recipe_book.wall_usage=Use a stick on a wall-mounted recipe to skewer quickly

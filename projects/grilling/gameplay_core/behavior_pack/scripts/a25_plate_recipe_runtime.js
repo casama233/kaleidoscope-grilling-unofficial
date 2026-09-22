@@ -282,6 +282,12 @@ world.afterEvents.playerBreakBlock.subscribe(e=>{
 });
 
 export function a25ReadPlateBlock(block){return readPlateBlock(block)}
+export function a25ReadRecipeBlockSnapshot(block){
+ const row=readRecipeBlock(block),book=restoreStack(row);if(!book)return null;
+ const record=readBookRecord(book);if(!record||typeof record.resultId!=='string'||!record.resultId)return null;
+ const slots=bookIngredientSlots(record);
+ return {resultId:record.resultId,ingredientSlots:Array.isArray(slots)?slots.map(slot=>[...slot]):[]};
+}
 export function a25PlateRows(stack){return plateRowsFromItem(stack)}
 export function a25PlateItem(rows,template){return plateItem(rows,template)}
 export function a25RestoreStack(row){return restoreStack(row)}
