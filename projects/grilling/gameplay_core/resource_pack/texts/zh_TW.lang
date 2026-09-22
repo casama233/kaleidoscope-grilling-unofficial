@@ -171,3 +171,7 @@ message.kaleidoscope_grilling.wedding_candy.received=今日的喜糖已送達：
 tile.kaleidoscope_grilling:pepper_log.name=花椒原木
 tile.kaleidoscope_grilling:pepper_leaves.name=花椒樹葉
 tile.kaleidoscope_grilling:pepper_sapling.name=花椒樹苗
+item.kaleidoscope_grilling:sugared_tomato.name=糖拌番茄
+tooltip.kaleidoscope_grilling.sugared_tomato.maxim=酸甜清爽，適合把一頓燒烤收個尾。
+item.kaleidoscope_grilling:pepper_honey.name=花椒蜂蜜
+tooltip.kaleidoscope_grilling.pepper_honey.maxim=吃這個...和吃電線有什麼區別？

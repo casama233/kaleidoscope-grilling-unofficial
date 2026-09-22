@@ -250,6 +250,12 @@
     },
     "wedding_candy": {
       "textures": "textures/items/wedding_candy"
+    },
+    "sugared_tomato": {
+      "textures": "textures/items/sugared_tomato"
+    },
+    "pepper_honey": {
+      "textures": "textures/items/pepper_honey"
     }
   }
 }

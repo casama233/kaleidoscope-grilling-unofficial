@@ -192,3 +192,7 @@ message.kaleidoscope_grilling.wedding_candy.received=Today's wedding candy has a
 tile.kaleidoscope_grilling:pepper_log.name=Pepper Log
 tile.kaleidoscope_grilling:pepper_leaves.name=Pepper Leaves
 tile.kaleidoscope_grilling:pepper_sapling.name=Pepper Sapling
+item.kaleidoscope_grilling:sugared_tomato.name=Sugared Tomato
+tooltip.kaleidoscope_grilling.sugared_tomato.maxim=Sweet, tart, and ready to close out a barbecue.
+item.kaleidoscope_grilling:pepper_honey.name=Pepper Honey
+tooltip.kaleidoscope_grilling.pepper_honey.maxim=Eating this... how is it different from chewing an electric wire?

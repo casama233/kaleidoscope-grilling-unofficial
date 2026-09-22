@@ -1,0 +1,43 @@
+{
+  "version": "A2.7.49",
+  "scope": "rebase and finish the existing Sugared Tomato + Pepper Honey Java-parity slice on published A2.7.48",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "foods": {
+    "sugared_tomato": {
+      "nutrition": 6,
+      "saturation_modifier": 0.65,
+      "java_recipe": [
+        "c:crops/tomato",
+        "minecraft:sugar"
+      ],
+      "bedrock_recipe": [
+        "kaleidoscope_cookery:tomato",
+        "minecraft:sugar"
+      ],
+      "required_cookery_host_tomato_used": true
+    },
+    "pepper_honey": {
+      "nutrition": 4,
+      "saturation_modifier": 0.25,
+      "recipe": [
+        "3x kaleidoscope_grilling:sichuan_pepper",
+        "minecraft:honey_bottle"
+      ],
+      "effect": "numb",
+      "effect_ticks": 1200,
+      "uses_shared_standalone_food_effect_runtime": true
+    }
+  },
+  "dedupe": {
+    "existing_pr_46_source_reused": true,
+    "new_item_complete_use_listener_created": false,
+    "existing_a2732_shared_effect_runtime_reused": true,
+    "wedding_candy_effect_row_preserved": true,
+    "duplicate_cookery_tomato_created": false
+  },
+  "catalog_registered": true,
+  "maxim_translation_keys_present": true,
+  "maxim_tooltip_runtime_binding_ported": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}
