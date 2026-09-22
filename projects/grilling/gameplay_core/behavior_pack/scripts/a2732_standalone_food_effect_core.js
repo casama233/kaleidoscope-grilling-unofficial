@@ -4,6 +4,9 @@ import {
 import {
  COLD_ID,FIRE_RESISTANCE_TICKS
 } from './a2722_cold_houttuynia_core.js';
+import {
+ WEDDING_CANDY_ID,WEDDING_CANDY_EFFECT,WEDDING_CANDY_EFFECT_TICKS
+} from './a2747_wedding_candy_core.js';
 
 export const FX_KEY='kaleidoscope_grilling:a21_fx';
 
@@ -28,6 +31,18 @@ const ROWS=Object.freeze([
     effect:'fire_resistance',
     ticks:FIRE_RESISTANCE_TICKS,
     options:Object.freeze({showParticles:true})
+   })
+  ])
+ }),
+ Object.freeze({
+  itemId:WEDDING_CANDY_ID,
+  effects:Object.freeze([
+   Object.freeze({
+    kind:'persistent_fx',
+    effect:WEDDING_CANDY_EFFECT,
+    ticks:WEDDING_CANDY_EFFECT_TICKS,
+    amplifier:0,
+    stacking:'max_until'
    })
   ])
  })

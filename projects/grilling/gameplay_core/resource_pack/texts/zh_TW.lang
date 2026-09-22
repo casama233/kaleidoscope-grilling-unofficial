@@ -164,3 +164,7 @@ ui.kaleidoscope_grilling.advanced_rack.deposit=存入全部符合篩選的物品
 message.kaleidoscope_grilling.rack_swap_failed=廚具架交換失敗
 message.kaleidoscope_grilling.rack_nothing_to_deposit=沒有符合現有篩選的物品
 message.kaleidoscope_grilling.rack_not_found=8格內找不到高級廚具架
+item.kaleidoscope_grilling:wedding_candy.name=喜糖
+tooltip.kaleidoscope_grilling.wedding_candy.1=一顆來自微風 Breezeth 的喜糖。
+tooltip.kaleidoscope_grilling.wedding_candy.2=這份甜蜜，也想與你一同分享。
+message.kaleidoscope_grilling.wedding_candy.received=今日的喜糖已送達：共 %1$s 顆，願你也沾沾喜氣！

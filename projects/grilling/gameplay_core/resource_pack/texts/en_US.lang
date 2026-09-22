@@ -185,3 +185,7 @@ ui.kaleidoscope_grilling.advanced_rack.deposit=Deposit all matching items
 message.kaleidoscope_grilling.rack_swap_failed=Rack swap failed
 message.kaleidoscope_grilling.rack_nothing_to_deposit=Nothing matches the rack filters
 message.kaleidoscope_grilling.rack_not_found=No Advanced Rack found within 8 blocks
+item.kaleidoscope_grilling:wedding_candy.name=Wedding Candy
+tooltip.kaleidoscope_grilling.wedding_candy.1=A wedding candy from Breezeth.
+tooltip.kaleidoscope_grilling.wedding_candy.2=He would like to share this sweetness with you.
+message.kaleidoscope_grilling.wedding_candy.received=Today's wedding candy has arrived: %1$s pieces. May some of the happiness find you too!

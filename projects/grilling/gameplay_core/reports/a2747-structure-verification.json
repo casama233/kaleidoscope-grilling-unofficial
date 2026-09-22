@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.47",
+  "wedding_candy": true,
+  "shared_standalone_food_effect_runtime": true,
+  "new_item_complete_use_listener": false,
+  "event_runtime": true,
+  "invincible_ticks": 300,
+  "event_window": "2026-09-01..2026-09-12 Asia/Shanghai",
+  "xp_reward": 50,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.47",
+  "tested_commit": "8e88fda6b849a62428d9373ac1ca93f337fba486",
+  "run_id": "35678704592",
+  "incremental_from_published_a2746": true,
+  "wedding_candy": true,
+  "shared_standalone_food_effect_runtime": true,
+  "new_item_complete_use_listener": false,
+  "event_runtime": true,
+  "invincible_ticks": 300,
+  "xp_reward": 50,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "e3e2f114f802307656550ec0c5387dfcdef99ce6298b1f2f580597cde5b446e2",
+  "brproject_sha256": "605aff33c9ad113efef0515786ed3e87d36bdfdc53b0d7ad75ebd08b7fe2e4dd",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

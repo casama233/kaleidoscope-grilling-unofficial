@@ -247,6 +247,9 @@
     },
     "advanced_rack": {
       "textures": "textures/blocks/advanced_rack"
+    },
+    "wedding_candy": {
+      "textures": "textures/items/wedding_candy"
     }
   }
 }

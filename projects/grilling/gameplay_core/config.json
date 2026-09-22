@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.46 Advanced Rack",
+  "name": "Kaleidoscope Grilling A2.7.47 Wedding Candy",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_45_Advanced_Rack"
+          "packName": "Kaleidoscope_Grilling_A2_7_47_Wedding_Candy"
         }
       ]
     ]
