@@ -1,0 +1,43 @@
+{
+  "version": "A2.7.40",
+  "scope": "attach Grill to A2.7.39 shared crosshair HUD without another poll loop",
+  "java_contract": {
+    "finished_ticks": 800,
+    "burnt_ticks": 400,
+    "required_flips": 4,
+    "flip_cooldown": 20,
+    "machine_hud": [
+      "title",
+      "timer",
+      "flips",
+      "seasoning",
+      "ready_to_take"
+    ],
+    "jade_states": [
+      "need_heat",
+      "empty",
+      "need_oil",
+      "flipping",
+      "need_flip",
+      "need_seasoning",
+      "ready",
+      "burning"
+    ]
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "single_poll_loop": true,
+    "shared_grill_state_adapter": "a2740_grill_state_adapter.js",
+    "main_uses_shared_read_state": true,
+    "main_uses_shared_state_key": true,
+    "main_uses_shared_occupied_slots": true,
+    "duplicate_state_machine": false
+  },
+  "bedrock_adaptation": {
+    "timer_sample_ticks": 20,
+    "reason": "actionbar should not overwrite interaction feedback every 4 ticks",
+    "state_flip_and_seasoning_changes_immediate": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

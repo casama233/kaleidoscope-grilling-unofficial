@@ -1,6 +1,7 @@
 import {world,system,ItemStack} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';
 import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,canExtract,breakDisposition,outputKind} from './core_logic.js';
+import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
 import {mergeIntoContainer,compactSkewerContainer} from './a23_hot_runtime.js';
 import './a23_oil_world.js';
 import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw} from './a24_skewering_core.js';
@@ -14,6 +15,7 @@ import './a2736_typed_oil_pot_block_runtime.js';
 import './a2737_offhand_oil_fill_runtime.js';
 import './a2739_crosshair_hud_runtime.js';
 import './a2739_oil_pot_hud_provider.js';
+import './a2740_grill_hud_provider.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
@@ -69,15 +71,8 @@ function advanceBites(player,a){
 function now(){try{return world.getAbsoluteTime()}catch{return system.currentTick}}
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
-function stateKey(block){return 'kaleidoscope_grilling:g_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
 function seasoningBlockKey(block){return 'kaleidoscope_grilling:sb_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
 function inv(block){return block.getComponent('minecraft:inventory')?.container}
-function occupied(block){const c=inv(block);if(!c)return 0;let n=0;for(let i=0;i<3;i++)if(c.getItem(i))n++;return n}
-function readState(block){
- const raw=world.getDynamicProperty(stateKey(block));if(raw===undefined)return initialState();
- if(typeof raw!=='string')throw new Error('invalid persisted grill state');
- return normalizeState(JSON.parse(raw));
-}
 function grillDirection(block){
  try{const d=String(block.permutation.getState('minecraft:cardinal_direction')??'north');return ['north','south','west','east'].includes(d)?d:'north'}catch{return 'north'}
 }

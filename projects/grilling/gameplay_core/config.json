@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.39 Shared Crosshair HUD",
+  "name": "Kaleidoscope Grilling A2.7.40 Grill HUD Provider",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_39_Shared_Crosshair_HUD"
+          "packName": "Kaleidoscope_Grilling_A2_7_40_Grill_HUD_Provider"
         }
       ]
     ]

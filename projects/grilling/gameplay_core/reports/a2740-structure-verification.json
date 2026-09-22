@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.40",
+  "grill_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "shared_grill_state_adapter": true,
+  "required_flips_shared": true,
+  "timer_sample_ticks": 20,
+  "single_poll_loop": true,
+  "duplicate_state_machine": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
