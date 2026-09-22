@@ -30,7 +30,7 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
  for p in P.rglob('*.json'):load(p)
  bm,rm=load(BP/'manifest.json'),load(RP/'manifest.json')
- assert bm['header']['version']==[2,7,47] and rm['header']['version']==[2,7,47]
+ assert bm['header']['version']==[2,7,48] and rm['header']['version']==[2,7,48]
  assert bm['header']['name']=='Kaleidoscope Grilling A2.7.48 Pepper Tree Lifecycle BP'
  for name in SCRIPTS:assert (BP/'scripts'/name).read_bytes()==(DEV/name).read_bytes(),name
  for dst,src in BLOCKS.items():assert (BP/'blocks'/dst).read_bytes()==(DEV/src).read_bytes(),dst
