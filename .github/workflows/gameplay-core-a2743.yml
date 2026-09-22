@@ -59,7 +59,7 @@ jobs:
           "value=$mode" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "A2.7.43 workflow mode: $mode ($version)"
 
-      - name: Verify published A2.7.43 baseline
+      - name: Verify published A2.7.42 baseline
         if: steps.mode.outputs.value == 'source'
         shell: pwsh
         run: |
