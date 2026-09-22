@@ -74,6 +74,12 @@ jobs:
           python development/gameplay_core/verify_a2758_java_advancement_contract.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Verify pinned Microsoft Bedrock scripting samples
+        shell: pwsh
+        run: |
+          python development/gameplay_core/verify_a2757_official_samples.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Verify A2.7.58 pure challenge advancement core
         shell: pwsh
         run: |
