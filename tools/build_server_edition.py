@@ -90,6 +90,7 @@ ITEM_VARS = {
     'a279_beef_board_runtime.js': ['stack'],
     'a2730_cookery_oil_pot_adapter.js': ['out', 'stack'],
     'a2734_cookery_oil_pot_adapter.js': ['out', 'stack'],
+    'a2746_rack_item_codec.js': ['stack'],
 }
 rewritten = {}
 for name, vars_ in ITEM_VARS.items():
