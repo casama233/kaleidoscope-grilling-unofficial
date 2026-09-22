@@ -1,0 +1,61 @@
+{
+  "version": "A2.7.57",
+  "scope": "P0 Cookery cuisine metadata hardening against official Bedrock stable Script API behavior",
+  "bug": {
+    "previous_order": [
+      "seasoning_dynamic_property",
+      "hot_lore_and_dynamic_property"
+    ],
+    "fixed_order": [
+      "hot_lore_and_dynamic_property",
+      "seasoning_dynamic_property"
+    ],
+    "impact": "seasoning metadata on stackable Cookery servings could be rejected before HotFood lore customized the ItemStack"
+  },
+  "official_samples_commit": "73a171fc8393a1052b4ca0669dc82231f775d8b1",
+  "official_references": [
+    {
+      "source": "Microsoft Learn - ItemStack",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemstack?view=minecraft-bedrock-stable",
+      "contract": "ItemStack.setDynamicProperty only works with non-stackable items"
+    },
+    {
+      "source": "Microsoft Learn - ContainerSlot",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/containerslot?view=minecraft-bedrock-stable",
+      "contract": "isStackable is false when an item contains custom data or properties"
+    },
+    {
+      "source": "Microsoft Learn - Working With Events",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/documents/scripting/events?view=minecraft-bedrock-stable",
+      "contract": "WorldBeforeEvents listeners must not directly modify gameplay state"
+    },
+    {
+      "source": "Microsoft minecraft-scripting-samples - Containers",
+      "url": "https://github.com/microsoft/minecraft-scripting-samples/blob/73a171fc8393a1052b4ca0669dc82231f775d8b1/howto-gallery/scripts/Containers.ts",
+      "contract": "Container.setItem is the canonical exact-slot replacement path"
+    },
+    {
+      "source": "Microsoft minecraft-scripting-samples - DynamicProperties",
+      "url": "https://github.com/microsoft/minecraft-scripting-samples/blob/73a171fc8393a1052b4ca0669dc82231f775d8b1/howto-gallery/scripts/DynamicProperties.ts",
+      "contract": "world dynamic properties can persist JSON strings for structured state"
+    }
+  ],
+  "architecture_audit": {
+    "before_event_mutation_deferred_with_system_run": true,
+    "world_json_dynamic_property_pattern_matches_official_sample": true,
+    "exact_slot_rewrite_uses_container_api": true,
+    "cookery_public_extension_api_preserved": true,
+    "cookery_private_kc_station_access": false,
+    "duplicate_wok_or_stockpot": false
+  },
+  "p0_regression_guard": {
+    "wok_foods": 3,
+    "stockpot_foods": 3,
+    "special_seasoning": true,
+    "typed_oil": true,
+    "hot_food": true,
+    "shared_cuisine_eat_path": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

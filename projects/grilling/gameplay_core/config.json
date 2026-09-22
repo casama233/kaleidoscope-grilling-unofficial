@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.56 Event Advancement Parity",
+  "name": "Kaleidoscope Grilling A2.7.57 P0 Official API Hardening",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_56_Event_Advancement_Parity"
+          "packName": "Kaleidoscope_Grilling_A2_7_57_P0_Official_API_Hardening"
         }
       ]
     ]

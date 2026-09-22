@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.57",
+  "tested_commit": "aa11a9be747e6865c219c1004e504034bc13707a",
+  "run_id": "35720107036",
+  "incremental_from_published_a2756": true,
+  "official_api_hardening": true,
+  "hot_before_seasoning": true,
+  "official_samples_pinned": true,
+  "cookery_private_state_access": false,
+  "wok_foods": 3,
+  "stockpot_foods": 3,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "1bd5e71dbf8b615a0289c08a853badda628ba7ee3db3f5b7da3c1c1530ad9a91",
+  "brproject_sha256": "4437b2323bfe9bbd6cabfd724369f8779da21e000ac76e030c3102f04e90f710",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

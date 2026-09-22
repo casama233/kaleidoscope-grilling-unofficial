@@ -57,5 +57,9 @@ export function setHotFood(stack,ticks){
 }
 export function applyFoodMetadata(stack,{seasoning=[],hotTicks=0}={}){
  if(!stack)return stack;
- setFoodSeasonings(stack,seasoning);setHotFood(stack,hotTicks);return stack;
+ // Official stable API: ItemStack dynamic properties require a non-stackable/custom item.
+ // HotFood lore is therefore committed first; that customizes the serving before the
+ // seasoning dynamic property is written. All Cookery Pot/Stockpot outputs reach this
+ // adapter with a positive hot duration, matching Java's HotFood integration.
+ setHotFood(stack,hotTicks);setFoodSeasonings(stack,seasoning);return stack;
 }
