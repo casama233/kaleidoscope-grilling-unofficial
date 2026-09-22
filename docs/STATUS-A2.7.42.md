@@ -58,6 +58,18 @@ Bedrock A2.6 目前沒有等價的通用流體能力層；它只實作上面五�
 
 本批 HUD 嚴格顯示 Bedrock 真實能力，不建立假的通用 fluid API，也不把這個差異標成已完成。
 
+## 順手收束 A2.7.40 Grill ready 契約
+
+A2.7.40 玩家看到的 ready-to-take 文案本身正確，但內部狀態直接用了 Machine HUD 的 `message.kaleidoscope_grilling.grill_ready_to_take`，沒有保留 Java Jade 的 `jade.kaleidoscope_grilling.grill.ready`。
+
+A2.7.42 將兩者分開：
+
+- `grillHudStatusKey()` 返回 Java Jade 的 `jade...grill.ready`；
+- actionbar 顯示時再映射到 Java Machine HUD 的 `grill_ready_to_take` 文案；
+- en_US / zh_CN / zh_TW 補齊 `jade...grill.ready`。
+
+這不新增另一套 Grill HUD，只修正既有 provider 的語義層。
+
 ## 下一步
 
 共享 HUD 目前已有：
