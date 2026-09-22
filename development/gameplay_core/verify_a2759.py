@@ -15,7 +15,7 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
  for p in P.rglob('*.json'):load(p)
  bm,rm=load(BP/'manifest.json'),load(RP/'manifest.json')
- assert bm['header']['version']==[2,7,58] and rm['header']['version']==[2,7,58]
+ assert bm['header']['version']==[2,7,59] and rm['header']['version']==[2,7,59]
  assert bm['header']['name']=='Kaleidoscope Grilling A2.7.59 P1 Completion BP'
 
  assert (BP/'scripts'/CORE).read_bytes()==(DEV/CORE).read_bytes()
