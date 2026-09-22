@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {VAT_CAPACITY_BUCKETS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_core.js';
 import {bigVatContentKey,bigVatHudView} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2742_big_vat_hud_core.js';
+import {grillHudStatusKey,grillHudView} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2740_grill_hud_core.js';
 
 let n=0;const t=(name,fn)=>{fn();n++;console.log('PASS',name)};
 
@@ -42,6 +43,14 @@ t('type changes refresh signature',()=>{
  const a=bigVatHudView({type:'water',buckets:2});
  const b=bigVatHudView({type:'lava',buckets:2});
  assert.notEqual(a.signature,b.signature);
+});
+
+t('Grill ready keeps Jade state but renders Machine HUD ready text',()=>{
+ const state={phase:2,phaseTicks:120,flips:4,flipCooldown:0,seasoned:true,failed:false,heatTicks:1200,lit:true,seasonings:[]};
+ assert.equal(grillHudStatusKey(state,2),'jade.kaleidoscope_grilling.grill.ready');
+ const v=grillHudView(state,2);
+ assert.equal(v.status,'jade.kaleidoscope_grilling.grill.ready');
+ assert.equal(v.message.rawtext[3].translate,'message.kaleidoscope_grilling.grill_ready_to_take');
 });
 
 console.log('A2.7.42 Big Vat HUD core: '+n+'/'+n);
