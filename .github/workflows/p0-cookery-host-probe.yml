@@ -1,0 +1,48 @@
+name: P0 Cookery Host Probe
+on:
+  push:
+    branches: [a2745-p0-cookery-host]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download pinned Cookery 1.0.6 and print host contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon'
+          curl -L --fail --retry 3 "$url" -o /tmp/kc106.mcaddon
+          echo "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351  /tmp/kc106.mcaddon" | sha256sum -c -
+          python - <<'PY'
+          import zipfile,re
+          p='/tmp/kc106.mcaddon'
+          with zipfile.ZipFile(p) as z:
+              names=z.namelist()
+              print('=== RELEVANT PATHS ===')
+              pats=('KC_EXTENSION_API','extensionRegistry','directStation','pot.js','stockpot','pot/','recipes','recipe')
+              relevant=[n for n in names if '[BP]/' in n and any(x.lower() in n.lower() for x in pats)]
+              for n in relevant:
+                  if n.endswith('/') or any(x in n.lower() for x in ('texture','model','animation','loot')): continue
+                  print(n)
+              print('=== END PATHS ===')
+              exact=[]
+              for n in names:
+                  low=n.lower()
+                  if n.endswith('[BP]/documentation/KC_EXTENSION_API.md') or n.endswith('[BP]/scripts/api/extensionRegistry.js'):
+                      exact.append(n)
+                  elif '[BP]/scripts/' in n and n.endswith('.js') and any(x in low for x in ('pot','stockpot','recipe','directstation')):
+                      exact.append(n)
+              for n in exact:
+                  data=z.read(n)
+                  if len(data)>120000: continue
+                  try:s=data.decode('utf-8')
+                  except: continue
+                  print('\n===== FILE:',n,'=====')
+                  print(s)
+                  print('===== END FILE =====')
+          PY
