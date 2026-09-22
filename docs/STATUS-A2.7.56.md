@@ -29,7 +29,7 @@ HotFood 会先写 lore，再写 hot-until；之后 seasoning dynamic property �
 - Microsoft Learn — ItemStack / ContainerSlot：有 custom data/properties 的 item 不再 stackable。
 - Microsoft Learn — Working With Events：WorldBeforeEvents 不允许直接修改 gameplay state，需要延后到可写阶段。
 - Microsoft Learn — system.run guide：官方示例用 `system.run()` 把 before-event 的修改延后。
-- Microsoft scripting samples 的 Container / DynamicProperties 模式继续作为项目的 API 使用参考。
+- Microsoft scripting samples 的 Container / DynamicProperties 模式继续作为项目的 API 使用参考。\n- CI 固定官方 sample commit：73a171fc8393a1052b4ca0669dc82231f775d8b1，并按 Git blob SHA 重验 Containers.ts、DynamicProperties.ts、custom-components/scripts/main.ts。
 
 ## 不改架构
 
