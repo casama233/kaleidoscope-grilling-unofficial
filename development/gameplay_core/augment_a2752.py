@@ -228,7 +228,7 @@ def patch_main():
  p=BP/'scripts/main.js';s=p.read_text(encoding='utf-8')
  anchor="import {WOK_FOOD_IDS} from './a2750_wok_food_core.js';\n"
  s=replace_once(s,anchor,anchor+"import {STOCKPOT_FOOD_IDS} from './a2752_stockpot_food_core.js';\n",'stockpot food import')
- if s.count('WOK_EATS')!=3:raise RuntimeError(f'A2.7.52 WOK_EATS drift: {s.count("WOK_EATS")}')
+ if s.count('WOK_EATS')!=5:raise RuntimeError(f'A2.7.52 WOK_EATS drift: {s.count("WOK_EATS")}')
  if s.count('WOK_FOOD_SET')!=3:raise RuntimeError(f'A2.7.52 WOK_FOOD_SET drift: {s.count("WOK_FOOD_SET")}')
  s=s.replace('WOK_EATS','CUISINE_EATS').replace('WOK_FOOD_SET','CUISINE_FOOD_SET')
  old="const CUISINE_FOOD_SET=new Set(WOK_FOOD_IDS);"
