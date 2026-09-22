@@ -47,6 +47,26 @@ export function stationKind(id){
  return '';
 }
 
+export function stateBeforeSeasoning(kind,state={},hasHostOil=false){
+ const current=normalizeCuisineState(state);
+ if(kind==='pot'&&!hasHostOil&&current.oilType)return normalizeCuisineState({});
+ return current;
+}
+
+export function planPotOilTransition(state={},beforeHasOil=false,afterHasOil=false,candidateType=''){
+ const current=normalizeCuisineState(state);
+ if(beforeHasOil||!afterHasOil)return {changed:false,state:current};
+ const candidate=normalizeOilType(candidateType)||(String(candidateType??'')==='default'?'default':'default');
+ return {
+  changed:true,
+  state:normalizeCuisineState({
+   ...current,
+   seasoning:current.oilType?[]:current.seasoning,
+   oilType:candidate
+  })
+ };
+}
+
 export function oilTypeFromHeld(itemId,typedOilType=''){
  const typed=normalizeOilType(typedOilType);
  if(itemId===COOKERY_FILLED_OIL_POT_ID)return typed||'default';
