@@ -42,7 +42,9 @@ t('phase two distinguishes seasoning and ready',()=>{
  let s={...initialState(),lit:true,phase:2,flips:4,seasoned:false};
  assert.equal(grillHudStatusKey(s,3),'jade.kaleidoscope_grilling.grill.need_seasoning');
  s={...s,seasoned:true};
- assert.equal(grillHudStatusKey(s,3),'message.kaleidoscope_grilling.grill_ready_to_take');
+ assert.equal(grillHudStatusKey(s,3),'jade.kaleidoscope_grilling.grill.ready');
+ const view=grillHudView(s,3);
+ assert.equal(view.message.rawtext[3].translate,'message.kaleidoscope_grilling.grill_ready_to_take');
 });
 
 t('phase three is burning and uses 400 tick timer',()=>{
