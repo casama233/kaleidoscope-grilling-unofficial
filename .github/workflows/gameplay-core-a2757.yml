@@ -56,7 +56,7 @@ jobs:
           $version = python -c "import json; print('.'.join(map(str,json.load(open('projects/grilling/gameplay_core/behavior_pack/manifest.json',encoding='utf-8-sig'))['header']['version'])))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ($version -eq '2.7.56') { $mode='source' }
-          elseif ($version -eq '2.7.56') { $mode='published' }
+          elseif ($version -eq '2.7.57') { $mode='published' }
           else { throw "Unsupported A2.7.57 workflow baseline: $version" }
           "value=$mode" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "A2.7.57 workflow mode: $mode ($version)"
