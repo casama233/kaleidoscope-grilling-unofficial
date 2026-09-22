@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 P=ROOT/'projects/grilling/gameplay_core';BP=P/'behavior_pack';RP=P/'resource_pack';DEV=Path(__file__).parent
 VERSION=[2,7,42]
 NEW_FILES=('a2742_big_vat_hud_core.js','a2742_big_vat_hud_provider.js')
+REFACTORED_GRILL='a2742_refactored_a2740_grill_hud_core.js'
 LANG={
  'en_US.lang':[
   'hud.kaleidoscope_grilling.vat.title=Vat · Storage',
@@ -17,6 +18,7 @@ LANG={
   'hud.kaleidoscope_grilling.vat.content.premium_chili=Contents: Magma Chili Oil',
   'hud.kaleidoscope_grilling.vat.capacity=Capacity: %1$s/%2$s buckets',
   'hud.kaleidoscope_grilling.vat.accepts=One fluid type only · No mixing',
+  'jade.kaleidoscope_grilling.grill.ready=Cooking complete; ready to take out',
  ],
  'zh_CN.lang':[
   'hud.kaleidoscope_grilling.vat.title=大缸 · 储存状态',
@@ -28,6 +30,7 @@ LANG={
   'hud.kaleidoscope_grilling.vat.content.premium_chili=内容：熔岩辣椒油',
   'hud.kaleidoscope_grilling.vat.capacity=容量：%1$s/%2$s 桶',
   'hud.kaleidoscope_grilling.vat.accepts=仅可装一种流体 · 不可混装',
+  'jade.kaleidoscope_grilling.grill.ready=烹饪已完成，可以取出',
  ],
  'zh_TW.lang':[
   'hud.kaleidoscope_grilling.vat.title=大缸 · 儲存狀態',
@@ -39,6 +42,7 @@ LANG={
   'hud.kaleidoscope_grilling.vat.content.premium_chili=內容：熔岩辣椒油',
   'hud.kaleidoscope_grilling.vat.capacity=容量：%1$s/%2$s 桶',
   'hud.kaleidoscope_grilling.vat.accepts=僅可裝一種流體 · 不可混裝',
+  'jade.kaleidoscope_grilling.grill.ready=烹飪已完成，可以取出',
  ],
 }
 
@@ -62,6 +66,7 @@ def patch_versions():
 def patch_scripts():
  scripts=BP/'scripts'
  for name in NEW_FILES:shutil.copy2(DEV/name,scripts/name)
+ shutil.copy2(DEV/REFACTORED_GRILL,scripts/'a2740_grill_hud_core.js')
  main=scripts/'main.js';s=main.read_text(encoding='utf-8')
  anchor="import './a2741_oil_press_hud_provider.js';\n"
  add=anchor+"import './a2742_big_vat_hud_provider.js';\n"
@@ -94,6 +99,7 @@ def report():
    'duplicate_vat_state_parser':False,
    'direct_dynamic_property_access':False
   },
+  'grill_ready_contract_repaired':True,
   'bedrock_fluid_types':['water','lava','canola','secret_chili','premium_chili'],
   'parity_boundary':{
    'java_generic_registered_fluids':True,
