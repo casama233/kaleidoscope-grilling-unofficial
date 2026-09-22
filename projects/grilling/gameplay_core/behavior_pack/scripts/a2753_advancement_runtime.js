@@ -2,6 +2,7 @@ import {world} from '@minecraft/server';
 import {
  MOUNTAIN_FRAGRANCE,advancementAwardPlan
 } from './a2753_advancement_core.js';
+import {advancementFrameTranslationKeys} from './a2758_advancement_challenge_core.js';
 
 function claimed(player,key){
  try{return player?.getDynamicProperty(key)===true}catch{return false}
@@ -16,16 +17,17 @@ function giveExperience(player,amount){
 }
 function announce(player,spec){
  if(!spec.announce)return;
+ const keys=advancementFrameTranslationKeys(spec.frame);
  try{
   world.sendMessage({rawtext:[
    {text:'§d'+String(player.name??'Player')+'§r'},
-   {translate:'message.kaleidoscope_grilling.advancement.goal_announce'},
+   {translate:keys.announce},
    {translate:spec.titleKey}
   ]});
  }catch{}
  try{
   player.sendMessage({rawtext:[
-   {translate:'message.kaleidoscope_grilling.advancement.goal_self'},
+   {translate:keys.self},
    {translate:spec.titleKey},
    {text:'§r — §7'},
    {translate:spec.descriptionKey}

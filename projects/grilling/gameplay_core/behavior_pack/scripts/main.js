@@ -49,6 +49,7 @@ import './a2747_wedding_candy_runtime.js';
 import './a2748_pepper_tree_runtime.js';
 import './a2750_cookery_cuisine_runtime.js';
 import {awardLookingThePart,awardGleamingWithOil,awardSeasoningMilestones,awardEatItHot} from './a2756_advancement_event_runtime.js';
+import {awardSeasoningFinishedChallenges,awardMentalPreparationFailed,awardMetalToleranceFailed,awardOrdinaryChallenge,ordinaryChallengeOutcome} from './a2758_advancement_challenge_runtime.js';
 import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
@@ -477,18 +478,25 @@ function applySeasoning(player,list){
  if((c.speed??0)>0)try{player.addEffect('speed',duration,{amplifier:c.speed>=4?1:0,showParticles:true})}catch{}
  if((c.strength??0)>0)try{player.addEffect('strength',duration,{amplifier:c.strength>=4?1:0,showParticles:true})}catch{}
  if((c.numbness??0)>=4)fxSet(player,'numb',900*((c.duration??0)>=4?4:(c.duration??0)>0?2:1));
- if((c.totem??0)>0&&!fxGet(player,'heavy_metal_poisoning'))fxSet(player,'heavy_metal',duration,c.totem>=4?1:0);
+ if((c.totem??0)>0){
+  const poisoned=!!fxGet(player,'heavy_metal_poisoning');
+  if(poisoned)awardMetalToleranceFailed(player,c.totem,true);
+  else fxSet(player,'heavy_metal',duration,c.totem>=4?1:0);
+ }
  if((c.vitality??0)>0)applyDragonBlood(player,duration,c.vitality>=4?1:0);
 }
 function dangerousPreservation(player,itemId){if(!DANGEROUS_FOODS.has(itemId)||!fxGet(player,'preservation'))return;for(const id of ['hunger','poison','nausea'])try{player.removeEffect(id)}catch{}}
 function applyOrdinary(player){
  const challenged=!!fxGet(player,'invincible');if(challenged)fxClear(player,'invincible');
- if(challenged&&Math.random()<.5){try{player.dimension.playSound('random.shield_block',player.location);player.dimension.spawnParticle('minecraft:electric_spark_particle',{x:player.location.x,y:player.location.y+1,z:player.location.z})}catch{}message(player,'§6普通串被無敵擋下');return}
+ const outcome=ordinaryChallengeOutcome(challenged,Math.random());
+ if(outcome==='shield'){awardOrdinaryChallenge(player,outcome);try{player.dimension.playSound('random.shield_block',player.location);player.dimension.spawnParticle('minecraft:electric_spark_particle',{x:player.location.x,y:player.location.y+1,z:player.location.z})}catch{}message(player,'§6普通串被無敵擋下');return}
+ if(outcome==='spear')awardOrdinaryChallenge(player,outcome);
  system.run(()=>{try{player.kill()}catch{try{player.applyDamage(100000,{cause:'override'})}catch{}}});
 }
 function afterCommitted(player,id,meta,active,fullNative){
  applyFixedEffect(player,id);
  awardEatItHot(player,id,meta.hot);
+ awardMentalPreparationFailed(player,id);
  if(meta.hot){doubleNewNative(player,active.nativeBefore);doubleNewFx(player,active.fxBefore)}
  if(meta.hot&&fullNative&&active.saturationBefore!==undefined){const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(h&&sat){const gained=Math.max(0,sat.currentValue-active.saturationBefore);sat.setCurrentValue(Math.min(h.currentValue,active.saturationBefore+gained*1.25))}}
  if(meta.hot)applySeasoning(player,meta.seasonings);
@@ -518,7 +526,7 @@ function completePlateUse(player,eventStack){
 function completePending(player,stack){
  const list=readSeasonings(stack);if(!hasSeasoningBase(list)){message(player,'§c缺少基礎三料，不能完成調料');return}
  const hand=handFor(player,PENDING_SEASONING)?.name??'main',out=new ItemStack(SEASONING_ID,1);setSeasonings(out,list);setUses(out,0);
- try{out.setDynamicProperty(SEASON_VARIANT_KEY,Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)));out.setLore(['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY])}catch{};setHand(player,hand,out);message(player,'§a調料搖勻完成');
+ try{out.setDynamicProperty(SEASON_VARIANT_KEY,Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)));out.setLore(['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY])}catch{};setHand(player,hand,out);awardSeasoningFinishedChallenges(player,list);message(player,'§a調料搖勻完成');
 }
 world.afterEvents.itemStartUse.subscribe(e=>{
  const id=e.itemStack?.typeId;

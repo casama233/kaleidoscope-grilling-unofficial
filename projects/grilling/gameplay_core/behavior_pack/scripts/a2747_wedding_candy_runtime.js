@@ -1,8 +1,9 @@
 import {world,system,ItemStack} from '@minecraft/server';
 import {
- WEDDING_CANDY_ID,WEDDING_CANDY_STATE_KEY,WEDDING_CANDY_XP,
+ WEDDING_CANDY_ID,WEDDING_CANDY_STATE_KEY,
  shanghaiCalendar,isWeddingCandyEventDate,nextWeddingCandyProgress
 } from './a2747_wedding_candy_core.js';
+import {awardWeddingCandy} from './a2758_advancement_challenge_runtime.js';
 
 function readState(player){
  try{
@@ -28,17 +29,16 @@ function giveCandy(player,amount){
 function announce(player,amount){
  try{player.sendMessage({rawtext:[{translate:'message.kaleidoscope_grilling.wedding_candy.received',with:[String(amount)]}]})}catch{}
 }
-function rewardExperience(player){
- try{player.addExperience(WEDDING_CANDY_XP);return}catch{}
- try{player.runCommand('xp '+WEDDING_CANDY_XP+' @s')}catch{}
-}
 
 export function tickWeddingCandyPlayer(player,calendar=shanghaiCalendar()){
  const before=readState(player),next=nextWeddingCandyProgress(before,calendar);
  if(!next.active)return false;
  writeState(player,next);
  if(next.grant<=0)return false;
- giveCandy(player,next.grant);rewardExperience(player);announce(player,next.grant);return true;
+ giveCandy(player,next.grant);
+ awardWeddingCandy(player);
+ announce(player,next.grant);
+ return true;
 }
 
 system.runInterval(()=>{
