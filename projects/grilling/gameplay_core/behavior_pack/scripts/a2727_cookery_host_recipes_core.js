@@ -1,4 +1,5 @@
 import {wokRecipes} from './a2750_wok_food_core.js';
+import {stockpotRecipes} from './a2752_stockpot_food_core.js';
 
 export const KC_API=1;
 export const KC_READY_EVENT='kaleidoscope_cookery:api_ready';
@@ -41,6 +42,22 @@ function wok(recipe){
  });
 }
 
+function stockpot(recipe){
+ return Object.freeze({
+  capability:recipe.kind,
+  requiresItems:Object.freeze([...(recipe.requiresItems??[])]),
+  payload:Object.freeze({
+   api:KC_API,kind:recipe.kind,source:SOURCE,
+   recipe:Object.freeze({
+    id:recipe.id,
+    ingredients:Object.freeze(recipe.ingredients.map(slot=>Object.freeze([...slot]))),
+    result:recipe.result,count:recipe.count,time:recipe.time,base:recipe.base,
+    carrier:recipe.carrier,finishedKind:recipe.finishedKind
+   })
+  })
+ });
+}
+
 const RECIPES=Object.freeze([
  board('kaleidoscope_grilling:chopping_board/raw_sweet_potato_sheet',
   'kaleidoscope_grilling:sweet_potato_powder','kaleidoscope_grilling:raw_sweet_potato_sheet',1,4),
@@ -61,16 +78,21 @@ const RECIPES=Object.freeze([
  millstone('kaleidoscope_grilling:millstone/red_chili_powder',
   'kaleidoscope_cookery:red_chili','kaleidoscope_grilling:red_chili_powder',1,1.0),
  ...wokRecipes().map(wok),
+ ...stockpotRecipes().map(stockpot),
 ]);
 
 export function recipeTable(){
  return RECIPES.map(x=>({
   capability:x.capability,
+  requiresItems:[...(x.requiresItems??[])],
   payload:JSON.parse(JSON.stringify(x.payload))
  }));
 }
-export function recipesForReady(info){
+export function recipesForReady(info,{availableItems=[]}={}){
  if(!info||Number(info.api)!==KC_API)return [];
  const caps=new Set(Array.isArray(info.capabilities)?info.capabilities.map(String):[]);
- return RECIPES.filter(x=>caps.has(x.capability)).map(x=>JSON.parse(JSON.stringify(x.payload)));
+ const available=new Set(Array.isArray(availableItems)?availableItems.map(String):[]);
+ return RECIPES.filter(x=>
+  caps.has(x.capability)&&(x.requiresItems??[]).every(id=>available.has(id))
+ ).map(x=>JSON.parse(JSON.stringify(x.payload)));
 }

@@ -265,6 +265,15 @@
     },
     "braised_chicken_wings": {
       "textures": "textures/items/braised_chicken_wings"
+    },
+    "potato_beef_stew": {
+      "textures": "textures/items/potato_beef_stew"
+    },
+    "red_sweet_potato_porridge": {
+      "textures": "textures/items/red_sweet_potato_porridge"
+    },
+    "sour_spicy_noodles": {
+      "textures": "textures/items/sour_spicy_noodles"
     }
   }
 }

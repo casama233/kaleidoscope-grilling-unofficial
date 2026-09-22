@@ -1,10 +1,16 @@
-import {system} from '@minecraft/server';
+import {system,ItemTypes} from '@minecraft/server';
 import {
  KC_READY_EVENT,KC_PING_EVENT,KC_REGISTER_EVENT,SOURCE,recipesForReady
 } from './a2727_cookery_host_recipes_core.js';
+import {TAVERN_VINEGAR_IDS} from './a2752_stockpot_food_core.js';
 
+function optionalRecipeItems(){
+ const out=[];
+ for(const id of TAVERN_VINEGAR_IDS)try{if(ItemTypes.get(id))out.push(id)}catch{}
+ return out;
+}
 function registerReady(info){
- for(const payload of recipesForReady(info)){
+ for(const payload of recipesForReady(info,{availableItems:optionalRecipeItems()})){
   system.sendScriptEvent(KC_REGISTER_EVENT,JSON.stringify(payload));
  }
 }

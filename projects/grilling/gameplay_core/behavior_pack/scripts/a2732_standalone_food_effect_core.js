@@ -8,6 +8,7 @@ import {
  WEDDING_CANDY_ID,WEDDING_CANDY_EFFECT,WEDDING_CANDY_EFFECT_TICKS
 } from './a2747_wedding_candy_core.js';
 import {pepperHoneyEffectRow} from './a2749_sugared_tomato_pepper_honey_core.js';
+import {stockpotEffectRows} from './a2752_stockpot_food_core.js';
 
 export const FX_KEY='kaleidoscope_grilling:a21_fx';
 
@@ -47,7 +48,8 @@ const ROWS=Object.freeze([
    })
   ])
  }),
- pepperHoneyEffectRow()
+ pepperHoneyEffectRow(),
+ ...stockpotEffectRows()
 ]);
 
 export function standaloneFoodEffectTable(){
