@@ -17,9 +17,13 @@ export const POT_HOT_TICKS=Object.freeze({
 });
 export const STOCKPOT_HOT_TICKS=1200;
 
+export function cuisineStateKeyAt(dimensionId,x,y,z){
+ return 'kaleidoscope_grilling:cuisine_'+String(dimensionId??'').replace(/[^a-z0-9]/gi,'_')+'_'+
+  Math.floor(Number(x)||0)+'_'+Math.floor(Number(y)||0)+'_'+Math.floor(Number(z)||0);
+}
+
 export function cuisineStateKey(block){
- return 'kaleidoscope_grilling:cuisine_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+
-  block.x+'_'+block.y+'_'+block.z;
+ return cuisineStateKeyAt(block.dimension.id,block.x,block.y,block.z);
 }
 
 export function normalizeCuisineState(row={}){
