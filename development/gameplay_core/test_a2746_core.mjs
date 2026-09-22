@@ -4,7 +4,7 @@ import {
  COOKERY_KNIFE_TAG,COOKERY_SHOVEL_TAG,
  rackSlotKind,rackItemKind,rackCanPlace,rackFilterFor,rackFilterMatches,
  rackCanPlaceWithFilter,rackFiltersAfterInsert,rackCanClearFilter,rackSpiceLevel
-} from './a2746_advanced_rack_core.js';
+} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_core.js';
 
 let n=0;const t=(name,fn)=>{fn();n++;console.log('PASS',name)};
 
