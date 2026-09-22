@@ -9,6 +9,8 @@ function timerMax(state){
 }
 
 function statusMessage(status,state){
+ if(status==='jade.kaleidoscope_grilling.grill.ready')
+  return {translate:'message.kaleidoscope_grilling.grill_ready_to_take'};
  return (status==='jade.kaleidoscope_grilling.grill.flipping'||status==='jade.kaleidoscope_grilling.grill.need_flip')
   ?{translate:status,with:[String(state.flips),String(REQUIRED_FLIPS)]}
   :{translate:status};
@@ -23,7 +25,7 @@ export function grillHudStatusKey(state={},occupied=0){
   ?'jade.kaleidoscope_grilling.grill.flipping'
   :'jade.kaleidoscope_grilling.grill.need_flip';
  if(s.phase===2)return s.seasoned
-  ?'message.kaleidoscope_grilling.grill_ready_to_take'
+  ?'jade.kaleidoscope_grilling.grill.ready'
   :'jade.kaleidoscope_grilling.grill.need_seasoning';
  return 'jade.kaleidoscope_grilling.grill.burning';
 }
