@@ -17,7 +17,7 @@ t('empty press with no vat',()=>{
 });
 
 t('progress and ready vat are visible',()=>{
- const v=oilPressHudView({cakes:4,progress:9,waiting:false},{status:'SUCCESS',vat:{type:'',buckets:3}});
+ const v=oilPressHudView({cakes:4,progress:9,waiting:false},{status:'SUCCESS',vat:{type:'canola',buckets:3}});
  assert.equal(v.cakes,4);assert.equal(v.progress,9);assert.equal(v.vatStatus,'SUCCESS');
  assert.deepEqual(v.message.rawtext.at(-1).with,['3','8']);
  assert.equal(v.message.rawtext.at(-1).translate,'hud.kaleidoscope_grilling.press.vat.found');
