@@ -22,7 +22,7 @@ permissions:
   contents: write
   actions: write
 concurrency:
-  group: grilling-gameplay-core-a2742-\${{ github.ref }}
+  group: grilling-gameplay-core-a2742-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Read exact confirmed repository commit
         shell: bash
         env:
-          EXPECTED_SHA: \${{ github.sha }}
+          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
@@ -194,7 +194,7 @@ jobs:
         if: steps.mode.outputs.value == 'source' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git add -- projects/grilling/gameplay_core artifacts/Kaleidoscope_Grilling_A2.7.42_Sugared_Tomato_Pepper_Honey.mcaddon artifacts/Kaleidoscope_Grilling_A2.7.42_Sugared_Tomato_Pepper_Honey.brproject
