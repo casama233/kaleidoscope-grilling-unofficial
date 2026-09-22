@@ -41,6 +41,7 @@ def report():
    'fixed_order':['hot_lore_and_dynamic_property','seasoning_dynamic_property'],
    'impact':'seasoning metadata on stackable Cookery servings could be rejected before HotFood lore customized the ItemStack'
   },
+  'official_samples_commit':'73a171fc8393a1052b4ca0669dc82231f775d8b1',
   'official_references':[
    {
     'source':'Microsoft Learn - ItemStack',
@@ -59,12 +60,12 @@ def report():
    },
    {
     'source':'Microsoft minecraft-scripting-samples - Containers',
-    'url':'https://github.com/microsoft/minecraft-scripting-samples/blob/main/howto-gallery/scripts/Containers.ts',
+    'url':'https://github.com/microsoft/minecraft-scripting-samples/blob/73a171fc8393a1052b4ca0669dc82231f775d8b1/howto-gallery/scripts/Containers.ts',
     'contract':'Container.setItem is the canonical exact-slot replacement path'
    },
    {
     'source':'Microsoft minecraft-scripting-samples - DynamicProperties',
-    'url':'https://github.com/microsoft/minecraft-scripting-samples/blob/main/howto-gallery/scripts/DynamicProperties.ts',
+    'url':'https://github.com/microsoft/minecraft-scripting-samples/blob/73a171fc8393a1052b4ca0669dc82231f775d8b1/howto-gallery/scripts/DynamicProperties.ts',
     'contract':'world dynamic properties can persist JSON strings for structured state'
    }
   ],
