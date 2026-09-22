@@ -15,6 +15,7 @@ import {
  readRackItems,writeRackItems,clearRackItems,syncRackDisplay
 } from './a2746_rack_state_adapter.js';
 import {readRackPayloadItem,writeRackPayloadItem} from './a2746_rack_item_codec.js';
+import {awardNeatAndOrderly} from './a2756_advancement_event_runtime.js';
 
 const BIND_PREFIX='kaleidoscope_grilling:rack_binding_';
 
@@ -256,14 +257,14 @@ function restorePlacedRack(block,item){
 
 function scheduleRackPlacement(event){
  if(event.isFirstEvent===false||event.itemStack?.typeId!==ADVANCED_RACK_ITEM_ID)return;
- const snapshot=event.itemStack.clone(),dimension=event.block.dimension;
+ const snapshot=event.itemStack.clone(),dimension=event.block.dimension,player=event.player;
  const candidates=rackPlacementCandidates(event.block.location,event.blockFace)
   .map(location=>({location,wasRack:dimension.getBlock(location)?.typeId===ADVANCED_RACK_BLOCK_ID}));
  system.run(()=>{
   for(const row of candidates){
    if(row.wasRack)continue;
    const block=dimension.getBlock(row.location);
-   if(block?.typeId===ADVANCED_RACK_BLOCK_ID){restorePlacedRack(block,snapshot);return}
+   if(block?.typeId===ADVANCED_RACK_BLOCK_ID){restorePlacedRack(block,snapshot);awardNeatAndOrderly(player);return}
   }
  });
 }

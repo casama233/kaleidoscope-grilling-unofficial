@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.56",
+  "event_advancement_parity": true,
+  "advancement_count": 6,
+  "shared_a2753_adapter": true,
+  "new_listener_count": 0,
+  "new_interval_count": 0,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.55 Fortress Houttuynia Loot",
+  "name": "Kaleidoscope Grilling A2.7.56 Event Advancement Parity",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_55_Fortress_Houttuynia_Loot"
+          "packName": "Kaleidoscope_Grilling_A2_7_56_Event_Advancement_Parity"
         }
       ]
     ]

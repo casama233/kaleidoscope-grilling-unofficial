@@ -48,6 +48,7 @@ import './a2732_standalone_food_effect_runtime.js';
 import './a2747_wedding_candy_runtime.js';
 import './a2748_pepper_tree_runtime.js';
 import './a2750_cookery_cuisine_runtime.js';
+import {awardLookingThePart,awardGleamingWithOil,awardSeasoningMilestones,awardEatItHot} from './a2756_advancement_event_runtime.js';
 import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
@@ -240,6 +241,7 @@ function threadCurrent(player){
   const keep=off.amount-(creative(player)?0:1);setOff(player,next);if(keep>0)give(player,new ItemStack('minecraft:stick',keep));
  }else setOff(player,next);
  try{player.playSound('random.pop',{volume:.7,pitch:1.2})}catch{}
+ awardLookingThePart(player,outcome);
  message(player,outcome.kind==='fixed'?'§a固定配方完成':outcome.kind==='secret'?'§d秘制串完成':'§e已穿入 '+nextRows.length+'/3');
  return true;
 }
@@ -377,10 +379,11 @@ function handleGrill(block,player,hand='main'){
   const result=brush(state,n,oil.heat);
   if(result.ok){
    if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
+   awardGleamingWithOil(player);
    try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§e刷油完成，消耗 '+(creative(player)?0:n)+' 點油')
   }return;
  }
- if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§8相容刷具：已刷油；正式流程請使用 Cookery 油壺')}return}
+ if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§8相容刷具：已刷油；正式流程請使用 Cookery 油壺')}return}
  if(id===SEASONING_ID){
   if(state.phase!==2||state.seasoned||n<1){message(player,'§7現在不能撒料');return}
   const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
@@ -428,7 +431,7 @@ function handleSeasoningBlock(block,player){
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
   if(top.ingredients.length>=SEASONING_CAPACITY){message(player,'§c最上層調料瓶已滿 '+SEASONING_CAPACITY+'/'+SEASONING_CAPACITY);return}
-  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);
+  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);awardSeasoningMilestones(player,top.ingredients);
   try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
   message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY+'；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY);return;
  }
@@ -485,6 +488,7 @@ function applyOrdinary(player){
 }
 function afterCommitted(player,id,meta,active,fullNative){
  applyFixedEffect(player,id);
+ awardEatItHot(player,id,meta.hot);
  if(meta.hot){doubleNewNative(player,active.nativeBefore);doubleNewFx(player,active.fxBefore)}
  if(meta.hot&&fullNative&&active.saturationBefore!==undefined){const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(h&&sat){const gained=Math.max(0,sat.currentValue-active.saturationBefore);sat.setCurrentValue(Math.min(h.currentValue,active.saturationBefore+gained*1.25))}}
  if(meta.hot)applySeasoning(player,meta.seasonings);
