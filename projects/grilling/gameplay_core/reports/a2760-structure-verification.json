@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.60",
+  "pepper_worldgen_bds_fix": true,
+  "lean_height_present": true,
+  "lean_steps_present": true,
+  "worldgen_leaf_weights": [
+    3,
+    1
+  ],
+  "initial_fruiting_probability": 0.25,
+  "server_shim_becomes_noop_for_trunk_lean": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "prior_server_shim_bds_tested": true
+}

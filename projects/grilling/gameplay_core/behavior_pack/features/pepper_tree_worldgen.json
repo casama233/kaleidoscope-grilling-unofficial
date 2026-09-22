@@ -8,14 +8,29 @@
       "trunk_width": 1,
       "trunk_height": {
         "base": 2,
-        "intervals": [1],
+        "intervals": [
+          1
+        ],
         "min_height_for_canopy": 2
       },
       "trunk_block": {
         "name": "kaleidoscope_grilling:pepper_log"
       },
       "trunk_lean": {
-        "allow_diagonal_growth": false
+        "allow_diagonal_growth": false,
+        "lean_height": {
+          "base": 1,
+          "intervals": [
+            1
+          ],
+          "min_height_for_canopy": 2
+        },
+        "lean_steps": {
+          "base": 1,
+          "intervals": [
+            1
+          ]
+        }
       }
     },
     "random_spread_canopy": {
@@ -23,11 +38,19 @@
       "canopy_radius": 1,
       "leaf_placement_attempts": 18,
       "leaf_blocks": [
-        ["kaleidoscope_grilling:pepper_leaves", 3],
-        ["kaleidoscope_grilling:pepper_leaves_fruiting_bridge", 1]
+        [
+          "kaleidoscope_grilling:pepper_leaves",
+          3
+        ],
+        [
+          "kaleidoscope_grilling:pepper_leaves_fruiting_bridge",
+          1
+        ]
       ]
     },
-    "base_block": ["minecraft:dirt"],
+    "base_block": [
+      "minecraft:dirt"
+    ],
     "may_grow_on": [
       "minecraft:dirt",
       "minecraft:grass_block",
