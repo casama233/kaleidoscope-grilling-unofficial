@@ -20,6 +20,7 @@ def main():
    if not name.endswith('.json'):continue
    try:obj=json.loads(z.read(name).decode('utf-8-sig'))
    except:continue
+   if not isinstance(obj,dict):continue
    for root in ('minecraft:item','minecraft:block'):
     ident=obj.get(root,{}).get('description',{}).get('identifier')
     if ident:found.add(ident)
