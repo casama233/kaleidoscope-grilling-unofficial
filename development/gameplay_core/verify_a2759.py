@@ -43,7 +43,7 @@ def main():
  assert "frame:'challenge'" in core
  assert 'xp:100' in core
  assert "FIREWORKS_FEAST_PROGRESS_KEY='kaleidoscope_grilling:advancement_foods'" in core
- assert core.count("'kaleidoscope_grilling:")==30  # 29 foods + progress key
+ assert core.count(" 'kaleidoscope_grilling:")==29
  assert "'kaleidoscope_grilling:secret_skewer'" not in core
  assert 'FIREWORKS_FEAST_FOODS.length' in core
  assert 'JSON.parse(value)' in core
