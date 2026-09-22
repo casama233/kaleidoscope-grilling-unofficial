@@ -43,7 +43,7 @@ export function seasoningHudView(row={}){
  }
  rawtext.push({text:' §8| §e'},{translate:'hud.kaleidoscope_grilling.seasoning.effects'});
  if(!effects.length)rawtext.push({text:' §7'},{translate:'hud.kaleidoscope_grilling.seasoning.no_effect'});
- for(const effect of effects)rawtext.push({text:' §7'},{rawtext:[effectMessage(effect)]});
+ for(const effect of effects)rawtext.push({text:' §7'},effectMessage(effect));
 
  return {
   signature:[
