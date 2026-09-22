@@ -163,6 +163,18 @@
     },
     "kg_a2746_advanced_rack": {
       "textures": "textures/blocks/advanced_rack"
+    },
+    "kg_a2748_pepper_log": {
+      "textures": "textures/blocks/pepper_log"
+    },
+    "kg_a2748_pepper_leaves": {
+      "textures": "textures/blocks/pepper_leaves"
+    },
+    "kg_a2748_pepper_leaves_fruiting": {
+      "textures": "textures/blocks/pepper_leaves_fruiting"
+    },
+    "kg_a2748_pepper_sapling": {
+      "textures": "textures/blocks/pepper_sapling"
     }
   }
 }

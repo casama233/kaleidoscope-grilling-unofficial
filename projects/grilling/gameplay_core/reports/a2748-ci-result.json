@@ -1,0 +1,21 @@
+{
+  "version": "A2.7.48",
+  "tested_commit": "381b8d65bf8baf1e738286cf9720481d3dc7c0aa",
+  "run_id": "35679224446",
+  "incremental_from_published_a2747": true,
+  "pepper_tree_lifecycle": true,
+  "sapling_growth": true,
+  "leaf_fruiting": true,
+  "leaf_harvest": true,
+  "leaf_decay": true,
+  "pepper_sting": true,
+  "log_stripping": true,
+  "preconverted_assets_reused": true,
+  "forest_worldgen": false,
+  "village_acquisition": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "95d95879edef4488f62b5236f4153da93cad640a53ca6649937387a78bc13e45",
+  "brproject_sha256": "8b55fd9e49e7a9c4afac0f7ecc0187bdf780cd9b9e70a7142eb4fe6f8cca33a9",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

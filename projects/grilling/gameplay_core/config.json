@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.47 Wedding Candy",
+  "name": "Kaleidoscope Grilling A2.7.48 Pepper Tree Lifecycle",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_47_Wedding_Candy"
+          "packName": "Kaleidoscope_Grilling_A2_7_48_Pepper_Tree_Lifecycle"
         }
       ]
     ]

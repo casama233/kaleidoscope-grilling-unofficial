@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.7.47 Wedding Candy RP",
+    "name": "Kaleidoscope Grilling A2.7.48 Pepper Tree Lifecycle RP",
     "description": "逐口3D與四瓶調料外觀；需要 Cookery 1.0.6",
     "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
     "version": [
       2,
       7,
-      47
+      48
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         7,
-        47
+        48
       ]
     }
   ],

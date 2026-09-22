@@ -1,0 +1,38 @@
+{
+  "version": "A2.7.48",
+  "scope": "Pepper Log/Leaves/Sapling lifecycle and manual tree growth; acquisition/worldgen deferred",
+  "java": {
+    "sapling_stages": 2,
+    "bonemeal_success": 0.45,
+    "growth_light": 9,
+    "random_growth_denominator": 7,
+    "tree_height": [
+      2,
+      3
+    ],
+    "new_leaf_pepper_chance": 0.25,
+    "leaf_refruit_chance": 0.05,
+    "harvest_pepper": [
+      1,
+      2
+    ],
+    "sting_interval_ticks": 20,
+    "sting_damage": 1,
+    "strip_result": "minecraft:stripped_oak_log"
+  },
+  "reuse": {
+    "block_custom_component_pattern": true,
+    "shared_player_io": "a2735_player_io.js",
+    "preconverted_assets": true,
+    "global_poll_loop": false,
+    "dirt_tag_first": true
+  },
+  "deferred": {
+    "forest_worldgen": true,
+    "village_chest_acquisition": true,
+    "pepper_picked_advancement": true,
+    "continuous_entity_inside_slowdown": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}
