@@ -38,7 +38,7 @@ def main():
  assert rack.count("import {awardNeatAndOrderly} from './a2756_advancement_event_runtime.js';")==1
  assert rack.count('awardNeatAndOrderly(player);')==1
  assert 'world.beforeEvents.playerInteractWithBlock.subscribe' in rack
- assert rack.count('.subscribe(')==3  # existing interact, break, explosion only
+ assert rack.count('.subscribe(')==4  # existing interact, break, explosion, startup command only
 
  for lang in ('en_US.lang','zh_CN.lang','zh_TW.lang'):
   rows=(RP/'texts'/lang).read_text(encoding='utf-8').splitlines()
