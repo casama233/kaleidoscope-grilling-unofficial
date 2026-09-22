@@ -15,7 +15,8 @@ import {
 import {
  COOKERY_POT_ID,COOKERY_STOCKPOT_ID,COOKERY_FILLED_OIL_POT_ID,
  cuisineStateKey,cuisineStateKeyAt,normalizeCuisineState,stationKind,
- oilTypeFromHeld,planSeasoningUse,inventoryGains,metadataPlan
+ oilTypeFromHeld,planSeasoningUse,inventoryGains,metadataPlan,
+ stateBeforeSeasoning,planPotOilTransition
 } from './a2745_cookery_cuisine_core.js';
 
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
@@ -127,11 +128,7 @@ function applySeasoning(player,block){
  const ingredients=readFoodSeasonings(held),uses=readUses(held);
  const plan=planSeasoningUse({ingredients,uses,creative:isCreative(player)});
  if(!plan.ok){message(player,'§7調料瓶內沒有可用調料');return true}
- let state=readCuisineState(block);
- // Java Pot reset clears the previous cycle. If the host currently has no oil but our
- // extension still remembers an oil type, that state belongs to a completed/burnt cycle.
- if(block.typeId===COOKERY_POT_ID&&!hostHasOil(block)&&state.oilType)
-  state=normalizeCuisineState({});
+ const state=stateBeforeSeasoning(stationKind(block.typeId),readCuisineState(block),hostHasOil(block));
  if(!writeCuisineState(block,{...state,seasoning:plan.ingredients})){
   message(player,'§c鍋具調料狀態寫入失敗');return true;
  }
@@ -159,14 +156,9 @@ function finishHostInteraction(player,dimension,location,kind,beforeInventory,be
  const gains=inventoryGains(beforeInventory,afterInventory);
  const afterHasOil=kind==='pot'&&block?.typeId===COOKERY_POT_ID?hostHasOil(block):false;
 
- if(kind==='pot'&&!beforeHasOil&&afterHasOil){
-  const stale=!!stateBefore.oilType;
-  const cycle={
-   ...stateBefore,
-   seasoning:stale?[]:stateBefore.seasoning,
-   oilType:candidateOil||'default'
-  };
-  if(block?.typeId===COOKERY_POT_ID)writeCuisineState(block,cycle);
+ if(kind==='pot'){
+  const transition=planPotOilTransition(stateBefore,beforeHasOil,afterHasOil,candidateOil);
+  if(transition.changed&&block?.typeId===COOKERY_POT_ID)writeCuisineState(block,transition.state);
  }
 
  const effective={
