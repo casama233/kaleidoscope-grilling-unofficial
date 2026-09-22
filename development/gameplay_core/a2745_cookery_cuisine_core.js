@@ -23,15 +23,17 @@ export function cuisineStateKey(block){
 }
 
 export function normalizeCuisineState(row={}){
+ const typed=normalizeOilType(row?.oilType);
  return {
   seasoning:normalizeSeasoningList(row?.seasoning),
-  oilType:normalizeOilType(row?.oilType)||String(row?.oilType??'')==='default'?'default':'',
+  oilType:typed||(String(row?.oilType??'')==='default'?'default':''),
   lastOutputTick:Math.max(0,Math.floor(Number(row?.lastOutputTick)||0))
  };
 }
 
 export function potHotTicks(type){
- const t=normalizeOilType(type)||String(type??'')==='default'?'default':'';
+ const typed=normalizeOilType(type);
+ const t=typed||(String(type??'')==='default'?'default':'');
  return t?POT_HOT_TICKS[t]??POT_HOT_TICKS.default:0;
 }
 
