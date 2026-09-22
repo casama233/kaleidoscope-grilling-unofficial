@@ -82,9 +82,10 @@ def main():
  assert publisher.count('system.afterEvents.scriptEventReceive.subscribe')==1
  assert publisher.count('KC_REGISTER_EVENT')>=1
  core=(BP/'scripts/a2727_cookery_host_recipes_core.js').read_text(encoding='utf-8')
- assert core.count("capability:'wok'")==3
- assert core.count("'stockpot_exact'")==4  # helper kind check + three recipe calls
- assert core.count("'stockpot_flex'")==4
+ assert core.count("capability:'wok'")==1
+ assert core.count("'stockpot_exact'")==3
+ assert core.count("'stockpot_flex'")==3
+ assert core.count("wok('kaleidoscope_grilling:wok/")==3
  assert 'wok_flex' not in core
  assert 'kaleidoscope_tavern:vinegar' in core
 
