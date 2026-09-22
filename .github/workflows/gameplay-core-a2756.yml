@@ -68,6 +68,12 @@ jobs:
           python development/gameplay_core/verify_a2755.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Verify pinned Microsoft Bedrock scripting samples
+        shell: pwsh
+        run: |
+          python development/gameplay_core/verify_a2756_official_samples.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Apply and verify A2.7.56
         if: steps.mode.outputs.value == 'source'
         shell: pwsh
@@ -157,7 +163,7 @@ jobs:
           result={
             'version':'A2.7.56','tested_commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
             'incremental_from_published_a2755':True,'official_api_hardening':True,
-            'hot_before_seasoning':True,'cookery_private_state_access':False,
+            'hot_before_seasoning':True,'official_samples_pinned':True,'cookery_private_state_access':False,
             'wok_foods':3,'stockpot_foods':3,'dash_compiled_and_compared':True,
             'mcaddon_sha256':hashlib.sha256(mc.read_bytes()).hexdigest(),
             'brproject_sha256':hashlib.sha256(br.read_bytes()).hexdigest(),
@@ -179,7 +185,7 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=sys.stdin.read().splitlines(); ok=("projects/grilling/gameplay_core/","artifacts/Kaleidoscope_Grilling_A2.7.56_P0_Official_API_Hardening."); assert p and all(x.startswith(ok) for x in p)'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'feat: publish A2.7.56 P0 Official API Hardening'
+          git commit -m 'fix: publish A2.7.56 P0 Official API Hardening'
           AUTH=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
           git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $AUTH" push origin HEAD:main
           unset AUTH
