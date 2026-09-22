@@ -22,6 +22,7 @@ LANG_KEYS=(
  'jade.kaleidoscope_grilling.grill.flipping',
  'jade.kaleidoscope_grilling.grill.need_flip',
  'jade.kaleidoscope_grilling.grill.need_seasoning',
+ 'jade.kaleidoscope_grilling.grill.ready',
  'jade.kaleidoscope_grilling.grill.burning',
 )
 
@@ -74,6 +75,8 @@ def main():
  assert 'REQUIRED_FLIPS' in hud
  assert 'FINISHED_TICKS' in hud and 'BURNT_TICKS' in hud
  assert "status==='jade.kaleidoscope_grilling.grill.flipping'||status==='jade.kaleidoscope_grilling.grill.need_flip'" in hud
+ assert "status==='jade.kaleidoscope_grilling.grill.ready'" in hud
+ assert "?'jade.kaleidoscope_grilling.grill.ready'" in hud
 
  shared=(BP/'scripts/a2739_crosshair_hud_runtime.js').read_text(encoding='utf-8')
  assert shared.count('system.runInterval(')==1
