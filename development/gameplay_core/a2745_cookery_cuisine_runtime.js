@@ -127,7 +127,11 @@ function applySeasoning(player,block){
  const ingredients=readFoodSeasonings(held),uses=readUses(held);
  const plan=planSeasoningUse({ingredients,uses,creative:isCreative(player)});
  if(!plan.ok){message(player,'§7調料瓶內沒有可用調料');return true}
- const state=readCuisineState(block);
+ let state=readCuisineState(block);
+ // Java Pot reset clears the previous cycle. If the host currently has no oil but our
+ // extension still remembers an oil type, that state belongs to a completed/burnt cycle.
+ if(block.typeId===COOKERY_POT_ID&&!hostHasOil(block)&&state.oilType)
+  state=normalizeCuisineState({});
  if(!writeCuisineState(block,{...state,seasoning:plan.ingredients})){
   message(player,'§c鍋具調料狀態寫入失敗');return true;
  }
@@ -156,7 +160,12 @@ function finishHostInteraction(player,dimension,location,kind,beforeInventory,be
  const afterHasOil=kind==='pot'&&block?.typeId===COOKERY_POT_ID?hostHasOil(block):false;
 
  if(kind==='pot'&&!beforeHasOil&&afterHasOil){
-  const cycle={...stateBefore,seasoning:[],oilType:candidateOil||'default'};
+  const stale=!!stateBefore.oilType;
+  const cycle={
+   ...stateBefore,
+   seasoning:stale?[]:stateBefore.seasoning,
+   oilType:candidateOil||'default'
+  };
   if(block?.typeId===COOKERY_POT_ID)writeCuisineState(block,cycle);
  }
 
