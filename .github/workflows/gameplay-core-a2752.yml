@@ -8,6 +8,7 @@ on:
       - 'development/gameplay_core/test_a2752*.mjs'
       - 'development/gameplay_core/augment_a2752.py'
       - 'development/gameplay_core/verify_a2752*.py'
+      - 'development/gameplay_core/contracts/a2752_*'
       - 'docs/STATUS-A2.7.52.md'
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - 'development/gameplay_core/test_a2752*.mjs'
       - 'development/gameplay_core/augment_a2752.py'
       - 'development/gameplay_core/verify_a2752*.py'
+      - 'development/gameplay_core/contracts/a2752_*'
       - 'docs/STATUS-A2.7.52.md'
   workflow_dispatch:
 permissions:

@@ -64,6 +64,8 @@ A2.7.52 固定核對 Tavern commit：
 
 並把 q1～q6 作為同一 vinegar ingredient slot 的 alternatives。
 
+CI 使用從上述固定 Tavern commit 經授權讀取、且 Git blob SHA 與來源完全一致的六個開發期 contract snapshots；它們只存在於 `development/gameplay_core/contracts/`，不會進入 Bedrock 發布包，也不需要 CI 跨私有倉庫 token。
+
 同時保留 Java optional-mod 語義：
 
 - 既有唯一 Cookery recipe publisher 使用 `ItemTypes.get()` 檢測 q1～q6；
