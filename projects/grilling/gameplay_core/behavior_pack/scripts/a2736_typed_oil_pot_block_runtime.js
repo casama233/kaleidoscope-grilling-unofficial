@@ -6,29 +6,13 @@ import {
 } from './a2734_cookery_oil_pot_adapter.js';
 import {findHand,setHand,isCreative as creative} from './a2735_player_io.js';
 import {
- HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,hostBlockCountKey,typedOilBlockKey,
- placementCandidateLocations,normalizePlacedOilCount,planPlacedTypedOilAddition,blocksNativeCookeryInteraction
+ HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,
+ placementCandidateLocations,planPlacedTypedOilAddition,blocksNativeCookeryInteraction
 } from './a2736_typed_oil_pot_block_core.js';
+import {
+ placedOilPotLocation,readPlacedOilPotState,writePlacedOilPotState,clearPlacedOilPotState
+} from './a2739_cookery_oil_pot_block_adapter.js';
 
-function blockLoc(block){return {x:block.x,y:block.y,z:block.z}}
-function typeKeyAt(d,l){return typedOilBlockKey(d.id,l.x,l.y,l.z)}
-function countKeyAt(d,l){return hostBlockCountKey(d.id,l.x,l.y,l.z)}
-function readTypeAt(d,l){try{return String(world.getDynamicProperty(typeKeyAt(d,l))??'')}catch{return ''}}
-function readCountAt(d,l,type=''){try{return normalizePlacedOilCount(type,world.getDynamicProperty(countKeyAt(d,l))??0)}catch{return 0}}
-function clearAt(d,l){
- try{world.setDynamicProperty(typeKeyAt(d,l),undefined)}catch{}
- try{world.setDynamicProperty(countKeyAt(d,l),undefined)}catch{}
-}
-function writeAt(block,type,count){
- if(!block||block.typeId!==HOST_BLOCK_ID)return false;
- const d=block.dimension,l=blockLoc(block),next=normalizePlacedOilCount(type,count);
- try{
-  world.setDynamicProperty(typeKeyAt(d,l),type||undefined);
-  world.setDynamicProperty(countKeyAt(d,l),next>0?next:undefined);
- }catch{return false}
- try{block.setPermutation(block.permutation.withState('kaleidoscope_cookery:has_oil',next>0))}catch{}
- return true;
-}
 function mismatch(p){try{p.onScreenDisplay.setActionBar('§c油壺內已有不同內容')}catch{}}
 function playPour(p,type,count){try{p.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*Math.min(GRILLING_FLUID_CAPACITY,count)/GRILLING_FLUID_CAPACITY})}catch{}}
 
@@ -44,25 +28,25 @@ function scheduleTypedPlacement(e){
   for(const c of candidates){
    if(c.wasPot)continue;
    const block=d.getBlock(c.l);
-   if(block?.typeId===HOST_BLOCK_ID){writeAt(block,state.type,state.count);break}
+   if(block?.typeId===HOST_BLOCK_ID){writePlacedOilPotState(block,state.type,state.count);break}
   }
  });
 }
 
 function fillPlacedPot(player,dimension,location,incomingType,hand){
  const block=dimension.getBlock(location);if(!block||block.typeId!==HOST_BLOCK_ID)return;
- const type=readTypeAt(dimension,location),count=readCountAt(dimension,location,type);
- const plan=planPlacedTypedOilAddition(type,count,incomingType,OIL_BUCKET_POINTS);
+ const state=readPlacedOilPotState(block);if(!state)return;
+ const plan=planPlacedTypedOilAddition(state.type,state.count,incomingType,OIL_BUCKET_POINTS);
  if(!plan.ok){mismatch(player);return}
- if(!writeAt(block,plan.type,plan.nextCount))return;
+ if(!writePlacedOilPotState(block,plan.type,plan.nextCount))return;
  if(!creative(player)&&hand)setHand(player,hand,new ItemStack('minecraft:bucket',1));
  playPour(player,plan.type,plan.nextCount);
 }
 
 function manuallyBreakTypedPot(d,l,type,count,drop){
  const block=d.getBlock(l);if(!block||block.typeId!==HOST_BLOCK_ID)return false;
- const liveType=readTypeAt(d,l);if(liveType!==type)return false;
- clearAt(d,l);
+ const state=readPlacedOilPotState(block);if(state?.type!==type)return false;
+ clearPlacedOilPotState(block);
  try{block.setType('minecraft:air')}catch{return false}
  if(drop){
   const stack=buildCookeryOilPot(type,count);
@@ -74,7 +58,7 @@ function manuallyBreakTypedPot(d,l,type,count,drop){
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{scheduleTypedPlacement(e)}catch{}
  if(e.block.typeId!==HOST_BLOCK_ID)return;
- const d=e.block.dimension,l=blockLoc(e.block),type=readTypeAt(d,l),itemId=e.itemStack?.typeId;
+ const d=e.block.dimension,l=placedOilPotLocation(e.block),state=readPlacedOilPotState(e.block),type=state?.type??'',itemId=e.itemStack?.typeId;
  const incoming=oilTypeForBucketId(itemId,OIL_TYPES);
  if(incoming){
   e.cancel=true;if(e.isFirstEvent===false)return;
@@ -90,18 +74,18 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
 
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(e.block.typeId!==HOST_BLOCK_ID)return;
- const d=e.block.dimension,l=blockLoc(e.block),type=readTypeAt(d,l);if(!type)return;
- const count=readCountAt(d,l,type),drop=!creative(e.player);e.cancel=true;
- system.run(()=>manuallyBreakTypedPot(d,l,type,count,drop));
+ const state=readPlacedOilPotState(e.block);if(!state?.type)return;
+ const d=e.block.dimension,l=placedOilPotLocation(e.block),drop=!creative(e.player);e.cancel=true;
+ system.run(()=>manuallyBreakTypedPot(d,l,state.type,state.count,drop));
 });
 
 world.beforeEvents.explosion.subscribe(e=>{
  const impacted=e.getImpactedBlocks(),keep=[],typed=[];
  for(const block of impacted){
   if(block.typeId!==HOST_BLOCK_ID){keep.push(block);continue}
-  const d=block.dimension,l=blockLoc(block),type=readTypeAt(d,l);
-  if(!type){keep.push(block);continue}
-  typed.push({d,l,type,count:readCountAt(d,l,type)});
+  const state=readPlacedOilPotState(block);
+  if(!state?.type){keep.push(block);continue}
+  typed.push({d:block.dimension,l:placedOilPotLocation(block),type:state.type,count:state.count});
  }
  if(!typed.length)return;
  e.setImpactedBlocks(keep);

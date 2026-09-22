@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.38 Shared Oil Contract",
+  "name": "Kaleidoscope Grilling A2.7.39 Shared Crosshair HUD",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_38_Shared_Oil_Contract"
+          "packName": "Kaleidoscope_Grilling_A2_7_39_Shared_Crosshair_HUD"
         }
       ]
     ]

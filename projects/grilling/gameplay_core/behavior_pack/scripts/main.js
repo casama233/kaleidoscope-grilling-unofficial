@@ -12,6 +12,8 @@ import {COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryOilPotConsumption} from '
 import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,findHandEntry as handFor,setHand,isCreative as creative} from './a2735_player_io.js';
 import './a2736_typed_oil_pot_block_runtime.js';
 import './a2737_offhand_oil_fill_runtime.js';
+import './a2739_crosshair_hud_runtime.js';
+import './a2739_oil_pot_hud_provider.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';

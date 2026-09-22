@@ -115,3 +115,10 @@ item.kaleidoscope_grilling:cold_houttuynia.name=Dressed Houttuynia
 kaleidoscope_grilling:itemGroup.main=Kaleidoscope Grilling
 
 item.kaleidoscope_grilling:red_chili_powder.name=Red Chili Powder
+hud.kaleidoscope_grilling.oil_pot.title=Oil Pot · Storage
+hud.kaleidoscope_grilling.oil_pot.capacity=Capacity %1$s/%2$s · %3$s remaining
+tooltip.kaleidoscope_grilling.oil_pot.empty=Any oil: %s points
+tooltip.kaleidoscope_grilling.oil_pot.fat=Fat: %s items
+tooltip.kaleidoscope_grilling.oil_pot.canola=Canola oil: %s points
+tooltip.kaleidoscope_grilling.oil_pot.secret_chili=Chili oil: %s points
+tooltip.kaleidoscope_grilling.oil_pot.premium_chili=Magma chili oil: %s points

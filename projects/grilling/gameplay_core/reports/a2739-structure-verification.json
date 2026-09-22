@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.39",
+  "shared_crosshair_hud": true,
+  "oil_pot_provider": true,
+  "shared_block_state_adapter": true,
+  "poll_ticks": 4,
+  "max_distance": 6,
+  "localized_rawmessage": true,
+  "single_poll_loop": true,
+  "duplicate_host_block_created": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}
