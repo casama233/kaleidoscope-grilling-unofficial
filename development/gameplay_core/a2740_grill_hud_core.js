@@ -9,7 +9,7 @@ function timerMax(state){
 }
 
 function statusMessage(status,state){
- return status==='jade.kaleidoscope_grilling.grill.flipping'
+ return (status==='jade.kaleidoscope_grilling.grill.flipping'||status==='jade.kaleidoscope_grilling.grill.need_flip')
   ?{translate:status,with:[String(state.flips),String(REQUIRED_FLIPS)]}
   :{translate:status};
 }
