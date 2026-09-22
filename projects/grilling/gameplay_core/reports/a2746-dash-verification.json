@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.46",
+  "advanced_rack": true,
+  "compartments": 9,
+  "persistent_filters": true,
+  "deposit_matching": true,
+  "hotbar_binding": true,
+  "automation_api": true,
+  "break_preserves_contents": true,
+  "models_reused": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 208,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 616,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

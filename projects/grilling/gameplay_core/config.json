@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.45 Skewer Recipe HUD Provider",
+  "name": "Kaleidoscope Grilling A2.7.46 Advanced Rack",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_45_Skewer_Recipe_HUD_Provider"
+          "packName": "Kaleidoscope_Grilling_A2_7_45_Advanced_Rack"
         }
       ]
     ]

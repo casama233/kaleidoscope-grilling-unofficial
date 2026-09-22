@@ -244,6 +244,9 @@
     },
     "red_chili_powder": {
       "textures": "textures/items/red_chili_powder"
+    },
+    "advanced_rack": {
+      "textures": "textures/blocks/advanced_rack"
     }
   }
 }

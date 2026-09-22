@@ -160,6 +160,9 @@
     },
     "kg_a2733_seasoning_bottle": {
       "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a2746_advanced_rack": {
+      "textures": "textures/blocks/advanced_rack"
     }
   }
 }
