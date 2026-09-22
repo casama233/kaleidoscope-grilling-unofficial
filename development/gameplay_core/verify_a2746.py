@@ -12,7 +12,7 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
  for p in P.rglob('*.json'):load(p)
  bm,rm=load(BP/'manifest.json'),load(RP/'manifest.json')
- assert bm['header']['version']==[2,7,45] and rm['header']['version']==[2,7,45]
+ assert bm['header']['version']==[2,7,46] and rm['header']['version']==[2,7,46]
  assert any(d.get('module_name')=='@minecraft/server-ui' and d.get('version')=='2.2.0' for d in bm['dependencies'])
  for name in SCRIPTS:assert (BP/'scripts'/name).read_bytes()==(DEV/name).read_bytes(),name
  assert (BP/'blocks/advanced_rack_block.json').read_bytes()==(DEV/'a2746_advanced_rack_block.json').read_bytes()
