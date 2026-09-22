@@ -1,0 +1,13 @@
+{
+  "version": "A2.7.42",
+  "big_vat_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_vat_reader_reused": true,
+  "single_poll_loop": true,
+  "duplicate_vat_state_parser": false,
+  "grill_ready_contract_repaired": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

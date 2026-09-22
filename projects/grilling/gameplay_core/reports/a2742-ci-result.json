@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.42",
+  "tested_commit": "9c7cb72c60da94469a3d06c0d28c862113a6c300",
+  "run_id": "35673888669",
+  "incremental_from_published_a2741": true,
+  "big_vat_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_vat_reader_reused": true,
+  "single_poll_loop": true,
+  "duplicate_vat_state_parser": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "13888d5ef529f0eb44a73b8742816bacb2947c06407f77fbcd87a445d48a46da",
+  "brproject_sha256": "03ff0edb1c2003760dfffca1f1cb51895f97956afdeeb9b6716c8f11c8fd4dbc",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
