@@ -61,6 +61,10 @@ def main():
  main_text=(BP/'scripts/main.js').read_text(encoding='utf-8')
  assert main_text.count("import './a2745_cookery_cuisine_runtime.js';")==1
  assert "from './a2745_food_state_adapter.js';" in main_text
+ assert "import {P0_FOOD_IDS} from './a2745_p0_food_contract.js';" in main_text
+ assert 'const P0_FOOD_SET=new Set(P0_FOOD_IDS);' in main_text
+ assert 'P0_EATS.set(' in main_text and 'P0_EATS.delete(' in main_text
+ assert 'afterCommitted(e.source,id,a.meta,a,true);return;' in main_text
  for forbidden in (
   "const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until'",
   'function readSeasonings(stack)','function setSeasonings(stack,list)',
