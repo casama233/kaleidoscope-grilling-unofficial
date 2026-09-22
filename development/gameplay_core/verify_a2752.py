@@ -22,7 +22,7 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
  for p in P.rglob('*.json'):load(p)
  bm,rm=load(BP/'manifest.json'),load(RP/'manifest.json')
- assert bm['header']['version']==[2,7,51] and rm['header']['version']==[2,7,51]
+ assert bm['header']['version']==[2,7,52] and rm['header']['version']==[2,7,52]
  assert bm['header']['name']=='Kaleidoscope Grilling A2.7.52 Cookery Stockpot Cuisine BP'
 
  core=BP/'scripts/a2752_stockpot_food_core.js'
