@@ -79,13 +79,13 @@ def patch_scripts():
  if 'a2756_advancement_event_runtime.js' in s:raise RuntimeError('A2.7.56 main already patched')
  s=s.replace(import_anchor,import_add,1)
 
- old="  try{player.playSound('random.pop',{volume:.7,pitch:1.2})}catch{}\n  message(player,outcome.kind==='fixed'?'§a固定配方完成':outcome.kind==='secret'?'§d秘制串完成':'§e已穿入 '+nextRows.length+'/3');"
- new="  try{player.playSound('random.pop',{volume:.7,pitch:1.2})}catch{}\n  awardLookingThePart(player,outcome);\n  message(player,outcome.kind==='fixed'?'§a固定配方完成':outcome.kind==='secret'?'§d秘制串完成':'§e已穿入 '+nextRows.length+'/3');"
+ old=" message(player,outcome.kind==='fixed'?'§a固定配方完成':outcome.kind==='secret'?'§d秘制串完成':'§e已穿入 '+nextRows.length+'/3');"
+ new=" awardLookingThePart(player,outcome);\n"+old
  if s.count(old)!=1:raise RuntimeError('A2.7.56 threading anchor drift')
  s=s.replace(old,new,1)
 
- old="    if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}\n    try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}"
- new="    if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}\n    awardGleamingWithOil(player);\n    try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}"
+ old="   if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}\n"
+ new=old+"   awardGleamingWithOil(player);\n"
  if s.count(old)!=1:raise RuntimeError('A2.7.56 Cookery oil award anchor drift')
  s=s.replace(old,new,1)
 
@@ -94,13 +94,13 @@ def patch_scripts():
  if s.count(old)!=1:raise RuntimeError('A2.7.56 compatibility oil award anchor drift')
  s=s.replace(old,new,1)
 
- old="   top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);\n   try{block.dimension.spawnParticle('minecraft:endrod'"
- new="   top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);awardSeasoningMilestones(player,top.ingredients);\n   try{block.dimension.spawnParticle('minecraft:endrod'"
+ old="  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);"
+ new=old+"awardSeasoningMilestones(player,top.ingredients);"
  if s.count(old)!=1:raise RuntimeError('A2.7.56 seasoning award anchor drift')
  s=s.replace(old,new,1)
 
- old="function afterCommitted(player,id,meta,active,fullNative){\n  applyFixedEffect(player,id);"
- new="function afterCommitted(player,id,meta,active,fullNative){\n  applyFixedEffect(player,id);\n  awardEatItHot(player,id,meta.hot);"
+ old="function afterCommitted(player,id,meta,active,fullNative){\n applyFixedEffect(player,id);"
+ new=old+"\n awardEatItHot(player,id,meta.hot);"
  if s.count(old)!=1:raise RuntimeError('A2.7.56 hot-food award anchor drift')
  s=s.replace(old,new,1)
  main.write_text(s,encoding='utf-8')
