@@ -25,6 +25,7 @@ LANG={
   'jade.kaleidoscope_grilling.grill.flipping=Flipping... (%1$s/%2$s)',
   'jade.kaleidoscope_grilling.grill.need_flip=Waiting to flip (%1$s/%2$s)',
   'jade.kaleidoscope_grilling.grill.need_seasoning=Cooking complete; waiting for seasoning',
+  'jade.kaleidoscope_grilling.grill.ready=Cooking complete; ready to take out',
   'jade.kaleidoscope_grilling.grill.burning=The food is burning; act quickly',
  ],
  'zh_CN.lang':[
@@ -40,6 +41,7 @@ LANG={
   'jade.kaleidoscope_grilling.grill.flipping=翻面中...（%1$s/%2$s）',
   'jade.kaleidoscope_grilling.grill.need_flip=等待翻面（%1$s/%2$s）',
   'jade.kaleidoscope_grilling.grill.need_seasoning=烹饪已完成，等待撒料',
+  'jade.kaleidoscope_grilling.grill.ready=烹饪已完成，可以取出',
   'jade.kaleidoscope_grilling.grill.burning=烧烤正在焦化，请尽快处理',
  ],
  'zh_TW.lang':[
@@ -55,6 +57,7 @@ LANG={
   'jade.kaleidoscope_grilling.grill.flipping=翻面中...（%1$s/%2$s）',
   'jade.kaleidoscope_grilling.grill.need_flip=等待翻面（%1$s/%2$s）',
   'jade.kaleidoscope_grilling.grill.need_seasoning=烹飪已完成，等待撒料',
+  'jade.kaleidoscope_grilling.grill.ready=烹飪已完成，可以取出',
   'jade.kaleidoscope_grilling.grill.burning=燒烤正在焦化，請儘快處理',
  ],
 }
