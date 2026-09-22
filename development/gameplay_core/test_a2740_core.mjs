@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {initialState,FINISHED_TICKS,BURNT_TICKS,REQUIRED_FLIPS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/core_logic.js';
-import {GRILL_HUD_TIMER_STEP,grillHudStatusKey,grillHudView} from './a2740_grill_hud_core.js';
+import {GRILL_HUD_TIMER_STEP,grillHudStatusKey,grillHudView} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2740_grill_hud_core.js';
 
 let n=0;const t=(name,fn)=>{fn();n++;console.log('PASS',name)};
 
@@ -27,11 +27,15 @@ t('phase zero requires oil',()=>{
  assert.equal(grillHudStatusKey(s,2),'jade.kaleidoscope_grilling.grill.need_oil');
 });
 
-t('phase one distinguishes flip cooldown',()=>{
+t('phase one distinguishes flip cooldown and parameterizes both flip messages',()=>{
  let s={...initialState(),lit:true,phase:1,flipCooldown:7,flips:2};
- assert.equal(grillHudStatusKey(s,2),'jade.kaleidoscope_grilling.grill.flipping');
+ let v=grillHudView(s,2);
+ assert.equal(v.status,'jade.kaleidoscope_grilling.grill.flipping');
+ assert.deepEqual(v.message.rawtext[3].with,['2','4']);
  s={...s,flipCooldown:0};
- assert.equal(grillHudStatusKey(s,2),'jade.kaleidoscope_grilling.grill.need_flip');
+ v=grillHudView(s,2);
+ assert.equal(v.status,'jade.kaleidoscope_grilling.grill.need_flip');
+ assert.deepEqual(v.message.rawtext[3].with,['2','4']);
 });
 
 t('phase two distinguishes seasoning and ready',()=>{
