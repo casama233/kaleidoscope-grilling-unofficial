@@ -145,10 +145,20 @@ def patch_scripts():
 } from './a2745_food_state_adapter.js';
 """
  s=replace_once(s,anchor,add,'shared food-state import')
+ data_anchor="import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';\n"
+ s=replace_once(s,data_anchor,data_anchor+"import {P0_FOOD_IDS} from './a2745_p0_food_contract.js';\n",'P0 food import')
  s=replace_once(s,
   "const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until',FX_KEY='kaleidoscope_grilling:a21_fx';",
   "const FX_KEY='kaleidoscope_grilling:a21_fx';",
   'local hot key')
+ s=replace_once(s,
+  "const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();",
+  "const ACTIVE_EATS=new Map(),P0_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();",
+  'P0 eat state map')
+ s=replace_once(s,
+  "const MAX_GRILLS=256;",
+  "const MAX_GRILLS=256;\nconst P0_FOOD_SET=new Set(P0_FOOD_IDS);",
+  'P0 food set')
 
  h0=s.index('function readSeasonings(stack)')
  h1=s.index('function cookedStack(raw,state)',h0)
@@ -156,6 +166,28 @@ def patch_scripts():
 function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack}
 """
  s=s[:h0]+keep+s[h1:]
+
+ start_use="if(!FOOD_DATA[id]&&id!==SECRET_ID)return;\n const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM'"
+ repl_start="""if(P0_FOOD_SET.has(id)){
+  const meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
+  P0_EATS.set(e.source.id,{id,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
+  return;
+ }
+ if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
+ const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM'"""
+ s=replace_once(s,start_use,repl_start,'P0 itemStartUse hook')
+
+ complete="dangerousPreservation(e.source,id);if(!FOOD_DATA[id]&&id!==SECRET_ID)return;"
+ repl_complete="""dangerousPreservation(e.source,id);
+ if(P0_FOOD_SET.has(id)){
+  const a=P0_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};
+  P0_EATS.delete(e.source.id);afterCommitted(e.source,id,a.meta,a,true);return;
+ }
+ if(!FOOD_DATA[id]&&id!==SECRET_ID)return;"""
+ s=replace_once(s,complete,repl_complete,'P0 itemCompleteUse hook')
+
+ stop="world.afterEvents.itemStopUse.subscribe(e=>{const a=ACTIVE_EATS.get(e.source.id);if(!a)return;"
+ s=replace_once(s,stop,"world.afterEvents.itemStopUse.subscribe(e=>{P0_EATS.delete(e.source.id);const a=ACTIVE_EATS.get(e.source.id);if(!a)return;",'P0 itemStopUse cleanup')
 
  runtime_anchor="import './a2744_skewer_plate_hud_provider.js';\n"
  if runtime_anchor not in s:runtime_anchor="import './a2743_seasoning_hud_provider.js';\n"
