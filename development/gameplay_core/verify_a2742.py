@@ -1,13 +1,16 @@
 from __future__ import annotations
 from pathlib import Path
 import argparse,hashlib,json,subprocess
-from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[2];P=ROOT/'projects/grilling/gameplay_core';BP=P/'behavior_pack';RP=P/'resource_pack';DEV=Path(__file__).parent
 TEX={'sugared_tomato':'da58483560e98eaeb3abc24973f0c1b247931c65','pepper_honey':'0a629329dce3bd29c7d56baa5d2ebbf5693d6f6a'}
 def load(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 def blob(path):
  v=path.read_bytes();return hashlib.sha1(b'blob '+str(len(v)).encode()+bytes([0])+v).hexdigest()
+def png_size(path):
+ v=path.read_bytes()
+ assert v[:8]==b'\x89PNG\r\n\x1a\n' and v[12:16]==b'IHDR',path
+ return int.from_bytes(v[16:20],'big'),int.from_bytes(v[20:24],'big')
 
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--compiled',action='store_true');a=ap.parse_args()
@@ -22,7 +25,7 @@ def main():
   assert c['minecraft:food']=={'can_always_eat':False,'nutrition':nutrition,'saturation_modifier':sat}
   assert c['minecraft:use_animation']=={'value':'eat'} and c['minecraft:tags']['tags']==['minecraft:is_food']
   tex=RP/f'textures/items/{name}.png';assert tex.is_file() and blob(tex)==TEX[name]
-  with Image.open(tex) as im:assert im.size==(16,16)
+  assert png_size(tex)==(16,16)
   assert load(RP/'textures/item_texture.json')['texture_data'][name]['textures']==f'textures/items/{name}'
  sug=load(BP/'recipes/sugared_tomato.json')['minecraft:recipe_shapeless']
  assert sug['ingredients']==[{'item':'kaleidoscope_cookery:tomato'},{'item':'minecraft:sugar'}]
