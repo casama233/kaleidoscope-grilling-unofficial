@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {P0_FOODS,p0EffectRows} from './a2745_p0_food_contract.js';
 import {
- COOKERY_POT_ID,COOKERY_STOCKPOT_ID,planSeasoningUse,potHotTicks,inventoryGains,metadataPlan,oilTypeFromHeld
+ COOKERY_POT_ID,COOKERY_STOCKPOT_ID,planSeasoningUse,potHotTicks,inventoryGains,metadataPlan,oilTypeFromHeld,
+ stateBeforeSeasoning,planPotOilTransition
 } from './a2745_cookery_cuisine_core.js';
 import {recipeTable,recipesForReady} from './a2745_refactored_a2727_cookery_host_recipes_core.js';
 
@@ -34,6 +35,16 @@ t('Pot and Stockpot hot durations match Java mixins',()=>{
  assert.equal(potHotTicks('secret_chili'),12000);
  assert.equal(potHotTicks('premium_chili'),24000);
  assert.equal(metadataPlan('stockpot',{seasoning:['minecraft:redstone']}).hotTicks,1200);
+});
+
+ t('pre-oil seasoning survives a fresh Wok cycle but stale prior-cycle state is reset',()=>{
+ const fresh=stateBeforeSeasoning('pot',{seasoning:['minecraft:redstone'],oilType:''},false);
+ assert.deepEqual(fresh.seasoning,['minecraft:redstone']);
+ const next=planPotOilTransition(fresh,false,true,'secret_chili');
+ assert.equal(next.changed,true);assert.equal(next.state.oilType,'secret_chili');
+ assert.deepEqual(next.state.seasoning,['minecraft:redstone']);
+ const stale=planPotOilTransition({seasoning:['minecraft:redstone'],oilType:'canola'},false,true,'premium_chili');
+ assert.equal(stale.state.oilType,'premium_chili');assert.deepEqual(stale.state.seasoning,[]);
 });
 
 t('seasoning use consumes one of Java 16 uses',()=>{
