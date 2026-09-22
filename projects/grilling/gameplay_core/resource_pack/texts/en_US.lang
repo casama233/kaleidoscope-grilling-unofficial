@@ -168,3 +168,7 @@ hud.kaleidoscope_grilling.seasoning.numbness=Numb · Sichuan Pepper ×%s (requir
 hud.kaleidoscope_grilling.seasoning.numbness_pending=Numb (inactive) · Sichuan Pepper ×%s/4
 jade.kaleidoscope_grilling.seasoning.capacity=Seasoning capacity: %1$s/%2$s
 jade.kaleidoscope_grilling.seasoning.uses=Uses remaining: %s
+jade.kaleidoscope_grilling.skewer_plate.count=Skewers placed: %1$s/%2$s
+jade.kaleidoscope_grilling.skewer_plate.empty=Empty plate; right-click with a skewer to add it
+jade.kaleidoscope_grilling.skewer_plate.take=Right-click with an empty hand to take the last skewer
+jade.kaleidoscope_grilling.skewer_plate.pack=Break to pack and carry the whole plate

@@ -281,6 +281,7 @@ world.afterEvents.playerBreakBlock.subscribe(e=>{
  }catch{}
 });
 
+export function a25ReadPlateBlock(block){return readPlateBlock(block)}
 export function a25PlateRows(stack){return plateRowsFromItem(stack)}
 export function a25PlateItem(rows,template){return plateItem(rows,template)}
 export function a25RestoreStack(row){return restoreStack(row)}

@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.43 Seasoning Bottle HUD",
+  "name": "Kaleidoscope Grilling A2.7.44 Skewer Plate HUD Provider",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_43_Seasoning_Bottle_HUD"
+          "packName": "Kaleidoscope_Grilling_A2_7_44_Skewer_Plate_HUD_Provider"
         }
       ]
     ]

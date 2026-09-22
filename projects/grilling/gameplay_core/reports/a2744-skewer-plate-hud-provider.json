@@ -1,0 +1,30 @@
+{
+  "version": "A2.7.44",
+  "scope": "attach Skewer Plate Java Jade status to shared crosshair HUD using A2.5 plate state",
+  "java_contract": {
+    "capacity": 5,
+    "jade": [
+      "count",
+      "empty",
+      "take",
+      "pack",
+      "item_elements"
+    ]
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "plate_reader": "a25ReadPlateBlock -> existing readPlateBlock",
+    "plate_capacity": "PLATE_CAPACITY",
+    "plate_normalizer": "normalizePlateRows",
+    "single_poll_loop": true,
+    "duplicate_plate_state_parser": false,
+    "direct_dynamic_property_access": false
+  },
+  "ui_boundary": {
+    "java_item_icons": true,
+    "bedrock_actionbar_item_icons": false,
+    "content_signature_tracks_item_ids": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -147,3 +147,7 @@ hud.kaleidoscope_grilling.seasoning.numbness=麻了 · 花椒 ×%s（至少需�
 hud.kaleidoscope_grilling.seasoning.numbness_pending=麻了（未觸發） · 花椒 ×%s/4
 jade.kaleidoscope_grilling.seasoning.capacity=調料容量：%1$s/%2$s
 jade.kaleidoscope_grilling.seasoning.uses=剩餘使用次數：%s
+jade.kaleidoscope_grilling.skewer_plate.count=已放置烤串：%1$s/%2$s
+jade.kaleidoscope_grilling.skewer_plate.empty=空盤，手持烤串右鍵放入
+jade.kaleidoscope_grilling.skewer_plate.take=空手右鍵取回最後放入的烤串
+jade.kaleidoscope_grilling.skewer_plate.pack=左鍵破壞，整體打包攜帶
