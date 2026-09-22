@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
 P=ROOT/'projects/grilling/gameplay_core';BP=P/'behavior_pack';RP=P/'resource_pack';DEV=Path(__file__).parent
-VERSION=[2,7,58]
+VERSION=[2,7,59]
 CORE='a2759_pepper_worldgen_fruiting_core.js'
 RUNTIME='a2759_pepper_worldgen_fruiting_runtime.js'
 BLOCK='a2759_pepper_leaves_fruiting_bridge.block.json'
@@ -28,7 +28,7 @@ def patch_versions():
  write(BP/'manifest.json',bm);write(RP/'manifest.json',rm)
  cfg=load(P/'config.json')
  cfg['name']='Kaleidoscope Grilling A2.7.59 P1 Completion'
- cfg['compiler']['plugins'][0][1]['packName']='Kaleidoscope_Grilling_A2_7_58_P1_Completion'
+ cfg['compiler']['plugins'][0][1]['packName']='Kaleidoscope_Grilling_A2_7_59_P1_Completion'
  write(P/'config.json',cfg)
 
 def patch_content():
