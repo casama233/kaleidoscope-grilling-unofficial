@@ -1,63 +1,74 @@
 # A2.7.56 — P0 Official API Hardening
 
-這一批不新增玩法，專門把已完成的 Cookery Wok/Stockpot P0 整合拿去對照 Microsoft 官方 Bedrock Script API 與官方 samples，修掉一個可以實際影響 seasoning metadata 的寫入順序問題。
+本批优先收束一个会直接影响 Cookery 菜品游戏性的稳定 API 风险，不新增玩法。
 
-## 官方案例對照
+## 问题
 
-Microsoft Learn — ItemStack stable API:
-https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemstack?view=minecraft-bedrock-stable
+A2.7.50 的 `applyFoodMetadata()` 原顺序是：
 
-ItemStack.setDynamicProperty 明確只支援 non-stackable items。
+1. 写 Special Seasoning dynamic property
+2. 写 HotFood lore / hot-until
 
-Microsoft Learn — ContainerSlot stable API:
-https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/containerslot?view=minecraft-bedrock-stable
+但 Cookery 产出的菜是可堆叠 ItemStack。Microsoft 官方稳定 Script API 文档明确说明：含 custom data / properties 的 stack 不再 stackable；项目此前已经用“先写 lore，把 serving 变成 custom item，再写稳定 dynamic property”的模式规避 ItemStack 限制。
 
-官方定義：max stack > 1 且沒有 custom data/properties 才屬於 stackable。
+因此旧顺序存在 seasoning metadata 在 stack 仍是普通可堆叠物时被拒绝的风险。
 
-Microsoft Learn — Working With Events:
-https://learn.microsoft.com/en-us/minecraft/creator/documents/scripting/events?view=minecraft-bedrock-stable
+## 修复
 
-WorldBeforeEvents listener 不能直接修改 gameplay state。
+统一改成：
 
-Microsoft 官方 minecraft-scripting-samples，固定 commit:
-https://github.com/microsoft/minecraft-scripting-samples/commit/73a171fc8393a1052b4ca0669dc82231f775d8b1
+1. `setHotFood(stack, hotTicks)`
+2. `setFoodSeasonings(stack, seasoning)`
 
-Containers.ts 以 Container.setItem 做精確 slot replacement。
-DynamicProperties.ts 以 world dynamic property + JSON 字串保存結構化狀態。
-custom-components/scripts/main.ts 提供官方 item consume / complete-use component 範例。
+HotFood 会先写 lore，再写 hot-until；之后 seasoning dynamic property 落在已经 custom/non-stackable 的 serving 上。
 
-## 修正
+## 官方参考
 
-A2.7.50 的 applyFoodMetadata 原本順序：
+实现前核对：
 
-1. seasoning dynamic property
-2. HotFood lore + hot dynamic property
+- Microsoft Learn — ItemStack / ContainerSlot：有 custom data/properties 的 item 不再 stackable。
+- Microsoft Learn — Working With Events：WorldBeforeEvents 不允许直接修改 gameplay state，需要延后到可写阶段。
+- Microsoft Learn — system.run guide：官方示例用 `system.run()` 把 before-event 的修改延后。
+- Microsoft scripting samples 的 Container / DynamicProperties 模式继续作为项目的 API 使用参考。
 
-Cookery 菜品本身 max stack > 1，因此第 1 步可能在 item 還可堆疊時被 stable API 拒絕；catch 會讓錯誤靜默，造成「看起來有煙火氣，但 seasoning data 不一定留下」。
+## 不改架构
 
-A2.7.56 改成：
+仍保留：
 
-1. 先寫 HotFood lore，使這份出菜成為 custom / non-stackable serving。
-2. 再寫 hot dynamic property。
-3. 最後寫 seasoning dynamic property。
+- Cookery public extension API
+- 单一 Wok / Stockpot host
+- `a2750_cookery_cuisine_runtime.js`
+- inventory-delta output isolation
+- typed oil
+- HotFood
+- Special Seasoning
+- shared cuisine eat path
 
-沒有新增第二套 Wok/Stockpot，也沒有讀 Cookery 私有 kc_station:*。
+不读 `kc_station` 私有状态，也不新增 Wok / Stockpot。
 
-## 保留的既有架構
+## Fortress Wart Replacement 研究结论
 
-Cookery recipe 仍只走公開 v1 Script Event extension API。
-Wok/Stockpot 本體仍完全由 Cookery 1.0.6 擁有。
-Grilling 只保存自己的 typed-oil / seasoning sidecar。
-before block interaction 只讀與 cancel；inventory/state commit 延後至 system.run。
-出菜仍用 inventory before/after delta，只裝飾本次新增的 serving。
-3 個 Wok 菜 + 3 個 Stockpot 菜保持不變。
+同步核对官方 worldgen / Script API 后，仍没有 stable generated Nether Fortress bounding-box 查询。
 
-## Java 語義核查
+- `/locate structure fortress` 可由命令定位，但 Script `CommandResult` 只返回 successCount，没有坐标输出。
+- Feature Rule 条件按 biome / placement pass，不提供 structure bounds filter。
+- `minecraft:ore_feature` 虽能只替换 Nether Wart，但全 Nether 使用会把 Bastion wart 一起替换，不等价于 Java Fortress-only。
 
-StockpotBlockEntityMixin 本身沒有在每批結束時清空 grilling$seasoning，因此目前 Bedrock Stockpot sidecar 持續保留 seasoning 並不是移植 bug；沒有擅自改掉。
+所以本批不把 heuristic 冒充 parity。
 
-Java FlexPot 仍沒有對應 Cookery Bedrock v1 公開 Wok-flex API；本批仍不以錯誤 batching 偽裝。
+## 验证
 
-## 測試邊界
+CI 会验证：
 
-本批包含結構驗證、JavaScript syntax check、Dash output compare、固定 Microsoft 官方 sample commit contract；不宣稱 Minecraft client 或 BDS 實機測試。
+- 只改共享 food-state adapter
+- HotFood 写入顺序严格早于 seasoning
+- Wok / Stockpot 六道菜仍存在
+- Cookery bridge 不读私有 host state
+- A2.7.53 advancement 与 A2.7.54/55 loot overlay 保留
+- 全 JS syntax
+- 官方 Dash build + compiled-output comparison
+
+仍保持：
+
+- `minecraft_tested=false`
+- `bds_tested=false`
