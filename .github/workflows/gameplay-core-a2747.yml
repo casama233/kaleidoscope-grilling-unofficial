@@ -128,7 +128,7 @@ jobs:
           & "$env:RUNNER_TEMP/dash.exe" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-       - name: Compare real Dash outputs
+      - name: Compare real Dash outputs
         if: steps.mode.outputs.value == 'source'
         shell: pwsh
         run: |
@@ -150,7 +150,7 @@ jobs:
               found=[x.parent for x in (p/'builds/dist').rglob('manifest.json') if load(x).get('header',{}).get('uuid')==uid]
               assert len(found)==1,(name,found);packs[name]=found[0]
           mc=art/'Kaleidoscope_Grilling_A2.7.47_Wedding_Candy.mcaddon'
-          with zipfile.ZipFile(mc,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z
+          with zipfile.ZipFile(mc,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for name,pack in packs.items():
                   for f in sorted(pack.rglob('*')):
                       if f.is_file():z.write(f,name+'/'+f.relative_to(pack).as_posix())
@@ -195,7 +195,7 @@ jobs:
         with:
           name: Kaleidoscope-Grilling-A2.7.47-Wedding-Candy
           path: |
-            artifacts/Kaleidosccope_Grilling_A2.7.47_Wedding_Candy.mcaddon
+            artifacts/Kaleidoscope_Grilling_A2.7.47_Wedding_Candy.mcaddon
             artifacts/Kaleidoscope_Grilling_A2.7.47_Wedding_Candy.brproject
             projects/grilling/gameplay_core/reports/
           retention-days: 14
