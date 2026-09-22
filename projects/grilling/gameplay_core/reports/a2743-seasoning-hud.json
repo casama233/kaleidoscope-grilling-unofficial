@@ -1,0 +1,47 @@
+{
+  "version": "A2.7.43",
+  "scope": "Seasoning Bottle provider + shared seasoning contract and placed-state adapter",
+  "java_contract": {
+    "capacity": 8,
+    "max_bottles": 4,
+    "max_uses": 16,
+    "variant_range": [
+      0,
+      7
+    ],
+    "base": [
+      "green_chili_powder",
+      "sichuan_pepper",
+      "onion_powder"
+    ],
+    "effects": [
+      "speed",
+      "strength",
+      "duration",
+      "totem",
+      "vitality",
+      "numbness"
+    ],
+    "numbness_threshold": 4
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "shared_contract": "a2743_seasoning_contract_core.js",
+    "shared_block_adapter": "a2743_seasoning_block_adapter.js",
+    "main_reuses_contract": true,
+    "main_reuses_block_adapter": true,
+    "provider_direct_dynamic_property_access": false,
+    "single_poll_loop": true
+  },
+  "hud": {
+    "top_bottle_semantics": true,
+    "capacity": true,
+    "remaining_uses": true,
+    "required_base_counts": true,
+    "effect_preview": true,
+    "variant_in_signature": true,
+    "variant_displayed": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -11,6 +11,16 @@ import './a26_oil_machine_runtime.js';
 import './a2727_cookery_host_recipes_runtime.js';
 import {COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryOilPotConsumption} from './a2734_cookery_oil_pot_adapter.js';
 import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,findHandEntry as handFor,setHand,isCreative as creative} from './a2735_player_io.js';
+import {
+ SEASONING_CAPACITY,SEASONING_MAX_BOTTLES,SEASONING_MAX_USES,SEASONING_VARIANT_MAX,
+ PENDING_SEASONING_ID as PENDING_SEASONING,SEASONING_PLACE_BLOCK_ID as SEASONING_BLOCK,
+ SEASONING_LIST_KEY as SEASON_LIST_KEY,SEASONING_USES_KEY as SEASON_USES_KEY,
+ SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,SEASONING_KINDS,
+ normalizeSeasoningList,hasSeasoningBase,isSeasoningBlockId as isSeasoningBlock
+} from './a2743_seasoning_contract_core.js';
+import {
+ readPlacedSeasoningStack as readBottleStack,writePlacedSeasoningStack as writeBottleStack
+} from './a2743_seasoning_block_adapter.js';
 import './a2736_typed_oil_pot_block_runtime.js';
 import './a2737_offhand_oil_fill_runtime.js';
 import './a2739_crosshair_hud_runtime.js';
@@ -18,6 +28,7 @@ import './a2739_oil_pot_hud_provider.js';
 import './a2740_grill_hud_provider.js';
 import './a2741_oil_press_hud_provider.js';
 import './a2742_big_vat_hud_provider.js';
+import './a2743_seasoning_hud_provider.js';
 import './a271_sweet_potato_runtime.js';
 import {tryScheduleBeefBoardOverride} from './a279_beef_board_runtime.js';
 import './a2710_chicken_acquisition_runtime.js';
@@ -34,17 +45,7 @@ const REGISTRY='kaleidoscope_grilling:a2_grills';
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
 const ACTIVE_EATS=new Map(),PLATE_EATS=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),SEASON_PLACE_CACHE=new Map(),THREAD_LAST=new Map();
 const MAX_GRILLS=256;
-const PENDING_SEASONING='kaleidoscope_grilling:pending_seasoning',SEASONING_BLOCK='kaleidoscope_grilling:seasoning_bottle_1';
-const SEASONING_BLOCKS=new Set(['kaleidoscope_grilling:seasoning_bottle','kaleidoscope_grilling:seasoning_bottle_1','kaleidoscope_grilling:seasoning_bottle_2','kaleidoscope_grilling:seasoning_bottle_3','kaleidoscope_grilling:seasoning_bottle_4']);
-const SEASON_LIST_KEY='kaleidoscope_grilling:seasonings',SEASON_USES_KEY='kaleidoscope_grilling:uses',SEASON_VARIANT_KEY='kaleidoscope_grilling:variant';
 const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until',FX_KEY='kaleidoscope_grilling:a21_fx';
-const BASE_SEASONINGS=new Set(['kaleidoscope_grilling:green_chili_powder','kaleidoscope_grilling:sichuan_pepper','kaleidoscope_grilling:onion_powder']);
-const SEASONING_KINDS=Object.freeze({
- 'minecraft:redstone':'speed','minecraft:gunpowder':'strength',
- 'kaleidoscope_grilling:houttuynia_powder':'duration','kaleidoscope_grilling:totem_powder':'totem',
- 'kaleidoscope_grilling:dragon_egg_powder':'vitality','kaleidoscope_grilling:sichuan_pepper':'numbness',
- 'kaleidoscope_grilling:green_chili_powder':'base','kaleidoscope_grilling:onion_powder':'base'
-});
 const HEAT_BLOCKS=new Set(['minecraft:fire','minecraft:soul_fire','minecraft:lava','minecraft:campfire','minecraft:soul_campfire','minecraft:magma']);
 const TUNDRA_BLOCKS=new Set(['minecraft:snow','minecraft:snow_layer','minecraft:snow_block','minecraft:powder_snow','minecraft:ice','minecraft:packed_ice','minecraft:blue_ice','minecraft:frosted_ice']);
 const DANGEROUS_FOODS=new Set(['minecraft:rotten_flesh','minecraft:chicken','minecraft:poisonous_potato','minecraft:pufferfish','minecraft:spider_eye']);
@@ -55,7 +56,6 @@ const NUMB_VISUAL=new Set(),DRAGON_REPLAY=new Set();
 const STORAGE_SORT_BLOCKS=new Set(['minecraft:chest','minecraft:trapped_chest','minecraft:barrel']);
 const DRAGON_POOL_KEY='kaleidoscope_grilling:dragon_pool';
 const OIL_TYPES=Object.freeze({canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}});
-function isSeasoningBlock(id){return SEASONING_BLOCKS.has(id)}
 function soundFor(profile){return profile==='ONE'?'one_skewer_eat':profile==='TWO'?'two_skewer_eat':profile==='FOUR'?'four_skewer_eat':'three_skewer_eat'}
 function stopEatSound(player,profile){try{player.runCommand('stopsound @s kg_imm.'+soundFor(profile))}catch{}}
 function spawnBiteCrumbs(player){
@@ -72,8 +72,6 @@ function advanceBites(player,a){
 
 function now(){try{return world.getAbsoluteTime()}catch{return system.currentTick}}
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
-function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
-function seasoningBlockKey(block){return 'kaleidoscope_grilling:sb_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
 function inv(block){return block.getComponent('minecraft:inventory')?.container}
 function grillDirection(block){
  try{const d=String(block.permutation.getState('minecraft:cardinal_direction')??'north');return ['north','south','west','east'].includes(d)?d:'north'}catch{return 'north'}
@@ -258,12 +256,10 @@ function addSecretNutrition(player,stack,meta){
 function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}
 function clearContainer(block){const c=inv(block);if(c)for(let i=0;i<3;i++)c.setItem(i,undefined)}
 function resetBlock(block,lit=false){const s=initialState();s.lit=lit;writeState(block,s)}
-function parseList(raw){if(typeof raw!=='string')return [];try{const v=JSON.parse(raw);return Array.isArray(v)?v.filter(x=>typeof x==='string').slice(0,8):[]}catch{return []}}
-function readSeasonings(stack){try{return parseList(stack?.getDynamicProperty(SEASON_LIST_KEY))}catch{return []}}
-function setSeasonings(stack,list){try{stack.setDynamicProperty(SEASON_LIST_KEY,JSON.stringify(list.slice(0,8)))}catch{}return stack}
-function hasSeasoningBase(list){return [...BASE_SEASONINGS].every(x=>list.includes(x))}
-function getUses(stack){try{return Math.max(0,Math.min(16,Number(stack?.getDynamicProperty(SEASON_USES_KEY)??0)|0))}catch{return 0}}
-function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(0,Math.min(16,n|0)))}catch{}return stack}
+function readSeasonings(stack){try{const raw=stack?.getDynamicProperty(SEASON_LIST_KEY);return typeof raw==='string'?normalizeSeasoningList(JSON.parse(raw)):[]}catch{return []}}
+function setSeasonings(stack,list){try{stack.setDynamicProperty(SEASON_LIST_KEY,JSON.stringify(normalizeSeasoningList(list)))}catch{}return stack}
+function getUses(stack){try{return Math.max(0,Math.min(SEASONING_MAX_USES,Number(stack?.getDynamicProperty(SEASON_USES_KEY)??0)|0))}catch{return 0}}
+function setUses(stack,n){try{stack.setDynamicProperty(SEASON_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack}
 function bucketHot(until){return until-(((until%100)+100)%100)}
 function setHot(stack,ticks){
  if(ticks<=0)return stack;
@@ -417,32 +413,23 @@ function handleGrill(block,player,hand='main'){
  if(state.phase===0&&n>0){message(player,'§e還需要刷油');return}if(state.phase===2&&!state.seasoned){message(player,'§e還需要撒料');return}
  if(canExtract(state)){const got=extract(block,player,player.isSneaking);if(got)message(player,'§a取出 '+got+' 串')}
 }
-function readBottleStack(block){
- try{
-  const raw=world.getDynamicProperty(seasoningBlockKey(block));if(raw===undefined)return [];
-  const v=JSON.parse(raw);if(!Array.isArray(v))return [];
-  if(v.length&&typeof v[0]==='string'){const list=v.filter(x=>typeof x==='string').slice(0,8);return [{kind:hasSeasoningBase(list)?'pending':'empty',ingredients:list,uses:0,variant:0}]}
-  return v.slice(0,4).map(x=>({kind:['empty','pending','special'].includes(x?.kind)?x.kind:'empty',ingredients:Array.isArray(x?.ingredients)?x.ingredients.filter(y=>typeof y==='string').slice(0,8):[],uses:Math.max(0,Math.min(16,Number(x?.uses)||0)),variant:Math.max(0,Math.min(7,Number(x?.variant)||0))}));
- }catch{return []}
-}
-function writeBottleStack(block,stack){world.setDynamicProperty(seasoningBlockKey(block),stack.length?JSON.stringify(stack.slice(0,4)):undefined)}
 function bottleDataFromItem(stack){
  const kind=stack?.typeId===SEASONING_ID?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';
- return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?Math.max(0,Math.min(7,Number(stack.getDynamicProperty(SEASON_VARIANT_KEY)??0)|0)):0};
+ return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?Math.max(0,Math.min(SEASONING_VARIANT_MAX,Number(stack.getDynamicProperty(SEASON_VARIANT_KEY)??0)|0)):0};
 }
 function bottleItem(data){
  const id=data.kind==='special'?SEASONING_ID:data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
- if(data.kind==='special'){setUses(stack,data.uses??0);try{stack.setDynamicProperty(SEASON_VARIANT_KEY,data.variant??0);stack.setLore(['§7Uses: '+(16-(data.uses??0))+'/16','§7Ingredients: '+(data.ingredients?.length??0)+'/8'])}catch{}}
- else try{if(data.ingredients?.length)stack.setLore(['§7Ingredients: '+data.ingredients.length+'/8',data.kind==='pending'?'§eReady to shake':'§7Missing base seasoning'])}catch{}
+ if(data.kind==='special'){setUses(stack,data.uses??0);try{stack.setDynamicProperty(SEASON_VARIANT_KEY,data.variant??0);stack.setLore(['§7Uses: '+(SEASONING_MAX_USES-(data.uses??0))+'/'+SEASONING_MAX_USES,'§7Ingredients: '+(data.ingredients?.length??0)+'/'+SEASONING_CAPACITY])}catch{}}
+ else try{if(data.ingredients?.length)stack.setLore(['§7Ingredients: '+data.ingredients.length+'/'+SEASONING_CAPACITY,data.kind==='pending'?'§eReady to shake':'§7Missing base seasoning'])}catch{}
  return stack;
 }
 function setBottleVisual(block,count){
- const target=count>0?'kaleidoscope_grilling:seasoning_bottle_'+Math.max(1,Math.min(4,count)):'minecraft:air';
+ const target=count>0?'kaleidoscope_grilling:seasoning_bottle_'+Math.max(1,Math.min(SEASONING_MAX_BOTTLES,count)):'minecraft:air';
  if(block.typeId!==target)block.setType(target);
 }
 function pushBottle(block,player,held){
- const stack=readBottleStack(block);if(stack.length>=4){message(player,'§c最多只能堆4瓶');return false}
- stack.push(bottleDataFromItem(held));if(!decrementMain(player))return false;writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a調料瓶堆疊 '+stack.length+'/4');return true;
+ const stack=readBottleStack(block);if(stack.length>=SEASONING_MAX_BOTTLES){message(player,'§c最多只能堆'+SEASONING_MAX_BOTTLES+'瓶');return false}
+ stack.push(bottleDataFromItem(held));if(!decrementMain(player))return false;writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a調料瓶堆疊 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return true;
 }
 function handleSeasoningBlock(block,player){
  let stack=readBottleStack(block);if(!stack.length)stack=[{kind:'empty',ingredients:[],uses:0,variant:0}];
@@ -451,13 +438,13 @@ function handleSeasoningBlock(block,player){
  const top=stack[stack.length-1];
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
-  if(top.ingredients.length>=8){message(player,'§c最上層調料瓶已滿 8/8');return}
+  if(top.ingredients.length>=SEASONING_CAPACITY){message(player,'§c最上層調料瓶已滿 '+SEASONING_CAPACITY+'/'+SEASONING_CAPACITY);return}
   top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);
   try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
-  message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/8；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/8');return;
+  message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY+'；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY);return;
  }
  if(!id){
-  const out=stack.pop();setMain(player,bottleItem(out));writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/4');return;
+  const out=stack.pop();setMain(player,bottleItem(out));writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return;
  }
  message(player,'§7這不是可加入的調料或調料瓶');
 }
@@ -538,7 +525,7 @@ function completePlateUse(player,eventStack){
 function completePending(player,stack){
  const list=readSeasonings(stack);if(!hasSeasoningBase(list)){message(player,'§c缺少基礎三料，不能完成調料');return}
  const hand=handFor(player,PENDING_SEASONING)?.name??'main',out=new ItemStack(SEASONING_ID,1);setSeasonings(out,list);setUses(out,0);
- try{out.setDynamicProperty(SEASON_VARIANT_KEY,Math.floor(Math.random()*8));out.setLore(['§7Uses: 16/16','§7Ingredients: '+list.length+'/8'])}catch{};setHand(player,hand,out);message(player,'§a調料搖勻完成');
+ try{out.setDynamicProperty(SEASON_VARIANT_KEY,Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)));out.setLore(['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY])}catch{};setHand(player,hand,out);message(player,'§a調料搖勻完成');
 }
 world.afterEvents.itemStartUse.subscribe(e=>{
  const id=e.itemStack?.typeId;

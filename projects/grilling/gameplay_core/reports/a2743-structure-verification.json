@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.43",
+  "seasoning_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "shared_seasoning_contract": true,
+  "shared_seasoning_block_adapter": true,
+  "single_poll_loop": true,
+  "main_reuses_contract": true,
+  "main_reuses_block_adapter": true,
+  "effect_preview": true,
+  "numbness_threshold": 4,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

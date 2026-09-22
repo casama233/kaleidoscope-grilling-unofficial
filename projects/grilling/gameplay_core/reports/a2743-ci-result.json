@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.43",
+  "tested_commit": "dfb22f8c37175b9175e4cca57a823f6d66a7473c",
+  "run_id": "35675270902",
+  "incremental_from_published_a2742": true,
+  "seasoning_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "shared_seasoning_contract": true,
+  "shared_seasoning_block_adapter": true,
+  "single_poll_loop": true,
+  "main_reuses_contract": true,
+  "main_reuses_block_adapter": true,
+  "effect_preview": true,
+  "numbness_threshold": 4,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "d00af58f682707a6b51a6c7350da13e528479833d3a7e981eb8f6bdb5d1c5b3e",
+  "brproject_sha256": "5709335fa99adc9ce4f8a3ff96eaa778dd980d47a779ecd2aa2002ab0796fc04",
+  "minecraft_tested": false,
+  "bds_tested": false
+}
