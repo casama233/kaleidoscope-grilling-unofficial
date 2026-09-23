@@ -20,7 +20,7 @@
       "minecraft:hand_equipped": true,
       "minecraft:block_placer": {
         "block": "kaleidoscope_grilling:seasoning_bottle_1",
-        "replace_block_item": true
+        "replace_block_item": false
       }
     }
   }
