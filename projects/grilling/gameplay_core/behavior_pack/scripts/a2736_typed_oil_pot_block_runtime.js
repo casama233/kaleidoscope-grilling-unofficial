@@ -4,7 +4,8 @@ import {GRILLING_FLUID_CAPACITY,oilTypeForBucketId} from './a2738_oil_contract_c
 import {
  COOKERY_FILLED_ID,readCookeryOilPotForPlacement,buildCookeryOilPot
 } from './a2734_cookery_oil_pot_adapter.js';
-import {findHand,setHand,isCreative as creative} from './a2735_player_io.js';
+import {setHand,isCreative as creative} from './a2735_player_io.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './interaction_intent.js';
 import {
  HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,
  placementCandidateLocations,planPlacedTypedOilAddition,blocksNativeCookeryInteraction
@@ -58,17 +59,18 @@ function manuallyBreakTypedPot(d,l,type,count,drop){
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{scheduleTypedPlacement(e)}catch{}
  if(e.block.typeId!==HOST_BLOCK_ID)return;
+ const p=e.player,intent=captureInteractionIntent(p,e.itemStack);
+ if(intent.hand!=='main')return;
  const d=e.block.dimension,l=placedOilPotLocation(e.block),state=readPlacedOilPotState(e.block),type=state?.type??'',itemId=e.itemStack?.typeId;
  const incoming=oilTypeForBucketId(itemId,OIL_TYPES);
  if(incoming){
   e.cancel=true;if(e.isFirstEvent===false)return;
-  const p=e.player,hand=findHand(p,itemId);
-  system.run(()=>fillPlacedPot(p,d,l,incoming,hand));
+  system.run(()=>{if(!interactionIntentStillCurrent(p,intent)){mismatch(p);return}fillPlacedPot(p,d,l,incoming,'main')});
   return;
  }
  if(blocksNativeCookeryInteraction(type,itemId)){
   e.cancel=true;
-  if(itemId===HOST_FAT_ITEM_ID&&e.isFirstEvent!==false){const p=e.player;system.run(()=>mismatch(p))}
+  if(e.isFirstEvent!==false)system.run(()=>mismatch(p));
  }
 });
 
