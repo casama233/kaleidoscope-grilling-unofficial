@@ -13,6 +13,7 @@
 - 榨油器由 registry tick 更新時不再為每台機器重新讀取／註冊 registry；registry 本身只在成員真的改變時重存。
 - 新增通用 canonical checker、Dash compiled-output 比對與 deterministic candidate packager，後續不再需要為每個小版本複製一整份 CI 工作流。
 - Java `GrillBlock.use()` 的點火、刷油、調味、插串、翻面與取出優先序本批不改。
+- 盤子／掛牆食譜／榨油器／大缸新增 `isFirstEvent` 去重與主副手 intent；deferred commit 前重新核對 stack，且 `main.js` 尊重前置 runtime 已 claim 的互動。
 
 詳見 [Runtime architecture](docs/RUNTIME-ARCHITECTURE.md) 與 [A2.7.61 狀態](docs/STATUS-A2.7.61.md)。
 
