@@ -2,9 +2,19 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.3 Gameplay Core 已補上 Hot Food 堆疊/儲物整理、烤爐四態、效果差異收斂與三種世界油模擬；仍不是 Java 全模組完整移植。**
+**目前：A2.7.61 Runtime Hygiene 候選。現行 Gameplay Core 已推進至 A2.7.60 的 P1／世界生成修正，本批開始把正式 BP/RP 收斂為 canonical runtime，並先處理不改玩法語義的熱路徑與可重現建置。Minecraft／Android 視覺與完整多人流程仍需實機驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.7.61：Runtime Hygiene 候選
+
+- 正式執行內容固定為 `projects/grilling/gameplay_core/behavior_pack` 與 `resource_pack`；歷史 `augment_a*.py` 降為重播／取證用途。
+- 烤架 tick 仍保留支撐／腿部同步，但狀態未變時不再每 tick 重寫 world dynamic property。
+- 榨油器由 registry tick 更新時不再為每台機器重新讀取／註冊 registry；registry 本身只在成員真的改變時重存。
+- 新增通用 canonical checker、Dash compiled-output 比對與 deterministic candidate packager，後續不再需要為每個小版本複製一整份 CI 工作流。
+- Java `GrillBlock.use()` 的點火、刷油、調味、插串、翻面與取出優先序本批不改。
+
+詳見 [Runtime architecture](docs/RUNTIME-ARCHITECTURE.md) 與 [A2.7.61 狀態](docs/STATUS-A2.7.61.md)。
 
 ## A2.3：Hot Food堆疊＋烤爐四態＋世界油
 
