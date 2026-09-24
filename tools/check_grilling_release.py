@@ -88,6 +88,8 @@ def check_interaction_contracts():
     main = (SCRIPTS / "main.js").read_text(encoding="utf-8")
     plate = (SCRIPTS / "a25_plate_recipe_runtime.js").read_text(encoding="utf-8")
     oil = (SCRIPTS / "a26_oil_machine_runtime.js").read_text(encoding="utf-8")
+    typed_oil = (SCRIPTS / "a2736_typed_oil_pot_block_runtime.js").read_text(encoding="utf-8")
+    cuisine = (SCRIPTS / "a2750_cookery_cuisine_runtime.js").read_text(encoding="utf-8")
     intent = (SCRIPTS / "interaction_intent.js").read_text(encoding="utf-8")
 
     required = {
@@ -98,6 +100,11 @@ def check_interaction_contracts():
         "oil machine uses one-shot block input": (oil, "isInitialBlockPress(e.isFirstEvent)"),
         "oil machine captures interaction hand intent": (oil, "captureInteractionIntent(p,e.itemStack)"),
         "oil machine revalidates deferred intent": (oil, "interactionIntentStillCurrent(p,intent)"),
+        "typed oil pot captures interaction intent": (typed_oil, "captureInteractionIntent(p,e.itemStack)"),
+        "typed oil pot keeps Java main-hand bucket rule": (typed_oil, "if(intent.hand!=='main')return;"),
+        "Cookery cuisine captures interaction intent": (cuisine, "captureInteractionIntent(player,event.itemStack)"),
+        "Cookery seasoning remains Java main-hand only": (cuisine, "if(hand==='main'&&used?.typeId===SEASONING_ID)"),
+        "Cookery oil metadata uses the actual event hand": (cuisine, "typedHeldOil(used)"),
         "shared intent tracks main and offhand": (intent, "chooseInteractionHand(eventDesc,main,off)"),
     }
     for label, (text, token) in required.items():
