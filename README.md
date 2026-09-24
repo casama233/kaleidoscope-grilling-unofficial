@@ -2,9 +2,19 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.7.63 Held Display Parity Batch 1 候選。A2.7.62 大缸 corrective 全部保留；本批開始按 Render Audit 修調料瓶與 Advanced Rack 的 Java 手持 transform。Minecraft／Android 最終視覺與完整多人流程仍需實機驗收。**
+**目前：A2.7.64 Skewer Held Display Parity 候選。A2.7.62 大缸與 A2.7.63 調料瓶／Advanced Rack corrective 全部保留；39 個 fixed skewer 已完成 bound-root 分離與 Java FP/TP display parity。Minecraft／Android 最終視覺與完整多人流程仍需實機驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.7.64：Skewer Held Display Parity 候選
+
+- 39 个 fixed-skewer attachable 全部停止直接移动 bound root。
+- 150 个 bite-stage geometry 统一为 `bound root -> display -> 原 shell`。
+- 新共享 display animation 套用 pinned Java FP-right / FP-left / TP-right / TP-left rotation、translation、scale。
+- 一次性迁移实际核对 264 份 fixed-skewer Java display report；迁移后的 Render Audit 为 **error 0 / high 0 / medium 0**。
+- 原 bite stage、逐口 selector、UV、贴图与 gameplay ItemStack 不改。
+
+详见 [A2.7.64 状态](docs/STATUS-A2.7.64.md)。
 
 ## A2.7.63：Held Display Parity Batch 1 候選
 
