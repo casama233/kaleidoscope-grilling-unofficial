@@ -47,6 +47,20 @@ Operations whose Java semantics depend on two hands must snapshot both sides. Th
 
 ActionForm-based Rack UI is treated like Java's container menu: every mutating callback rechecks that the same Rack still exists and remains within 8 blocks (`distanceToSqr <= 64`).
 
+## Visual corrective policy
+
+For custom block items, placed-block geometry and held-item geometry are separate concerns. A visually correct world model does not prove the default Bedrock block-item transform matches Java.
+
+A2.7.62 applies this to Big Vat:
+
+- placed geometry uses an explicit solid rim rather than a transparent-hole top face;
+- the shell material is opaque while fluid surfaces keep their dedicated blended material;
+- the held representation uses a stable attachable bound with `q.item_slot_to_bone_name(context.item_slot)`;
+- Java display rotation/translation/scale is applied on an unbound child `display` bone, not by moving the bound root;
+- no Upcoming Creator Features-only `minecraft:item_visual` or geometry `item_display_transforms` dependency is introduced.
+
+Static validation can prove the geometry/material/transform graph. It still cannot certify the final pixels produced by a specific Minecraft client/GPU.
+
 ## Hot-path policy
 
 ### Grill registry
