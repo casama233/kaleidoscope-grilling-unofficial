@@ -1,0 +1,24 @@
+{
+  "version": "A2.7.61",
+  "title": "Interaction Safety + Canonical Build Gate",
+  "java_reference": {
+    "repository": "breezeth-CN/KaleidoscopeGrilling",
+    "commit": "9a1acdab27698457bec16c9362678e574895a28c",
+    "seasoning_bottle_block_blob": "1088a0eed827be3c773ea5aeca37d5c284e4cb8e",
+    "skewering_handler_blob": "88bf552aeebed54e284264f38a6151488c8cb9ed",
+    "grill_block_blob": "b3f4784635d631a239a471642770b105977ee2d6"
+  },
+  "fixes": {
+    "seasoning_uses_event_hand": true,
+    "custom_block_intent_rechecked_after_defer": true,
+    "single_custom_block_dispatch_function": true,
+    "canonical_ci_watches_gameplay_core_source": true,
+    "deterministic_review_packager": true
+  },
+  "bedrock_constraint": "Plain non-usable skewer ingredients still need block/entity interaction fallbacks because stable Script API has no generic use-button callback. Those callbacks now feed one skewering executor instead of defining separate gameplay rules.",
+  "identifiers_preserved": true,
+  "gameplay_rule_changes": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}
