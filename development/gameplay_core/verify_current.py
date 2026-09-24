@@ -27,6 +27,7 @@ VERIFIERS = {
     (2, 7, 60): "verify_a2760.py",
     (2, 7, 61): "verify_a2761.py",
     (2, 7, 62): "verify_a2762.py",
+    (2, 7, 63): "verify_a2763.py",
 }
 
 
@@ -143,6 +144,7 @@ def main() -> None:
     args = parser.parse_args()
 
     major, minor, patch, imports = generic_gate()
+    subprocess.run([sys.executable, str(DEV / "verify_visual_refs.py")], check=True)
     version = (major, minor, patch)
     verifier = VERIFIERS.get(version)
     if verifier is None:
