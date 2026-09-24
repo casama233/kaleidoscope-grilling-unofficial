@@ -67,7 +67,7 @@ def main():
             text = json.dumps(out, ensure_ascii=False, indent=2) + "\n"
             if args.check:
                 assert target.is_file(), target
-                assert target.read_text(encoding="utf-8") == text, target
+                assert load(target) == out, target
             else:
                 target.write_text(text, encoding="utf-8")
             written.append(target)
