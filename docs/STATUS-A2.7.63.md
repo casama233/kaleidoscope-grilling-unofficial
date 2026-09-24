@@ -24,6 +24,18 @@
 
 任何引用缺失都會讓 `verify_current.py` fail closed。
 
+
+## Gate 首次抓到的真斷鏈：Big Vat 水/熔岩
+
+第一次跑 visual gate 即發現 `terrain_texture.json` 的 `kg_a26_water` / `kg_a26_lava` 分別指向包內不存在的 `textures/blocks/water_still_grey` / `textures/blocks/lava_still`。Big Vat 的 `fluid` material 又確實使用這兩個 key，因此這不是無用 dead entry，而是會影響水/熔岩液面的真實 resource chain。
+
+Mojang `bedrock-samples@46ba6ea985fb5a92d79a9419198f10dda14c199d` 的 vanilla terrain atlas 已提供：
+
+- `still_water_grey` → `textures/blocks/water_still_grey`
+- `still_lava` → `textures/blocks/lava_still`
+
+A2.7.63 因此改為 Big Vat 直接使用這兩個 vanilla atlas key，並移除假的 `kg_a26_water` / `kg_a26_lava` 自訂 alias；不把 Minecraft 原版貼圖複製進模組。
+
 ## 額外 guard
 
 - 三個 Seasoning Bottle attachable 必須維持 A2733 baked hand-space geometry，且不得重新加入 root hold animation。
