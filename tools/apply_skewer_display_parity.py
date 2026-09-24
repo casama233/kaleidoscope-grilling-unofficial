@@ -170,8 +170,9 @@ def main():
         write(path, doc)
         changed_attachables += 1
 
-    # Verify the migration on disk before allowing the workflow to commit.
-    for path, doc in skewer_attachables():
+    # Verify the same 39 paths captured before mutation; successful migration intentionally removes OLD_FP/OLD_TP.
+    for path, _before_doc in attachables:
+        doc = load(path)
         desc = doc["minecraft:attachable"]["description"]
         if set((desc.get("animations") or {}).values()) != set(ANIM_IDS.values()):
             raise RuntimeError(f"attachable animation contract drift after write: {path}")
