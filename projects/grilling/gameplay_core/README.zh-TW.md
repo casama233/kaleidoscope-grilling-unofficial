@@ -1,4 +1,4 @@
-# A2.7.63 Held Display Parity Batch 1 候選
+# A2.7.64 Skewer Held Display Parity 候選
 
 目前可交付的 Gameplay Core 以本目錄為 **canonical runtime**：
 
@@ -8,6 +8,6 @@
 
 `development/gameplay_core/augment_a*.py` 是歷史版本的增量重播／取證工具，不是日常修改後再覆蓋本目錄的預設建置入口。新修正應先落到 canonical runtime，再由通用 release checker、Dash 比對與 deterministic packager 驗證。
 
-A2.7.63 包含 A2.7.62 的 Big Vat corrective，並開始清理 Render Audit 揭露的手持 display parity：三種調料瓶把 Java FP/TP transform 套到安全的 child `display` bone；Advanced Rack 新增專用 held attachable 並套用 Java 明確存在的 FP-right / TP-right / TP-left transform。玩法、容量、互動與持久化格式不變。
+A2.7.64 包含 A2.7.63 的調料瓶／Advanced Rack 修正，並完成 39 個 fixed skewer 的 held hierarchy：150 個 bite geometry 改為 `bound root -> display -> shell`，正式 attachable 不再移動 bound root，FP/TP 四組 transform 直接对齐 pinned Java display。玩法、咬合 stage、UV、配方與持久化不變。
 
-完整說明見 `docs/RUNTIME-ARCHITECTURE.md`、`docs/STATUS-A2.7.62.md`、`docs/STATUS-A2.7.63.md` 與 `docs/RENDER-AUDIT-A2.7.62.md`。
+完整說明見 `docs/RUNTIME-ARCHITECTURE.md`、`docs/STATUS-A2.7.64.md` 與 `docs/RENDER-AUDIT-A2.7.62.md`。
