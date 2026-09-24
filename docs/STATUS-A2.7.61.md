@@ -90,6 +90,8 @@ Java 盤子的一個特殊優先序也保留：潛行時若實際是副手烤串
 
 Advanced Rack 也補回 Java `Container.stillValid` 的 8 格限制。表單打開後即使玩家走遠，返回表單結果時也會重新檢查距離，超過 8 格便取消交換／存入／取回，不再能遠端操作已離開的廚具架。
 
+對空氣使用的食譜轉換／烤串食譜書也接入同一 intent：只有實際主手事件會提交，且下一 tick 會同時重驗副手材料／木棍。甜薯粉揉製的 `itemStartUse` 則不再只靠 typeId 猜手，改用事件 stack signature 判斷主副手；完成使用時仍沿用開始時記錄的 hand/slot，避免兩手同類物品時無條件偏向主手。
+
 ### 建置
 
 - `projects/grilling/gameplay_core/{behavior_pack,resource_pack}` 明確成為 canonical runtime。
