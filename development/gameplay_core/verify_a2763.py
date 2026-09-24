@@ -32,6 +32,20 @@ def main() -> None:
     assert gate.is_file()
     subprocess.run([sys.executable, str(gate)], check=True)
 
+    vat = load(BP / 'blocks/big_vat.json')['minecraft:block']
+    default_fluid = vat['components']['minecraft:material_instances']['fluid']['texture']
+    assert default_fluid == 'still_water_grey'
+    fluid_by_state = {}
+    for perm in vat.get('permutations', []):
+        cond = str(perm.get('condition', ''))
+        mats = perm.get('components', {}).get('minecraft:material_instances', {})
+        if not isinstance(mats, dict) or 'fluid' not in mats:
+            continue
+        if "'water'" in cond: fluid_by_state['water'] = mats['fluid']['texture']
+        if "'lava'" in cond: fluid_by_state['lava'] = mats['fluid']['texture']
+    assert fluid_by_state == {'water':'still_water_grey','lava':'still_lava'}
+    terrain = load(RP / 'textures/terrain_texture.json')['texture_data']
+    assert 'kg_a26_water' not in terrain and 'kg_a26_lava' not in terrain
     # Preserve the A2733 corrective: hand-space geometry is baked; do not re-apply A2726 hold animation.
     for item in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):
         desc = load(RP / 'attachables' / f'{item}.attachable.json')['minecraft:attachable']['description']
@@ -63,6 +77,7 @@ def main() -> None:
     assert report['visual_reference_gate_added'] is True
     assert report['seasoning_a2733_double_transform_guard'] is True
     assert report['skewer_attachable_count_guard'] == 39
+    assert report['big_vat_fluid_texture_fix']['replacement_vanilla_atlas_keys'] == ['still_water_grey','still_lava']
     assert report['gameplay_logic_changed'] is False
     assert report['minecraft_tested'] is False
     assert report['client_visuals_tested'] is False
