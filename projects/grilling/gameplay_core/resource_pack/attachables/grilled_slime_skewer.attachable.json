@@ -26,10 +26,16 @@
         ],
         "animate": [
           {
-            "hold_first_person": "context.is_first_person == 1.0"
+            "fp_right": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
           },
           {
-            "hold_third_person": "context.is_first_person == 0.0"
+            "fp_left": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          },
+          {
+            "tp_right": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "tp_left": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
           }
         ]
       },
@@ -37,8 +43,10 @@
         "controller.render.kg_a22.bite"
       ],
       "animations": {
-        "hold_first_person": "animation.kaleidoscope_grilling.a2725.skewer_hold_first_person",
-        "hold_third_person": "animation.kaleidoscope_grilling.a2725.skewer_hold_third_person"
+        "fp_right": "animation.kaleidoscope_grilling.a2764.skewer_fp_right",
+        "fp_left": "animation.kaleidoscope_grilling.a2764.skewer_fp_left",
+        "tp_right": "animation.kaleidoscope_grilling.a2764.skewer_tp_right",
+        "tp_left": "animation.kaleidoscope_grilling.a2764.skewer_tp_left"
       }
     }
   }
