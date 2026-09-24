@@ -39,6 +39,14 @@ Known current owners include the grill/seasoning path in `main.js`, plate/recipe
 
 A later cleanup can move these handlers behind one dispatcher, but only after preserving each module's exact Java/host priority and cancellation rules. Mechanical consolidation is not itself a correctness improvement.
 
+## Container ownership and deferred commit
+
+World-fluid placement must yield to container integrations that consume the same bucket gesture. In particular, Cookery oil pots and Grilling Big Vats own their bucket interactions; the generic oil-world handler must not also place an adjacent source block.
+
+Operations whose Java semantics depend on two hands must snapshot both sides. The shared interaction intent covers the event hand; the companion offhand stack is separately signed where the transaction also consumes or mutates it.
+
+ActionForm-based Rack UI is treated like Java's container menu: every mutating callback rechecks that the same Rack still exists and remains within 8 blocks (`distanceToSqr <= 64`).
+
 ## Hot-path policy
 
 ### Grill registry
