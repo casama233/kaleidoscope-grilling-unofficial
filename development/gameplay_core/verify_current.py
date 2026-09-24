@@ -26,6 +26,7 @@ EXPECTED = {
 VERIFIERS = {
     (2, 7, 60): "verify_a2760.py",
     (2, 7, 61): "verify_a2761.py",
+    (2, 7, 62): "verify_a2762.py",
 }
 
 
@@ -95,6 +96,12 @@ def generic_gate() -> tuple[int, int, int, int]:
     assert config["type"] == "minecraftBedrock"
     assert config["namespace"] == "kaleidoscope_grilling"
     assert config["packs"] == {"behaviorPack": "./behavior_pack", "resourcePack": "./resource_pack"}
+
+    active_legacy = sorted((ROOT / ".github/workflows").glob("gameplay-core-a*.yml"))
+    archived_legacy = sorted((ROOT / "docs/legacy_workflows").glob("gameplay-core-a*.yml"))
+    assert not active_legacy, f"retired gameplay workflows reactivated: {active_legacy}"
+    assert len(archived_legacy) == 65, f"expected 65 archived gameplay workflows, got {len(archived_legacy)}"
+    assert (ROOT / ".github/workflows/gameplay-core.yml").is_file()
 
     return bp_version[0], bp_version[1], bp_version[2], imports
 
