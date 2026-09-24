@@ -1,0 +1,22 @@
+{
+  "version": "A2.7.63",
+  "title": "Client Visual Reference Gate",
+  "visual_reference_gate_added": true,
+  "checks": [
+    "attachable geometry identifiers resolve",
+    "attachable render-controller identifiers resolve",
+    "attachable animation identifiers and animate aliases resolve",
+    "attachable direct texture paths exist",
+    "item atlas texture paths exist",
+    "terrain atlas texture paths exist",
+    "behavior block custom geometry identifiers resolve",
+    "behavior block material texture keys resolve",
+    "behavior item icon keys resolve"
+  ],
+  "seasoning_a2733_double_transform_guard": true,
+  "skewer_attachable_count_guard": 39,
+  "gameplay_logic_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}
