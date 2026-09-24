@@ -1,6 +1,6 @@
 # Kaleidoscope Grilling Gameplay Core
 
-目前 canonical runtime：**A2.7.62 Runtime Split**。
+目前 canonical runtime：**A2.7.63 Client Visual Gate**。
 
 這個目錄下的 `behavior_pack/` 與 `resource_pack/` 是目前真正要編譯、驗證與打包的來源。歷史 `development/gameplay_core/aXX*`、`verify_aXX*` 與 `.github/workflows/gameplay-core-aXX.yml` 保留作版本追溯；**新修改不要再從舊 augment/workflow 生成回來覆寫 canonical runtime**。
 
