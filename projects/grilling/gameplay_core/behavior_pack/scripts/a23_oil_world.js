@@ -1,7 +1,9 @@
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {OIL_BUCKET_POINTS} from './a24_skewering_core.js';
 import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
-import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,findHand,setHand,isCreative as creative} from './a2735_player_io.js';
+import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,setHand,isCreative as creative} from './a2735_player_io.js';
+import {isInitialBlockPress} from './a275_grill_input_core.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './interaction_intent.js';
 
 const REG='kaleidoscope_grilling:a23_oil_sources';
 export const OIL_TYPES=Object.freeze({
@@ -11,7 +13,7 @@ export const OIL_TYPES=Object.freeze({
 });
 const BLOCK_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.block,k])));
 const BUCKET_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.bucket,k])));
-const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,1],South:[0,0,-1]};
+const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,-1],South:[0,0,1]};
 const HORIZ=[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
 const MAX_SOURCES=64,MAX_CELLS=160,MAX_DROP=16;
 
@@ -99,15 +101,19 @@ function takeSource(player,block,type,hand,toCookery=false){
  return true;
 }
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
- if(e.block.typeId==='kaleidoscope_grilling:big_vat')return;
+ if(e.cancel)return;
+ // Java container integrations own these targets; do not also place a world-fluid source beside them.
+ if(e.block.typeId==='kaleidoscope_grilling:big_vat'||e.block.typeId==='kaleidoscope_cookery:oil_pot')return;
  const item=e.itemStack,typeFromBlock=BLOCK_TO_TYPE[e.block.typeId],bucketType=item?BUCKET_TO_TYPE[item.typeId]:undefined;
  if(typeFromBlock&&(item?.typeId==='minecraft:bucket'||item?.typeId===COOKERY_EMPTY||item?.typeId===COOKERY_FILLED)){
-  e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,hand=findHand(p,item.typeId);
-  system.run(()=>{const b=dim.getBlock(loc);if(b&&hand)takeSource(p,b,typeFromBlock,hand,item.typeId!== 'minecraft:bucket')});return;
+  e.cancel=true;if(!isInitialBlockPress(e.isFirstEvent))return;
+  const p=e.player,loc={...e.block.location},dim=e.block.dimension,intent=captureInteractionIntent(p,item),hand=intent.hand,toCookery=item.typeId!=='minecraft:bucket';
+  system.run(()=>{if(!interactionIntentStillCurrent(p,intent))return;const b=dim.getBlock(loc);if(b)takeSource(p,b,typeFromBlock,hand,toCookery)});return;
  }
  if(bucketType){
-  e.cancel=true;const p=e.player,loc=faceTarget(e),dim=e.block.dimension,hand=findHand(p,item.typeId);
-  system.run(()=>{if(hand)placeFromBucket(p,dim,loc,bucketType,hand)});return;
+  e.cancel=true;if(!isInitialBlockPress(e.isFirstEvent))return;
+  const p=e.player,loc=faceTarget(e),dim=e.block.dimension,intent=captureInteractionIntent(p,item),hand=intent.hand;
+  system.run(()=>{if(interactionIntentStillCurrent(p,intent))placeFromBucket(p,dim,loc,bucketType,hand)});return;
  }
 });
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
@@ -115,11 +121,11 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  system.run(()=>{const b=dim.getBlock(loc);if(b&&isOil(b.typeId))try{b.setType('minecraft:air')}catch{}});
 });
 system.runInterval(()=>{
- const rows=readReg(),keep=[];
+ const rows=readReg(),before=JSON.stringify(rows),keep=[];
  for(const row of rows){
   const def=OIL_TYPES[row.type];if(!def)continue;
   if(system.currentTick%def.interval!==0){keep.push(row);continue}
   if(compute(row,rows))keep.push(row);
  }
- if(JSON.stringify(keep)!==JSON.stringify(rows))saveReg(keep);else saveReg(rows);
+ if(JSON.stringify(keep)!==before)saveReg(keep);
 },1);
