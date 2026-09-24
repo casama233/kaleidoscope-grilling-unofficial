@@ -6,7 +6,10 @@ import json
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "projects/grilling/gameplay_core"
 BP = PROJECT / "behavior_pack"
-RP = PROJECT / "resource_pack"\n\n# Pinned Mojang bedrock-samples terrain keys (46ba6ea985fb5a92d79a9419198f10dda14c199d).\nKNOWN_VANILLA_TERRAIN_KEYS = {"still_water_grey", "still_lava"}
+RP = PROJECT / "resource_pack"
+
+# Pinned Mojang bedrock-samples terrain keys (46ba6ea985fb5a92d79a9419198f10dda14c199d).
+KNOWN_VANILLA_TERRAIN_KEYS = {"still_water_grey", "still_lava"}
 
 def load(path: Path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
