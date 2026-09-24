@@ -1,0 +1,38 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:advanced_rack",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/blocks/advanced_rack"
+      },
+      "geometry": {
+        "default": "geometry.kg_a2763.advanced_rack_hand"
+      },
+      "animations": {
+        "fp_right": "animation.kaleidoscope_grilling.a2763.advanced_rack_fp_right",
+        "tp_right": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_right",
+        "tp_left": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_left"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "fp_right": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "tp_right": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "tp_left": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.kg_a2763.advanced_rack_hand"
+      ]
+    }
+  }
+}
