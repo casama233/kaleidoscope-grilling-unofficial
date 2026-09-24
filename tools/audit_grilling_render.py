@@ -14,6 +14,10 @@ RP = PROJECT / "resource_pack"
 JAVA_DISPLAY = ROOT / "projects" / "grilling" / "reports" / "java_display_transforms"
 
 SEVERITY_ORDER = {"error": 0, "high": 1, "medium": 2, "info": 3}
+VANILLA_TEXTURE_PATHS = {
+    "textures/blocks/water_still_grey",
+    "textures/blocks/lava_still",
+}
 
 
 def load_json(path: Path):
@@ -286,8 +290,13 @@ def check_blocks(findings, geometry_index):
                 tex_rel = atlas[texture_key]
                 tex_path = RP / (tex_rel + ".png")
                 if not tex_path.is_file():
-                    add(findings, "error", "missing_block_texture_file", ident,
-                        f"terrain key {texture_key} points to missing {tex_rel}.png", str(path.relative_to(ROOT)))
+                    if tex_rel in VANILLA_TEXTURE_PATHS:
+                        add(findings, "info", "vanilla_texture_reference", ident,
+                            f"terrain key {texture_key} intentionally resolves through the vanilla base resource pack: {tex_rel}",
+                            str(path.relative_to(ROOT)))
+                    else:
+                        add(findings, "error", "missing_block_texture_file", ident,
+                            f"terrain key {texture_key} points to missing {tex_rel}.png", str(path.relative_to(ROOT)))
                     continue
                 if tex_path not in texture_alpha_cache:
                     try:
@@ -433,6 +442,10 @@ def main():
 
     findings.sort(key=lambda x: (SEVERITY_ORDER.get(x["severity"], 99), x["code"], x["subject"]))
     counts = Counter(x["severity"] for x in findings)
+    by_code = Counter(x["code"] for x in findings)
+    subjects_by_code = {}
+    for item in findings:
+        subjects_by_code.setdefault(item["code"], set()).add(item["subject"])
     report = {
         "scope": "canonical Gameplay Core render audit",
         "project": str(PROJECT.relative_to(ROOT)).replace("\\", "/"),
@@ -441,6 +454,8 @@ def main():
             "high": counts["high"],
             "medium": counts["medium"],
             "info": counts["info"],
+            "by_code": dict(sorted(by_code.items())),
+            "unique_subjects_by_code": {k: len(v) for k, v in sorted(subjects_by_code.items())},
             "geometries": len(geometries),
             "animations": len(animations),
             "render_controllers": len(controllers),
