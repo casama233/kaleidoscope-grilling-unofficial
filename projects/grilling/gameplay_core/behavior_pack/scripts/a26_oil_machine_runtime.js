@@ -8,6 +8,8 @@ import {
 } from './a26_oil_machine_core.js';
 import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,readCookeryOilPot,buildCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
 import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,setMainHand as setMain,setOffHand as setOff,findHand as handFor,getHand as held,setHand,isCreative as creative} from './a2735_player_io.js';
+import {isInitialBlockPress} from './a275_grill_input_core.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './interaction_intent.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';
@@ -183,13 +185,13 @@ function startPress(block,p,amount){
  },PRESS_IMPACT_TICK);
  return true;
 }
-function interactPress(block,p,item){
+function interactPress(block,p,item,hand=null){
  const state=readPress(block);
  if(state.waiting){finishPress(block,p);return}
- const hand=item?handFor(p,item.typeId):null;
+ const actualHand=hand??(item?handFor(p,item.typeId):null);
  if(item?.typeId===OIL_CAKE_ID){
   const x=pressAddCake(state);if(!x.ok){msg(p,'§e榨油器最多放 4 個油餅');return}
-  if(hand&&!decHand(p,hand,1))return;writePress(block,x.state);
+  if(actualHand&&!decHand(p,actualHand,1))return;writePress(block,x.state);
   try{block.dimension.playSound('dig.grass',block.location,{volume:.8,pitch:1})}catch{};return;
  }
  const amount=toolProgress(item?.typeId);if(amount>0){startPress(block,p,amount);return}
@@ -203,15 +205,15 @@ function breakVat(block,p){
  const v=readVat(block),dim=block.dimension,loc={x:block.x+.5,y:block.y+.5,z:block.z+.5};clearVat(block);block.setType('minecraft:air');
  if(creative(p))return;const item=vatItem(v);if(item)dim.spawnItem(item,loc);
 }
-function placePackedVat(support,face,p,item){
- const target=targetFor(support,face);if(!replaceable(target))return false;const hand=handFor(p,item.typeId);if(!hand)return false;
- const packed=vatPacked(item);target.setType(BIG_VAT_ID);writeVat(target,packed);decHand(p,hand,1);return true;
+function placePackedVat(support,face,p,item,hand=null){
+ const target=targetFor(support,face);if(!replaceable(target))return false;const actualHand=hand??handFor(p,item?.typeId);if(!actualHand)return false;
+ const packed=vatPacked(item);target.setType(BIG_VAT_ID);writeVat(target,packed);decHand(p,actualHand,1);return true;
 }
-function interactVat(block,p,item){
- const hand=item?handFor(p,item.typeId):null;if(!item){vatStatus(block,p);return}
- if((item.typeId===COOKERY_EMPTY||item.typeId===COOKERY_FILLED)&&hand&&fillPotFromVat(block,p,hand,item))return;
- if(bucketType(item.typeId)&&hand&&fillVatFromBucket(block,p,hand,item))return;
- if(item.typeId==='minecraft:bucket'&&hand&&takeVatBucket(block,p,hand))return;
+function interactVat(block,p,item,hand=null){
+ const actualHand=hand??(item?handFor(p,item.typeId):null);if(!item){vatStatus(block,p);return}
+ if((item.typeId===COOKERY_EMPTY||item.typeId===COOKERY_FILLED)&&actualHand&&fillPotFromVat(block,p,actualHand,item))return;
+ if(bucketType(item.typeId)&&actualHand&&fillVatFromBucket(block,p,actualHand,item))return;
+ if(item.typeId==='minecraft:bucket'&&actualHand&&takeVatBucket(block,p,actualHand))return;
  vatStatus(block,p);
 }
 
@@ -231,17 +233,16 @@ function doubleCropGrowth(block,p,hand){
 
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{
-  const b=e.block,p=e.player,item=e.itemStack??main(p);
-  if(b.typeId===OIL_PRESS_ID){e.cancel=true;const dim=b.dimension,loc={...b.location};system.run(()=>interactPress(dim.getBlock(loc),p,main(p)));return}
-  if(b.typeId===BIG_VAT_ID){e.cancel=true;const dim=b.dimension,loc={...b.location};system.run(()=>interactVat(dim.getBlock(loc),p,main(p)));return}
+  const b=e.block,p=e.player,intent=captureInteractionIntent(p,e.itemStack),hand=intent.hand,item=held(p,hand),first=isInitialBlockPress(e.isFirstEvent);
+  const defer=fn=>system.run(()=>{if(!interactionIntentStillCurrent(p,intent)){msg(p,'§7操作已取消：互動後手持物品已改變');return}fn()});
+  if(b.typeId===OIL_PRESS_ID){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location};defer(()=>interactPress(dim.getBlock(loc),p,held(p,hand),hand));return}
+  if(b.typeId===BIG_VAT_ID){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location};defer(()=>interactVat(dim.getBlock(loc),p,held(p,hand),hand));return}
   if(item?.typeId===BIG_VAT_ID){
-   const target=targetFor(b,e.blockFace);if(replaceable(target)){e.cancel=true;const dim=b.dimension,loc={...b.location},face=e.blockFace,copy=item.clone();copy.amount=1;system.run(()=>placePackedVat(dim.getBlock(loc),face,p,copy));return}
+   const target=targetFor(b,e.blockFace);if(replaceable(target)){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location},face=e.blockFace;defer(()=>{const current=held(p,hand);if(current?.typeId===BIG_VAT_ID)placePackedVat(dim.getBlock(loc),face,p,current,hand)});return}
   }
   if(item?.typeId===OIL_RESIDUE_ID){
-   const hand=handFor(p,item.typeId);if(hand){
-    let can=false;try{const states=b.permutation.getAllStates();can=['growth','minecraft:growth','age','minecraft:age'].some(k=>typeof states[k]==='number')}catch{}
-    if(can){e.cancel=true;const dim=b.dimension,loc={...b.location};system.run(()=>doubleCropGrowth(dim.getBlock(loc),p,hand));return}
-   }
+   let can=false;try{const states=b.permutation.getAllStates();can=['growth','minecraft:growth','age','minecraft:age'].some(k=>typeof states[k]==='number')}catch{}
+   if(can){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location};defer(()=>doubleCropGrowth(dim.getBlock(loc),p,hand));return}
   }
  }catch{}
 });
