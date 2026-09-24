@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.60 Pepper Worldgen BDS Fix",
+  "name": "Kaleidoscope Grilling A2.7.61 Interaction Safety",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_60_Pepper_Worldgen_BDS_Fix"
+          "packName": "Kaleidoscope_Grilling_A2_7_61_Interaction_Safety"
         }
       ]
     ]
