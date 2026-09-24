@@ -5,6 +5,7 @@ import {
  getMainHand,getOffHand,setMainHand,setOffHand,isCreative as creative
 } from './a2735_player_io.js';
 import {oilTypeForBucketId,planOffhandOilFill,ITEM_FILL_POINTS} from './a2737_offhand_oil_fill_core.js';
+import {captureInteractionIntent,interactionIntentStillCurrent,interactionStackSignature} from './interaction_intent.js';
 
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
 
@@ -51,12 +52,15 @@ function fillOffhandPot(player,expectedBucketId){
 }
 
 world.beforeEvents.itemUse.subscribe(ev=>{
- const player=ev.source,eventItem=ev.itemStack,main=getMainHand(player),off=getOffHand(player);
- if(!eventItem||main?.typeId!==eventItem.typeId)return;
+ if(ev.cancel)return;
+ const player=ev.source,eventItem=ev.itemStack,intent=captureInteractionIntent(player,eventItem);
+ if(intent.hand!=='main')return;
+ const main=getMainHand(player),off=getOffHand(player);if(!eventItem||main?.typeId!==eventItem.typeId)return;
  const type=oilTypeForBucketId(main.typeId,OIL_TYPES);if(!type)return;
- const preview=planOffhandOilFill(readCookeryOilPot(off),type);
- if(!preview.handled)return;
- ev.cancel=true;
- const bucketId=main.typeId;
- system.run(()=>{try{fillOffhandPot(player,bucketId)}catch{}});
+ const preview=planOffhandOilFill(readCookeryOilPot(off),type);if(!preview.handled)return;
+ ev.cancel=true;const bucketId=main.typeId,offSignature=interactionStackSignature(off);
+ system.run(()=>{try{
+  if(!interactionIntentStillCurrent(player,intent)||interactionStackSignature(getOffHand(player))!==offSignature){message(player,'§7操作已取消：油桶或油壺已變更');return}
+  fillOffhandPot(player,bucketId);
+ }catch{}});
 });
