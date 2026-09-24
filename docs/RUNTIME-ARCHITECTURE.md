@@ -35,7 +35,7 @@ The project is not yet fully converted to one central event router. Until that m
 - Do not fix display bugs by changing recipe, consumption or persistence semantics.
 - Do not add a second pack-level script entry to solve a routing problem.
 
-Known current owners include the grill/seasoning path in `main.js`, plate/recipe placement in `a25_plate_recipe_runtime.js`, oil press/big vat in `a26_oil_machine_runtime.js`, typed Cookery oil-pot state in `a2736_typed_oil_pot_block_runtime.js`, Advanced Rack in `a2746_advanced_rack_runtime.js`, and Cookery host cuisine metadata in `a2750_cookery_cuisine_runtime.js`. `a25` and `a26` now use the shared `interaction_intent.js`; `main.js` respects earlier ownership through the event cancel flag.
+Known current owners include the grill/seasoning path in `main.js`, plate/recipe placement in `a25_plate_recipe_runtime.js`, oil press/big vat in `a26_oil_machine_runtime.js`, typed Cookery oil-pot state in `a2736_typed_oil_pot_block_runtime.js`, Advanced Rack in `a2746_advanced_rack_runtime.js`, and Cookery host cuisine metadata in `a2750_cookery_cuisine_runtime.js`. `a25`, `a26`, typed oil-pot interception and Cookery cuisine hooks now share the interaction-intent contract; `main.js` respects earlier ownership through the event cancel flag. Host integrations must not broaden Java's hand restriction: typed-oil bucket filling and Cookery seasoning are main-hand-only because the pinned Java handlers are main-hand-only.
 
 A later cleanup can move these handlers behind one dispatcher, but only after preserving each module's exact Java/host priority and cancellation rules. Mechanical consolidation is not itself a correctness improvement.
 
