@@ -8,7 +8,7 @@ import {
 } from './a25_plate_recipe_core.js';
 import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,setHand,isCreative as creative} from './a2735_player_io.js';
 import {isInitialBlockPress} from './a275_grill_input_core.js';
-import {captureInteractionIntent,interactionIntentStillCurrent} from './interaction_intent.js';
+import {captureInteractionIntent,interactionIntentStillCurrent,interactionStackSignature} from './interaction_intent.js';
 
 const COOKERY_RECIPE_ITEMS=new Set([
  'kaleidoscope_cookery:recipe_block',
@@ -235,10 +235,15 @@ function breakRecipe(block,player){
 
 world.beforeEvents.itemUse.subscribe(e=>{
  try{
-  const id=e.itemStack?.typeId;
-  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(e.source,'§7空烤串盤不能食用');return}
-  if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(e.source))){e.cancel=true;const p=e.source;system.run(()=>convertCookeryRecipe(p));return}
-  if(id!==BOOK_ID)return;e.cancel=true;const p=e.source,item=cloneOne(e.itemStack);system.run(()=>handleBookAir(p,item));
+  if(e.cancel)return;const id=e.itemStack?.typeId,p=e.source;
+  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(p,'§7空烤串盤不能食用');return}
+  const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;
+  if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(p))){
+   e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
+   system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜或副手烤串已變更');return}convertCookeryRecipe(p)});return;
+  }
+  if(id!==BOOK_ID)return;e.cancel=true;const item=cloneOne(e.itemStack),offSignature=interactionStackSignature(heldOff(p));
+  system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜書或副手材料已變更');return}handleBookAir(p,item)});
  }catch{}
 });
 
