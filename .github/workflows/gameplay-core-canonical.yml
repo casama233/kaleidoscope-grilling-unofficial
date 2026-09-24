@@ -11,6 +11,8 @@ on:
       - 'docs/RUNTIME-ARCHITECTURE.md'
       - 'docs/STATUS-A2.7.61.md'
       - 'docs/STATUS-A2.7.62.md'
+      - 'docs/STATUS-A2.7.63.md'
+      - 'docs/RENDER-AUDIT-A2.7.62.md'
   push:
     branches: [main]
     paths:
