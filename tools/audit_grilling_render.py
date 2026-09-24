@@ -425,6 +425,94 @@ def check_attachables(findings, geometry_index, animations, controllers, known_i
     return dict(stats)
 
 
+def check_corrective_display_contracts(findings, geometry_index, animations):
+    # Seasoning bottle: A2.7.33 established safe hand-space shell; A2.7.63 adds Java display on child bone.
+    seasoning_geo_id = "geometry.kg_a2733.seasoning_bottle_hand"
+    row = geometry_index.get(seasoning_geo_id)
+    seasoning_report = load_json(JAVA_DISPLAY / "seasoning_bottles_1.json")["java_display"]
+    if not row:
+        add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "missing seasoning hand geometry")
+    else:
+        bones = {b.get("name"): b for b in row["geo"].get("bones", [])}
+        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
+            add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "root lost item-slot binding")
+        if bones.get("display", {}).get("parent") != "root":
+            add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "display bone must be an unbound child of root")
+        for name, bone in bones.items():
+            if name not in {"root", "display"} and bone.get("parent") != "display":
+                add(findings, "error", "seasoning_display_contract", seasoning_geo_id,
+                    f"shell bone {name} must stay below display")
+
+    seasoning_map = {
+        "firstperson_righthand": "animation.kaleidoscope_grilling.a2763.seasoning_fp_right",
+        "firstperson_lefthand": "animation.kaleidoscope_grilling.a2763.seasoning_fp_left",
+        "thirdperson_righthand": "animation.kaleidoscope_grilling.a2763.seasoning_tp_right",
+        "thirdperson_lefthand": "animation.kaleidoscope_grilling.a2763.seasoning_tp_left",
+    }
+    for java_key, anim_id in seasoning_map.items():
+        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
+        expected = seasoning_report[java_key]
+        if actual is None:
+            add(findings, "error", "seasoning_display_contract", anim_id, "missing corrective display animation")
+            continue
+        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
+            add(findings, "error", "seasoning_display_contract", anim_id,
+                f"rotation/scale drift from Java {java_key}")
+        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
+            add(findings, "error", "seasoning_display_contract", anim_id,
+                f"translation drift from Java {java_key}")
+
+    for item in ("empty_seasoning_bottle", "pending_seasoning", "special_seasoning"):
+        path = RP / "attachables" / f"{item}.attachable.json"
+        desc = load_json(path)["minecraft:attachable"]["description"]
+        values = set((desc.get("animations") or {}).values())
+        if set(seasoning_map.values()) - values:
+            add(findings, "error", "seasoning_display_contract", f"kaleidoscope_grilling:{item}",
+                "attachable does not expose all four Java display animations")
+
+    # Advanced Rack: Java defines FP right only; do not invent a FP-left parity claim.
+    rack_geo_id = "geometry.kg_a2763.advanced_rack_hand"
+    rack_row = geometry_index.get(rack_geo_id)
+    rack_report = load_json(JAVA_DISPLAY / "advanced_rack_0.json")["java_display"]
+    if not rack_row:
+        add(findings, "error", "rack_display_contract", rack_geo_id, "missing Advanced Rack hand geometry")
+    else:
+        bones = {b.get("name"): b for b in rack_row["geo"].get("bones", [])}
+        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
+            add(findings, "error", "rack_display_contract", rack_geo_id, "root lost item-slot binding")
+        if bones.get("display", {}).get("parent") != "root":
+            add(findings, "error", "rack_display_contract", rack_geo_id, "display bone must be an unbound child of root")
+
+    rack_map = {
+        "firstperson_righthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_fp_right",
+        "thirdperson_righthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_right",
+        "thirdperson_lefthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_left",
+    }
+    for java_key, anim_id in rack_map.items():
+        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
+        expected = rack_report[java_key]
+        if actual is None:
+            add(findings, "error", "rack_display_contract", anim_id, "missing corrective display animation")
+            continue
+        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
+            add(findings, "error", "rack_display_contract", anim_id,
+                f"rotation/scale drift from Java {java_key}")
+        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
+            add(findings, "error", "rack_display_contract", anim_id,
+                f"translation drift from Java {java_key}")
+
+    rack_desc = load_json(RP / "attachables" / "advanced_rack.attachable.json")["minecraft:attachable"]["description"]
+    if rack_desc.get("geometry", {}).get("default") != rack_geo_id:
+        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
+            "attachable does not use the corrective hand geometry")
+    if "firstperson_lefthand" in rack_report:
+        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
+            "audit assumption drift: Java now defines first-person left and corrective must be updated")
+    if "fp_left" in (rack_desc.get("animations") or {}):
+        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
+            "FP-left transform was invented even though the pinned Java source does not define one")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", dest="json_path")
@@ -439,6 +527,7 @@ def main():
     geometry_stats = check_geometry_structure(findings, geometries)
     block_stats = check_blocks(findings, geometries)
     attachable_stats = check_attachables(findings, geometries, animations, controllers, known_ids)
+    check_corrective_display_contracts(findings, geometries, animations)
 
     findings.sort(key=lambda x: (SEVERITY_ORDER.get(x["severity"], 99), x["code"], x["subject"]))
     counts = Counter(x["severity"] for x in findings)
