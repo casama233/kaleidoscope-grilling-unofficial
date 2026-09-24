@@ -2,9 +2,19 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.7.62 Big Vat Render Corrective 候選。A2.7.61 的 canonical runtime／互動 ownership 修正全部保留，本批針對實機截圖修正大缸透明頂圈漏縫與未套用 Java 手持 transform。Minecraft／Android 最終視覺與完整多人流程仍需實機驗收。**
+**目前：A2.7.63 Held Display Parity Batch 1 候選。A2.7.62 大缸 corrective 全部保留；本批開始按 Render Audit 修調料瓶與 Advanced Rack 的 Java 手持 transform。Minecraft／Android 最終視覺與完整多人流程仍需實機驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.7.63：Held Display Parity Batch 1 候選
+
+- 三種調料瓶保留 A2.7.33 已驗證的 hand-space shell，不再移動 bound root；新增 child `display` 並套用 Java first/third-person rotation / translation / scale。
+- Advanced Rack 新增專用 stable attachable / hand geometry / animation / render controller；Java 明確存在的 FP-right / TP-right / TP-left transform 已接入。
+- Java Advanced Rack 沒有 `firstperson_lefthand`，因此本批不偽造左手 parity；左手第一人稱保留平台 fallback，等實機驗證。
+- Render Audit 把 seasoning / rack display hierarchy 與 Java transform 數值升成 error-level regression contract。
+- 最大剩餘渲染債務仍是 39 個 fixed skewer：bound-root hold animation + Java display transform 未真正接入。
+
+詳見 [A2.7.63 狀態](docs/STATUS-A2.7.63.md) 與 [Render Audit](docs/RENDER-AUDIT-A2.7.62.md)。
 
 ## A2.7.62：Big Vat Render Corrective 候選
 
