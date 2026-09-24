@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.62 Big Vat Render Corrective",
+  "name": "Kaleidoscope Grilling A2.7.63 Held Display Parity",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_62_Big_Vat_Render_Corrective"
+          "packName": "Kaleidoscope_Grilling_A2_7_63_Held_Display_Parity"
         }
       ]
     ]
