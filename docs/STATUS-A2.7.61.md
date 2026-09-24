@@ -54,6 +54,23 @@
 - 只有 keep 長度改變時才重存 registry；
 - completionDelay 仍維持 1 tick 更新，沒有改 Java 時序。
 
+### 互動入口與主／副手
+
+重新對照 Java `SkewerPlateBlock`、`SkewerRecipeBlock`、`OilPressBlock`、`BigVatBlock` 後，找到兩個實際風險：
+
+- 盤子／食譜與榨油器／大缸的 Bedrock `playerInteractWithBlock` 沒有一致使用 `isFirstEvent`，長按一次使用鍵可能多次排入同一動作；
+- 事件延遲到下一 tick 執行時，部分函式重新讀 `main hand`，所以副手操作可能被錯讀成主手，或在玩家切槽後提交到另一個物品。
+
+A2.7.61 現在：
+
+- 新增 `scripts/interaction_intent.js`，記錄事件當下主／副手、stack signature 與 selected slot；
+- 盤子、掛牆食譜、榨油器、大缸在 deferred commit 前重新驗證 intent；
+- edge-triggered block interaction 只在 `isFirstEvent` 執行一次，後續 repeat 仍由原 owner claim，但不重複扣料／產出；
+- plate/recipe/oil-machine 的實際操作 hand 傳到 handler，不再固定讀主手；
+- `main.js` 看到較早註冊的 runtime 已把事件 `cancel` 後立即退出，避免同一右鍵再進穿串／拆串。
+
+Java 盤子的一個特殊優先序也保留：潛行時若實際是副手烤串互動，盤子 handler 讓出給 offhand disassembly 路徑；主手烤串放置被盤子/放置 owner claim 後，`main.js` 不再同時拆副手。
+
 ### 建置
 
 - `projects/grilling/gameplay_core/{behavior_pack,resource_pack}` 明確成為 canonical runtime。
@@ -82,5 +99,5 @@
 
 - 沒有執行模擬玩家互動測試。
 - 這批新 A2.7.61 candidate 尚未由 Minecraft 客戶端、Android 或 BDS 實機驗收。
-- 本批沒有宣稱所有 runtime listener 已經合併；事件入口收斂會分小批處理，先從有重疊風險的 block interaction 開始。
+- 本批沒有宣稱所有 runtime listener 已經合併；已先完成 plate/recipe/oil-machine 與 `main.js` 的 ownership/hand-intent 收斂，其餘 listener 仍分批處理。
 - 手持模型、透明材質、HUD coexistence 與多人互動不因 CI 通過而視為已驗收。
