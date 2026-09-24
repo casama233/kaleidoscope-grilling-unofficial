@@ -30,7 +30,7 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a26_big_vat",
-          "render_method": "alpha_test",
+          "render_method": "opaque",
           "ambient_occlusion": 1.0,
           "face_dimming": true
         },
@@ -109,7 +109,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "alpha_test",
+              "render_method": "opaque",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             },
@@ -128,7 +128,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "alpha_test",
+              "render_method": "opaque",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             },
@@ -147,7 +147,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "alpha_test",
+              "render_method": "opaque",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             },
@@ -166,7 +166,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "alpha_test",
+              "render_method": "opaque",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             },
@@ -185,7 +185,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "alpha_test",
+              "render_method": "opaque",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             },
