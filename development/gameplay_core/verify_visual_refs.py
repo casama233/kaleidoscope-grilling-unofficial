@@ -6,7 +6,7 @@ import json
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "projects/grilling/gameplay_core"
 BP = PROJECT / "behavior_pack"
-RP = PROJECT / "resource_pack"
+RP = PROJECT / "resource_pack"\n\n# Pinned Mojang bedrock-samples terrain keys (46ba6ea985fb5a92d79a9419198f10dda14c199d).\nKNOWN_VANILLA_TERRAIN_KEYS = {"still_water_grey", "still_lava"}
 
 def load(path: Path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -134,7 +134,7 @@ def audit_block_geometry_and_materials(geometry_ids: set[str], terrain_keys: set
                     continue
                 texture = row.get("texture")
                 if isinstance(texture, str) and texture and not texture.startswith("minecraft:"):
-                    assert texture in terrain_keys, f"{path}: material {slot} uses missing terrain key {texture}"
+                    assert texture in terrain_keys or texture in KNOWN_VANILLA_TERRAIN_KEYS, f"{path}: material {slot} uses missing terrain key {texture}"
     return blocks, geometry_refs
 
 def audit_item_icons(item_keys: set[str]) -> tuple[int, int]:
