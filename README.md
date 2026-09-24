@@ -17,6 +17,7 @@
 - typed Cookery 油壺與 Cookery pot/stockpot 也按 Java 收回 MAIN_HAND 限制：副手不再誤灌油／誤調味，空手點 typed 油壺會正確提示油種衝突。
 - 世界油不再和 Cookery 油壺／大缸搶同一個油桶右鍵；修正 North/South 放置方向，並把 world-oil registry 改為 dirty-only 持久化。
 - 雙手油壺交易與涼拌折耳根會同時重驗主副手；Advanced Rack 表單操作恢復 Java 的 8 格有效距離。
+- 對空氣使用的食譜書／Cookery 食譜轉換也會重驗副手；甜薯粉長按揉製改用事件 stack 判斷實際使用手。
 
 詳見 [Runtime architecture](docs/RUNTIME-ARCHITECTURE.md) 與 [A2.7.61 狀態](docs/STATUS-A2.7.61.md)。
 
