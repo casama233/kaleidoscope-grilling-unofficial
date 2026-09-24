@@ -595,6 +595,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
 });
 world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||![EMPTY_SEASONING_ID,PENDING_SEASONING,SEASONING_ID].includes(held.typeId))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
+ if(e.cancel)return;
  if(tryScheduleBeefBoardOverride(e))return;
  const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));
  if(skewerInput){e.cancel=true;if(isInitialBlockPress(e.isFirstEvent))scheduleSkewerAction(e.player,skewerInput);return}
