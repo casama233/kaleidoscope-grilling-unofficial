@@ -61,6 +61,13 @@ A2.7.62 applies this to Big Vat:
 
 Static validation can prove the geometry/material/transform graph. It still cannot certify the final pixels produced by a specific Minecraft client/GPU.
 
+A2.7.63 extends the same rule to held props:
+
+- seasoning keeps its already-correct A2.7.33 hand-space shell, then applies Java display transforms only on an unbound child `display` bone;
+- Advanced Rack receives its own attachable instead of falling back to the default block-item pose;
+- missing Java transforms are not invented. Advanced Rack currently has no pinned `firstperson_lefthand`, so that case remains an explicit platform fallback rather than a fake parity claim;
+- render-audit contracts compare corrective animation values against the pinned Java display reports.
+
 ## Hot-path policy
 
 ### Grill registry
