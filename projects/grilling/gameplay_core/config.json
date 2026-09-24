@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.61 Interaction Safety",
+  "name": "Kaleidoscope Grilling A2.7.62 Runtime Split",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_61_Interaction_Safety"
+          "packName": "Kaleidoscope_Grilling_A2_7_62_Runtime_Split"
         }
       ]
     ]
