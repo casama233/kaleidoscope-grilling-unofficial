@@ -79,6 +79,17 @@ Java 盤子的一個特殊優先序也保留：潛行時若實際是副手烤串
 - Cookery 原生鍋具的其他操作不被 Grilling 取消；Grilling 只記錄事件實際 hand 的油型候選與 inventory before/after，用來附加 hot/seasoning metadata。
 
 
+### 世界油、雙手交易與 Rack
+
+後續 audit 再修四個具體問題：
+
+- `a23_oil_world.js` 原本比 typed Cookery 油壺 handler 更早接手自訂油桶；點 Cookery 油壺時可能一邊向油壺灌油、一邊又在旁邊放出世界油源。現在 Big Vat 與 Cookery oil pot 都由各自 adapter 獨占，world-fluid handler 明確退出。
+- 世界油 `North/South` face offset 原本顛倒；現在統一為 North = -Z、South = +Z。
+- world-oil registry 原本每 tick 都保存，而且 dirty comparison 比較的是已被原地修改的同一批 row。現在在運算前保存序列化快照，只有來源/cells 真正改變才寫入。
+- 主手油桶 + 副手 Cookery 油壺的空氣灌油、以及涼拌折耳根（主手材料 + 副手油壺）都在 deferred commit 前同時驗證兩隻手，避免切槽或換油壺後錯扣新物品。
+
+Advanced Rack 也補回 Java `Container.stillValid` 的 8 格限制。表單打開後即使玩家走遠，返回表單結果時也會重新檢查距離，超過 8 格便取消交換／存入／取回，不再能遠端操作已離開的廚具架。
+
 ### 建置
 
 - `projects/grilling/gameplay_core/{behavior_pack,resource_pack}` 明確成為 canonical runtime。
