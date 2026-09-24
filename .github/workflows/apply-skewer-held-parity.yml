@@ -1,0 +1,64 @@
+name: Apply Fixed Skewer Held Display Parity
+
+on:
+  push:
+    branches:
+      - codex/a2761-runtime-hygiene
+    paths:
+      - '.github/workflows/apply-skewer-held-parity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440' && github.ref == 'refs/heads/codex/a2761-runtime-hygiene'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read exact branch commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
+          test "$GITHUB_REPOSITORY_ID" = '1377218440'
+          test "$GITHUB_REF" = 'refs/heads/codex/a2761-runtime-hygiene'
+          git init .
+          git config core.autocrlf false
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git checkout -B codex/a2761-runtime-hygiene FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Apply deterministic skewer display migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/apply_skewer_display_parity.py
+
+      - name: Verify generated render chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/audit_grilling_render.py --fail-on-error
+          python tools/check_grilling_release.py
+          git diff --check
+
+      - name: Commit canonical generated resources
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git add             projects/grilling/gameplay_core/resource_pack/attachables             projects/grilling/gameplay_core/resource_pack/models/entity/a22_bites             projects/grilling/gameplay_core/resource_pack/animations/a2764_skewer_java_display.animation.json
+          if git diff --cached --quiet; then
+            echo 'Migration produced no canonical changes' >&2
+            exit 1
+          fi
+          git config user.name 'grilling-render-migration[bot]'
+          git config user.email 'grilling-render-migration[bot]@users.noreply.github.com'
+          git commit -m 'fix: port Java held transforms to fixed skewers'
+          git push origin HEAD:refs/heads/codex/a2761-runtime-hygiene
