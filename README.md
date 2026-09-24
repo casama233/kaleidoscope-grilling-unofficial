@@ -2,9 +2,19 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.7.61 Runtime Hygiene 候選。現行 Gameplay Core 已推進至 A2.7.60 的 P1／世界生成修正，本批開始把正式 BP/RP 收斂為 canonical runtime，並先處理不改玩法語義的熱路徑與可重現建置。Minecraft／Android 視覺與完整多人流程仍需實機驗收。**
+**目前：A2.7.62 Big Vat Render Corrective 候選。A2.7.61 的 canonical runtime／互動 ownership 修正全部保留，本批針對實機截圖修正大缸透明頂圈漏縫與未套用 Java 手持 transform。Minecraft／Android 最終視覺與完整多人流程仍需實機驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## A2.7.62：Big Vat Render Corrective 候選
+
+- 大缸 5 個液位模型移除 16×16 alpha-cutout 頂面，改成四條真實頂圈幾何；主缸體 material 改為 `opaque`，流體表面仍獨立使用 `blend`。
+- 新增 `big_vat` held attachable；first/third-person、主／副手 transform 逐值取自 Java 原模型已保存的 display transform。
+- attachable 的 bound root 只負責 item-slot 綁定，縮放／旋轉放在 child `display` bone，避免再出現模型被動畫拉到玩家腿部附近的舊類型錯位。
+- canonical checker 新增 Big Vat render contract，阻止舊生成器把透明洞、預設 block-item 手持或錯誤 transform 覆蓋回正式 RP。
+- 截圖中的黑色方框為 Minecraft selection outline，不是大缸幾何；本批沒有為了隱藏它而篡改 collision/selection box。
+
+詳見 [A2.7.62 狀態](docs/STATUS-A2.7.62.md)。
 
 ## A2.7.61：Runtime Hygiene 候選
 
