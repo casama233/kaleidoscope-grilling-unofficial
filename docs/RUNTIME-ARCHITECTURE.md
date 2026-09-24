@@ -28,13 +28,14 @@ This means old augmenters cannot silently overwrite a newer canonical runtime du
 
 The project is not yet fully converted to one central event router. Until that migration is complete, every runtime module must follow these rules:
 
-- A gesture is owned by one module after its target predicate matches.
+- A gesture is owned by one module after its target predicate matches. Later handlers must respect an already-cancelled event instead of layering a second mutation on top.
 - Repeated `playerInteractWithBlock` callbacks must honor `isFirstEvent` where the action is edge-triggered.
+- Deferred inventory/block mutations must capture the event hand and stack signature, then revalidate them before commit. Do not re-read the main hand as a substitute for the hand that generated the event.
 - Java rules live in core/contract modules; Bedrock event routing and inventory mutation live in runtime/adapters; HUD, animation, sound and particles remain presentation responsibilities.
 - Do not fix display bugs by changing recipe, consumption or persistence semantics.
 - Do not add a second pack-level script entry to solve a routing problem.
 
-Known current owners include the grill/seasoning path in `main.js`, plate/recipe placement in `a25_plate_recipe_runtime.js`, oil press/big vat in `a26_oil_machine_runtime.js`, typed Cookery oil-pot state in `a2736_typed_oil_pot_block_runtime.js`, Advanced Rack in `a2746_advanced_rack_runtime.js`, and Cookery host cuisine metadata in `a2750_cookery_cuisine_runtime.js`.
+Known current owners include the grill/seasoning path in `main.js`, plate/recipe placement in `a25_plate_recipe_runtime.js`, oil press/big vat in `a26_oil_machine_runtime.js`, typed Cookery oil-pot state in `a2736_typed_oil_pot_block_runtime.js`, Advanced Rack in `a2746_advanced_rack_runtime.js`, and Cookery host cuisine metadata in `a2750_cookery_cuisine_runtime.js`. `a25` and `a26` now use the shared `interaction_intent.js`; `main.js` respects earlier ownership through the event cancel flag.
 
 A later cleanup can move these handlers behind one dispatcher, but only after preserving each module's exact Java/host priority and cancellation rules. Mechanical consolidation is not itself a correctness improvement.
 
