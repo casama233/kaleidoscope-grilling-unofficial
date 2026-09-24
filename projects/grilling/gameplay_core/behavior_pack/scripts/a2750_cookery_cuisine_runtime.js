@@ -1,6 +1,7 @@
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID,SEASONING_ID} from './data.js';
-import {playerInventory,getMainHand,setMainHand,isCreative} from './a2735_player_io.js';
+import {playerInventory,getMainHand,setMainHand,getHand,isCreative} from './a2735_player_io.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './interaction_intent.js';
 import {readCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
 import {SEASONING_MAX_USES,SEASONING_USES_KEY} from './a2743_seasoning_contract_core.js';
 import {
@@ -123,15 +124,16 @@ function finishHostInteraction(player,dimension,location,kind,beforeInventory,be
 }
 world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  try{
-  const kind=stationKind(event.block?.typeId);if(!kind||!isFirst(event))return;
-  const player=event.player,main=getMainHand(player);
-  if(main?.typeId===SEASONING_ID){
-   event.cancel=true;const dimension=event.block.dimension,location={...event.block.location};
-   system.run(()=>{const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
+  const kind=stationKind(event.block?.typeId);if(!kind)return;
+  const player=event.player,intent=captureInteractionIntent(player,event.itemStack),hand=intent.hand,used=getHand(player,hand);
+  if(hand==='main'&&used?.typeId===SEASONING_ID){
+   event.cancel=true;if(!isFirst(event))return;const dimension=event.block.dimension,location={...event.block.location};
+   system.run(()=>{if(!interactionIntentStillCurrent(player,intent)){message(player,'§7操作已取消：互動後手持物品已改變');return}const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
   }
+  if(!isFirst(event))return;
   const dimension=event.block.dimension,location={...event.block.location};
   const stateBefore=readCuisineState(event.block),beforeInventory=snapshotInventory(player);
-  const beforeHasOil=kind==='pot'?hostHasOil(event.block):false,candidateOil=kind==='pot'?typedHeldOil(main):'';
+  const beforeHasOil=kind==='pot'?hostHasOil(event.block):false,candidateOil=kind==='pot'?typedHeldOil(used):'';
   system.run(()=>finishHostInteraction(player,dimension,location,kind,beforeInventory,beforeHasOil,candidateOil,stateBefore));
  }catch{}
 });
