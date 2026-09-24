@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.63 Held Display Parity",
+  "name": "Kaleidoscope Grilling A2.7.64 Skewer Held Display Parity",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_63_Held_Display_Parity"
+          "packName": "Kaleidoscope_Grilling_A2_7_64_Skewer_Held_Display_Parity"
         }
       ]
     ]
