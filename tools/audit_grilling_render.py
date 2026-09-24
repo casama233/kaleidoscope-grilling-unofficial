@@ -513,6 +513,78 @@ def check_corrective_display_contracts(findings, geometry_index, animations):
             "FP-left transform was invented even though the pinned Java source does not define one")
 
 
+def check_skewer_display_contracts(findings, geometry_index, animations):
+    expected_ids = {
+        "fp_right": "animation.kaleidoscope_grilling.a2764.skewer_fp_right",
+        "fp_left": "animation.kaleidoscope_grilling.a2764.skewer_fp_left",
+        "tp_right": "animation.kaleidoscope_grilling.a2764.skewer_tp_right",
+        "tp_left": "animation.kaleidoscope_grilling.a2764.skewer_tp_left",
+    }
+    java_keys = {
+        "fp_right": "firstperson_righthand",
+        "fp_left": "firstperson_lefthand",
+        "tp_right": "thirdperson_righthand",
+        "tp_left": "thirdperson_lefthand",
+    }
+    java = load_json(JAVA_DISPLAY / "beef_raw.json")["java_display"]
+    for alias, anim_id in expected_ids.items():
+        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
+        expected = java[java_keys[alias]]
+        if actual is None:
+            add(findings, "error", "skewer_display_contract", anim_id, "missing shared fixed-skewer display animation")
+            continue
+        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
+            add(findings, "error", "skewer_display_contract", anim_id,
+                f"rotation/scale drift from Java {java_keys[alias]}")
+        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
+            add(findings, "error", "skewer_display_contract", anim_id,
+                f"translation drift from Java {java_keys[alias]}")
+
+    rows = []
+    for path in sorted((RP / "attachables").glob("*.attachable.json")):
+        desc = load_json(path).get("minecraft:attachable", {}).get("description", {})
+        values = set((desc.get("animations") or {}).values())
+        if values == set(expected_ids.values()):
+            rows.append((path, desc))
+    if len(rows) != 39:
+        add(findings, "error", "skewer_display_contract", "fixed-skewer attachables",
+            f"expected 39 migrated attachables, got {len(rows)}")
+
+    refs = set()
+    for path, desc in rows:
+        values = set((desc.get("animations") or {}).values())
+        if "animation.kaleidoscope_grilling.a2725.skewer_hold_first_person" in values or \
+           "animation.kaleidoscope_grilling.a2725.skewer_hold_third_person" in values:
+            add(findings, "error", "skewer_display_contract", desc.get("identifier", str(path)),
+                "legacy bound-root hold animation was reintroduced")
+        animate = (desc.get("scripts") or {}).get("animate", [])
+        aliases = {next(iter(row.keys())) for row in animate if isinstance(row, dict) and len(row) == 1}
+        if aliases != set(expected_ids):
+            add(findings, "error", "skewer_display_contract", desc.get("identifier", str(path)),
+                f"expected four hand-specific display selectors, got {sorted(aliases)}")
+        for ref in (desc.get("geometry") or {}).values():
+            if isinstance(ref, str):
+                refs.add(ref)
+
+    if len(refs) != 150:
+        add(findings, "error", "skewer_display_contract", "fixed-skewer bite geometries",
+            f"expected 150 referenced bite geometries, got {len(refs)}")
+    for ref in sorted(refs):
+        row = geometry_index.get(ref)
+        if not row:
+            add(findings, "error", "skewer_display_contract", ref, "referenced bite geometry is missing")
+            continue
+        bones = {b.get("name"): b for b in row["geo"].get("bones", [])}
+        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
+            add(findings, "error", "skewer_display_contract", ref, "root lost item-slot binding")
+        if bones.get("display", {}).get("parent") != "root":
+            add(findings, "error", "skewer_display_contract", ref, "display must be an unbound child of root")
+        for name, bone in bones.items():
+            if name not in {"root", "display"} and bone.get("parent") == "root":
+                add(findings, "error", "skewer_display_contract", ref,
+                    f"shell bone {name} is directly under bound root instead of display")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", dest="json_path")
@@ -528,6 +600,7 @@ def main():
     block_stats = check_blocks(findings, geometries)
     attachable_stats = check_attachables(findings, geometries, animations, controllers, known_ids)
     check_corrective_display_contracts(findings, geometries, animations)
+    check_skewer_display_contracts(findings, geometries, animations)
 
     findings.sort(key=lambda x: (SEVERITY_ORDER.get(x["severity"], 99), x["code"], x["subject"]))
     counts = Counter(x["severity"] for x in findings)
