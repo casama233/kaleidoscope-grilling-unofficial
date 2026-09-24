@@ -88,6 +88,10 @@ def check_interaction_contracts():
     main = (SCRIPTS / "main.js").read_text(encoding="utf-8")
     plate = (SCRIPTS / "a25_plate_recipe_runtime.js").read_text(encoding="utf-8")
     oil = (SCRIPTS / "a26_oil_machine_runtime.js").read_text(encoding="utf-8")
+    oil_world = (SCRIPTS / "a23_oil_world.js").read_text(encoding="utf-8")
+    offhand_oil = (SCRIPTS / "a2737_offhand_oil_fill_runtime.js").read_text(encoding="utf-8")
+    cold_houttuynia = (SCRIPTS / "a2722_cold_houttuynia_runtime.js").read_text(encoding="utf-8")
+    rack = (SCRIPTS / "a2746_advanced_rack_runtime.js").read_text(encoding="utf-8")
     typed_oil = (SCRIPTS / "a2736_typed_oil_pot_block_runtime.js").read_text(encoding="utf-8")
     cuisine = (SCRIPTS / "a2750_cookery_cuisine_runtime.js").read_text(encoding="utf-8")
     intent = (SCRIPTS / "interaction_intent.js").read_text(encoding="utf-8")
@@ -100,6 +104,17 @@ def check_interaction_contracts():
         "oil machine uses one-shot block input": (oil, "isInitialBlockPress(e.isFirstEvent)"),
         "oil machine captures interaction hand intent": (oil, "captureInteractionIntent(p,e.itemStack)"),
         "oil machine revalidates deferred intent": (oil, "interactionIntentStillCurrent(p,intent)"),
+        "world oil respects earlier ownership": (oil_world, "if(e.cancel)return;"),
+        "world oil excludes Cookery oil-pot ownership": (oil_world, "kaleidoscope_cookery:oil_pot"),
+        "world oil uses one-shot block input": (oil_world, "isInitialBlockPress(e.isFirstEvent)"),
+        "world oil revalidates interaction intent": (oil_world, "interactionIntentStillCurrent(p,intent)"),
+        "world oil north face is negative Z": (oil_world, "North:[0,0,-1],South:[0,0,1]"),
+        "world oil registry uses pre-mutation dirty snapshot": (oil_world, "const rows=readReg(),before=JSON.stringify(rows),keep=[];"),
+        "offhand oil fill requires main-hand event ownership": (offhand_oil, "if(intent.hand!=='main')return;"),
+        "offhand oil fill revalidates both hands": (offhand_oil, "interactionStackSignature(getOffHand(player))!==offSignature"),
+        "cold houttuynia requires main-hand event ownership": (cold_houttuynia, "if(intent.hand!=='main')return;"),
+        "cold houttuynia revalidates offhand oil": (cold_houttuynia, "interactionStackSignature(off(player))!==offSignature"),
+        "rack rejects stale remote form actions": (rack, "rackInUseRange(player,live)"),
         "typed oil pot captures interaction intent": (typed_oil, "captureInteractionIntent(p,e.itemStack)"),
         "typed oil pot keeps Java main-hand bucket rule": (typed_oil, "if(intent.hand!=='main')return;"),
         "Cookery cuisine captures interaction intent": (cuisine, "captureInteractionIntent(player,event.itemStack)"),
