@@ -71,6 +71,14 @@ A2.7.61 現在：
 
 Java 盤子的一個特殊優先序也保留：潛行時若實際是副手烤串互動，盤子 handler 讓出給 offhand disassembly 路徑；主手烤串放置被盤子/放置 owner claim 後，`main.js` 不再同時拆副手。
 
+第二輪 listener audit 另外核對 Java `OilFillingHandler`、`OilPotBlockMixin`、`PotBlockUseMixin` 與 `StockpotBlockUseMixin`：
+
+- Grilling 自訂油桶向已放置 Cookery 油壺灌油只接受 **MAIN_HAND**；Bedrock 不再用 `findHand(typeId)` 接受副手。
+- typed 油壺已有 Grilling 油時，Java 對主手空手／Cookery fat 的衝突會 claim interaction 並提示 mismatch；Bedrock 現在也會提示，不再靜默吞掉空手互動。
+- Cookery pot / stockpot 的 Special Seasoning mixin 明確只攔截 **MAIN_HAND**；Bedrock 現在只在事件本身確實來自主手調料時 claim。
+- Cookery 原生鍋具的其他操作不被 Grilling 取消；Grilling 只記錄事件實際 hand 的油型候選與 inventory before/after，用來附加 hot/seasoning metadata。
+
+
 ### 建置
 
 - `projects/grilling/gameplay_core/{behavior_pack,resource_pack}` 明確成為 canonical runtime。
