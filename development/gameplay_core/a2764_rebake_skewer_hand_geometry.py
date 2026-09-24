@@ -19,7 +19,8 @@ def load(path: Path):
 
 def shifted(vec):
     assert isinstance(vec, list) and len(vec) == 3, vec
-    return [vec[i] + OFFSET[i] for i in range(3)]
+    values = [vec[i] + OFFSET[i] for i in range(3)]
+    return [int(v) if float(v).is_integer() else v for v in values]
 
 
 def rebake(doc: dict, item: str, stage: int) -> dict:
