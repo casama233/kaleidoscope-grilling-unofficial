@@ -87,6 +87,7 @@ def check_identifiers():
 def check_interaction_contracts():
     main = (SCRIPTS / "main.js").read_text(encoding="utf-8")
     plate = (SCRIPTS / "a25_plate_recipe_runtime.js").read_text(encoding="utf-8")
+    knead = (SCRIPTS / "a271_sweet_potato_runtime.js").read_text(encoding="utf-8")
     oil = (SCRIPTS / "a26_oil_machine_runtime.js").read_text(encoding="utf-8")
     oil_world = (SCRIPTS / "a23_oil_world.js").read_text(encoding="utf-8")
     offhand_oil = (SCRIPTS / "a2737_offhand_oil_fill_runtime.js").read_text(encoding="utf-8")
@@ -101,6 +102,9 @@ def check_interaction_contracts():
         "plate uses one-shot block input": (plate, "isInitialBlockPress(e.isFirstEvent)"),
         "plate captures interaction hand intent": (plate, "captureInteractionIntent(p,e.itemStack)"),
         "plate revalidates deferred intent": (plate, "interactionIntentStillCurrent(p,intent)"),
+        "air-use recipe path is main-hand owned": (plate, "const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;"),
+        "air-use recipe path revalidates offhand": (plate, "interactionStackSignature(heldOff(p))!==offSignature"),
+        "powder kneading uses event-hand intent": (knead, "captureInteractionIntent(player,eventStack)"),
         "oil machine uses one-shot block input": (oil, "isInitialBlockPress(e.isFirstEvent)"),
         "oil machine captures interaction hand intent": (oil, "captureInteractionIntent(p,e.itemStack)"),
         "oil machine revalidates deferred intent": (oil, "interactionIntentStillCurrent(p,intent)"),
