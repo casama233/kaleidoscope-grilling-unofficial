@@ -110,3 +110,17 @@ Java `advanced_rack_0..4` 都有同一組明確 display transform：
 ## 驗證邊界
 
 Render Audit 是靜態鏈檢查。它能證明引用、bone ownership、geometry/material contract 與已知 Java transform drift；不能證明特定 Minecraft 客戶端/GPU 最終像素、FOV、皮膚交互、Android 透明排序或動畫實際觀感。
+
+
+## A2.7.64 follow-up
+
+A2.7.63 已消除 seasoning 3 项与 Advanced Rack 1 项 high finding。
+
+A2.7.64 随后迁移全部 39 个 fixed-skewer attachable 与 150 个 bite geometry；迁移脚本核对 264 份 fixed-skewer Java display report。迁移后的实际 Render Audit：
+
+- error: **0**
+- high: **0**
+- medium: **0**
+- info: **2**
+
+因此 A2.7.62 初始的 119 个 high finding 已全部从 canonical render chain 中消除。两项 info 仍是合法的 vanilla water/lava base-resource reference。
