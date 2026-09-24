@@ -65,9 +65,9 @@ function syncPress(block,s){
   p=p.withState('kaleidoscope_grilling:press_stage',pressVisualStage(state.progress));block.setPermutation(p);
  }catch{}
 }
-function writePress(block,s){
+function writePress(block,s,ensureRegistered=true){
  if(!block||block.typeId!==OIL_PRESS_ID)return;const state=normalizePress(s);
- world.setDynamicProperty(key(PRESS_PREFIX,block),JSON.stringify(state));syncPress(block,state);registerPress(block);
+ world.setDynamicProperty(key(PRESS_PREFIX,block),JSON.stringify(state));syncPress(block,state);if(ensureRegistered)registerPress(block);
 }
 function clearPress(block){world.setDynamicProperty(key(PRESS_PREFIX,block));removePressReg(block)}
 
@@ -258,11 +258,11 @@ system.runInterval(()=>{
   let dim,b;try{dim=world.getDimension(row.d);b=dim.getBlock({x:row.x,y:row.y,z:row.z})}catch{continue}
   if(!b||b.typeId!==OIL_PRESS_ID)continue;keep.push(row);const s=readPress(b);
   if(s.completionDelay>0){
-   const next={...s,completionDelay:s.completionDelay-1};writePress(b,next);
+   const next={...s,completionDelay:s.completionDelay-1};writePress(b,next,false);
    if(next.completionDelay===0&&next.progress>=PRESS_REQUIRED_PROGRESS)finishPress(b);
   }
  }
- saveReg(keep);
+ if(keep.length!==rows.length)saveReg(keep);
 },1);
 
 export function a26ReadPress(block){return readPress(block)}
