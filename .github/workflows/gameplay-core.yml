@@ -1,0 +1,90 @@
+name: Grilling Gameplay Core — Canonical
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gameplay-core.yml'
+      - 'projects/grilling/gameplay_core/**'
+      - 'development/gameplay_core/**'
+      - 'docs/STATUS-A2.7.*.md'
+  pull_request:
+    paths:
+      - '.github/workflows/gameplay-core.yml'
+      - 'projects/grilling/gameplay_core/**'
+      - 'development/gameplay_core/**'
+      - 'docs/STATUS-A2.7.*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grilling-gameplay-core-canonical-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canonical:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Read exact confirmed repository commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
+          test "$GITHUB_REPOSITORY_ID" = '1377218440'
+          git init .
+          git config core.autocrlf false
+          git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
+          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Verify canonical source
+        shell: pwsh
+        run: |
+          python development/gameplay_core/verify_current.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Download checksum-pinned official bridge Dash v1.2.0
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $dash=Join-Path $env:RUNNER_TEMP 'dash.exe'
+          Invoke-WebRequest 'https://github.com/bridge-core/deno-dash-compiler/releases/download/v1.2.0/dash.exe' -OutFile $dash
+          if ((Get-FileHash $dash -Algorithm SHA256).Hash.ToLower() -ne '00bb6d984f0ffb819e2fb26c1eda5768db2d6e07a979712e34e1c76c2b7594de') { throw 'Dash checksum mismatch' }
+
+      - name: Compile canonical runtime with Dash
+        working-directory: projects/grilling/gameplay_core
+        shell: pwsh
+        run: |
+          & "$env:RUNNER_TEMP/dash.exe" build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Compare real Dash output with canonical source
+        shell: pwsh
+        run: |
+          python development/gameplay_core/verify_current.py --compiled
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Package deterministic review artifacts
+        shell: pwsh
+        run: |
+          python development/gameplay_core/package_current.py --output-dir artifacts/review
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload canonical review artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Kaleidoscope-Grilling-Canonical-Review
+          path: |
+            artifacts/review/
+          retention-days: 14
+          if-no-files-found: error
+          overwrite: true
