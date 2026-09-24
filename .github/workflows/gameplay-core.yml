@@ -4,16 +4,18 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/gameplay-core.yml'
+      - '.github/workflows/gameplay-core*.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'development/gameplay_core/**'
       - 'docs/STATUS-A2.7.*.md'
+      - 'docs/legacy_workflows/**'
   pull_request:
     paths:
-      - '.github/workflows/gameplay-core.yml'
+      - '.github/workflows/gameplay-core*.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'development/gameplay_core/**'
       - 'docs/STATUS-A2.7.*.md'
+      - 'docs/legacy_workflows/**'
   workflow_dispatch:
 
 permissions:
