@@ -137,6 +137,82 @@ def check_interaction_contracts():
     return len(required) + 2
 
 
+def check_big_vat_render_contract():
+    block = load_json(BP / "blocks" / "big_vat.json")["minecraft:block"]
+    materials = [block.get("components", {}).get("minecraft:material_instances", {})]
+    for permutation in block.get("permutations", []):
+        value = permutation.get("components", {}).get("minecraft:material_instances")
+        if isinstance(value, dict):
+            materials.append(value)
+    for value in materials:
+        shell = value.get("*", {})
+        if shell.get("render_method") != "opaque":
+            fail("Big Vat shell must stay opaque after solid-rim corrective")
+
+    expected_strips = {
+        "a2762_rim_top_north": ([-8, 16, -8], [16, 0, 2], [0, 0], [16, 2]),
+        "a2762_rim_top_south": ([-8, 16, 6], [16, 0, 2], [0, 14], [16, 2]),
+        "a2762_rim_top_west": ([-8, 16, -6], [2, 0, 12], [0, 2], [2, 12]),
+        "a2762_rim_top_east": ([6, 16, -6], [2, 0, 12], [14, 2], [2, 12]),
+    }
+    for level in range(5):
+        geo = load_json(RP / "models" / "blocks" / f"big_vat_{level}.geo.json")["minecraft:geometry"][0]
+        bones = {b.get("name"): b for b in geo.get("bones", [])}
+        top = bones.get("instance_0_element_0_0", {}).get("cubes", [{}])[0]
+        if "up" in top.get("uv", {}):
+            fail(f"Big Vat level {level} restored the alpha-cutout top face")
+        for name, (origin, size, uv, uv_size) in expected_strips.items():
+            bone = bones.get(name)
+            if not bone or len(bone.get("cubes", [])) != 1:
+                fail(f"Big Vat level {level} missing solid rim strip {name}")
+            cube = bone["cubes"][0]
+            face = cube.get("uv", {}).get("up", {})
+            if cube.get("origin") != origin or cube.get("size") != size or face.get("uv") != uv or face.get("uv_size") != uv_size:
+                fail(f"Big Vat level {level} solid rim strip drift: {name}")
+        if any("binding" in b for b in geo.get("bones", [])):
+            fail(f"placed Big Vat geometry {level} must not contain attachable bindings")
+
+    hand = load_json(RP / "models" / "entity" / "a2762_big_vat_hand.geo.json")["minecraft:geometry"][0]
+    if hand.get("description", {}).get("identifier") != "geometry.kg_a2762.big_vat_hand":
+        fail("Big Vat hand geometry identifier drift")
+    hb = {b.get("name"): b for b in hand.get("bones", [])}
+    if hb.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
+        fail("Big Vat hand geometry lost item-slot binding")
+    if hb.get("display", {}).get("parent") != "root":
+        fail("Big Vat hand display bone must remain below the bound root")
+    if "up" in hb.get("instance_0_element_0_0", {}).get("cubes", [{}])[0].get("uv", {}):
+        fail("Big Vat hand geometry restored the alpha-cutout top face")
+    for name in expected_strips:
+        if hb.get(name, {}).get("parent") != "display":
+            fail(f"Big Vat hand rim strip lost display parent: {name}")
+
+    attachable = load_json(RP / "attachables" / "big_vat.attachable.json")["minecraft:attachable"]["description"]
+    if attachable.get("identifier") != "kaleidoscope_grilling:big_vat":
+        fail("Big Vat attachable identifier drift")
+    if attachable.get("materials", {}).get("default") != "entity":
+        fail("Big Vat held material must remain opaque")
+    if attachable.get("geometry", {}).get("default") != "geometry.kg_a2762.big_vat_hand":
+        fail("Big Vat attachable geometry drift")
+
+    animation = load_json(RP / "animations" / "a2762_big_vat_hand.animation.json")["animations"]
+    java = load_json(ROOT / "projects" / "grilling" / "reports" / "java_display_transforms" / "big_vat.json")["java_display"]
+    mapping = {
+        "firstperson_righthand": "animation.kaleidoscope_grilling.a2762.big_vat_fp_right",
+        "firstperson_lefthand": "animation.kaleidoscope_grilling.a2762.big_vat_fp_left",
+        "thirdperson_righthand": "animation.kaleidoscope_grilling.a2762.big_vat_tp_right",
+        "thirdperson_lefthand": "animation.kaleidoscope_grilling.a2762.big_vat_tp_left",
+    }
+    for java_key, animation_id in mapping.items():
+        expected = java[java_key]
+        actual = animation[animation_id]["bones"]["display"]
+        for key in ("rotation", "scale"):
+            if actual.get(key) != expected.get(key):
+                fail(f"Big Vat held {java_key} {key} no longer matches Java")
+        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
+            fail(f"Big Vat held {java_key} translation no longer matches Java")
+    return 5 + len(expected_strips) + len(mapping)
+
+
 def check_script_graph():
     node = shutil.which("node")
     if not node:
@@ -207,6 +283,7 @@ def main():
 
     identifiers = check_identifiers()
     interaction_contracts = check_interaction_contracts()
+    big_vat_render_contracts = check_big_vat_render_contract()
     js_files, imports = check_script_graph()
 
     compiled = []
@@ -226,6 +303,7 @@ def main():
         "javascript_files": js_files,
         "local_script_imports": imports,
         "interaction_contracts": interaction_contracts,
+        "big_vat_render_contracts": big_vat_render_contracts,
         "script_entry": "scripts/main.js",
         "bp_uuid_preserved": True,
         "rp_uuid_preserved": True,
