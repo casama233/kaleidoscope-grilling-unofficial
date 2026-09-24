@@ -7,6 +7,7 @@ import {
  COOKERY_FILLED_ID,readCookeryOilPot,buildCookeryOilPot
 } from './a2734_cookery_oil_pot_adapter.js';
 import {playerInventory as inventory,getMainHand as main,getOffHand as off,setMainHand as setMain,setOffHand as setOff} from './a2735_player_io.js';
+import {captureInteractionIntent,interactionIntentStillCurrent,interactionStackSignature} from './interaction_intent.js';
 
 function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
 function give(player,stack){
@@ -53,13 +54,16 @@ export function tryCraftColdHouttuynia(player){
 }
 
 world.beforeEvents.playerInteractWithBlock.subscribe(ev=>{
- if(ev.block?.typeId!==CRAFTING_TABLE_ID||!ev.player?.isSneaking)return;
+ if(ev.cancel||ev.block?.typeId!==CRAFTING_TABLE_ID||!ev.player?.isSneaking)return;
  if(ev.itemStack?.typeId!==HOUTTUYNIA_ID)return;
- const oil=off(ev.player);
- if(oil?.typeId!==COOKERY_FILLED_ID)return;
- ev.cancel=true;
- if(ev.isFirstEvent===false)return;
- const player=ev.player;
- system.run(()=>{try{tryCraftColdHouttuynia(player)}catch{}});
+ const player=ev.player,intent=captureInteractionIntent(player,ev.itemStack);
+ if(intent.hand!=='main')return;
+ const oil=off(player);if(oil?.typeId!==COOKERY_FILLED_ID)return;
+ ev.cancel=true;if(ev.isFirstEvent===false)return;
+ const offSignature=interactionStackSignature(oil);
+ system.run(()=>{try{
+  if(!interactionIntentStillCurrent(player,intent)||interactionStackSignature(off(player))!==offSignature){message(player,'§7操作已取消：折耳根或油壺已變更');return}
+  tryCraftColdHouttuynia(player);
+ }catch{}});
 });
 
