@@ -18,5 +18,21 @@
   "gameplay_logic_changed": false,
   "minecraft_tested": false,
   "bds_tested": false,
-  "client_visuals_tested": false
+  "client_visuals_tested": false,
+  "big_vat_fluid_texture_fix": {
+    "previous_broken_aliases": [
+      "kg_a26_water",
+      "kg_a26_lava"
+    ],
+    "previous_missing_paths": [
+      "textures/blocks/water_still_grey",
+      "textures/blocks/lava_still"
+    ],
+    "replacement_vanilla_atlas_keys": [
+      "still_water_grey",
+      "still_lava"
+    ],
+    "mojang_bedrock_samples_commit": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+    "copied_vanilla_texture_files": false
+  }
 }
