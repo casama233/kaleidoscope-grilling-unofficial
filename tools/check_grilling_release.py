@@ -84,6 +84,33 @@ def check_identifiers():
     return len(seen)
 
 
+def check_interaction_contracts():
+    main = (SCRIPTS / "main.js").read_text(encoding="utf-8")
+    plate = (SCRIPTS / "a25_plate_recipe_runtime.js").read_text(encoding="utf-8")
+    oil = (SCRIPTS / "a26_oil_machine_runtime.js").read_text(encoding="utf-8")
+    intent = (SCRIPTS / "interaction_intent.js").read_text(encoding="utf-8")
+
+    required = {
+        "main respects earlier interaction ownership": (main, "playerInteractWithBlock.subscribe(e=>{\n if(e.cancel)return;"),
+        "plate uses one-shot block input": (plate, "isInitialBlockPress(e.isFirstEvent)"),
+        "plate captures interaction hand intent": (plate, "captureInteractionIntent(p,e.itemStack)"),
+        "plate revalidates deferred intent": (plate, "interactionIntentStillCurrent(p,intent)"),
+        "oil machine uses one-shot block input": (oil, "isInitialBlockPress(e.isFirstEvent)"),
+        "oil machine captures interaction hand intent": (oil, "captureInteractionIntent(p,e.itemStack)"),
+        "oil machine revalidates deferred intent": (oil, "interactionIntentStillCurrent(p,intent)"),
+        "shared intent tracks main and offhand": (intent, "chooseInteractionHand(eventDesc,main,off)"),
+    }
+    for label, (text, token) in required.items():
+        if token not in text.replace("\r\n", "\n"):
+            fail(f"interaction ownership contract missing: {label}")
+
+    if "handlePlateBlock(block,player,hand='main')" not in plate:
+        fail("plate block handler lost explicit hand ownership")
+    if "interactPress(block,p,item,hand=null)" not in oil or "interactVat(block,p,item,hand=null)" not in oil:
+        fail("oil-machine handlers lost explicit hand ownership")
+    return len(required) + 2
+
+
 def check_script_graph():
     node = shutil.which("node")
     if not node:
@@ -153,6 +180,7 @@ def main():
             fail(f"unexpected whole-player override in public Gameplay Core: {path.relative_to(ROOT)}")
 
     identifiers = check_identifiers()
+    interaction_contracts = check_interaction_contracts()
     js_files, imports = check_script_graph()
 
     compiled = []
@@ -171,6 +199,7 @@ def main():
         "registered_block_item_identifiers": identifiers,
         "javascript_files": js_files,
         "local_script_imports": imports,
+        "interaction_contracts": interaction_contracts,
         "script_entry": "scripts/main.js",
         "bp_uuid_preserved": True,
         "rp_uuid_preserved": True,
