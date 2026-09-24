@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: grilling-gameplay-core-canonical-${{ github.ref }}
+  group: grilling-gameplay-core-canonical-v2-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
