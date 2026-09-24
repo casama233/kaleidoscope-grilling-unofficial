@@ -6,15 +6,18 @@ on:
       - '.github/workflows/gameplay-core-canonical.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'tools/check_grilling_release.py'
+      - 'tools/audit_grilling_render.py'
       - 'tools/build_grilling_release.py'
       - 'docs/RUNTIME-ARCHITECTURE.md'
       - 'docs/STATUS-A2.7.61.md'
+      - 'docs/STATUS-A2.7.62.md'
   push:
     branches: [main]
     paths:
       - '.github/workflows/gameplay-core-canonical.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'tools/check_grilling_release.py'
+      - 'tools/audit_grilling_render.py'
       - 'tools/build_grilling_release.py'
   workflow_dispatch:
 
@@ -52,6 +55,12 @@ jobs:
           python tools/check_grilling_release.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Audit canonical render chain
+        shell: pwsh
+        run: |
+          python tools/audit_grilling_render.py --fail-on-error --json "$env:RUNNER_TEMP/grilling-render-audit.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Download checksum-pinned official bridge Dash v1.2.0
         shell: pwsh
         run: |
@@ -86,6 +95,7 @@ jobs:
           path: |
             ${{ runner.temp }}/Kaleidoscope_Grilling_Canonical.mcaddon
             ${{ runner.temp }}/Kaleidoscope_Grilling_Canonical.mcaddon.sha256
+            ${{ runner.temp }}/grilling-render-audit.json
           retention-days: 14
           if-no-files-found: error
           overwrite: true
