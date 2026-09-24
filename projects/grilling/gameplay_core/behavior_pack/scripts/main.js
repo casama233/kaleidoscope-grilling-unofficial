@@ -116,6 +116,14 @@ function syncGrillPermutation(block,state){
  }catch{}
 }
 function writeState(block,s){const state=normalizeState(s);world.setDynamicProperty(stateKey(block),JSON.stringify(state));syncGrillPermutation(block,state)}
+function writeTickState(block,before,next){
+ const state=normalizeState(next),beforeState=normalizeState(before),raw=JSON.stringify(state);
+ const same=beforeState.phase===state.phase&&beforeState.phaseTicks===state.phaseTicks&&beforeState.flips===state.flips&&beforeState.flipCooldown===state.flipCooldown&&beforeState.seasoned===state.seasoned&&beforeState.failed===state.failed&&beforeState.heatTicks===state.heatTicks&&beforeState.lit===state.lit&&beforeState.seasonings.length===state.seasonings.length&&beforeState.seasonings.every((x,i)=>x===state.seasonings[i]);
+ if(!same)world.setDynamicProperty(stateKey(block),raw);
+ // Java updateShape changes LEGGED when support below changes. Keep that visual/support sync live even on an otherwise idle grill.
+ syncGrillPermutation(block,state);
+ return state;
+}
 function clearState(block){world.setDynamicProperty(stateKey(block))}
 function key(block){const p=block.location;return [block.dimension.id,p.x,p.y,p.z].join('|')}
 function readRegistry(){try{const raw=world.getDynamicProperty(REGISTRY);return typeof raw==='string'?JSON.parse(raw):[]}catch{return []}}
@@ -624,7 +632,7 @@ function repelPhantoms(player){
 function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecraft:ice','minecraft:packed_ice','minecraft:frosted_ice'].includes(id))return 1.11;return 1.3}
 system.runInterval(()=>{
  const rows=readRegistry(),keep=[];
- for(const row of rows){try{const dim=world.getDimension(row.d),block=dim.getBlock({x:row.x,y:row.y,z:row.z});if(!block||block.typeId!==GRILL_ID){const helper=dim.getBlock({x:row.x,y:row.y-1,z:row.z});if(helper?.typeId===GRILL_LEGS_ID)helper.setType('minecraft:air');continue}keep.push(row);let state=readState(block),before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){const count=1+Math.floor(Math.random()*2);clearContainer(block);block.dimension.spawnItem(new ItemStack('minecraft:charcoal',count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});writeState(block,state);continue}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeState(block,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch{}}
+ for(const row of rows){try{const dim=world.getDimension(row.d),block=dim.getBlock({x:row.x,y:row.y,z:row.z});if(!block||block.typeId!==GRILL_ID){const helper=dim.getBlock({x:row.x,y:row.y-1,z:row.z});if(helper?.typeId===GRILL_LEGS_ID)helper.setType('minecraft:air');continue}keep.push(row);let state=readState(block),beforeState=state,before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){const count=1+Math.floor(Math.random()*2);clearContainer(block);block.dimension.spawnItem(new ItemStack('minecraft:charcoal',count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});writeState(block,state);continue}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeTickState(block,beforeState,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch{}}
  if(keep.length!==rows.length)saveRegistry(keep);
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
