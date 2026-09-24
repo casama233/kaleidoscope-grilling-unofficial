@@ -53,7 +53,7 @@ import {awardLookingThePart,awardGleamingWithOil,awardSeasoningMilestones,awardE
 import {awardSeasoningFinishedChallenges,awardMentalPreparationFailed,awardMetalToleranceFailed,awardOrdinaryChallenge,ordinaryChallengeOutcome} from './a2758_advancement_challenge_runtime.js';
 import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
-import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
+import {primitiveStackProps,captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
@@ -157,36 +157,12 @@ function copyCustomData(from,to){
  for(const id of ids)try{to.setDynamicProperty(id,from.getDynamicProperty(id))}catch{}
  return to;
 }
-function primitiveProps(stack){
- const out={};let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
- for(const id of ids)try{const value=stack.getDynamicProperty(id);if(['string','number','boolean'].includes(typeof value))out[id]=value;else if(value&&typeof value==='object'&&Number.isFinite(value.x)&&Number.isFinite(value.y)&&Number.isFinite(value.z))out[id]={x:value.x,y:value.y,z:value.z}}catch{}
- return out;
-}
-function stackIntentSignature(stack){
- if(!stack)return null;
- const raw=primitiveProps(stack),props=Object.fromEntries(Object.keys(raw).sort().map(k=>[k,raw[k]]));
- let lore=[];try{lore=stack.getLore()}catch{}
- let name='';try{name=stack.nameTag??''}catch{}
- let damage=null;try{damage=Number(stack.getComponent('minecraft:durability')?.damage??0)}catch{}
- return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props,damage});
-}
-function stackIntentDescriptor(stack){
- return stack?{empty:false,id:stack.typeId,sig:stackIntentSignature(stack)}:{empty:true,id:null,sig:null};
-}
-function captureInteractionIntent(player,eventStack){
- const e=stackIntentDescriptor(eventStack),m=stackIntentDescriptor(heldMain(player)),o=stackIntentDescriptor(heldOff(player));
- const hand=chooseInteractionHand(e,m,o),sig=hand==='off'?o.sig:m.sig;
- return makeIntent(hand,sig,player.selectedSlotIndex);
-}
-function interactionIntentStillCurrent(player,intent){
- return intentMatches(intent,stackIntentSignature(heldMain(player)),stackIntentSignature(heldOff(player)),player.selectedSlotIndex);
-}
 function ingredientSnapshot(stack){
  let nutrition=0,saturation=0,convertTo='';
  try{const food=stack.getComponent('minecraft:food');if(food){nutrition=Number(food.nutrition)||0;saturation=Number(food.saturationModifier)||0;convertTo=String(food.usingConvertsTo??'')}}catch{}
  let lore=[];try{lore=stack.getLore()}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
- const props=primitiveProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
+ const props=primitiveStackProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
  return {id:stack.typeId,nutrition,saturation,convertTo,name,lore,props,signature};
 }
 function restoreIngredient(row){
