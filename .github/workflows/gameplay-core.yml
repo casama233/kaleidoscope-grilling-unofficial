@@ -130,10 +130,8 @@ jobs:
           - BDS tested: **NO**
           - Client visuals tested: **NO**
 
-          For A2.7.64, the current skewer hand corrective is intentionally a 3-item sample phase:
-          - raw_beef_skewer
-          - grilled_beef_skewer
-          - ordinary_skewer
+          Version-specific scope and validation boundaries are documented in:
+          docs/STATUS-A$version.md
 
           Use the attached .mcaddon for in-game testing. The .brproject, SHA256 list, and build report are included for reproducibility.
           "@ | Set-Content -Path $notesFile -Encoding utf8
