@@ -55,6 +55,8 @@ import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
 import {primitiveStackProps,captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
+import {isSpecialSeasoningId,specialSeasoningVisualId} from './a2766_special_seasoning_visual_core.js';
+import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
@@ -327,13 +329,13 @@ function planCookeryOil(player,hand,needed){
  return {...oil,heat,mutate:true};
 }
 function planSeasoningBottle(player,hand,needed){
- const stack=heldByHand(player,hand);if(stack?.typeId!==SEASONING_ID)return {ok:false,reason:'not_seasoning'};
+ const stack=heldByHand(player,hand);if(!isSpecialSeasoningId(stack?.typeId))return {ok:false,reason:'not_seasoning'};
  const uses=getUses(stack),remaining=16-uses;if(remaining<needed)return {ok:false,reason:'insufficient',remaining};
  const ingredients=readSeasonings(stack),before=stack.clone();
  if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
  const nextUses=uses+needed;
  if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
- const next=stack.clone();setUses(next,nextUses);try{next.setLore(['§7Uses: '+(16-nextUses)+'/16'])}catch{}
+ const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{next.setLore(['§7Uses: '+(16-nextUses)+'/16'])}catch{}
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 function handleGrill(block,player,hand='main'){
@@ -362,7 +364,7 @@ function handleGrill(block,player,hand='main'){
   }return;
  }
  if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}message(player,'§8相容刷具：已刷油；正式流程請使用 Cookery 油壺')}return}
- if(id===SEASONING_ID){
+ if(isSpecialSeasoningId(id)){
   if(state.phase!==2||state.seasoned||n<1){message(player,'§7現在不能撒料');return}
   const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
   const result=season(state,n,bottle.ingredients);
@@ -384,11 +386,11 @@ function handleGrill(block,player,hand='main'){
  if(canExtract(state)){const got=extract(block,player,player.isSneaking);if(got)message(player,'§a取出 '+got+' 串')}
 }
 function bottleDataFromItem(stack){
- const kind=stack?.typeId===SEASONING_ID?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';
- return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?Math.max(0,Math.min(SEASONING_VARIANT_MAX,Number(stack.getDynamicProperty(SEASON_VARIANT_KEY)??0)|0)):0};
+ const kind=isSpecialSeasoningId(stack?.typeId)?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';
+ return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?specialSeasoningVariant(stack):0};
 }
 function bottleItem(data){
- const id=data.kind==='special'?SEASONING_ID:data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
+ const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
  if(data.kind==='special'){setUses(stack,data.uses??0);try{stack.setDynamicProperty(SEASON_VARIANT_KEY,data.variant??0);stack.setLore(['§7Uses: '+(SEASONING_MAX_USES-(data.uses??0))+'/'+SEASONING_MAX_USES,'§7Ingredients: '+(data.ingredients?.length??0)+'/'+SEASONING_CAPACITY])}catch{}}
  else try{if(data.ingredients?.length)stack.setLore(['§7Ingredients: '+data.ingredients.length+'/'+SEASONING_CAPACITY,data.kind==='pending'?'§eReady to shake':'§7Missing base seasoning'])}catch{}
  return stack;
@@ -404,7 +406,7 @@ function pushBottle(block,player,held,hand='main'){
 function handleSeasoningBlock(block,player,hand='main'){
  let stack=readBottleStack(block);if(!stack.length)stack=[{kind:'empty',ingredients:[],uses:0,variant:0}];
  const held=heldByHand(player,hand),id=held?.typeId;
- if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||id===SEASONING_ID){pushBottle(block,player,held,hand);return}
+ if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||isSpecialSeasoningId(id)){pushBottle(block,player,held,hand);return}
  const top=stack[stack.length-1];
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
@@ -508,8 +510,8 @@ function completePlateUse(player,eventStack){
 }
 function completePending(player,stack){
  const list=readSeasonings(stack);if(!hasSeasoningBase(list)){message(player,'§c缺少基礎三料，不能完成調料');return}
- const hand=handFor(player,PENDING_SEASONING)?.name??'main',out=new ItemStack(SEASONING_ID,1);setSeasonings(out,list);setUses(out,0);
- try{out.setDynamicProperty(SEASON_VARIANT_KEY,Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)));out.setLore(['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY])}catch{};setHand(player,hand,out);awardSeasoningFinishedChallenges(player,list);message(player,'§a調料搖勻完成');
+ const hand=handFor(player,PENDING_SEASONING)?.name??'main',variant=Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)),out=new ItemStack(specialSeasoningVisualId(0,variant),1);setSeasonings(out,list);setUses(out,0);
+ try{out.setDynamicProperty(SEASON_VARIANT_KEY,variant);out.setLore(['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY])}catch{};setHand(player,hand,out);awardSeasoningFinishedChallenges(player,list);message(player,'§a調料搖勻完成');
 }
 world.afterEvents.itemStartUse.subscribe(e=>{
  const id=e.itemStack?.typeId;
@@ -567,7 +569,7 @@ world.beforeEvents.itemUse.subscribe(e=>{
 world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
  try{const action=skewerAction(e.player,e.itemStack??heldMain(e.player));if(!action)return;e.cancel=true;scheduleSkewerAction(e.player,action)}catch{}
 });
-world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||![EMPTY_SEASONING_ID,PENDING_SEASONING,SEASONING_ID].includes(held.typeId))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
+world.beforeEvents.playerPlaceBlock.subscribe(e=>{try{if(e.permutationToPlace?.type?.id!==SEASONING_BLOCK)return;const held=heldMain(e.player);if(!held||!(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId)))return;SEASON_PLACE_CACHE.set(e.player.id,{tick:system.currentTick,data:bottleDataFromItem(held)})}catch{}});
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  if(tryScheduleBeefBoardOverride(e))return;
  const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));
