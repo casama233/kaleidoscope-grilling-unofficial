@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.64 Skewer Held Geometry Corrective",
+  "name": "Kaleidoscope Grilling A2.7.65 Full Skewer Hand Geometry",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_64_Skewer_Held_Geometry_Corrective"
+          "packName": "Kaleidoscope_Grilling_A2_7_65_Full_Skewer_Hand_Geometry"
         }
       ]
     ]
