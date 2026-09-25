@@ -112,3 +112,12 @@ A2.7.15–A2.7.20 新增油菜／洋蔥／甘薯作物與烤甘薯，問題類�
 - 其餘差異與 A2.7.46 相同一組。
 
 正式服部署後：兩包內容日誌 0 錯誤。
+
+## 11. A2.7.65 測試版（pre-release）部署註記
+
+上游開始發布正式 pre-release（`A2.7.65-test.78.1`）。伺服器側仍需兩處處理，已於部署時套用：
+
+- 8 個配方缺 `unlock`（`advanced_rack`、`big_vat`、`oil_cake`、`oil_press`、`pepper_honey`、`secret_chili_oil`、`sugared_tomato`、`oak_planks_from_pepper_log`）。
+- 相依識別碼仍指向上游標準廚房包，需改接（與歷次相同）。
+
+胡椒樹世界生成修復（`lean_height`/`lean_steps`）已由上游自行補上，伺服器版無需再處理。
