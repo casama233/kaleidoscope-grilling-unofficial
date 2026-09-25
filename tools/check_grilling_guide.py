@@ -301,7 +301,7 @@ def main():
     parser.add_argument("--compiled", action="store_true")
     args = parser.parse_args()
 
-    subprocess.run([sys.executable, str(ROOT / "tools" / "build_grilling_guide.py"), "--check"], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tools" / "build_grilling_guide.py"), "--check"], check=True, stdout=subprocess.DEVNULL)
     source = load(SOURCE)
     p = payload()
     structure = check_structure(source, p)
