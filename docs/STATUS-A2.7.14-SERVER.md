@@ -1,127 +1,31 @@
-# A2.7.x 伺服器版（Senluo 部署）— 差異與引擎除錯紀錄
+# 伺服器差異清單 — A2.7.67 修正狀態
 
-> 已部署版本：`artifacts/Kaleidoscope_Grilling_A2.7.58_Challenge_Advancement_Parity.mcaddon`（上游建置，未修改上游檔案）。
-> 上游發布節奏很快（本次工作期間由 A2.7.14 推進到 A2.7.21），工具預設挑最新 A2.7 產物，重跑即可跟上。
-> 首輪為 A2.7.14（同一組差異，已在隔離引擎與正式服各驗證一次）；差異表與工具以最新產物為準，兩版輸入差異見 §7。
-> 部署對象：實際運營的 Bedrock 專用伺服器 1.26.51.1，與森羅物語：廚房 1.0.6 併用。
-> 本文件只記錄「伺服器版相對上游產物的差異」與「以伺服器自帶 Content Log／腳本除錯得到的結果」。
+更新：2026-09-25。此路徑原先累積 A2.7.14–A2.7.66 的部署紀錄；完整舊文已[原樣歸檔](history/STATUS-A2.7.14-SERVER-before-A2.7.67.md)，blob `6b942d166651578d8298ec033cb57b5f4d95fe5d`。原有證據與限制沒有刪除，以下只更新本次實際完成的事項。
 
-## 1. 為什麼需要伺服器版
+## 目前來源與發版範圍
 
-上游產物直接在專用伺服器上會出現三類問題：相依識別碼指向公開版廚房包、若干腳本在**受限執行環境**（before 事件）中呼叫被禁止的 API、以及 1.20+ 配方／方塊元件 schema 與實際引擎版本不符。這些問題在 Java 版與用戶端不存在，只有在伺服器載入時才會顯現。
+A2.7.67 的窄範圍修正 PR #71 已合入正在產生 A2.7.66 測試包的 `refactor/canonical-runtime-interactions-20260924`，提交 `96fd50ceefe07fed20f689520a9737fd19e83b31`；發版標記提交 `4d02ce29331968fae73dd7c32841ac962c4ffbb5`。較大的 PR #70 仍待審核，**本次沒有將它整批合進 main；main 的 runtime 不因此冒充已升級 A2.7.67**。
 
-## 2. 差異清單（逐項可驗證）
+詳見 [PR #71](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/71) 與 [A2.7.67 server status](https://github.com/casama233/kaleidoscope-grilling-unofficial/blob/4d02ce29331968fae73dd7c32841ac962c4ffbb5/docs/STATUS-A2.7.67-SERVER.md)。
 
-| # | 檔案 | 上游 | 伺服器版 | 依據 |
-|---|------|------|----------|------|
-| 1 | `manifest.json`（BP／RP） | 相依 `10f37ae2-9ccf-435f-b34b-0eec8191cd94`（廚房 BP）、`c89dc8df-c3fc-4bc8-8bd0-527abba76681`（廚房 RP） | 改接該伺服器實際安裝的廚房包 `403f7a4a-a837-42c8-b5d3-76d5079ef269`、`8f39983b-00a6-4818-b489-0a73daf3bc87` | 相依必須能在世界內解析，否則管理器拒絕啟用 |
-| 2 | `scripts/itemData.js`（新增） | 無 | 可堆疊物品的動態屬性／lore 一律走 lore-token + 世界動態屬性 | 穩定版 API 禁止在 `maxAmount > 1` 的 ItemStack 上寫動態屬性 |
-| 3 | `scripts/blockSupport.js`（新增） | `block.isSolid`（mock 有、實際 BDS 未曝露） | `hasSolidTop()` 近似判定 | 穩定版未曝露 `isSolid` |
-| 4 | `scripts/main.js` 等 6 檔 | 直接 `stack.get/setDynamicProperty`、`stack.get/setLore` | 改呼叫 `itemData.js` 轉接層 | 同上；共 81 處呼叫點 |
-| 5 | `scripts/main.js` 調料瓶放置 | `world.beforeEvents.playerPlaceBlock` 內讀取手持物 | 改用方塊自訂元件 `senluo:grilling_bottle_place`（`system.beforeEvents.startup` 註冊） | 穩定版 2.9 於方塊元件提供 `beforeOnPlayerPlace`，before 事件拿不到原始手持堆疊 |
-| 6 | `blocks/seasoning_bottle*.json`（5 檔） | 無自訂元件 | 加入 `"senluo:grilling_bottle_place": {}` | 搭配 #5 |
-| 7 | `blocks/skewer_recipe.json`、`houttuynia_crop.json` | `"ambient_occlusion": false` | `0.0` | 欄位型別為數值 |
-| 8 | `blocks/houttuynia_crop.json` | `"tag:minecraft:crop": {}` | 移除 | 該版本方塊 schema 無此元件；Content Log 逐次報錯，且腳本以方塊識別碼判斷，不依賴標籤 |
-| 9 | `recipes/oil_press.json`、`oil_cake.json`、`big_vat.json` | 無 `unlock` | 補上 `unlock` | 1.20+ 配方缺少解鎖資料會被引擎拒絕 |
-| 10 | `scripts/a23_oil_world.js` | `North:[0,0,1], South:[0,0,-1]` | 對調為 `North:[0,0,-1], South:[0,0,1]`；來源方塊缺失時保留註冊列；`compute()` 例外改為保留列 | 座標偏移與上游其他檔案慣例相反；避免暫時未載入區塊造成註冊遺失 |
-| 11 | `scripts/a26_oil_machine_runtime.js` | 大缸放置分支在 before 事件內執行 `copy.amount=1` | 將該次寫入延後到 `system.run()` 內 | **受限執行環境禁止原生屬性寫入**，例外被外層空 `catch` 吞掉，導致放置大缸完全無效（見 §4） |
-| 12 | `scripts/guide.js` + `guidePublisher.js` | 無（僅 `integration/cookery106` 測試包） | 由 `integration/cookery106` 的 publisher 產生指南入口，`REVISION` 改為 `server_a2_7_14`，內容改寫為 A2.7.14 實際可玩範圍 | 指南必須維持「廚房指南內的一個煙火入口」，不新增獨立指南書 |
+## 已修正
 
-## 3. 伺服器端報錯與處理（Content Log）
+**原 §11／§12 的八份配方缺 unlock**：油壓機、高級置物架、花椒原木轉木板、大缸、秘製辣椒油、花椒蜂蜜、油餅、糖拌番茄，全部補上以原料為條件的 unlock。配方形狀、材料、數量及成品未改，熔爐配方不額外加 unlock。
 
-在隔離的 BDS 實例開啟 `content-log-file-enabled` / `content-log-console-output-enabled` 後逐輪修正：
+**原 §5 的 MaterialInstances 警告已有具體來源**：A2.7.66 大缸六份宣告材質表內，外殼 alpha_test 與液體 blend 混用；本次統一為 blend，保留透明液體與原始素材。此處更正舊文「未發現同一方塊混用」的中間判斷，但不宣稱歷史 26 條警告都已逐條歸因或實機消失。
 
-1. `blocks/houttuynia_crop.json → components → tag:minecraft:crop: not present in the Schema` → 移除該元件（差異 #8）。
-2. `1.20+ Recipes require unlock data`（榨油機／油餅／大缸）→ 補 `unlock`（差異 #9）。
-3. `ItemStack::amount cannot be used in restricted execution`（a26 大缸放置）→ 差異 #11。
-4. 部署後比對新舊啟動日誌：新日誌 **0 ERROR**，且先前的世界載入等待警告消失。
+新增靜態 gate 已核對 23 個方塊、133 組材質配置、72 個 block_placer 與全部工作台配方；扣除已授權資料修正後，1,239 個非 manifest runtime 檔案與原 A2.7.66 正規化內容一致。正常 CI 已通過實際 Dash 編譯與 source/dist 核對。
 
-## 4. 引擎測試（隔離 BDS ＋ 模擬玩家）
+## 仍需保留的部署適配與未解項目
 
-以伺服器自帶 Content Log 與 `@minecraft/server-gametest` 的模擬玩家在隔離實例執行，非用戶端驗收。
+私服 Cookery UUID 改接是該伺服器的部署需求，不是公開包應寫死的 UUID。ItemStack 中介資料、支撐判斷、before-event 延後、油流未載入保留與指南等舊 server-edition adapter 本輪未移除，也沒有宣稱已全數吸收進公開 runtime。`tools/build_server_edition.py` 的用途不變；使用新輸入仍需按實際部署驗收，不能套用歷史 BDS 通過紀錄。
 
-**通過**
+三筆調料瓶 block_placer 警告的目标是存在的 `seasoning_bottle_1`，目前多個物品狀態共用該方塊，沒有刪除其放置路線。舊隔離世界中的酒館桌／吧檯重啟遺失也尚未在固定包組合重現，不改寫或清空使用者世界。
 
-- 大缸：物品放置、空桶裝／倒油往返、榨油機（4 塊油餅、鐵砧壓榨達滿進度）將 4 桶油轉入相鄰大缸、油渣噴出、廚房油壺吸取（可堆疊物品中介資料經 lore-token 保存）。
-- 烤爐：點火、手持生串放入消耗 1。
-- 魚腥草作物：`age`／`red_variant` 狀態。
-- 方塊支撐判定：草方塊計為實心頂面。
-- 廚房指南：宿主（廚房包）註冊一個煙火入口、9 個條目。
+新增 `Block  couldn't be found in the registry` 日誌沒有方塊 ID／來源路徑，仍未歸因。本包靜態 block_placer 檢查沒有空值或不存在的本包目標；這不能排除跨包、引擎版本或世界載入問題。
 
-**未涵蓋（不得計為已驗證）**
+魔法輪盤紫黑缺圖另有酒館自身 title 通道干擾：Tavern PR #87／0.6.42 已撤掉 title 資料傳輸與閒置 `ktmix:off`，改用有限生命週期的獨立 actionbar 圖形。不等於已證明所有 A Magic Way 圖片問題的原因；沒有改寫 A Magic Way、UI Queue 或 Novelty API。
 
-- 模擬玩家不執行原生方塊放置，因此「由物品原生放置榨油機／烤爐」未受測；大缸與調料瓶的原生放置路徑由模組自身處理函式覆蓋。
-- 真實客戶端（iOS／Android／Windows）的模型、動畫、觸控與渲染未驗收。
-- 多人、長時間負載未測試。
+## 驗證邊界
 
-## 5. 尚待處理
-
-- `All MaterialInstances must use the same render_method for a given block`：本批新增的套件在伺服器啟動時出現 26 次此警告（舊日誌為 0）。已靜態掃描兩包全部方塊檔（含 permutation）與資源包，未發現同一方塊混用 render_method 的情形，尚未定位到具體方塊；此警告僅提示可能影響用戶端渲染，無 ERROR。需要用戶端或逐包二分測試才能確認。
-- `minecraft:block_placer` 警告 3 筆（`empty_seasoning_bottle`／`pending_seasoning`／`special_seasoning` 指向 `seasoning_bottle_1`）：與 A2.5 部署版本完全相同，屬上游既有狀態，非本次升級引入。
-- 隔離測試中曾觀察到酒館桌／吧檯在重啟後未出現在原座標（同批的動態屬性與大缸方塊正常保留）；該測試世界的套件曾多次被覆寫，尚不能判定為模組缺陷，需在受控世界重測。
-
-## 6. 重現
-
-`tools/build_server_edition.py` 以倉庫內最新的 A2.7 產物為輸入，依上表逐項套用差異並自我檢查（每個取代都要求命中次數相符、且不得動到 `world`／`entity`／玩家的屬性呼叫），輸出可直接部署的 `BP/`＋`RP/` 目錄：
-
-```
-python tools/build_server_edition.py [--artifact PATH] [--version X.Y.Z] [OUT_DIR]
-```
-
-## 7. A2.7.20 追加處理
-
-A2.7.15–A2.7.20 新增油菜／洋蔥／甘薯作物與烤甘薯，問題類別相同，工具已一併涵蓋：
-
-- 新增 4 個作物方塊的 `tag:minecraft:crop` 移除（`canola_crop`／`onion_crop`／`houttuynia_crop`／`sweet_potato_crop`）。
-- `ambient_occlusion` 布林值共 40 處改為數值。
-- 新配方 `roasted_sweet_potato` 為熔爐配方，不需要 `unlock`（1.20+ 只要求工作台配方）。
-- `main.js` 物品屬性呼叫點由 37 處增至 47 處，改寫改以「物品變數名」為準，並斷言世界／實體／玩家的同名呼叫數量不變。
-- 引擎複驗（隔離 BDS）：指南入口仍為 9 個條目並由廚房宿主註冊；大缸放置與空桶往返透過。
-
-## 8. A2.7.33 → A2.7.37 同步（2026-09-22 部署）
-
-上游在一天內從 A2.7.21 推進到 A2.7.37（調料瓶修正、榨油壺轉接層與 typed 方塊橋接、農田作物宿主整合、獨立食物效果統一、共用玩家 IO、副手油壺灌裝）。伺服器版差異縮減為：
-
-- 相依識別碼改接（同 #1）。
-- `a2730`／`a2734_cookery_oil_pot_adapter.js`：上游新檔仍直接寫物品屬性，納入 itemData 改寫（`out`／`stack` 兩個變數；A2.7.36 時改名為 a2734）。
-- `a23_oil_world.js` 於 A2.7.37 已被上游重構為無物品屬性呼叫，工具自動跳過。
-- 配方 unlock 改為通用推導（鐵錠 > 磚塊 > 空桶 > 首個材料），A2.7.33 新增的 `secret_chili_oil`（shapeless）等也缺 unlock。
-- 其餘差異（tag:minecraft:crop、ambient_occlusion、指南入口）與 A2.7.20 相同，工具自動涵蓋。
-
-正式服部署後 Content Log 對比：A2.7.21 時代的 `Grilling ... ArgumentOutOfBoundsError` 執行期錯誤消失，無新增錯誤。
-
-隔離引擎測試新觀察（待上游確認）：A2.7.33 的烤爐點火改為交易式提交（`planDamagedHand`＋`commitGrillAndHand`），在模擬玩家路徑下點火未生效（A2.7.21 同測法可點火）；真人手持打火石點烤爐需要實機複驗。
-
-## 9. A2.7.46 同步（2026-09-22 部署）
-
-上游推進到 A2.7.46（A2.7.41–46 為 HUD 提供者系列：榨油機／大缸／調料瓶／串盤／食譜 HUD，加上 A2.7.46 的高級置物架）。伺服器版差異：
-
-- 高級置物架的新檔 `a2746_rack_item_codec.js` 直接讀寫物品屬性，已納入 itemData 改寫（`stack`）。
-- 配方 unlock 通用推導自動涵蓋新配方 `advanced_rack`（以鐵錠為解鎖）。
-- 其餘差異與 A2.7.37 相同一組，工具無須其他改動。
-
-正式服部署後：兩包內容日誌 0 錯誤；日誌比對無新增問題。
-
-## 10. A2.7.58 同步（2026-09-22 部署）
-
-上游推進到 A2.7.58（A2.7.47–58：村莊花椒與要塞魚腥草戰利品、事件／挑戰進度、A2.7.57 以官方模式加固 Cookery metadata、A2.7.58 進度同步）。伺服器版差異：
-
-- 新檔 `a2750_cookery_cuisine_runtime.js`（`stack`／`next`）與 `a2750_food_state_adapter.js`（`stack`）直接讀寫物品屬性，已納入 itemData 改寫。
-- 配方 unlock 通用推導自動涵蓋新配方（`pepper_honey`、`sugared_tomato` 等）。
-- **修正上游 A2.7.58 的世界生成缺陷**：`features/pepper_tree_worldgen.json` 的 `acacia_trunk.trunk_lean` 缺少本版 BDS 必填的 `lean_height` 與 `lean_steps`，導致整個特徵無法註冊（Content Log：`No definition found for feature 'kaleidoscope_grilling:pepper_tree_worldgen'`）。建置程序補上這兩個子物件（`base:1, intervals:[1]`）。
-- 其餘差異與 A2.7.46 相同一組。
-
-正式服部署後：兩包內容日誌 0 錯誤。
-
-## 11. A2.7.65 測試版（pre-release）部署註記
-
-上游開始發布正式 pre-release（`A2.7.65-test.78.1`）。伺服器側仍需兩處處理，已於部署時套用：
-
-- 8 個配方缺 `unlock`（`advanced_rack`、`big_vat`、`oil_cake`、`oil_press`、`pepper_honey`、`secret_chili_oil`、`sugared_tomato`、`oak_planks_from_pepper_log`）。
-- 相依識別碼仍指向上游標準廚房包，需改接（與歷次相同）。
-
-胡椒樹世界生成修復（`lean_height`/`lean_steps`）已由上游自行補上，伺服器版無需再處理。
-
-## 12. A2.7.66 測試版
-
-`A2.7.66-test.93.1`（Seasoning State Completion）與 A2.7.65 相同，仍缺同 8 個配方的 `unlock`、相依仍指向上游標準廚房 UUID——伺服器部署流程（補 unlock＋改接）持續適用，已再次驗證。
+本輪沒有啟動 Minecraft 客戶端、BDS 或模擬玩家互動測試。材料／引用／資料校驗、CI、真實 Dash build 與上傳成品比對，不能代替 Android 透明排序、魔法輪盤或重啟持久化實機驗收。下一次回報請保留第一條錯誤前後的 Content Log、實際包版本與載入順序。
