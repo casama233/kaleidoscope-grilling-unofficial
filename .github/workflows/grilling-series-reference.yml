@@ -1,0 +1,84 @@
+name: Inspect public Kaleidoscope series catalogs
+on:
+  push:
+    branches: [fix/grilling-creative-groups]
+    paths: ['.github/workflows/grilling-series-reference.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Read public reference packs; export only creative metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import io, json, hashlib, urllib.request, zipfile
+          from pathlib import Path
+          sources = {
+            'chinese_food': ('1.0.2', 8908581, 'Kaleidoscope%20Chinese%20Food%20v1.0.2.mcaddon'),
+            'cookery': ('1.0.6', 8908596, 'Kaleidoscope%20Cookery%20v1.0.6.mcaddon'),
+          }
+          def files(data, prefix=''):
+            with zipfile.ZipFile(io.BytesIO(data)) as z:
+              if z.testzip(): raise ValueError('Damaged source ZIP')
+              for name in z.namelist():
+                if name.endswith('/'): continue
+                if name.lower().endswith(('.mcpack','.zip')):
+                  yield from files(z.read(name), prefix+name+'!/')
+                elif name.lower().endswith(('.json','.lang')):
+                  yield prefix+name, z.read(name)
+          audit={}
+          for key,(version,file_id,filename) in sources.items():
+            errors=[]
+            for host in ('edge.forgecdn.net','mediafilez.forgecdn.net'):
+              url=f'https://{host}/files/{file_id//1000}/{file_id%1000}/{filename}'
+              try:
+                request=urllib.request.Request(url,headers={'User-Agent':'Kaleidoscope-creative-reference-audit/1'})
+                with urllib.request.urlopen(request,timeout=60) as response: data=response.read()
+                if not zipfile.is_zipfile(io.BytesIO(data)): raise ValueError('Not a ZIP file')
+                break
+              except Exception as exc: errors.append(str(exc))
+            else: raise RuntimeError(errors)
+            entry={'version':version,'curseforge_file_id':file_id,'download_url':url,
+                   'pack_sha256':hashlib.sha256(data).hexdigest(),
+                   'catalogs':{},'definitions':[],'group_labels':{},'manifests':[],'unparsed':[]}
+            for path,raw in files(data):
+              text=raw.decode('utf-8-sig')
+              if path.endswith('.lang'):
+                labels={line.partition('=')[0]:line.partition('=')[2] for line in text.splitlines()
+                        if '=' in line and ('itemGroup' in line or 'item_group' in line or 'group.' in line)}
+                if labels: entry['group_labels'][path]=labels
+                continue
+              try: doc=json.loads(text)
+              except ValueError:
+                entry['unparsed'].append(path)
+                if 'catalog' in path: raise
+                continue
+              if 'minecraft:crafting_items_catalog' in doc:
+                entry['catalogs'][path]={'sha256':hashlib.sha256(raw).hexdigest(),'content':doc}
+              for kind in ('minecraft:item','minecraft:block'):
+                if kind in doc:
+                  desc=doc[kind].get('description',{})
+                  entry['definitions'].append({'path':path,'kind':kind,'identifier':desc.get('identifier'),
+                    'menu_category':desc.get('menu_category'),
+                    'display_name':doc[kind].get('components',{}).get('minecraft:display_name')})
+              if path.endswith('/manifest.json') or path=='manifest.json':
+                entry['manifests'].append(doc)
+            if not entry['catalogs']: raise ValueError(f'{key}: no actual catalog located')
+            audit[key]=entry
+            print('SOURCE',key,entry['pack_sha256'])
+            for path,cat in entry['catalogs'].items():
+              print('CATALOG',path,json.dumps(cat['content'],ensure_ascii=False))
+            print('GROUP LABELS',json.dumps(entry['group_labels'],ensure_ascii=False))
+          Path('reference-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Retain inspected metadata, not third-party packs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: kaleidoscope-series-reference-metadata
+          path: reference-audit.json
+          retention-days: 3
+          if-no-files-found: error
