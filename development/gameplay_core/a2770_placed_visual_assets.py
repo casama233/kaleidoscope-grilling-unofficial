@@ -200,6 +200,7 @@ def ingredient_palette():
   paths=atlas.get(key,{}).get('textures');path=paths[0] if isinstance(paths,list) else paths
   if not isinstance(path,str):continue
   candidate=RP/(path if path.endswith('.png') else path+'.png')
+  if key in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):candidate=RP/'textures/blocks/seasoning_bottle.png'
   if not candidate.is_file():continue
   image=Image.open(candidate).convert('RGBA');w,h=image.size
   colors=Counter((r<<16)|(g<<8)|b for r,g,b,a in image.crop((w//4,h//4,3*w//4,3*h//4)).getdata() if a>=48)
