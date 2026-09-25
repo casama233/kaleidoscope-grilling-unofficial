@@ -4,25 +4,28 @@ on:
   pull_request:
     paths:
       - '.github/workflows/guide-canonical.yml'
-      - 'projects/grilling/guide/content.a2.json'
+      - 'projects/grilling/guide/catalog.a3.json'
       - 'projects/grilling/guide/host-contract.verified.json'
       - 'projects/grilling/integration/cookery106/**'
-      - 'projects/grilling/gameplay_core/behavior_pack/scripts/**'
-      - 'projects/grilling/gameplay_core/behavior_pack/recipes/**'
+      - 'projects/grilling/gameplay_core/behavior_pack/**'
+      - 'projects/grilling/gameplay_core/resource_pack/textures/**'
+      - 'projects/grilling/gameplay_core/resource_pack/texts/**'
       - 'tools/build_grilling_guide.py'
       - 'tools/check_grilling_guide.py'
       - 'tools/build_grilling_guide_release.py'
       - 'development/guide/patch_cookery106_guide_locale.py'
-      - 'docs/STATUS-GUIDE-A2.0.md'
+      - 'docs/STATUS-GUIDE-A3.0.md'
+      - 'docs/GUIDE-INDEX-A3.md'
   push:
     branches: [main]
     paths:
       - '.github/workflows/guide-canonical.yml'
-      - 'projects/grilling/guide/content.a2.json'
+      - 'projects/grilling/guide/catalog.a3.json'
       - 'projects/grilling/guide/host-contract.verified.json'
       - 'projects/grilling/integration/cookery106/**'
-      - 'projects/grilling/gameplay_core/behavior_pack/scripts/**'
-      - 'projects/grilling/gameplay_core/behavior_pack/recipes/**'
+      - 'projects/grilling/gameplay_core/behavior_pack/**'
+      - 'projects/grilling/gameplay_core/resource_pack/textures/**'
+      - 'projects/grilling/gameplay_core/resource_pack/texts/**'
       - 'tools/build_grilling_guide.py'
       - 'tools/check_grilling_guide.py'
       - 'tools/build_grilling_guide_release.py'
@@ -30,7 +33,6 @@ on:
 
 permissions:
   contents: read
-
 concurrency:
   group: grilling-guide-canonical-${{ github.ref }}
   cancel-in-progress: true
@@ -57,19 +59,16 @@ jobs:
           git fetch --depth=1 origin "$EXPECTED_SHA"
           git checkout --detach FETCH_HEAD
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-
-      - name: Check generated guide outputs
+      - name: Check generated encyclopedia outputs
         shell: pwsh
         run: |
           python tools/build_grilling_guide.py --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Check Guide A2 contracts
+      - name: Check native categories, item coverage and source facts
         shell: pwsh
         run: |
           python tools/check_grilling_guide.py | Tee-Object -FilePath "$env:RUNNER_TEMP/guide-check.json"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
       - name: Download checksum-pinned Cookery 1.0.6
         shell: pwsh
         run: |
@@ -77,8 +76,7 @@ jobs:
           $cookery=Join-Path $env:RUNNER_TEMP 'Kaleidoscope_Cookery_v1.0.6.mcaddon'
           Invoke-WebRequest 'https://mediafilez.forgecdn.net/files/8908/596/Kaleidoscope%20Cookery%20v1.0.6.mcaddon' -OutFile $cookery
           if ((Get-FileHash $cookery -Algorithm SHA256).Hash.ToLower() -ne 'c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351') { throw 'Cookery checksum mismatch' }
-
-      - name: Build narrow Cookery Guide API locale compat host
+      - name: Preserve existing narrow Cookery Guide API locale compatibility
         shell: pwsh
         run: |
           $cookery=Join-Path $env:RUNNER_TEMP 'Kaleidoscope_Cookery_v1.0.6.mcaddon'
@@ -86,7 +84,6 @@ jobs:
           $report=Join-Path $env:RUNNER_TEMP 'cookery-guide-locale-compat.json'
           python development/guide/patch_cookery106_guide_locale.py $cookery $patched $report
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
       - name: Download checksum-pinned official bridge Dash v1.2.0
         shell: pwsh
         run: |
@@ -94,33 +91,29 @@ jobs:
           $dash=Join-Path $env:RUNNER_TEMP 'dash.exe'
           Invoke-WebRequest 'https://github.com/bridge-core/deno-dash-compiler/releases/download/v1.2.0/dash.exe' -OutFile $dash
           if ((Get-FileHash $dash -Algorithm SHA256).Hash.ToLower() -ne '00bb6d984f0ffb819e2fb26c1eda5768db2d6e07a979712e34e1c76c2b7594de') { throw 'Dash checksum mismatch' }
-
-      - name: Compile canonical Guide A2
+      - name: Compile canonical Guide A3
         working-directory: projects/grilling/integration/cookery106
         shell: pwsh
         run: |
           & "$env:RUNNER_TEMP/dash.exe" build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Compare compiled Guide A2
+      - name: Compare compiled Guide A3 to source
         shell: pwsh
         run: |
           python tools/check_grilling_guide.py --compiled | Tee-Object -FilePath "$env:RUNNER_TEMP/guide-compiled-check.json"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Build deterministic Guide A2 candidate
+      - name: Build deterministic guide-only A3 candidate
         shell: pwsh
         run: |
-          python tools/build_grilling_guide_release.py --output "$env:RUNNER_TEMP/Kaleidoscope_Grilling_Guide_A2_0.mcaddon"
+          python tools/build_grilling_guide_release.py --output "$env:RUNNER_TEMP/Kaleidoscope_Grilling_Guide_A3_0.mcaddon"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Upload Guide A2 review artifact
+      - name: Upload Guide A3 review artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: Kaleidoscope-Grilling-Guide-A2-${{ github.sha }}
+          name: Kaleidoscope-Grilling-Guide-A3-${{ github.sha }}
           path: |
-            ${{ runner.temp }}/Kaleidoscope_Grilling_Guide_A2_0.mcaddon
-            ${{ runner.temp }}/Kaleidoscope_Grilling_Guide_A2_0.mcaddon.sha256
+            ${{ runner.temp }}/Kaleidoscope_Grilling_Guide_A3_0.mcaddon
+            ${{ runner.temp }}/Kaleidoscope_Grilling_Guide_A3_0.mcaddon.sha256
             ${{ runner.temp }}/Kaleidoscope_Cookery_v1.0.6_Grilling_Guide_Locale_Compat.mcaddon
             ${{ runner.temp }}/cookery-guide-locale-compat.json
             ${{ runner.temp }}/guide-check.json
