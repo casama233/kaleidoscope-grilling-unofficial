@@ -417,17 +417,17 @@
         "zh_CN": [
           "折耳根在 Cookery 砧板上切 4 次可得到碎折耳根；苕皮串会用到碎折耳根。",
           "完整折耳根还能用于凉拌折耳根等料理；具体的高级辣椒油配合方式见“进阶与排错”。",
-          "折耳根粉是特制调料的持续时间材料；当前指南不虚构未在正式配方表中暴露的取得方式。"
+          "折耳根粉用于特制调料的效果延时；具体倍率见“调料与烟火气”。"
         ],
         "zh_TW": [
           "折耳根在 Cookery 砧板上切 4 次可得到碎折耳根；苕皮串會用到碎折耳根。",
           "完整折耳根還能用於涼拌折耳根等料理；具體的高級辣椒油配合方式見「進階與排錯」。",
-          "折耳根粉是特製調料的持續時間材料；目前指南不虛構未在正式配方表中暴露的取得方式。"
+          "折耳根粉用於特製調料的效果延時；具體倍率見「調料與煙火氣」。"
         ],
         "en_US": [
           "Chop Houttuynia 4 times on a Cookery Chopping Board to make Minced Houttuynia; the Sweet Potato Sheet Skewer uses the minced ingredient.",
           "Whole Houttuynia also participates in dishes such as Cold Houttuynia; see Advanced & Troubleshooting for the Premium Chili Oil interaction.",
-          "Houttuynia Powder is the duration ingredient for Special Seasoning. This guide does not invent an acquisition recipe that is not exposed by the current canonical recipe table."
+          "Houttuynia Powder extends Special Seasoning effects; see Seasoning & Hot Food for the exact multipliers."
         ]
       }
     },
@@ -581,21 +581,21 @@
       "body": {
         "zh_CN": [
           "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。",
-          "趁热吃时，新获得的固定食物效果持续时间会翻倍，新增的饱和度提高 25%。",
-          "特制调料的附加效果只会在食物仍有烟火气时触发；冷掉后仍能吃，但不会触发这些调料效果。",
-          "秘制辣椒油桶可用 1 桶菜籽油 + 3 份红辣椒粉无序合成；本指南不会虚构当前正式配方表未暴露的高级辣椒油制作方式。"
+          "趁热吃时，新获得的固定烤串效果持续时间会翻倍，新增的饱和度提高 25%。",
+          "特制调料的附加效果只会在食物仍有烟火气时触发；它们不会再被烟火气二次翻倍。冷掉后仍能吃，但不会触发这些调料效果。",
+          "秘制辣椒油桶可用 1 桶菜籽油 + 3 份红辣椒粉无序合成；三种油都可通过桶、大缸与 Cookery 油壶进行已支持的转移。"
         ],
         "zh_TW": [
           "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。",
-          "趁熱吃時，新獲得的固定食物效果持續時間會翻倍，新增的飽和度提高 25%。",
-          "特製調料的附加效果只會在食物仍有煙火氣時觸發；冷掉後仍能吃，但不會觸發這些調料效果。",
-          "秘製辣椒油桶可用 1 桶菜籽油 + 3 份紅辣椒粉無序合成；本指南不會虛構目前正式配方表未暴露的高級辣椒油製作方式。"
+          "趁熱吃時，新獲得的固定烤串效果持續時間會翻倍，新增的飽和度提高 25%。",
+          "特製調料的附加效果只會在食物仍有煙火氣時觸發；它們不會再被煙火氣二次翻倍。冷掉後仍能吃，但不會觸發這些調料效果。",
+          "秘製辣椒油桶可用 1 桶菜籽油 + 3 份紅辣椒粉無序合成；三種油都可透過桶、大缸與 Cookery 油壺進行已支援的轉移。"
         ],
         "en_US": [
           "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore.",
-          "When eaten hot, newly gained fixed food effects have double duration and newly gained saturation is increased by 25%.",
-          "Special Seasoning effects only trigger while the food is still hot. Cold food remains edible, but those seasoning effects do not activate.",
-          "A Secret Chili Oil Bucket is shapelessly crafted from 1 Canola Oil Bucket + 3 Red Chili Powder. This guide does not invent a Premium Chili Oil recipe that is not exposed by the canonical recipe table."
+          "When eaten hot, newly gained fixed skewer effects have double duration and newly gained saturation is increased by 25%.",
+          "Special Seasoning effects only trigger while the food is still hot; Hot Food does not double those seasoning durations a second time. Cold food remains edible, but those seasoning effects do not activate.",
+          "A Secret Chili Oil Bucket is shapelessly crafted from 1 Canola Oil Bucket + 3 Red Chili Powder. All three oils can use the supported bucket, Big Vat, and Cookery Oil Pot transfer paths."
         ]
       }
     },
@@ -720,17 +720,17 @@
         "zh_CN": [
           "调料中加入龙蛋粉并趁热食用，会获得龙血：提高生命上限，并额外提供一个 2 点伤害吸收池。",
           "1–3 份龙蛋粉使用较低等级生命提升；达到 4 份或更多时使用更高等级。",
-          "折耳根粉会延长龙血的持续时间；烟火气也会把新获得的固定效果时长翻倍。"
+          "折耳根粉会按同一 ×2 / ×4 规则延长龙血持续时间；食物冷掉后不会触发龙血。"
         ],
         "zh_TW": [
           "調料中加入龍蛋粉並趁熱食用，會獲得龍血：提高生命上限，並額外提供一個 2 點傷害吸收池。",
           "1–3 份龍蛋粉使用較低等級生命提升；達到 4 份或更多時使用更高等級。",
-          "折耳根粉會延長龍血的持續時間；煙火氣也會把新獲得的固定效果時長翻倍。"
+          "折耳根粉會按同一 ×2 / ×4 規則延長龍血持續時間；食物冷掉後不會觸發龍血。"
         ],
         "en_US": [
           "Add Dragon Egg Powder to seasoning and eat it hot to gain Dragon Blood: increased maximum health plus a separate 2-point damage-absorption pool.",
           "1–3 Dragon Egg Powder uses the lower health-boost level; 4 or more uses the higher level.",
-          "Houttuynia Powder extends Dragon Blood duration, and Hot Food also doubles the newly gained fixed-effect duration."
+          "Houttuynia Powder extends Dragon Blood using the same ×2 / ×4 rule; Dragon Blood does not trigger after the food goes cold."
         ]
       }
     },
@@ -972,17 +972,17 @@
         "zh_CN": [
           "三种烟火油桶都可像流体一样放到世界中；源方块会向下优先、再向水平方向扩散，并显示 8 级液面。",
           "空桶可收回油源；Cookery 油壶也可直接从油源吸取对应油。",
-          "这是基岩版脚本流体模拟，不等同于 Java Forge 自定义 FluidType；大缸和 Cookery 油壶交互会优先于世界放油。"
+          "基岩版里的烟火油由脚本模拟，因此不保证具备原版水/熔岩的所有互动；对大缸或 Cookery 油壶使用油桶时，容器操作会优先。"
         ],
         "zh_TW": [
           "三種煙火油桶都可像流體一樣放到世界中；源方塊會向下優先、再向水平方向擴散，並顯示 8 級液面。",
           "空桶可收回油源；Cookery 油壺也可直接從油源吸取對應油。",
-          "這是基岩版腳本流體模擬，不等同於 Java Forge 自訂 FluidType；大缸和 Cookery 油壺互動會優先於世界放油。"
+          "基岩版裡的煙火油由腳本模擬，因此不保證具備原版水／熔岩的所有互動；對大缸或 Cookery 油壺使用油桶時，容器操作會優先。"
         ],
         "en_US": [
           "All three Grilling oil buckets can be placed into the world as fluids. A source flows downward first, then horizontally, using 8 visual levels.",
           "An empty bucket can collect an oil source, and a Cookery Oil Pot can also take matching oil directly from a source.",
-          "This is a scripted Bedrock fluid simulation, not a native Forge FluidType. Big Vat and Cookery Oil Pot interactions take priority over world-fluid placement."
+          "On Bedrock these oils are script-simulated, so they do not promise every vanilla water/lava interaction. When an oil bucket is used on a Big Vat or Cookery Oil Pot, the container interaction takes priority."
         ]
       }
     },
