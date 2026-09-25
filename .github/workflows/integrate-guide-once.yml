@@ -35,11 +35,12 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           p=Path('development/guide/integrate_a3_into_grilling.py');s=p.read_text(encoding='utf-8')
-          old="merged_lang(RP/'texts'/f'{l}.lang,lang_text"
-          new="merged_lang(RP/'texts'/f'{l}.lang',lang_text"
-          assert s.count(old)==1
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
-          compile(p.read_text(encoding='utf-8'),str(p),'exec')
+          fixes={"merged_lang(RP/'texts'/f'{l}.lang,lang_text":"merged_lang(RP/'texts'/f'{l}.lang',lang_text", "text=path.read_text(encoding='utf-8-sig') if path.exists() else ''":"text=path.read_bytes().decode('utf-8-sig') if path.exists() else ''"}
+          for old,new in fixes.items():
+              assert s.count(old)==1,old
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          compile(s,str(p),'exec')
           PY
           python development/guide/integrate_a3_into_grilling.py
           python tools/build_grilling_guide.py --check
