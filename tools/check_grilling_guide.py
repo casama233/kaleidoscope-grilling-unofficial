@@ -236,13 +236,23 @@ def check_structure(source: dict, p: dict) -> dict:
         fail("52-topic guide must not restore the giant flat All Entries view")
     if len(p.get("categories", [])) != 5:
         fail("published category count drift")
-    if set(p.get("mechanicsByLocale", {})) != set(LOCALES):
-        fail("published mechanics locales drift")
-    for loc in LOCALES:
-        if len(p["mechanicsByLocale"][loc]) != 52:
-            fail(f"{loc}: expected 52 localized mechanics")
-        if p["mechanics"] != p["mechanicsByLocale"]["zh_TW"]:
-            fail("zh_TW fallback mechanics drift")
+    entries = p.get("entries", [])
+    if len(entries) != 52:
+        fail(f"published entry count drift: {len(entries)}")
+    for entry in entries:
+        localized = entry.get("mechanicsByLocale")
+        if not isinstance(localized, dict) or set(localized) != set(LOCALES):
+            fail(f"published mechanics locales drift: {entry.get('id')}")
+        if entry.get("mechanics") != localized["zh_TW"]:
+            fail(f"zh_TW fallback mechanics drift: {entry.get('id')}")
+        if entry.get("kinds") != []:
+            fail(f"unexpected kind metadata in static Guide v1 entry: {entry.get('id')}")
+    published_counts = Counter(entry.get("category") for entry in entries)
+    if dict(published_counts) != EXPECTED_COUNTS:
+        fail(f"published category counts drift: {dict(published_counts)}")
+    for key in ("titleKey", "introKey", "allKey", "selectKey", "backKey", "languageNoteKey"):
+        if key not in p:
+            fail(f"Cookery Guide v1 key missing: {key}")
     legacy_phrase = "穿好后放上烧烤架，依刷油、翻面与调味流程烤熟"
     if legacy_phrase in json.dumps(p, ensure_ascii=False):
         fail("legacy duplicated recipe filler text returned")
