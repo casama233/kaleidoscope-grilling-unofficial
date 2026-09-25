@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A1.16 — PER-PLAYER LOCALIZED BODY RP",
-    "description": "Complete zh_CN/zh_TW/en_US guide language files and icons for the Cookery guidebook.",
+    "name": "Grilling Guide A2.0 — Complete Player Manual RP",
+    "description": "Localized guide text and icons for the rebuilt Grilling chapter inside the Cookery guidebook.",
     "uuid": "32baef08-6b04-5115-9d5b-2d4ba2d3a7b4",
     "version": [
       0,
-      1,
-      16
+      2,
+      0
     ],
     "min_engine_version": [
       1,
@@ -21,8 +21,8 @@
       "uuid": "9636907f-da0d-566f-8fd1-34e39bfa0b76",
       "version": [
         0,
-        1,
-        16
+        2,
+        0
       ]
     }
   ],
