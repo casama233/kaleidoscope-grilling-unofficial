@@ -16,9 +16,9 @@ def method(m,k,seen=frozenset()):
  assert k not in seen,('material alias cycle',k)
  row=m[k]
  return method(m,row,seen|{k}) if isinstance(row,str) else row.get('render_method','opaque')
-def check_schema(project=PROJECT):
+def check_schema(project=PROJECT,expected_version=(2,7,67)):
  bp=project/'behavior_pack';rp=project/'resource_pack'
- for side in (bp,rp):assert load(side/'manifest.json')['header']['version']==[2,7,67]
+ for side in (bp,rp):assert load(side/'manifest.json')['header']['version']==list(expected_version)
  blocks={};maps=0;placers=0
  for p in sorted((bp/'blocks').glob('*.json')):
   b=load(p)['minecraft:block'];bid=b['description']['identifier']
@@ -66,11 +66,11 @@ def check_schema(project=PROJECT):
    h.update((rel+'\0').encode());h.update(hashlib.sha256(data).digest());count+=1
  assert (count,vat_maps,unlock_count)==(1239,6,8),(count,vat_maps,unlock_count)
  assert h.hexdigest()==BASELINE,('unexpected runtime drift',h.hexdigest())
- return {'version':'A2.7.67','blocks':len(blocks),'materialMaps':maps,'blockPlacers':placers,'craftingRecipesWithUnlock':recipes,'newUnlocks':8,'vatMapsCorrected':6,'baselineRuntimeFilesPreservedExceptDeclaredChanges':count,'minecraft_tested':False,'bds_tested':False,'client_visuals_tested':False,'blankRegistryErrorAttributed':False}
-def main():
+ return {'version':'A'+'.'.join(map(str,expected_version)),'blocks':len(blocks),'materialMaps':maps,'blockPlacers':placers,'craftingRecipesWithUnlock':recipes,'newUnlocks':8,'vatMapsCorrected':6,'baselineRuntimeFilesPreservedExceptDeclaredChanges':count,'minecraft_tested':False,'bds_tested':False,'client_visuals_tested':False,'blankRegistryErrorAttributed':False}
+def main(expected_version=(2,7,67)):
  parser=argparse.ArgumentParser();parser.add_argument('--compiled',action='store_true');args=parser.parse_args()
  from verify_a2766 import check_assets
- check_assets();result=check_schema()
+ check_assets();result=check_schema(expected_version=expected_version)
  subprocess.run([sys.executable,str(DEV/'a2764_rebake_skewer_hand_geometry.py'),'--check'],check=True)
  subprocess.run([sys.executable,str(DEV/'verify_a2761_java_interaction_contract.py')],check=True)
  for name in ('test_a275_core.mjs','test_a276_core.mjs','test_a277_core.mjs','test_a2762_core.mjs'):
