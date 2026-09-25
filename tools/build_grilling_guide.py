@@ -26,17 +26,17 @@ def full_id(value: str) -> str:
     return value if ":" in value else "kg_a1:" + value
 
 
-def mechanics_for(source: dict, locale: str) -> list[dict]:
-    out = []
-    for row in source["entries"]:
-        out.append({
-            "id": full_id(row["id"]),
-            "kind": "mechanic",
-            "category": row["category"],
-            "icon": icon_path(row["icon"]),
-            "lines": list(row["body"][locale]),
-        })
-    return out
+def build_entries(source: dict) -> list[dict]:
+    fallback = source["fallback_locale"]
+    locales = source["locales"]
+    return [{
+        "id": full_id(row["id"]),
+        "category": row["category"],
+        "icon": icon_path(row["icon"]),
+        "kinds": [],
+        "mechanics": list(row["body"][fallback]),
+        "mechanicsByLocale": {loc: list(row["body"][loc]) for loc in locales},
+    } for row in source["entries"]]
 
 
 def build_payload(source: dict) -> dict:
@@ -55,25 +55,29 @@ def build_payload(source: dict) -> dict:
     categories = [{
         "id": row["id"],
         "labelKey": row["id"],
+        "fallback": row["title"]["en_US"],
         "icon": icon_path(row["icon"]),
     } for row in source["categories"]]
-    localized = {loc: mechanics_for(source, loc) for loc in locales}
     return {
         "api": 1,
         "id": source["module_id"],
         "version": source["version"],
         "order": source["order"],
         "icon": icon_path(source["icon"]),
+        "titleKey": "title",
+        "introKey": "intro",
+        "allKey": "all",
+        "selectKey": "select",
+        "backKey": "back",
+        "languageNoteKey": "language_note",
         "showAll": bool(source.get("showAll", False)),
         "showIds": bool(source.get("showIds", False)),
         "showKinds": bool(source.get("showKinds", False)),
         "showCategoryOnEntry": bool(source.get("showCategoryOnEntry", False)),
-        "text": text,
         "categories": categories,
-        "kinds": [],
+        "entries": build_entries(source),
         "names": names,
-        "mechanics": localized[fallback],
-        "mechanicsByLocale": localized,
+        "text": text,
     }
 
 
@@ -175,7 +179,10 @@ def main():
         "entries": len(source["entries"]),
         "locales": source["locales"],
         "fallback_locale": source["fallback_locale"],
-        "mechanics_per_locale": {loc: len(payload["mechanicsByLocale"][loc]) for loc in source["locales"]},
+        "mechanics_per_locale": {
+            loc: sum(1 for row in payload["entries"] if loc in row["mechanicsByLocale"])
+            for loc in source["locales"]
+        },
         "showAll": payload["showAll"],
         "mode": "check" if args.check else "write",
     }
