@@ -31,13 +31,13 @@
         "*": {
           "texture": "kg_a26_big_vat",
           "render_method": "alpha_test",
-          "ambient_occlusion": 1.0,
+          "ambient_occlusion": 1,
           "face_dimming": true
         },
         "fluid": {
-          "texture": "kg_a26_water",
+          "texture": "still_water_grey",
           "render_method": "blend",
-          "ambient_occlusion": 0.0,
+          "ambient_occlusion": 0,
           "face_dimming": false
         }
       },
@@ -66,10 +66,10 @@
         ]
       },
       "minecraft:destructible_by_mining": {
-        "seconds_to_destroy": 2.0
+        "seconds_to_destroy": 2
       },
       "minecraft:destructible_by_explosion": {
-        "explosion_resistance": 6.0
+        "explosion_resistance": 6
       }
     },
     "permutations": [
@@ -110,13 +110,13 @@
             "*": {
               "texture": "kg_a26_big_vat",
               "render_method": "alpha_test",
-              "ambient_occlusion": 1.0,
+              "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
-              "texture": "kg_a26_water",
+              "texture": "still_water_grey",
               "render_method": "blend",
-              "ambient_occlusion": 0.0,
+              "ambient_occlusion": 0,
               "face_dimming": false
             }
           }
@@ -129,13 +129,13 @@
             "*": {
               "texture": "kg_a26_big_vat",
               "render_method": "alpha_test",
-              "ambient_occlusion": 1.0,
+              "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
-              "texture": "kg_a26_lava",
+              "texture": "still_lava",
               "render_method": "blend",
-              "ambient_occlusion": 0.0,
+              "ambient_occlusion": 0,
               "face_dimming": false
             }
           }
@@ -148,13 +148,13 @@
             "*": {
               "texture": "kg_a26_big_vat",
               "render_method": "alpha_test",
-              "ambient_occlusion": 1.0,
+              "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_canola_oil",
               "render_method": "blend",
-              "ambient_occlusion": 0.0,
+              "ambient_occlusion": 0,
               "face_dimming": false
             }
           }
@@ -167,13 +167,13 @@
             "*": {
               "texture": "kg_a26_big_vat",
               "render_method": "alpha_test",
-              "ambient_occlusion": 1.0,
+              "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_secret_chili_oil",
               "render_method": "blend",
-              "ambient_occlusion": 0.0,
+              "ambient_occlusion": 0,
               "face_dimming": false
             }
           }
@@ -186,13 +186,13 @@
             "*": {
               "texture": "kg_a26_big_vat",
               "render_method": "alpha_test",
-              "ambient_occlusion": 1.0,
+              "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_premium_chili_oil",
               "render_method": "blend",
-              "ambient_occlusion": 0.0,
+              "ambient_occlusion": 0,
               "face_dimming": false
             }
           }

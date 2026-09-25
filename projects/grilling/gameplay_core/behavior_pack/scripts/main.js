@@ -53,7 +53,7 @@ import {awardLookingThePart,awardGleamingWithOil,awardSeasoningMilestones,awardE
 import {awardSeasoningFinishedChallenges,awardMentalPreparationFailed,awardMetalToleranceFailed,awardOrdinaryChallenge,ordinaryChallengeOutcome} from './a2758_advancement_challenge_runtime.js';
 import './a2722_cold_houttuynia_runtime.js';
 import {isExtinguishTool,isInitialBlockPress,nextDurability} from './a275_grill_input_core.js';
-import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
+import {primitiveStackProps,captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {commitTwoParty,chooseExtractDelivery} from './a277_grill_transaction_core.js';
 
 const REGISTRY='kaleidoscope_grilling:a2_grills';
@@ -157,36 +157,12 @@ function copyCustomData(from,to){
  for(const id of ids)try{to.setDynamicProperty(id,from.getDynamicProperty(id))}catch{}
  return to;
 }
-function primitiveProps(stack){
- const out={};let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
- for(const id of ids)try{const value=stack.getDynamicProperty(id);if(['string','number','boolean'].includes(typeof value))out[id]=value;else if(value&&typeof value==='object'&&Number.isFinite(value.x)&&Number.isFinite(value.y)&&Number.isFinite(value.z))out[id]={x:value.x,y:value.y,z:value.z}}catch{}
- return out;
-}
-function stackIntentSignature(stack){
- if(!stack)return null;
- const raw=primitiveProps(stack),props=Object.fromEntries(Object.keys(raw).sort().map(k=>[k,raw[k]]));
- let lore=[];try{lore=stack.getLore()}catch{}
- let name='';try{name=stack.nameTag??''}catch{}
- let damage=null;try{damage=Number(stack.getComponent('minecraft:durability')?.damage??0)}catch{}
- return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props,damage});
-}
-function stackIntentDescriptor(stack){
- return stack?{empty:false,id:stack.typeId,sig:stackIntentSignature(stack)}:{empty:true,id:null,sig:null};
-}
-function captureGrillIntent(player,eventStack){
- const e=stackIntentDescriptor(eventStack),m=stackIntentDescriptor(heldMain(player)),o=stackIntentDescriptor(heldOff(player));
- const hand=chooseInteractionHand(e,m,o),sig=hand==='off'?o.sig:m.sig;
- return makeIntent(hand,sig,player.selectedSlotIndex);
-}
-function grillIntentStillCurrent(player,intent){
- return intentMatches(intent,stackIntentSignature(heldMain(player)),stackIntentSignature(heldOff(player)),player.selectedSlotIndex);
-}
 function ingredientSnapshot(stack){
  let nutrition=0,saturation=0,convertTo='';
  try{const food=stack.getComponent('minecraft:food');if(food){nutrition=Number(food.nutrition)||0;saturation=Number(food.saturationModifier)||0;convertTo=String(food.usingConvertsTo??'')}}catch{}
  let lore=[];try{lore=stack.getLore()}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
- const props=primitiveProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
+ const props=primitiveStackProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
  return {id:stack.typeId,nutrition,saturation,convertTo,name,lore,props,signature};
 }
 function restoreIngredient(row){
@@ -421,26 +397,32 @@ function setBottleVisual(block,count){
  const target=count>0?'kaleidoscope_grilling:seasoning_bottle_'+Math.max(1,Math.min(SEASONING_MAX_BOTTLES,count)):'minecraft:air';
  if(block.typeId!==target)block.setType(target);
 }
-function pushBottle(block,player,held){
+function pushBottle(block,player,held,hand='main'){
  const stack=readBottleStack(block);if(stack.length>=SEASONING_MAX_BOTTLES){message(player,'§c最多只能堆'+SEASONING_MAX_BOTTLES+'瓶');return false}
- stack.push(bottleDataFromItem(held));if(!decrementMain(player))return false;writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a調料瓶堆疊 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return true;
+ stack.push(bottleDataFromItem(held));if(!decrementHand(player,hand))return false;writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a調料瓶堆疊 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return true;
 }
-function handleSeasoningBlock(block,player){
+function handleSeasoningBlock(block,player,hand='main'){
  let stack=readBottleStack(block);if(!stack.length)stack=[{kind:'empty',ingredients:[],uses:0,variant:0}];
- const held=heldMain(player),id=held?.typeId;
- if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||id===SEASONING_ID){pushBottle(block,player,held);return}
+ const held=heldByHand(player,hand),id=held?.typeId;
+ if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||id===SEASONING_ID){pushBottle(block,player,held,hand);return}
  const top=stack[stack.length-1];
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
   if(top.ingredients.length>=SEASONING_CAPACITY){message(player,'§c最上層調料瓶已滿 '+SEASONING_CAPACITY+'/'+SEASONING_CAPACITY);return}
-  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementMain(player))return;writeBottleStack(block,stack);awardSeasoningMilestones(player,top.ingredients);
+  top.ingredients.push(id);top.kind=hasSeasoningBase(top.ingredients)?'pending':'empty';if(!decrementHand(player,hand))return;writeBottleStack(block,stack);awardSeasoningMilestones(player,top.ingredients);
   try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
   message(player,hasSeasoningBase(top.ingredients)?'§a已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY+'；基礎三料齊全':'§e已加入 '+top.ingredients.length+'/'+SEASONING_CAPACITY);return;
  }
  if(!id){
-  const out=stack.pop();setMain(player,bottleItem(out));writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return;
+  const out=stack.pop();setHand(player,hand,bottleItem(out));writeBottleStack(block,stack);setBottleVisual(block,stack.length);message(player,'§a取回最上層調料瓶，剩 '+stack.length+'/'+SEASONING_MAX_BOTTLES);return;
  }
  message(player,'§7這不是可加入的調料或調料瓶');
+}
+function handleCustomBlockInteraction(block,player,intent){
+ if(!block||(block.typeId!==GRILL_ID&&!isSeasoningBlock(block.typeId)))return;
+ if(!interactionIntentStillCurrent(player,intent)){message(player,'§7操作已取消：互動後手持物品已改變');return}
+ if(block.typeId===GRILL_ID)handleGrill(block,player,intent.hand);
+ else handleSeasoningBlock(block,player,intent.hand);
 }
 function placeSeasoningState(block,player){
  const cached=SEASON_PLACE_CACHE.get(player.id);SEASON_PLACE_CACHE.delete(player.id);
@@ -598,14 +580,8 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
   system.run(()=>{const b=dim.getBlock(loc),c=b?.getComponent('minecraft:inventory')?.container;if(!c)return;const r=compactSkewerContainer(c,false);message(p,r.changed?'§b已整理串類：熱度差≤5分鐘的熱串按數量加權合併':'§7沒有可整理的串類')});return;
  }
  if(!customTarget)return;
- e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,intent=grillTarget?captureGrillIntent(p,e.itemStack):null;
- system.run(()=>{
-  const block=dim.getBlock(loc);
-  if(block?.typeId===GRILL_ID){
-   if(!grillIntentStillCurrent(p,intent)){message(p,'§7操作已取消：互動後手持物品已改變');return}
-   handleGrill(block,p,intent.hand);
-  }else if(block&&isSeasoningBlock(block.typeId))handleSeasoningBlock(block,p);
- });
+ e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,intent=customTarget?captureInteractionIntent(p,e.itemStack):null;
+ system.run(()=>handleCustomBlockInteraction(dim.getBlock(loc),p,intent));
 });
 world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID){register(e.block);resetBlock(e.block,false)}else if(isSeasoningBlock(e.block.typeId))placeSeasoningState(e.block,e.player)});
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
