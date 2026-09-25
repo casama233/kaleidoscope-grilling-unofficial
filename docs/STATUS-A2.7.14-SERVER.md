@@ -39,3 +39,13 @@ A2.7.65-test 與 A2.7.66-test 相對 A2.7.64 出現三處回歸，均在正式�
 3. **`tag:minecraft:crop` 回歸**：`canola_crop.json`、`onion_crop.json`、`houttuynia_crop.json`、`sweet_potato_crop.json` 重新帶上本版 schema 不支援的 `tag:minecraft:crop` 元件（A2.7.14 伺服器版已移除過一次）。
 
 另：`All MaterialInstances must use the same render_method` 警告（26 條）**不是包缺陷**——隔離實驗證明同一組包在另一世界為 0 條，僅在生產世界（level.dat 開啟 `experimental_creator_cameras`／`voxel_shapes`／`y_2026_drop_3` 三個實驗）出現，屬實驗模式下引擎的更嚴格驗證提示，不影響載入。
+
+## 14. A2.8.0 整合測試版（2026-09-25 部署）
+
+`A2.8.0-test.115.1` 已部署（2.8.1）。伺服器側處理清單：
+
+- 相依改接（同前）；8 個配方缺 unlock → 其中 2 個為熔爐配方（本就免 unlock），實際補 0；AO 布林 10 檔、`tag:minecraft:crop` 4 檔、`playerPlaceBlock` 調料瓶放置——三類回歸仍在，已按既有流程修復（§13）。
+- **新回歸**：新增的 `a2770_placed_oil.json`／`a2770_placed_seasoning.json` 實體使用 `"deals_damage": false`（布林），本版 schema 僅接受字串，已改為 `"no"`。
+- 上游已自行吸收：RP `capabilities:["pbr"]`（VV 聲明）、配方 unlock 主體、胡椒樹世界生成。
+
+三包（煙火 2.8.1／酒館 0.6.44／世界名酒 0.1.7）部署後 Content Log **0 錯誤**。
