@@ -29,3 +29,13 @@ A2.7.67 的窄範圍修正 PR #71 已合入正在產生 A2.7.66 測試包的 `re
 ## 驗證邊界
 
 本輪沒有啟動 Minecraft 客戶端、BDS 或模擬玩家互動測試。材料／引用／資料校驗、CI、真實 Dash build 與上傳成品比對，不能代替 Android 透明排序、魔法輪盤或重啟持久化實機驗收。下一次回報請保留第一條錯誤前後的 Content Log、實際包版本與載入順序。
+
+## 13. A2.7.65/A2.7.66 測試版的三處回歸（2026-09-25 伺服器側已修，建議上游修正）
+
+A2.7.65-test 與 A2.7.66-test 相對 A2.7.64 出現三處回歸，均在正式服內修復並驗證：
+
+1. **調料瓶放置腳本崩溃（致命）**：`main.js` 使用 `world.beforeEvents.playerPlaceBlock`（穩定版 API 無此事件），`main.js:572` 拋出 `cannot read property 'subscribe' of undefined`，整個腳本未載入、全部玩法失效。修法同伺服器版既有模式：改為 `system.beforeEvents.startup` 註冊 `senluo:grilling_bottle_place` 方塊自訂元件，並在 5 個 `seasoning_bottle*.json` 補上元件聲明。
+2. **`ambient_occlusion` 型別回歸**：`skewer_recipe.json`、`pepper_sapling.json`、`pepper_leaves.json`、`sweet_potato_crop.json` 等重新出現布林值 `false`（本版 schema 僅接受數值），觸發 `invalid numeric value` / `invalid string`。已全包規範化為浮點數。
+3. **`tag:minecraft:crop` 回歸**：`canola_crop.json`、`onion_crop.json`、`houttuynia_crop.json`、`sweet_potato_crop.json` 重新帶上本版 schema 不支援的 `tag:minecraft:crop` 元件（A2.7.14 伺服器版已移除過一次）。
+
+另：`All MaterialInstances must use the same render_method` 警告（26 條）**不是包缺陷**——隔離實驗證明同一組包在另一世界為 0 條，僅在生產世界（level.dat 開啟 `experimental_creator_cameras`／`voxel_shapes`／`y_2026_drop_3` 三個實驗）出現，屬實驗模式下引擎的更嚴格驗證提示，不影響載入。
