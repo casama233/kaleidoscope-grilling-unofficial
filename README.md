@@ -6,6 +6,22 @@
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
+## Guide A2.0：完整玩家手冊重做
+
+煙火仍然只佔 Cookery 原指南中的 **一個入口**，沒有新增第二本指南書。
+
+舊 A1.16 的 3 分類 / 33 條靜態手冊已重做為 **5 章 / 52 個主題 / zh_CN + zh_TW + en_US**：
+
+- 快速上手 4：完整燒烤閉環、烤架操作、過熟／燒焦與穿串。
+- 設備與加工 12：串盤、串譜、榨油器、大缸、高級廚具架、作物與原料加工。
+- 烤串配方 20：只保留材料順序與熟串實際效果，不再 20 頁重複同一句燒烤流程。
+- 調料與煙火氣 9：三種油、Hot Food、Special Seasoning、紅石／火藥／折耳根粉／圖騰粉／龍蛋粉／花椒。
+- 進階與排錯 7：烤架拒絕原因、中途拆爐、熱串整理、秘製串、普通串致命挑戰、涼拌折耳根與世界油。
+
+唯一目前內容源是 `projects/grilling/guide/content.a2.json`；`tools/build_grilling_guide.py` 生成正式 payload / 三語文字，`tools/check_grilling_guide.py` 會把指南關鍵數字與目前 Gameplay Core runtime 靜態對照。舊 A1.x `content.json` / augmenter 只保留作歷史取證。
+
+詳見 [Guide A2.0 狀態](docs/STATUS-GUIDE-A2.0.md)。
+
 ## A2.7.64：Skewer Held Display Parity 候選
 
 - 39 个 fixed-skewer attachable 全部停止直接移动 bound root。
@@ -230,7 +246,7 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、自由／秘制串、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+仍待完成的主要工作是 Minecraft／BDS／Android 的完整實機驗收、Numb 準星視覺、若未來穩定 API 可行時的引擎原生自訂 FluidType，以及完整多人回歸。串盤、串譜、榨油器、大缸、Advanced Rack、主要作物加工、花椒樹與秘製串等已進正式 runtime，不再列為「尚未完成」。Cookery Guide API v1 本身不提供搜尋、收藏或自訂配方持久化；A2.0 指南不偽造這些宿主沒有的能力。
 
 **Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
 
