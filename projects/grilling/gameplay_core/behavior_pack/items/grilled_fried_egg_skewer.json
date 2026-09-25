@@ -4,8 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:grilled_fried_egg_skewer",
       "menu_category": {
-        "category": "items",
-        "group": "kaleidoscope_grilling:itemGroup.grilled_skewers"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.foods"
       }
     },
     "components": {

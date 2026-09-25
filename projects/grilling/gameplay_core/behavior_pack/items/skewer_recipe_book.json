@@ -4,8 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:skewer_recipe_book",
       "menu_category": {
-        "category": "items",
-        "group": "kaleidoscope_grilling:itemGroup.tools"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.recipe_pages"
       }
     },
     "components": {

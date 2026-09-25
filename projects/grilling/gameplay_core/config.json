@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.70 Creative Groups",
+  "name": "Kaleidoscope Grilling A2.7.71 Shared Series Groups",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_7_70_Creative_Groups"
+          "packName": "Kaleidoscope_Grilling_A2_7_71_Shared_Series_Groups"
         }
       ]
     ]

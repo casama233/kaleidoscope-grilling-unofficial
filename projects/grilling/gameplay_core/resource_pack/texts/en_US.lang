@@ -112,7 +112,6 @@ item.kaleidoscope_grilling:roasted_sweet_potato.name=Roasted Sweet Potato
 item.kaleidoscope_grilling:roasted_chicken_wing.name=Roasted Chicken Wing
 
 item.kaleidoscope_grilling:cold_houttuynia.name=Dressed Houttuynia
-kaleidoscope_grilling:itemGroup.main=Kaleidoscope Grilling
 
 item.kaleidoscope_grilling:red_chili_powder.name=Red Chili Powder
 hud.kaleidoscope_grilling.oil_pot.title=Oil Pot · Storage
@@ -242,14 +241,3 @@ message.kaleidoscope_grilling.advancement.task_announce= made the advancement:
 message.kaleidoscope_grilling.advancement.task_self=§aAdvancement made: §r
 message.kaleidoscope_grilling.advancement.challenge_announce= completed the challenge: 
 message.kaleidoscope_grilling.advancement.challenge_self=§5Challenge complete: §r
-kaleidoscope_grilling:itemGroup.stations=Kaleidoscope Grilling · Stations
-kaleidoscope_grilling:itemGroup.tools=Kaleidoscope Grilling · Tools and serving
-kaleidoscope_grilling:itemGroup.raw_skewers=Kaleidoscope Grilling · Raw skewers
-kaleidoscope_grilling:itemGroup.grilled_skewers=Kaleidoscope Grilling · Grilled skewers
-kaleidoscope_grilling:itemGroup.special_skewers=Kaleidoscope Grilling · Custom and special skewers
-kaleidoscope_grilling:itemGroup.seasoning=Kaleidoscope Grilling · Seasoning
-kaleidoscope_grilling:itemGroup.oils=Kaleidoscope Grilling · Oils and pressing products
-kaleidoscope_grilling:itemGroup.ingredients=Kaleidoscope Grilling · Ingredients
-kaleidoscope_grilling:itemGroup.dishes=Kaleidoscope Grilling · Dishes and treats
-kaleidoscope_grilling:itemGroup.crops=Kaleidoscope Grilling · Crops and planting
-kaleidoscope_grilling:itemGroup.pepper_tree=Kaleidoscope Grilling · Pepper tree and wood

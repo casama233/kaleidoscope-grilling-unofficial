@@ -3,35 +3,61 @@
   "minecraft:crafting_items_catalog": {
     "categories": [
       {
-        "category_name": "items",
+        "category_name": "equipment",
         "groups": [
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:grill",
-              "name": "kaleidoscope_grilling:itemGroup.stations"
+              "name": "kaleidoscope_cookery:itemGroup.name.tools"
+            },
+            "items": [
+              "kaleidoscope_grilling:empty_seasoning_bottle"
+            ]
+          },
+          {
+            "group_identifier": {
+              "name": "kaleidoscope_cookery:itemGroup.name.cooking_stations"
             },
             "items": [
               "kaleidoscope_grilling:grill",
               "kaleidoscope_grilling:oil_press",
-              "kaleidoscope_grilling:big_vat",
+              "kaleidoscope_grilling:big_vat"
+            ]
+          },
+          {
+            "group_identifier": {
+              "name": "kaleidoscope_cookery:itemGroup.name.storage_utility"
+            },
+            "items": [
               "kaleidoscope_grilling:advanced_rack"
             ]
           },
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:skewer_recipe_book",
-              "name": "kaleidoscope_grilling:itemGroup.tools"
+              "name": "kaleidoscope_cookery:itemGroup.name.crops"
             },
             "items": [
-              "kaleidoscope_grilling:skewer_recipe_book"
+              "kaleidoscope_grilling:canola_seeds",
+              "kaleidoscope_grilling:onion",
+              "kaleidoscope_grilling:sweet_potato",
+              "kaleidoscope_grilling:houttuynia",
+              "kaleidoscope_grilling:pepper_sapling"
             ]
           },
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:raw_beef_skewer",
-              "name": "kaleidoscope_grilling:itemGroup.raw_skewers"
+              "name": "kaleidoscope_cookery:itemGroup.name.ingredients"
             },
             "items": [
+              "kaleidoscope_grilling:beef_chunks",
+              "kaleidoscope_grilling:chicken_skin",
+              "kaleidoscope_grilling:chicken_wing",
+              "kaleidoscope_grilling:squid_tentacle",
+              "kaleidoscope_grilling:minced_houttuynia",
+              "kaleidoscope_grilling:carrot_dice",
+              "kaleidoscope_grilling:potato_slice",
+              "kaleidoscope_grilling:raw_sweet_potato_sheet",
+              "kaleidoscope_grilling:raw_mantou_slice",
+              "kaleidoscope_grilling:sweet_potato_powder",
               "kaleidoscope_grilling:raw_beef_skewer",
               "kaleidoscope_grilling:raw_pork_belly_skewer",
               "kaleidoscope_grilling:raw_chicken_skin_skewer",
@@ -50,13 +76,26 @@
               "kaleidoscope_grilling:raw_fried_egg_skewer",
               "kaleidoscope_grilling:raw_gluten_skewer",
               "kaleidoscope_grilling:raw_lamb_skewer",
-              "kaleidoscope_grilling:raw_golden_skewer"
+              "kaleidoscope_grilling:raw_golden_skewer",
+              "kaleidoscope_grilling:special_seasoning",
+              "kaleidoscope_grilling:green_chili_powder",
+              "kaleidoscope_grilling:red_chili_powder",
+              "kaleidoscope_grilling:sichuan_pepper",
+              "kaleidoscope_grilling:onion_powder",
+              "kaleidoscope_grilling:houttuynia_powder",
+              "kaleidoscope_grilling:canola_powder",
+              "kaleidoscope_grilling:totem_powder",
+              "kaleidoscope_grilling:dragon_egg_powder",
+              "kaleidoscope_grilling:canola_oil_bucket",
+              "kaleidoscope_grilling:secret_chili_oil_bucket",
+              "kaleidoscope_grilling:premium_chili_oil_bucket",
+              "kaleidoscope_grilling:oil_cake",
+              "kaleidoscope_grilling:oil_residue"
             ]
           },
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:grilled_beef_skewer",
-              "name": "kaleidoscope_grilling:itemGroup.grilled_skewers"
+              "name": "kaleidoscope_cookery:itemGroup.name.foods"
             },
             "items": [
               "kaleidoscope_grilling:grilled_beef_skewer",
@@ -77,75 +116,10 @@
               "kaleidoscope_grilling:grilled_fried_egg_skewer",
               "kaleidoscope_grilling:grilled_gluten_skewer",
               "kaleidoscope_grilling:grilled_lamb_skewer",
-              "kaleidoscope_grilling:grilled_golden_skewer"
-            ]
-          },
-          {
-            "group_identifier": {
-              "icon": "kaleidoscope_grilling:ordinary_skewer",
-              "name": "kaleidoscope_grilling:itemGroup.special_skewers"
-            },
-            "items": [
+              "kaleidoscope_grilling:grilled_golden_skewer",
               "kaleidoscope_grilling:ordinary_skewer",
               "kaleidoscope_grilling:mysterious_skewer",
-              "kaleidoscope_grilling:dark_grilling"
-            ]
-          },
-          {
-            "group_identifier": {
-              "icon": "kaleidoscope_grilling:empty_seasoning_bottle",
-              "name": "kaleidoscope_grilling:itemGroup.seasoning"
-            },
-            "items": [
-              "kaleidoscope_grilling:empty_seasoning_bottle",
-              "kaleidoscope_grilling:special_seasoning",
-              "kaleidoscope_grilling:green_chili_powder",
-              "kaleidoscope_grilling:red_chili_powder",
-              "kaleidoscope_grilling:sichuan_pepper",
-              "kaleidoscope_grilling:onion_powder",
-              "kaleidoscope_grilling:houttuynia_powder",
-              "kaleidoscope_grilling:canola_powder",
-              "kaleidoscope_grilling:totem_powder",
-              "kaleidoscope_grilling:dragon_egg_powder"
-            ]
-          },
-          {
-            "group_identifier": {
-              "icon": "kaleidoscope_grilling:canola_oil_bucket",
-              "name": "kaleidoscope_grilling:itemGroup.oils"
-            },
-            "items": [
-              "kaleidoscope_grilling:canola_oil_bucket",
-              "kaleidoscope_grilling:secret_chili_oil_bucket",
-              "kaleidoscope_grilling:premium_chili_oil_bucket",
-              "kaleidoscope_grilling:oil_cake",
-              "kaleidoscope_grilling:oil_residue"
-            ]
-          },
-          {
-            "group_identifier": {
-              "icon": "kaleidoscope_grilling:beef_chunks",
-              "name": "kaleidoscope_grilling:itemGroup.ingredients"
-            },
-            "items": [
-              "kaleidoscope_grilling:beef_chunks",
-              "kaleidoscope_grilling:chicken_skin",
-              "kaleidoscope_grilling:chicken_wing",
-              "kaleidoscope_grilling:squid_tentacle",
-              "kaleidoscope_grilling:minced_houttuynia",
-              "kaleidoscope_grilling:carrot_dice",
-              "kaleidoscope_grilling:potato_slice",
-              "kaleidoscope_grilling:raw_sweet_potato_sheet",
-              "kaleidoscope_grilling:raw_mantou_slice",
-              "kaleidoscope_grilling:sweet_potato_powder"
-            ]
-          },
-          {
-            "group_identifier": {
-              "icon": "kaleidoscope_grilling:roasted_sweet_potato",
-              "name": "kaleidoscope_grilling:itemGroup.dishes"
-            },
-            "items": [
+              "kaleidoscope_grilling:dark_grilling",
               "kaleidoscope_grilling:roasted_sweet_potato",
               "kaleidoscope_grilling:roasted_chicken_wing",
               "kaleidoscope_grilling:cold_houttuynia",
@@ -162,25 +136,19 @@
           },
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:canola_seeds",
-              "name": "kaleidoscope_grilling:itemGroup.crops"
+              "name": "kaleidoscope_cookery:itemGroup.name.other_blocks"
             },
             "items": [
-              "kaleidoscope_grilling:canola_seeds",
-              "kaleidoscope_grilling:onion",
-              "kaleidoscope_grilling:sweet_potato",
-              "kaleidoscope_grilling:houttuynia"
+              "kaleidoscope_grilling:pepper_log",
+              "kaleidoscope_grilling:pepper_leaves"
             ]
           },
           {
             "group_identifier": {
-              "icon": "kaleidoscope_grilling:pepper_sapling",
-              "name": "kaleidoscope_grilling:itemGroup.pepper_tree"
+              "name": "kaleidoscope_cookery:itemGroup.name.recipe_pages"
             },
             "items": [
-              "kaleidoscope_grilling:pepper_sapling",
-              "kaleidoscope_grilling:pepper_leaves",
-              "kaleidoscope_grilling:pepper_log"
+              "kaleidoscope_grilling:skewer_recipe_book"
             ]
           }
         ]

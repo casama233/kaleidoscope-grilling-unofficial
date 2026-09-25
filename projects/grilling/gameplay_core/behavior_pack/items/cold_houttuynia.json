@@ -4,8 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:cold_houttuynia",
       "menu_category": {
-        "category": "items",
-        "group": "kaleidoscope_grilling:itemGroup.dishes"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.foods"
       }
     },
     "components": {

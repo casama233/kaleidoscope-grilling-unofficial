@@ -4,8 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:sichuan_pepper",
       "menu_category": {
-        "category": "items",
-        "group": "kaleidoscope_grilling:itemGroup.seasoning"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
