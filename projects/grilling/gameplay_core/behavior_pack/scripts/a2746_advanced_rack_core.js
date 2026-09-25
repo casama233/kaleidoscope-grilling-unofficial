@@ -1,3 +1,4 @@
+import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
 export const ADVANCED_RACK_ITEM_ID='kaleidoscope_grilling:advanced_rack';
 export const ADVANCED_RACK_BLOCK_ID='kaleidoscope_grilling:advanced_rack_block';
 export const RACK_PAYLOAD_KEY='kaleidoscope_grilling:rack_payload';
@@ -36,7 +37,7 @@ export function rackSlotKind(slot){
 
 export function rackItemKind(typeId,tags=[]){
  const id=String(typeId??'');
- if(SEASONING_ITEM_IDS.has(id))return 'seasoning';
+ if(SEASONING_ITEM_IDS.has(id)||isSpecialSeasoningId(id))return 'seasoning';
  if(TOOL_ITEM_IDS.has(id))return 'tool';
  const set=new Set(Array.isArray(tags)?tags:[]);
  if(set.has('kaleidoscope_cookery:kitchen_knife')||set.has('kaleidoscope_cookery:kitchen_shovel'))return 'tool';
@@ -48,7 +49,7 @@ export function rackCanonicalFilter(typeId,tags=[]){
  if(!kind)return undefined;
  if(id==='kaleidoscope_cookery:oil_pot'||id==='kaleidoscope_cookery:oil_pot_filled')
   return {kind:'seasoning',category:'oil_pot',typeId:'kaleidoscope_cookery:oil_pot'};
- if(id==='kaleidoscope_grilling:empty_seasoning_bottle'||id==='kaleidoscope_grilling:pending_seasoning'||id==='kaleidoscope_grilling:special_seasoning')
+ if(id==='kaleidoscope_grilling:empty_seasoning_bottle'||id==='kaleidoscope_grilling:pending_seasoning'||isSpecialSeasoningId(id))
   return {kind:'seasoning',category:'seasoning_bottle',typeId:'kaleidoscope_grilling:empty_seasoning_bottle'};
  return {kind,category:'exact',typeId:id};
 }

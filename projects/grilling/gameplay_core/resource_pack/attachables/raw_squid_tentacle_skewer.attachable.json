@@ -14,32 +14,20 @@
         "stage4": "textures/a22_bites/raw_squid_tentacle_skewer_stage3"
       },
       "geometry": {
-        "stage0": "geometry.kg_a22.raw_squid_tentacle_skewer.stage0",
-        "stage1": "geometry.kg_a22.raw_squid_tentacle_skewer.stage1",
-        "stage2": "geometry.kg_a22.raw_squid_tentacle_skewer.stage2",
-        "stage3": "geometry.kg_a22.raw_squid_tentacle_skewer.stage3",
-        "stage4": "geometry.kg_a22.raw_squid_tentacle_skewer.stage3"
+        "stage0": "geometry.kg_a2764.raw_squid_tentacle_skewer.stage0",
+        "stage1": "geometry.kg_a2764.raw_squid_tentacle_skewer.stage1",
+        "stage2": "geometry.kg_a2764.raw_squid_tentacle_skewer.stage2",
+        "stage3": "geometry.kg_a2764.raw_squid_tentacle_skewer.stage3",
+        "stage4": "geometry.kg_a2764.raw_squid_tentacle_skewer.stage3"
       },
       "scripts": {
         "pre_animation": [
           "v.kg_bite_stage = q.is_using_item ? (q.item_in_use_duration >= 3.52083 ? 3 : (q.item_in_use_duration >= 2.25000 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0))) : 0;"
-        ],
-        "animate": [
-          {
-            "hold_first_person": "context.is_first_person == 1.0"
-          },
-          {
-            "hold_third_person": "context.is_first_person == 0.0"
-          }
         ]
       },
       "render_controllers": [
         "controller.render.kg_a22.bite"
-      ],
-      "animations": {
-        "hold_first_person": "animation.kaleidoscope_grilling.a2725.skewer_hold_first_person",
-        "hold_third_person": "animation.kaleidoscope_grilling.a2725.skewer_hold_third_person"
-      }
+      ]
     }
   }
 }

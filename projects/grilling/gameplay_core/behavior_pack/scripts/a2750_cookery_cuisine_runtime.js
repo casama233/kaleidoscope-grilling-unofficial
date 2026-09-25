@@ -1,8 +1,12 @@
 import {world,system,ItemStack} from '@minecraft/server';
-import {EMPTY_SEASONING_ID,SEASONING_ID} from './data.js';
+import {EMPTY_SEASONING_ID} from './data.js';
+import {commitTwoParty} from './a277_grill_transaction_core.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {playerInventory,getMainHand,setMainHand,isCreative} from './a2735_player_io.js';
 import {readCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
 import {SEASONING_MAX_USES,SEASONING_USES_KEY} from './a2743_seasoning_contract_core.js';
+import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
+import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
 import {
  readFoodSeasonings,setFoodSeasonings,setHotFood,applyFoodMetadata
 } from './a2750_food_state_adapter.js';
@@ -85,22 +89,33 @@ function setUses(stack,n){
  try{stack.setDynamicProperty(SEASONING_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack;
 }
 function applySeasoning(player,block){
- const held=getMainHand(player);if(held?.typeId!==SEASONING_ID)return false;
+ const held=getMainHand(player);if(!isSpecialSeasoningId(held?.typeId))return false;
  const ingredients=readFoodSeasonings(held),uses=readUses(held);
  const plan=planSeasoningUse({ingredients,uses,creative:isCreative(player)});
  if(!plan.ok){message(player,'§7調料瓶內沒有可用調料');return true}
- const state=stateBeforeSeasoning(stationKind(block.typeId),readCuisineState(block),hostHasOil(block));
- if(!writeCuisineState(block,{...state,seasoning:plan.ingredients})){message(player,'§c鍋具調料狀態寫入失敗');return true}
+ // Prepare the replacement before either participant is changed.
+ const inventory=playerInventory(player),slot=player.selectedSlotIndex;
+ if(plan.mutate&&!inventory){message(player,'§c無法讀取背包，操作已取消');return true}
+ let next;
  if(plan.mutate){
-  if(plan.replaceEmpty)setMainHand(player,new ItemStack(EMPTY_SEASONING_ID,1));
-  else{
-   const next=held.clone();setUses(next,plan.nextUses);
-   try{
-    const lore=next.getLore().filter(x=>!String(x).startsWith('§7Uses:'));
-    lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);next.setLore(lore);
-   }catch{}
-   setMainHand(player,next);
-  }
+  next=plan.replaceEmpty?new ItemStack(EMPTY_SEASONING_ID,1):retargetSpecialSeasoningStack(held,plan.nextUses,specialSeasoningVariant(held));
+  if(!next){message(player,'§c調料外觀狀態同步失敗，操作已取消');return true}
+  if(!plan.replaceEmpty)try{
+   const lore=next.getRawLore().filter(x=>typeof x!=='string'||!x.startsWith('§7Uses:'));
+   lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);next.setLore(lore);
+  }catch{message(player,'§c調料資料準備失敗，操作已取消');return true}
+ }
+ const key=cuisineStateKey(block),beforeRaw=world.getDynamicProperty(key);
+ const state=stateBeforeSeasoning(stationKind(block.typeId),readCuisineState(block),hostHasOil(block));
+ const result=commitTwoParty(
+  ()=>{if(plan.mutate)inventory.setItem(slot,next)},
+  ()=>{if(!writeCuisineState(block,{...state,seasoning:plan.ingredients}))throw new Error('cuisine_state_write')},
+  ()=>{if(plan.mutate)inventory.setItem(slot,held)},
+  ()=>world.setDynamicProperty(key,beforeRaw)
+ );
+ if(!result.ok){
+  if(result.rollbackErrors)console.warn('[Grilling] seasoning rollback failed: '+result.rollbackErrors);
+  message(player,result.rollbackErrors?'§c操作失敗且回滾不完整，請查看 Content Log':'§c操作未完成，調料與鍋具狀態已回復');return true;
  }
  try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}
  try{player.playSound('kg_imm.season',{volume:.85,pitch:1})}catch{}
@@ -125,9 +140,9 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  try{
   const kind=stationKind(event.block?.typeId);if(!kind||!isFirst(event))return;
   const player=event.player,main=getMainHand(player);
-  if(main?.typeId===SEASONING_ID){
-   event.cancel=true;const dimension=event.block.dimension,location={...event.block.location};
-   system.run(()=>{const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
+  if(isSpecialSeasoningId(main?.typeId)){
+   event.cancel=true;const dimension=event.block.dimension,location={...event.block.location},intent=captureInteractionIntent(player,main);
+   system.run(()=>{if(!interactionIntentStillCurrent(player,intent)){message(player,'§7操作已取消：手持物品已改變');return}const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
   }
   const dimension=event.block.dimension,location={...event.block.location};
   const stateBefore=readCuisineState(event.block),beforeInventory=snapshotInventory(player);

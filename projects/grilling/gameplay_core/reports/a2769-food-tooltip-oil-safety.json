@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.69",
+  "baseline": "09d6b6d596e021326b2cb20299c23f3d3c950d0b",
+  "maxim_items": ["sugared_tomato", "pepper_honey", "houttuynia_stir_fried_pork", "green_pepper_squid_tentacles", "braised_chicken_wings", "potato_beef_stew", "red_sweet_potato_porridge", "sour_spicy_noodles"],
+  "java_commit": "9a1acdab27698457bec16c9362678e574895a28c",
+  "maxim_presentation": "localized RawMessage lore; dark gray italic",
+  "oil_changes": ["fail-closed item builder", "deferred hand and target revalidation", "state and hand compensation", "prepare drop before deleting contents"],
+  "pure_lore_cases": 10,
+  "simulated_player_tests": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false,
+  "placed_oil_color_fixed": false,
+  "placed_seasoning_visual_fixed": false
+}

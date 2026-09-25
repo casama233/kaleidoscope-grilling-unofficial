@@ -2,7 +2,7 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前：A2.3 Gameplay Core 已補上 Hot Food 堆疊/儲物整理、烤爐四態、效果差異收斂與三種世界油模擬；仍不是 Java 全模組完整移植。**
+**目前 canonical runtime：A2.7.65 Full Skewer Hand Geometry。核心玩法、穿串、調料、油系統、Advanced Rack、主要作物、花椒樹/世界生成、Cookery 菜餚與主要 advancement 已完成可實作 parity；目前主要剩餘工作是 Minecraft/BDS/多人實機驗收、client visual 打磨與 Bedrock 平台無法 1:1 的差異收斂。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
@@ -185,9 +185,11 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 
 ## 尚未完成
 
-Minecraft實機下的 A2 烤爐／BlockEntity／逐口3D與玩家動作驗收、Numb準星視覺、真正自訂油流體（若未來穩定API可行）、自由／秘制串、餐盤、串譜、榨油／大缸／厨具架、作物與世界生成、指南動態搜尋／收藏／自訂配方頁面、完整玩法與多人驗收。魚腥草与花椒只有靜態素材，沒有種植、採收或樹木生成。
+目前剩餘重點已從「補主要玩法」轉為**成品驗收與平台差異**：Minecraft 客戶端中的手持/放置模型、透明材質、HUD/動畫與不同 FOV；BDS 長時間運行、重進世界持久化、多人同時操作與效能；Guide + Cookery 1.0.6 組合的多人語言實測；以及 Bedrock stable API 無法 1:1 的 Java 行為（例如真自訂 FluidType、Pepper Leaves `entityInside`、Numb per-player 準星偏移、任意 modded smoking recipe lookup）。
 
-**Dash成功不等於bridge.圖形介面、Minecraft、BDS或材質／光照／動畫已驗收。** 來源與匯出解析分開，但離線圖像比較共用光柵器；新展示台只在標準20TPS下對齊主要時序，低TPS與Java牆鐘差異仍需處理。
+自由／秘制串、餐盤、串譜、榨油／大缸／Advanced Rack、作物種植、花椒樹 lifecycle / acquisition / forest worldgen 等早期 README 所列缺口後續已實作，請以最新 `projects/grilling/gameplay_core/reports/a27xx-*.json` 與 `docs/STATUS-A2.7.xx.md` 為準。
+
+**Dash/Node/靜態 reference gate 成功不等於 Minecraft、BDS 或 client visual 已驗收。** A2.7.63 新增的 visual gate 只保證 attachable / geometry / render controller / animation / atlas 引用鏈不斷；實際手感與畫面仍需真機驗收。
 
 ## 來源、授權與資料保護
 
