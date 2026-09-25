@@ -1,7 +1,7 @@
 {
   "type": "minecraftBedrock",
-  "name": "Grilling Guide — Cookery 1.0.6 per-player localized body A1.16",
-  "description": "One Grilling entry inside Cookery; complete per-player zh_CN / zh_TW / en_US body localization when used with the pinned Cookery 1.0.6 locale-compat host.",
+  "name": "Grilling Guide — Cookery 1.0.6 A2.0 Complete Player Manual",
+  "description": "One Grilling entry inside Cookery; rebuilt 5-section/52-topic zh_CN/zh_TW/en_US manual generated from one canonical content source.",
   "authors": [
     "cary — 素材移植工程"
   ],
@@ -23,7 +23,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "KG_Grilling_Guide_A116_Per_Player_Locale"
+          "packName": "KG_Grilling_Guide_A2_0_Complete_Player_Manual"
         }
       ]
     ]
