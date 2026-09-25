@@ -67,11 +67,11 @@ catch (error) { console.warn(`[Grilling guide] Initialization failed: ${String(e
     replace(builder,"PROJECT=ROOT/'projects/grilling/integration/cookery106'","PROJECT=ROOT/'projects/grilling/gameplay_core'")
     replace(builder,"BP/'scripts/payload.js'","BP/'scripts/guide/payload.js'")
     replace(builder,"    for l in LOCALES:write_or_check(RP/'texts'/f'{l}.lang',lang_text(s,l),a.check)",
-            "    for l in LOCALES:write_or_check(RP/'texts'/f'{l}.lang',merged_lang(RP/'texts'/f'{l}.lang,lang_text(s,l)),a.check)")
+            "    for l in LOCALES:write_or_check(RP/'texts'/f'{l}.lang',merged_lang(RP/'texts'/f'{l}.lang',lang_text(s,l)),a.check)")
     merge_func='''LANG_BEGIN='## BEGIN GRILLING GUIDE A3 (generated)'
 LANG_END='## END GRILLING GUIDE A3 (generated)'
 def merged_lang(path,guide_text):
-    text=path.read_text(encoding='utf-8-sig') if path.exists() else ''
+    text=path.read_bytes().decode('utf-8-sig') if path.exists() else ''
     if LANG_BEGIN in text or LANG_END in text:
         if text.count(LANG_BEGIN)!=1 or text.count(LANG_END)!=1:raise ValueError('Guide language markers are malformed')
         prefix,rest=text.split(LANG_BEGIN,1);_old,suffix=rest.split(LANG_END,1)

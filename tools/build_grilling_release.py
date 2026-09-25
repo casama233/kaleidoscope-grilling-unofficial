@@ -4,6 +4,8 @@ import argparse
 import hashlib
 import json
 import zipfile
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +32,7 @@ def main():
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
+    subprocess.run([sys.executable, str(ROOT / "tools/check_grilling_guide.py")], check=True)
     bm = load_json(BP / "manifest.json")
     rm = load_json(RP / "manifest.json")
     version = tuple(int(x) for x in bm["header"]["version"])
@@ -61,6 +64,19 @@ def main():
         if "behavior_pack/scripts/main.js" not in zf.namelist():
             raise RuntimeError("packaged Script API entry is missing")
 
+    with zipfile.ZipFile(output) as zf:
+        names=set(zf.namelist())
+        if {n for n in names if n.endswith('/manifest.json')} != {'behavior_pack/manifest.json','resource_pack/manifest.json'}:
+            raise RuntimeError('Product must contain exactly its original BP/RP, not bundled guide packs')
+        for n in ('main.js','publisher.js','payload.js'):
+            key='behavior_pack/scripts/guide/'+n
+            if key not in names or zf.read(key)!=(BP/'scripts/guide'/n).read_bytes():
+                raise RuntimeError('Built-in guide missing or stale in package: '+key)
+        if b"import './guide/main.js';" not in zf.read('behavior_pack/scripts/main.js'):
+            raise RuntimeError('Packaged guide is not connected to the main entry')
+        for p in (RP/'textures/ui/kg_grilling').rglob('*.png'):
+            key='resource_pack/'+p.relative_to(RP).as_posix()
+            if key not in names or zf.read(key)!=p.read_bytes():raise RuntimeError('Packaged guide icon mismatch')
     digest = hashlib.sha256(output.read_bytes()).hexdigest()
     checksum = output.with_name(output.name + ".sha256")
     checksum.write_text(f"{digest}  {output.name}\n", encoding="utf-8")
@@ -71,6 +87,8 @@ def main():
         "deterministic_file_order": True,
         "fixed_zip_timestamps": True,
         "contains_canonical_bp_rp": True,
+        "built_in_guide": True,
+        "standalone_guide_packs": 0,
     }, indent=2))
 
 

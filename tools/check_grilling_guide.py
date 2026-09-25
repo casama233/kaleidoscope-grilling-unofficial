@@ -5,8 +5,8 @@ from pathlib import Path
 from build_grilling_guide import ROOT,SOURCE,PROJECT,BP,RP,LOCALES,load,validate_source
 GAME=ROOT/'projects/grilling/gameplay_core/behavior_pack'
 GP=ROOT/'projects/grilling/gameplay_core/resource_pack'
-BP_UUID='f8c367c2-84d6-5bf6-b5a8-1bbe6cdb93ab'
-RP_UUID='32baef08-6b04-5115-9d5b-2d4ba2d3a7b4'
+BP_UUID='c68005c5-23ff-54e8-a3ff-da6349ad43c2'
+RP_UUID='bbbd2d60-52e5-53a6-8b9a-c09b0f516389'
 NS='kaleidoscope_grilling:'
 
 def require(ok,message):
@@ -102,18 +102,27 @@ def main():
     facts=check_facts(s)
     require([c['id'] for c in s['categories'] if not c.get('parent')]==s['host_reference']['root_category_ids'],'Host taxonomy drift')
     require(s['host_reference']['guide_sha256']=='acff33eec87add1c149aff3789b1b9ec62dd1ef642a5bc7d2b2f1b70dd6332ff','Host evidence drift')
-    require(not (BP/'items').exists() and not (BP/'recipes').exists(),'Guide must not create gameplay items/recipes')
-    require(not (RP/'ui').exists() and not (RP/'entity/player.entity.json').exists(),'No host UI/player override')
-    require(set(p.name for p in (BP/'scripts').glob('*.js'))=={'main.js','payload.js','publisher.js'},'Extra guide runtime')
-    version=[int(x) for x in s['version'].split('.')]
+    # The guide is part of the EXISTING product, not a guide pack.
+    require(not (ROOT/'projects/grilling/integration/cookery106/behavior_pack/manifest.json').exists(),'Standalone guide BP resurrected')
+    require(not (ROOT/'projects/grilling/integration/cookery106/resource_pack/manifest.json').exists(),'Standalone guide RP resurrected')
+    require(not (ROOT/'.github/workflows/guide-canonical.yml').exists(),'Standalone guide publication workflow resurrected')
+    require(not (BP/'items/guidebook.json').exists(),'Do not create a second physical guidebook')
+    require(not (RP/'entity/player.entity.json').exists(),'Do not replace the host player definition')
+    require(set(p.name for p in (BP/'scripts/guide').glob('*.js'))=={'main.js','payload.js','publisher.js'},'Guide module contents drift')
+    startup=(BP/'scripts/main.js').read_text(encoding='utf-8')
+    require(startup.count("import './guide/main.js';")==1,'Guide must load exactly once from the product entry')
+    version=load(BP/'manifest.json')['header']['version']
     for pack,uid in [(BP,BP_UUID),(RP,RP_UUID)]:
-        m=load(pack/'manifest.json');require(m['header']['uuid']==uid and m['header']['version']==version,'Guide UUID/version drift')
+        m=load(pack/'manifest.json');require(m['header']['uuid']==uid and m['header']['version']==version,'Product UUID/version drift')
         require(all(x['version']==version for x in m['modules']),'Module version drift')
-    bm=load(BP/'manifest.json');require(any(d.get('uuid')==RP_UUID and d['version']==version for d in bm['dependencies']),'BP/RP dependency drift')
-    pub=(BP/'scripts/publisher.js').read_text();require(f"REVISION = '{s['revision']}'" in pub,'Publisher revision drift')
-    for p in (BP/'scripts').glob('*.js'):subprocess.run(['node','--check',str(p)],check=True)
+    bm=load(BP/'manifest.json')
+    require([m.get('entry') for m in bm['modules'] if m.get('type')=='script']==['scripts/main.js'],'Product has a second script entry')
+    require(any(d.get('uuid')==RP_UUID and d['version']==version for d in bm['dependencies']),'BP/RP dependency drift')
+    require(not any(d.get('uuid') in {'f8c367c2-84d6-5bf6-b5a8-1bbe6cdb93ab','32baef08-6b04-5115-9d5b-2d4ba2d3a7b4'} for d in bm['dependencies']),'Legacy guide pack dependency')
+    pub=(BP/'scripts/guide/publisher.js').read_text();require(f"REVISION = '{s['revision']}'" in pub,'Publisher revision drift')
+    for p in (BP/'scripts/guide').glob('*.js'):subprocess.run(['node','--check',str(p)],check=True)
     code="import {pathToFileURL} from 'node:url';const root=process.argv[1];const p=await import(pathToFileURL(root+'/payload.js'));const m=await import(pathToFileURL(root+'/publisher.js'));const rows=m.encodeMessages(p.GUIDE_PAYLOAD);console.log(JSON.stringify({messages:rows.length,max:Math.max(...rows.map(x=>x.message.length))}));"
-    frames=json.loads(subprocess.check_output(['node','--input-type=module','-e',code,str(BP/'scripts')],text=True,encoding='utf-8'))
+    frames=json.loads(subprocess.check_output(['node','--input-type=module','-e',code,str(BP/'scripts/guide')],text=True,encoding='utf-8'))
     require(frames['max']<=2048,'Script Event length')
-    print(json.dumps({'guide':s['version'],'entries':len(s['entries']),'categories':len(s['categories']),'recipe_variants':sum(len(e.get('recipes',[])) for e in s['entries']),**facts,'script_event_serialization':frames,'compiled_files':compiled_compare() if args.compiled else None,'validation_boundary':'Static source/data/serialization/packaging checks only; no player or client UI interaction was simulated.'},ensure_ascii=False,indent=2))
+    print(json.dumps({'built_into_grilling':True,'product_version':version,'guide_data_version':s['version'],'entries':len(s['entries']),'categories':len(s['categories']),'recipe_variants':sum(len(e.get('recipes',[])) for e in s['entries']),**facts,'script_event_serialization':frames,'compiled_files':compiled_compare() if args.compiled else None,'validation_boundary':'Static source/data/serialization/packaging checks only; no player or client UI interaction was simulated.'},ensure_ascii=False,indent=2))
 if __name__=='__main__':main()

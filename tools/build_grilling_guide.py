@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'projects/grilling/guide/catalog.a3.json'
-PROJECT=ROOT/'projects/grilling/integration/cookery106'
+PROJECT=ROOT/'projects/grilling/gameplay_core'
 BP,RP=PROJECT/'behavior_pack',PROJECT/'resource_pack'
 LOCALES=('zh_CN','zh_TW','en_US')
 METHOD_LABELS={'Hand Threading':'穿串 / Threading','Grill':'燒烤 / Grill','Crafting':'合成 / Crafting','Furnace':'熔爐 / Furnace','Smoker':'煙燻爐 / Smoker','Campfire':'營火 / Campfire','Soul Campfire':'靈魂營火 / Soul Campfire'}
@@ -103,6 +103,18 @@ def index_text(s):
             rows += ['、'.join(e['title']['zh_TW'] for e in s['entries'] if c['id'] in e['categories']), '']
     return '\n'.join(rows)+'\n'
 
+LANG_BEGIN='## BEGIN GRILLING GUIDE A3 (generated)'
+LANG_END='## END GRILLING GUIDE A3 (generated)'
+def merged_lang(path,guide_text):
+    text=path.read_bytes().decode('utf-8-sig') if path.exists() else ''
+    if LANG_BEGIN in text or LANG_END in text:
+        if text.count(LANG_BEGIN)!=1 or text.count(LANG_END)!=1:raise ValueError('Guide language markers are malformed')
+        prefix,rest=text.split(LANG_BEGIN,1);_old,suffix=rest.split(LANG_END,1)
+        if suffix.strip():raise ValueError('Do not append gameplay text inside/after the generated guide section')
+        text=prefix
+    if any(line.startswith('guide.kg.') for line in text.splitlines()):raise ValueError('Duplicate unmanaged guide language keys')
+    return text.rstrip('\r\n')+'\n\n'+LANG_BEGIN+'\n'+guide_text+LANG_END+'\n'
+
 def write_or_check(p,b,check):
     if isinstance(b,str):b=b.encode('utf-8')
     if check:
@@ -115,8 +127,8 @@ def main():
     raw=json.dumps(p,ensure_ascii=True,separators=(',',':'))
     chunks=(len(raw)+1599)//1600
     if chunks>512:raise ValueError('Host transfer capacity exceeded')
-    write_or_check(BP/'scripts/payload.js','export const GUIDE_PAYLOAD='+json.dumps(p,ensure_ascii=False,separators=(',',':'))+';\n',a.check)
-    for l in LOCALES:write_or_check(RP/'texts'/f'{l}.lang',lang_text(s,l),a.check)
+    write_or_check(BP/'scripts/guide/payload.js','export const GUIDE_PAYLOAD='+json.dumps(p,ensure_ascii=False,separators=(',',':'))+';\n',a.check)
+    for l in LOCALES:write_or_check(RP/'texts'/f'{l}.lang',merged_lang(RP/'texts'/f'{l}.lang',lang_text(s,l)),a.check)
     for target,row in s['icon_sources'].items():write_or_check(RP/(target+'.png'),(ROOT/row['source']).read_bytes(),a.check)
     write_or_check(ROOT/'docs/GUIDE-INDEX-A3.md',index_text(s),a.check)
     print(json.dumps({'guide_version':s['version'],'entries':len(p['entries']),'root_categories':len([c for c in s['categories'] if not c.get('parent')]),'child_categories':len([c for c in s['categories'] if c.get('parent')]),'category_memberships':dict(counts),'recipes':sum(len(e['recipes']) for e in p['entries']),'item_icons':len(s['icon_sources']),'transfer_chunks':chunks,'acquisition_gaps':len(s['acquisition_gaps']),'mode':'check' if a.check else 'write'},ensure_ascii=False,indent=2))
