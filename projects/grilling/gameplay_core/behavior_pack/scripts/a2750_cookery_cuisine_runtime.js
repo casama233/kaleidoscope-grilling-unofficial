@@ -3,6 +3,8 @@ import {EMPTY_SEASONING_ID,SEASONING_ID} from './data.js';
 import {playerInventory,getMainHand,setMainHand,isCreative} from './a2735_player_io.js';
 import {readCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
 import {SEASONING_MAX_USES,SEASONING_USES_KEY} from './a2743_seasoning_contract_core.js';
+import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
+import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
 import {
  readFoodSeasonings,setFoodSeasonings,setHotFood,applyFoodMetadata
 } from './a2750_food_state_adapter.js';
@@ -85,7 +87,7 @@ function setUses(stack,n){
  try{stack.setDynamicProperty(SEASONING_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack;
 }
 function applySeasoning(player,block){
- const held=getMainHand(player);if(held?.typeId!==SEASONING_ID)return false;
+ const held=getMainHand(player);if(!isSpecialSeasoningId(held?.typeId))return false;
  const ingredients=readFoodSeasonings(held),uses=readUses(held);
  const plan=planSeasoningUse({ingredients,uses,creative:isCreative(player)});
  if(!plan.ok){message(player,'§7調料瓶內沒有可用調料');return true}
@@ -94,7 +96,7 @@ function applySeasoning(player,block){
  if(plan.mutate){
   if(plan.replaceEmpty)setMainHand(player,new ItemStack(EMPTY_SEASONING_ID,1));
   else{
-   const next=held.clone();setUses(next,plan.nextUses);
+   const next=retargetSpecialSeasoningStack(held,plan.nextUses,specialSeasoningVariant(held));if(!next){message(player,'§c調料外觀狀態同步失敗');return true}setUses(next,plan.nextUses);
    try{
     const lore=next.getLore().filter(x=>!String(x).startsWith('§7Uses:'));
     lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);next.setLore(lore);
@@ -125,7 +127,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  try{
   const kind=stationKind(event.block?.typeId);if(!kind||!isFirst(event))return;
   const player=event.player,main=getMainHand(player);
-  if(main?.typeId===SEASONING_ID){
+  if(isSpecialSeasoningId(main?.typeId)){
    event.cancel=true;const dimension=event.block.dimension,location={...event.block.location};
    system.run(()=>{const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
   }
