@@ -254,14 +254,19 @@ def check_structure(source: dict, p: dict) -> dict:
     if any(len(chunk) + 160 > 2048 for chunk in chunks):
         fail("guide chunk would exceed safe Script Event envelope")
 
-    host = load(HOST_CONTRACT)
-    if host["guidebook_extension_api"]["api"] != 1:
+    host_contract = load(HOST_CONTRACT)
+    host = host_contract.get("host", {})
+    if host_contract.get("module_entry_id") != "kg_a1:grilling":
+        fail("host module entry id drift")
+    if host_contract.get("standalone_book_item") is not False:
+        fail("Grilling guide must remain inside the Cookery guidebook")
+    if host.get("entry_registration_api") != "KC Guidebook Extension API v1":
         fail("host Guide API version changed")
-    if host["guidebook_extension_api"]["custom_callbacks_supported"] is not False:
+    if host.get("custom_callbacks_supported") is not False:
         fail("host contract unexpectedly gained callbacks; review guide architecture")
-    if host["guidebook_item"] != "kaleidoscope_cookery:guidebook":
+    if host.get("guide_item_identifier") != "kaleidoscope_cookery:guidebook":
         fail("guide host item drift")
-    if host["language"]["property"] != "kc:guidebook_language":
+    if "kc:guidebook_language" not in str(host.get("locale_selection", "")):
         fail("per-player guide language property drift")
 
     return {
@@ -269,6 +274,7 @@ def check_structure(source: dict, p: dict) -> dict:
         "transfer_chunks": len(chunks),
         "host_api": 1,
         "host_callbacks": False,
+        "standalone_book_item": False,
     }
 
 
