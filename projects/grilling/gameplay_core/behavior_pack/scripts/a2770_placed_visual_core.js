@@ -3,7 +3,7 @@ export const PREFIX='kaleidoscope_grilling:';
 export const SEASON_ENTITY=PREFIX+'placed_seasoning_visual';
 export const OIL_ENTITY=PREFIX+'placed_oil_visual';
 export const FALLBACK_COLORS=[0xB86B45,0xE0A56A];
-export const OFFSETS=[[[0,0]],[[4,3],[-3,-1]],[[4,4],[-3,3],[3,-3.75]],[[4,5],[-3,4],[3.5,-3.25],[-4.25,-3.25]];
+export const OFFSETS=[[[0,0]],[[4,3],[-3,-1]],[[4,4],[-3,3],[3,-3.75]],[[4,5],[-3,4],[3.5,-3.25],[-4.25,-3.25]]];
 const integer=(value,min,max)=>Math.max(min,Math.min(max,Number.isFinite(Number(value))?Math.floor(Number(value)):min));
 export function isSeasoningBlock(id){return /^kaleidoscope_grilling:seasoning_bottle(?:_[1-4])?$/.test(id||'')}
 export function bottlePlan(row,palette={}){
