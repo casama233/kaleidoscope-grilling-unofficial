@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+/artifacts/review/
+/projects/grilling/gameplay_core/builds/
+*.bundle

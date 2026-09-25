@@ -1,1 +1,42 @@
-{"format_version":"1.26.0","minecraft:attachable":{"description":{"identifier":"kaleidoscope_grilling:special_seasoning_r7_v6","materials":{"default":"entity_alphablend"},"textures":{"default":"textures/a2766_special_seasoning/palette_v6"},"geometry":{"default":"geometry.kg_a2766.special_seasoning.r7.v0"},"render_controllers":["controller.render.kg_a2733.seasoning_bottle_hand"]}}}
+{
+  "format_version": "1.26.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:special_seasoning_r7_v6",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/a2766_special_seasoning/palette_v6"
+      },
+      "geometry": {
+        "default": "geometry.kg_a2766.special_seasoning.r7.v0"
+      },
+      "render_controllers": [
+        "controller.render.kg_a2733.seasoning_bottle_hand"
+      ],
+      "animations": {
+        "fp_right": "animation.kaleidoscope_grilling.a2763.seasoning_fp_right",
+        "fp_left": "animation.kaleidoscope_grilling.a2763.seasoning_fp_left",
+        "tp_right": "animation.kaleidoscope_grilling.a2763.seasoning_tp_right",
+        "tp_left": "animation.kaleidoscope_grilling.a2763.seasoning_tp_left"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "fp_right": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "fp_left": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          },
+          {
+            "tp_right": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "tp_left": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          }
+        ]
+      }
+    }
+  }
+}

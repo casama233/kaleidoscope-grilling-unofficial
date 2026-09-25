@@ -1,0 +1,144 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:placed_seasoning_visual",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/blocks/seasoning_bottle",
+        "v5": "textures/a2766_special_seasoning/palette_v5",
+        "v6": "textures/a2766_special_seasoning/palette_v6",
+        "v7": "textures/a2766_special_seasoning/palette_v7",
+        "pending_0": "textures/a2770_placed/pending_0",
+        "pending_1": "textures/a2770_placed/pending_1",
+        "pending_2": "textures/a2770_placed/pending_2",
+        "pending_3": "textures/a2770_placed/pending_3",
+        "pending_4": "textures/a2770_placed/pending_4",
+        "pending_5": "textures/a2770_placed/pending_5",
+        "pending_6": "textures/a2770_placed/pending_6",
+        "pending_7": "textures/a2770_placed/pending_7",
+        "pending_8": "textures/a2770_placed/pending_8",
+        "pending_9": "textures/a2770_placed/pending_9",
+        "pending_10": "textures/a2770_placed/pending_10",
+        "pending_11": "textures/a2770_placed/pending_11",
+        "pending_12": "textures/a2770_placed/pending_12",
+        "pending_13": "textures/a2770_placed/pending_13",
+        "pending_14": "textures/a2770_placed/pending_14",
+        "pending_15": "textures/a2770_placed/pending_15"
+      },
+      "geometry": {
+        "r1v0": "geometry.kg_a2770.seasoning.r1v0",
+        "r1v1": "geometry.kg_a2770.seasoning.r1v1",
+        "r1v2": "geometry.kg_a2770.seasoning.r1v2",
+        "r1v3": "geometry.kg_a2770.seasoning.r1v3",
+        "r1v4": "geometry.kg_a2770.seasoning.r1v4",
+        "r2v0": "geometry.kg_a2770.seasoning.r2v0",
+        "r2v1": "geometry.kg_a2770.seasoning.r2v1",
+        "r2v2": "geometry.kg_a2770.seasoning.r2v2",
+        "r2v3": "geometry.kg_a2770.seasoning.r2v3",
+        "r2v4": "geometry.kg_a2770.seasoning.r2v4",
+        "r3v0": "geometry.kg_a2770.seasoning.r3v0",
+        "r3v1": "geometry.kg_a2770.seasoning.r3v1",
+        "r3v2": "geometry.kg_a2770.seasoning.r3v2",
+        "r3v3": "geometry.kg_a2770.seasoning.r3v3",
+        "r3v4": "geometry.kg_a2770.seasoning.r3v4",
+        "r4v0": "geometry.kg_a2770.seasoning.r4v0",
+        "r4v1": "geometry.kg_a2770.seasoning.r4v1",
+        "r4v2": "geometry.kg_a2770.seasoning.r4v2",
+        "r4v3": "geometry.kg_a2770.seasoning.r4v3",
+        "r4v4": "geometry.kg_a2770.seasoning.r4v4",
+        "r5v0": "geometry.kg_a2770.seasoning.r5v0",
+        "r5v1": "geometry.kg_a2770.seasoning.r5v1",
+        "r5v2": "geometry.kg_a2770.seasoning.r5v2",
+        "r5v3": "geometry.kg_a2770.seasoning.r5v3",
+        "r5v4": "geometry.kg_a2770.seasoning.r5v4",
+        "r6v0": "geometry.kg_a2770.seasoning.r6v0",
+        "r6v1": "geometry.kg_a2770.seasoning.r6v1",
+        "r6v2": "geometry.kg_a2770.seasoning.r6v2",
+        "r6v3": "geometry.kg_a2770.seasoning.r6v3",
+        "r6v4": "geometry.kg_a2770.seasoning.r6v4",
+        "r7v0": "geometry.kg_a2770.seasoning.r7v0",
+        "r7v1": "geometry.kg_a2770.seasoning.r7v1",
+        "r7v2": "geometry.kg_a2770.seasoning.r7v2",
+        "r7v3": "geometry.kg_a2770.seasoning.r7v3",
+        "r7v4": "geometry.kg_a2770.seasoning.r7v4",
+        "r8v0": "geometry.kg_a2770.seasoning.r8v0",
+        "r8v1": "geometry.kg_a2770.seasoning.r8v1",
+        "r8v2": "geometry.kg_a2770.seasoning.r8v2",
+        "r8v3": "geometry.kg_a2770.seasoning.r8v3",
+        "r8v4": "geometry.kg_a2770.seasoning.r8v4",
+        "pending_0": "geometry.kg_a2770.pending_0",
+        "pending_1": "geometry.kg_a2770.pending_1",
+        "pending_2": "geometry.kg_a2770.pending_2",
+        "pending_3": "geometry.kg_a2770.pending_3",
+        "pending_4": "geometry.kg_a2770.pending_4",
+        "pending_5": "geometry.kg_a2770.pending_5",
+        "pending_6": "geometry.kg_a2770.pending_6",
+        "pending_7": "geometry.kg_a2770.pending_7",
+        "pending_8": "geometry.kg_a2770.pending_8",
+        "pending_9": "geometry.kg_a2770.pending_9",
+        "pending_10": "geometry.kg_a2770.pending_10",
+        "pending_11": "geometry.kg_a2770.pending_11",
+        "pending_12": "geometry.kg_a2770.pending_12",
+        "pending_13": "geometry.kg_a2770.pending_13",
+        "pending_14": "geometry.kg_a2770.pending_14",
+        "pending_15": "geometry.kg_a2770.pending_15"
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_a2770.seasoning": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 2"
+        },
+        {
+          "controller.render.kg_a2770.pending_0": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 0"
+        },
+        {
+          "controller.render.kg_a2770.pending_1": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 0"
+        },
+        {
+          "controller.render.kg_a2770.pending_2": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 1"
+        },
+        {
+          "controller.render.kg_a2770.pending_3": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 1"
+        },
+        {
+          "controller.render.kg_a2770.pending_4": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 2"
+        },
+        {
+          "controller.render.kg_a2770.pending_5": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 2"
+        },
+        {
+          "controller.render.kg_a2770.pending_6": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 3"
+        },
+        {
+          "controller.render.kg_a2770.pending_7": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 3"
+        },
+        {
+          "controller.render.kg_a2770.pending_8": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 4"
+        },
+        {
+          "controller.render.kg_a2770.pending_9": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 4"
+        },
+        {
+          "controller.render.kg_a2770.pending_10": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 5"
+        },
+        {
+          "controller.render.kg_a2770.pending_11": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 5"
+        },
+        {
+          "controller.render.kg_a2770.pending_12": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 6"
+        },
+        {
+          "controller.render.kg_a2770.pending_13": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 6"
+        },
+        {
+          "controller.render.kg_a2770.pending_14": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 7"
+        },
+        {
+          "controller.render.kg_a2770.pending_15": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:mode') == 1 && q.property('kaleidoscope_grilling:fill') > 7"
+        }
+      ]
+    }
+  }
+}

@@ -1,3 +1,5 @@
+> **目前整合測試版：A2.8.0**。指南、最新共享創造欄、Java 手持姿態與放置外觀已整合；安裝完整煙火，不需另裝指南 addon。詳見 `docs/STATUS-A2.8.0.md`，實機驗收尚待完成。
+
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。

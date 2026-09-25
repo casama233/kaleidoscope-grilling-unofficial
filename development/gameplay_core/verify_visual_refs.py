@@ -149,7 +149,7 @@ def audit_item_icons(item_keys: set[str]) -> tuple[int, int]:
             continue
         items += 1
         icon = item.get("components", {}).get("minecraft:icon")
-        key = icon if isinstance(icon, str) else icon.get("texture") if isinstance(icon, dict) else None
+        key = icon if isinstance(icon, str) else icon.get("texture", icon.get("textures", {}).get("default")) if isinstance(icon, dict) else None
         if isinstance(key, str) and key and not key.startswith("minecraft:"):
             assert key in item_keys, f"{path}: missing item atlas key {key}"
             refs += 1
@@ -165,15 +165,20 @@ def audit_seasoning_bottle_runtime_chain() -> None:
         assert desc.get("geometry") == {"default": expected_geometry}, path
         assert desc.get("render_controllers") == [expected_rc], path
         assert desc.get("textures") == {"default": "textures/blocks/seasoning_bottle"}, path
-        assert "animations" not in desc, f"{path}: A2733 hand-space geometry must not receive the retired A2726 -6Y animation again"
-        assert "scripts" not in desc, f"{path}: A2733 hand-space geometry must not double-apply a hold transform"
+        if tuple(load(BP / "manifest.json")["header"]["version"]) >= (2,8,0):
+            expected = load(RP / "animations/a2763_seasoning_bottle_display.animation.json")["animations"]
+            assert set(desc["animations"].values()) == set(expected)
+            assert all(set(anim["bones"]) == {"display"} for anim in expected.values())
+        else:
+            assert "animations" not in desc
+            assert "scripts" not in desc
 
     geo = load(RP / "models/entity/a2733_seasoning_bottle_hand.geo.json")["minecraft:geometry"][0]
     root = geo["bones"][0]
     assert root["name"] == "root"
     assert root.get("binding") == "q.item_slot_to_bone_name(context.item_slot)"
     assert all(
-        bone.get("name") == "root" or (
+        bone.get("name") in {"root", "display"} or (
             isinstance(bone.get("pivot"), list) and len(bone["pivot"]) == 3 and float(bone["pivot"][1]) == -6.0
         )
         for bone in geo["bones"]

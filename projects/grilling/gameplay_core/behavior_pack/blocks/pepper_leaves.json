@@ -3,10 +3,19 @@
   "minecraft:block": {
     "description": {
       "identifier": "kaleidoscope_grilling:pepper_leaves",
-      "menu_category": {"category": "nature"},
+      "menu_category": {
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.other_blocks"
+      },
       "states": {
-        "kaleidoscope_grilling:has_pepper": [false,true],
-        "kaleidoscope_grilling:persistent": [false,true]
+        "kaleidoscope_grilling:has_pepper": [
+          false,
+          true
+        ],
+        "kaleidoscope_grilling:persistent": [
+          false,
+          true
+        ]
       }
     },
     "components": {
@@ -20,10 +29,36 @@
           "ambient_occlusion": false
         }
       },
-      "minecraft:collision_box": {"origin": [-8,15,-8],"size":[16,1,16]},
-      "minecraft:selection_box": {"origin": [-8,0,-8],"size":[16,16,16]},
-      "minecraft:destructible_by_mining": {"seconds_to_destroy": 0.2},
-      "minecraft:destructible_by_explosion": {"explosion_resistance": 0.2},
+      "minecraft:collision_box": {
+        "origin": [
+          -8,
+          15,
+          -8
+        ],
+        "size": [
+          16,
+          1,
+          16
+        ]
+      },
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.2
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 0.2
+      },
       "minecraft:light_dampening": 1,
       "minecraft:loot": "loot_tables/blocks/pepper_leaves_fallback.json",
       "kaleidoscope_grilling:pepper_leaves_logic": {}

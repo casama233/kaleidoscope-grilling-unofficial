@@ -35,6 +35,9 @@ VERIFIERS = {
     (2, 7, 67): "verify_a2767.py",
     (2, 7, 68): "verify_a2768.py",
     (2, 7, 69): "verify_a2769.py",
+    (2, 7, 70): "verify_a2770.py",
+    (2, 7, 71): "verify_a2771.py",
+    (2, 8, 0): "verify_a280.py",
 }
 
 
@@ -57,7 +60,7 @@ def dependency_by_uuid(manifest: dict, uuid: str) -> dict:
 def verify_relative_imports() -> int:
     pattern = re.compile(r"(?:from\s+|import\s*)['\"](\.[^'\"]+)['\"]")
     checked = 0
-    for path in sorted((BP / "scripts").glob("*.js")):
+    for path in sorted((BP / "scripts").rglob("*.js")):
         text = path.read_text(encoding="utf-8")
         for spec in pattern.findall(text):
             target = (path.parent / spec).resolve()

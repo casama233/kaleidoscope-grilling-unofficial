@@ -6,7 +6,10 @@ import {
  PLATE_ID,PLATE_BLOCK_ID,BOOK_ID,RECIPE_BLOCK_ID,PLATE_SKEWERS_KEY,BOOK_RECORD_KEY,PLATE_CAPACITY,
  normalizePlateRows,plateAdd,plateRemoveLast,isRecordableRecipe,makeBookRecord,bookIngredientSlots,planInventoryConsumption
 } from './a25_plate_recipe_core.js';
-import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,isCreative as creative} from './a2735_player_io.js';
+import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,setHand,isCreative as creative} from './a2735_player_io.js';
+import {isInitialBlockPress} from './a275_grill_input_core.js';
+import {stackIntentSignature as interactionStackSignature} from './a2762_interaction_intent_core.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 
 const COOKERY_RECIPE_ITEMS=new Set([
  'kaleidoscope_cookery:recipe_block',
@@ -31,6 +34,10 @@ function decrementMain(player,count=1){
 function decrementOff(player,count=1){
  if(creative(player))return true;const s=heldOff(player);if(!s||s.amount<count)return false;
  if(s.amount===count)setOff(player,undefined);else{s.amount-=count;setOff(player,s)}return true;
+}
+function decrementHand(player,hand,count=1){
+ if(creative(player))return true;const s=heldByHand(player,hand);if(!s||s.amount<count)return false;
+ if(s.amount===count)setHand(player,hand,undefined);else{s.amount-=count;setHand(player,hand,s)}return true;
 }
 function give(player,stack){
  if(!stack)return;const c=mainContainer(player);if(!c){player.dimension.spawnItem(stack,player.location);return}
@@ -128,7 +135,7 @@ function setFacing(block,face){
  const f=faceName(face);if(!['north','south','west','east'].includes(f))return;
  try{block.setPermutation(block.permutation.withState('minecraft:cardinal_direction',f))}catch{}
 }
-function placePlateOn(support,face,player,source){
+function placePlateOn(support,face,player,source,hand='main'){
  if(faceName(face)!=='up'||!player.isSneaking)return false;
  if(support.typeId!==COOKERY_TABLE&&!(support.isSolid??false))return false;
  const target=blockAtOffset(support,{x:0,y:1,z:0});if(!isAirReplaceable(target))return false;
@@ -137,21 +144,22 @@ function placePlateOn(support,face,player,source){
  else if(isSkewer(source))rows=[stackRow(source)];
  else return false;
  if(!rows.length)return false;
- target.setType(PLATE_BLOCK_ID);writePlateBlock(target,rows);decrementMain(player,1);
+ target.setType(PLATE_BLOCK_ID);writePlateBlock(target,rows);decrementHand(player,hand,1);
  try{target.dimension.playSound('dig.wood',target.location,{volume:.8,pitch:1})}catch{}
  return true;
 }
-function handlePlateBlock(block,player){
+function handlePlateBlock(block,player,hand='main'){
  if(!block||block.typeId!==PLATE_BLOCK_ID)return;
- const held=heldMain(player),rows=readPlateBlock(block);
+ const held=heldByHand(player,hand),rows=readPlateBlock(block);
  if(held&&isSkewer(held)){
+  if(player.isSneaking&&hand==='off')return;
   const added=plateAdd(rows,stackRow(held));if(!added.ok){message(player,'§e烤串盤已滿 5/5');return}
-  if(!decrementMain(player,1))return;writePlateBlock(block,added.rows);
+  if(!decrementHand(player,hand,1))return;writePlateBlock(block,added.rows);
   try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:1.1})}catch{};return;
  }
  if(held)return;
  const removed=plateRemoveLast(rows);if(!removed.ok)return;
- const stack=restoreStack(removed.removed);if(!stack)return;setMain(player,stack);writePlateBlock(block,removed.rows);
+ const stack=restoreStack(removed.removed);if(!stack)return;setHand(player,hand,stack);writePlateBlock(block,removed.rows);
  try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:.9})}catch{}
 }
 function breakPlate(block,player){
@@ -206,17 +214,17 @@ function convertCookeryRecipe(player){
  }
  give(player,out);message(player,'§aCookery 空白食譜已記錄為烤串食譜');return true;
 }
-function placeRecipeBlock(support,face,player,book){
+function placeRecipeBlock(support,face,player,book,hand='main'){
  const f=faceName(face);if(!['north','south','west','east'].includes(f))return false;
  const record=readBookRecord(book);if(!record){message(player,'§c空白烤串食譜不能貼牆');return true}
  const target=blockAtOffset(support,faceOffset(face));if(!isAirReplaceable(target))return false;
- target.setType(RECIPE_BLOCK_ID);setFacing(target,f);writeRecipeBlock(target,book);decrementMain(player,1);
+ target.setType(RECIPE_BLOCK_ID);setFacing(target,f);writeRecipeBlock(target,book);decrementHand(player,hand,1);
  try{target.dimension.playSound('random.pop',target.location,{volume:.6,pitch:1})}catch{}return true;
 }
-function handleRecipeBlock(block,player){
+function handleRecipeBlock(block,player,hand='main'){
  if(!block||block.typeId!==RECIPE_BLOCK_ID)return;
- const row=readRecipeBlock(block),book=restoreStack(row),held=heldMain(player);
- if(held?.typeId==='minecraft:stick'&&book){craftFromBook(player,book,'main');return}
+ const row=readRecipeBlock(block),book=restoreStack(row),held=heldByHand(player,hand);
+ if(held?.typeId==='minecraft:stick'&&book){craftFromBook(player,book,hand);return}
  if(held)return;
  clearRecipeBlock(block);block.setType('minecraft:air');if(book)give(player,book);
  try{block.dimension.playSound('random.pop',block.location,{volume:.6,pitch:.9})}catch{}
@@ -228,28 +236,40 @@ function breakRecipe(block,player){
 
 world.beforeEvents.itemUse.subscribe(e=>{
  try{
-  const id=e.itemStack?.typeId;
-  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(e.source,'§7空烤串盤不能食用');return}
-  if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(e.source))){e.cancel=true;const p=e.source;system.run(()=>convertCookeryRecipe(p));return}
-  if(id!==BOOK_ID)return;e.cancel=true;const p=e.source,item=cloneOne(e.itemStack);system.run(()=>handleBookAir(p,item));
+  if(e.cancel)return;const id=e.itemStack?.typeId,p=e.source;
+  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(p,'§7空烤串盤不能食用');return}
+  const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;
+  if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(p))){
+   e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
+   system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜或副手烤串已變更');return}convertCookeryRecipe(p)});return;
+  }
+  if(id!==BOOK_ID)return;e.cancel=true;const item=cloneOne(e.itemStack),offSignature=interactionStackSignature(heldOff(p));
+  system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜書或副手材料已變更');return}handleBookAir(p,item)});
  }catch{}
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{
-  const block=e.block,p=e.player,item=e.itemStack??heldMain(p);
-  if(block.typeId===PLATE_BLOCK_ID){e.cancel=true;const loc={...block.location},dim=block.dimension;system.run(()=>handlePlateBlock(dim.getBlock(loc),p));return}
-  if(block.typeId===RECIPE_BLOCK_ID){
-   if(!item||item.typeId==='minecraft:stick'){e.cancel=true;const loc={...block.location},dim=block.dimension;system.run(()=>handleRecipeBlock(dim.getBlock(loc),p))}return;
+  const block=e.block,p=e.player,intent=captureInteractionIntent(p,e.itemStack),hand=intent.hand,item=heldByHand(p,hand),first=isInitialBlockPress(e.isFirstEvent);
+  const defer=fn=>system.run(()=>{if(!interactionIntentStillCurrent(p,intent)){message(p,'§7操作已取消：互動後手持物品已改變');return}fn()});
+  if(block.typeId===PLATE_BLOCK_ID){
+   if(item&&isSkewer(item)&&p.isSneaking&&hand==='off')return;
+   if(!item&&readPlateBlock(block).length===0)return;
+   e.cancel=true;if(!first)return;const loc={...block.location},dim=block.dimension;defer(()=>handlePlateBlock(dim.getBlock(loc),p,hand));return;
   }
-  if(p.isSneaking&&item&&COOKERY_RECIPE_ITEMS.has(item.typeId)&&isRecordableStack(heldOff(p))){
-   e.cancel=true;system.run(()=>convertCookeryRecipe(p));return;
+  if(block.typeId===RECIPE_BLOCK_ID){
+   if(item&&item.typeId!=='minecraft:stick')return;
+   e.cancel=true;if(!first)return;const loc={...block.location},dim=block.dimension;defer(()=>handleRecipeBlock(dim.getBlock(loc),p,hand));return;
+  }
+  if(p.isSneaking&&hand==='main'&&item&&COOKERY_RECIPE_ITEMS.has(item.typeId)&&isRecordableStack(heldOff(p))){
+   e.cancel=true;if(!first)return;defer(()=>convertCookeryRecipe(p));return;
   }
   if(p.isSneaking&&item&&(item.typeId===PLATE_ID||isSkewer(item))&&faceName(e.blockFace)==='up'){
-   const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;system.run(()=>placePlateOn(dim.getBlock(loc),face,p,heldMain(p)));return;
+   if(isSkewer(item)&&hand!=='main')return;
+   const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;if(!first)return;defer(()=>placePlateOn(dim.getBlock(loc),face,p,heldByHand(p,hand),hand));return;
   }
   if(item?.typeId===BOOK_ID&&['north','south','west','east'].includes(faceName(e.blockFace))){
-   const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;system.run(()=>placeRecipeBlock(dim.getBlock(loc),face,p,heldMain(p)));return;
+   const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;if(!first)return;defer(()=>placeRecipeBlock(dim.getBlock(loc),face,p,heldByHand(p,hand),hand));return;
   }
  }catch{}
 });

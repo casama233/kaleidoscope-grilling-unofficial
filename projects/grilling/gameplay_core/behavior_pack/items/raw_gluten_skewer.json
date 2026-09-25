@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:raw_gluten_skewer",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {

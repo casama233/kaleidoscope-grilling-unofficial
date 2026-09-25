@@ -25,6 +25,11 @@ function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catc
 function resolveRack(dimension,location){
  try{const b=dimension.getBlock(location);return b?.typeId===ADVANCED_RACK_BLOCK_ID?b:undefined}catch{return undefined}
 }
+function rackInUseRange(player,block){
+ if(!player||!block||player.dimension.id!==block.dimension.id)return false;
+ const dx=block.x+.5-player.location.x,dy=block.y+.5-player.location.y,dz=block.z+.5-player.location.z;
+ return dx*dx+dy*dy+dz*dz<=64;
+}
 function bindingKey(slot){return BIND_PREFIX+slot}
 function readBinding(player,hotbarSlot){
  try{
@@ -209,7 +214,7 @@ function slotButton(slot,stored,filter){
 }
 
 async function openSlotForm(player,dimension,location,slot){
- const block=resolveRack(dimension,location);if(!block)return;
+ const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
  const c=rackContainer(block),filters=readRackFilters(block),stored=c?.getItem(slot);
  const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
  form.body('§7槽位 '+(slot+1)+' · '+(slot<5?'調料':'工具')+'\n'+filterLabel(filters[slot]));
@@ -220,7 +225,7 @@ async function openSlotForm(player,dimension,location,slot){
  form.button('§7返回');
  let r;try{r=await form.show(player)}catch{return}
  if(r.canceled)return;
- const live=resolveRack(dimension,location);if(!live)return;
+ const live=resolveRack(dimension,location);if(!live||!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return;}
  if(r.selection===0){if(!swapWithHotbar(player,live,slot))message(player,'§c無法交換：請確認槽位分類與背包空間')}
  else if(r.selection===1){if(!depositSelected(player,live,slot))message(player,'§c無法存入：物品分類或篩選不符合')}
  else if(r.selection===2){if(!withdrawToInventory(player,live,slot))message(player,'§c背包沒有足夠空間')}
@@ -232,7 +237,7 @@ async function openSlotForm(player,dimension,location,slot){
 }
 
 export async function openRackForm(player,dimension,location){
- const block=resolveRack(dimension,location);if(!block)return;
+ const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
  const c=rackContainer(block),filters=readRackFilters(block);if(!c)return;
  const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
  form.body({translate:'ui.kaleidoscope_grilling.advanced_rack.hint'});
@@ -243,6 +248,7 @@ export async function openRackForm(player,dimension,location){
  if(r.selection>=0&&r.selection<RACK_COMPARTMENTS)system.run(()=>openSlotForm(player,dimension,location,r.selection));
  else if(r.selection===RACK_COMPARTMENTS){
   const live=resolveRack(dimension,location);
+  if(live&&!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return}
   if(live&&depositMatching(player,live))message(player,'§a已存入所有符合既有篩選的物品');
   else message(player,'§7沒有可存入的符合物品');
  }
@@ -296,6 +302,7 @@ function nearestRack(player){
 }
 
 world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
+ if(event.cancel)return;
  if(event.block.typeId===ADVANCED_RACK_BLOCK_ID){
   event.cancel=true;
   if(event.isFirstEvent!==false){const p=event.player,d=event.block.dimension,l=loc(event.block);system.run(()=>openRackForm(p,d,l))}

@@ -14,20 +14,40 @@
         "stage4": "textures/a22_bites/raw_bun_slice_skewer_stage2"
       },
       "geometry": {
-        "stage0": "geometry.kg_a2764.raw_bun_slice_skewer.stage0",
-        "stage1": "geometry.kg_a2764.raw_bun_slice_skewer.stage1",
-        "stage2": "geometry.kg_a2764.raw_bun_slice_skewer.stage2",
-        "stage3": "geometry.kg_a2764.raw_bun_slice_skewer.stage2",
-        "stage4": "geometry.kg_a2764.raw_bun_slice_skewer.stage2"
+        "stage0": "geometry.kg_a22.raw_bun_slice_skewer.stage0",
+        "stage1": "geometry.kg_a22.raw_bun_slice_skewer.stage1",
+        "stage2": "geometry.kg_a22.raw_bun_slice_skewer.stage2",
+        "stage3": "geometry.kg_a22.raw_bun_slice_skewer.stage2",
+        "stage4": "geometry.kg_a22.raw_bun_slice_skewer.stage2"
       },
       "scripts": {
         "pre_animation": [
           "v.kg_bite_stage = q.is_using_item ? (q.item_in_use_duration >= 4.00000 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0)) : 0;"
+        ],
+        "animate": [
+          {
+            "fp_right": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "fp_left": "context.is_first_person == 1.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          },
+          {
+            "tp_right": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'rightItem'"
+          },
+          {
+            "tp_left": "context.is_first_person == 0.0 && q.item_slot_to_bone_name(context.item_slot) == 'leftItem'"
+          }
         ]
       },
       "render_controllers": [
         "controller.render.kg_a22.bite"
-      ]
+      ],
+      "animations": {
+        "fp_right": "animation.kaleidoscope_grilling.a2764.skewer_fp_right",
+        "fp_left": "animation.kaleidoscope_grilling.a2764.skewer_fp_left",
+        "tp_right": "animation.kaleidoscope_grilling.a2764.skewer_tp_right",
+        "tp_left": "animation.kaleidoscope_grilling.a2764.skewer_tp_left"
+      }
     }
   }
 }
