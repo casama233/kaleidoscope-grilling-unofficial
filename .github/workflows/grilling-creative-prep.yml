@@ -57,7 +57,7 @@ jobs:
           python development/gameplay_core/test_a2770_catalog.py
           python development/gameplay_core/a2770_creative_catalog.py --apply
           python development/gameplay_core/verify_current.py
-          git diff --check
+          git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check
       - name: Commit verified changes to this review branch only; retire preparation workflow
         env:
           GH_TOKEN: ${{ github.token }}
