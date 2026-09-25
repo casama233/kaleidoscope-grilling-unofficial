@@ -1,6 +1,6 @@
 # Kaleidoscope Grilling Gameplay Core
 
-目前 canonical runtime：**A2.7.64 Skewer Held Geometry Corrective（3 個樣本驗證階段）**。
+目前 canonical runtime：**A2.7.65 Full Skewer Hand Geometry**。
 
 這個目錄下的 `behavior_pack/` 與 `resource_pack/` 是目前真正要編譯、驗證與打包的來源。歷史 `development/gameplay_core/aXX*`、`verify_aXX*` 與 `.github/workflows/gameplay-core-aXX.yml` 保留作版本追溯；**新修改不要再從舊 augment/workflow 生成回來覆寫 canonical runtime**。
 
@@ -39,7 +39,7 @@ A2.7.61 起，Grill 與 Seasoning Bottle 的 block interaction 共享同一套 h
 
 ## A2.7.64 烤串手持 corrective
 
-目前先把 `raw_beef_skewer`、`grilled_beef_skewer`、`ordinary_skewer` 三個代表樣本切換成 baked hand-space geometry。A2.7.25 的 `[0,+7,+2]` root animation 位移改由 A2764 geometry 直接承擔；三個樣本不再引用 A2725 hold animation，但其餘 36 個仍暫時保留舊路線，等待 Minecraft 第一/第三人稱實機驗收後才全量轉換。
+39/39 個烤串 attachable 已全部切換成 baked hand-space geometry；150/150 個 bite-stage geometry 使用 A2.7.25 已證明的 `[0,+7,+2]` hand-space 平移。正式 runtime 不再引用 A2725 first/third-person root hold animation；舊 animation 檔只保留作歷史重建。
 
 ## Legacy workflow 封存
 
