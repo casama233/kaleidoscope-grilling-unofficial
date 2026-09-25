@@ -1,0 +1,52 @@
+name: Prepare Grilling creative groups (one-shot)
+on:
+  push:
+    branches: [fix/grilling-creative-groups]
+    paths: ['.github/workflows/grilling-creative-prep.yml', 'development/gameplay_core/a2770_creative_catalog.py', 'development/gameplay_core/verify_a2770.py', 'development/gameplay_core/test_a2770_catalog.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: grilling-creative-prep
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440' && github.ref == 'refs/heads/fix/grilling-creative-groups'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Read exact branch commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
+          test "$GITHUB_REPOSITORY_ID" = '1377218440'
+          git init .
+          git config core.autocrlf false
+          git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
+          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Generate and verify creative-only metadata
+        run: |
+          set -euo pipefail
+          python development/gameplay_core/test_a2770_catalog.py
+          python development/gameplay_core/a2770_creative_catalog.py --apply
+          python development/gameplay_core/verify_current.py
+          git diff --check
+      - name: Commit verified changes to this review branch only; retire preparation workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          gh auth setup-git
+          git rm -- .github/workflows/grilling-creative-prep.yml
+          git add -- projects/grilling/gameplay_core development/gameplay_core/verify_current.py development/gameplay_core/verify_a2769.py
+          git commit -m 'release: A2.7.70 group Grilling creative items by use'
+          git push origin HEAD:refs/heads/fix/grilling-creative-groups
