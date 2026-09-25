@@ -33,7 +33,7 @@ def fail(message: str):
 
 def payload():
     text = (BP / "scripts" / "payload.js").read_text(encoding="utf-8").strip()
-    prefix = "export const GUIDEBOOK_PAYLOAD="
+    prefix = "export const GUIDE_PAYLOAD="
     if not text.startswith(prefix) or not text.endswith(";"):
         fail("payload.js is not the canonical generated export")
     return json.loads(text[len(prefix):-1])
