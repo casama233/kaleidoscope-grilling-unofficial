@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:sour_spicy_noodles",
       "menu_category": {
-        "category": "items"
+        "category": "items",
+        "group": "kaleidoscope_grilling:itemGroup.dishes"
       }
     },
     "components": {

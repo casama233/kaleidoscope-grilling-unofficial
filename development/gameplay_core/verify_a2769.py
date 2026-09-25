@@ -65,8 +65,8 @@ def java_contract():
   assert blob(data)==sha,('Java reference drift',path)
   for token in tokens:assert token in data.decode(),(path,token)
 
-def source_guards():
- for side in (BP,RP):assert load(side/'manifest.json')['header']['version']==[2,7,69]
+def source_guards(expected_version=(2,7,69)):
+ for side in (BP,RP):assert load(side/'manifest.json')['header']['version']==list(expected_version)
  for locale in ('en_US','zh_CN','zh_TW'):
   text=(RP/f'texts/{locale}.lang').read_text(encoding='utf-8-sig')
   keys={line.split('=',1)[0] for line in text.splitlines() if '=' in line}

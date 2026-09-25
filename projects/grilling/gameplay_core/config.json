@@ -1,8 +1,20 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.7.69 Food Tooltip and Oil Safety",
+  "name": "Kaleidoscope Grilling A2.7.70 Creative Groups",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
-  "packs": {"behaviorPack": "./behavior_pack", "resourcePack": "./resource_pack"},
-  "compiler": {"plugins": [["simpleRewrite", {"packName": "Kaleidoscope_Grilling_A2_7_69_Food_Tooltip_Oil_Safety"}]]}
+  "packs": {
+    "behaviorPack": "./behavior_pack",
+    "resourcePack": "./resource_pack"
+  },
+  "compiler": {
+    "plugins": [
+      [
+        "simpleRewrite",
+        {
+          "packName": "Kaleidoscope_Grilling_A2_7_70_Creative_Groups"
+        }
+      ]
+    ]
+  }
 }

@@ -30,7 +30,7 @@ class CatalogTests(unittest.TestCase):
         for locale in c.LOCALES:
             result=c.localized('other:item=unchanged\r\n',locale,active)
             for key in active:self.assertEqual(result.count(key+'='),1)
-            self.assertIn('other:item=unchanged\n',result)
+            self.assertIn('other:item=unchanged',result.splitlines())
     def test_localization_idempotent(self):
         active={c.GROUP_PREFIX+'stations'}
         first=c.localized('old:key=text\n', 'zh_TW', active)

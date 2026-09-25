@@ -121,7 +121,8 @@ def localized(text, locale, active):
             label = dict(zip(LOCALES, (tw, cn, en)))[locale]
             prefix = '森羅煙火' if locale == 'zh_TW' else '森罗烟火' if locale == 'zh_CN' else 'Kaleidoscope Grilling'
             kept.append(GROUP_PREFIX+key+'='+prefix+' · '+label)
-    return '\n'.join(kept) + '\n'
+    newline = '\r\n' if '\r\n' in text else '\n'
+    return newline.join(kept) + newline
 
 
 def immutable_digest():
@@ -215,7 +216,7 @@ def apply():
     active={g['group_identifier']['name'] for g in groups}
     for locale in LOCALES:
         path=RP/f'texts/{locale}.lang'
-        pending[path]=localized(path.read_text(encoding='utf-8-sig'),locale,active)
+        pending[path]=localized(path.read_bytes().decode('utf-8-sig'),locale,active)
     for pack,suffix in ((BP,'BP'),(RP,'RP')):
         path=pack/'manifest.json';doc=load(path)
         doc['header']['name']='Kaleidoscope Grilling A2.7.70 Creative Groups '+suffix

@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:grill",
       "menu_category": {
-        "category": "items"
+        "category": "items",
+        "group": "kaleidoscope_grilling:itemGroup.stations"
       },
       "states": {
         "kaleidoscope_grilling:legged": [

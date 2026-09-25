@@ -1,1 +1,204 @@
-{"format_version":"1.26.50","minecraft:block":{"description":{"identifier":"kaleidoscope_grilling:big_vat","menu_category":{"category":"items"},"states":{"kaleidoscope_grilling:vat_level":[0,1,2,3,4],"kaleidoscope_grilling:vat_fluid":["empty","water","lava","canola","secret_chili","premium_chili"]}},"components":{"minecraft:display_name":"tile.kaleidoscope_grilling:big_vat.name","minecraft:geometry":"geometry.kg_a26.big_vat_0","minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"still_water_grey","render_method":"blend","ambient_occlusion":0,"face_dimming":false}},"minecraft:collision_box":{"origin":[-8,0,-8],"size":[16,16,16]},"minecraft:selection_box":{"origin":[-8,0,-8],"size":[16,16,16]},"minecraft:destructible_by_mining":{"seconds_to_destroy":2},"minecraft:destructible_by_explosion":{"explosion_resistance":6}},"permutations":[{"condition":"q.block_state('kaleidoscope_grilling:vat_level') == 0","components":{"minecraft:geometry":"geometry.kg_a26.big_vat_0"}},{"condition":"q.block_state('kaleidoscope_grilling:vat_level') == 1","components":{"minecraft:geometry":"geometry.kg_a26.big_vat_1"}},{"condition":"q.block_state('kaleidoscope_grilling:vat_level') == 2","components":{"minecraft:geometry":"geometry.kg_a26.big_vat_2"}},{"condition":"q.block_state('kaleidoscope_grilling:vat_level') == 3","components":{"minecraft:geometry":"geometry.kg_a26.big_vat_3"}},{"condition":"q.block_state('kaleidoscope_grilling:vat_level') == 4","components":{"minecraft:geometry":"geometry.kg_a26.big_vat_4"}},{"condition":"q.block_state('kaleidoscope_grilling:vat_fluid') == 'water'","components":{"minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"still_water_grey","render_method":"blend","ambient_occlusion":0,"face_dimming":false}}}},{"condition":"q.block_state('kaleidoscope_grilling:vat_fluid') == 'lava'","components":{"minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"still_lava","render_method":"blend","ambient_occlusion":0,"face_dimming":false}}}},{"condition":"q.block_state('kaleidoscope_grilling:vat_fluid') == 'canola'","components":{"minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"kg_a23_canola_oil","render_method":"blend","ambient_occlusion":0,"face_dimming":false}}}},{"condition":"q.block_state('kaleidoscope_grilling:vat_fluid') == 'secret_chili'","components":{"minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"kg_a23_secret_chili_oil","render_method":"blend","ambient_occlusion":0,"face_dimming":false}}}},{"condition":"q.block_state('kaleidoscope_grilling:vat_fluid') == 'premium_chili'","components":{"minecraft:material_instances":{"*":{"texture":"kg_a26_big_vat","render_method":"blend","ambient_occlusion":1,"face_dimming":true},"fluid":{"texture":"kg_a23_premium_chili_oil","render_method":"blend","ambient_occlusion":0,"face_dimming":false}}}}]}}
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:big_vat",
+      "menu_category": {
+        "category": "items",
+        "group": "kaleidoscope_grilling:itemGroup.stations"
+      },
+      "states": {
+        "kaleidoscope_grilling:vat_level": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "kaleidoscope_grilling:vat_fluid": [
+          "empty",
+          "water",
+          "lava",
+          "canola",
+          "secret_chili",
+          "premium_chili"
+        ]
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.kaleidoscope_grilling:big_vat.name",
+      "minecraft:geometry": "geometry.kg_a26.big_vat_0",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kg_a26_big_vat",
+          "render_method": "blend",
+          "ambient_occlusion": 1,
+          "face_dimming": true
+        },
+        "fluid": {
+          "texture": "still_water_grey",
+          "render_method": "blend",
+          "ambient_occlusion": 0,
+          "face_dimming": false
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6
+      }
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_level') == 0",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.big_vat_0"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_level') == 1",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.big_vat_1"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_level') == 2",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.big_vat_2"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_level') == 3",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.big_vat_3"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_level') == 4",
+        "components": {
+          "minecraft:geometry": "geometry.kg_a26.big_vat_4"
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_fluid') == 'water'",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "kg_a26_big_vat",
+              "render_method": "blend",
+              "ambient_occlusion": 1,
+              "face_dimming": true
+            },
+            "fluid": {
+              "texture": "still_water_grey",
+              "render_method": "blend",
+              "ambient_occlusion": 0,
+              "face_dimming": false
+            }
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_fluid') == 'lava'",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "kg_a26_big_vat",
+              "render_method": "blend",
+              "ambient_occlusion": 1,
+              "face_dimming": true
+            },
+            "fluid": {
+              "texture": "still_lava",
+              "render_method": "blend",
+              "ambient_occlusion": 0,
+              "face_dimming": false
+            }
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_fluid') == 'canola'",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "kg_a26_big_vat",
+              "render_method": "blend",
+              "ambient_occlusion": 1,
+              "face_dimming": true
+            },
+            "fluid": {
+              "texture": "kg_a23_canola_oil",
+              "render_method": "blend",
+              "ambient_occlusion": 0,
+              "face_dimming": false
+            }
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_fluid') == 'secret_chili'",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "kg_a26_big_vat",
+              "render_method": "blend",
+              "ambient_occlusion": 1,
+              "face_dimming": true
+            },
+            "fluid": {
+              "texture": "kg_a23_secret_chili_oil",
+              "render_method": "blend",
+              "ambient_occlusion": 0,
+              "face_dimming": false
+            }
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('kaleidoscope_grilling:vat_fluid') == 'premium_chili'",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "kg_a26_big_vat",
+              "render_method": "blend",
+              "ambient_occlusion": 1,
+              "face_dimming": true
+            },
+            "fluid": {
+              "texture": "kg_a23_premium_chili_oil",
+              "render_method": "blend",
+              "ambient_occlusion": 0,
+              "face_dimming": false
+            }
+          }
+        }
+      }
+    ]
+  }
+}

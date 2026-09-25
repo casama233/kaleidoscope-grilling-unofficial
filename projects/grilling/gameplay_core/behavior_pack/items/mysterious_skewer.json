@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:mysterious_skewer",
       "menu_category": {
-        "category": "items"
+        "category": "items",
+        "group": "kaleidoscope_grilling:itemGroup.special_skewers"
       }
     },
     "components": {
