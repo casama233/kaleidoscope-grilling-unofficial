@@ -37,7 +37,7 @@ A2.7.61 起，Grill 與 Seasoning Bottle 的 block interaction 共享同一套 h
 
 穿串因 Bedrock stable 沒有完全等價於 Forge `RightClickItem` 的 generic use-button 事件，對不可原生 use 的食材仍需要 item/block/entity 多個事件來源；它們只作事件適配，實際穿串仍收斂到同一個 `scheduleSkewerAction` executor，並有同 tick 去重。這是平台差異，不應再複製一套穿串規則。
 
-## A2.7.64 烤串手持 corrective
+## A2.7.65 烤串手持 corrective
 
 39/39 個烤串 attachable 已全部切換成 baked hand-space geometry；150/150 個 bite-stage geometry 使用 A2.7.25 已證明的 `[0,+7,+2]` hand-space 平移。正式 runtime 不再引用 A2725 first/third-person root hold animation；舊 animation 檔只保留作歷史重建。
 
