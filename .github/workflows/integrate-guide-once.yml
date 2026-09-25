@@ -1,0 +1,53 @@
+name: Integrate Guide Into Grilling Once
+on:
+  push:
+    branches: [codex/a2761-runtime-hygiene]
+    paths: ['.github/workflows/integrate-guide-once.yml']
+permissions:
+  contents: write
+jobs:
+  integrate:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440' && github.ref == 'refs/heads/codex/a2761-runtime-hygiene'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Read exact review-branch commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
+          test "$GITHUB_REPOSITORY_ID" = '1377218440'
+          git init .
+          git config core.autocrlf false
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git checkout -B codex/a2761-runtime-hygiene FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Integrate and validate the existing product
+        shell: bash
+        run: |
+          set -euo pipefail
+          python development/guide/integrate_a3_into_grilling.py
+          python tools/build_grilling_guide.py --check
+          python tools/build_grilling_release.py --output "$RUNNER_TEMP/Grilling_Builtin_Guide.mcaddon"
+          git diff --check
+      - name: Commit the corrected canonical product only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A -- projects/grilling/gameplay_core projects/grilling/guide projects/grilling/integration/cookery106 history/standalone-guide-a3 tools docs/GUIDE-INDEX-A3.md .github/workflows/gameplay-core-canonical.yml .github/workflows/guide-canonical.yml
+          python - <<'PY'
+          import subprocess
+          names=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed=('projects/grilling/gameplay_core/','projects/grilling/guide/','projects/grilling/integration/cookery106/','history/standalone-guide-a3/','tools/','docs/GUIDE-INDEX-A3.md','.github/workflows/gameplay-core-canonical.yml','.github/workflows/guide-canonical.yml')
+          assert names and all(n.startswith(allowed) for n in names), names
+          PY
+          git config user.name 'grilling-guide-integration[bot]'
+          git config user.email 'grilling-guide-integration[bot]@users.noreply.github.com'
+          git commit -m 'fix: ship Cookery guide chapter inside Grilling existing BP and RP'
+          git push origin HEAD:refs/heads/codex/a2761-runtime-hygiene
