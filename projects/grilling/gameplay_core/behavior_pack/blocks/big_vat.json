@@ -71,6 +71,17 @@
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 6
+      },
+      "minecraft:item_visual": {
+        "geometry": "geometry.kg_a26.big_vat_0",
+        "material_instances": {
+          "*": {
+            "texture": "kg_a26_big_vat",
+            "render_method": "alpha_test",
+            "ambient_occlusion": true,
+            "face_dimming": true
+          }
+        }
       }
     },
     "permutations": [

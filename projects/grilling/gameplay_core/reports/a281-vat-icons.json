@@ -1,0 +1,54 @@
+{
+  "version": "A2.8.1",
+  "baseline": "45b5f8d001fb624fcf49f5503b5e16b81c93b950",
+  "unchanged_runtime_files": 1383,
+  "native_vat_display_contexts": 7,
+  "removed_active_attachables": [
+    "kaleidoscope_grilling:big_vat"
+  ],
+  "icons": {
+    "empty_seasoning_bottle": {
+      "bbox": [
+        11,
+        5,
+        53,
+        59
+      ],
+      "sha256": "e0bd1e10011502c7b30503646475113df0200b2f4c344b9ad301ed220d121650",
+      "rgba_sha256": "c5b5c52ba5af239a4729e16d5fd6adb78289995092fc1f2e70f46fbcce2831e0"
+    },
+    "pending_seasoning": {
+      "bbox": [
+        11,
+        5,
+        53,
+        59
+      ],
+      "sha256": "e0bd1e10011502c7b30503646475113df0200b2f4c344b9ad301ed220d121650",
+      "rgba_sha256": "c5b5c52ba5af239a4729e16d5fd6adb78289995092fc1f2e70f46fbcce2831e0"
+    },
+    "special_seasoning": {
+      "bbox": [
+        11,
+        5,
+        53,
+        59
+      ],
+      "sha256": "911dd1a62942cd48171f9f39d7df4164d4adf821c7a69662c072c6269d6e6f11",
+      "rgba_sha256": "0ddc82e425bfb57ddbaddf7a3807a81e75a8d83f2655a0fe5df044e05e34ee97"
+    }
+  },
+  "icon_source_sha256": {
+    "projects/grilling/source_snapshots/common/src/main/resources/assets/kaleidoscope_grilling/models/block/seasoning_bottle.json": "21cf9d267dfae0e006643216e91d71292533831313ee8944d997d41efcb3cdc7",
+    "projects/grilling/source_snapshots/common/src/main/resources/assets/kaleidoscope_grilling/textures/block/spice_jar.png": "d2a4d3b0e081cf145b8bc54ff5fba6b4b12a754dfd7dc80972c1d26646932f33",
+    "development/gameplay_core/fixtures/a2770/grilling/kaleidoscope_grilling/models/item/pending_seasoning.json": "1260906270ee529fd6bb0cf9d9ef86dfd2ab7afdf32192ed8b494d5f2f72f102",
+    "projects/grilling/source_snapshots/common/src/main/resources/assets/kaleidoscope_grilling/models/item/seasoning_special_states/remaining_8_variant_0.json": "eac621f605aaae5b5b0b81b5ec22640ec88beacbf549b82c740109401efa28bf"
+  },
+  "pending_static_icon": "zero-ingredient Java default; live ingredient icon is not claimed",
+  "special_static_icon": "full variant 0 representative; 64 held states unchanged",
+  "gameplay_changed": false,
+  "world_geometry_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

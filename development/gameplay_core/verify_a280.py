@@ -111,11 +111,13 @@ def source_gate():
  assert 'pbr' in load(R/'manifest.json')['capabilities']
  return materials
 
-def main():
+def main(version=(2,8,0), proof_name="a280-integration-invariants.json"):
+ global VERSION
+ VERSION=list(version)
  parser=argparse.ArgumentParser();parser.add_argument('--compiled',action='store_true');parser.add_argument('--offline',action='store_true');args=parser.parse_args()
  from verify_a2766 import check_assets
  assets=check_assets(java_display=True);catalog=catalog_gate();helper=helper_gate();display=display_gate();materials=source_gate()
- proof=load(P/'reports/a280-integration-invariants.json')
+ proof=load(P/'reports'/proof_name)
  assert runtime_digest()==proof['runtime_sha256'],'audited runtime changed; update the reviewed integration manifest intentionally'
  for path,expected in proof['preserved_core_sha256'].items():assert digest(ROOT/path)==expected,path
  for record in load(ROOT/'docs/integration/early-pr-resolutions.json').values():
@@ -131,5 +133,5 @@ def main():
   import verify_a2769 as prior
   prior.java_contract();run(sys.executable,str(D/'verify_a2761_java_interaction_contract.py'))
  for p in (B/'scripts').rglob('*.js'):run('node','--check',str(p))
- print(json.dumps({'version':'A2.8.0','catalog':catalog,'helpers':helper,'display':display,'assets':assets,'material_maps':materials,'runtime_sha256':proof['runtime_sha256'],'java_network_contract_checked':not args.offline,'compiled_requested':args.compiled,'minecraft_tested':False,'bds_tested':False,'client_visuals_tested':False},ensure_ascii=False,indent=2))
+ print(json.dumps({'version':'A'+'.'.join(map(str,VERSION)),'catalog':catalog,'helpers':helper,'display':display,'assets':assets,'material_maps':materials,'runtime_sha256':proof['runtime_sha256'],'java_network_contract_checked':not args.offline,'compiled_requested':args.compiled,'minecraft_tested':False,'bds_tested':False,'client_visuals_tested':False},ensure_ascii=False,indent=2))
 if __name__=='__main__':main()

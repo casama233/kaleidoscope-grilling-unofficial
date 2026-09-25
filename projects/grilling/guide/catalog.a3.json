@@ -5885,7 +5885,7 @@
     },
     "textures/ui/kg_grilling/catalog/special_seasoning": {
       "source": "projects/grilling/gameplay_core/resource_pack/textures/items/special_seasoning.png",
-      "sha256": "9a889a96a4bb34b999ddfc5bcb42b1f1a691fc1e65c91253726b7eee6a3dc94b",
+      "sha256": "911dd1a62942cd48171f9f39d7df4164d4adf821c7a69662c072c6269d6e6f11",
       "item": "kaleidoscope_grilling:special_seasoning",
       "atlas_key": "special_seasoning"
     },
