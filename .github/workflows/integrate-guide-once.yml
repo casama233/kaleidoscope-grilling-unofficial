@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 15
     env:
       PYTHONUTF8: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Read exact review-branch commit
         shell: bash
@@ -39,23 +40,25 @@ jobs:
           for old,new in fixes.items():
               assert s.count(old)==1,old
               s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
-          compile(s,str(p),'exec')
+          p.write_text(s,encoding='utf-8');compile(s,str(p),'exec')
           PY
           python development/guide/integrate_a3_into_grilling.py
           python tools/build_grilling_guide.py --check
           python tools/build_grilling_release.py --output "$RUNNER_TEMP/Grilling_Builtin_Guide.mcaddon"
           git diff --check
-      - name: Commit the corrected canonical product only
+      - name: Commit product resources without requesting workflow privileges
         shell: bash
         run: |
           set -euo pipefail
-          git add -A -- projects/grilling/gameplay_core projects/grilling/guide projects/grilling/integration/cookery106 history/standalone-guide-a3 tools docs/GUIDE-INDEX-A3.md development/guide/integrate_a3_into_grilling.py .github/workflows/gameplay-core-canonical.yml .github/workflows/guide-canonical.yml
+          # The Actions token cannot edit workflows. The authorized GitHub
+          # connector applies those two edits separately after this commit.
+          git restore --source=HEAD -- .github/workflows/gameplay-core-canonical.yml .github/workflows/guide-canonical.yml
+          git add -A -- projects/grilling/gameplay_core projects/grilling/guide projects/grilling/integration/cookery106 history/standalone-guide-a3 tools docs/GUIDE-INDEX-A3.md development/guide/integrate_a3_into_grilling.py
           python - <<'PY'
           import subprocess
           names=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
-          allowed=('projects/grilling/gameplay_core/','projects/grilling/guide/','projects/grilling/integration/cookery106/','history/standalone-guide-a3/','tools/','docs/GUIDE-INDEX-A3.md','development/guide/integrate_a3_into_grilling.py','.github/workflows/gameplay-core-canonical.yml','.github/workflows/guide-canonical.yml')
-          assert names and all(n.startswith(allowed) for n in names), names
+          allowed=('projects/grilling/gameplay_core/','projects/grilling/guide/','projects/grilling/integration/cookery106/','history/standalone-guide-a3/','tools/','docs/GUIDE-INDEX-A3.md','development/guide/integrate_a3_into_grilling.py')
+          assert names and all(n.startswith(allowed) and '__pycache__' not in n and not n.endswith('.pyc') for n in names), names
           PY
           git config user.name 'grilling-guide-integration[bot]'
           git config user.email 'grilling-guide-integration[bot]@users.noreply.github.com'
