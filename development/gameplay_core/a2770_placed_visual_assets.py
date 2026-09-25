@@ -1,12 +1,11 @@
-"""Deterministic, offline-checkable placed display assets. --install is a one-time migration.
-Normal canonical CI only uses --check; it never regenerates runtime sources.
+"""Derived placed assets: exact JSON/JS bytes and exact PNG RGBA pixels.
+Canonical source/dist and committed runtime hashes remain byte-for-byte checks.
 """
 from pathlib import Path
 from copy import deepcopy
 from collections import Counter
 import argparse,base64,hashlib,io,json,os,re,urllib.request
 from PIL import Image
-
 ROOT=Path(__file__).resolve().parents[2]
 P=ROOT/'projects/grilling/gameplay_core'; BP=P/'behavior_pack'; RP=P/'resource_pack'
 VENDOR=ROOT/'development/gameplay_core/fixtures/a2770'
@@ -39,8 +38,7 @@ def model(name,chain=()):
  namespace,path=name.split(':',1)
  doc=json.loads(source(namespace+'/models/'+path+'.json'))
  parent=doc.get('parent');result={}
- if parent and not parent.startswith(('minecraft:','builtin/')):
-  result=model(parent,(*chain,name))
+ if parent and not parent.startswith(('minecraft:','builtin/')):result=model(parent,(*chain,name))
  result=deepcopy(result)
  result['textures']={**result.get('textures',{}),**doc.get('textures',{})}
  for k,v in doc.items():
@@ -62,7 +60,6 @@ def geo(identifier,cubes,width=32,height=32):
   'bones':[{'name':'root','pivot':[0,0,0],'cubes':cubes}]}
 
 def convert(doc,identifier,tint=None,image_override=None,inflate=0):
- # Per-face atlasing explicitly bakes Java UV flips/90-degree rotations. No unsupported uv_rotation fields.
  faces=[];cubes=[]
  for element in doc.get('elements',[]):
   if element.get('rotation',{}).get('angle',0)!=0:raise ValueError('unexpected rotated source element')
@@ -116,8 +113,6 @@ def pending_assets(controllers,description,geometries):
   geometries.append(g);key='pending_'+str(tint)
   description['geometry'][key]=identifier
   description['textures'][key]='textures/a2770_placed/'+key
-  # Bake RGB tint into a small tile atlas. This avoids relying on a custom
-  # shader's overlay_color support in RenderDragon/Vibrant Visuals.
   rows=(len(TINT_VALUES)+TINT_COLUMNS-1)//TINT_COLUMNS
   tiled=Image.new('RGBA',(atlas.width*TINT_COLUMNS,atlas.height*rows),(0,0,0,0))
   red,green,blue,alpha=atlas.split()
@@ -127,7 +122,6 @@ def pending_assets(controllers,description,geometries):
    tiled.paste(tinted,((tile%TINT_COLUMNS)*atlas.width,(tile//TINT_COLUMNS)*atlas.height))
   out(RP/('textures/a2770_placed/'+key+'.png'),png(tiled))
   prop="q.property('"+NS+'color_'+str(tint)+"')"
-  color={'r':f'math.floor({prop}/65536)/255','g':f'math.mod(math.floor({prop}/256),256)/255','b':f'math.mod({prop},256)/255','a':1}
   rc='controller.render.kg_a2770.'+key
   controllers[rc]={'geometry':'Geometry.'+key,'materials':[{'*':'Material.default'}],
    'textures':['Texture.'+key],'uv_anim':{'scale':[1/TINT_COLUMNS,1/rows],'offset':[f'math.mod({prop},{TINT_COLUMNS})/{TINT_COLUMNS}',f'math.floor({prop}/{TINT_COLUMNS})/{rows}']}}
@@ -230,53 +224,47 @@ def build():
  out(VENDOR/'sources.json',source_index)
  return source_index
 
-def patch(path,old,new):
- text=path.read_text(encoding='utf-8-sig');assert text.count(old)==1,(path,old)
- path.write_text(text.replace(old,new),encoding='utf-8',newline='\n')
-def install():
- raise RuntimeError("Retired one-shot installer; A2.8 integration owns manifests and runtime wiring")
+def assert_generated(actual,expected,path):
+ if not path.endswith('.png'):
+  assert actual==expected,('generated source drift',path)
+  return
+ # Different OS zlib encoders can emit different streams for identical pixels.
+ # Validate CRC/format, dimensions, RGBA mode and every channel (including alpha).
+ images=[]
+ for raw in (actual,expected):
+  with Image.open(io.BytesIO(raw)) as check:
+   assert check.format=='PNG' and check.mode=='RGBA',('unexpected generated PNG format',path)
+   check.verify()
+  with Image.open(io.BytesIO(raw)) as image:
+   image.load();images.append((image.size,image.mode,image.tobytes()))
+ assert images[0]==images[1],('generated PNG pixel drift',path)
 
- assert load(BP/'manifest.json')['header']['version']==[2,7,69],'install only on verified A2.7.69'
- for side,label in [(BP,'BP'),(RP,'RP')]:
-  doc=load(side/'manifest.json');doc['header']['version']=[2,7,70]
-  doc['header']['name']='Kaleidoscope Grilling A2.7.70 Placed Visuals '+label
-  for module in doc['modules']:module['version']=[2,7,70]
-  for dep in doc.get('dependencies',[]):
-   if dep.get('uuid')=='bbbd2d60-52e5-53a6-8b9a-c09b0f516389':dep['version']=[2,7,70]
-  (side/'manifest.json').write_bytes(dump(doc))
- cfg=load(P/'config.json');cfg['name']='Kaleidoscope Grilling A2.7.70 Placed Visuals'
- cfg['compiler']['plugins'][0][1]['packName']='Kaleidoscope_Grilling_A2_7_70_Placed_Visuals';(P/'config.json').write_bytes(dump(cfg))
- main=BP/'scripts/main.js';raw=main.read_bytes();assert b'a2770_placed_visual_runtime' not in raw
- # Preserve every existing byte after one new side-effect import.
- main.write_bytes(b"import './a2770_placed_visual_runtime.js';\n"+raw)
- adapter=BP/'scripts/a2743_seasoning_block_adapter.js'
- text=adapter.read_text();old=';return true}catch{return false}'
- assert text.count(old)==1
- text="import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';\n"+text.replace(old,';markPlacedVisualDirty(block);return true}catch{return false}')
- adapter.write_text(text,encoding='utf-8',newline='\n')
- adapter=BP/'scripts/a2739_cookery_oil_pot_block_adapter.js';text=adapter.read_text()
- text="import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';\n"+text
- assert text.count('  return true;')==1
- text=text.replace('  return true;','  markPlacedVisualDirty(block);return true;')
- text=text.replace(' return ok;',' markPlacedVisualDirty(block);return ok;')
- adapter.write_text(text,encoding='utf-8',newline='\n')
- patch(ROOT/'development/gameplay_core/verify_current.py','    (2, 7, 69): "verify_a2769.py",','    (2, 7, 69): "verify_a2769.py",\n    (2, 7, 70): "verify_a2770.py",')
- patch(ROOT/'development/gameplay_core/verify_a2769.py','def source_guards():','def source_guards(expected_version=(2,7,69)):')
- patch(ROOT/'development/gameplay_core/verify_a2769.py',"['header']['version']==[2,7,69]","['header']['version']==list(expected_version)")
- for file in [ROOT/'README.md',P/'README.zh-TW.md']:
-  text=file.read_text(encoding='utf-8-sig')
-  file.write_text('> 最新整合：A2.7.70（放置調料內容及類型油壺外觀；尚待實機驗收）。詳見 docs/STATUS-A2.7.70.md。\n\n'+text,encoding='utf-8')
+def equivalence_regression():
+ # Pure image-data checks, not Minecraft rendering or player simulation.
+ image=Image.new('RGBA',(4,4),(120,70,30,180))
+ raw=[]
+ for level in (0,9):
+  stream=io.BytesIO();image.save(stream,format='PNG',compress_level=level);raw.append(stream.getvalue())
+ assert raw[0]!=raw[1];assert_generated(raw[0],raw[1],'test.png')
+ image.putpixel((0,0),(120,70,30,179));stream=io.BytesIO();image.save(stream,format='PNG')
+ try:assert_generated(raw[0],stream.getvalue(),'test.png')
+ except AssertionError:pass
+ else:raise AssertionError('PNG checker failed to reject alpha drift')
+ try:assert_generated(b'old',b'new','test.json')
+ except AssertionError:pass
+ else:raise AssertionError('source checker failed to reject text drift')
 
 def main():
  global ALLOW_FETCH
  parser=argparse.ArgumentParser();parser.add_argument('--install',action='store_true');parser.add_argument('--fetch-sources',action='store_true');parser.add_argument('--check',action='store_true');args=parser.parse_args()
+ if args.install:raise RuntimeError('Retired one-shot installer; A2.8 integration owns manifests and runtime wiring')
  ALLOW_FETCH=args.fetch_sources
  report=build()
  if args.check:
-  for path,data in OUT.items():assert (ROOT/path).read_bytes()==data,('generated asset drift',path)
+  equivalence_regression()
+  for path,data in OUT.items():assert_generated((ROOT/path).read_bytes(),data,path)
  else:
   for path,data in OUT.items():
    target=ROOT/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
- if args.install:install()
  print(json.dumps({'generated_files':len(OUT),'source_files':len(SOURCES),**report},ensure_ascii=False,indent=2))
 if __name__=='__main__':main()
