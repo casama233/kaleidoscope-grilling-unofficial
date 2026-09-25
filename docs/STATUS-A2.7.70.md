@@ -1,23 +1,13 @@
-# A2.7.70 — 煙火自己的創造欄分類
+# A2.7.70 — 已撤回的獨立創造群組方案
 
-## 範圍
+**此版本對使用者需求的理解有誤，已由 A2.7.71 取代。不要以此版本的分類方案繼續開發。**
 
-只改 `casama233/kaleidoscope-grilling-unofficial`。酒館與森羅廚房是使用方式參考，不是本次修改目標；沒有新增獨立附屬包或覆寫其他 addon 的創造目錄。
+A2.7.70 曾將 90 個煙火可見項目拆成 11 個 `kaleidoscope_grilling:itemGroup.*` 自建群組，全部放在 Items 分頁。雖然引用、翻譯、隱藏狀態與建置檢查通過，但這不符合使用者要求的「附屬併入森羅系列本體既有群組」。測試通過並不代表需求做對。
 
-煙火原有單一 main 群組拆成按用途排列的可摺疊群組：設備、工具、生串、熟串、特殊串、調料、油品、加工食材、菜餚、作物、花椒樹材。僅有實際可見物品的群組會產生；最終群組數與物品清單見 `reports/a2770-creative-catalog.json`。
+## 正確方案
 
-保留原本 Items 大分類，不造不存在的新分頁或多層資料夾。所有群組使用煙火自己的 namespaced identifier、圖示與繁中／簡中／英文名稱。19 種生串與熟串使用相同的品種排序。
+A2.7.71 直接檢查使用者指定的 Chinese Food 1.0.2 與 Cookery 1.0.6 公開包，以实际 catalog 為準：煙火物品使用 Equipment 分頁與本體 `kaleidoscope_cookery:itemGroup.name.*` 群組識別。
 
-## 安全限制
+不新增煙火群組，不覆寫本體群組圖示或翻譯。詳見 `docs/STATUS-A2.7.71.md` 和 `projects/grilling/gameplay_core/reports/a2771-shared-creative-groups.json`。
 
-同時更新 catalog 與可見 item/block 的 `menu_category`，避免兩者不一致。任何尚未分類的可見物品都會使生成器停止；不以英文檔名排序或「其他」群組掩蓋缺漏。
-
-`none` 與未公開的內部狀態物品完全不動。生成前後校驗所有隱藏定義的 SHA256，並對所有 BP/RP 資料建立忽略本次創造元資料與版本名稱之外的完整摘要，保證配方、玩法程式、模型、貼圖、UUID、API 依賴及存檔鍵沒有改動。
-
-A2.7.69 的食物 lore、油壺交易、材質與配方回歸檢查繼續執行。原版本 verifier 僅將版本參數開放給新檢查入口，保留預設 2.7.69。
-
-## 驗收邊界
-
-CI 與包體檢查不代表 Minecraft 客戶端實測；`minecraft_tested`、`bds_tested`、`client_visuals_tested` 仍為 false。
-
-實機請清空創造欄搜尋字串，打開 Items 分頁，檢查各煙火群組展開、圖示、翻譯、生熟串次序，以及內部瓶身／液位／咬食狀態沒有出現在一般創造欄。
+本版本的 `a2770-creative-catalog.json` 留作 90 個可見項目、88 份隱藏定義及非創造資料的基線證據；不是現行分組規格。A2.7.71 仍以該基線證明沒有更改玩法、配方、貼圖、模型、UUID 或存檔鍵。
