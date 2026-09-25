@@ -10,7 +10,6 @@ RP = ROOT / "projects/grilling/gameplay_core/resource_pack"
 SOURCE = RP / "models/entity/a22_bites"
 OUTPUT = RP / "models/entity/a2764_skewer_hand"
 OFFSET = (0.0, 7.0, 2.0)
-SAMPLES = ("raw_beef_skewer", "grilled_beef_skewer", "ordinary_skewer")
 
 
 def load(path: Path):
@@ -23,14 +22,14 @@ def shifted(vec):
     return [int(v) if float(v).is_integer() else v for v in values]
 
 
-def rebake(doc: dict, item: str, stage: int) -> dict:
+def rebake(doc: dict) -> dict:
     out = deepcopy(doc)
     rows = out["minecraft:geometry"]
     assert len(rows) == 1
     geo = rows[0]
     old_id = geo["description"]["identifier"]
-    assert old_id == f"geometry.kg_a22.{item}.stage{stage}", old_id
-    geo["description"]["identifier"] = f"geometry.kg_a2764.{item}.stage{stage}"
+    assert old_id.startswith("geometry.kg_a22."), old_id
+    geo["description"]["identifier"] = old_id.replace("geometry.kg_a22.", "geometry.kg_a2764.", 1)
 
     for bone in geo["bones"]:
         if bone.get("name") == "root":
@@ -46,34 +45,33 @@ def rebake(doc: dict, item: str, stage: int) -> dict:
     return out
 
 
-def source_files(item: str):
-    return sorted(SOURCE.glob(f"{item}_stage*.geo.json"))
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
+    sources = sorted(SOURCE.glob("*.geo.json"))
+    assert len(sources) == 150, len(sources)
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    written = []
-    for item in SAMPLES:
-        files = source_files(item)
-        assert files, item
-        for source in files:
-            stage = int(source.stem.rsplit("_stage", 1)[1].split(".", 1)[0])
-            out = rebake(load(source), item, stage)
-            target = OUTPUT / source.name
-            text = json.dumps(out, ensure_ascii=False, indent=2) + "\n"
-            if args.check:
-                assert target.is_file(), target
-                assert load(target) == out, target
-            else:
-                target.write_text(text, encoding="utf-8")
-            written.append(target)
 
-    assert len(written) == 14, len(written)
-    print(f"A2.7.64 sample hand-space geometries: {len(written)}")
+    expected_names = set()
+    for source in sources:
+        out = rebake(load(source))
+        target = OUTPUT / source.name
+        expected_names.add(target.name)
+        text = json.dumps(out, ensure_ascii=False, indent=2) + "\n"
+        if args.check:
+            assert target.is_file(), target
+            assert load(target) == out, target
+        else:
+            target.write_text(text, encoding="utf-8")
+
+    actual_names = {p.name for p in OUTPUT.glob("*.geo.json")}
+    assert actual_names == expected_names, {
+        "missing": sorted(expected_names - actual_names),
+        "extra": sorted(actual_names - expected_names),
+    }
+    print(f"A2.7.65 full hand-space geometries: {len(expected_names)}")
 
 
 if __name__ == "__main__":
