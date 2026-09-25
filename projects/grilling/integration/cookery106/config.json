@@ -1,7 +1,7 @@
 {
   "type": "minecraftBedrock",
-  "name": "Grilling Guide — Cookery 1.0.6 A2.0 Complete Player Manual",
-  "description": "One Grilling entry inside Cookery; rebuilt 5-section/52-topic zh_CN/zh_TW/en_US manual generated from one canonical content source.",
+  "name": "Grilling Guide A3.0 — Cookery-style Encyclopedia",
+  "description": "One Grilling entry in Cookery: item-centric catalog, native parent categories, recipes and actual item icons.",
   "authors": [
     "cary — 素材移植工程"
   ],
@@ -23,7 +23,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "KG_Grilling_Guide_A2_0_Complete_Player_Manual"
+          "packName": "KG_Grilling_Guide_A3_0_Encyclopedia"
         }
       ]
     ]

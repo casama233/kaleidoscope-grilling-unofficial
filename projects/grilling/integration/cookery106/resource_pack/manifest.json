@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Grilling Guide A2.0 — Complete Player Manual RP",
-    "description": "Localized guide text and icons for the rebuilt Grilling chapter inside the Cookery guidebook.",
+    "name": "Grilling Guide A3.0 — Cookery-style Encyclopedia RP",
+    "description": "Cookery-style categories; item acquisition, recipes, controls and effects in one guide entry.",
     "uuid": "32baef08-6b04-5115-9d5b-2d4ba2d3a7b4",
     "version": [
       0,
-      2,
+      3,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "9636907f-da0d-566f-8fd1-34e39bfa0b76",
       "version": [
         0,
-        2,
+        3,
         0
       ]
     }
