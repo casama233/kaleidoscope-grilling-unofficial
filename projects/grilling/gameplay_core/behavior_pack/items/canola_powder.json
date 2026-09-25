@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:canola_powder",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {

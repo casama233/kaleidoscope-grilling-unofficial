@@ -1,0 +1,66 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kaleidoscope_grilling.a2763.advanced_rack_fp_right": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "rotation": [
+            0,
+            57,
+            0
+          ],
+          "scale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        }
+      }
+    },
+    "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_right": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            2.5,
+            0
+          ],
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "scale": [
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    },
+    "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_left": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            2.5,
+            0
+          ],
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "scale": [
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    }
+  }
+}

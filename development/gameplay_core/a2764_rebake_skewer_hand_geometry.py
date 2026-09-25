@@ -31,6 +31,14 @@ def rebake(doc: dict) -> dict:
     assert old_id.startswith("geometry.kg_a22."), old_id
     geo["description"]["identifier"] = old_id.replace("geometry.kg_a22.", "geometry.kg_a2764.", 1)
 
+    # A2.8 uses Java display on a child bone; remove only that identity node
+    # when rebuilding the retired A2764 hand-space provenance assets.
+    display = [b for b in geo["bones"] if b.get("name") == "display"]
+    if display:
+        assert display == [{"name": "display", "parent": "root", "pivot": [0, 0, 0]}]
+        geo["bones"] = [b for b in geo["bones"] if b.get("name") != "display"]
+        for bone in geo["bones"]:
+            if bone.get("parent") == "display": bone["parent"] = "root"
     for bone in geo["bones"]:
         if bone.get("name") == "root":
             assert bone.get("binding") == "q.item_slot_to_bone_name(context.item_slot)"

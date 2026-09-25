@@ -1,0 +1,442 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_a2770.seasoning": {
+      "arrays": {
+        "geometries": {
+          "Array.fills": [
+            "Geometry.r1v0",
+            "Geometry.r1v1",
+            "Geometry.r1v2",
+            "Geometry.r1v3",
+            "Geometry.r1v4",
+            "Geometry.r2v0",
+            "Geometry.r2v1",
+            "Geometry.r2v2",
+            "Geometry.r2v3",
+            "Geometry.r2v4",
+            "Geometry.r3v0",
+            "Geometry.r3v1",
+            "Geometry.r3v2",
+            "Geometry.r3v3",
+            "Geometry.r3v4",
+            "Geometry.r4v0",
+            "Geometry.r4v1",
+            "Geometry.r4v2",
+            "Geometry.r4v3",
+            "Geometry.r4v4",
+            "Geometry.r5v0",
+            "Geometry.r5v1",
+            "Geometry.r5v2",
+            "Geometry.r5v3",
+            "Geometry.r5v4",
+            "Geometry.r6v0",
+            "Geometry.r6v1",
+            "Geometry.r6v2",
+            "Geometry.r6v3",
+            "Geometry.r6v4",
+            "Geometry.r7v0",
+            "Geometry.r7v1",
+            "Geometry.r7v2",
+            "Geometry.r7v3",
+            "Geometry.r7v4",
+            "Geometry.r8v0",
+            "Geometry.r8v1",
+            "Geometry.r8v2",
+            "Geometry.r8v3",
+            "Geometry.r8v4"
+          ]
+        },
+        "textures": {
+          "Array.colors": [
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.v5",
+            "Texture.v6",
+            "Texture.v7"
+          ]
+        }
+      },
+      "geometry": "Array.fills[(math.clamp(q.property('kaleidoscope_grilling:fill'),1,8)-1)*5+(q.property('kaleidoscope_grilling:variant')<5?q.property('kaleidoscope_grilling:variant'):0)]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.colors[q.property('kaleidoscope_grilling:variant')]"
+      ]
+    },
+    "controller.render.kg_a2770.pending_0": {
+      "geometry": "Geometry.pending_0",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_0"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_0'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_0')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_1": {
+      "geometry": "Geometry.pending_1",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_1"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_1'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_1')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_2": {
+      "geometry": "Geometry.pending_2",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_2"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_2'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_2')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_3": {
+      "geometry": "Geometry.pending_3",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_3"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_3'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_3')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_4": {
+      "geometry": "Geometry.pending_4",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_4"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_4'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_4')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_5": {
+      "geometry": "Geometry.pending_5",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_5"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_5'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_5')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_6": {
+      "geometry": "Geometry.pending_6",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_6"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_6'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_6')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_7": {
+      "geometry": "Geometry.pending_7",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_7"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_7'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_7')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_8": {
+      "geometry": "Geometry.pending_8",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_8"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_8'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_8')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_9": {
+      "geometry": "Geometry.pending_9",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_9"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_9'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_9')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_10": {
+      "geometry": "Geometry.pending_10",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_10"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_10'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_10')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_11": {
+      "geometry": "Geometry.pending_11",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_11"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_11'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_11')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_12": {
+      "geometry": "Geometry.pending_12",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_12"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_12'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_12')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_13": {
+      "geometry": "Geometry.pending_13",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_13"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_13'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_13')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_14": {
+      "geometry": "Geometry.pending_14",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_14"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_14'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_14')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.pending_15": {
+      "geometry": "Geometry.pending_15",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending_15"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.045454545454545456
+        ],
+        "offset": [
+          "math.mod(q.property('kaleidoscope_grilling:color_15'),8)/8",
+          "math.floor(q.property('kaleidoscope_grilling:color_15')/8)/22"
+        ]
+      }
+    },
+    "controller.render.kg_a2770.oil": {
+      "arrays": {
+        "textures": {
+          "Array.oils": [
+            "Texture.canola",
+            "Texture.canola",
+            "Texture.chili",
+            "Texture.chili"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.oils[q.property('kaleidoscope_grilling:oil')]"
+      ]
+    },
+    "controller.render.kg_a2770.oil_glow": {
+      "geometry": "Geometry.glow",
+      "materials": [
+        {
+          "*": "Material.glow"
+        }
+      ],
+      "textures": [
+        "Texture.glow"
+      ]
+    }
+  }
+}

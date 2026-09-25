@@ -1,3 +1,4 @@
+import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';
 import {world} from '@minecraft/server';
 import {normalizeOilType,oilCapacity} from './a2738_oil_contract_core.js';
 import {
@@ -36,7 +37,7 @@ export function restorePlacedOilPotSnapshot(block,snapshot){
  try{world.setDynamicProperty(snapshot.typeKey,snapshot.rawType)}catch{ok=false}
  try{world.setDynamicProperty(snapshot.countKey,snapshot.rawCount)}catch{ok=false}
  if(!ok)console.warn('[Grilling A2.7.69] Oil-pot rollback incomplete at '+snapshot.countKey);
- return ok;
+ markPlacedVisualDirty(block);return ok;
 }
 export function readPlacedOilPotState(block){
  const snapshot=capturePlacedOilPotSnapshot(block);if(!snapshot)return undefined;
@@ -54,7 +55,7 @@ export function writePlacedOilPotState(block,type,count){
   block.setPermutation(permutation);
   const result=readPlacedOilPotState(block);
   if(!result||result.type!==normalizedType||result.count!==next||block.permutation.getState('kaleidoscope_cookery:has_oil')!==(next>0))throw new Error('state readback differs');
-  return true;
+  markPlacedVisualDirty(block);return true;
  }catch{
   restorePlacedOilPotSnapshot(block,snapshot);return false;
  }

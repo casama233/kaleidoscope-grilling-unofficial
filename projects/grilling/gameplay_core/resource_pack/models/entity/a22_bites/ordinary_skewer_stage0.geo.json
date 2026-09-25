@@ -25,8 +25,17 @@
           "binding": "q.item_slot_to_bone_name(context.item_slot)"
         },
         {
-          "name": "instance_0_wood_0",
+          "name": "display",
           "parent": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "instance_0_wood_0",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -111,7 +120,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_1",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -206,7 +215,7 @@
         },
         {
           "name": "instance_0_pufferfish_2",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -301,7 +310,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_3",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -396,7 +405,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_4",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -491,7 +500,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_5",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -586,7 +595,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_6",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -681,7 +690,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_7",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -776,7 +785,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_8",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -871,7 +880,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_9",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -966,7 +975,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_10",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1061,7 +1070,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_11",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1156,7 +1165,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_12",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1251,7 +1260,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_13",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1346,7 +1355,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_14",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1441,7 +1450,7 @@
         },
         {
           "name": "instance_0_puffer_fin_left_15",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1536,7 +1545,7 @@
         },
         {
           "name": "instance_0_spider_eye_16",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1621,7 +1630,7 @@
         },
         {
           "name": "instance_0_poisonous_potato_17",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -1716,7 +1725,7 @@
         },
         {
           "name": "instance_0_poisonous_potato_18",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,

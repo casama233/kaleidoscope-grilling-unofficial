@@ -25,8 +25,17 @@
           "binding": "q.item_slot_to_bone_name(context.item_slot)"
         },
         {
-          "name": "instance_0_wood_0",
+          "name": "display",
           "parent": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "instance_0_wood_0",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -111,7 +120,7 @@
         },
         {
           "name": "instance_0_food3_1",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -206,7 +215,7 @@
         },
         {
           "name": "instance_0_food3_2",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -301,7 +310,7 @@
         },
         {
           "name": "instance_0_food3_3",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -396,7 +405,7 @@
         },
         {
           "name": "instance_0_food3_4",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -491,7 +500,7 @@
         },
         {
           "name": "instance_0_food3_5",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -586,7 +595,7 @@
         },
         {
           "name": "instance_0_food3_6",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -681,7 +690,7 @@
         },
         {
           "name": "instance_0_food3_7",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -776,7 +785,7 @@
         },
         {
           "name": "instance_0_food3_8",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -871,7 +880,7 @@
         },
         {
           "name": "instance_0_food3_9",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,

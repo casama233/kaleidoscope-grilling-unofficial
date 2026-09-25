@@ -1,14 +1,14 @@
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {POWDER_ID,KNEAD_TICKS,kneadResult} from './a271_sweet_potato_core.js';
+import {captureInteractionIntent} from './a2762_interaction_intent_adapter.js';
 
 const ACTIVE_KNEADS=new Map();
 
 function inventory(player){return player.getComponent('minecraft:inventory')?.container}
 function offhand(player){return player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Offhand)}
-function identifyHand(player){
- const c=inventory(player),slot=player.selectedSlotIndex,m=c?.getItem(slot),o=offhand(player);
- if(m?.typeId===POWDER_ID)return {hand:'main',slot};
- if(o?.typeId===POWDER_ID)return {hand:'off',slot:-1};
+function identifyHand(player,eventStack){
+ const slot=player.selectedSlotIndex,intent=captureInteractionIntent(player,eventStack);
+ if(intent.hand==='off')return {hand:'off',slot:-1};
  return {hand:'main',slot};
 }
 function setHand(player,state,stack){
@@ -33,7 +33,7 @@ function clear(playerId){ACTIVE_KNEADS.delete(playerId)}
 
 world.afterEvents.itemStartUse.subscribe(e=>{
  if(e.itemStack?.typeId!==POWDER_ID)return;
- const hand=identifyHand(e.source);
+ const hand=identifyHand(e.source,e.itemStack);
  ACTIVE_KNEADS.set(e.source.id,{
   ...hand,
   amount:Math.max(1,Math.min(64,Number(e.itemStack.amount)||1)),
@@ -48,7 +48,7 @@ world.afterEvents.itemStopUse.subscribe(e=>{
 
 world.afterEvents.itemCompleteUse.subscribe(e=>{
  if(e.itemStack?.typeId!==POWDER_ID)return;
- const active=ACTIVE_KNEADS.get(e.source.id)??{...identifyHand(e.source),amount:Number(e.itemStack.amount)||1,start:system.currentTick-KNEAD_TICKS};
+ const active=ACTIVE_KNEADS.get(e.source.id)??{...identifyHand(e.source,e.itemStack),amount:Number(e.itemStack.amount)||1,start:system.currentTick-KNEAD_TICKS};
  clear(e.source.id);
  const held=Math.max(KNEAD_TICKS,system.currentTick-active.start);
  const plan=kneadResult(POWDER_ID,active.amount,held);

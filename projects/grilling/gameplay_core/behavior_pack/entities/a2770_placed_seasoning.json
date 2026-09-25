@@ -1,0 +1,218 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:placed_seasoning_visual",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "kaleidoscope_grilling:ready": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:mode": {
+          "type": "int",
+          "range": [
+            0,
+            2
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:fill": {
+          "type": "int",
+          "range": [
+            0,
+            8
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:variant": {
+          "type": "int",
+          "range": [
+            0,
+            7
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_0": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_1": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_2": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_3": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_4": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_5": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_6": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_7": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_8": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_9": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_10": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_11": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_12": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_13": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_14": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:color_15": {
+          "type": "int",
+          "range": [
+            0,
+            168
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "kg_render_helper"
+        ]
+      },
+      "minecraft:transient": {},
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:collision_box": {
+        "width": 0,
+        "height": 0
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:fire_immune": {}
+    }
+  }
+}

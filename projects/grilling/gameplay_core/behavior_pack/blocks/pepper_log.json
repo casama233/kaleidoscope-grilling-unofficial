@@ -3,10 +3,15 @@
   "minecraft:block": {
     "description": {
       "identifier": "kaleidoscope_grilling:pepper_log",
-      "menu_category": {"category": "construction"},
+      "menu_category": {
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.other_blocks"
+      },
       "traits": {
         "minecraft:placement_position": {
-          "enabled_states": ["minecraft:block_face"]
+          "enabled_states": [
+            "minecraft:block_face"
+          ]
         }
       }
     },
@@ -14,21 +19,44 @@
       "minecraft:display_name": "tile.kaleidoscope_grilling:pepper_log.name",
       "minecraft:geometry": "geometry.kg_a1.pepper_log",
       "minecraft:material_instances": {
-        "*": {"texture": "kg_a2748_pepper_log","render_method": "opaque"}
+        "*": {
+          "texture": "kg_a2748_pepper_log",
+          "render_method": "opaque"
+        }
       },
-      "minecraft:destructible_by_mining": {"seconds_to_destroy": 2.0},
-      "minecraft:destructible_by_explosion": {"explosion_resistance": 2.0},
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.0
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 2.0
+      },
       "minecraft:loot": "loot_tables/blocks/pepper_log.json",
       "kaleidoscope_grilling:pepper_log_logic": {}
     },
     "permutations": [
       {
         "condition": "q.block_state('minecraft:block_face') == 'east' || q.block_state('minecraft:block_face') == 'west'",
-        "components": {"minecraft:transformation": {"rotation": [0,0,90]}}
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              90
+            ]
+          }
+        }
       },
       {
         "condition": "q.block_state('minecraft:block_face') == 'north' || q.block_state('minecraft:block_face') == 'south'",
-        "components": {"minecraft:transformation": {"rotation": [90,0,0]}}
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              90,
+              0,
+              0
+            ]
+          }
+        }
       }
     ]
   }

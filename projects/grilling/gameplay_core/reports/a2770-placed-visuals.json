@@ -1,0 +1,13 @@
+{
+  "version": "A2.7.70",
+  "baseline": "600219d00fee8b12048dcfb6187d1d795abdd0dc",
+  "placed_seasoning": {"independent_slots": 4, "remaining_bins": 8, "finished_variants": 8, "pending_layers": 8, "glass_shells_unchanged": true},
+  "placed_oil": {"typed_skins": ["canola", "secret_chili", "premium_chili"], "premium_emissive_overlay": true, "native_container_preserved": true},
+  "renderer": "transient collision-free entity overlays derived from authoritative world data",
+  "world_data_migration": false,
+  "live_client_resource_pack_color_sampling": false,
+  "host_geometry_alignment_tested": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

@@ -1,0 +1,93 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kaleidoscope_grilling.a2763.seasoning_fp_right": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            5,
+            0
+          ],
+          "rotation": [
+            -180,
+            60.25,
+            -180
+          ],
+          "scale": [
+            0.72,
+            0.72,
+            0.72
+          ]
+        }
+      }
+    },
+    "animation.kaleidoscope_grilling.a2763.seasoning_fp_left": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            5,
+            0
+          ],
+          "rotation": [
+            -180,
+            60.25,
+            -180
+          ],
+          "scale": [
+            0.72,
+            0.72,
+            0.72
+          ]
+        }
+      }
+    },
+    "animation.kaleidoscope_grilling.a2763.seasoning_tp_right": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            3,
+            2.75
+          ],
+          "rotation": [
+            29.5,
+            45,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        }
+      }
+    },
+    "animation.kaleidoscope_grilling.a2763.seasoning_tp_left": {
+      "loop": true,
+      "bones": {
+        "display": {
+          "position": [
+            0,
+            3,
+            2.75
+          ],
+          "rotation": [
+            29.5,
+            45,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        }
+      }
+    }
+  }
+}

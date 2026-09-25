@@ -1,3 +1,4 @@
+import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';
 import {world} from '@minecraft/server';
 import {
  SEASONING_MAX_BOTTLES,hasSeasoningBase,normalizeBottleData,normalizeBottleStack
@@ -25,7 +26,7 @@ export function readPlacedSeasoningStack(block){
 
 export function writePlacedSeasoningStack(block,rows){
  const stack=normalizeBottleStack(rows).slice(0,SEASONING_MAX_BOTTLES);
- try{world.setDynamicProperty(seasoningBlockKey(block),stack.length?JSON.stringify(stack):undefined);return true}catch{return false}
+ try{world.setDynamicProperty(seasoningBlockKey(block),stack.length?JSON.stringify(stack):undefined);markPlacedVisualDirty(block);return true}catch{return false}
 }
 
 export function topPlacedSeasoningBottle(block){
