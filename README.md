@@ -2,7 +2,7 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前 canonical runtime：A2.7.63 Client Visual Gate。核心玩法、穿串、調料、油系統、Advanced Rack、主要作物、花椒樹/世界生成、Cookery 菜餚與主要 advancement 已完成可實作 parity；目前主要剩餘工作是 Minecraft/BDS/多人實機驗收、client visual 打磨與 Bedrock 平台無法 1:1 的差異收斂。**
+**目前 canonical runtime：A2.7.65 Full Skewer Hand Geometry。核心玩法、穿串、調料、油系統、Advanced Rack、主要作物、花椒樹/世界生成、Cookery 菜餚與主要 advancement 已完成可實作 parity；目前主要剩餘工作是 Minecraft/BDS/多人實機驗收、client visual 打磨與 Bedrock 平台無法 1:1 的差異收斂。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
