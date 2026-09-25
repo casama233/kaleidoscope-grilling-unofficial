@@ -297,7 +297,7 @@ def check_project() -> dict:
     if "export const REVISION = 'a2_0_0';" not in publisher:
         fail("guide publisher revision is not A2.0")
     main = (BP / "scripts" / "main.js").read_text(encoding="utf-8")
-    if "GUIDEBOOK_PAYLOAD" not in main or "installPublisher" not in main:
+    if "GUIDE_PAYLOAD" not in main or "installPublisher" not in main:
         fail("guide main entry no longer publishes the generated payload")
     return {"bp_uuid": BP_UUID, "rp_uuid": RP_UUID, "script_entry": "scripts/main.js"}
 
