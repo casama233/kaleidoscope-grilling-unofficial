@@ -18,7 +18,8 @@ on:
       - 'docs/STATUS-A2.7.65.md'
       - 'docs/RENDER-AUDIT-A2.7.62.md'
   push:
-    branches: [main]
+    # Also verify the exact review-branch tree; this never merges or writes main.
+    branches: [main, codex/a2761-runtime-hygiene]
     paths:
       - '.github/workflows/gameplay-core-canonical.yml'
       - 'projects/grilling/gameplay_core/**'
