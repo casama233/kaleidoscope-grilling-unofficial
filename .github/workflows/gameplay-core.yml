@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: grilling-gameplay-core-canonical-v2-${{ github.ref }}
@@ -90,3 +90,53 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           overwrite: true
+      - name: Publish green PR build as GitHub prerelease
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $manifest = Get-Content 'projects/grilling/gameplay_core/behavior_pack/manifest.json' -Raw | ConvertFrom-Json
+          $version = ($manifest.header.version -join '.')
+          $tag = "A$version-test.$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
+          $title = "Kaleidoscope Grilling A$version Test Build $env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
+
+          $mcaddon = Get-ChildItem 'artifacts/review/*.mcaddon' -File | Select-Object -First 1
+          $brproject = Get-ChildItem 'artifacts/review/*.brproject' -File | Select-Object -First 1
+          $checksums = Get-Item 'artifacts/review/SHA256SUMS.txt'
+          $report = Get-Item 'artifacts/review/build-report.json'
+          if (-not $mcaddon -or -not $brproject -or -not $checksums -or -not $report) { throw 'Expected prerelease assets are missing.' }
+
+          $notesFile = Join-Path $env:RUNNER_TEMP 'grilling-prerelease-notes.md'
+          @"
+          # A$version test build
+
+          This is an **automated prerelease test build**, not a stable release.
+
+          Source commit: $env:GITHUB_SHA
+          Pull request: #${{ github.event.pull_request.number }}
+          Canonical workflow run: $env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT
+
+          Validation completed before publishing:
+          - canonical source verifier: PASS
+          - client visual reference gate: PASS
+          - checksum-pinned bridge Dash compile: PASS
+          - source/dist exact comparison: PASS
+          - deterministic review packaging: PASS
+
+          Runtime validation status:
+          - Minecraft tested: **NO**
+          - BDS tested: **NO**
+          - Client visuals tested: **NO**
+
+          For A2.7.64, the current skewer hand corrective is intentionally a 3-item sample phase:
+          - raw_beef_skewer
+          - grilled_beef_skewer
+          - ordinary_skewer
+
+          Use the attached .mcaddon for in-game testing. The .brproject, SHA256 list, and build report are included for reproducibility.
+          "@ | Set-Content -Path $notesFile -Encoding utf8
+
+          gh release create $tag $mcaddon.FullName $brproject.FullName $checksums.FullName $report.FullName --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title $title --notes-file $notesFile --prerelease
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
