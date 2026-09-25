@@ -1,50 +1,30 @@
-# Grilling Guide content
+# Grilling Guide A3.0 — 物品百科
 
-## Canonical source
+目前唯一可編輯的玩家指南內容源是 `catalog.a3.json`。
 
-Guide A2.0 之后，当前玩家指南唯一内容源是：
+指南沿用 Cookery 基岩本體的工作站、食物百科、工具與裝備、儲存與實用功能、耕作與收成、進度與指南物品六個頂層分類；食物按製作方式分成八組。
+76 個唯一條目涵蓋 88 個非歷史油刷 item，生熟烤串與調料瓶狀態合頁。同一物品的取得、製作、操作與效果留在同頁。
 
-- `projects/grilling/guide/content.a2.json`
-
-它描述：
-
-- 5 个玩家章节；
-- 52 个主题；
-- zh_CN / zh_TW / en_US 三套标题与正文；
-- Cookery Guidebook Extension API v1 所需图标、分类与条目顺序。
-
-生成正式 Cookery 集成内容：
+## 修改與驗證
 
 ```sh
 python tools/build_grilling_guide.py
-```
-
-检查仓库中的 `payload.js` 与三套 `.lang` 是否仍由当前内容源生成：
-
-```sh
 python tools/build_grilling_guide.py --check
 python tools/check_grilling_guide.py
+python tools/build_grilling_guide_release.py
 ```
 
-## Delivery path
+`build_grilling_guide.py` 只讀 A3 catalog，輸出正式 guide payload、三語文字、可追溯物品圖標與 `docs/GUIDE-INDEX-A3.md`。
+`check_grilling_guide.py` 核對本體可達分類、item 覆蓋、來源配方／營養、關鍵容量與時間、圖標及傳輸上限；不以固定 5 章／52 篇的舊數字限制內容。
 
-当前实际交付工程仍是：
+正式交付目錄仍是 `projects/grilling/integration/cookery106/{behavior_pack,resource_pack}`。
+Module ID 保持 `kg_a1:grilling`，只出現在 Cookery 原指南的一個附屬入口；不新增實體指南書、不覆蓋本體 UI。
 
-- `projects/grilling/integration/cookery106/behavior_pack/`
-- `projects/grilling/integration/cookery106/resource_pack/`
+## 歷史與相容性
 
-烟火只注册为 Cookery 原指南中的一个 `kg_a1:grilling` 入口，不新增第二本指南书。
+`content.json` 與 `content.a2.json` 是歷史快照，不參與正常建置。
+`development/guide/rebuild_catalog_a3.py` 是來源取證／一次性遷移腳本，不能拿來覆寫日後直接編輯的 A3 catalog。
+Cookery 1.0.6 的既有 locale validator 相容處理仍由窄範圍 locale-compat 候選負責；本次不改本體玩法或 UI。
 
-Cookery 1.0.6 原始 Guidebook Extension API v1 的 `mechanicsByLocale` locale validator 有已验证兼容问题；canonical CI 会继续生成现有的窄范围 locale-compat host 候选，只修改该 validator，不修改 Cookery gameplay、UUID 或指南 UI 流程。
-
-## Historical files
-
-- `projects/grilling/guide/content.json` 是 A1.x 时代的历史内容快照，不再是当前发布来源。
-- `development/guide/augment_a*.py`、`verify_a*.py` 保存旧版迁移和取证逻辑，不应在 A2.0 canonical guide 上重新执行。
-- 旧 A1.x workflow 保留作历史证据；常规指南修改由 `.github/workflows/guide-canonical.yml` 验证。
-
-## Validation boundary
-
-Guide checker / Dash / compiled-output comparison 可以证明内容结构、引用、生成结果以及与当前 Gameplay Core 关键常数的静态一致性。
-
-它们不能证明 Minecraft 客户端中的触控排版、控制器导航、字体换行、实际 Cookery UI 观感或多人环境行为；这些仍需真实客户端验收。
+詳情見 `docs/STATUS-GUIDE-A3.0.md`；分類索引見 `docs/GUIDE-INDEX-A3.md`。
+靜態資料檢查、Dash 與編譯輸出比較不代表客戶端排版和觸控导航已驗收。
