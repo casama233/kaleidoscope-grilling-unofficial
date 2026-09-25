@@ -1,0 +1,50 @@
+name: Materialize A2.7.70 reviewed visual assets (one-shot)
+on:
+  push:
+    branches: [fix/a2770-placed-visuals]
+    paths:
+      - '.github/workflows/placed-visual-bootstrap.yml'
+      - 'development/gameplay_core/a2770_placed_visual_assets.py'
+permissions:
+  contents: write
+concurrency:
+  group: grilling-a2770-bootstrap
+  cancel-in-progress: false
+jobs:
+  materialize:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch exact reviewed commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git config core.autocrlf false
+          gh auth setup-git
+          git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
+          git fetch --depth=1 origin "$GITHUB_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Materialize pinned and derived resources
+        run: |
+          set -euo pipefail
+          python -m pip install Pillow==11.3.0
+          python -m py_compile development/gameplay_core/a2770_placed_visual_assets.py
+          python development/gameplay_core/a2770_placed_visual_assets.py --fetch-sources --install
+          python development/gameplay_core/a2770_placed_visual_assets.py --check
+          node development/gameplay_core/test_a2770_core.mjs
+      - name: Commit only reviewed source outputs (never force push)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/fix/a2770-placed-visuals | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add projects/grilling/gameplay_core development/gameplay_core README.md
+          git diff --cached --stat
+          git commit -m 'build: materialize reviewed A2.7.70 placed visual resources'
+          git push origin HEAD:refs/heads/fix/a2770-placed-visuals
