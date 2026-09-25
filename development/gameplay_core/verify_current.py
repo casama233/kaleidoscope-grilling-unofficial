@@ -6,6 +6,7 @@ import json
 import re
 import subprocess
 import sys
+from vibrant_gate import check_pair
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "projects/grilling/gameplay_core"
@@ -32,6 +33,7 @@ VERIFIERS = {
     (2, 7, 65): "verify_a2765.py",
     (2, 7, 66): "verify_a2766.py",
     (2, 7, 67): "verify_a2767.py",
+    (2, 7, 68): "verify_a2768.py",
 }
 
 
@@ -72,6 +74,8 @@ def generic_gate() -> tuple[int, int, int, int]:
     bp_version = tuple(bp["header"]["version"])
     rp_version = tuple(rp["header"]["version"])
     assert bp_version == rp_version, (bp_version, rp_version)
+    if bp_version >= (2, 7, 68):
+        check_pair(bp, rp)
 
     assert bp["header"]["uuid"] == EXPECTED["bp_header_uuid"]
     assert rp["header"]["uuid"] == EXPECTED["rp_header_uuid"]

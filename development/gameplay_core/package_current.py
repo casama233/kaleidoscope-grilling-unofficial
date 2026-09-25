@@ -6,6 +6,8 @@ import hashlib
 import json
 import os
 import zipfile
+from vibrant_gate import check_paths, check_archive
+from verify_current import generic_gate, verify_compiled_exact
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "projects/grilling/gameplay_core"
@@ -75,8 +77,12 @@ def main() -> None:
     parser.add_argument("--output-dir", default="artifacts/review")
     args = parser.parse_args()
 
-    bp_manifest = load(BP / "manifest.json")
-    rp_manifest = load(RP / "manifest.json")
+    # Standalone packaging must reject a lost declaration or an old Dash build,
+    # even when the caller bypasses the usual CI verifier steps.
+    generic_gate()
+    source_manifests = check_paths(BP, RP)
+    verify_compiled_exact()
+    bp_manifest, rp_manifest = source_manifests
     version = tuple(bp_manifest["header"]["version"])
     assert version == tuple(rp_manifest["header"]["version"])
     label = ".".join(map(str, version))
@@ -91,6 +97,7 @@ def main() -> None:
     report = out / "build-report.json"
 
     make_zip(mcaddon, [("behavior_pack", compiled_bp), ("resource_pack", compiled_rp)])
+    check_archive(mcaddon, source_manifests)
     make_zip(brproject, [("", PROJECT)], exclude_project_builds=True)
 
     payload = {
@@ -101,6 +108,7 @@ def main() -> None:
         "mcaddon": {"path": mcaddon.relative_to(ROOT).as_posix(), "sha256": sha256(mcaddon)},
         "brproject": {"path": brproject.relative_to(ROOT).as_posix(), "sha256": sha256(brproject)},
         "deterministic_zip_timestamp": "2020-01-01T00:00:00",
+        "vibrant_manifest_and_export_checked": True,
         "minecraft_tested": False,
         "bds_tested": False,
         "client_visuals_tested": False,
