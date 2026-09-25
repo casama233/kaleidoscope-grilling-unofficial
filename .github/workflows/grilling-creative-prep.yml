@@ -31,6 +31,26 @@ jobs:
           git fetch --depth=1 origin "$EXPECTED_SHA"
           git checkout --detach FETCH_HEAD
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Preserve original locale newlines in the generator
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('development/gameplay_core/a2770_creative_catalog.py')
+          s=path.read_text(encoding='utf-8')
+          old="    return '\\n'.join(kept) + '\\n'"
+          new="    newline = '\\r\\n' if '\\r\\n' in text else '\\n'\n    return newline.join(kept) + newline"
+          assert s.count(old)==1
+          s=s.replace(old,new)
+          old="pending[path]=localized(path.read_text(encoding='utf-8-sig'),locale,active)"
+          new="pending[path]=localized(path.read_bytes().decode('utf-8-sig'),locale,active)"
+          assert s.count(old)==1
+          path.write_text(s.replace(old,new),encoding='utf-8')
+          path=Path('development/gameplay_core/test_a2770_catalog.py')
+          s=path.read_text(encoding='utf-8')
+          old="self.assertIn('other:item=unchanged\\n',result)"
+          assert s.count(old)==1
+          path.write_text(s.replace(old,"self.assertIn('other:item=unchanged',result.splitlines())"),encoding='utf-8')
+          PY
       - name: Generate and verify creative-only metadata
         run: |
           set -euo pipefail
@@ -47,6 +67,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           gh auth setup-git
           git rm -- .github/workflows/grilling-creative-prep.yml
-          git add -- projects/grilling/gameplay_core development/gameplay_core/verify_current.py development/gameplay_core/verify_a2769.py
+          git add -- projects/grilling/gameplay_core development/gameplay_core/verify_current.py development/gameplay_core/verify_a2769.py development/gameplay_core/a2770_creative_catalog.py development/gameplay_core/test_a2770_catalog.py
           git commit -m 'release: A2.7.70 group Grilling creative items by use'
           git push origin HEAD:refs/heads/fix/grilling-creative-groups
