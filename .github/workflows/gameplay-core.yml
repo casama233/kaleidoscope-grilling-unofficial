@@ -7,15 +7,17 @@ on:
       - '.github/workflows/gameplay-core*.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'development/gameplay_core/**'
-      - 'docs/STATUS-A2.7.*.md'
+      - 'docs/STATUS-A*.md'
       - 'docs/legacy_workflows/**'
+      - 'tools/**'
   pull_request:
     paths:
       - '.github/workflows/gameplay-core*.yml'
       - 'projects/grilling/gameplay_core/**'
       - 'development/gameplay_core/**'
-      - 'docs/STATUS-A2.7.*.md'
+      - 'docs/STATUS-A*.md'
       - 'docs/legacy_workflows/**'
+      - 'tools/**'
   workflow_dispatch:
 
 permissions:
@@ -47,6 +49,12 @@ jobs:
           git fetch --depth=1 origin "$EXPECTED_SHA"
           git checkout --detach FETCH_HEAD
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Install pinned asset-verifier dependency
+        shell: pwsh
+        run: |
+          python -m pip install Pillow==11.3.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify canonical source
         shell: pwsh
@@ -90,72 +98,11 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           overwrite: true
-      - name: Publish green PR build as GitHub prerelease
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+      - name: Publish tested main as prerelease
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          $ErrorActionPreference='Stop'
-
-          $message = gh api "repos/$env:GITHUB_REPOSITORY/commits/$env:RELEASE_SOURCE_SHA" --jq '.commit.message'
+          python development/gameplay_core/publish_test_release.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $subject = (($message -split "`n")[0]).Trim()
-          if (-not $subject.StartsWith('release:')) {
-            Write-Host "Skipping prerelease: PR head commit is not a release: marker ($subject)"
-            exit 0
-          }
-
-          $manifest = Get-Content 'projects/grilling/gameplay_core/behavior_pack/manifest.json' -Raw | ConvertFrom-Json
-          $version = ($manifest.header.version -join '.')
-          $tag = "A$version-test.$env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
-          $title = "Kaleidoscope Grilling A$version Test Build $env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT"
-
-          $mcaddon = Get-ChildItem 'artifacts/review/*.mcaddon' -File | Select-Object -First 1
-          $brproject = Get-ChildItem 'artifacts/review/*.brproject' -File | Select-Object -First 1
-          $checksums = Get-Item 'artifacts/review/SHA256SUMS.txt'
-          $report = Get-Item 'artifacts/review/build-report.json'
-          if (-not $mcaddon -or -not $brproject -or -not $checksums -or -not $report) { throw 'Expected prerelease assets are missing.' }
-
-          $notesFile = Join-Path $env:RUNNER_TEMP 'grilling-prerelease-notes.md'
-          @"
-          # A$version test build
-
-          This is an **automated prerelease test build**, not a stable release.
-
-          Source commit: $env:RELEASE_SOURCE_SHA
-          Pull request: #${{ github.event.pull_request.number }}
-          Canonical workflow run: $env:GITHUB_RUN_NUMBER.$env:GITHUB_RUN_ATTEMPT
-
-          Validation completed before publishing:
-          - canonical source verifier: PASS
-          - client visual reference gate: PASS
-          - checksum-pinned bridge Dash compile: PASS
-          - source/dist exact comparison: PASS
-          - deterministic review packaging: PASS
-
-          Runtime validation status:
-          - Minecraft tested: **NO**
-          - BDS tested: **NO**
-          - Client visuals tested: **NO**
-
-          Version-specific scope and validation boundaries are documented in:
-          docs/STATUS-A$version.md
-
-          Use the attached .mcaddon for in-game testing. The .brproject, SHA256 list, and build report are included for reproducibility.
-          "@ | Set-Content -Path $notesFile -Encoding utf8
-
-          gh release create $tag $mcaddon.FullName $brproject.FullName $checksums.FullName $report.FullName --repo $env:GITHUB_REPOSITORY --target $env:RELEASE_SOURCE_SHA --title $title --notes-file $notesFile --prerelease
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-          $prefix = "A$version-test."
-          $rows = gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName,isPrerelease | ConvertFrom-Json
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          foreach ($row in $rows) {
-            if ($row.isPrerelease -and $row.tagName.StartsWith($prefix) -and $row.tagName -ne $tag) {
-              Write-Host "Removing superseded prerelease $($row.tagName)"
-              gh release delete $row.tagName --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
-              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            }
-          }
