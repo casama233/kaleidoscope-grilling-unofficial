@@ -79,7 +79,7 @@ def build_payload(source: dict) -> dict:
 
 def payload_js(payload: dict) -> str:
     body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    return "export const GUIDEBOOK_PAYLOAD=" + body + ";\n"
+    return "export const GUIDE_PAYLOAD=" + body + ";\n"
 
 
 def lang_text(source: dict, locale: str) -> str:
