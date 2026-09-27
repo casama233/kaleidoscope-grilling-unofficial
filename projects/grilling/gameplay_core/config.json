@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.8.1 Vat and Icon Corrective",
+  "name": "Kaleidoscope Grilling A2.8.3 Immersion Repair",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_8_1_Vat_Icon_Corrective"
+          "packName": "Kaleidoscope_Grilling_A2_8_3_Immersion_Repair"
         }
       ]
     ]

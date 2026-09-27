@@ -10,7 +10,7 @@
         "default": "textures/blocks/seasoning_bottle"
       },
       "geometry": {
-        "default": "geometry.kg_a2766.special_seasoning.r1.v2"
+        "default": "geometry.kg_a283.kg_a2766.special_seasoning.r1.v2"
       },
       "render_controllers": [
         "controller.render.kg_a2733.seasoning_bottle_hand"

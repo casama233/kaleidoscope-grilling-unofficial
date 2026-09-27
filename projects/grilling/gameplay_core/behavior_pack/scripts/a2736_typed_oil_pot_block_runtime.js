@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {OIL_TYPES} from './a23_oil_world.js';
 import {GRILLING_FLUID_CAPACITY,oilTypeForBucketId} from './a2738_oil_contract_core.js';
@@ -10,8 +11,8 @@ import {HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,placementCandidateLocat
 import {placedOilPotLocation,readPlacedOilPotState,writePlacedOilPotState,clearPlacedOilPotState,
  capturePlacedOilPotSnapshot,placedOilPotSnapshotMatches,restorePlacedOilPotSnapshot} from './a2739_cookery_oil_pot_block_adapter.js';
 
-function mismatch(p){try{p.onScreenDisplay.setActionBar('§c油壺內已有不同內容或容量不足')}catch{}}
-function failed(p){try{p?.onScreenDisplay.setActionBar('§7油壺操作已取消：物品、容器或資料已改變')}catch{}}
+function mismatch(p){interactionFeedback(p,'§c油壺內已有不同內容或容量不足')}
+function failed(p){interactionFeedback(p,'§7油壺操作已取消：物品、容器或資料已改變')}
 function warn(text){console.warn('[Grilling A2.7.69] '+text)}
 function playPour(p,type,count){try{p.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*Math.min(GRILLING_FLUID_CAPACITY,count)/GRILLING_FLUID_CAPACITY})}catch{}}
 function livePot(d,l){try{const b=d.getBlock(l);return b?.typeId===HOST_BLOCK_ID?b:undefined}catch{return undefined}}

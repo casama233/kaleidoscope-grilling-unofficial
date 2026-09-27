@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID} from './data.js';
 import {commitTwoParty} from './a277_grill_transaction_core.js';
@@ -17,7 +18,7 @@ import {
  stateBeforeSeasoning,planPotOilTransition
 } from './a2750_cookery_cuisine_core.js';
 
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 function isFirst(event){return event.isFirstEvent!==false}
 function readCuisineState(block){
  try{
@@ -119,7 +120,7 @@ function applySeasoning(player,block){
  }
  try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}
  try{player.playSound('kg_imm.season',{volume:.85,pitch:1})}catch{}
- message(player,'§a已向 Cookery 鍋具加入特製調料');return true;
+ return true;
 }
 function finishHostInteraction(player,dimension,location,kind,beforeInventory,beforeHasOil,candidateOil,stateBefore){
  const block=dimension.getBlock(location),afterInventory=snapshotInventory(player),gains=inventoryGains(beforeInventory,afterInventory);

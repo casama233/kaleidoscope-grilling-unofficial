@@ -378,61 +378,6 @@
                     64
                   ],
                   "material_instance": "fluid"
-                },
-                "down": {
-                  "uv": [
-                    0,
-                    0
-                  ],
-                  "uv_size": [
-                    64,
-                    64
-                  ],
-                  "material_instance": "fluid"
-                },
-                "north": {
-                  "uv": [
-                    0,
-                    0
-                  ],
-                  "uv_size": [
-                    64,
-                    64
-                  ],
-                  "material_instance": "fluid"
-                },
-                "south": {
-                  "uv": [
-                    0,
-                    0
-                  ],
-                  "uv_size": [
-                    64,
-                    64
-                  ],
-                  "material_instance": "fluid"
-                },
-                "east": {
-                  "uv": [
-                    0,
-                    0
-                  ],
-                  "uv_size": [
-                    64,
-                    64
-                  ],
-                  "material_instance": "fluid"
-                },
-                "west": {
-                  "uv": [
-                    0,
-                    0
-                  ],
-                  "uv_size": [
-                    64,
-                    64
-                  ],
-                  "material_instance": "fluid"
                 }
               }
             }

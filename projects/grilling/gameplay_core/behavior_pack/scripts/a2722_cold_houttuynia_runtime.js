@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
  COLD_ID,HOUTTUYNIA_ID,CRAFTING_TABLE_ID,REQUIRED_OIL_TYPE,
@@ -10,7 +11,7 @@ import {playerInventory as inventory,getMainHand as main,getOffHand as off,setMa
 import {stackIntentSignature as interactionStackSignature} from './a2762_interaction_intent_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 function give(player,stack){
  const c=inventory(player);
  if(!c){try{player.dimension.spawnItem(stack,player.location)}catch{};return}
@@ -50,7 +51,7 @@ export function tryCraftColdHouttuynia(player){
  }
  give(player,output);
  try{player.dimension.playSound('random.pop',player.location,{volume:.65,pitch:1.15})}catch{}
- message(player,'§a完成涼拌折耳根（折耳根×3，高級辣椒油 -2）');
+
  return true;
 }
 

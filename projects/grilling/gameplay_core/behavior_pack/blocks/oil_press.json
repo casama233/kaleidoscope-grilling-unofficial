@@ -38,7 +38,7 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a26_oil_press",
-          "render_method": "alpha_test",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 1.0,
           "face_dimming": true
         }
@@ -72,6 +72,17 @@
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 3.0
+      },
+      "minecraft:item_visual": {
+        "geometry": "geometry.kg_a283.item_oil_press",
+        "material_instances": {
+          "*": {
+            "texture": "kg_a26_oil_press",
+            "render_method": "alpha_test_single_sided",
+            "ambient_occlusion": 1.0,
+            "face_dimming": true
+          }
+        }
       }
     },
     "permutations": [

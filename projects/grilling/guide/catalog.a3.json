@@ -5524,8 +5524,8 @@
   },
   "icon_sources": {
     "textures/ui/kg_grilling/catalog/advanced_rack": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/blocks/advanced_rack.png",
-      "sha256": "c86a83ffacbf794c6083d19ca055e3e8ec984f906cc53f858e8a5581a0160e60",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/advanced_rack.png",
+      "sha256": "2b2d97318a6cff46a14d791add9560284e50f072bb0a78674c9fd064c02623b4",
       "item": "kaleidoscope_grilling:advanced_rack",
       "atlas_key": "advanced_rack"
     },
@@ -5590,8 +5590,8 @@
       "atlas_key": "dark_grilling"
     },
     "textures/ui/kg_grilling/catalog/dragon_egg_powder": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/dragon_egg_powder.png",
-      "sha256": "606848a752d322a4c2733270fb54cf6ae943a0dd1236ebb4dc1cab039f6757e2",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/a283_icons/dragon_egg_powder.png",
+      "sha256": "e48b5c68997d7a36186f3d475563009e007fb1f8da6ea2083be3cf66e6706213",
       "item": "kaleidoscope_grilling:dragon_egg_powder",
       "atlas_key": "dragon_egg_powder"
     },
@@ -5728,8 +5728,8 @@
       "atlas_key": "houttuynia"
     },
     "textures/ui/kg_grilling/catalog/houttuynia_powder": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/houttuynia_powder.png",
-      "sha256": "862d6d81bb19f7f92c67d6c47be6c17a770d1f059417ed7c1762f37fa665a704",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/a283_icons/houttuynia_powder.png",
+      "sha256": "327c1e911cf5819215660b7a65e009a64ada5661992ecc58cfabf08e7fb64a48",
       "item": "kaleidoscope_grilling:houttuynia_powder",
       "atlas_key": "houttuynia_powder"
     },
@@ -5770,8 +5770,8 @@
       "atlas_key": "onion"
     },
     "textures/ui/kg_grilling/catalog/onion_powder": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/onion_powder.png",
-      "sha256": "1fc807e739cfe05aa9454f73478178154f4da9cf4247d4524e181b04a7ad9ee0",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/a283_icons/onion_powder.png",
+      "sha256": "e1722325cbcc5c8e5e25a260ff854dc8538f27d8978de709f9d4794fde1647ec",
       "item": "kaleidoscope_grilling:onion_powder",
       "atlas_key": "onion_powder"
     },
@@ -5867,7 +5867,7 @@
     },
     "textures/ui/kg_grilling/catalog/skewer_plate": {
       "source": "projects/grilling/gameplay_core/resource_pack/textures/items/skewer_plate.png",
-      "sha256": "67cee3ad1bbedd1d0e0400b5d0715b53126e5a6aba352f25521b3e0508677ec7",
+      "sha256": "e032e2bf77636d446658e151560b4641f32a7132b18f97c8c4380e2d8c80b430",
       "item": "kaleidoscope_grilling:skewer_plate",
       "atlas_key": "skewer_plate"
     },
@@ -5914,8 +5914,8 @@
       "atlas_key": "sweet_potato_powder"
     },
     "textures/ui/kg_grilling/catalog/totem_powder": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/totem_powder.png",
-      "sha256": "874dc3be3d312077adbea5976337a2c58e1eb61102c131e7e7e547249850027c",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/a283_icons/totem_powder.png",
+      "sha256": "da41c3a2369ebc62fa341dcd2db71d1db857054ec8922a789583cd88d69e9ba6",
       "item": "kaleidoscope_grilling:totem_powder",
       "atlas_key": "totem_powder"
     },
@@ -5926,8 +5926,8 @@
       "atlas_key": "unfinished_skewer"
     },
     "textures/ui/kg_grilling/catalog/wedding_candy": {
-      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/wedding_candy.png",
-      "sha256": "a83f1260bf21cfdf479c0c2e1b2e50af16e4a28c4db6ad29ac323acebf133d44",
+      "source": "projects/grilling/gameplay_core/resource_pack/textures/items/a283_icons/wedding_candy.png",
+      "sha256": "f9f0f50d786d9712754a14fd0861d3d49739a2993676b8cd8d08e9530f34b4ca",
       "item": "kaleidoscope_grilling:wedding_candy",
       "atlas_key": "wedding_candy"
     },

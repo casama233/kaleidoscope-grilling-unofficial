@@ -17,7 +17,7 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a23_grill_unlit",
-          "render_method": "alpha_test",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 1.0,
           "face_dimming": true
         }

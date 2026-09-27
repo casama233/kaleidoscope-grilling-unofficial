@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {
  world,system,ItemStack,CommandPermissionLevel
 } from '@minecraft/server';
@@ -21,7 +22,7 @@ const BIND_PREFIX='kaleidoscope_grilling:rack_binding_';
 
 function loc(block){return {x:block.x,y:block.y,z:block.z}}
 function tags(stack){try{return stack?.getTags?.()??[]}catch{return []}}
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 function resolveRack(dimension,location){
  try{const b=dimension.getBlock(location);return b?.typeId===ADVANCED_RACK_BLOCK_ID?b:undefined}catch{return undefined}
 }
@@ -232,7 +233,7 @@ async function openSlotForm(player,dimension,location,slot){
  else if(r.selection===3){
   const lc=rackContainer(live),lf=readRackFilters(live);
   if(lc?.getItem(slot))message(player,'§c槽位有物品時不能清除篩選');
-  else{lf[slot]=null;writeRackFilters(live,lf);message(player,'§a已清除槽位 '+(slot+1)+' 的篩選')}
+  else{lf[slot]=null;writeRackFilters(live,lf);}
  }else if(r.selection===4){system.run(()=>openRackForm(player,dimension,location))}
 }
 
@@ -249,8 +250,7 @@ export async function openRackForm(player,dimension,location){
  else if(r.selection===RACK_COMPARTMENTS){
   const live=resolveRack(dimension,location);
   if(live&&!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return}
-  if(live&&depositMatching(player,live))message(player,'§a已存入所有符合既有篩選的物品');
-  else message(player,'§7沒有可存入的符合物品');
+  if(!live||!depositMatching(player,live))message(player,'§7沒有可存入的符合物品');
  }
 }
 

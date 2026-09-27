@@ -32,7 +32,7 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a2746_advanced_rack",
-          "render_method": "alpha_test",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 1,
           "face_dimming": true
         }

@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
  PRESS_MAX_CAKES,PRESS_REQUIRED_PROGRESS,PRESS_COOLDOWN_TICKS,PRESS_IMPACT_TICK,PRESS_COMPLETION_DELAY,
@@ -49,7 +50,7 @@ function give(p,stack){
  if(!stack)return;const c=playerContainer(p);if(!c){p.dimension.spawnItem(stack,p.location);return}
  try{const rem=c.addItem(stack);if(rem)p.dimension.spawnItem(rem,p.location)}catch{p.dimension.spawnItem(stack,p.location)}
 }
-function msg(p,text){try{p.onScreenDisplay.setActionBar(text)}catch{}}
+const msg=interactionFeedback;
 function faceName(face){return String(face??'').toLowerCase()}
 function faceOffset(face){
  switch(faceName(face)){case'north':return{x:0,y:0,z:-1};case'south':return{x:0,y:0,z:1};case'west':return{x:-1,y:0,z:0};case'east':return{x:1,y:0,z:0};case'up':return{x:0,y:1,z:0};case'down':return{x:0,y:-1,z:0};default:return null}
@@ -130,7 +131,6 @@ function fillPotFromVat(block,p,hand,item){
  const next=vatExtract(v,v.type,plan.buckets);if(!next.ok)return true;
  const pot=buildCookeryOilPot(plan.type,plan.nextCount,item);if(pot)setHand(p,hand,pot);writeVat(block,next.state);return true;
 }
-function vatStatus(block,p){const v=readVat(block);msg(p,'§7大缸：'+(v.type||'empty')+' '+v.buckets+'/'+VAT_CAPACITY_BUCKETS+' 桶')}
 
 function scanVat(press){
  let fallback={status:'NO_CONTAINER',block:null};
@@ -147,8 +147,7 @@ function scanVat(press){
 }
 function broadcastPressFailure(block,status,source){
  const text=status==='FULL'?'§c附近大缸容量不足':status==='INCOMPATIBLE'?'§c附近大缸裝有不同流體':'§c附近沒有可接 4 桶菜籽油的大缸';
- let sent=false;try{for(const p of block.dimension.getPlayers({location:block.location,maxDistance:6})){msg(p,text);sent=true}}catch{}
- if(!sent&&source)msg(source,text);
+ if(source)msg(source,text);
 }
 function residueEject(block,count){
  if(count<=0)return;let facing='north';try{facing=String(block.permutation.getState('minecraft:cardinal_direction')??'north')}catch{}
@@ -175,13 +174,12 @@ function startPress(block,p,amount){
  const dry=impactPress(state,amount);if(!dry.ok)return true;
  PRESS_COOLDOWNS.set(cd,now+PRESS_COOLDOWN_TICKS);
  try{p.playAnimation('animation.kg_a26.player.anvil_press',{blendOutTime:.05})}catch{}
- const dim=block.dimension,loc={...block.location},pid=p.id;
+ const dim=block.dimension,loc={...block.location};
  system.runTimeout(()=>{
   const b=dim.getBlock(loc);if(!b||b.typeId!==OIL_PRESS_ID)return;const current=readPress(b),hit=impactPress(current,amount);if(!hit.ok)return;
   writePress(b,hit.state);
   try{dim.playSound('random.anvil_land',b.location,{volume:1.15,pitch:.88})}catch{}
   try{for(let i=0;i<6;i++)dim.spawnParticle('minecraft:critical_hit_emitter',{x:b.x+.5+(Math.random()-.5)*.4,y:b.y+.9+(Math.random()-.5)*.2,z:b.z+.5+(Math.random()-.5)*.4})}catch{}
-  try{const source=world.getEntity(pid);if(source)msg(source,'§7榨油進度 '+hit.state.progress+'/'+PRESS_REQUIRED_PROGRESS)}catch{}
  },PRESS_IMPACT_TICK);
  return true;
 }
@@ -195,7 +193,7 @@ function interactPress(block,p,item,hand=null){
   try{block.dimension.playSound('dig.grass',block.location,{volume:.8,pitch:1})}catch{};return;
  }
  const amount=toolProgress(item?.typeId);if(amount>0){startPress(block,p,amount);return}
- msg(p,'§7榨油器：油餅 '+state.cakes+'/4，進度 '+state.progress+'/'+PRESS_REQUIRED_PROGRESS);
+
 }
 function breakPress(block,p){
  const s=readPress(block),dim=block.dimension,loc={x:block.x+.5,y:block.y+.5,z:block.z+.5};clearPress(block);block.setType('minecraft:air');
@@ -210,11 +208,11 @@ function placePackedVat(support,face,p,item,hand=null){
  const packed=vatPacked(item);target.setType(BIG_VAT_ID);writeVat(target,packed);decHand(p,actualHand,1);return true;
 }
 function interactVat(block,p,item,hand=null){
- const actualHand=hand??(item?handFor(p,item.typeId):null);if(!item){vatStatus(block,p);return}
+ const actualHand=hand??(item?handFor(p,item.typeId):null);if(!item){return}
  if((item.typeId===COOKERY_EMPTY||item.typeId===COOKERY_FILLED)&&actualHand&&fillPotFromVat(block,p,actualHand,item))return;
  if(bucketType(item.typeId)&&actualHand&&fillVatFromBucket(block,p,actualHand,item))return;
  if(item.typeId==='minecraft:bucket'&&actualHand&&takeVatBucket(block,p,actualHand))return;
- vatStatus(block,p);
+
 }
 
 function doubleCropGrowth(block,p,hand){

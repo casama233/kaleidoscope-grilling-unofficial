@@ -147,16 +147,16 @@
       "textures": "textures/items/sichuan_pepper"
     },
     "onion_powder": {
-      "textures": "textures/items/onion_powder"
+      "textures": "textures/items/a283_icons/onion_powder"
     },
     "houttuynia_powder": {
-      "textures": "textures/items/houttuynia_powder"
+      "textures": "textures/items/a283_icons/houttuynia_powder"
     },
     "totem_powder": {
-      "textures": "textures/items/totem_powder"
+      "textures": "textures/items/a283_icons/totem_powder"
     },
     "dragon_egg_powder": {
-      "textures": "textures/items/dragon_egg_powder"
+      "textures": "textures/items/a283_icons/dragon_egg_powder"
     },
     "pending_seasoning": {
       "textures": "textures/items/pending_seasoning"
@@ -246,10 +246,10 @@
       "textures": "textures/items/red_chili_powder"
     },
     "advanced_rack": {
-      "textures": "textures/blocks/advanced_rack"
+      "textures": "textures/items/advanced_rack"
     },
     "wedding_candy": {
-      "textures": "textures/items/wedding_candy"
+      "textures": "textures/items/a283_icons/wedding_candy"
     },
     "sugared_tomato": {
       "textures": "textures/items/sugared_tomato"

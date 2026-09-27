@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {OIL_TYPES} from './a23_oil_world.js';
 import {readCookeryOilPot,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
@@ -8,7 +9,7 @@ import {oilTypeForBucketId,planOffhandOilFill,ITEM_FILL_POINTS} from './a2737_of
 import {stackIntentSignature as interactionStackSignature} from './a2762_interaction_intent_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 
 function verifyPot(stack,type,count){
  const state=readCookeryOilPot(stack);
@@ -48,7 +49,7 @@ function fillOffhandPot(player,expectedBucketId){
  }
 
  try{player.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*plan.nextCount/plan.capacity})}catch{}
- message(player,'§a已向油壺加入 '+ITEM_FILL_POINTS+' 點油（'+plan.nextCount+'/'+plan.capacity+'）');
+
  return true;
 }
 

@@ -1,0 +1,572 @@
+{
+  "hand_geometries": 194,
+  "attachables": 107,
+  "removed_faces": {
+    "advanced_rack_2.geo.json": [
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "north",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "east",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "south",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "west",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "up",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "down",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "north",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "east",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "south",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "west",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "up",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "down",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_east_1",
+        "face": "east",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_west_2",
+        "face": "west",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_east_9",
+        "face": "east",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_west_11",
+        "face": "west",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_east_15",
+        "face": "east",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_west_17",
+        "face": "west",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_east_21",
+        "face": "east",
+        "kept": "instance_0_element_27_27"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_west_23",
+        "face": "west",
+        "kept": "instance_0_element_27_27"
+      }
+    ],
+    "big_vat_3.geo.json": [
+      {
+        "bone": "fluid_surface",
+        "face": "down",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "north",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "south",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "east",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "west",
+        "kept": "fluid top only"
+      }
+    ],
+    "big_vat_1.geo.json": [
+      {
+        "bone": "fluid_surface",
+        "face": "down",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "north",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "south",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "east",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "west",
+        "kept": "fluid top only"
+      }
+    ],
+    "advanced_rack_3.geo.json": [
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "north",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "east",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "south",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "west",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "up",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "down",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "north",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "east",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "south",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "west",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "up",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "down",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_east_1",
+        "face": "east",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_west_2",
+        "face": "west",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_east_9",
+        "face": "east",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_west_11",
+        "face": "west",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_east_15",
+        "face": "east",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_west_17",
+        "face": "west",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_east_21",
+        "face": "east",
+        "kept": "instance_0_element_27_27"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_west_23",
+        "face": "west",
+        "kept": "instance_0_element_27_27"
+      }
+    ],
+    "big_vat_4.geo.json": [
+      {
+        "bone": "fluid_surface",
+        "face": "down",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "north",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "south",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "east",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "west",
+        "kept": "fluid top only"
+      }
+    ],
+    "advanced_rack_4.geo.json": [
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "north",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "east",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "south",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "west",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "up",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "down",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "north",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "east",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "south",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "west",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "up",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "down",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_east_1",
+        "face": "east",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_west_2",
+        "face": "west",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_east_9",
+        "face": "east",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_west_11",
+        "face": "west",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_east_15",
+        "face": "east",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_west_17",
+        "face": "west",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_east_21",
+        "face": "east",
+        "kept": "instance_0_element_27_27"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_west_23",
+        "face": "west",
+        "kept": "instance_0_element_27_27"
+      }
+    ],
+    "advanced_rack_0.geo.json": [
+      {
+        "bone": "instance_0_source_0_mixed_east_1",
+        "face": "east",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_west_2",
+        "face": "west",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_east_9",
+        "face": "east",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_west_11",
+        "face": "west",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_east_15",
+        "face": "east",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_west_17",
+        "face": "west",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_east_21",
+        "face": "east",
+        "kept": "instance_0_element_27_27"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_west_23",
+        "face": "west",
+        "kept": "instance_0_element_27_27"
+      }
+    ],
+    "big_vat_2.geo.json": [
+      {
+        "bone": "fluid_surface",
+        "face": "down",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "north",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "south",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "east",
+        "kept": "fluid top only"
+      },
+      {
+        "bone": "fluid_surface",
+        "face": "west",
+        "kept": "fluid top only"
+      }
+    ],
+    "advanced_rack_1.geo.json": [
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "north",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "east",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "south",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "west",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "up",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_32_32",
+        "face": "down",
+        "kept": "instance_0_element_30_30"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "north",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "east",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "south",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "west",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "up",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_element_33_33",
+        "face": "down",
+        "kept": "instance_0_element_31_31"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_east_1",
+        "face": "east",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_0_mixed_west_2",
+        "face": "west",
+        "kept": "instance_0_element_5_5"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_east_9",
+        "face": "east",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_5_mixed_west_11",
+        "face": "west",
+        "kept": "instance_0_element_7_7"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_east_15",
+        "face": "east",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_6_mixed_west_17",
+        "face": "west",
+        "kept": "instance_0_element_26_26"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_east_21",
+        "face": "east",
+        "kept": "instance_0_element_27_27"
+      },
+      {
+        "bone": "instance_0_source_7_mixed_west_23",
+        "face": "west",
+        "kept": "instance_0_element_27_27"
+      }
+    ]
+  },
+  "block_materials": 13,
+  "animation_strip_icons": [
+    "onion_powder",
+    "houttuynia_powder",
+    "totem_powder",
+    "dragon_egg_powder",
+    "wedding_candy"
+  ]
+}

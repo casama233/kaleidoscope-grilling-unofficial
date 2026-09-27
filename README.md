@@ -1,3 +1,5 @@
+> Current corrective build: **A2.8.3** — [immersion/rendering changes and validation limits](docs/STATUS-A2.8.3.md). Client visual acceptance is pending.
+
 > 最新修正：A2.8.1 — 大缸使用原生方塊物品渲染；調料瓶 UI 圖示修正。見 docs/STATUS-A2.8.1.md。
 
 > **目前整合測試版：A2.8.0**。指南、最新共享創造欄、Java 手持姿態與放置外觀已整合；安裝完整煙火，不需另裝指南 addon。詳見 `docs/STATUS-A2.8.0.md`，實機驗收尚待完成。

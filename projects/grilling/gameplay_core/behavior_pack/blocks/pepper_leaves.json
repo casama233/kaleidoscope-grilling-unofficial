@@ -26,7 +26,7 @@
           "texture": "kg_a2748_pepper_leaves",
           "render_method": "alpha_test",
           "face_dimming": false,
-          "ambient_occlusion": false
+          "ambient_occlusion": 0
         }
       },
       "minecraft:collision_box": {
@@ -73,7 +73,7 @@
               "texture": "kg_a2748_pepper_leaves_fruiting",
               "render_method": "alpha_test",
               "face_dimming": false,
-              "ambient_occlusion": false
+              "ambient_occlusion": 0
             }
           }
         }

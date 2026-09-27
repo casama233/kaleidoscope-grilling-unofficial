@@ -43,7 +43,8 @@
       },
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 0.3
-      }
+      },
+      "senluo:grilling_bottle_place": {}
     }
   }
 }

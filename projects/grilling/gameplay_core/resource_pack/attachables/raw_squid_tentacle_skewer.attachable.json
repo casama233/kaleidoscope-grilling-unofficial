@@ -4,7 +4,7 @@
     "description": {
       "identifier": "kaleidoscope_grilling:raw_squid_tentacle_skewer",
       "materials": {
-        "default": "entity_alphablend"
+        "default": "entity_alphatest_one_sided"
       },
       "textures": {
         "stage0": "textures/a22_bites/raw_squid_tentacle_skewer_stage0",
@@ -14,11 +14,11 @@
         "stage4": "textures/a22_bites/raw_squid_tentacle_skewer_stage3"
       },
       "geometry": {
-        "stage0": "geometry.kg_a22.raw_squid_tentacle_skewer.stage0",
-        "stage1": "geometry.kg_a22.raw_squid_tentacle_skewer.stage1",
-        "stage2": "geometry.kg_a22.raw_squid_tentacle_skewer.stage2",
-        "stage3": "geometry.kg_a22.raw_squid_tentacle_skewer.stage3",
-        "stage4": "geometry.kg_a22.raw_squid_tentacle_skewer.stage3"
+        "stage0": "geometry.kg_a283.kg_a22.raw_squid_tentacle_skewer.stage0",
+        "stage1": "geometry.kg_a283.kg_a22.raw_squid_tentacle_skewer.stage1",
+        "stage2": "geometry.kg_a283.kg_a22.raw_squid_tentacle_skewer.stage2",
+        "stage3": "geometry.kg_a283.kg_a22.raw_squid_tentacle_skewer.stage3",
+        "stage4": "geometry.kg_a283.kg_a22.raw_squid_tentacle_skewer.stage3"
       },
       "scripts": {
         "pre_animation": [

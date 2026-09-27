@@ -1,3 +1,4 @@
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
  SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
@@ -25,7 +26,7 @@ for(const id of ['kaleidoscope_grilling:mysterious_skewer','kaleidoscope_grillin
 
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
 function posKey(prefix,block){return prefix+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z)}
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 function cloneOne(stack){const out=stack.clone();out.amount=1;return out}
 function decrementMain(player,count=1){
  if(creative(player))return true;const s=heldMain(player);if(!s||s.amount<count)return false;
@@ -172,7 +173,7 @@ function recordBookFromSkewer(player,book,skewer,hand='main'){
  if(!record){message(player,'§c這根串不能記錄成配方');return false}
  const out=bookItem(record,stackRow(skewer),book);if(!out)return false;
  if(hand==='off')setOff(player,out);else setMain(player,out);
- message(player,'§a已記錄烤串配方：'+record.resultId);return true;
+ return true;
 }
 function consumePlan(player,plan){
  if(creative(player))return true;const c=mainContainer(player);if(!c)return false;
@@ -197,7 +198,7 @@ function craftFromBook(player,book,stickHand='off'){
   }
  }else try{output=new ItemStack(record.resultId,1)}catch{}
  if(!output)return false;give(player,output);
- try{player.playSound('random.levelup',{volume:.45,pitch:1.5})}catch{}message(player,'§a烤串配方製作完成');return true;
+ try{player.playSound('random.levelup',{volume:.45,pitch:1.5})}catch{}return true;
 }
 function handleBookAir(player,item){
  const main=heldMain(player),off=heldOff(player),hand=main?.typeId===BOOK_ID?'main':off?.typeId===BOOK_ID?'off':null;if(!hand)return;
@@ -212,7 +213,7 @@ function convertCookeryRecipe(player){
  const out=bookItem(record,stackRow(off));if(!creative(player)){
   if(main.amount<=1)setMain(player,undefined);else{main.amount-=1;setMain(player,main)}
  }
- give(player,out);message(player,'§aCookery 空白食譜已記錄為烤串食譜');return true;
+ give(player,out);return true;
 }
 function placeRecipeBlock(support,face,player,book,hand='main'){
  const f=faceName(face);if(!['north','south','west','east'].includes(f))return false;

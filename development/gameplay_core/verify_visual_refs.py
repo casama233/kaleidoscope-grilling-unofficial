@@ -158,6 +158,9 @@ def audit_item_icons(item_keys: set[str]) -> tuple[int, int]:
 def audit_seasoning_bottle_runtime_chain() -> None:
     items = ("empty_seasoning_bottle", "pending_seasoning", "special_seasoning")
     expected_geometry = "geometry.kg_a2733.seasoning_bottle_hand"
+    a283 = tuple(load(BP / "manifest.json")["header"]["version"]) >= (2,8,3)
+    if a283:
+        expected_geometry = "geometry.kg_a283.kg_a2733.seasoning_bottle_hand"
     expected_rc = "controller.render.kg_a2733.seasoning_bottle_hand"
     for item in items:
         path = RP / "attachables" / f"{item}.attachable.json"
@@ -173,13 +176,15 @@ def audit_seasoning_bottle_runtime_chain() -> None:
             assert "animations" not in desc
             assert "scripts" not in desc
 
-    geo = load(RP / "models/entity/a2733_seasoning_bottle_hand.geo.json")["minecraft:geometry"][0]
+    geometry_path = "models/entity/a283_hand/kg_a2733.seasoning_bottle_hand.geo.json" if a283 else "models/entity/a2733_seasoning_bottle_hand.geo.json"
+    geo = load(RP / geometry_path)["minecraft:geometry"][0]
     root = geo["bones"][0]
     assert root["name"] == "root"
     assert root.get("binding") == "q.item_slot_to_bone_name(context.item_slot)"
+    assert root['pivot'] == [0,24 if a283 else 0,0]
     assert all(
         bone.get("name") in {"root", "display"} or (
-            isinstance(bone.get("pivot"), list) and len(bone["pivot"]) == 3 and float(bone["pivot"][1]) == -6.0
+            isinstance(bone.get("pivot"), list) and len(bone["pivot"]) == 3 and float(bone["pivot"][1]) == (18.0 if a283 else -6.0)
         )
         for bone in geo["bones"]
     ), "A2733 seasoning hand geometry lost its baked -6Y hand-space transform"
