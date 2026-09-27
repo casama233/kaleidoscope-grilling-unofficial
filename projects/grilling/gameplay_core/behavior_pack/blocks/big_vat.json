@@ -31,13 +31,13 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a26_big_vat",
-          "render_method": "blend",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 1,
           "face_dimming": true
         },
         "fluid": {
           "texture": "still_water_grey",
-          "render_method": "blend",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 0,
           "face_dimming": false
         }
@@ -140,13 +140,13 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "still_lava",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0,
               "face_dimming": false
             }
@@ -159,13 +159,13 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_canola_oil",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0,
               "face_dimming": false
             }
@@ -178,13 +178,13 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_secret_chili_oil",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0,
               "face_dimming": false
             }
@@ -197,13 +197,13 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a26_big_vat",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1,
               "face_dimming": true
             },
             "fluid": {
               "texture": "kg_a23_premium_chili_oil",
-              "render_method": "blend",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0,
               "face_dimming": false
             }

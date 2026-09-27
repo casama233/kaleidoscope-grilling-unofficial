@@ -13,6 +13,9 @@ def run(*cmd): subprocess.run(cmd,cwd=ROOT,check=True)
 def load(p):return repair.load(p)
 
 def assets():
+ if tuple(load(BP/"manifest.json")["header"]["version"]) >= (2,8,6):
+  from verify_a286 import render_assets
+  return render_assets()
  index={g['description']['identifier']:g for p in (RP/'models').rglob('*.geo.json') for g in load(p)['minecraft:geometry']}
  refs=set();attachables=list((RP/'attachables').glob('*.json'))
  assert len(attachables)==107
@@ -67,7 +70,7 @@ def feedback():
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--compiled',action='store_true');args=parser.parse_args()
  version=generic_gate()[:3]
- assert version in ((2,8,3),(2,8,4),(2,8,5))
+ assert version in ((2,8,3),(2,8,4),(2,8,5),(2,8,6))
  result=assets();feedback()
  run(sys.executable,str(DEV/'test_a283_geometry.py'))
  run('node',str(DEV/'test_a283_feedback.mjs'))

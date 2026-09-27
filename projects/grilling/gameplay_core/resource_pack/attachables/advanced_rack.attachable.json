@@ -10,13 +10,13 @@
         "default": "textures/blocks/advanced_rack"
       },
       "geometry": {
-        "default": "geometry.kg_a283.kg_a2763.advanced_rack_hand"
+        "default": "geometry.kg_a286.kg_a2763.advanced_rack_hand"
       },
       "animations": {
-        "fp_right": "animation.kaleidoscope_grilling.a2763.advanced_rack_fp_right",
-        "tp_right": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_right",
-        "tp_left": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_left",
-        "fp_left": "animation.kaleidoscope_grilling.a283.advanced_rack_fp_left"
+        "fp_right": "animation.kg_a286.rack_fp_right",
+        "fp_left": "animation.kg_a286.rack_fp_left",
+        "tp_right": "animation.kg_a286.rack_tp_right",
+        "tp_left": "animation.kg_a286.rack_tp_left"
       },
       "scripts": {
         "animate": [

@@ -156,6 +156,10 @@ def audit_item_icons(item_keys: set[str]) -> tuple[int, int]:
     return items, refs
 
 def audit_seasoning_bottle_runtime_chain() -> None:
+    if tuple(load(BP / "manifest.json")["header"]["version"]) >= (2,8,6):
+        from verify_a286 import bottle_chain
+        bottle_chain()
+        return
     items = ("empty_seasoning_bottle", "pending_seasoning", "special_seasoning")
     expected_geometry = "geometry.kg_a2733.seasoning_bottle_hand"
     a283 = tuple(load(BP / "manifest.json")["header"]["version"]) >= (2,8,3)

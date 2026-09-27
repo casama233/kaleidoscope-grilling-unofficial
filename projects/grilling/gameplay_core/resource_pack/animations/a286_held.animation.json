@@ -1,0 +1,149 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_a286.bottle_fp_right": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            27,
+            -39,
+            -159
+          ],
+          "scale": 0.625
+        }
+      }
+    },
+    "animation.kg_a286.bottle_fp_left": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            27,
+            39,
+            159
+          ],
+          "scale": 0.625
+        }
+      }
+    },
+    "animation.kg_a286.bottle_tp_right": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            -1.5,
+            -1
+          ],
+          "rotation": [
+            90,
+            0,
+            0
+          ],
+          "scale": 0.5
+        }
+      }
+    },
+    "animation.kg_a286.bottle_tp_left": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            -1.5,
+            -1
+          ],
+          "rotation": [
+            90,
+            0,
+            0
+          ],
+          "scale": 0.5
+        }
+      }
+    },
+    "animation.kg_a286.rack_fp_right": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            57,
+            0
+          ],
+          "scale": 0.4
+        }
+      }
+    },
+    "animation.kg_a286.rack_fp_left": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -57,
+            0
+          ],
+          "scale": 0.4
+        }
+      }
+    },
+    "animation.kg_a286.rack_tp_right": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            -1.5,
+            -1
+          ],
+          "rotation": [
+            75,
+            45,
+            0
+          ],
+          "scale": 0.375
+        }
+      }
+    },
+    "animation.kg_a286.rack_tp_left": {
+      "loop": true,
+      "bones": {
+        "grip": {
+          "position": [
+            0,
+            -1.5,
+            -1
+          ],
+          "rotation": [
+            75,
+            -45,
+            0
+          ],
+          "scale": 0.375
+        }
+      }
+    }
+  }
+}
