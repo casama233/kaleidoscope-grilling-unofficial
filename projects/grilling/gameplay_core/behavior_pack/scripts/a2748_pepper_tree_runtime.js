@@ -31,7 +31,7 @@ function lightAbove(block){
  try{return Number(block.dimension.getLightLevel({x:block.x,y:block.y+1,z:block.z}))||0}catch{return 0}
 }
 function isDirt(block){
- try{return !!block?.hasTag('dirt')}catch{return ['minecraft:dirt','minecraft:grass_block','minecraft:coarse_dirt','minecraft:podzol','minecraft:rooted_dirt','minecraft:mycelium'].includes(block?.typeId)}
+ try{return !!block?.hasTag('dirt')}catch{return ['minecraft:dirt','minecraft:grass_block','minecraft:coarse_dirt','minecraft:podzol','minecraft:dirt_with_roots','minecraft:mycelium'].includes(block?.typeId)}
 }
 function isReplaceable(block,origin=false){
  if(!block)return false;
