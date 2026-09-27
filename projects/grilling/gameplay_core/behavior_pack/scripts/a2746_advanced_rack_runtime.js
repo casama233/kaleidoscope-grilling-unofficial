@@ -1,3 +1,5 @@
+import {rackSlotAtHit} from './a285_rack_quick_pick.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
 import {
  world,system,ItemStack,CommandPermissionLevel
@@ -305,7 +307,16 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  if(event.cancel)return;
  if(event.block.typeId===ADVANCED_RACK_BLOCK_ID){
   event.cancel=true;
-  if(event.isFirstEvent!==false){const p=event.player,d=event.block.dimension,l=loc(event.block);system.run(()=>openRackForm(p,d,l))}
+  if(event.isFirstEvent!==false){
+   const p=event.player,d=event.block.dimension,l=loc(event.block);
+   if(p.isSneaking){
+    const slot=rackSlotAtHit(event.block.permutation.getState('minecraft:cardinal_direction'),event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
+    system.run(()=>{
+     const live=resolveRack(d,l);if(slot<0||!live||!rackInUseRange(p,live)||!interactionIntentStillCurrent(p,intent))return;
+     if(!swapWithHotbar(p,live,slot))message(p,'§7這個槽位是空的，或背包沒有足夠空間');
+    });
+   }else system.run(()=>openRackForm(p,d,l));
+  }
   return;
  }
  try{scheduleRackPlacement(event)}catch{}

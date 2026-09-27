@@ -1,3 +1,4 @@
+import {overlappedBlockPositions} from './a285_contact_core.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {getMainHand,getOffHand,setHand,findHandEntry,isCreative} from './a2735_player_io.js';
 import {
@@ -114,14 +115,13 @@ function advanceSapling(block){
 }
 
 function sting(entity){
- if(!entity||entity.typeId==='minecraft:fox'||entity.typeId==='minecraft:bee')return;
+ if(!entity||!entity.getComponent('minecraft:health')||entity.typeId==='minecraft:fox'||entity.typeId==='minecraft:bee')return;
  try{entity.addEffect('slowness',10,{amplifier:0,showParticles:false})}catch{}
- const now=system.currentTick;
+ const now=world.getAbsoluteTime();
  try{
   const until=Number(entity.getDynamicProperty(STING_UNTIL)??0);
   if(now<until)return;
-  entity.applyDamage(1);
-  entity.setDynamicProperty(STING_UNTIL,now+STING_INTERVAL_TICKS);
+  if(entity.applyDamage(1))entity.setDynamicProperty(STING_UNTIL,now+STING_INTERVAL_TICKS);
  }catch{}
 }
 
@@ -210,3 +210,16 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
   e.cancel=true;system.run(()=>breakLeaves(dim.getBlock(loc),p,tool,hasPepper));
  }catch{}
 });
+
+// Check actual living-entity bounds, including contact from the side or below.
+// Shared sting cooldown prevents damage multiplying across neighboring leaves.
+system.runInterval(()=>{
+ for(const id of ['overworld','nether','the_end']){
+  const dimension=world.getDimension(id);
+  for(const entity of dimension.getEntities())try{
+   if(!entity.getComponent('minecraft:health')||entity.typeId==='minecraft:fox'||entity.typeId==='minecraft:bee')continue;
+   const bounds=entity.getAABB();
+   if(overlappedBlockPositions(bounds).some(p=>at(dimension,p)?.typeId===PEPPER_LEAVES_ID))sting(entity);
+  }catch{}
+ }
+},5);

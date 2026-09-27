@@ -56,7 +56,7 @@ export function canonicalIngredients(id){
  const r=RECIPES.find(x=>x.id===id);return r?r.slots.map(slot=>slot[0]):[];
 }
 
-export function secretFood(rows,cooked=false){
+export function secretFood(rows,cooked=false,originalRows=rows){
  const foods=(rows??[]).map(x=>({
   id:String(x?.id??''),
   signature:String(x?.signature??x?.id??''),
@@ -66,7 +66,8 @@ export function secretFood(rows,cooked=false){
  if(!foods.length)return {nutrition:1,saturation:0,duplicate:false};
  let total=0,weighted=0,duplicate=false;
  const seen=new Set();
- for(const x of foods){total+=x.nutrition;weighted+=x.nutrition*x.saturation;if(seen.has(x.signature))duplicate=true;seen.add(x.signature)}
+ for(const x of originalRows??[]){const signature=String(x?.signature??x?.id??'');if(seen.has(signature))duplicate=true;seen.add(signature)}
+ for(const x of foods){total+=x.nutrition;weighted+=x.nutrition*x.saturation}
  let nutrition=Math.max(1,Math.floor(total*.6*(duplicate?.8:1))),saturation=Math.max(0,weighted/Math.max(1,total));
  if(!cooked){nutrition=Math.max(1,Math.floor(nutrition*.5));saturation*=.5}
  return {nutrition,saturation,duplicate};

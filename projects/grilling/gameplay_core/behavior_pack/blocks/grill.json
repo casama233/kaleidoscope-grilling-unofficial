@@ -83,7 +83,15 @@
             "face_dimming": true
           }
         }
-      }
+      },
+      "minecraft:tick": {
+        "interval_range": [
+          1,
+          1
+        ],
+        "looping": true
+      },
+      "kaleidoscope_grilling:grill_tick": {}
     },
     "permutations": [
       {

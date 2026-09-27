@@ -68,18 +68,18 @@ function normalCompatible(rep,stack,t){
  if(rh<=0)return true;
  return Math.abs(rh-sh)<=NORMAL_HEAT_WINDOW;
 }
-export function compactSkewerContainer(container,fullSort=false,t=now()){
+export function compactSkewerContainer(container,fullSort=false,t=now(),onlyType=undefined){
  const groups=[],nonSkewer=[];
  for(let slot=0;slot<container.size;slot++){
   const stack=container.getItem(slot);if(!stack)continue;
-  if(!isSkewer(stack)){nonSkewer.push({slot,stack});continue}
+  if(!isSkewer(stack)||(onlyType&&stack.typeId!==onlyType)){nonSkewer.push({slot,stack});continue}
   let group=groups.find(g=>fullSort?sameForHeatMerge(g.rep,stack):normalCompatible(g.rep,stack,t));
   if(!group){group={rep:stack.clone(),count:0,totalHeat:0};groups.push(group)}
   group.count+=stack.amount;group.totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
  }
  if(!groups.length)return {changed:false,groups:0,stacks:0};
  const oldSkewerSlots=[];
- for(let i=0;i<container.size;i++)if(isSkewer(container.getItem(i)))oldSkewerSlots.push(i);
+ for(let i=0;i<container.size;i++)if(isSkewer(container.getItem(i))&&(!onlyType||container.getItem(i).typeId===onlyType))oldSkewerSlots.push(i);
  for(const i of oldSkewerSlots)container.setItem(i,undefined);
  const out=[];
  for(const g of groups){

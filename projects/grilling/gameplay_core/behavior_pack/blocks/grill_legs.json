@@ -30,7 +30,15 @@
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 0
-      }
+      },
+      "minecraft:tick": {
+        "interval_range": [
+          20,
+          20
+        ],
+        "looping": true
+      },
+      "kaleidoscope_grilling:grill_legs_tick": {}
     },
     "permutations": [
       {

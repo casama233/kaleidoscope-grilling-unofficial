@@ -67,7 +67,7 @@ def feedback():
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--compiled',action='store_true');args=parser.parse_args()
  version=generic_gate()[:3]
- assert version in ((2,8,3),(2,8,4))
+ assert version in ((2,8,3),(2,8,4),(2,8,5))
  result=assets();feedback()
  run(sys.executable,str(DEV/'test_a283_geometry.py'))
  run('node',str(DEV/'test_a283_feedback.mjs'))

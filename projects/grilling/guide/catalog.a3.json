@@ -197,21 +197,24 @@
           "槽位第一次存入物品时会建立筛选；油壶各状态视为同一家族，调料瓶的空/待摇/完成状态也视为同一家族。",
           "右键打开界面，可交换当前快捷栏、存入、取回或在空槽位清除筛选；“批量存入”会按既有筛选整理背包。",
           "操作距离为 8 格；打掉厨具架时，内容和筛选会写入掉落物，重新放置后恢复。",
-          "工作台图样（空位为 ·）：\nIII\n·R·\nSSS\nI = 铁锭；R = 厨具架；S = 任意木台阶"
+          "工作台图样（空位为 ·）：\nIII\n·R·\nSSS\nI = 铁锭；R = 厨具架；S = 任意木台阶",
+          "快速取用：潜行并点选架子的上排五格调味槽或下排四格工具槽，可直接切换到手中；普通互动仍可管理全部槽位。"
         ],
         "zh_TW": [
           "高級廚具架有 9 個槽位：前 5 格放油壺/調料瓶，後 4 格放廚房刀、廚房鏟、打火石等工具。",
           "槽位第一次存入物品時會建立篩選；油壺各狀態視為同一家族，調料瓶的空/待搖/完成狀態也視為同一家族。",
           "右鍵開啟介面，可交換目前快捷欄、存入、取回或在空槽位清除篩選；「批量存入」會按既有篩選整理背包。",
           "操作距離為 8 格；打掉廚具架時，內容和篩選會寫入掉落物，重新放置後恢復。",
-          "工作台圖樣（空位為 ·）：\nIII\n·R·\nSSS\nI = 鐵錠；R = 廚具架；S = 任意木半磚"
+          "工作台圖樣（空位為 ·）：\nIII\n·R·\nSSS\nI = 鐵錠；R = 廚具架；S = 任意木半磚",
+          "快速取用：潛行並點選架子的上排五格調味槽或下排四格工具槽，可直接切換到手中；普通互動仍可管理全部槽位。"
         ],
         "en_US": [
           "The Advanced Kitchen Rack has 9 slots: the first 5 are for oil pots/seasoning bottles, and the last 4 are for kitchen knives, the kitchen shovel, Flint and Steel, and similar tools.",
           "The first inserted item establishes a slot filter. Oil-pot states share one family, and empty/pending/special seasoning bottles share one family.",
           "Open the rack to swap with the selected hotbar slot, deposit, withdraw, or clear an empty-slot filter. Deposit All follows existing filters.",
           "Use range is 8 blocks. Breaking the rack stores its contents and filters on the dropped item, which are restored when placed again.",
-          "Crafting-table pattern (· = empty):\nIII\n·R·\nSSS\nI = Iron Ingot；R = Kitchenware Racks；S = Any wooden slab"
+          "Crafting-table pattern (· = empty):\nIII\n·R·\nSSS\nI = Iron Ingot；R = Kitchenware Racks；S = Any wooden slab",
+          "Quick pick: sneak-use a position on the upper row (five seasoning slots) or lower row (four tools) to switch it directly into your hand. Normal use opens storage management."
         ]
       },
       "kinds": [
@@ -2233,7 +2236,8 @@
           "空手取回待摇晃的瓶子并持续使用/摇晃，即可完成特制调料；完成瓶有 16 次使用次数。",
           "对烧烤架撒料时，每根架上烤串消耗 1 次；剩余次数不足时不会部分提交。",
           "搭配：红石提供速度，火药提供力量，折耳根粉延时；不死图腾粉与龙蛋粉提供特殊效果。各材料的数量门槛见其同名条目。",
-          "初始空瓶：当前候选未核实空调料瓶的生存取得途径；不把原作配方当作已经实装。"
+          "初始空瓶：当前候选未核实空调料瓶的生存取得途径；不把原作配方当作已经实装。",
+          "把一瓶调料单独放入合成格，可清空内容并取回空瓶；包含待摇瓶与已用过的完成调料。"
         ],
         "zh_TW": [
           "放置空調料瓶後，對最上層瓶子加入材料；每瓶最多記錄 8 份材料，世界中最多可疊放 4 瓶。",
@@ -2241,7 +2245,8 @@
           "空手取回待搖晃的瓶子並持續使用／搖晃，即可完成特製調料；完成瓶有 16 次使用次數。",
           "對燒烤架撒料時，每根架上烤串消耗 1 次；剩餘次數不足時不會部分提交。",
           "搭配：紅石提供速度，火藥提供力量，折耳根粉延時；不死圖騰粉與龍蛋粉提供特殊效果。各材料的數量門檻見其同名條目。",
-          "初始空瓶：目前候選未核實空調料瓶的生存取得途徑；不把原作配方當作已經實裝。"
+          "初始空瓶：目前候選未核實空調料瓶的生存取得途徑；不把原作配方當作已經實裝。",
+          "把一瓶調料單獨放入合成格，可清空內容並取回空瓶；包含待搖瓶與已用過的完成調料。"
         ],
         "en_US": [
           "Place an Empty Seasoning Bottle and add ingredients to the top bottle. Each bottle stores up to 8 ingredients, and up to 4 bottles can be stacked in the world.",
@@ -2249,7 +2254,8 @@
           "Take the pending bottle back with an empty hand and hold-use/shake it to finish Special Seasoning. A finished bottle has 16 uses.",
           "Seasoning a grill costs 1 use per skewer currently on the grill; insufficient remaining uses do not partially commit.",
           "Mixing: Redstone grants Speed, Gunpowder grants Strength, and Houttuynia Powder extends effects. Totem and Dragon Egg Powders add special effects; see their material entries for thresholds.",
-          "Initial empty bottle: no checked survival acquisition route in this candidate. An upstream recipe is not treated as implemented."
+          "Initial empty bottle: no checked survival acquisition route in this candidate. An upstream recipe is not treated as implemented.",
+          "Place one seasoning bottle alone in a crafting grid to discard its contents and recover an empty bottle. Pending and partially used bottles are supported."
         ]
       },
       "kinds": [
@@ -2914,7 +2920,8 @@
           "秘制辣椒油桶可用 1 桶菜籽油 + 3 份红辣椒粉无序合成；三种油都可通过桶、大缸与 Cookery 油壶进行已支持的转移。",
           "带烟火气的烤串不会随便与冷串或热度差距很大的串合并。",
           "对箱子、陷阱箱或木桶潜行空手使用，会整理串类：只有烟火气剩余时间相差不超过 5 分钟的热串才会合并。",
-          "合并后的烟火气按各堆数量做加权平均，避免用一根刚出炉的串把整堆旧串瞬间“续满”。"
+          "合并后的烟火气按各堆数量做加权平均，避免用一根刚出炉的串把整堆旧串瞬间“续满”。",
+          "副手留空，潜行并使用手中的热串，可整理背包内同类串并按数量平均剩余热度；普通进食请松开潜行。"
         ],
         "zh_TW": [
           "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。",
@@ -2923,7 +2930,8 @@
           "秘製辣椒油桶可用 1 桶菜籽油 + 3 份紅辣椒粉無序合成；三種油都可透過桶、大缸與 Cookery 油壺進行已支援的轉移。",
           "帶煙火氣的烤串不會隨便與冷串或熱度差距很大的串合併。",
           "對箱子、陷阱箱或木桶潛行空手使用，會整理串類：只有煙火氣剩餘時間相差不超過 5 分鐘的熱串才會合併。",
-          "合併後的煙火氣按各堆數量做加權平均，避免用一根剛出爐的串把整堆舊串瞬間「續滿」。"
+          "合併後的煙火氣按各堆數量做加權平均，避免用一根剛出爐的串把整堆舊串瞬間「續滿」。",
+          "副手留空，潛行並使用手中的熱串，可整理背包內同類串並按數量平均剩餘熱度；普通進食請鬆開潛行。"
         ],
         "en_US": [
           "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore.",
@@ -2932,7 +2940,8 @@
           "A Secret Chili Oil Bucket is shapelessly crafted from 1 Canola Oil Bucket + 3 Red Chili Powder. All three oils can use the supported bucket, Big Vat, and Cookery Oil Pot transfer paths.",
           "Hot skewers do not freely merge with cold skewers or stacks whose remaining heat is very different.",
           "Sneak-use a Chest, Trapped Chest, or Barrel with an empty hand to sort skewers. Hot stacks only merge when their remaining Hot Food time differs by at most 5 minutes.",
-          "Merged heat is a count-weighted average, so one fresh skewer cannot instantly refresh a whole old stack."
+          "Merged heat is a count-weighted average, so one fresh skewer cannot instantly refresh a whole old stack.",
+          "With an empty offhand, sneak-use a hot skewer to merge matching skewers in your inventory using count-weighted remaining heat. Release sneak to eat normally."
         ]
       },
       "kinds": [],
