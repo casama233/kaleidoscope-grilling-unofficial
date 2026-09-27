@@ -12,6 +12,11 @@ def survival_gate():
     assert 'kaleidoscope_grilling:grill_tick' in block
     settle=script.split('function hungerSettle(',1)[1].split('function resolvedProfile(',1)[0]
     assert settle.index('eatingStillCurrent') < settle.index('commitEating')
+    assert settle.index('secretRemainders') < settle.index('afterCommitted')
+    full=script.split('world.afterEvents.itemCompleteUse.subscribe',1)[1].split('world.afterEvents.itemStopUse.subscribe',1)[0]
+    assert full.rindex('secretRemainders') < full.rindex('afterCommitted')
+    plate=script.split('function completePlateUse',1)[1].split('function completePending',1)[0]
+    assert plate.index('secretRemainders') < plate.index('afterCommitted')
     assert 'captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex)' in script
     assert 'SEASON_PLACE_CACHE.set(key(e.block)' in script
     assert 'cached.playerId!==player.id' in script
