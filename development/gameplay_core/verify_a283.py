@@ -66,7 +66,8 @@ def feedback():
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--compiled',action='store_true');args=parser.parse_args()
- assert generic_gate()[:3]==(2,8,3)
+ version=generic_gate()[:3]
+ assert version in ((2,8,3),(2,8,4))
  result=assets();feedback()
  run(sys.executable,str(DEV/'test_a283_geometry.py'))
  run('node',str(DEV/'test_a283_feedback.mjs'))
@@ -77,5 +78,5 @@ def main():
  run(sys.executable,str(ROOT/'tools/check_grilling_guide.py'))
  for p in (BP/'scripts').rglob('*.js'):run('node','--check',str(p))
  if args.compiled:verify_compiled_exact()
- print(json.dumps({'version':'A2.8.3','assets':result,'static_checks':'PASS','client_visuals_tested':False},indent=2))
+ print(json.dumps({'version':'A'+'.'.join(map(str,version)),'assets':result,'static_checks':'PASS','client_visuals_tested':False},indent=2))
 if __name__=='__main__':main()

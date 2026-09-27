@@ -1,0 +1,48 @@
+"""Eating-pose regression gate. Static evidence only; client acceptance remains open."""
+import json, re
+from verify_a283 import BP, RP, main as previous_gate
+
+
+def eating_gate():
+    script = (BP / 'scripts/main.js').read_text()
+    start = script.split('world.afterEvents.itemStartUse.subscribe', 1)[1].split('world.afterEvents.itemCompleteUse.subscribe', 1)[0]
+    # Pending seasoning has its separate shake; food must never invoke a player pose.
+    food_start = start.split('if(!FOOD_DATA[id]&&id!==SECRET_ID)return;', 1)[1]
+    assert 'playAnimation' not in food_start
+    stop = script.split('world.afterEvents.itemStopUse.subscribe', 1)[1].split('world.beforeEvents.entityHurt.subscribe', 1)[0]
+    assert 'playAnimation' not in stop
+    tick = script.split('if(active){advanceBites', 1)[1].split('writeFx(p,readFx(p))', 1)[0]
+    assert 'playAnimation' not in tick
+    assert 'hungerSettle(p,active.id,active)' in tick
+    assert 'used>=25&&used<profileDuration(a.profile)' in stop
+    for file in (BP / 'scripts').rglob('*.js'):
+        assert 'animation.kg_imm.player.eat_' not in file.read_text(), file
+    data = (BP / 'scripts/data.js').read_text()
+    required = set(json.loads(re.search(r'export const FOOD_DATA=Object.freeze\((.*)\);', data)[1]))
+    required.add('kaleidoscope_grilling:secret_skewer')
+    foods = set()
+    for file in (BP / 'items').glob('*.json'):
+        item = json.loads(file.read_text())['minecraft:item']
+        c = item['components']
+        if item['description']['identifier'] not in required:
+            continue
+        animation = c.get('minecraft:use_animation')
+        value = animation.get('value') if isinstance(animation, dict) else animation
+        assert value == 'eat', (file, value)
+        assert c['minecraft:use_modifiers']['use_duration'] > 0, file
+        foods.add(item['description']['identifier'])
+    assert foods == required, required - foods
+    # Native arm animation must still carry the same attachable/bite stages.
+    skewers = 0
+    for file in (RP / 'attachables').glob('*_skewer.attachable.json'):
+        d = json.loads(file.read_text())['minecraft:attachable']['description']
+        assert 'controller.render.kg_a22.bite' in d['render_controllers'], file
+        assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file
+        skewers += 1
+    assert skewers == 39, skewers
+    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no scripted eating bone override')
+
+
+if __name__ == '__main__':
+    eating_gate()
+    previous_gate()

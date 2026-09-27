@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling A2.8.3 Immersion Repair",
+  "name": "Kaleidoscope Grilling A2.8.4 Eating Pose Repair",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_A2_8_3_Immersion_Repair"
+          "packName": "Kaleidoscope_Grilling_A2_8_4_Eating_Pose_Repair"
         }
       ]
     ]

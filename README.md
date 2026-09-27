@@ -1,4 +1,5 @@
-> Current corrective build: **A2.8.3** — [immersion/rendering changes and validation limits](docs/STATUS-A2.8.3.md). Client visual acceptance is pending.
+> Current corrective build: **A2.8.4** — [eating pose repair and validation limits](docs/STATUS-A2.8.4.md). Java custom eating choreography and client visual acceptance remain pending.
+> A2.8.3 的提示與渲染修正仍包含於本版：[修正記錄](docs/STATUS-A2.8.3.md)。
 
 > 最新修正：A2.8.1 — 大缸使用原生方塊物品渲染；調料瓶 UI 圖示修正。見 docs/STATUS-A2.8.1.md。
 
@@ -8,7 +9,7 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前 canonical runtime：A2.7.65 Full Skewer Hand Geometry。核心玩法、穿串、調料、油系統、Advanced Rack、主要作物、花椒樹/世界生成、Cookery 菜餚與主要 advancement 已完成可實作 parity；目前主要剩餘工作是 Minecraft/BDS/多人實機驗收、client visual 打磨與 Bedrock 平台無法 1:1 的差異收斂。**
+**目前 canonical runtime：A2.8.4。功能與 Java 的完整同步尚未完成；本版重點是移除錯誤的進食骨架覆寫。歷史版本的完成敘述不能取代目前的客戶端及多人驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
