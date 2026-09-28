@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.8.7 Survival Repair BP",
-    "description": "逐口3D、四瓶調料堆疊與Numb動作；需要 Cookery 1.0.6",
+    "name": "Kaleidoscope Grilling A2.8.8 Local Review BP",
+    "description": "本地候選：A2.8.7 基線；交易與重複更新改善，未做遊戲實機驗收；需要官方 Cookery 1.0.6",
     "uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
     "version": [
       2,
       8,
-      7
+      8
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         8,
-        7
+        8
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         2,
         8,
-        7
+        8
       ]
     }
   ],
@@ -43,7 +43,7 @@
       "version": [
         2,
         8,
-        7
+        8
       ]
     },
     {

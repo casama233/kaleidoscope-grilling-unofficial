@@ -1,61 +1,28 @@
-> 最新修正：A2.8.1 — 大缸使用原生方塊物品渲染；調料瓶 UI 圖示修正。見 docs/STATUS-A2.8.1.md。
+# 森羅煙火 A2.8.8 Local Review
 
-> **目前整合測試版：A2.8.0**。指南、最新共享創造欄、Java 手持姿態與放置外觀已整合；安裝完整煙火，不需另裝指南 addon。詳見 `docs/STATUS-A2.8.0.md`，實機驗收尚待完成。
+這是本地候選版，不是已發布版本，也未部署至任何伺服器。
+基線為 A2.8.7，GitHub commit `707d28edab4ea9af76878e0e29d8244848971db3`，
+workflow run `36373807017`、artifact `10950386970`。
 
-# Kaleidoscope Grilling Gameplay Core
+本輪實際修改：嚴格處理手持寫入失敗、穿串／拆串／烤架放串／調料瓶同步操作的最佳努力回滾、
+延遲穿串的雙手與槽位快照、熱串整理先規劃再寫入、停止烤架無變化狀態重寫、顯示佇列同輪去重、離線暫存清理。
 
-目前 canonical runtime：**A2.7.66 Seasoning State Completion**。
+UUID、內容 ID、存檔 key、原料理規則與熱度分組、Cookery 1.0.6 依賴未更換。
+沒有重製手持／透明材質、沒有新增指南書、沒有修改指南目錄、創造欄或配方資料。
 
-這個目錄下的 `behavior_pack/` 與 `resource_pack/` 是目前真正要編譯、驗證與打包的來源。歷史 `development/gameplay_core/aXX*`、`verify_aXX*` 與已封存的版本 workflow 保留作追溯；**不要再從舊 augment/workflow 生成回來覆寫 canonical runtime**。
+## 驗證
 
-## Canonical 路徑
+在此目錄執行 `python review/validate_candidate.py`。需要 Python 3.10+ 與 Node.js；不下載依賴。
+只做 JSON／JavaScript／引用／manifest／來源差异檢查及三個純演算法模組測試。
+不模擬玩家，不啟動 Minecraft／BDS；也不把這些檢查當作手機渲染、多人生存或效能量測。
+完整 repository 的既有 gates 與官方 Dash 應在整合分支繼續執行；這次未聲稱它們對候選版通過。
 
-```text
-projects/grilling/gameplay_core/behavior_pack
-projects/grilling/gameplay_core/resource_pack
-        │
-        ├─ python development/gameplay_core/verify_current.py
-        ├─ bridge Dash v1.2.0 build
-        ├─ python development/gameplay_core/verify_current.py --compiled
-        └─ python development/gameplay_core/package_current.py
-                 ↓
-           artifacts/review/*.mcaddon
-           artifacts/review/*.brproject
-           artifacts/review/SHA256SUMS.txt
-```
+## 導入
 
-GitHub canonical gate 為 `.github/workflows/gameplay-core.yml`，直接監聽正式來源。通過驗證且 PR head 提交主旨以 `release:` 開頭時，工作流程建立附有測試包的 GitHub Prerelease；這不等於穩定版或實機驗收。
+只能先在備份世界或新測試世界導入候選 `.mcaddon`。
+本候選依賴官方 Cookery 1.0.6 的 BP/RP UUID，不是帶有私人 UUID／補丁的伺服器整合包。
+保留舊 pack UUID 代表 Minecraft 可能把候選視為更新而覆蓋同 UUID 的舊包；導入前請保留原包與世界备份。
+完整回退方式是恢復備份的世界與 A2.8.7 原包，不能保證匯入較低 manifest 版本即可自動降版。
 
-## 互動架構
-
-原作 Java 是規格。`core_logic.js` 與 `*_core.js` 負責規則，`main.js` 與 adapters 負責 Minecraft API／事件／交易，attachable、geometry、animation 與 HUD provider 負責顯示。
-
-Grill 與 Seasoning Bottle 共用 hand intent。A2.7.62 將 signature／capture／recheck 拆成純 `a2762_interaction_intent_core.js` 與 Minecraft adapter，延後執行前重新確認槽位和物品資料。
-
-穿串仍有 item/block/entity 事件來源，但它們只作適配，實際玩法收斂到同一個 `scheduleSkewerAction` executor，保留同 tick 去重。
-
-## A2.7.66 調料狀態與 Cookery 交易
-
-補齊特製調料瓶尚缺的 22 種物品與 attachable：現在 8 個剩餘量分級 × 8 個變體共 64 種均有定義，覆蓋 128 組有效使用次數／變體輸入。新增狀態重用原模型，三張 palette 只複製既有貼圖的對應填充色塊，不另改手持偏移。
-
-切換外觀保留配料、使用次數、變體、名稱、原始 lore、dynamic properties 與物品限制；資料複製失敗不返回半成品。Cookery 調味先準備新瓶，再提交背包與鍋具，失敗嘗試回滾；延後期间换槽或改變手持內容會取消。
-
-放置瓶的世界外觀、Typed Oil Pot 世界外觀與 MAXIM tooltip 仍有待續作，不能以本批手持狀態完成取代它們。
-
-## A2.7.65 烤串手持成果保留
-
-39 個烤串 attachable／150 個 bite-stage geometry 已轉成 A2764 baked hand-space 路線，正式 runtime 不再引用 A2725 first/third-person root hold animation。A2.7.66 保留該成果並做結構回歸，不聲稱實際第一／第三人稱位置已通過 Minecraft 驗收。
-
-## Legacy workflow 封存
-
-A2.0～A2.7.60 的 65 條版本化 `gameplay-core-a*.yml` 原 blob 保存在 `docs/legacy_workflows/`，不再由 Actions 註冊。不要搬回 `.github/workflows/`；canonical gate 會拒絕重新出現的舊 workflow。
-
-## 版本與資料相容
-
-保留 BP/RP/module UUID、既有物品與方塊 identifier、world dynamic-property key 和 Cookery 1.0.6 依賴。新版本須在 `verify_current.py` 註冊對應 verifier，不能只改 manifest 後跳過檢查。
-
-## 驗證邊界
-
-Node／Python／Dash／CI 只能證明規則、語法、資源引用、編譯與打包；**不能證明 Minecraft/BDS 實機、Android 畫面、透明排序、動畫與多人可靠性**。A2.7.66 的 15 項 runtime 測試使用模擬 Minecraft API；各項實機旗標仍為 false。
-
-`reports/build.json` 是早期歷史基線。當前變更請讀 `reports/a2766-seasoning-state-completion.json` 與 `docs/STATUS-A2.7.66.md`。
+詳細根因、改動與未驗證邊界見 `review/CHANGELOG.zh-TW.md`。
+原工程 README 原文保存在 `review/baseline-README.zh-TW.md`，原 reports 亦保留作歷史記錄，並非本輪驗收結果。

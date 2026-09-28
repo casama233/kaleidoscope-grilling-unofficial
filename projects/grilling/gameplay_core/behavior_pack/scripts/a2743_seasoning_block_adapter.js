@@ -1,7 +1,7 @@
 import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';
 import {world} from '@minecraft/server';
 import {
- SEASONING_MAX_BOTTLES,hasSeasoningBase,normalizeBottleData,normalizeBottleStack
+ SEASONING_CAPACITY,SEASONING_MAX_BOTTLES,SEASONING_MAX_USES,SEASONING_VARIANT_MAX,hasSeasoningBase,normalizeBottleData,normalizeBottleStack
 } from './a2743_seasoning_contract_core.js';
 
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
@@ -10,18 +10,30 @@ export function seasoningBlockKey(block){
  return 'kaleidoscope_grilling:sb_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z);
 }
 
-export function readPlacedSeasoningStack(block){
+export function readPlacedSeasoningStack(block,strict=false){
  try{
   const raw=world.getDynamicProperty(seasoningBlockKey(block));
   if(raw===undefined)return [];
   const value=JSON.parse(raw);
-  if(!Array.isArray(value))return [];
+  if(!Array.isArray(value)){if(strict)throw new Error('Grilling: invalid saved seasoning stack');return []}
   if(value.length&&typeof value[0]==='string'){
+   if(strict&&(value.length>SEASONING_CAPACITY||value.some(x=>typeof x!=='string')))throw new Error('Grilling: invalid legacy seasoning data');
    const ingredients=value.filter(x=>typeof x==='string');
    return [normalizeBottleData({kind:hasSeasoningBase(ingredients)?'pending':'empty',ingredients,uses:0,variant:0})];
   }
+  if(strict){
+   const keys=new Set(['kind','ingredients','uses','variant']);
+   if(value.length>SEASONING_MAX_BOTTLES)throw new Error('Grilling: saved bottle capacity exceeded');
+   for(const row of value){
+    if(!row||typeof row!=='object'||Array.isArray(row)||Object.keys(row).some(key=>!keys.has(key)))throw new Error('Grilling: unsupported saved bottle data');
+    if(row.kind!==undefined&&!['empty','pending','special'].includes(row.kind))throw new Error('Grilling: unknown saved bottle kind');
+    if(row.ingredients!==undefined&&(!Array.isArray(row.ingredients)||row.ingredients.length>SEASONING_CAPACITY||row.ingredients.some(x=>typeof x!=='string')))throw new Error('Grilling: invalid saved ingredients');
+    for(const [key,max] of [['uses',SEASONING_MAX_USES],['variant',SEASONING_VARIANT_MAX]])
+     if(row[key]!==undefined&&(!Number.isInteger(row[key])||row[key]<0||row[key]>max))throw new Error('Grilling: invalid saved '+key);
+   }
+  }
   return normalizeBottleStack(value);
- }catch{return []}
+ }catch(error){if(strict)throw error;return []}
 }
 
 export function writePlacedSeasoningStack(block,rows){

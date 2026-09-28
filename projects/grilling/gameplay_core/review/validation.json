@@ -1,0 +1,41 @@
+{
+  "version": "A2.8.8 Local Review",
+  "baseline_version": "A2.8.7",
+  "baseline_git_commit": "707d28edab4ea9af76878e0e29d8244848971db3",
+  "js_checked": 128,
+  "json_checked": 1301,
+  "relative_imports_checked": 252,
+  "baseline_pack_files": 1905,
+  "candidate_pack_files": 1907,
+  "unchanged_baseline_pack_files": 1896,
+  "changed_pack_files": [
+    "behavior_pack/manifest.json",
+    "behavior_pack/scripts/a23_hot_runtime.js",
+    "behavior_pack/scripts/a2735_player_io.js",
+    "behavior_pack/scripts/a2743_seasoning_block_adapter.js",
+    "behavior_pack/scripts/a2762_interaction_intent_adapter.js",
+    "behavior_pack/scripts/a2770_placed_visual_runtime.js",
+    "behavior_pack/scripts/a277_grill_transaction_core.js",
+    "behavior_pack/scripts/main.js",
+    "resource_pack/manifest.json"
+  ],
+  "added_pack_files": [
+    "behavior_pack/scripts/a288_intent_core.js",
+    "behavior_pack/scripts/a288_visual_budget_core.js"
+  ],
+  "removed_pack_files": [],
+  "pure_algorithm_tests_passed": 22,
+  "tests_import_minecraft_api": false,
+  "simulated_player_tests_run": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false,
+  "multiplayer_tested": false,
+  "performance_benchmarked": false,
+  "official_dash_run_for_candidate": false,
+  "full_repository_ci_run_for_candidate": false,
+  "pushed_to_github": false,
+  "release_published": false,
+  "server_deployed": false,
+  "all_checks_above_passed": true
+}

@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kaleidoscope Grilling A2.8.7 Survival Repair RP",
-    "description": "逐口3D與四瓶調料外觀；需要 Cookery 1.0.6",
+    "name": "Kaleidoscope Grilling A2.8.8 Local Review RP",
+    "description": "本地候選：A2.8.7 基線；交易與重複更新改善，未做遊戲實機驗收；需要官方 Cookery 1.0.6",
     "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
     "version": [
       2,
       8,
-      7
+      8
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         8,
-        7
+        8
       ]
     }
   ],

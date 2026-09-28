@@ -1,5 +1,6 @@
 import {world} from '@minecraft/server';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
+import {commitSteps} from './a277_grill_transaction_core.js';
 
 const HOT='kaleidoscope_grilling:hot_until';
 const IGNORE=new Set([
@@ -50,7 +51,7 @@ export function canManualMerge(a,b,t=now()){
  if(!sameForHeatMerge(a,b))return false;
  return isHot(a,t)===isHot(b,t);
 }
-export function mergeIntoContainer(container,incoming,t=now()){
+export function mergeIntoContainer(container,incoming,t=now(),strict=false){
  if(!incoming)return undefined;
  let remaining=incoming.clone();
  for(let i=0;i<container.size;i++){
@@ -59,7 +60,7 @@ export function mergeIntoContainer(container,incoming,t=now()){
   const moved=Math.min(capacity,remaining.amount);remaining=moveCount(target,remaining,moved,t);container.setItem(i,target);
   if(!remaining)return undefined;
  }
- try{return container.addItem(remaining)}catch{return remaining}
+ try{return container.addItem(remaining)}catch(error){if(strict)throw error;return remaining}
 }
 function normalCompatible(rep,stack,t){
  if(!sameForHeatMerge(rep,stack))return false;
@@ -69,28 +70,35 @@ function normalCompatible(rep,stack,t){
  return Math.abs(rh-sh)<=NORMAL_HEAT_WINDOW;
 }
 export function compactSkewerContainer(container,fullSort=false,t=now(),onlyType=undefined){
- const groups=[],nonSkewer=[];
+ const groups=[],originals=[];
+ // Plan and construct everything before the first inventory mutation.
  for(let slot=0;slot<container.size;slot++){
-  const stack=container.getItem(slot);if(!stack)continue;
-  if(!isSkewer(stack)||(onlyType&&stack.typeId!==onlyType)){nonSkewer.push({slot,stack});continue}
+  const stack=container.getItem(slot);if(!stack||!isSkewer(stack)||(onlyType&&stack.typeId!==onlyType))continue;
+  originals.push({slot,stack:stack.clone()});
   let group=groups.find(g=>fullSort?sameForHeatMerge(g.rep,stack):normalCompatible(g.rep,stack,t));
   if(!group){group={rep:stack.clone(),count:0,totalHeat:0};groups.push(group)}
   group.count+=stack.amount;group.totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
  }
  if(!groups.length)return {changed:false,groups:0,stacks:0};
- const oldSkewerSlots=[];
- for(let i=0;i<container.size;i++)if(isSkewer(container.getItem(i))&&(!onlyType||container.getItem(i).typeId===onlyType))oldSkewerSlots.push(i);
- for(const i of oldSkewerSlots)container.setItem(i,undefined);
  const out=[];
  for(const g of groups){
   const avg=g.count?Math.floor(g.totalHeat/g.count):0;let left=g.count;
-  while(left>0){const s=g.rep.clone(),count=Math.min(s.maxAmount,left);s.amount=count;setHot(s,avg,t);out.push(s);left-=count}
+  while(left>0){
+   const stack=g.rep.clone(),count=Math.min(stack.maxAmount,left);
+   if(count<=0)throw new Error('Grilling: invalid stack capacity');
+   stack.amount=count;setHot(stack,avg,t);
+   const expected=avg>0?bucket(t+avg):0;
+   if(hotUntil(stack)!==expected)throw new Error('Grilling: merged heat was not saved');
+   out.push(stack);left-=count;
+  }
  }
- const targets=[...oldSkewerSlots];
- while(targets.length<out.length){
-  let empty=-1;for(let i=0;i<container.size;i++){if(!container.getItem(i)&&!targets.includes(i)){empty=i;break}}
-  if(empty<0)break;targets.push(empty);
+ if(out.length>originals.length)throw new Error('Grilling: compaction cannot fit without replacing unrelated slots');
+ const result=commitSteps(originals.map(({slot,stack},i)=>({
+  apply(){container.setItem(slot,out[i])},rollback(){container.setItem(slot,stack)}
+ })));
+ if(!result.ok){
+  console.warn('[Grilling hot merge] '+String(result.error)+'; rollback failures='+result.rollbackErrors);
+  return {changed:false,groups:groups.length,stacks:originals.length,failed:true,rollbackErrors:result.rollbackErrors};
  }
- for(let i=0;i<out.length;i++){if(i<targets.length)container.setItem(targets[i],out[i]);}
  return {changed:true,groups:groups.length,stacks:out.length};
 }

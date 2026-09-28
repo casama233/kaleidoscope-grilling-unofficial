@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "A2.8.7",
+  "git_sha": "707d28edab4ea9af76878e0e29d8244848971db3",
+  "source_tree_sha256": "6f34f5fc778f7e4d864cae73da88b20e118341f6a5d023b184f7c29c93ff8cf3",
+  "mcaddon": {
+    "path": "artifacts/review/Kaleidoscope_Grilling_A2.8.7_Review.mcaddon",
+    "sha256": "95e0ad3530d01c8b0afa39dc27bd19c42e210094df23b71f6054a9d93fd2bc9c"
+  },
+  "brproject": {
+    "path": "artifacts/review/Kaleidoscope_Grilling_A2.8.7_Review.brproject",
+    "sha256": "e380d360c7fe0714e07a10621789cb23095955afd8ebc90af17086024cf92708"
+  },
+  "deterministic_zip_timestamp": "2020-01-01T00:00:00",
+  "vibrant_manifest_and_export_checked": true,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false,
+  "artifact_id": 10950386970,
+  "workflow_run_id": 36373807017,
+  "repository": "casama233/kaleidoscope-grilling-unofficial",
+  "repository_id": 1377218440
+}

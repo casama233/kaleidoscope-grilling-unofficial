@@ -1,4 +1,5 @@
 import {world,system} from '@minecraft/server';
+import {visitUniqueTracked} from './a288_visual_budget_core.js';
 import {readPlacedSeasoningStack} from './a2743_seasoning_block_adapter.js';
 import {readPlacedOilPotState} from './a2739_cookery_oil_pot_block_adapter.js';
 import {HOST_BLOCK_ID} from './a2736_typed_oil_pot_block_core.js';
@@ -67,20 +68,19 @@ function sync(row,players){
  }
 }
 function pump(){
- const players=world.getAllPlayers().map(p=>({dimensionId:p.dimension.id,...p.location}));
+ const players=[];
+ for(const player of world.getAllPlayers())try{players.push({dimensionId:player.dimension.id,...player.location})}catch(error){warn(error)}
  // Reserve half the work for old targets so busy interactions cannot starve cleanup.
- let used=0;
+ const seen=new Set();let used=0;
  for(const [key,value] of dirtyPlacedVisuals){
-  dirtyPlacedVisuals.delete(key);
-  try{sync(remember(value),players)}catch(error){warn(error)}
+  dirtyPlacedVisuals.delete(key);const row=remember(value);seen.add(row);
+  try{sync(row,players)}catch(error){warn(error)}
   if(++used>=BUDGET/2)break;
  }
- for(let i=0;i<BUDGET-used;i++){
-  if(!cursor)cursor=tracked.values();
-  let next=cursor.next();
-  if(next.done){cursor=tracked.values();next=cursor.next();if(next.done)break}
-  try{sync(next.value,players)}catch(error){warn(error)}
- }
+ const result=visitUniqueTracked(tracked,cursor,seen,BUDGET-used,row=>{
+  try{sync(row,players)}catch(error){warn(error)}
+ });
+ cursor=result.cursor;
 }
 function indexSavedTargets(){
  if(indexing)return;indexing=true;

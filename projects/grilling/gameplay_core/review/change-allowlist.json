@@ -1,0 +1,18 @@
+{
+  "changed": [
+    "behavior_pack/manifest.json",
+    "behavior_pack/scripts/a23_hot_runtime.js",
+    "behavior_pack/scripts/a2735_player_io.js",
+    "behavior_pack/scripts/a2743_seasoning_block_adapter.js",
+    "behavior_pack/scripts/a2762_interaction_intent_adapter.js",
+    "behavior_pack/scripts/a2770_placed_visual_runtime.js",
+    "behavior_pack/scripts/a277_grill_transaction_core.js",
+    "behavior_pack/scripts/main.js",
+    "resource_pack/manifest.json"
+  ],
+  "added": [
+    "behavior_pack/scripts/a288_intent_core.js",
+    "behavior_pack/scripts/a288_visual_budget_core.js"
+  ],
+  "removed": []
+}
