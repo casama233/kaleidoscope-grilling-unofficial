@@ -20,7 +20,7 @@
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a2748_pepper_sapling",
-          "render_method": "alpha_test",
+          "render_method": "alpha_test_single_sided",
           "face_dimming": false,
           "ambient_occlusion": 0
         }

@@ -22,21 +22,25 @@ def bottle_chain():
  assert len(set(ids))==3 and not fill[0] and fill[1] and fill[2]
  assert fill[1][0]['size'][1] < fill[2][0]['size'][1]
 def render_assets():
- idx=index();refs=set();changed=0
- for p in (RP/'attachables').glob('*.json'):
-  d=load(p)['minecraft:attachable']['description'];assert len(d['scripts']['animate'])==4
-  if any(ref.startswith('geometry.kg_a286.') for ref in d['geometry'].values()):changed+=1
-  for ref in d['geometry'].values():
-   refs.add(ref);g=idx[ref]
-   if ref.startswith('geometry.kg_a286.'):
-    assert len(g['bones'])==1
-    b=g['bones'][0];assert b['name']=='grip' and b['pivot']==[0,24,0] and b['binding']=='q.item_slot_to_bone_name(context.item_slot)'
-    assert b.get('cubes') and 'parent' not in b
-    for anim in d['animations'].values():assert anim.startswith('animation.kg_a286.')
-   else:
-    assert ref.startswith('geometry.kg_a283.')
-    expected=deepcopy(idx['geometry.'+ref.removeprefix('geometry.kg_a283.')]);old.deduplicate(expected);assert g==old.shifted(expected)
- assert changed==68,changed
+ if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,7):
+  from verify_a287 import binding_assets
+  idx,refs,audit=binding_assets();changed=audit['attachables']
+ else:
+  idx=index();refs=set();changed=0
+  for p in (RP/'attachables').glob('*.json'):
+   d=load(p)['minecraft:attachable']['description'];assert len(d['scripts']['animate'])==4
+   if any(ref.startswith('geometry.kg_a286.') for ref in d['geometry'].values()):changed+=1
+   for ref in d['geometry'].values():
+    refs.add(ref);g=idx[ref]
+    if ref.startswith('geometry.kg_a286.'):
+     assert len(g['bones'])==1
+     b=g['bones'][0];assert b['name']=='grip' and b['pivot']==[0,24,0] and b['binding']=='q.item_slot_to_bone_name(context.item_slot)'
+     assert b.get('cubes') and 'parent' not in b
+     for anim in d['animations'].values():assert anim.startswith('animation.kg_a286.')
+    else:
+     assert ref.startswith('geometry.kg_a283.')
+     expected=deepcopy(idx['geometry.'+ref.removeprefix('geometry.kg_a283.')]);old.deduplicate(expected);assert g==old.shifted(expected)
+  assert changed==68,changed
  bottle_chain()
  # Tests of the physical opening independent of generator byte output.
  for name in ['grill_flat','grill_flat_lit','grill_legged','grill_legged_lit','a283_item_grill']+[f'big_vat_{i}' for i in range(5)]:
@@ -73,6 +77,6 @@ def render_assets():
  for name in ('grill','oil_press'):
   g=load(RP/f'models/blocks/a283_item_{name}.geo.json')['minecraft:geometry'][0]
   assert g['item_display_transforms']==load(Path(__file__).parent/f'fixtures/a283/{name}.json')['display']
- return {'attachables':107,'rebound_bottles_and_rack':changed,'hand_geometries':len(refs),'openings_checked':10,'client_visuals_tested':False}
+ return {'attachables':107,'single_bone_attachables':changed,'hand_geometries':len(refs),'openings_checked':10,'client_visuals_tested':False}
 if __name__=='__main__':
  eating_gate();survival_gate();previous_gate()
