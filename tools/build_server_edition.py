@@ -337,6 +337,37 @@ payload = {'api': 1, 'id': 'kg_a1:grilling', 'version': version, 'order': 300, '
     "import{system}from'@minecraft/server';import{installPublisher}from'./guidePublisher.js';\n"
     'installPublisher(system,' + json.dumps(payload, ensure_ascii=False) + ');\n', encoding='utf-8')
 
+# 11. creative catalog: shared-group entries appended without an icon override
+# Cookery's icon-carrying definitions depending on stack order, collapsing the
+# creative "equipment" page to flat items (2026-09-25 incident; recurred when
+# A2.8.7 reverted the server-side patch). Fill canonical Cookery group icons so
+# the merge is order-independent. Only None icons are filled; an upstream icon
+# is never overwritten, and an unknown name-only group fails loudly.
+CATALOG_ICONS = {
+    'kaleidoscope_cookery:itemGroup.name.tools': 'kaleidoscope_cookery:iron_kitchen_knife',
+    'kaleidoscope_cookery:itemGroup.name.cooking_stations': 'kaleidoscope_cookery:stove',
+    'kaleidoscope_cookery:itemGroup.name.storage_utility': 'kaleidoscope_cookery:fruit_basket',
+    'kaleidoscope_cookery:itemGroup.name.crops': 'kaleidoscope_cookery:rice',
+    'kaleidoscope_cookery:itemGroup.name.ingredients': 'kaleidoscope_cookery:flour',
+    'kaleidoscope_cookery:itemGroup.name.foods': 'kaleidoscope_cookery:mantou',
+    'kaleidoscope_cookery:itemGroup.name.other_blocks': 'kaleidoscope_cookery:oil_block',
+    'kaleidoscope_cookery:itemGroup.name.recipe_pages': 'kaleidoscope_cookery:master_recipe_page',
+}
+cat = bp / 'item_catalog/crafting_item_catalog.json'
+if cat.is_file():
+    cj = json.loads(cat.read_text(encoding='utf-8-sig'))
+    filled = 0
+    for category in cj['minecraft:crafting_items_catalog']['categories']:
+        for group in category['groups']:
+            gi = group['group_identifier']
+            if gi.get('icon') is None:
+                icon = CATALOG_ICONS.get(gi['name'])
+                assert icon, 'no canonical icon for name-only group ' + str(gi['name'])
+                gi['icon'] = icon
+                filled += 1
+    cat.write_text(json.dumps(cj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    print('creative catalog icons filled:', filled)
+
 # verification
 INFRA = {'blockSupport.js', 'itemData.js'}
 bad = []
