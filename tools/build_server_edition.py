@@ -93,6 +93,11 @@ ITEM_VARS = {
     'a2746_rack_item_codec.js': ['stack'],
     'a2750_cookery_cuisine_runtime.js': ['stack', 'next'],
     'a2750_food_state_adapter.js': ['stack'],
+    # A2.8.7 additions.
+    'a2762_interaction_intent_core.js': ['stack'],
+    'a2766_special_seasoning_visual_runtime.js': ['stack', 'out', 'from', 'to'],
+    'a2769_food_tooltip_core.js': ['stack'],
+    'a285_eating_transaction.js': ['stack'],
 }
 rewritten = {}
 for name, vars_ in ITEM_VARS.items():
@@ -102,6 +107,8 @@ for name, vars_ in ITEM_VARS.items():
     total = 0
     for v in vars_:
         for pat, rep in [
+            (rf'\b{v}\?\.getDynamicPropertyIds\?\.\(\)', f'getItemPropertyIds({v})'),
+            (rf'\b{v}\.getDynamicPropertyIds\?\.\(\)', f'getItemPropertyIds({v})'),
             (rf'\b{v}\?\.getDynamicPropertyIds\(\)', f'getItemPropertyIds({v})'),
             (rf'\b{v}\.getDynamicPropertyIds\(\)', f'getItemPropertyIds({v})'),
             (rf'\b{v}\?\.getDynamicProperty\(', f'getItemProperty({v},'),
@@ -139,6 +146,8 @@ for name in ['main.js', 'a25_plate_recipe_runtime.js']:
     t = t.replace('below?.isSolid??false', 'hasSolidTop(below)')
     t = t.replace('!(support.isSolid??false)', '!hasSolidTop(support)')
     t = t.replace('if(support?.isSolid)return;', 'if(hasSolidTop(support))return;')
+    # A2.8.7 adds a teleport-footing check on the stable block API.
+    t = t.replace('if(below?.isSolid){', 'if(hasSolidTop(below)){')
     assert '.isSolid' not in t, name
     if 'blockSupport.js' not in t:
         lines = t.splitlines(True)
@@ -150,9 +159,13 @@ print('isSolid replaced with hasSolidTop')
 # 5. seasoning bottle placement through a block custom component
 M = bp / 'scripts/main.js'
 t = M.read_text(encoding='utf-8')
-old_place = re.search(r"world\.beforeEvents\.playerPlaceBlock\.subscribe\(e=>\{try\{if\(e\.permutationToPlace\?\.type\?\.id!==SEASONING_BLOCK\).*?\}\);\n", t, re.S)
-assert old_place, 'seasoning placeBlock handler not found'
-t = t[:old_place.start()] + """// Capture the item while native placement still has its original hand stack.
+if 'senluo:grilling_bottle_place' in t:
+    # A2.8.7 upstream absorbed this server delta (block component + per-block cache).
+    print('seasoning bottle placement absorbed upstream; skipped handler rewrite')
+else:
+    old_place = re.search(r"world\.beforeEvents\.playerPlaceBlock\.subscribe\(e=>\{try\{if\(e\.permutationToPlace\?\.type\?\.id!==SEASONING_BLOCK\).*?\}\);\n", t, re.S)
+    assert old_place, 'seasoning placeBlock handler not found'
+    t = t[:old_place.start()] + """// Capture the item while native placement still has its original hand stack.
 // Stable 2.9 exposes this on the block component, not world.beforeEvents.
 system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
  blockComponentRegistry.registerCustomComponent('senluo:grilling_bottle_place',{
@@ -160,25 +173,53 @@ system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
  });
 });
 """ + t[old_place.end():]
-t = "import './guide.js';\n" + t
+if "import './guide.js';" not in t:
+    t = "import './guide.js';\n" + t
 M.write_text(t, encoding='utf-8')
 
 # 6. a23 oil world: face offsets + robustness
-sub(bp / 'scripts/a23_oil_world.js', [
-    ('North:[0,0,1],South:[0,0,-1]', 'North:[0,0,-1],South:[0,0,1]', 1),
-    ('if(!source||source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}',
-     'if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}', 1),
-    ('const rows=readReg(),keep=[];', 'const rows=readReg(),before=JSON.stringify(rows),keep=[];', 1),
-    ('if(compute(row,rows))keep.push(row);', 'try{if(compute(row,rows))keep.push(row)}catch{keep.push(row)}', 1),
+# A2.8.7 absorbed some of these deltas upstream; apply whatever is still missing
+# and assert that each pattern is either absent upstream or applied by us.
+p23 = bp / 'scripts/a23_oil_world.js'
+t23 = p23.read_text(encoding='utf-8')
+for old23, new23 in [
+    ('North:[0,0,1],South:[0,0,-1]', 'North:[0,0,-1],South:[0,0,1]'),
+    ('const rows=readReg(),keep=[];', 'const rows=readReg(),before=JSON.stringify(rows),keep=[];'),
     ('if(JSON.stringify(keep)!==JSON.stringify(rows))saveReg(keep);else saveReg(rows);',
-     'if(JSON.stringify(keep)!==before)saveReg(keep);', 1),
-], 'a23_oil_world.js')
+     'if(JSON.stringify(keep)!==before)saveReg(keep);'),
+]:
+    if old23 in t23:
+        t23 = t23.replace(old23, new23, 1)
+        print('a23 patched:', old23[:44])
+    elif new23 in t23:
+        print('a23 absorbed upstream:', old23[:44])
+    else:
+        raise AssertionError('a23 pattern drifted: ' + old23[:70])
+for old23, new23 in [
+    ('if(!source||source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}',
+     'if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}'),
+    ('if(compute(row,rows))keep.push(row);', 'try{if(compute(row,rows))keep.push(row)}catch{keep.push(row)}'),
+]:
+    n23 = t23.count(old23)
+    assert n23 == 1, f'a23_oil_world.js: expected 1 of {old23[:60]!r}, found {n23}'
+    t23 = t23.replace(old23, new23)
+    print('a23 patched:', old23[:44])
+p23.write_text(t23, encoding='utf-8')
 
 # 7. a26 big-vat placement: keep the mutation out of restricted execution
-sub(bp / 'scripts/a26_oil_machine_runtime.js', [
-    ('copy.amount=1;system.run(()=>placePackedVat(dim.getBlock(loc),face,p,copy));return}',
-     'system.run(()=>{copy.amount=1;placePackedVat(dim.getBlock(loc),face,p,copy)});return}', 1),
-], 'a26-vat-placement')
+# 7. a26 big-vat placement: keep the mutation out of restricted execution.
+p26 = bp / 'scripts/a26_oil_machine_runtime.js'
+t26 = p26.read_text(encoding='utf-8')
+old26 = 'copy.amount=1;system.run(()=>placePackedVat(dim.getBlock(loc),face,p,copy));return}'
+new26 = 'system.run(()=>{copy.amount=1;placePackedVat(dim.getBlock(loc),face,p,copy)});return}'
+if old26 in t26:
+    t26 = t26.replace(old26, new26, 1)
+    print('a26 vat placement patched')
+elif re.search(r'defer\(\(\)=>\{[^}]*placePackedVat', t26):
+    print('a26 vat placement absorbed upstream (defer(...) wrapper present)')
+else:
+    raise AssertionError('a26 vat placement pattern drifted')
+p26.write_text(t26, encoding='utf-8')
 
 # 8. blocks: bottle component, numeric AO, unsupported crop tag
 for name in ['seasoning_bottle.json', 'seasoning_bottle_1.json', 'seasoning_bottle_2.json',
@@ -206,8 +247,8 @@ for p in sorted((bp / 'blocks').glob('*.json')):
     if '"tag:minecraft:crop": {},' not in t: continue
     t = t.replace('"tag:minecraft:crop": {},', '')
     json.loads(t); p.write_text(t, encoding='utf-8'); tagged.append(p.name)
-assert tagged, 'no crop tag removed'
-print('tag:minecraft:crop removed from:', tagged)
+# A2.8.7 upstream no longer ships the unsupported crop tag; tolerate zero removals.
+print('tag:minecraft:crop removed from:', tagged) if tagged else print('tag:minecraft:crop absent upstream (absorbed)')
 
 # 8b. The A2.7.58 pepper-tree worldgen ships an acacia_trunk whose trunk_lean is
 # missing the two children this BDS requires (lean_height, lean_steps), so the
