@@ -8,6 +8,7 @@ BRANCH = 'codex/grilling-a288-local-review'
 BASE = '707d28edab4ea9af76878e0e29d8244848971db3'
 PAYLOAD_HASH = '5db3c9b3f2f7ca6109474bfa718ad34fa9204d3d639cbbcd29e4c1d27d132ec2'
 LEDGER = 'projects/grilling/gameplay_core/review/baseline-pack-sha256.json'
+CRLF_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/a23_hot_runtime.js'
 ROOT = Path.cwd().resolve()
 
 def require(condition, message):
@@ -74,6 +75,10 @@ require(len(ledger) == 1905 and sha(ledger_bytes) == '0a11097fcca89c03cea8df2f5e
 extras = payload['additional_files']
 require(set(extras) == {'development/gameplay_core/verify_a288_local.py', 'docs/STATUS-A2.8.8-LOCAL.md'}, 'Unexpected additional files')
 expected_patch_paths = set(paths) - set(extras) - {LEDGER} - set(planned_transforms)
+# The delivered diff was decoded as text and normalized to LF. Only this
+# reviewed runtime uses CRLF; normalize for patching, then restore exact bytes.
+crlf_target = target(CRLF_PATH)
+crlf_target.write_bytes(crlf_target.read_bytes().replace(b'\r\n', b'\n'))
 with tempfile.TemporaryDirectory() as temp:
     patch = Path(temp) / 'source.patch'
     patch.write_bytes(payload['source.patch'].encode('utf-8'))
@@ -82,6 +87,7 @@ with tempfile.TemporaryDirectory() as temp:
     require(len(patch_paths) == 22 and set(patch_paths) == expected_patch_paths, 'Patch path allowlist mismatch')
     subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
     subprocess.run(['git', 'apply', str(patch)], check=True)
+crlf_target.write_bytes(crlf_target.read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
 for relative, content in {LEDGER: ledger_bytes, **{p: text.encode('utf-8') for p, text in extras.items()}, **planned_transforms}.items():
     path = target(relative)
     path.parent.mkdir(parents=True, exist_ok=True)
