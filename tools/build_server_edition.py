@@ -365,8 +365,29 @@ if cat.is_file():
                 assert icon, 'no canonical icon for name-only group ' + str(gi['name'])
                 gi['icon'] = icon
                 filled += 1
+    # Appended shared groups must also sit in Cookery's category: crops live
+    # under "nature" (the vanilla nature tab), not under equipment. Upstream
+    # ships crops under equipment, which renders a second duplicate "crops"
+    # group on the equipment page.
+    moved = 0
+    cats = cj['minecraft:crafting_items_catalog']['categories']
+    for category in cats:
+        if category['category_name'] != 'equipment':
+            continue
+        keep = []
+        for group in category['groups']:
+            if group['group_identifier']['name'] == 'kaleidoscope_cookery:itemGroup.name.crops':
+                nature = next((c for c in cats if c['category_name'] == 'nature'), None)
+                if nature is None:
+                    nature = {'category_name': 'nature', 'groups': []}
+                    cats.append(nature)
+                nature['groups'].append(group)
+                moved += 1
+            else:
+                keep.append(group)
+        category['groups'] = keep
     cat.write_text(json.dumps(cj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print('creative catalog icons filled:', filled)
+    print('creative catalog icons filled:', filled, 'crops moved to nature:', moved)
 
 # verification
 INFRA = {'blockSupport.js', 'itemData.js'}
