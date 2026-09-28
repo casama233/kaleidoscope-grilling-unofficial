@@ -46,13 +46,14 @@ jobs:
           git init .
           git config core.autocrlf false
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
+          git fetch --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
-          # recorded as BASE='<sha>' in development/gameplay_core/*.py. A plain
-          # shallow clone lacks those commits, so fetch each baseline explicitly;
-          # the list follows the scripts automatically.
-          BASELINES=$(grep -rhoE "BASE='[0-9a-f]{40}'" development/gameplay_core/*.py | cut -d"'" -f2 | sort -u)
-          git fetch --depth=1 origin "$EXPECTED_SHA" $BASELINES
-          git checkout --detach FETCH_HEAD
+          # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
+          # read straight from the fetched commit, then those commits are fetched
+          # too, so a shallow clone still resolves every baseline.
+          BASELINES=$(git grep -h -o -E "BASE='[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          if [ -n "$BASELINES" ]; then git fetch --depth=1 origin $BASELINES; fi
+          git checkout --detach "$EXPECTED_SHA"
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 
       - name: Install pinned asset-verifier dependency
