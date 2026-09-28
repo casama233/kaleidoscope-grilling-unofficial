@@ -46,7 +46,7 @@ jobs:
           git init .
           git config core.autocrlf false
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
-          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git fetch --depth=2 origin "$EXPECTED_SHA"  # a287_binding_repair.py reads the pre-repair source at the parent commit
           git checkout --detach FETCH_HEAD
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 
