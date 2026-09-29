@@ -1,0 +1,84 @@
+name: Integrate family2 storage candidate
+on:
+  push:
+    branches: ['fix/family-compat-batch2-20260929']
+    paths: ['.github/workflows/family2-integrate.yml']
+permissions:
+  contents: read
+jobs:
+  integrate:
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reconstruct hash-locked owned source changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,hashlib,json,lzma,subprocess
+          from pathlib import Path,PurePosixPath
+          repo='casama233/kaleidoscope-grilling-unofficial'
+          blob=json.loads(subprocess.check_output(['gh','api','repos/'+repo+'/git/blobs/464202194346540b21efdf17f770dc9d82e29558']))
+          raw=lzma.decompress(base64.b64decode(blob['content']))
+          assert hashlib.sha256(raw).hexdigest()=='cee23e476c0d9784b3c1b61e16db6614c2a467987ae93a553a9dae3cd1eab463'
+          changes=json.loads(raw);assert len(changes)==32
+          seen=set()
+          for row in changes:
+              name=row['path'];p=Path(name);parts=PurePosixPath(name)
+              assert not parts.is_absolute() and '..' not in parts.parts and name not in seen and not p.is_symlink()
+              assert name.startswith(('compat/family/','development/gameplay_core/','projects/grilling/gameplay_core/','tools/','docs/FAMILY-COMPAT-BATCH2.md'))
+              seen.add(name)
+              if row['before'] is None:assert not p.exists();old=b''
+              else:old=p.read_bytes();assert hashlib.sha256(old).hexdigest()==row['before'],name
+              text=old.decode();end=0
+              for a,b,value in row['edits']:assert end<=a<=b<=len(text);end=b
+              for a,b,value in reversed(row['edits']):text=text[:a]+value+text[b:]
+              assert hashlib.sha256(text.encode()).hexdigest()==row['after'],name
+              p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
+          PY
+      - name: Static guards, real call sites, unchanged assets and complete reproducible package
+        run: |
+          python tools/apply_family_profile.py
+          python tools/check_station_storage.py
+          node tools/check_family_knives.mjs
+          python tools/family_candidate.py --build
+          python - <<'PY'
+          import hashlib,subprocess
+          from pathlib import Path
+          p=Path('dist/family/Kaleidoscope_Grilling_A2.8.9_compat2.mcaddon')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='15ebdf47397c397fa9c39584f6fcbb57ca5be2ad4c16513d979c737d06c5952a'
+          before={p.as_posix():p.read_bytes() for p in Path('projects/grilling/gameplay_core').rglob('*') if p.is_file()}
+          subprocess.run(['python','tools/apply_family_profile.py'],check=True)
+          after={p.as_posix():p.read_bytes() for p in Path('projects/grilling/gameplay_core').rglob('*') if p.is_file()}
+          assert before==after,'Profile must be idempotent'
+          PY
+      - name: Commit canonical source on the candidate branch only
+        env:
+          EXPECTED_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/fix/family-compat-batch2-20260929 | cut -f1)" = "$EXPECTED_HEAD"
+          git diff --exit-code -- .github/
+          git add compat/family/ development/gameplay_core/ projects/grilling/gameplay_core/ tools/ docs/FAMILY-COMPAT-BATCH2.md
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Add persistent native station-inventory backend for nonexperimental 2.8.9 compatibility candidate'
+          git push origin HEAD:refs/heads/fix/family-compat-batch2-20260929
+          git rev-parse HEAD > dist/family/SOURCE_COMMIT
+          cp docs/FAMILY-COMPAT-BATCH2.md dist/family/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Grilling-family2-source-candidate
+          path: dist/family/
+          retention-days: 14
