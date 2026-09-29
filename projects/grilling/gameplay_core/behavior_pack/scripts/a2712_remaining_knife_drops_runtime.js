@@ -1,5 +1,5 @@
 import {world,ItemStack,EquipmentSlot} from '@minecraft/server';
-import {KITCHEN_KNIVES,isKitchenKnife} from './a2710_chicken_acquisition_core.js';
+import {KITCHEN_KNIVES,isKitchenKnifeStack} from './a2710_chicken_acquisition_core.js';
 import {
  COW_ID,SQUID_ID,RAW_COW_OFFAL_ID,SQUID_TENTACLE_ID,
  cowOffalDropCount,squidTentacleDropCount,squidTentacleShouldDrop
@@ -28,7 +28,7 @@ world.afterEvents.entityDie.subscribe(event=>{
   const dead=event.deadEntity;
   if(dead?.typeId!==COW_ID&&dead?.typeId!==SQUID_ID)return;
   const killer=event.damageSource?.damagingEntity;if(killer?.typeId!=='minecraft:player')return;
-  const weapon=mainHand(killer);if(!isKitchenKnife(weapon?.typeId))return;
+  const weapon=mainHand(killer);if(!isKitchenKnifeStack(weapon))return;
   const looting=lootingLevel(weapon);
   const baseRandom=Math.random();
   const bonusRandom=looting>0?Math.random():0;

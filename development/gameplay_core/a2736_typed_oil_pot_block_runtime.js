@@ -1,113 +1,47 @@
-import {world,system,ItemStack} from '@minecraft/server';
-import {
- COOKERY_FILLED_ID,readCookeryOilPotForPlacement,buildCookeryOilPot
-} from './a2734_cookery_oil_pot_adapter.js';
-import {findHand,setHand,isCreative as creative} from './a2735_player_io.js';
-import {
- HOST_BLOCK_ID,HOST_FAT_ITEM_ID,OIL_BUCKET_POINTS,hostBlockCountKey,typedOilBlockKey,
- placementCandidateLocations,normalizePlacedOilCount,planPlacedTypedOilAddition,blocksNativeCookeryInteraction
-} from './a2736_typed_oil_pot_block_core.js';
+import {world,system} from '@minecraft/server';
+import {interactionFeedback} from './a283_interaction_feedback.js';
+import {HOST_BLOCK_ID,typedOilBlockKey} from './a2736_typed_oil_pot_block_core.js';
+import {COOKERY_FILLED_ID,GRILLING_TYPE_KEY} from './a2734_cookery_oil_pot_core.js';
 
-const BUCKET_TO_TYPE=Object.freeze({
- 'kaleidoscope_grilling:canola_oil_bucket':'canola',
- 'kaleidoscope_grilling:secret_chili_oil_bucket':'secret_chili',
- 'kaleidoscope_grilling:premium_chili_oil_bucket':'premium_chili'
-});
-
-function blockLoc(block){return {x:block.x,y:block.y,z:block.z}}
-function typeKeyAt(d,l){return typedOilBlockKey(d.id,l.x,l.y,l.z)}
-function countKeyAt(d,l){return hostBlockCountKey(d.id,l.x,l.y,l.z)}
-function readTypeAt(d,l){try{return String(world.getDynamicProperty(typeKeyAt(d,l))??'')}catch{return ''}}
-function readCountAt(d,l,type=''){try{return normalizePlacedOilCount(type,world.getDynamicProperty(countKeyAt(d,l))??0)}catch{return 0}}
-function clearAt(d,l){
- try{world.setDynamicProperty(typeKeyAt(d,l),undefined)}catch{}
- try{world.setDynamicProperty(countKeyAt(d,l),undefined)}catch{}
+const notices=new Map();
+function notify(player){
+ if(!player)return;
+ const last=notices.get(player.id)??-1000;
+ if(system.currentTick-last<60)return;
+ notices.set(player.id,system.currentTick);
+ system.run(()=>{try{interactionFeedback(player,'§c此特殊油壺暫停跨模組操作；資料與物品保留，請勿拆除。 / Typed oil-pot bridge unavailable; contents preserved.')}catch{}});
 }
-function writeAt(block,type,count){
- if(!block||block.typeId!==HOST_BLOCK_ID)return false;
- const d=block.dimension,l=blockLoc(block),next=normalizePlacedOilCount(type,count);
+world.afterEvents.playerLeave.subscribe(e=>notices.delete(e.playerId));
+function legacyTypedPot(block){
+ if(block?.typeId!==HOST_BLOCK_ID)return false;
  try{
-  world.setDynamicProperty(typeKeyAt(d,l),type||undefined);
-  world.setDynamicProperty(countKeyAt(d,l),next>0?next:undefined);
- }catch{return false}
- try{block.setPermutation(block.permutation.withState('kaleidoscope_cookery:has_oil',next>0))}catch{}
- return true;
+  const p=block.location;
+  // This marker belongs to Grilling. It is NOT Cookery's oil quantity.
+  const marker=world.getDynamicProperty(typedOilBlockKey(block.dimension.id,p.x,p.y,p.z));
+  return marker!==undefined&&marker!==null&&marker!=='';
+ }catch{return true;} // unreadable existing state is not an empty container
 }
-function mismatch(p){try{p.onScreenDisplay.setActionBar('§c油壺內已有不同內容')}catch{}}
-function playPour(p,type,count){try{p.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*Math.min(64,count)/64})}catch{}}
-
-function scheduleTypedPlacement(e){
- if(e.isFirstEvent===false||e.block.typeId===HOST_BLOCK_ID)return;
- const item=e.itemStack;
- if(item?.typeId!==COOKERY_FILLED_ID)return;
- const state=readCookeryOilPotForPlacement(item);
- if(!state.type||state.count<=0)return;
- const d=e.block.dimension;
- const candidates=placementCandidateLocations(e.block.location,e.blockFace).map(l=>({l,wasPot:d.getBlock(l)?.typeId===HOST_BLOCK_ID}));
- system.run(()=>{
-  for(const c of candidates){
-   if(c.wasPot)continue;
-   const block=d.getBlock(c.l);
-   if(block?.typeId===HOST_BLOCK_ID){writeAt(block,state.type,state.count);break}
-  }
- });
+function typedHand(stack){
+ if(stack?.typeId!==COOKERY_FILLED_ID)return false;
+ try{const type=stack.getDynamicProperty(GRILLING_TYPE_KEY);return type!==undefined&&type!==null&&type!=='';}
+ catch{return true;}
 }
-
-function fillPlacedPot(player,dimension,location,incomingType,hand){
- const block=dimension.getBlock(location);if(!block||block.typeId!==HOST_BLOCK_ID)return;
- const type=readTypeAt(dimension,location),count=readCountAt(dimension,location,type);
- const plan=planPlacedTypedOilAddition(type,count,incomingType,OIL_BUCKET_POINTS);
- if(!plan.ok){mismatch(player);return}
- if(!writeAt(block,plan.type,plan.nextCount))return;
- if(!creative(player)&&hand)setHand(player,hand,new ItemStack('minecraft:bucket',1));
- playPour(player,plan.type,plan.nextCount);
-}
-
-function manuallyBreakTypedPot(d,l,type,count,drop){
- const block=d.getBlock(l);if(!block||block.typeId!==HOST_BLOCK_ID)return false;
- const liveType=readTypeAt(d,l);if(liveType!==type)return false;
- clearAt(d,l);
- try{block.setType('minecraft:air')}catch{return false}
- if(drop){
-  const stack=buildCookeryOilPot(type,count);
-  if(stack)try{d.spawnItem(stack,{x:l.x+.5,y:l.y+.35,z:l.z+.5})}catch{}
- }
- return true;
-}
-
+function typedBucket(stack){return [
+ 'kaleidoscope_grilling:canola_oil_bucket','kaleidoscope_grilling:secret_chili_oil_bucket',
+ 'kaleidoscope_grilling:premium_chili_oil_bucket'].includes(stack?.typeId);}
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
- try{scheduleTypedPlacement(e)}catch{}
- if(e.block.typeId!==HOST_BLOCK_ID)return;
- const d=e.block.dimension,l=blockLoc(e.block),type=readTypeAt(d,l),itemId=e.itemStack?.typeId;
- const incoming=BUCKET_TO_TYPE[itemId];
- if(incoming){
-  e.cancel=true;if(e.isFirstEvent===false)return;
-  const p=e.player,hand=findHand(p,itemId);
-  system.run(()=>fillPlacedPot(p,d,l,incoming,hand));
-  return;
- }
- if(blocksNativeCookeryInteraction(type,itemId)){
-  e.cancel=true;
-  if(itemId===HOST_FAT_ITEM_ID&&e.isFirstEvent!==false){const p=e.player;system.run(()=>mismatch(p))}
+ // Untyped host pots pass through untouched, including the host's own filling.
+ // Block placing a Grilling-typed host item anywhere until the host can own it.
+ if(typedHand(e.itemStack)||legacyTypedPot(e.block)||(e.block?.typeId===HOST_BLOCK_ID&&typedBucket(e.itemStack))){
+  e.cancel=true;if(e.isFirstEvent!==false)notify(e.player);
  }
 });
-
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
- if(e.block.typeId!==HOST_BLOCK_ID)return;
- const d=e.block.dimension,l=blockLoc(e.block),type=readTypeAt(d,l);if(!type)return;
- const count=readCountAt(d,l,type),drop=!creative(e.player);e.cancel=true;
- system.run(()=>manuallyBreakTypedPot(d,l,type,count,drop));
+ if(legacyTypedPot(e.block)){e.cancel=true;notify(e.player);}
 });
-
 world.beforeEvents.explosion.subscribe(e=>{
- const impacted=e.getImpactedBlocks(),keep=[],typed=[];
- for(const block of impacted){
-  if(block.typeId!==HOST_BLOCK_ID){keep.push(block);continue}
-  const d=block.dimension,l=blockLoc(block),type=readTypeAt(d,l);
-  if(!type){keep.push(block);continue}
-  typed.push({d,l,type,count:readCountAt(d,l,type)});
- }
- if(!typed.length)return;
- e.setImpactedBlocks(keep);
- system.run(()=>{for(const row of typed)manuallyBreakTypedPot(row.d,row.l,row.type,row.count,true)});
+ const impacted=e.getImpactedBlocks(),keep=impacted.filter(block=>!legacyTypedPot(block));
+ if(keep.length!==impacted.length)e.setImpactedBlocks(keep);
 });
+// No cleanup of old properties, block removal, item spawning, or host-state write.
+// Command edits and other addons that ignore cancellation cannot be prevented.

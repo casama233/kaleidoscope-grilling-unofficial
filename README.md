@@ -1,3 +1,5 @@
+> **相容修復第一批／待驗收候選**：此分支面向公開 Cookery 1.0.8，不可直接取代使用舊 Cookery UUID 的正式世界。見 `docs/FAMILY-COMPAT-BATCH1.md`。下方既有發布記錄是歷史資料。
+
 > **A2.8.5 生存修復**：[本批變更與驗證](docs/STATUS-A2.8.5.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。整體移植與客戶端验收尚未完成。
 
 > Current corrective build: **A2.8.4** — [eating pose repair and validation limits](docs/STATUS-A2.8.4.md). Java custom eating choreography and client visual acceptance remain pending.
