@@ -23,6 +23,9 @@ def check(syntax=True):
         # Normalize only the explicitly allowed version/dependency changes.
         normalized=json.loads(json.dumps(m));normalized['header']['version']=old['header']['version']
         normalized['dependencies']=old['dependencies']
+        for key,value in c.get('allowedHeaderMetadata',{}).get(side,{}).items():
+            assert key in ('name','description') and normalized['header'][key]==value
+            normalized['header'][key]=old['header'][key]
         for module,prior in zip(normalized['modules'],old['modules']):module['version']=prior['version']
         assert normalized==old, 'Manifest identities/capabilities/engine requirements changed'
         expected=c['expectedDependencies'][side]
@@ -43,7 +46,7 @@ def check(syntax=True):
     report={'version':c['version'],'baselineCommit':c['baselineCommit'],'files':len(files),
             'untouchedFiles':len(untouched),'untouchedDigest':digest(untouched),'allowedRuntimeChanges':sorted(allowed),
             'syntaxChecked':syntax,'nativeLoadTest':False,'clientTest':False,'simulatedPlayerTest':False,
-            'automaticCookeryMigration':False,'wholeFamilyCompatible':False}
+            'automaticCookeryMigration':False,'wholeFamilyCompatible':False,'legacyExperimentalInventoryMigration':False,'stationStorageBackend':'persistent-native-entity-inventory'}
     return c,report
 
 def main():

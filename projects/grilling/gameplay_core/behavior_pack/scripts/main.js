@@ -1,3 +1,4 @@
+import {stationContainer,retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
 import {rolledIngredientEffects} from './a285_ingredient_effects.js';
 import {EquipmentSlot} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,commitEating} from './a285_eating_transaction.js';
@@ -102,7 +103,7 @@ function advanceBites(player,a){
 
 function now(){try{return world.getAbsoluteTime()}catch{return system.currentTick}}
 const message=interactionFeedback;
-function inv(block){return block.getComponent('minecraft:inventory')?.container}
+function inv(block){return stationContainer(block)}
 function grillDirection(block){
  try{const d=String(block.permutation.getState('minecraft:cardinal_direction')??'north');return ['north','south','west','east'].includes(d)?d:'north'}catch{return 'north'}
 }
@@ -322,19 +323,20 @@ function extract(block,player,all=false){
  if(count)try{block.dimension.playSound('random.pop',block.location)}catch{}
  return count;
 }
-function removeEscrow(entities){for(const e of entities)try{e?.remove()}catch{}}
+function removeEscrow(entities){let ok=true;for(const e of entities)try{e?.remove()}catch{ok=false}return ok}
 function restoreBrokenGrill(dim,loc,permutation,state,raws){
  try{
   let b=dim.getBlock(loc);if(!b)return;
   b.setPermutation(permutation);b=dim.getBlock(loc)??b;
   const c=inv(b);if(c)for(let i=0;i<3;i++)c.setItem(i,raws[i]);
-  writeState(b,state);
- }catch{}
+  writeState(b,state);return true;
+ }catch{return false}
 }
 function customBreak(block,player){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;
  const state=readState(block),kind=breakDisposition(state),c=inv(block),dim=block.dimension,loc={...block.location},permutation=block.permutation;
- const raws=[0,1,2].map(i=>c?.getItem(i)),drops=[];
+ if(!c){message(player,'§c烤架庫存暫不可用，未拆除');return}
+ const raws=[0,1,2].map(i=>c.getItem(i)),drops=[];
  try{
   for(const raw of raws)if(raw)drops.push(outputFor(raw,state,kind));
   if(!creative(player))drops.push(new ItemStack(GRILL_ID,1));
@@ -343,13 +345,15 @@ function customBreak(block,player){
  try{
   for(let i=0;i<drops.length;i++)escrow.push(dim.spawnItem(drops[i],{x:loc.x+.5,y:loc.y+(i===drops.length-1&&!creative(player)?.3:.4),z:loc.z+.5}));
  }catch{
-  removeEscrow(escrow);message(player,'§c拆除失敗：掉落物生成失敗');return;
+  if(!removeEscrow(escrow))quarantineStation(block,'partial output cleanup unconfirmed');message(player,'§c拆除失敗：掉落物生成失敗');return;
  }
  try{
   clearContainer(block);clearState(block);removeGrillLegs(block);block.setType('minecraft:air');
  }catch{
-  removeEscrow(escrow);restoreBrokenGrill(dim,loc,permutation,state,raws);message(player,'§c拆除失敗，烤架內容已嘗試回滾');
+  if(!removeEscrow(escrow)){quarantineStation(block,'escrow cleanup unconfirmed');return}
+  if(!restoreBrokenGrill(dim,loc,permutation,state,raws))quarantineStation(block,'grill rollback incomplete');message(player,'§c拆除失敗，烤架內容已嘗試回滾');return;
  }
+ try{retireEmptyStationContainer(dim.getBlock(loc))}catch(error){console.warn('[Grilling storage retirement] '+error)}
 }
 function heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}
 function planCookeryOil(player,hand,needed){
@@ -663,6 +667,11 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  system.run(()=>handleCustomBlockInteraction(dim.getBlock(loc),p,intent));
 });
 world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID){resetBlock(e.block,false)}else if(isSeasoningBlock(e.block.typeId))placeSeasoningState(e.block,e.player)});
+world.beforeEvents.explosion.subscribe(e=>{
+ const grills=[],keep=[];for(const b of e.getImpactedBlocks()){if(b.typeId===GRILL_ID)grills.push({d:b.dimension,p:{...b.location}});else keep.push(b)}
+ if(!grills.length)return;e.setImpactedBlocks(keep);
+ system.run(()=>{for(const row of grills)try{customBreak(row.d.getBlock(row.p),undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}});
+});
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(e.block.typeId===GRILL_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>customBreak(dim.getBlock(loc),p));return}
  if(isSeasoningBlock(e.block.typeId)){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>{const b=dim.getBlock(loc);if(!b||!isSeasoningBlock(b.typeId))return;const bottles=readBottleStack(b);writeBottleStack(b,[]);b.setType('minecraft:air');if(!creative(p))for(const data of bottles)b.dimension.spawnItem(bottleItem(data),{x:loc.x+.5,y:loc.y+.4,z:loc.z+.5})})}
