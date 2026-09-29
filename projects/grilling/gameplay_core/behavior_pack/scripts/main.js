@@ -8,8 +8,10 @@ import {world,system,ItemStack} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';
 import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,canExtract,breakDisposition,outputKind} from './core_logic.js';
 import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
-import {mergeIntoContainer,compactSkewerContainer} from './a23_hot_runtime.js';
+import {mergeIntoContainer,compactSkewerContainer,compactHotFoodContainer} from './a23_hot_runtime.js';
 import './a23_oil_world.js';
+import './a288_parity_runtime.js';
+import {resolveSmokingResult} from './a288_parity_contract.js';
 import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw} from './a24_skewering_core.js';
 import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
@@ -203,13 +205,8 @@ function setSecretCreator(stack,player){
  try{const creator={name:player.name,id:player.id};stack.setDynamicProperty(SECRET_CREATOR_KEY,JSON.stringify(creator));const lore=stack.getLore();lore.push('§7製作者: '+player.name);stack.setLore(lore)}catch{}
  return stack;
 }
-const VANILLA_SMOKED=Object.freeze({
- 'minecraft:beef':'minecraft:cooked_beef','minecraft:porkchop':'minecraft:cooked_porkchop','minecraft:chicken':'minecraft:cooked_chicken',
- 'minecraft:mutton':'minecraft:cooked_mutton','minecraft:rabbit':'minecraft:cooked_rabbit','minecraft:cod':'minecraft:cooked_cod',
- 'minecraft:salmon':'minecraft:cooked_salmon','minecraft:potato':'minecraft:baked_potato','minecraft:kelp':'minecraft:dried_kelp'
-});
 function cookedIngredientRows(rows){
- return (rows??[]).map(row=>{const id=VANILLA_SMOKED[row.id];if(!id)return row;try{return ingredientSnapshot(new ItemStack(id,1))}catch{return row}});
+ return (rows??[]).map(row=>{const id=resolveSmokingResult(row.id);if(!id)return row;try{return ingredientSnapshot(new ItemStack(id,1))}catch{return row}});
 }
 function setCookedIngredientRows(stack,rows){try{stack.setDynamicProperty(SECRET_COOKED_INGREDIENTS_KEY,JSON.stringify(cookedIngredientRows(rows)))}catch{}return stack}
 function dynamicFood(stack){return stack?.typeId===SECRET_ID?secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack),readSkewerRows(stack)):FOOD_DATA[stack?.typeId]}
@@ -622,9 +619,9 @@ world.beforeEvents.itemUse.subscribe(e=>{
  try{
   const action=skewerAction(e.source,e.itemStack);
   if(action){e.cancel=true;scheduleSkewerAction(e.source,action);return}
-  if(e.source.isSneaking&&isHot(e.itemStack)&&!heldOff(e.source)&&dynamicFood(e.itemStack)){
+  if(e.source.isSneaking&&isHot(e.itemStack)&&!heldOff(e.source)&&isEdible(e.itemStack)){
    e.cancel=true;const p=e.source,intent=captureInteractionIntent(p,e.itemStack),id=e.itemStack.typeId;
-   system.run(()=>{if(interactionIntentStillCurrent(p,intent)){const c=mainContainer(p);if(c)compactSkewerContainer(c,true,undefined,id)}});
+   system.run(()=>{if(interactionIntentStillCurrent(p,intent)){const c=mainContainer(p);if(c)compactHotFoodContainer(c,undefined,id)}});
   }
  }catch{}
 });
