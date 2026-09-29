@@ -1,6 +1,6 @@
 """All held binding paths and pose dispatch. Does not simulate a Minecraft client."""
 from pathlib import Path
-import ast,json,re
+import ast,json,re,subprocess
 import a287_binding_repair as repair
 from verify_a285 import survival_gate
 from verify_a284 import eating_gate
@@ -98,5 +98,21 @@ def plant_gate():
    for vector in vectors:
     assert all(v==0 or isinstance(v,str) and v.endswith(' : 0.0') for v in vector),key
  print('A287 single-sided plant material instances:',count)
+def secret_compat_gate():
+ main=(BP/'scripts/main.js').read_text()
+ assert 'VANILLA_SMOKED' not in main
+ assert 'resolveSecretSmokedId(row)' in main
+ assert "emitSecretIngredientConsumed(player,row)" in main
+ runtime=(BP/'scripts/secret_compat_runtime.js').read_text()
+ for event in (
+  'kaleidoscope_grilling:register_secret_smoking',
+  'kaleidoscope_grilling:register_secret_food_behavior',
+  'kaleidoscope_grilling:register_secret_compat',
+  'kaleidoscope_grilling:secret_ingredient_consumed',
+ ):
+  assert event in runtime,event
+ subprocess.run(['node',str(Path(__file__).with_name('test_secret_compat_core.mjs'))],check=True)
+ print('A287 secret-skewer extensible smoking/finish-use compatibility: PASS')
+
 if __name__=='__main__':
- plant_gate();eating_gate();survival_gate();previous_gate()
+ plant_gate();secret_compat_gate();eating_gate();survival_gate();previous_gate()

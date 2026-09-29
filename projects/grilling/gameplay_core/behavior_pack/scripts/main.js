@@ -1,4 +1,6 @@
 import {rolledIngredientEffects} from './a285_ingredient_effects.js';
+import {resolveSecretSmokedId} from './secret_compat_core.js';
+import {emitSecretIngredientConsumed} from './secret_compat_runtime.js';
 import {EquipmentSlot} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,commitEating} from './a285_eating_transaction.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
@@ -171,16 +173,27 @@ function copyCustomData(from,to){
 function ingredientSnapshot(stack){
  let nutrition=0,saturation=0,convertTo='',edible=false;
  try{const food=stack.getComponent('minecraft:food');if(food){edible=true;nutrition=Number(food.nutrition)||0;saturation=Number(food.saturationModifier)||0;convertTo=String(food.usingConvertsTo??'')}}catch{}
+ let tags=[];try{tags=(stack.getTags?.()??[]).map(String).filter(x=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(x)).slice(0,64)}catch{}
  let lore=[];try{lore=stack.getLore()}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
  const props=primitiveStackProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
- return {id:stack.typeId,nutrition,saturation,convertTo,edible,name,lore,props,signature};
+ return {id:stack.typeId,nutrition,saturation,convertTo,edible,name,lore,props,tags,signature};
 }
 function restoreIngredient(row){
  let out;try{out=new ItemStack(row.id,1)}catch{return undefined}
  try{if(row.name)out.nameTag=row.name}catch{}
  const props=row.props&&typeof row.props==='object'?row.props:{},keys=Object.keys(props);
  try{if(Array.isArray(row.lore)&&row.lore.length)out.setLore(row.lore);else if(keys.length)out.setLore(['§r'])}catch{}
+ for(const id of keys)try{out.setDynamicProperty(id,props[id])}catch{}
+ return out;
+}
+function behaviorRemainder(behavior){
+ const spec=behavior?.remainder??(behavior?.convertTo?{id:behavior.convertTo,count:1}:undefined);
+ if(!spec?.id)return undefined;
+ let out;try{out=new ItemStack(spec.id,Math.max(1,Math.min(64,Number(spec.count)||1)))}catch{return undefined}
+ try{if(spec.name)out.nameTag=spec.name}catch{}
+ const props=spec.props&&typeof spec.props==='object'?spec.props:{},keys=Object.keys(props);
+ try{if(Array.isArray(spec.lore)&&spec.lore.length)out.setLore(spec.lore);else if(keys.length)out.setLore(['§r'])}catch{}
  for(const id of keys)try{out.setDynamicProperty(id,props[id])}catch{}
  return out;
 }
@@ -203,13 +216,8 @@ function setSecretCreator(stack,player){
  try{const creator={name:player.name,id:player.id};stack.setDynamicProperty(SECRET_CREATOR_KEY,JSON.stringify(creator));const lore=stack.getLore();lore.push('§7製作者: '+player.name);stack.setLore(lore)}catch{}
  return stack;
 }
-const VANILLA_SMOKED=Object.freeze({
- 'minecraft:beef':'minecraft:cooked_beef','minecraft:porkchop':'minecraft:cooked_porkchop','minecraft:chicken':'minecraft:cooked_chicken',
- 'minecraft:mutton':'minecraft:cooked_mutton','minecraft:rabbit':'minecraft:cooked_rabbit','minecraft:cod':'minecraft:cooked_cod',
- 'minecraft:salmon':'minecraft:cooked_salmon','minecraft:potato':'minecraft:baked_potato','minecraft:kelp':'minecraft:dried_kelp'
-});
 function cookedIngredientRows(rows){
- return (rows??[]).map(row=>{const id=VANILLA_SMOKED[row.id];if(!id)return row;try{return ingredientSnapshot(new ItemStack(id,1))}catch{return row}});
+ return (rows??[]).map(row=>{const id=resolveSecretSmokedId(row);if(!id)return row;try{return ingredientSnapshot(new ItemStack(id,1))}catch{return row}});
 }
 function setCookedIngredientRows(stack,rows){try{stack.setDynamicProperty(SECRET_COOKED_INGREDIENTS_KEY,JSON.stringify(cookedIngredientRows(rows)))}catch{}return stack}
 function dynamicFood(stack){return stack?.typeId===SECRET_ID?secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack),readSkewerRows(stack)):FOOD_DATA[stack?.typeId]}
@@ -271,7 +279,8 @@ function secretRemainders(player,stack){
    }catch{}
   }
   dangerousPreservation(player,row.id);
-  if(behavior.convertTo)try{give(player,new ItemStack(behavior.convertTo,1))}catch{}
+  const remainder=behaviorRemainder(behavior);if(remainder)give(player,remainder);
+  emitSecretIngredientConsumed(player,row);
  }
 }
 function addSecretNutrition(player,stack,meta){
