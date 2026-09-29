@@ -1,4 +1,4 @@
-import {world} from '@minecraft/server';
+import {system} from '@minecraft/server';
 import {applyParityRegistration} from './a288_parity_contract.js';
 
 function payload(message){try{const value=JSON.parse(String(message??''));return value&&typeof value==='object'?value:null}catch{return null}}
@@ -11,4 +11,4 @@ function receive(event){
   console.warn('[Grilling parity] rejected '+event.id+' registration');
 }
 // Optional chaining keeps pure/runtime test hosts that do not expose scriptEventReceive compatible.
-world.afterEvents.scriptEventReceive?.subscribe?.(receive);
+system.afterEvents.scriptEventReceive?.subscribe?.(receive);
