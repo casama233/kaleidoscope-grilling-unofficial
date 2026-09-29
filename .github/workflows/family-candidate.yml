@@ -1,9 +1,9 @@
 name: Family compatibility candidate checks
 on:
   push:
-    branches: ['fix/family-compat-batch1-20260929']
+    branches: ['fix/family-compat-batch2-20260929']
   pull_request:
-    paths: ['compat/family/**', 'tools/family_candidate.py', 'tools/check_family_knives.mjs', 'projects/grilling/gameplay_core/**', 'development/gameplay_core/**', '.github/workflows/family-candidate.yml']
+    paths: ['compat/family/**', 'tools/**', 'projects/grilling/gameplay_core/**', 'development/gameplay_core/**', '.github/workflows/family-candidate.yml']
 permissions:
   contents: read
 jobs:
@@ -19,18 +19,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check generators, actual source wiring and unchanged content
+      - name: Check stable storage, exact source wiring and unchanged content (no player mocks)
         run: |
           python tools/apply_family_profile.py
           git diff --exit-code -- projects/grilling/gameplay_core/
-          python tools/family_candidate.py --build
+          python tools/check_station_storage.py
           node tools/check_family_knives.mjs
+          python tools/family_candidate.py --build
           python - <<'PY'
           import hashlib
           from pathlib import Path
-          p=Path('dist/family/Kaleidoscope_Grilling_A2.8.8_compat1.mcaddon')
-          assert hashlib.sha256(p.read_bytes()).hexdigest()=='74eb694fe9168871d042e15ce529f9ce1164801072616a3831563e6077c22232'
+          p=Path('dist/family/Kaleidoscope_Grilling_A2.8.9_compat2.mcaddon')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='15ebdf47397c397fa9c39584f6fcbb57ca5be2ad4c16513d979c737d06c5952a'
           PY
+          git rev-parse HEAD > dist/family/SOURCE_COMMIT
       - uses: actions/upload-artifact@v4
         with:
           name: Grilling-family-compatibility-candidate

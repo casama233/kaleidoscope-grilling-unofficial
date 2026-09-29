@@ -29,7 +29,9 @@ concurrency:
 
 jobs:
   canonical:
-    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    # Family candidates use explicit static checks plus real zero-player BDS.
+    # Do not run this historical simulated-player verifier on those draft PRs.
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440' && !startsWith(github.head_ref, 'fix/family-compat-')
     runs-on: windows-latest
     timeout-minutes: 45
     env:
