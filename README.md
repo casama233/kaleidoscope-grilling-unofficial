@@ -1,4 +1,4 @@
-> **A2.8.5 生存修復**：[本批變更與驗證](docs/STATUS-A2.8.5.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。整體移植與客戶端验收尚未完成。
+> **A2.8.8 parity Batch 1**：[本批變更與邊界](docs/STATUS-A2.8.8.md)。秘製串跨包 smoking / finish-use 改為可註冊 parity contract，手動熱食合併擴至通用 food；仍不宣稱 Java 100% 等價。\n\n> **A2.8.5 生存修復**：[本批變更與驗證](docs/STATUS-A2.8.5.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。整體移植與客戶端验收尚未完成。
 
 > Current corrective build: **A2.8.4** — [eating pose repair and validation limits](docs/STATUS-A2.8.4.md). Java custom eating choreography and client visual acceptance remain pending.
 > A2.8.3 的提示與渲染修正仍包含於本版：[修正記錄](docs/STATUS-A2.8.3.md)。
@@ -11,7 +11,7 @@
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前 canonical runtime：A2.8.5。功能與 Java 的完整同步尚未完成；本版修復生存資料、食用結算與快捷操作。歷史版本的完成敘述不能取代目前的客戶端及多人驗收。**
+**目前 canonical runtime：A2.8.8（本 PR）。功能與 Java 的完整同步尚未完成；本批優先修秘製串跨包 parity contract 與通用熱食手動合併。歷史版本的完成敘述不能取代目前的客戶端及多人驗收。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
