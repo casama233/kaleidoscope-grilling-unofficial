@@ -21,3 +21,8 @@ for(const name of ['a279_beef_board_runtime.js','a2736_typed_oil_pot_block_runti
  assert.ok(!/kc_station:|kc_oilpot:/.test(text),name);
 }
 console.log('PASS: 10 pure knife/tag cases, actual call-site wiring, paired sources, no private station writes; no player or ItemStack mock.');
+
+const guard=fs.readFileSync('projects/grilling/gameplay_core/behavior_pack/scripts/a2736_typed_oil_pot_block_runtime.js','utf8');
+assert.ok(guard.includes('typedHand(e.itemStack)&&!localOilUse'));
+for(const id of ['grill','oil_press','big_vat'])assert.ok(guard.includes("'kaleidoscope_grilling:"+id+"'"));
+console.log('Owned oil-use stations are not blocked by the host-placement guard; client interactions not simulated.');

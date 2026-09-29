@@ -32,7 +32,11 @@ function typedBucket(stack){return [
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  // Untyped host pots pass through untouched, including the host's own filling.
  // Block placing a Grilling-typed host item anywhere until the host can own it.
- if(typedHand(e.itemStack)||legacyTypedPot(e.block)||(e.block?.typeId===HOST_BLOCK_ID&&typedBucket(e.itemStack))){
+ // Our own station routers always cancel native placement and own the hand
+ // transaction; do not break brushing/filling within Grilling while isolating
+ // only the unsupported transfer into Cookery's placed-block inventory.
+ const localOilUse=['kaleidoscope_grilling:grill','kaleidoscope_grilling:oil_press','kaleidoscope_grilling:big_vat'].includes(e.block?.typeId);
+ if((typedHand(e.itemStack)&&!localOilUse)||legacyTypedPot(e.block)||(e.block?.typeId===HOST_BLOCK_ID&&typedBucket(e.itemStack))){
   e.cancel=true;if(e.isFirstEvent!==false)notify(e.player);
  }
 });

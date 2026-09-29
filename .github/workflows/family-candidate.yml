@@ -1,0 +1,38 @@
+name: Family compatibility candidate checks
+on:
+  push:
+    branches: ['fix/family-compat-batch1-20260929']
+  pull_request:
+    paths: ['compat/family/**', 'tools/family_candidate.py', 'tools/check_family_knives.mjs', 'projects/grilling/gameplay_core/**', 'development/gameplay_core/**', '.github/workflows/family-candidate.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check generators, actual source wiring and unchanged content
+        run: |
+          python tools/apply_family_profile.py
+          git diff --exit-code -- projects/grilling/gameplay_core/
+          python tools/family_candidate.py --build
+          node tools/check_family_knives.mjs
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('dist/family/Kaleidoscope_Grilling_A2.8.8_compat1.mcaddon')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='74eb694fe9168871d042e15ce529f9ce1164801072616a3831563e6077c22232'
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Grilling-family-compatibility-candidate
+          path: dist/family/
+          retention-days: 14
