@@ -17,6 +17,9 @@ import {
  oilTypeFromHeld,planSeasoningUse,inventoryGains,metadataPlan,
  stateBeforeSeasoning,planPotOilTransition
 } from './a2750_cookery_cuisine_core.js';
+import {
+ COOKERY_OUTPUT_READY_EVENT,normalizeCookeryOutputRequest,authoritativeTargetMatches
+} from './cookery_output_contract_core.js';
 
 const message=interactionFeedback;
 function isFirst(event){return event.isFirstEvent!==false}
@@ -137,6 +140,44 @@ function finishHostInteraction(player,dimension,location,kind,beforeInventory,be
   else if(block?.typeId===COOKERY_STOCKPOT_ID)writeCuisineState(block,{...stateBefore,lastOutputTick:system.currentTick});
  }
 }
+function outputTarget(request){
+ const target=request.target;
+ if(target.kind==='player_slot'){
+  const player=world.getAllPlayers().find(p=>p.id===target.playerId);if(!player)return null;
+  const container=playerInventory(player);if(!container||target.slot>=container.size)return null;
+  return {container,slot:target.slot};
+ }
+ try{
+  const dimension=world.getDimension(target.dimensionId),block=dimension.getBlock({x:target.x,y:target.y,z:target.z});
+  const container=block?.getComponent('minecraft:inventory')?.container;
+  if(!container||target.slot>=container.size)return null;
+  return {container,slot:target.slot};
+ }catch{return null}
+}
+export function applyAuthoritativeCookeryOutput(request){
+ try{
+  const normalized=normalizeCookeryOutputRequest(request);if(!normalized)return false;
+  const dimension=world.getDimension(normalized.station.dimensionId);
+  const location={x:normalized.station.x,y:normalized.station.y,z:normalized.station.z};
+  const station=dimension.getBlock(location),kind=stationKind(station?.typeId);if(!kind)return false;
+  const target=outputTarget(normalized);if(!target)return false;
+  const current=target.container.getItem(target.slot);
+  if(!authoritativeTargetMatches(current,normalized.target)||!foodLike(current))return false;
+  const state=readCuisineState(station),plan=metadataPlan(kind,state),decorated=current.clone();
+  applyFoodMetadata(decorated,plan);target.container.setItem(target.slot,decorated);
+  if(kind==='pot')clearCuisineAt(dimension.id,location);
+  else writeCuisineState(station,{...state,lastOutputTick:system.currentTick});
+  return true;
+ }catch{return false}
+}
+system.afterEvents.scriptEventReceive.subscribe(event=>{
+ if(event.id!==COOKERY_OUTPUT_READY_EVENT)return;
+ try{
+  const request=normalizeCookeryOutputRequest(JSON.parse(String(event.message??'{}')));
+  if(!request)throw new Error('invalid authoritative output payload');
+  system.run(()=>{if(!applyAuthoritativeCookeryOutput(request))console.warn('[Grilling Cookery output] authoritative target was not decorated')});
+ }catch(error){console.warn('[Grilling Cookery output] '+error)}
+});
 world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  try{
   const kind=stationKind(event.block?.typeId);if(!kind)return;

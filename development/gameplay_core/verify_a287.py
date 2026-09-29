@@ -114,5 +114,15 @@ def secret_compat_gate():
  subprocess.run(['node',str(Path(__file__).with_name('test_secret_compat_core.mjs'))],check=True)
  print('A287 secret-skewer extensible smoking/finish-use compatibility: PASS')
 
+def parity_batch2_gate():
+ main=(BP/'scripts/main.js').read_text()
+ assert 'compactMatchingHotFood' in main and 'isFoodStack(e.itemStack)' in main
+ cuisine=(BP/'scripts/a2750_cookery_cuisine_runtime.js').read_text()
+ assert 'kaleidoscope_grilling:cookery_output_ready' not in cuisine  # event constant stays in the contract module
+ assert 'COOKERY_OUTPUT_READY_EVENT' in cuisine and 'applyAuthoritativeCookeryOutput' in cuisine
+ subprocess.run(['node','--experimental-vm-modules',str(Path(__file__).with_name('test_hot_food_manual_merge.mjs'))],check=True)
+ subprocess.run(['node',str(Path(__file__).with_name('test_cookery_output_contract_core.mjs'))],check=True)
+ print('A287 generic hot-food manual merge and authoritative Cookery output contract: PASS')
+
 if __name__=='__main__':
- plant_gate();secret_compat_gate();eating_gate();survival_gate();previous_gate()
+ plant_gate();secret_compat_gate();parity_batch2_gate();eating_gate();survival_gate();previous_gate()

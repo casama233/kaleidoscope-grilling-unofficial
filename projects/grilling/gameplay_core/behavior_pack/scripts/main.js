@@ -10,7 +10,7 @@ import {world,system,ItemStack} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';
 import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,canExtract,breakDisposition,outputKind} from './core_logic.js';
 import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
-import {mergeIntoContainer,compactSkewerContainer} from './a23_hot_runtime.js';
+import {mergeIntoContainer,compactSkewerContainer,compactMatchingHotFood,isFoodStack} from './a23_hot_runtime.js';
 import './a23_oil_world.js';
 import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw} from './a24_skewering_core.js';
 import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
@@ -631,9 +631,9 @@ world.beforeEvents.itemUse.subscribe(e=>{
  try{
   const action=skewerAction(e.source,e.itemStack);
   if(action){e.cancel=true;scheduleSkewerAction(e.source,action);return}
-  if(e.source.isSneaking&&isHot(e.itemStack)&&!heldOff(e.source)&&dynamicFood(e.itemStack)){
-   e.cancel=true;const p=e.source,intent=captureInteractionIntent(p,e.itemStack),id=e.itemStack.typeId;
-   system.run(()=>{if(interactionIntentStillCurrent(p,intent)){const c=mainContainer(p);if(c)compactSkewerContainer(c,true,undefined,id)}});
+  if(e.source.isSneaking&&isHot(e.itemStack)&&!heldOff(e.source)&&isFoodStack(e.itemStack)){
+   e.cancel=true;const p=e.source,intent=captureInteractionIntent(p,e.itemStack),sample=e.itemStack.clone();
+   system.run(()=>{if(interactionIntentStillCurrent(p,intent)){const c=mainContainer(p);if(c)compactMatchingHotFood(c,sample)}});
   }
  }catch{}
 });

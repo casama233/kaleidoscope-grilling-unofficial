@@ -21,6 +21,12 @@ function props(stack,includeHot=false){
  return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=stack.getDynamicProperty(k)}catch{}return [k,norm(v)]});
 }
 export function isSkewer(stack){return !!stack&&stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling')}
+export function isFoodStack(stack){
+ if(!stack)return false;
+ try{if(stack.getComponent?.('minecraft:food'))return true}catch{}
+ try{if(stack.hasTag?.('minecraft:is_food'))return true}catch{}
+ return isSkewer(stack);
+}
 export function mergeSignature(stack){return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),props:props(stack,false)})}
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
 export function hotUntil(stack){try{return Number(stack?.getDynamicProperty(HOT)??0)}catch{return 0}}
@@ -60,6 +66,23 @@ export function mergeIntoContainer(container,incoming,t=now()){
   if(!remaining)return undefined;
  }
  try{return container.addItem(remaining)}catch{return remaining}
+}
+export function compactMatchingHotFood(container,sample,t=now()){
+ if(!container||!sample||!isFoodStack(sample)||!isHot(sample,t))return {changed:false,count:0,stacks:0};
+ const signature=mergeSignature(sample),slots=[];let rep=null,totalCount=0,totalHeat=0;
+ for(let slot=0;slot<container.size;slot++){
+  const stack=container.getItem(slot);
+  if(!stack||!isFoodStack(stack)||!isHot(stack,t)||mergeSignature(stack)!==signature)continue;
+  slots.push(slot);if(!rep)rep=stack.clone();
+  totalCount+=stack.amount;totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
+ }
+ if(slots.length<2||!rep||totalCount<2)return {changed:false,count:totalCount,stacks:slots.length};
+ const avg=Math.floor(totalHeat/totalCount),out=[];let left=totalCount;
+ while(left>0){const stack=rep.clone(),count=Math.min(stack.maxAmount,left);stack.amount=count;setHot(stack,avg,t);out.push(stack);left-=count}
+ if(out.length>slots.length)return {changed:false,count:totalCount,stacks:slots.length};
+ for(const slot of slots)container.setItem(slot,undefined);
+ for(let i=0;i<out.length;i++)container.setItem(slots[i],out[i]);
+ return {changed:true,count:totalCount,stacks:out.length};
 }
 function normalCompatible(rep,stack,t){
  if(!sameForHeatMerge(rep,stack))return false;
