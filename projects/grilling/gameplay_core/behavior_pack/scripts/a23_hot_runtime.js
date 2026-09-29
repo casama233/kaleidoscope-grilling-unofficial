@@ -94,3 +94,32 @@ export function compactSkewerContainer(container,fullSort=false,t=now(),onlyType
  for(let i=0;i<out.length;i++){if(i<targets.length)container.setItem(targets[i],out[i]);}
  return {changed:true,groups:groups.length,stacks:out.length};
 }
+
+// Bedrock substitute for Java FoodState.mergeHot on a cursor/slot pair.
+// The stable UI API does not expose the inventory cursor, so a sneak-use action consolidates
+// every matching currently-hot stack of the selected type. Unlike refrigerator sorting this
+// has no five-minute window, matching FoodState.canMergeHot().
+export function compactHotFoodContainer(container,t=now(),onlyType=undefined){
+ const groups=[],slots=[];
+ for(let slot=0;slot<container.size;slot++){
+  const stack=container.getItem(slot);if(!stack||!isHot(stack,t)||(onlyType&&stack.typeId!==onlyType))continue;
+  slots.push(slot);
+  let group=groups.find(g=>sameForHeatMerge(g.rep,stack));
+  if(!group){group={rep:stack.clone(),count:0,totalHeat:0};groups.push(group)}
+  group.count+=stack.amount;group.totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
+ }
+ if(!groups.length)return {changed:false,groups:0,stacks:0};
+ for(const slot of slots)container.setItem(slot,undefined);
+ const out=[];
+ for(const g of groups){
+  const avg=g.count?Math.floor(g.totalHeat/g.count):0;let left=g.count;
+  while(left>0){const stack=g.rep.clone(),count=Math.min(stack.maxAmount,left);stack.amount=count;setHot(stack,avg,t);out.push(stack);left-=count}
+ }
+ const targets=[...slots];
+ while(targets.length<out.length){
+  let empty=-1;for(let i=0;i<container.size;i++){if(!container.getItem(i)&&!targets.includes(i)){empty=i;break}}
+  if(empty<0)break;targets.push(empty);
+ }
+ for(let i=0;i<out.length&&i<targets.length;i++)container.setItem(targets[i],out[i]);
+ return {changed:true,groups:groups.length,stacks:out.length};
+}
