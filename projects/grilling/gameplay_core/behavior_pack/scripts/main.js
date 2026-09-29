@@ -1,6 +1,10 @@
 import {rolledIngredientEffects} from './a285_ingredient_effects.js';
 import {resolveSecretSmokedId} from './secret_compat_core.js';
 import {emitSecretIngredientConsumed} from './secret_compat_runtime.js';
+import {
+ skewerIngredientDecision,customSkewerCookedId,isCompatRawSkewer
+} from './skewer_compat_core.js';
+import './skewer_compat_runtime.js';
 import {EquipmentSlot} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,commitEating} from './a285_eating_transaction.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
@@ -12,7 +16,7 @@ import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,
 import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
 import {mergeIntoContainer,compactSkewerContainer,compactMatchingHotFood,isFoodStack} from './a23_hot_runtime.js';
 import './a23_oil_world.js';
-import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw} from './a24_skewering_core.js';
+import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw,canAppendConfigured,isConfiguredIngredient} from './a24_skewering_core.js';
 import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
 import './a26_oil_machine_runtime.js';
@@ -226,7 +230,14 @@ function threadOutcome(player){
  const food=heldMain(player),off=heldOff(player);if(!food||!off||player.isSneaking)return null;
  if(off.typeId!=='minecraft:stick'&&off.typeId!==UNFINISHED_ID&&!(off.typeId===SECRET_ID&&!isSecretCooked(off)))return null;
  const rows=off.typeId==='minecraft:stick'?[]:readSkewerRows(off);
- return appendOutcome(rows,food.typeId,isEdible(food),false);
+ const configured=canAppendConfigured(rows,food.typeId)||isConfiguredIngredient(food.typeId);
+ let explicitAllow=false;
+ if(!configured){
+  const identity=ingredientSnapshot(food),decision=skewerIngredientDecision(identity);
+  if(decision==='deny')return null;
+  explicitAllow=decision==='allow';
+ }
+ return appendOutcome(rows,food.typeId,isEdible(food),explicitAllow);
 }
 function canDisassembleOff(player){const off=heldOff(player);return !!off&&isDisassemblableRaw(off.typeId,isSecretCooked(off))&&readSkewerRows(off).length>0}
 function threadCurrent(player){
@@ -298,7 +309,8 @@ function cookedStack(raw,state){
  if(raw.typeId===SECRET_ID){
   stack=copyOne(raw);setCookedIngredientRows(stack,readSkewerRows(raw));try{stack.setDynamicProperty(SECRET_COOKED_KEY,true)}catch{}
  }else{
-  const out=RAW_TO_COOKED[raw.typeId];if(!out)return new ItemStack(MYSTERIOUS_ID,1);
+  const out=customSkewerCookedId(ingredientSnapshot(raw))||RAW_TO_COOKED[raw.typeId];
+  if(!out)return new ItemStack(MYSTERIOUS_ID,1);
   stack=new ItemStack(out,1);copyCustomData(raw,stack);
  }
  setHot(stack,state.heatTicks);setSeasonings(stack,state.seasonings??[]);
@@ -413,7 +425,7 @@ function handleGrill(block,player,hand='main'){
    try{player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}
   }return;
  }
- if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||(id===SECRET_ID&&!isSecretCooked(held)&&readSkewerRows(held).length===3))){
+ if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||isCompatRawSkewer(ingredientSnapshot(held))||(id===SECRET_ID&&!isSecretCooked(held)&&readSkewerRows(held).length===3))){
   if(!state.lit){message(player,'§c需要先點火');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}
   const c=inv(block),slot=[0,1,2].find(i=>!c.getItem(i));if(slot===undefined)return;
   c.setItem(slot,copyOne(held));

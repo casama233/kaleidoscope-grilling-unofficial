@@ -124,5 +124,17 @@ def parity_batch2_gate():
  subprocess.run(['node',str(Path(__file__).with_name('test_cookery_output_contract_core.mjs'))],check=True)
  print('A287 generic hot-food manual merge and authoritative Cookery output contract: PASS')
 
+def parity_batch3_gate():
+ oil=(BP/'scripts/a23_oil_world.js').read_text()
+ assert 'MAX_SOURCES' not in oil and 'slice(0,MAX_SOURCES)' not in oil
+ assert 'getDynamicPropertyIds' in oil and 'FLOW_SOURCE_BUDGET' in oil and 'heightRange' in oil
+ main=(BP/'scripts/main.js').read_text()
+ assert 'skewerIngredientDecision' in main and 'customSkewerCookedId' in main and 'isCompatRawSkewer' in main
+ plate=(BP/'scripts/a25_plate_recipe_runtime.js').read_text()
+ assert 'RAW_SKEWER_TAG' in plate and 'GRILLED_SKEWER_TAG' in plate
+ subprocess.run(['node',str(Path(__file__).with_name('test_oil_source_registry_core.mjs'))],check=True)
+ subprocess.run(['node',str(Path(__file__).with_name('test_skewer_compat_core.mjs'))],check=True)
+ print('A287 per-source oil registry and declarative SkewerCompat parity: PASS')
+
 if __name__=='__main__':
- plant_gate();secret_compat_gate();parity_batch2_gate();eating_gate();survival_gate();previous_gate()
+ plant_gate();secret_compat_gate();parity_batch2_gate();parity_batch3_gate();eating_gate();survival_gate();previous_gate()

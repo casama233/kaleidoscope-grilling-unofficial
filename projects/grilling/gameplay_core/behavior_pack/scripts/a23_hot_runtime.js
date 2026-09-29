@@ -20,7 +20,11 @@ function props(stack,includeHot=false){
  let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
  return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=stack.getDynamicProperty(k)}catch{}return [k,norm(v)]});
 }
-export function isSkewer(stack){return !!stack&&stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling')}
+export function isSkewer(stack){
+ if(!stack)return false;
+ if(stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling'))return true;
+ try{return stack.hasTag?.('kaleidoscope_grilling:raw_skewers')||stack.hasTag?.('kaleidoscope_grilling:grilled_skewers')}catch{return false}
+}
 export function isFoodStack(stack){
  if(!stack)return false;
  try{if(stack.getComponent?.('minecraft:food'))return true}catch{}

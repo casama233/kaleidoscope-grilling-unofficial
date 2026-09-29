@@ -22,13 +22,13 @@
 | R14 | 烤架數量上限／區塊卸載丟登記 | A2.8.5 移至原生方塊 tick，保留原存檔狀態鍵 | 原生 BDS 300 烤架和完整程序重啟通過；玩家離區塊後回來待驗收 |
 | R15 | 多人同時烤串／滿背包／拆爐 | 既有交易與持久化檢查保留 | 尚需實際多人完成生存閉環；未冒稱通過 |
 | R16 | Cookery 非玩家／自動化輸出熱食 | parity batch 2 新增 `cookery_output_ready` 權威目標契約，可精確指定 player/container slot；舊玩家背包差量保留 fallback；並修正無 typed oil 的 Pot 取出仍有 60 秒煙火氣 | Cookery host／自動化端仍需送出權威事件；不以附近掉落物推測來源，因此尚不能稱零配接全自動 |
-| R17 | 三種油的原生流體等價 | 維持腳本流體 | Bedrock 可用 API 與 Java FluidType 不同；需分項驗證流動、裝桶、容器互動 |
+| R17 | 三種油的原生流體等價 | parity batch 3 將單一 registry 改成逐 source 持久化並自動遷移，移除 64 source 與固定 16 格下降上限；以 stable `getDynamicPropertyIds()` 恢復來源，流場 budget 提升至 512 | 仍是 scripted fluid simulation，不具 Java FluidType/capability；複雜地形與大量來源仍需實機效能／流動驗收 |
 | R18 | 花椒葉只踏上才刺 | A2.8.5 檢查生物實際碰撞範圍；原生 BDS 側面接觸損血通過 | 玩家、不同體型生物與減速感受；Java stuck-in-block 的垂直阻力仍不同 |
 | R19 | 植物生成／完整生存取得链 | 既有實作保留 | 新舊區塊自然生成、生長、村莊及要塞取得仍待遊戲驗收 |
 | R20 | 廚具架必須開表單才能取用 | A2.8.5 新增潛行點擊上五／下四槽快速取用 | 四個朝向、玩家與手機命中位置；Caps Lock 本身不可當跨平台操作 |
 | R21 | 玩家背包缺少通用熱食手動合併 | parity batch 2 將副手空＋潛行使用改為任意 `minecraft:food`／動態 skewer；按 Java merge signature 與數量加權熱度，不再限定烤串 | Bedrock 無 Java inventory CapsLock+slot-click Mixin，手勢仍屬平台替代；需玩家實機驗收 |
 | R22 | 指南三語／多人／簽譜手勢 | 同一本 Cookery 指南，76 條目三語檢查通過；加入新操作說明 | 客戶端 UI、多人隔離與配方扣料；合成格式簽譜仍與副手方案不同 |
-| R23 | Create／女僕／KubeJS／JEI／Jade | Java 可選前置沒有直接的 Bedrock 同名環境 | 平台／整合工作，不能藉新增相同名稱宣稱移植完成 |
+| R23 | Create／女僕／KubeJS／JEI／Jade／公共 API | parity batch 1–3 已補 Secret food/smoking contract 與 SkewerCompat item/tag + runtime registry，第三方可擴展可穿食材、禁止食材、raw/grilled tag、自訂 ID cooking | Create 機械流程、女僕 Task/Wireless IO、JEI/Jade UI 仍無 Bedrock 同名環境；公共 contract 不能冒充這些整合已完成 |
 
 ## 後續順序
 
