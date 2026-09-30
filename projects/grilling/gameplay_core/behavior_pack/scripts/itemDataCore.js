@@ -1,4 +1,5 @@
-import {world} from '@minecraft/server';
+let world;
+export function configureItemDataWorld(host){world=host;}
 // Stable Bedrock forbids ItemStack dynamic properties when maxAmount > 1.
 // Keep stackable item metadata in immutable, content-addressed world records.
 // A short formatting-only lore token travels with the item through vanilla

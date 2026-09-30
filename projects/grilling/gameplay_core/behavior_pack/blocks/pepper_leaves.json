@@ -61,7 +61,10 @@
       },
       "minecraft:light_dampening": 1,
       "minecraft:loot": "loot_tables/blocks/pepper_leaves_fallback.json",
-      "kaleidoscope_grilling:pepper_leaves_logic": {}
+      "kaleidoscope_grilling:pepper_leaves_logic": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     },
     "permutations": [
       {

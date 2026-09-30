@@ -1,3 +1,5 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+import {hasSolidTop} from './blockSupport.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
@@ -45,9 +47,9 @@ function give(player,stack){
  try{const rem=c.addItem(stack);if(rem)player.dimension.spawnItem(rem,player.location)}catch{player.dimension.spawnItem(stack,player.location)}
 }
 function primitiveProps(stack){
- const out={};let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
+ const out={};let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
  for(const id of ids)try{
-  const value=stack.getDynamicProperty(id);
+  const value=getItemProperty(stack,id);
   if(['string','number','boolean'].includes(typeof value))out[id]=value;
   else if(value&&typeof value==='object'&&Number.isFinite(value.x)&&Number.isFinite(value.y)&&Number.isFinite(value.z))out[id]={x:value.x,y:value.y,z:value.z};
  }catch{}
@@ -55,7 +57,7 @@ function primitiveProps(stack){
 }
 function parseRowsProperty(stack,key,limit=5){
  try{
-  const raw=stack?.getDynamicProperty(key);if(typeof raw!=='string')return [];
+  const raw=getItemProperty(stack,key);if(typeof raw!=='string')return [];
   const rows=JSON.parse(raw);return Array.isArray(rows)?rows.filter(x=>x&&typeof x.id==='string').slice(0,limit):[];
  }catch{return []}
 }
@@ -63,22 +65,22 @@ function skewerFood(stack){
  if(!stack)return {nutrition:0,saturation:0};
  if(stack.typeId===SECRET_ID){
   const rows=parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3);
-  let cooked=false;try{cooked=stack.getDynamicProperty(SECRET_COOKED_KEY)===true}catch{}
+  let cooked=false;try{cooked=getItemProperty(stack,SECRET_COOKED_KEY)===true}catch{}
   return secretFood(rows,cooked);
  }
  try{const food=stack.getComponent('minecraft:food');return {nutrition:Math.max(0,Number(food?.nutrition)||0),saturation:Math.max(0,Number(food?.saturationModifier)||0)}}catch{return {nutrition:0,saturation:0}}
 }
 function stackRow(stack){
  const food=skewerFood(stack),props=primitiveProps(stack);let lore=[],name='';
- try{lore=stack.getLore()}catch{}try{name=stack.nameTag??''}catch{}
+ try{lore=getItemLore(stack)}catch{}try{name=stack.nameTag??''}catch{}
  return {id:stack.typeId,name,lore,props,nutrition:food.nutrition,saturation:food.saturation};
 }
 function restoreStack(row){
  if(!row||typeof row.id!=='string')return undefined;let out;try{out=new ItemStack(row.id,1)}catch{return undefined}
  try{if(row.name)out.nameTag=row.name}catch{}
  const props=row.props&&typeof row.props==='object'?row.props:{},keys=Object.keys(props);
- try{if(Array.isArray(row.lore)&&row.lore.length)out.setLore(row.lore);else if(keys.length)out.setLore(['§r'])}catch{}
- for(const id of keys)try{out.setDynamicProperty(id,props[id])}catch{}
+ try{if(Array.isArray(row.lore)&&row.lore.length)setItemLore(out,row.lore);else if(keys.length)setItemLore(out,['§r'])}catch{}
+ for(const id of keys)try{setItemProperty(out,id,props[id])}catch{}
  return out;
 }
 function isSkewer(stack){return !!stack&&(FIXED_IDS.has(stack.typeId)||stack.typeId===SECRET_ID)}
@@ -91,9 +93,9 @@ function plateRowsFromItem(stack){return normalizePlateRows(parseRowsProperty(st
 function plateItem(rows,template){
  const clean=normalizePlateRows(rows);let out;
  try{out=template?.typeId===PLATE_ID?cloneOne(template):new ItemStack(PLATE_ID,1)}catch{return undefined}
- let lore=[];try{lore=out.getLore().filter(x=>!String(x).startsWith('§7Skewers:'))}catch{}
+ let lore=[];try{lore=getItemLore(out).filter(x=>!String(x).startsWith('§7Skewers:'))}catch{}
  lore.push('§7Skewers: '+clean.length+'/'+PLATE_CAPACITY);
- try{out.setLore(lore);out.setDynamicProperty(PLATE_SKEWERS_KEY,JSON.stringify(clean))}catch{}
+ try{setItemLore(out,lore);setItemProperty(out,PLATE_SKEWERS_KEY,JSON.stringify(clean))}catch{}
  return out;
 }
 function readPlateBlock(block){
@@ -108,7 +110,7 @@ function writePlateBlock(block,rows){
 function clearPlateBlock(block){world.setDynamicProperty(posKey(PLATE_PREFIX,block))}
 function readBookRecord(book){
  try{
-  const raw=book?.getDynamicProperty(BOOK_RECORD_KEY);if(typeof raw!=='string')return null;
+  const raw=getItemProperty(book,BOOK_RECORD_KEY);if(typeof raw!=='string')return null;
   const record=JSON.parse(raw);
   return record&&typeof record.resultId==='string'?record:null;
  }catch{return null}
@@ -116,9 +118,9 @@ function readBookRecord(book){
 function bookItem(record,recordedStack,template){
  let out;try{out=template?.typeId===BOOK_ID?cloneOne(template):new ItemStack(BOOK_ID,1)}catch{return undefined}
  const value=record?{...record,recordedStack:recordedStack??record.recordedStack??null}:null;
- let lore=[];try{lore=out.getLore().filter(x=>!String(x).startsWith('§7Recipe:'))}catch{}
+ let lore=[];try{lore=getItemLore(out).filter(x=>!String(x).startsWith('§7Recipe:'))}catch{}
  lore.push(value?'§7Recipe: '+value.resultId:'§7Recipe: <empty>');
- try{out.setLore(lore);out.setDynamicProperty(BOOK_RECORD_KEY,value?JSON.stringify(value):undefined)}catch{}
+ try{setItemLore(out,lore);setItemProperty(out,BOOK_RECORD_KEY,value?JSON.stringify(value):undefined)}catch{}
  return out;
 }
 function readRecipeBlock(block){
@@ -138,7 +140,7 @@ function setFacing(block,face){
 }
 function placePlateOn(support,face,player,source,hand='main'){
  if(faceName(face)!=='up'||!player.isSneaking)return false;
- if(support.typeId!==COOKERY_TABLE&&!(support.isSolid??false))return false;
+ if(support.typeId!==COOKERY_TABLE&&!hasSolidTop(support))return false;
  const target=blockAtOffset(support,{x:0,y:1,z:0});if(!isAirReplaceable(target))return false;
  let rows=[];
  if(source?.typeId===PLATE_ID)rows=plateRowsFromItem(source);
@@ -193,8 +195,8 @@ function craftFromBook(player,book,stickHand='off'){
  if(record.resultId===SECRET_ID&&record.recordedStack){
   output=restoreStack(record.recordedStack);
   if(output){
-   try{output.setDynamicProperty(SECRET_COOKED_KEY,false);output.setDynamicProperty(SECRET_CREATOR_KEY,player.name)}catch{}
-   try{const lore=output.getLore().filter(x=>!String(x).startsWith('§7製作者:'));lore.push('§7製作者: '+player.name);output.setLore(lore)}catch{}
+   try{setItemProperty(output,SECRET_COOKED_KEY,false);setItemProperty(output,SECRET_CREATOR_KEY,player.name)}catch{}
+   try{const lore=getItemLore(output).filter(x=>!String(x).startsWith('§7製作者:'));lore.push('§7製作者: '+player.name);setItemLore(output,lore)}catch{}
   }
  }else try{output=new ItemStack(record.resultId,1)}catch{}
  if(!output)return false;give(player,output);
@@ -288,7 +290,7 @@ function recipeSupport(block){
  }catch{return undefined}
 }
 function detachUnsupportedRecipe(block){
- if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const support=recipeSupport(block);if(support?.isSolid)return;
+ if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const support=recipeSupport(block);if(hasSolidTop(support))return;
  const row=readRecipeBlock(block),book=restoreStack(row),dim=block.dimension,loc={x:block.x+.5,y:block.y+.5,z:block.z+.5};
  clearRecipeBlock(block);block.setType('minecraft:air');if(book)dim.spawnItem(book,loc);
 }

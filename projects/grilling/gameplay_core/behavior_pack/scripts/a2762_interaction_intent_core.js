@@ -1,9 +1,10 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemDataCore.js';
 import {chooseInteractionHand,makeIntent,intentMatches} from './a276_grill_intent_core.js';
 
 export function primitiveStackProps(stack){
- const out={};let ids=[];try{ids=stack?.getDynamicPropertyIds?.()??[]}catch{}
+ const out={};let ids=[];try{ids=getItemPropertyIds(stack)??[]}catch{}
  for(const id of ids)try{
-  const value=stack.getDynamicProperty(id);
+  const value=getItemProperty(stack,id);
   if(['string','number','boolean'].includes(typeof value))out[id]=value;
   else if(value&&typeof value==='object'&&Number.isFinite(value.x)&&Number.isFinite(value.y)&&Number.isFinite(value.z))out[id]={x:value.x,y:value.y,z:value.z};
  }catch{}
@@ -13,7 +14,7 @@ export function primitiveStackProps(stack){
 export function stackIntentSignature(stack){
  if(!stack)return null;
  const raw=primitiveStackProps(stack),props=Object.fromEntries(Object.keys(raw).sort().map(k=>[k,raw[k]]));
- let lore=[];try{lore=stack.getLore()}catch{}
+ let lore=[];try{lore=getItemLore(stack)}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
  let damage=null;try{damage=Number(stack.getComponent('minecraft:durability')?.damage??0)}catch{}
  return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props,damage});

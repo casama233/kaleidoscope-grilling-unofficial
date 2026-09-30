@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {world,system} from '@minecraft/server';
 import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {readRawFoodLore,isHeatLore,applyFoodMaxim} from './a2769_food_tooltip_core.js';
@@ -8,7 +9,7 @@ function now(){try{return Number(world.getAbsoluteTime())||system.currentTick}ca
 function bucketHot(until){return until-(((until%100)+100)%100)}
 export function readFoodSeasonings(stack){
  try{
-  const raw=stack?.getDynamicProperty(SEASONING_LIST_KEY);
+  const raw=getItemProperty(stack,SEASONING_LIST_KEY);
   return typeof raw==='string'?normalizeSeasoningList(JSON.parse(raw)):[];
  }catch{return []}
 }
@@ -16,11 +17,11 @@ export function setFoodSeasonings(stack,list){
  if(!stack)return stack;
  try{
   const values=normalizeSeasoningList(list);
-  stack.setDynamicProperty(SEASONING_LIST_KEY,values.length?JSON.stringify(values):undefined);
+  setItemProperty(stack,SEASONING_LIST_KEY,values.length?JSON.stringify(values):undefined);
  }catch{}
  return stack;
 }
-export function hotUntil(stack){try{return Number(stack?.getDynamicProperty(HOT_UNTIL_KEY)??0)}catch{return 0}}
+export function hotUntil(stack){try{return Number(getItemProperty(stack,HOT_UNTIL_KEY)??0)}catch{return 0}}
 export function isHotFood(stack){return hotUntil(stack)>now()}
 export function refreshHotLore(stack){
  if(!stack)return stack;
@@ -29,11 +30,11 @@ export function refreshHotLore(stack){
   const base=readRawFoodLore(stack).filter(line=>!isHeatLore(line));
   if(until<=0)return stack;
   const left=Math.max(0,until-now());
-  if(left<=0){stack.setDynamicProperty(HOT_UNTIL_KEY,undefined);stack.setLore(base);return stack}
+  if(left<=0){setItemProperty(stack,HOT_UNTIL_KEY,undefined);setItemLore(stack,base);return stack}
   const sec=Math.max(1,Math.ceil(left/20)),m=Math.floor(sec/60),ss=String(sec%60).padStart(2,'0');
   // A full custom lore is not permission to discard a user's line.
   if(base.length>=20)return stack;
-  base.push('§c🔥 煙火氣 '+m+':'+ss);stack.setLore(base);
+  base.push('§c🔥 煙火氣 '+m+':'+ss);setItemLore(stack,base);
  }catch{}
  return stack;
 }
@@ -45,8 +46,8 @@ export function setHotFood(stack,ticks){
   const lore=readRawFoodLore(stack).filter(line=>!isHeatLore(line));
   if(lore.length>=20)return stack;
   lore.push('§c🔥 煙火氣 '+m+':'+ss);
-  stack.setLore(lore);
-  stack.setDynamicProperty(HOT_UNTIL_KEY,until);
+  setItemLore(stack,lore);
+  setItemProperty(stack,HOT_UNTIL_KEY,until);
  }catch{}
  return stack;
 }

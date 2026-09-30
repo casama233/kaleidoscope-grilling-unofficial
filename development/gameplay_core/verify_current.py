@@ -20,8 +20,8 @@ EXPECTED = {
     "bp_script_uuid": "d0bb6818-8187-5d20-8e1f-a2ab7b517795",
     "rp_header_uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
     "rp_module_uuid": "e7d592db-f4a0-53ce-8b0a-cab7a0cee8d7",
-    "cookery_bp_uuid": "10f37ae2-9ccf-435f-b34b-0eec8191cd94",
-    "cookery_rp_uuid": "c89dc8df-c3fc-4bc8-8bd0-527abba76681",
+    "cookery_bp_uuid": "d322809c-a51e-4742-bfc4-16d3c1491c9d",
+    "cookery_rp_uuid": "8e2c6318-2f5f-4907-aad0-31d10610e405",
 }
 
 VERIFIERS = {
@@ -44,6 +44,8 @@ VERIFIERS = {
     (2, 8, 5): "verify_a285.py",
     (2, 8, 6): "verify_a286.py",
     (2, 8, 7): "verify_a287.py",
+    (2, 8, 10): "verify_a2810.py",
+    (2, 8, 11): "verify_a2811.py",
 }
 
 
@@ -104,8 +106,8 @@ def generic_gate() -> tuple[int, int, int, int]:
     assert tuple(rp_dep["version"]) == rp_version
     cookery_bp = dependency_by_uuid(bp, EXPECTED["cookery_bp_uuid"])
     cookery_rp = dependency_by_uuid(rp, EXPECTED["cookery_rp_uuid"])
-    assert tuple(cookery_bp["version"]) == (1, 0, 6)
-    assert tuple(cookery_rp["version"]) == (1, 0, 6)
+    assert tuple(cookery_bp["version"]) == (1, 0, 8)
+    assert tuple(cookery_rp["version"]) == (1, 0, 8)
 
     entry = BP / script_module["entry"]
     assert entry.is_file(), entry

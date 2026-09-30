@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
@@ -92,9 +93,9 @@ function clearVat(block){world.setDynamicProperty(key(VAT_PREFIX,block))}
 
 function vatPacked(stack){
  let type='',buckets=0;
- try{type=String(stack?.getDynamicProperty(VAT_ITEM_TYPE)??'');buckets=Number(stack?.getDynamicProperty(VAT_ITEM_BUCKETS)??0)|0}catch{}
+ try{type=String(getItemProperty(stack,VAT_ITEM_TYPE)??'');buckets=Number(getItemProperty(stack,VAT_ITEM_BUCKETS)??0)|0}catch{}
  if(!type||buckets<=0)try{
-  for(const line of stack?.getLore?.()??[]){const m=String(line).match(/^§7Fluid: ([a-z_]+) (\d+)\/8$/);if(m){type=m[1];buckets=Number(m[2]);break}}
+  for(const line of getItemLore(stack)??[]){const m=String(line).match(/^§7Fluid: ([a-z_]+) (\d+)\/8$/);if(m){type=m[1];buckets=Number(m[2]);break}}
  }catch{}
  return normalizeVat({type,buckets});
 }
@@ -102,8 +103,8 @@ function vatItem(v){
  const state=normalizeVat(v);let out;try{out=new ItemStack(BIG_VAT_ID,1)}catch{return undefined}
  try{
   const lore=state.buckets?['§7Fluid: '+state.type+' '+state.buckets+'/'+VAT_CAPACITY_BUCKETS]:[];
-  if(lore.length)out.setLore(lore);
-  out.setDynamicProperty(VAT_ITEM_TYPE,state.type||undefined);out.setDynamicProperty(VAT_ITEM_BUCKETS,state.buckets||undefined);
+  if(lore.length)setItemLore(out,lore);
+  setItemProperty(out,VAT_ITEM_TYPE,state.type||undefined);setItemProperty(out,VAT_ITEM_BUCKETS,state.buckets||undefined);
  }catch{}
  return out;
 }

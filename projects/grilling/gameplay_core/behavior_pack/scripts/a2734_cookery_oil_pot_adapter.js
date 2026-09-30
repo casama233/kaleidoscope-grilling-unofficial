@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {ItemStack} from '@minecraft/server';
 import {
  COOKERY_EMPTY_ID,COOKERY_FILLED_ID,HOST_COUNT_KEY,GRILLING_TYPE_KEY,
@@ -6,7 +7,7 @@ import {
 
 export {COOKERY_EMPTY_ID,COOKERY_FILLED_ID,HOST_COUNT_KEY,GRILLING_TYPE_KEY};
 function dynamic(stack,key){
- try{return {ok:true,value:stack?.getDynamicProperty(key)}}catch{return {ok:false,value:undefined}}
+ try{return {ok:true,value:getItemProperty(stack,key)}}catch{return {ok:false,value:undefined}}
 }
 export function readCookeryOilPot(stack,{legacyPlacementFallback=false}={}){
  const filled=stack?.typeId===COOKERY_FILLED_ID,empty=stack?.typeId===COOKERY_EMPTY_ID;
@@ -35,9 +36,9 @@ export function buildCookeryOilPot(type,count,template=undefined){
   if(lore.length>=20)return undefined;
   lore.push('§7Oil: '+normalizedCount+'/'+cap);
   // Customize first, then persist. Never return an item with only half its oil payload.
-  out.setLore(lore);
-  out.setDynamicProperty(HOST_COUNT_KEY,normalizedCount);
-  out.setDynamicProperty(GRILLING_TYPE_KEY,normalizedType||undefined);
+  setItemLore(out,lore);
+  setItemProperty(out,HOST_COUNT_KEY,normalizedCount);
+  setItemProperty(out,GRILLING_TYPE_KEY,normalizedType||undefined);
   const result=readCookeryOilPot(out);
   if(!result.valid||result.type!==normalizedType||result.count!==normalizedCount)return undefined;
   return out;

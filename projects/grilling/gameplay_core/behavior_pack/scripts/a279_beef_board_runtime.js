@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {world,system,GameMode,EquipmentSlot} from '@minecraft/server';
 import {
  BOARD_ID,BEEF_ID,BEEF_CHUNKS_ID,
@@ -21,9 +22,9 @@ function readState(block){return parseState(rawState(block))}
 function mainSlot(player){try{return player.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Mainhand)}catch{return undefined}}
 function heldMain(player){const s=mainSlot(player);try{return s?.hasItem()?s.getItem():undefined}catch{return undefined}}
 function primitiveProps(stack){
- const out={};let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
+ const out={};let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
  for(const id of ids.sort())try{
-  const v=stack.getDynamicProperty(id);
+  const v=getItemProperty(stack,id);
   if(['string','number','boolean'].includes(typeof v))out[id]=v;
   else if(v&&typeof v==='object'&&Number.isFinite(v.x)&&Number.isFinite(v.y)&&Number.isFinite(v.z))out[id]={x:v.x,y:v.y,z:v.z};
  }catch{}
@@ -31,7 +32,7 @@ function primitiveProps(stack){
 }
 function signature(stack){
  if(!stack)return null;
- let lore=[];try{lore=stack.getLore()}catch{}
+ let lore=[];try{lore=getItemLore(stack)}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
  return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props:primitiveProps(stack)});
 }

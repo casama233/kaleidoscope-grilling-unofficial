@@ -53,7 +53,10 @@
         ],
         "looping": false
       },
-      "kaleidoscope_grilling:pepper_worldgen_fruiting_bridge": {}
+      "kaleidoscope_grilling:pepper_worldgen_fruiting_bridge": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     }
   }
 }

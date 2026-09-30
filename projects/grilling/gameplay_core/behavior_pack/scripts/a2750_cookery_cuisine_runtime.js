@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID} from './data.js';
@@ -40,9 +41,9 @@ function hostHasOil(block){
  try{return block?.permutation?.getState('kaleidoscope_cookery:has_oil')===true}catch{return false}
 }
 function primitiveProps(stack){
- const out={};let ids=[];try{ids=stack?.getDynamicPropertyIds()??[]}catch{}
+ const out={};let ids=[];try{ids=getItemPropertyIds(stack)??[]}catch{}
  for(const id of ids)try{
-  const value=stack.getDynamicProperty(id);
+  const value=getItemProperty(stack,id);
   if(['string','number','boolean'].includes(typeof value))out[id]=value;
   else if(value&&typeof value==='object'&&Number.isFinite(value.x)&&Number.isFinite(value.y)&&Number.isFinite(value.z))
    out[id]={x:value.x,y:value.y,z:value.z};
@@ -51,7 +52,7 @@ function primitiveProps(stack){
 }
 function descriptor(stack){
  if(!stack)return null;let lore=[],name='',damage=null;
- try{lore=stack.getLore()}catch{}try{name=stack.nameTag??''}catch{}
+ try{lore=getItemLore(stack)}catch{}try{name=stack.nameTag??''}catch{}
  try{damage=Number(stack.getComponent('minecraft:durability')?.damage??0)}catch{}
  return {id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props:primitiveProps(stack),damage};
 }
@@ -84,10 +85,10 @@ function typedHeldOil(stack){
  return oilTypeFromHeld(stack.typeId,'');
 }
 function readUses(stack){
- try{return Math.max(0,Math.min(SEASONING_MAX_USES,Number(stack?.getDynamicProperty(SEASONING_USES_KEY)??0)|0))}catch{return 0}
+ try{return Math.max(0,Math.min(SEASONING_MAX_USES,Number(getItemProperty(stack,SEASONING_USES_KEY)??0)|0))}catch{return 0}
 }
 function setUses(stack,n){
- try{stack.setDynamicProperty(SEASONING_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack;
+ try{setItemProperty(stack,SEASONING_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack;
 }
 function applySeasoning(player,block){
  const held=getMainHand(player);if(!isSpecialSeasoningId(held?.typeId))return false;
@@ -103,7 +104,7 @@ function applySeasoning(player,block){
   if(!next){message(player,'§c調料外觀狀態同步失敗，操作已取消');return true}
   if(!plan.replaceEmpty)try{
    const lore=next.getRawLore().filter(x=>typeof x!=='string'||!x.startsWith('§7Uses:'));
-   lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);next.setLore(lore);
+   lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);setItemLore(next,lore);
   }catch{message(player,'§c調料資料準備失敗，操作已取消');return true}
  }
  const key=cuisineStateKey(block),beforeRaw=world.getDynamicProperty(key);

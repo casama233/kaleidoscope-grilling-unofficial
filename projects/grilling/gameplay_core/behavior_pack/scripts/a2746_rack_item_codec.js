@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {ItemStack,ItemComponentTypes,EnchantmentType} from '@minecraft/server';
 import {RACK_COMPARTMENTS,RACK_PAYLOAD_KEY,normalizeRackFilters} from './a2746_advanced_rack_core.js';
 
@@ -14,8 +15,8 @@ export function encodeRackStack(stack){
  if(!stack)return null;
  const dynamic={};
  try{
-  for(const id of stack.getDynamicPropertyIds()){
-   const encoded=encodeDynamic(stack.getDynamicProperty(id));
+  for(const id of getItemPropertyIds(stack)){
+   const encoded=encodeDynamic(getItemProperty(stack,id));
    if(encoded)dynamic[id]=encoded;
   }
  }catch{}
@@ -27,7 +28,7 @@ export function encodeRackStack(stack){
    .map(x=>({id:x.type.id,level:x.level}));
  }catch{}
  let rawLore=[];
- try{rawLore=stack.getRawLore()}catch{try{rawLore=stack.getLore()}catch{}}
+ try{rawLore=stack.getRawLore()}catch{try{rawLore=getItemLore(stack)}catch{}}
  let canDestroy=[],canPlaceOn=[];
  try{canDestroy=stack.getCanDestroy()}catch{}
  try{canPlaceOn=stack.getCanPlaceOn()}catch{}
@@ -42,9 +43,9 @@ export function decodeRackStack(row){
  let stack;
  try{stack=new ItemStack(row.typeId,Math.max(1,Math.floor(Number(row.amount)||1)))}catch{return undefined}
  try{if(typeof row.nameTag==='string'&&row.nameTag)stack.nameTag=row.nameTag}catch{}
- try{if(Array.isArray(row.rawLore)&&row.rawLore.length)stack.setLore(row.rawLore)}catch{}
+ try{if(Array.isArray(row.rawLore)&&row.rawLore.length)setItemLore(stack,row.rawLore)}catch{}
  try{
-  for(const [id,encoded] of Object.entries(row.dynamic??{}))stack.setDynamicProperty(id,decodeDynamic(encoded));
+  for(const [id,encoded] of Object.entries(row.dynamic??{}))setItemProperty(stack,id,decodeDynamic(encoded));
  }catch{}
  try{
   const durability=stack.getComponent(ItemComponentTypes.Durability);
@@ -78,19 +79,19 @@ export function decodeRackPayload(raw){
 }
 
 export function readRackPayloadItem(stack){
- try{return decodeRackPayload(stack?.getDynamicProperty(RACK_PAYLOAD_KEY))}catch{return decodeRackPayload(undefined)}
+ try{return decodeRackPayload(getItemProperty(stack,RACK_PAYLOAD_KEY))}catch{return decodeRackPayload(undefined)}
 }
 
 export function writeRackPayloadItem(stack,items,filters){
  if(!stack)return stack;
- try{stack.setDynamicProperty(RACK_PAYLOAD_KEY,encodeRackPayload(items,filters))}catch{}
+ try{setItemProperty(stack,RACK_PAYLOAD_KEY,encodeRackPayload(items,filters))}catch{}
  try{
   const lore=[{translate:'tooltip.kaleidoscope_grilling.advanced_rack.saved_contents'}];
   for(let i=0;i<RACK_COMPARTMENTS&&lore.length<10;i++){
    const item=items?.[i];if(!item)continue;
    lore.push({rawtext:[{text:'§8- '+(i+1)+': §7'},{translate:item.localizationKey},{text:' ×'+item.amount}]});
   }
-  stack.setLore(lore);
+  setItemLore(stack,lore);
  }catch{}
  return stack;
 }

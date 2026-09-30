@@ -259,7 +259,10 @@
         ]
       },
       "minecraft:loot": "loot_tables/blocks/sweet_potato_crop.json",
-      "kaleidoscope_grilling:sweet_potato_crop_logic": {}
+      "kaleidoscope_grilling:sweet_potato_crop_logic": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     }
   }
 }
