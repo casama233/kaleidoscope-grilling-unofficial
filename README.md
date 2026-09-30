@@ -1,17 +1,10 @@
-> **A2.8.5 生存修復**：[本批變更與驗證](docs/STATUS-A2.8.5.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。整體移植與客戶端验收尚未完成。
-
-> Current corrective build: **A2.8.4** — [eating pose repair and validation limits](docs/STATUS-A2.8.4.md). Java custom eating choreography and client visual acceptance remain pending.
-> A2.8.3 的提示與渲染修正仍包含於本版：[修正記錄](docs/STATUS-A2.8.3.md)。
-
-> 最新修正：A2.8.1 — 大缸使用原生方塊物品渲染；調料瓶 UI 圖示修正。見 docs/STATUS-A2.8.1.md。
-
-> **目前整合測試版：A2.8.0**。指南、最新共享創造欄、Java 手持姿態與放置外觀已整合；安裝完整煙火，不需另裝指南 addon。詳見 `docs/STATUS-A2.8.0.md`，實機驗收尚待完成。
+> 本分支修正版：**A2.8.10** — [結算與伺服器打包修復](docs/STATUS-A2.8.10.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。main 基線仍為 A2.8.7；整體移植及客戶端驗收尚未完成。
 
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**目前 canonical runtime：A2.8.5。功能與 Java 的完整同步尚未完成；本版修復生存資料、食用結算與快捷操作。歷史版本的完成敘述不能取代目前的客戶端及多人驗收。**
+**本分支 canonical runtime：A2.8.10。保留 A2.8.7 綁定／植物材質修復，補上餐盤、搖勻瓶及伺服器指南衝突修復。功能與 Java 的完整同步尚未完成。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 

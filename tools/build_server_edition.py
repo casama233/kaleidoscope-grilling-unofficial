@@ -14,7 +14,7 @@ Deltas over the upstream artifact (see docs/STATUS-A2.7.14-SERVER.md):
   7. Add the unlock data that 1.20+ crafting recipes require.
   8. a26 big-vat placement: defer the ItemStack::amount write out of the
      beforeEvents handler (restricted execution; the throw was swallowed).
-  9. Install the Cookery guidebook extension (guide.js + publisher.js).
+  9. Preserve the canonical, single Cookery guide publisher and three languages.
 
 Usage:  python tools/build_server_edition.py [--artifact PATH] [--version X.Y.Z] [OUT_DIR]
 """
@@ -24,7 +24,6 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 SHIMS = HERE / 'server-edition'
-PUBLISHER = SHIMS / 'publisher.js'
 KC_BP, KC_RP = '403f7a4a-a837-42c8-b5d3-76d5079ef269', '8f39983b-00a6-4818-b489-0a73daf3bc87'
 UP_BP, UP_RP = '10f37ae2-9ccf-435f-b34b-0eec8191cd94', 'c89dc8df-c3fc-4bc8-8bd0-527abba76681'
 
@@ -73,13 +72,22 @@ SOLID_IMPORT = "import {hasSolidTop} from './blockSupport.js';\n"
 sub(bp / 'manifest.json', [(f'"{UP_BP}"', f'"{KC_BP}"', 1)], 'bp-manifest')
 sub(rp / 'manifest.json', [(f'"{UP_RP}"', f'"{KC_RP}"', 1)], 'rp-manifest')
 
+pack_version = [int(v) for v in version.split('.')]
+assert len(pack_version) == 3 and all(v >= 0 for v in pack_version), version
+for side in (bp, rp):
+    manifest = json.loads((side / 'manifest.json').read_text())
+    manifest['header']['version'] = pack_version
+    manifest['header']['name'] = f'Kaleidoscope Grilling A{version} Server Edition ' + ('BP' if side == bp else 'RP')
+    manifest['header']['description'] = manifest['header']['description'].replace('Cookery 1.0.6', 'Cookery 1.0.7')
+    for module in manifest['modules']: module['version'] = pack_version
+    for dep in manifest.get('dependencies', []):
+        if dep.get('uuid') in (KC_BP, KC_RP): dep['version'] = [1, 0, 7]
+        if dep.get('uuid') == 'bbbd2d60-52e5-53a6-8b9a-c09b0f516389': dep['version'] = pack_version
+    (side / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+
 # 2. shims
 shutil.copyfile(SHIMS / 'blockSupport.js', bp / 'scripts/blockSupport.js')
 shutil.copyfile(SHIMS / 'itemData.js', bp / 'scripts/itemData.js')
-(bp / 'scripts/guidePublisher.js').write_text(
-    PUBLISHER.read_text(encoding='utf-8').replace("'a1_12_0'", f"'server_a2_7_{version.split('.')[1]}'"),
-    encoding='utf-8')
-
 # 3. item-property rewrite, per file, restricted to known ItemStack variable names
 ITEM_VARS = {
     'main.js': ['from', 'next', 'out', 'stack', 'to'],
@@ -173,8 +181,7 @@ system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
  });
 });
 """ + t[old_place.end():]
-if "import './guide.js';" not in t:
-    t = "import './guide.js';\n" + t
+t = t.replace("import './guide.js';\n", '')
 M.write_text(t, encoding='utf-8')
 
 # 6. a23 oil world: face offsets + robustness
@@ -264,6 +271,26 @@ for p in sorted((bp / 'features').glob('*.json')):
     p.write_text(json.dumps(j, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     print(p.name, 'trunk_lean completed:', missing)
 
+# Preserve the installed fence-connection and nature-tab repairs. These deltas
+# are part of the server edition rather than the public gameplay source.
+NO_CONNECTION_BLOCKS = (
+    'advanced_rack_block', 'canola_crop', 'canola_oil', 'grill', 'grill_legs',
+    'houttuynia_crop', 'onion_crop', 'pepper_leaves', 'pepper_leaves_fruiting_bridge',
+    'pepper_sapling', 'premium_chili_oil', 'seasoning_bottle', 'seasoning_bottle_1',
+    'seasoning_bottle_2', 'seasoning_bottle_3', 'seasoning_bottle_4', 'secret_chili_oil',
+    'skewer_plate_block', 'skewer_recipe', 'sweet_potato_crop',
+)
+for name in NO_CONNECTION_BLOCKS:
+    p = bp / 'blocks' / (name + '.json')
+    j = json.loads(p.read_text())
+    j['minecraft:block']['components']['minecraft:connection_rule'] = {'accepts_connections_from': 'none'}
+    p.write_text(json.dumps(j, ensure_ascii=False, indent=2) + '\n')
+for folder, name in [('blocks', 'pepper_sapling')] + [('items', n) for n in ('canola_seeds', 'houttuynia', 'onion', 'sweet_potato')]:
+    p = bp / folder / (name + '.json')
+    j = json.loads(p.read_text())
+    j['minecraft:' + ('block' if folder == 'blocks' else 'item')]['description']['menu_category']['category'] = 'nature'
+    p.write_text(json.dumps(j, ensure_ascii=False, indent=2) + '\n')
+
 # 9. recipes: unlock data (1.20+ crafting recipes are rejected without it;
 # furnace recipes do not need any)
 PREFERENCE = ['minecraft:iron_ingot', 'minecraft:brick_block', 'minecraft:bucket']
@@ -279,63 +306,13 @@ for p in sorted((bp / 'recipes').glob('*.json')):
     p.write_text(json.dumps(j, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     print(p.name, 'unlock ->', gate)
 
-# 10. guide payload
-ICON = 'textures/items/grilled_beef_skewer'
-rows = [
- ('start', '版本與取得物品', [
-  f'目前安裝 A2.{version} 核心：烤爐、穿串、調料瓶、熱串、串盤與食譜記錄，並含榨油機、大缸、砧板加工與作物鏈。',
-  '工作台可合成烤爐、空調料瓶、榨油機、大缸與油餅；一根木棍可製成可放副手的空串。',
-  '砧板加工使用森羅物語：廚房的砧板與廚房刀。',
- ]),
- ('grill', '烤爐操作', [
-  '用打火石點火，放入最多三串生串，再用森羅物語裝油油壺刷油，每串消耗一點油。',
-  '空手使用烤爐翻面四次，每次至少隔一秒。用完成的調料瓶撒料，再空手取出；蹲下可一次取完。',
-  '不要擱置太久，會烤焦。一般油的熱串保溫一分鐘，熱度隨世界時間流逝。',
- ]),
- ('thread', '手工穿串', [
-  '先在工作台把一根木棍做成空串，放入副手；主手持食材使用即可依序穿入。',
-  '放入對應順序會形成固定串；其他可食用的三種材料會形成秘制串。',
-  '蹲下使用可拆解副手的未烤串並返還材料和木棍。',
- ]),
- ('seasoning', '調料瓶', [
-  '空調料瓶放在地上後，持材料使用瓶子；最多八種材料，必須含青辣椒粉、花椒與洋蔥粉。',
-  '取回待搖勻調料後，持續使用四秒搖勻；完成瓶共可供十六串調味。',
-  '瓶子可疊放至四層；不同瓶子的配方分別保存。',
- ]),
- ('plate', '串盤與保存', [
-  '蹲下持串對支撐方塊頂面使用即可擺盤，最多放五串；空手依序取回。',
-  '烤串的配料、熱度與秘制內容可隨物品保存。熱度會繼續隨世界時間下降。',
- ]),
- ('book', '烤串食譜', [
-  '副手放完整生串，主手持森羅物語空白食譜使用，即可記錄烤串配方。',
-  '記錄好的食譜可貼牆；主手持木棍點擊牆上食譜，可依背包材料製作。空手取回食譜。',
- ]),
- ('oil', '榨油機與大缸', [
-  '把油餅（工作台用油菜籽合成）放入榨油機，最多四塊；手持鐵砧對榨油機使用即可壓榨，壓滿後產出四桶油與油渣。',
-  '大缸可儲存八桶液體：三種油、水或岩漿。持對應空桶對大缸使用可裝取。',
-  '手持森羅物語空油壺對裝油的大缸使用，可為油壺灌油。',
- ]),
- ('board', '砧板加工', [
-  '在森羅物語：廚房的砧板上，手持廚房刀（鐵/金/鑽石/獄髓）對食材使用即可切配，多數食材需切四次。',
-  '可切胡蘿蔔、馬鈴薯、饅頭、洋蔥與魚腥草等；對生雞使用可取得雞皮、雞翅與小塊生肉。',
-  '部分烤串專用材料只能由砧板取得。',
- ]),
- ('crops', '作物鏈', [
-  '可在耕地上種植魚腥草、油菜、洋蔥與甘薯；成熟後收穫，部分有變種外觀。',
-  '油菜籽可合成油餅；洋蔥與魚腥草可在砧板切末，作為調料粉料來源。',
-  '甘薯可在熔爐、煙燻爐或營火烤成烤甘薯。',
- ]),
-]
-payload = {'api': 1, 'id': 'kg_a1:grilling', 'version': version, 'order': 300, 'icon': ICON,
- 'titleKey': 'title', 'introKey': 'intro', 'allKey': 'all', 'selectKey': 'select', 'backKey': 'back',
- 'showAll': False, 'showIds': False, 'showKinds': False, 'showCategoryOnEntry': False,
- 'categories': [{'id': 'play', 'labelKey': 'play', 'fallback': '煙火玩法', 'icon': ICON}],
- 'entries': [{'id': 'kg_a1:server_' + i, 'category': 'play', 'icon': ICON, 'kinds': [], 'mechanics': m} for i, _, m in rows],
- 'names': {lang: {'kg_a1:server_' + i: name for i, name, _ in rows} for lang in ['zh_TW', 'zh_CN', 'en_US']},
- 'text': {lang: {'title': '煙火 · 烤串', 'intro': '烤爐、穿串與調料操作', 'all': '全部', 'select': '選擇說明', 'back': '返回', 'play': '玩法與取得方式'} for lang in ['zh_TW', 'zh_CN', 'en_US']}}
-(bp / 'scripts/guide.js').write_text(
-    "import{system}from'@minecraft/server';import{installPublisher}from'./guidePublisher.js';\n"
-    'installPublisher(system,' + json.dumps(payload, ensure_ascii=False) + ');\n', encoding='utf-8')
+# 10. Use the upstream guide exactly once. A second publisher with the same
+# source/module ID races the canonical 76-entry payload and replaces languages.
+assert (bp / 'scripts/guide/main.js').is_file(), 'canonical guide required (A2.8.7+)'
+assert (bp / 'scripts/main.js').read_text().count("import './guide/main.js';") == 1
+for legacy in ['guide.js', 'guidePublisher.js']:
+    (bp / 'scripts' / legacy).unlink(missing_ok=True)
+print('canonical guide preserved; one publisher')
 
 # 11. creative catalog: shared-group entries appended without an icon override
 # Cookery's icon-carrying definitions depending on stack order, collapsing the
