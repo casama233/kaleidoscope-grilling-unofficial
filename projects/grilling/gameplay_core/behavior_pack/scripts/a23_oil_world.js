@@ -54,7 +54,7 @@ function compute(row,rows){
  const def=OIL_TYPES[row.type];if(!def)return false;
  let dim;try{dim=world.getDimension(row.d)}catch{return false}
  const source=dim.getBlock({x:row.x,y:row.y,z:row.z});
- if(!source||source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}
+ if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}
  const queue=[{x:row.x,y:row.y,z:row.z,l:0,drop:0}],seen=new Map(),desired=new Map();
  while(queue.length&&desired.size<MAX_CELLS){
   const n=queue.shift(),k=posKey(row.d,n.x,n.y,n.z);
@@ -125,7 +125,7 @@ system.runInterval(()=>{
  for(const row of rows){
   const def=OIL_TYPES[row.type];if(!def)continue;
   if(system.currentTick%def.interval!==0){keep.push(row);continue}
-  if(compute(row,rows))keep.push(row);
+  try{if(compute(row,rows))keep.push(row)}catch{keep.push(row)}
  }
  if(JSON.stringify(keep)!==before)saveReg(keep);
 },1);

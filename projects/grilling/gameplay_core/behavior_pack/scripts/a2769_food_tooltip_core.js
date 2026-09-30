@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 // Java FoodTooltip.appendMaxim: DARK_GRAY + ITALIC; existing RP translation keys.
 export const MAXIM_ITEMS=Object.freeze([
  'sugared_tomato','pepper_honey','houttuynia_stir_fried_pork',
@@ -35,6 +36,6 @@ export function applyFoodMaxim(stack){
  if(!foodMaximKey(stack?.typeId))return false;
  const next=planMaximLore(stack.typeId,readRawFoodLore(stack));
  if(!next)return false;
- stack.setLore(next);
+ setItemLore(stack,next);
  return true;
 }

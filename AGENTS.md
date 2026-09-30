@@ -9,3 +9,9 @@ Preserve existing assets and UUIDs during imports. Read upstream sources as need
 Keep migration status honest: files in a local artifact are not automatically in GitHub. Do not count planned or recovered-but-unverified work as delivered. Before reporting success, read the remote HEAD/files back and compare expected content hashes.
 
 The guide must remain one Grilling entry in the existing Cookery guide, not a new physical guidebook. Notebook tests with mock player adapters do not certify Minecraft persistence or guide UI integration. Asset previews do not certify engine rendering.
+
+# Canonical baseline
+
+- Follow `docs/BASELINE-MAINTENANCE.md`. Own fixes belong to canonical runtime; do not introduce gameplay transforms in a private builder or BSM hook.
+- A changed exported file requires a new release identity, lock/history update and functional verification. Never reuse the same version for different content.
+- Production deployment requires the family receipt, pinned upstream archives, client acceptance and explicit saved-world migration verification.

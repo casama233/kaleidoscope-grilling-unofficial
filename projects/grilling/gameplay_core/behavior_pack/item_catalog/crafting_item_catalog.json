@@ -7,7 +7,8 @@
         "groups": [
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.tools"
+              "name": "kaleidoscope_cookery:itemGroup.name.tools",
+              "icon": "kaleidoscope_cookery:iron_kitchen_knife"
             },
             "items": [
               "kaleidoscope_grilling:empty_seasoning_bottle"
@@ -15,7 +16,8 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.cooking_stations"
+              "name": "kaleidoscope_cookery:itemGroup.name.cooking_stations",
+              "icon": "kaleidoscope_cookery:stove"
             },
             "items": [
               "kaleidoscope_grilling:grill",
@@ -25,7 +27,8 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.storage_utility"
+              "name": "kaleidoscope_cookery:itemGroup.name.storage_utility",
+              "icon": "kaleidoscope_cookery:fruit_basket"
             },
             "items": [
               "kaleidoscope_grilling:advanced_rack"
@@ -33,19 +36,8 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.crops"
-            },
-            "items": [
-              "kaleidoscope_grilling:canola_seeds",
-              "kaleidoscope_grilling:onion",
-              "kaleidoscope_grilling:sweet_potato",
-              "kaleidoscope_grilling:houttuynia",
-              "kaleidoscope_grilling:pepper_sapling"
-            ]
-          },
-          {
-            "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.ingredients"
+              "name": "kaleidoscope_cookery:itemGroup.name.ingredients",
+              "icon": "kaleidoscope_cookery:flour"
             },
             "items": [
               "kaleidoscope_grilling:beef_chunks",
@@ -95,7 +87,8 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.foods"
+              "name": "kaleidoscope_cookery:itemGroup.name.foods",
+              "icon": "kaleidoscope_cookery:mantou"
             },
             "items": [
               "kaleidoscope_grilling:grilled_beef_skewer",
@@ -136,7 +129,8 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.other_blocks"
+              "name": "kaleidoscope_cookery:itemGroup.name.other_blocks",
+              "icon": "kaleidoscope_cookery:oil_block"
             },
             "items": [
               "kaleidoscope_grilling:pepper_log",
@@ -145,10 +139,29 @@
           },
           {
             "group_identifier": {
-              "name": "kaleidoscope_cookery:itemGroup.name.recipe_pages"
+              "name": "kaleidoscope_cookery:itemGroup.name.recipe_pages",
+              "icon": "kaleidoscope_cookery:master_recipe_page"
             },
             "items": [
               "kaleidoscope_grilling:skewer_recipe_book"
+            ]
+          }
+        ]
+      },
+      {
+        "category_name": "nature",
+        "groups": [
+          {
+            "group_identifier": {
+              "name": "kaleidoscope_cookery:itemGroup.name.crops",
+              "icon": "kaleidoscope_cookery:rice"
+            },
+            "items": [
+              "kaleidoscope_grilling:canola_seeds",
+              "kaleidoscope_grilling:onion",
+              "kaleidoscope_grilling:sweet_potato",
+              "kaleidoscope_grilling:houttuynia",
+              "kaleidoscope_grilling:pepper_sapling"
             ]
           }
         ]

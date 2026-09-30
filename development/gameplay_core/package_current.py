@@ -6,6 +6,9 @@ import hashlib
 import json
 import os
 import zipfile
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/"tools"))
+from baseline_gate import check as baseline_check,read as baseline_read
 from vibrant_gate import check_paths, check_archive
 from verify_current import generic_gate, verify_compiled_exact
 
@@ -75,13 +78,15 @@ def make_zip(path: Path, roots: list[tuple[str, Path]], *, exclude_project_build
 def main() -> None:
     parser = argparse.ArgumentParser(description="Create deterministic review artifacts from the canonical Grilling runtime")
     parser.add_argument("--output-dir", default="artifacts/review")
+    parser.add_argument("--compiled", action="store_true", help="Verify a Dash export and package it; default exports the canonical runtime directly")
     args = parser.parse_args()
 
     # Standalone packaging must reject a lost declaration or an old Dash build,
     # even when the caller bypasses the usual CI verifier steps.
+    baseline_check(baseline_read(ROOT/"baseline.json"),release=True)
     generic_gate()
     source_manifests = check_paths(BP, RP)
-    verify_compiled_exact()
+    if args.compiled:verify_compiled_exact()
     bp_manifest, rp_manifest = source_manifests
     version = tuple(bp_manifest["header"]["version"])
     assert version == tuple(rp_manifest["header"]["version"])
@@ -89,8 +94,8 @@ def main() -> None:
     stem = f"Kaleidoscope_Grilling_A{label}_Review"
     out = ROOT / args.output_dir
 
-    compiled_bp = compiled_pack(BP)
-    compiled_rp = compiled_pack(RP)
+    compiled_bp = compiled_pack(BP) if args.compiled else BP
+    compiled_rp = compiled_pack(RP) if args.compiled else RP
     mcaddon = out / f"{stem}.mcaddon"
     brproject = out / f"{stem}.brproject"
     sums = out / "SHA256SUMS.txt"
@@ -98,6 +103,7 @@ def main() -> None:
 
     make_zip(mcaddon, [("behavior_pack", compiled_bp), ("resource_pack", compiled_rp)])
     check_archive(mcaddon, source_manifests)
+    baseline_check(baseline_read(ROOT/"baseline.json"),archive=mcaddon)
     make_zip(brproject, [("", PROJECT)], exclude_project_builds=True)
 
     payload = {
@@ -109,6 +115,7 @@ def main() -> None:
         "brproject": {"path": brproject.relative_to(ROOT).as_posix(), "sha256": sha256(brproject)},
         "deterministic_zip_timestamp": "2020-01-01T00:00:00",
         "vibrant_manifest_and_export_checked": True,
+        "compiled_export_verified": args.compiled,
         "minecraft_tested": False,
         "bds_tested": False,
         "client_visuals_tested": False,

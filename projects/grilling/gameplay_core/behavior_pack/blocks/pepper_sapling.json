@@ -4,7 +4,7 @@
     "description": {
       "identifier": "kaleidoscope_grilling:pepper_sapling",
       "menu_category": {
-        "category": "equipment",
+        "category": "nature",
         "group": "kaleidoscope_cookery:itemGroup.name.crops"
       },
       "states": {
@@ -46,7 +46,10 @@
       },
       "minecraft:light_dampening": 0,
       "minecraft:loot": "loot_tables/blocks/pepper_sapling.json",
-      "kaleidoscope_grilling:pepper_sapling_logic": {}
+      "kaleidoscope_grilling:pepper_sapling_logic": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemDataCore.js';
 import {primitiveStackProps} from './a2762_interaction_intent_core.js';
 
 // Heat countdown lore changes while eating; authoritative heat/ingredient data must not.
@@ -5,7 +6,7 @@ export function eatingIdentity(stack){
  if(!stack)return null;
  const raw=primitiveStackProps(stack),props=Object.fromEntries(Object.keys(raw).sort().map(k=>[k,raw[k]]));
  return JSON.stringify({id:stack.typeId,amount:stack.amount,name:stack.nameTag??'',
-  lore:stack.getLore().filter(x=>!String(x).startsWith('§c🔥')),props});
+  lore:getItemLore(stack).filter(x=>!String(x).startsWith('§c🔥')),props});
 }
 export function captureEatingIdentity(stack,hand,slot){return {identity:eatingIdentity(stack),hand,slot}}
 export function eatingStillCurrent(use,current,slot){

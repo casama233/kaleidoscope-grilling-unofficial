@@ -259,7 +259,10 @@
         ]
       },
       "minecraft:loot": "loot_tables/blocks/canola_crop.json",
-      "kaleidoscope_grilling:canola_crop_logic": {}
+      "kaleidoscope_grilling:canola_crop_logic": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     }
   }
 }

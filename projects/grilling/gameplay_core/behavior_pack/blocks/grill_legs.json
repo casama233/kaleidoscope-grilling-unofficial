@@ -38,7 +38,10 @@
         ],
         "looping": true
       },
-      "kaleidoscope_grilling:grill_legs_tick": {}
+      "kaleidoscope_grilling:grill_legs_tick": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     },
     "permutations": [
       {

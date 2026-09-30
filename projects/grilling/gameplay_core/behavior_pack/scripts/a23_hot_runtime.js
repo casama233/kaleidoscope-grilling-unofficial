@@ -1,3 +1,4 @@
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {world} from '@minecraft/server';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
 
@@ -15,15 +16,15 @@ function norm(v){
  if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,norm(v[k])]));
  return String(v);
 }
-function baseLore(stack){try{return stack.getLore().filter(x=>!String(x).startsWith('§c🔥'))}catch{return []}}
+function baseLore(stack){try{return getItemLore(stack).filter(x=>!String(x).startsWith('§c🔥'))}catch{return []}}
 function props(stack,includeHot=false){
- let ids=[];try{ids=stack.getDynamicPropertyIds()}catch{}
- return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=stack.getDynamicProperty(k)}catch{}return [k,norm(v)]});
+ let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
+ return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=getItemProperty(stack,k)}catch{}return [k,norm(v)]});
 }
 export function isSkewer(stack){return !!stack&&stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling')}
 export function mergeSignature(stack){return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),props:props(stack,false)})}
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
-export function hotUntil(stack){try{return Number(stack?.getDynamicProperty(HOT)??0)}catch{return 0}}
+export function hotUntil(stack){try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}
 export function isHot(stack,t=now()){return hotUntil(stack)>t}
 function bucket(t){return t-(((t%100)+100)%100)}
 function setHot(stack,remaining,t=now()){
@@ -32,9 +33,9 @@ function setHot(stack,remaining,t=now()){
   if(remaining>0){const sec=Math.max(1,Math.ceil(remaining/20)),m=Math.floor(sec/60),s=String(sec%60).padStart(2,'0');lore.push('§c🔥 煙火氣 '+m+':'+s)}
   // Stable 2.9 ItemStack dynamic properties require a non-stackable/custom-data stack.
   // Give the stack custom lore first, then persist HotUntil.
-  stack.setLore(lore);
-  if(remaining>0)stack.setDynamicProperty(HOT,bucket(t+remaining));
-  else stack.setDynamicProperty(HOT,undefined);
+  setItemLore(stack,lore);
+  if(remaining>0)setItemProperty(stack,HOT,bucket(t+remaining));
+  else setItemProperty(stack,HOT,undefined);
  }catch{}
  return stack;
 }

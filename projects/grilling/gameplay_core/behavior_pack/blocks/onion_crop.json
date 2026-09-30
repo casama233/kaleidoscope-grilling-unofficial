@@ -259,7 +259,10 @@
         ]
       },
       "minecraft:loot": "loot_tables/blocks/onion_crop.json",
-      "kaleidoscope_grilling:onion_crop_logic": {}
+      "kaleidoscope_grilling:onion_crop_logic": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
+      }
     }
   }
 }
