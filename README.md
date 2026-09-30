@@ -2,15 +2,19 @@
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.
 
-> 本分支修正版：**A2.8.10** — [結算與伺服器打包修復](docs/STATUS-A2.8.10.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。main 基線仍為 A2.8.7；整體移植及客戶端驗收尚未完成。
+> main 維護基線：**A2.8.11** — [正式來源修訂](docs/RELEASE-NOTES-2.8.11.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
 
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**本分支 canonical runtime：A2.8.10。保留 A2.8.7 綁定／植物材質修復，補上餐盤、搖勻瓶及伺服器指南衝突修復。功能與 Java 的完整同步尚未完成。**
+**canonical runtime：A2.8.11，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。原生爐／串架容器需要 upcoming_creator_features；僅在隔離測試世界啟用並驗證，正式存檔尚未批准。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
+
+## 歷史開發與發佈記錄
+
+以下舊版本段落保留當時的開發狀態；A2.3／A1.x 產物和舊廚房依賴不是當前正式建置入口。當前來源以 baseline.json 和 release notes 為準。
 
 ## A2.3：Hot Food堆疊＋烤爐四態＋世界油
 

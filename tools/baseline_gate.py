@@ -20,6 +20,12 @@ def fingerprint(root):
 
 def validate(config):
  if not isinstance(config.get('version'),list) or len(config['version'])!=3 or any(type(x) is not int or x<0 for x in config['version']):fail('invalid release version')
+ for name in ['README.md','README.zh-TW.md']:
+  path=ROOT/name
+  if path.exists():
+   for line in path.read_text(encoding='utf-8').splitlines():
+    for prefix in ['## Current maintained baseline: ','## 當前維護基線：']:
+     if line.startswith(prefix) and line[len(prefix):]!='.'.join(map(str,config['version'])):fail(name+' maintained version differs from release version')
  manifests={};trees={};files={}
  for side,relative in config['runtime'].items():
   root=ROOT/relative;manifests[side]=m=read(root/'manifest.json')
