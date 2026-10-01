@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling 2.8.16 Canonical Baseline",
+  "name": "Kaleidoscope Grilling",
   "description": "Unofficial Bedrock port; canonical release runtime. See README.md for attribution and dependency requirements.",
   "authors": [
     "Unofficial port contributors"
@@ -9,8 +9,8 @@
   "experimentalGameplay": {},
   "namespace": "kaleidoscope_grilling",
   "packs": {
-    "behaviorPack": "./behavior_pack",
-    "resourcePack": "./resource_pack"
+    "behaviorPack": "./projects/grilling/gameplay_core/behavior_pack",
+    "resourcePack": "./projects/grilling/gameplay_core/resource_pack"
   },
   "worlds": [],
   "packDefinitions": {},
@@ -24,7 +24,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_2_8_16_Canonical"
+          "packName": "grilling"
         }
       ]
     ]
