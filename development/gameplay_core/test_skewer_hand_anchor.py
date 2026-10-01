@@ -3,6 +3,7 @@ import hashlib
 import json
 import math
 import unittest
+from held_pose_frames import make_pose
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
@@ -42,13 +43,14 @@ class HandAnchorTests(unittest.TestCase):
             # Native eat/sneak/walk arm motion therefore cannot amplify an offset.
             for scale in (.8,1,1.25):
                 self.assertEqual([v*scale for v in relative],[0,0,0])
-    def test_first_person_display_is_unchanged(self):
+    def test_first_person_display_uses_converted_frame(self):
         before=BEFORE['animations'];after=load(RP/ANIM)['animations']
         for hand in ('right','left'):
             name=f'animation.kg_a287.skewer_fp_{hand}'
-            self.assertEqual(after[name]['bones']['skewer_pose'],before[name]['bones']['grip'])
+            self.assertEqual(after[name]['bones'],make_pose('skewer','fp',hand))
+            self.assertNotEqual(after[name]['bones']['skewer_pose'],before[name]['bones']['grip'])
             self.assertEqual(after[name]['bones']['skewer_model']['position'],[0,0,0])
-    def test_rack_board_centre_bound_without_changing_first_person(self):
+    def test_rack_preserves_assets_and_uses_converted_display_frame(self):
         g=load(RP/'models/entity/a286_hand/kg_a2763.advanced_rack_hand.geo.json')['minecraft:geometry'][0]
         self.assertEqual(g['bones'][2]['cubes'],BEFORE['rack_geometry']['bones'][0]['cubes'])
         self.assertEqual(g['bones'][1],{'name':'rack_pose','parent':'grip','pivot':[0,24,0]})
@@ -57,10 +59,10 @@ class HandAnchorTests(unittest.TestCase):
         a=load(RP/'animations/a286_held.animation.json')['animations']
         for hand in ('right','left'):
             tp=a[f'animation.kg_a286.rack_tp_{hand}']['bones']
-            self.assertEqual(tp['rack_pose']['position'],[0,0,0])
+            self.assertEqual(tp,make_pose('rack','tp',hand))
             self.assertEqual([x+c-p for x,c,p in zip([0,16.5,1.625],tp['rack_model']['position'],[0,24,0])],[0,0,0])
             name=f'animation.kg_a286.rack_fp_{hand}'
-            self.assertEqual(a[name]['bones']['rack_pose'],BEFORE['rack_animations'][name]['bones']['grip'])
+            self.assertEqual(a[name]['bones'],make_pose('rack','fp',hand))
             self.assertEqual(a[name]['bones']['rack_model']['position'],[0,0,0])
     def test_reproduces_previous_displaced_grip(self):
         before=BEFORE['animations']
