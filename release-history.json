@@ -88,5 +88,15 @@
       "sha256": "026ec15148c520e5c1aab3b5bfed652bc7fe60072e6dc969afd126f4b3238cc9",
       "files": 1476
     }
+  },
+  "2.8.19": {
+    "BP": {
+      "sha256": "6679985c43f2ee9df20ebea9d34d3e4751de2268a3cdf0171afb5e31bfa484dd",
+      "files": 467
+    },
+    "RP": {
+      "sha256": "7b49fb25bd220b29295cf12cd395db0be9201b54343c1dea701b04ebf16ace1b",
+      "files": 1476
+    }
   }
 }

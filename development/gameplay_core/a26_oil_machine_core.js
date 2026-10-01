@@ -22,10 +22,10 @@ export const PRESS_STONES=Object.freeze(new Set([
 export const ANVILS=Object.freeze(new Set(['minecraft:anvil','minecraft:chipped_anvil','minecraft:damaged_anvil']));
 export const VAT_TYPES=Object.freeze(new Set(['water','lava','canola','secret_chili','premium_chili']));
 
-export function toolProgress(id){
+export function toolProgress(id,tags=[]){
  const key=String(id??'');
  if(ANVILS.has(key))return PRESS_ANVIL_PROGRESS;
- return PRESS_STONES.has(key)?PRESS_STONE_PROGRESS:0;
+ return PRESS_STONES.has(key)||(Array.isArray(tags)&&tags.includes('kaleidoscope_grilling:press_stones'))?PRESS_STONE_PROGRESS:0;
 }
 export function pressVisualStage(progress){
  const p=Math.max(0,Math.min(PRESS_REQUIRED_PROGRESS,Number(progress)||0));
