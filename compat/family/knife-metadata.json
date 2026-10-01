@@ -1,0 +1,60 @@
+[
+  {
+    "pack": "cookery-1.0.8",
+    "file": "items/netherite_kitchen_knife.json",
+    "item": "kaleidoscope_cookery:netherite_kitchen_knife",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items"
+    ]
+  },
+  {
+    "pack": "cookery-1.0.8",
+    "file": "items/gold_kitchen_knife.json",
+    "item": "kaleidoscope_cookery:gold_kitchen_knife",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items"
+    ]
+  },
+  {
+    "pack": "cookery-1.0.8",
+    "file": "items/diamond_kitchen_knife.json",
+    "item": "kaleidoscope_cookery:diamond_kitchen_knife",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items"
+    ]
+  },
+  {
+    "pack": "cookery-1.0.8",
+    "file": "items/iron_kitchen_knife.json",
+    "item": "kaleidoscope_cookery:iron_kitchen_knife",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items"
+    ]
+  },
+  {
+    "pack": "end-1.0.1",
+    "file": "items/tools/dragon_tooth_knife.json",
+    "item": "kaleidoscope_end:dragon_tooth_knife",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items",
+      "kaleidoscope_cookery:kitchen_rack_tool",
+      "kaleidoscope_cookery:kitchen_rack_sword_pose"
+    ]
+  },
+  {
+    "pack": "nether-1.0.1",
+    "file": "items/equipment/primitive_machete.json",
+    "item": "kaleidoscope_nether:primitive_machete",
+    "tags": [
+      "kaleidoscope_cookery:kitchen_knife",
+      "minecraft:transformable_items",
+      "kaleidoscope_cookery:kitchen_rack_tool",
+      "kaleidoscope_cookery:kitchen_rack_sword_pose"
+    ]
+  }
+]

@@ -1,14 +1,22 @@
-export function commitTwoParty(applyPrimary,applySecondary,rollbackPrimary,rollbackSecondary){
+// Synchronous best-effort rollback, not a crash-safe database transaction.
+// Native container writes return void; adapters may explicitly return false.
+function requireApplied(result){if(result===false)throw new Error('Grilling: transaction step rejected')}
+export function commitSteps(steps){
+ let attempted=0;
  try{
-  applyPrimary();
-  applySecondary();
+  for(const step of steps){attempted++;requireApplied(step.apply())}
   return {ok:true,rollbackErrors:0};
  }catch(error){
   let rollbackErrors=0;
-  try{rollbackSecondary()}catch{rollbackErrors++}
-  try{rollbackPrimary()}catch{rollbackErrors++}
+  for(let i=attempted-1;i>=0;i--)try{requireApplied(steps[i].rollback())}catch{rollbackErrors++}
   return {ok:false,error,rollbackErrors};
  }
+}
+export function commitTwoParty(applyPrimary,applySecondary,rollbackPrimary,rollbackSecondary){
+ return commitSteps([
+  {apply:applyPrimary,rollback:rollbackPrimary},
+  {apply:applySecondary,rollback:rollbackSecondary}
+ ]);
 }
 
 export function chooseExtractDelivery(emptySlot){

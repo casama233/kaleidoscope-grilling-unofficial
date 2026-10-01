@@ -1,6 +1,7 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {world} from '@minecraft/server';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
+import {commitSteps} from './a277_grill_transaction_core.js';
 
 const HOT='kaleidoscope_grilling:hot_until';
 const IGNORE=new Set([
@@ -21,7 +22,17 @@ function props(stack,includeHot=false){
  let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
  return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=getItemProperty(stack,k)}catch{}return [k,norm(v)]});
 }
-export function isSkewer(stack){return !!stack&&stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling')}
+export function isSkewer(stack){
+ if(!stack)return false;
+ if(stack.typeId.startsWith('kaleidoscope_grilling:')&&(stack.typeId.includes('skewer')||stack.typeId==='kaleidoscope_grilling:dark_grilling'))return true;
+ try{return stack.hasTag?.('kaleidoscope_grilling:raw_skewers')||stack.hasTag?.('kaleidoscope_grilling:grilled_skewers')}catch{return false}
+}
+export function isFoodStack(stack){
+ if(!stack)return false;
+ try{if(stack.getComponent?.('minecraft:food'))return true}catch{}
+ try{if(stack.hasTag?.('minecraft:is_food'))return true}catch{}
+ return isSkewer(stack);
+}
 export function mergeSignature(stack){return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),props:props(stack,false)})}
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
 export function hotUntil(stack){try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}
@@ -51,7 +62,7 @@ export function canManualMerge(a,b,t=now()){
  if(!sameForHeatMerge(a,b))return false;
  return isHot(a,t)===isHot(b,t);
 }
-export function mergeIntoContainer(container,incoming,t=now()){
+export function mergeIntoContainer(container,incoming,t=now(),strict=false){
  if(!incoming)return undefined;
  let remaining=incoming.clone();
  for(let i=0;i<container.size;i++){
@@ -60,7 +71,24 @@ export function mergeIntoContainer(container,incoming,t=now()){
   const moved=Math.min(capacity,remaining.amount);remaining=moveCount(target,remaining,moved,t);container.setItem(i,target);
   if(!remaining)return undefined;
  }
- try{return container.addItem(remaining)}catch{return remaining}
+ try{return container.addItem(remaining)}catch(error){if(strict)throw error;return remaining}
+}
+export function compactMatchingHotFood(container,sample,t=now()){
+ if(!container||!sample||!isFoodStack(sample)||!isHot(sample,t))return {changed:false,count:0,stacks:0};
+ const signature=mergeSignature(sample),slots=[];let rep=null,totalCount=0,totalHeat=0;
+ for(let slot=0;slot<container.size;slot++){
+  const stack=container.getItem(slot);
+  if(!stack||!isFoodStack(stack)||!isHot(stack,t)||mergeSignature(stack)!==signature)continue;
+  slots.push({slot,before:stack.clone()});if(!rep)rep=stack.clone();
+  totalCount+=stack.amount;totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
+ }
+ if(slots.length<2||!rep||totalCount<2)return {changed:false,count:totalCount,stacks:slots.length};
+ const avg=Math.floor(totalHeat/totalCount),out=[];let left=totalCount;
+ while(left>0){const stack=rep.clone(),count=Math.min(stack.maxAmount,left);if(count<=0)throw Error('Invalid food stack capacity');stack.amount=count;setHot(stack,avg,t);if(hotUntil(stack)!==bucket(t+avg))throw Error('Merged heat was not saved');out.push(stack);left-=count}
+ if(out.length>slots.length)return {changed:false,count:totalCount,stacks:slots.length};
+ const committed=commitSteps(slots.map(({slot,before},i)=>({apply(){container.setItem(slot,out[i]);},rollback(){container.setItem(slot,before);}})));
+ if(!committed.ok)return {changed:false,count:totalCount,stacks:slots.length,failed:true,rollbackErrors:committed.rollbackErrors};
+ return {changed:true,count:totalCount,stacks:out.length};
 }
 function normalCompatible(rep,stack,t){
  if(!sameForHeatMerge(rep,stack))return false;
@@ -70,28 +98,54 @@ function normalCompatible(rep,stack,t){
  return Math.abs(rh-sh)<=NORMAL_HEAT_WINDOW;
 }
 export function compactSkewerContainer(container,fullSort=false,t=now(),onlyType=undefined){
- const groups=[],nonSkewer=[];
+ const groups=[],originals=[];
+ // Plan and construct everything before the first inventory mutation.
  for(let slot=0;slot<container.size;slot++){
-  const stack=container.getItem(slot);if(!stack)continue;
-  if(!isSkewer(stack)||(onlyType&&stack.typeId!==onlyType)){nonSkewer.push({slot,stack});continue}
+  const stack=container.getItem(slot);if(!stack||!isSkewer(stack)||(onlyType&&stack.typeId!==onlyType))continue;
+  originals.push({slot,stack:stack.clone()});
   let group=groups.find(g=>fullSort?sameForHeatMerge(g.rep,stack):normalCompatible(g.rep,stack,t));
   if(!group){group={rep:stack.clone(),count:0,totalHeat:0};groups.push(group)}
   group.count+=stack.amount;group.totalHeat+=Math.max(0,hotUntil(stack)-t)*stack.amount;
  }
  if(!groups.length)return {changed:false,groups:0,stacks:0};
- const oldSkewerSlots=[];
- for(let i=0;i<container.size;i++)if(isSkewer(container.getItem(i))&&(!onlyType||container.getItem(i).typeId===onlyType))oldSkewerSlots.push(i);
- for(const i of oldSkewerSlots)container.setItem(i,undefined);
  const out=[];
  for(const g of groups){
   const avg=g.count?Math.floor(g.totalHeat/g.count):0;let left=g.count;
-  while(left>0){const s=g.rep.clone(),count=Math.min(s.maxAmount,left);s.amount=count;setHot(s,avg,t);out.push(s);left-=count}
+  while(left>0){
+   const stack=g.rep.clone(),count=Math.min(stack.maxAmount,left);
+   if(count<=0)throw new Error('Grilling: invalid stack capacity');
+   stack.amount=count;setHot(stack,avg,t);
+   const expected=avg>0?bucket(t+avg):0;
+   if(hotUntil(stack)!==expected)throw new Error('Grilling: merged heat was not saved');
+   out.push(stack);left-=count;
+  }
  }
- const targets=[...oldSkewerSlots];
- while(targets.length<out.length){
-  let empty=-1;for(let i=0;i<container.size;i++){if(!container.getItem(i)&&!targets.includes(i)){empty=i;break}}
-  if(empty<0)break;targets.push(empty);
+ if(out.length>originals.length)throw new Error('Grilling: compaction cannot fit without replacing unrelated slots');
+ const result=commitSteps(originals.map(({slot,stack},i)=>({
+  apply(){container.setItem(slot,out[i])},rollback(){container.setItem(slot,stack)}
+ })));
+ if(!result.ok){
+  console.warn('[Grilling hot merge] '+String(result.error)+'; rollback failures='+result.rollbackErrors);
+  return {changed:false,groups:groups.length,stacks:originals.length,failed:true,rollbackErrors:result.rollbackErrors};
  }
- for(let i=0;i<out.length;i++){if(i<targets.length)container.setItem(targets[i],out[i]);}
  return {changed:true,groups:groups.length,stacks:out.length};
+}
+
+/** Legacy #84 API delegates to the same #82 planner; commit the complete plan once. */
+export function compactHotFoodContainer(container,t=now(),onlyType){
+ const originals=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone());
+ const planned=originals.map(x=>x?.clone()),seen=new Set();let groups=0,changed=false;
+ const view={size:container.size,getItem:i=>planned[i]?.clone(),setItem:(i,s)=>{planned[i]=s?.clone();}};
+ for(const sample of originals){
+  if(!sample||(onlyType&&sample.typeId!==onlyType)||!isHot(sample,t))continue;
+  const signature=mergeSignature(sample);if(seen.has(signature))continue;seen.add(signature);groups++;
+  // The legacy API's explicit onlyType was already checked by its caller.
+  const food=sample.getComponent?.('minecraft:food')||isFoodStack(sample);
+  if(!food&&!onlyType)continue;
+  const result=compactMatchingHotFood(view,sample,t);changed=changed||result.changed;
+  if(result.failed)return {...result,groups};
+ }
+ if(!changed)return {changed:false,groups,stacks:planned.filter(Boolean).length};
+ const result=commitSteps(originals.map((before,i)=>({apply(){container.setItem(i,planned[i]);},rollback(){container.setItem(i,before);}})));
+ return {changed:result.ok,groups,stacks:(result.ok?planned:originals).filter(Boolean).length,...(!result.ok?{failed:true,rollbackErrors:result.rollbackErrors}:{})};
 }

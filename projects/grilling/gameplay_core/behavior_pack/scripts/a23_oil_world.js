@@ -4,23 +4,57 @@ import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,pl
 import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,setHand,isCreative as creative} from './a2735_player_io.js';
 import {isInitialBlockPress} from './a275_grill_input_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
+import {
+ LEGACY_OIL_REG,OIL_REG_PREFIX,FLOW_CELL_BUDGET,FLOW_SOURCE_BUDGET,
+ oilPosKey as posKey,oilSourcePropertyId,normalizeOilSourceRow
+} from './oil_source_registry_core.js';
 
-const REG='kaleidoscope_grilling:a23_oil_sources';
 export const OIL_TYPES=Object.freeze({
  canola:{block:'kaleidoscope_grilling:canola_oil',bucket:'kaleidoscope_grilling:canola_oil_bucket',interval:6},
  secret_chili:{block:'kaleidoscope_grilling:secret_chili_oil',bucket:'kaleidoscope_grilling:secret_chili_oil_bucket',interval:8},
  premium_chili:{block:'kaleidoscope_grilling:premium_chili_oil',bucket:'kaleidoscope_grilling:premium_chili_oil_bucket',interval:10}
 });
+const VALID_OIL_TYPES=Object.freeze(Object.keys(OIL_TYPES));
 const BLOCK_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.block,k])));
 const BUCKET_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.bucket,k])));
 const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,-1],South:[0,0,1]};
 const HORIZ=[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
-const MAX_SOURCES=64,MAX_CELLS=160,MAX_DROP=16;
+let registryCache;
 
-function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
-function posKey(d,x,y,z){return d+'|'+x+'|'+y+'|'+z}
-function readReg(){try{const raw=world.getDynamicProperty(REG);return typeof raw==='string'?JSON.parse(raw):[]}catch{return []}}
-function saveReg(rows){world.setDynamicProperty(REG,JSON.stringify(rows.slice(0,MAX_SOURCES)))}
+function loadReg(){
+ if(registryCache)return registryCache;
+ const byKey=new Map(),legacy=[];
+ try{
+  for(const id of world.getDynamicPropertyIds?.()??[]){
+   if(!id.startsWith(OIL_REG_PREFIX))continue;
+   const raw=world.getDynamicProperty(id);if(typeof raw!=='string')continue;
+   try{const row=normalizeOilSourceRow(JSON.parse(raw),VALID_OIL_TYPES);if(row)byKey.set(row.k,row)}catch{}
+  }
+  const old=world.getDynamicProperty(LEGACY_OIL_REG);
+  if(typeof old==='string')for(const value of JSON.parse(old)){
+   const row=normalizeOilSourceRow(value,VALID_OIL_TYPES);if(row&&!byKey.has(row.k)){byKey.set(row.k,row);legacy.push(row)}
+  }
+ }catch{}
+ registryCache=[...byKey.values()];
+ // Migrate A2.3's aggregate property only after all rows have been recovered.
+ if(legacy.length)try{
+  for(const row of legacy)world.setDynamicProperty(oilSourcePropertyId(row),JSON.stringify(row));
+  world.setDynamicProperty(LEGACY_OIL_REG,undefined);
+ }catch{}
+ return registryCache;
+}
+function readReg(){return loadReg()}
+function persistRow(row){
+ const normalized=normalizeOilSourceRow(row,VALID_OIL_TYPES);if(!normalized)return false;
+ const rows=loadReg(),i=rows.findIndex(x=>x.k===normalized.k);
+ if(i>=0)rows[i]=normalized;else rows.push(normalized);
+ Object.assign(row,normalized);
+ try{world.setDynamicProperty(oilSourcePropertyId(normalized),JSON.stringify(normalized));return true}catch{return false}
+}
+function removeRow(row){
+ const rows=loadReg(),i=rows.findIndex(x=>x.k===row.k);if(i>=0)rows.splice(i,1);
+ try{world.setDynamicProperty(oilSourcePropertyId(row),undefined)}catch{}
+}
 function isOil(id){return Object.hasOwn(BLOCK_TO_TYPE,id)}
 function level(block){try{return Number(block.permutation.getState('kaleidoscope_grilling:level')??0)}catch{return 0}}
 function setOil(block,type,lvl){
@@ -33,11 +67,11 @@ function canFlowInto(block,type,source=false){
  return false;
 }
 function addItem(p,stack){const c=playerContainer(p);if(!c)return;const rem=c.addItem(stack);if(rem)p.dimension.spawnItem(rem,p.location)}
-function sourceRow(dim,loc,type){return {k:posKey(dim.id,loc.x,loc.y,loc.z),d:dim.id,x:loc.x,y:loc.y,z:loc.z,type,cells:[]}}
+function sourceRow(dim,loc,type){return {k:posKey(dim.id,loc.x,loc.y,loc.z),d:dim.id,x:loc.x,y:loc.y,z:loc.z,type,cells:[],nextTick:system.currentTick}}
 function registerSource(dim,loc,type){
  const rows=readReg(),k=posKey(dim.id,loc.x,loc.y,loc.z),found=rows.find(r=>r.k===k);
- if(found){found.type=type;saveReg(rows);return}
- if(rows.length>=MAX_SOURCES)return;rows.push(sourceRow(dim,loc,type));saveReg(rows)
+ if(found){found.type=type;found.nextTick=Math.min(found.nextTick||0,system.currentTick);persistRow(found);return}
+ persistRow(sourceRow(dim,loc,type));
 }
 function sourceKeys(rows){return new Set(rows.map(r=>r.k))}
 function claimedByOther(rows,row,cell){return rows.some(r=>r!==row&&Array.isArray(r.cells)&&r.cells.includes(cell))}
@@ -55,18 +89,19 @@ function compute(row,rows){
  let dim;try{dim=world.getDimension(row.d)}catch{return false}
  const source=dim.getBlock({x:row.x,y:row.y,z:row.z});
  if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}
- const queue=[{x:row.x,y:row.y,z:row.z,l:0,drop:0}],seen=new Map(),desired=new Map();
- while(queue.length&&desired.size<MAX_CELLS){
+ const queue=[{x:row.x,y:row.y,z:row.z,l:0}],seen=new Map(),desired=new Map();
+ while(queue.length&&desired.size<FLOW_CELL_BUDGET){
   const n=queue.shift(),k=posKey(row.d,n.x,n.y,n.z);
   const old=seen.get(k);if(old!==undefined&&old<=n.l)continue;seen.set(k,n.l);
   const b=dim.getBlock({x:n.x,y:n.y,z:n.z});if(!b||(!canFlowInto(b,row.type)&&k!==row.k))continue;
   desired.set(k,{...n});
-  const below=dim.getBlock({x:n.x,y:n.y-1,z:n.z});
-  if(n.drop<MAX_DROP&&canFlowInto(below,row.type)){
-   queue.push({x:n.x,y:n.y-1,z:n.z,l:n.l,drop:n.drop+1});continue;
+  let minY=-64;try{minY=Number(dim.heightRange?.min??minY)}catch{}
+  const below=n.y>minY?dim.getBlock({x:n.x,y:n.y-1,z:n.z}):undefined;
+  if(n.y>minY&&canFlowInto(below,row.type)){
+   queue.push({x:n.x,y:n.y-1,z:n.z,l:n.l});continue;
   }
   if(n.l>=7)continue;
-  for(const [dx,dy,dz] of HORIZ)queue.push({x:n.x+dx,y:n.y,z:n.z+dz,l:n.l+1,drop:n.drop});
+  for(const [dx,dy,dz] of HORIZ)queue.push({x:n.x+dx,y:n.y,z:n.z+dz,l:n.l+1});
  }
  const desiredKeys=new Set(desired.keys()),sourceSet=sourceKeys(rows);
  for(const [k,n] of desired){
@@ -96,7 +131,7 @@ function takeSource(player,block,type,hand,toCookery=false){
  }
  const rows=readReg(),k=posKey(block.dimension.id,block.x,block.y,block.z),row=rows.find(r=>r.k===k);
  try{block.setType('minecraft:air')}catch{return false}
- if(row){clearCells(row,rows);saveReg(rows.filter(r=>r!==row))}
+ if(row){clearCells(row,rows);removeRow(row)}
  if(toCookery)setHand(player,hand,nextPot);else setHand(player,hand,new ItemStack(OIL_TYPES[type].bucket,1));
  return true;
 }
@@ -121,11 +156,12 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  system.run(()=>{const b=dim.getBlock(loc);if(b&&isOil(b.typeId))try{b.setType('minecraft:air')}catch{}});
 });
 system.runInterval(()=>{
- const rows=readReg(),before=JSON.stringify(rows),keep=[];
- for(const row of rows){
-  const def=OIL_TYPES[row.type];if(!def)continue;
-  if(system.currentTick%def.interval!==0){keep.push(row);continue}
-  try{if(compute(row,rows))keep.push(row)}catch{keep.push(row)}
+ const rows=readReg(),now=system.currentTick;
+ const due=rows.filter(row=>(row.nextTick??0)<=now)
+  .sort((a,b)=>(a.nextTick??0)-(b.nextTick??0)).slice(0,FLOW_SOURCE_BUDGET);
+ for(const row of due){
+  const def=OIL_TYPES[row.type];if(!def){removeRow(row);continue}
+  try{if(!compute(row,rows)){removeRow(row);continue}}catch{row.nextTick=now+def.interval;persistRow(row);continue}
+  row.nextTick=now+def.interval;persistRow(row);
  }
- if(JSON.stringify(keep)!==before)saveReg(keep);
 },1);

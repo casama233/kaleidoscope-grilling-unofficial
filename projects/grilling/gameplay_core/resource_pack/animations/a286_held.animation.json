@@ -76,7 +76,7 @@
     "animation.kg_a286.rack_fp_right": {
       "loop": true,
       "bones": {
-        "grip": {
+        "rack_pose": {
           "position": [
             0,
             0,
@@ -88,13 +88,20 @@
             0
           ],
           "scale": 0.4
+        },
+        "rack_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
         }
       }
     },
     "animation.kg_a286.rack_fp_left": {
       "loop": true,
       "bones": {
-        "grip": {
+        "rack_pose": {
           "position": [
             0,
             0,
@@ -106,17 +113,24 @@
             0
           ],
           "scale": 0.4
+        },
+        "rack_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
         }
       }
     },
     "animation.kg_a286.rack_tp_right": {
       "loop": true,
       "bones": {
-        "grip": {
+        "rack_pose": {
           "position": [
             0,
-            -1.5,
-            -1
+            0,
+            0
           ],
           "rotation": [
             75,
@@ -124,17 +138,24 @@
             0
           ],
           "scale": 0.375
+        },
+        "rack_model": {
+          "position": [
+            0,
+            7.5,
+            -1.625
+          ]
         }
       }
     },
     "animation.kg_a286.rack_tp_left": {
       "loop": true,
       "bones": {
-        "grip": {
+        "rack_pose": {
           "position": [
             0,
-            -1.5,
-            -1
+            0,
+            0
           ],
           "rotation": [
             75,
@@ -142,6 +163,13 @@
             0
           ],
           "scale": 0.375
+        },
+        "rack_model": {
+          "position": [
+            0,
+            7.5,
+            -1.625
+          ]
         }
       }
     }

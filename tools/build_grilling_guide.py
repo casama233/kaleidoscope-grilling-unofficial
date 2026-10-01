@@ -21,6 +21,10 @@ def units(text):return len(text.encode('utf-16-le'))//2
 def validate_source(s):
     if s.get('schema_version')!=3 or s.get('module_id')!='kg_a1:grilling':raise ValueError('Wrong catalog schema/module')
     if s['locales']!=list(LOCALES) or s['fallback_locale']!='zh_TW':raise ValueError('Locale contract drift')
+    # ActionForm icons are full PNGs, not block UVs or multi-item atlases.
+    bad={'textures/ui/kg_grilling/guide_grill','textures/ui/kg_grilling/guide_seasoning'}
+    icons=[s['icon'],*[row['icon'] for row in s['categories']],*[row['icon'] for row in s['entries']]]
+    if any(icon in bad for icon in icons):raise ValueError('Raw material atlas used as a guide icon')
     cats={c['id']:c for c in s['categories']}
     if len(cats)!=len(s['categories']) or not 1<=len(cats)<=32:raise ValueError('Category IDs/count')
     parents={c['parent'] for c in cats.values() if c.get('parent')}

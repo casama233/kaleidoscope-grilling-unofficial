@@ -1,6 +1,6 @@
 {
   "type": "minecraftBedrock",
-  "name": "Kaleidoscope Grilling 2.8.11 Canonical Baseline",
+  "name": "Kaleidoscope Grilling 2.8.14 Canonical Baseline",
   "targetVersion": "1.26.50",
   "namespace": "kaleidoscope_grilling",
   "packs": {
@@ -12,7 +12,7 @@
       [
         "simpleRewrite",
         {
-          "packName": "Kaleidoscope_Grilling_2_8_11_Canonical"
+          "packName": "Kaleidoscope_Grilling_2_8_14_Canonical"
         }
       ]
     ]

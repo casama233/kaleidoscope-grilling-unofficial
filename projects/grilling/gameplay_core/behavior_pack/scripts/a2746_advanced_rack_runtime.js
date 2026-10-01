@@ -1,3 +1,4 @@
+import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
 import {rackSlotAtHit} from './a285_rack_quick_pick.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
@@ -11,13 +12,13 @@ import {
 import {
  ADVANCED_RACK_ITEM_ID,ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,RACK_RANGE,
  rackPlacementCandidates,rackCanPlace,rackCanonicalFilter,rackFilterMatches,
- bindingInRange
+ bindingInRange,RACK_PAYLOAD_KEY
 } from './a2746_advanced_rack_core.js';
 import {
  rackContainer,readRackFilters,writeRackFilters,clearRackFilters,
  readRackItems,writeRackItems,clearRackItems,syncRackDisplay
 } from './a2746_rack_state_adapter.js';
-import {readRackPayloadItem,writeRackPayloadItem} from './a2746_rack_item_codec.js';
+import {readRackPayloadItem,writeRackPayloadItem,encodeRackPayload} from './a2746_rack_item_codec.js';
 import {awardNeatAndOrderly} from './a2756_advancement_event_runtime.js';
 
 const BIND_PREFIX='kaleidoscope_grilling:rack_binding_';
@@ -257,10 +258,16 @@ export async function openRackForm(player,dimension,location){
 }
 
 function restorePlacedRack(block,item){
- const payload=readRackPayloadItem(item);
- writeRackItems(block,payload.items);
- writeRackFilters(block,payload.filters);
- syncRackDisplay(block);
+ const raw=item.getDynamicProperty(RACK_PAYLOAD_KEY),payload=readRackPayloadItem(item);
+ if(raw!==undefined&&encodeRackPayload(payload.items,payload.filters)!==raw)
+  throw new Error('Packed rack metadata cannot round-trip; refusing partial restore');
+ const existing=readRackItems(block);
+ if(existing.some(Boolean))throw new Error('Refusing to overwrite occupied backing inventory');
+ if(!writeRackItems(block,payload.items)||!writeRackFilters(block,payload.filters)){
+  quarantineStation(block,'packed placement commit incomplete');
+  throw new Error('Packed rack restore incomplete; inventory quarantined');
+ }
+ syncRackDisplay(block);return true;
 }
 
 function scheduleRackPlacement(event){
@@ -284,10 +291,26 @@ function createRackDrop(block){
 }
 function manuallyBreakRack(block,drop=true){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return false;
- const dimension=block.dimension,location=loc(block),item=createRackDrop(block);
- clearRackItems(block);clearRackFilters(block);
- try{block.setType('minecraft:air')}catch{return false}
- if(drop)try{dimension.spawnItem(item,{x:location.x+.5,y:location.y+.35,z:location.z+.5})}catch{}
+ const dimension=block.dimension,location=loc(block),permutation=block.permutation;
+ let items,filters,item,escrow;
+ try{
+  items=readRackItems(block);filters=readRackFilters(block);
+  const raw=encodeRackPayload(items,filters);
+  item=writeRackPayloadItem(new ItemStack(ADVANCED_RACK_ITEM_ID,1),items,filters);
+  if(item.getDynamicProperty(RACK_PAYLOAD_KEY)!==raw)throw new Error('Packed rack payload was not saved');
+  const check=readRackPayloadItem(item);
+  if(encodeRackPayload(check.items,check.filters)!==raw)throw new Error('Rack item metadata cannot round-trip');
+  if(drop)escrow=dimension.spawnItem(item,{x:location.x+.5,y:location.y+.35,z:location.z+.5});
+ }catch(error){console.warn('[Grilling rack break preparation] '+error);return false}
+ try{
+  if(!clearRackItems(block)||!clearRackFilters(block))throw new Error('rack state commit failed');
+  block.setType('minecraft:air');
+ }catch(error){
+  try{escrow?.remove()}catch(cleanup){quarantineStation(block,'escrow removal unconfirmed');console.warn('[Grilling rack quarantine] '+cleanup);return false}
+  try{const live=dimension.getBlock(location);live.setPermutation(permutation);if(!writeRackItems(live,items)||!writeRackFilters(live,filters))throw new Error('rollback commit failed')}catch(restore){quarantineStation(block,'rollback incomplete');console.warn('[Grilling rack rollback] '+restore)}
+  console.warn('[Grilling rack break] '+error);return false;
+ }
+ try{retireEmptyStationContainer(dimension.getBlock(location))}catch(error){console.warn('[Grilling storage retirement] '+error)}
  return true;
 }
 

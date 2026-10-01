@@ -28,11 +28,6 @@
     },
     "components": {
       "minecraft:display_name": "tile.kaleidoscope_grilling:grill.name",
-      "minecraft:block_entity": {
-        "container": {
-          "slot_count": 3
-        }
-      },
       "minecraft:geometry": "geometry.kg_a23.grill_flat",
       "minecraft:material_instances": {
         "*": {
