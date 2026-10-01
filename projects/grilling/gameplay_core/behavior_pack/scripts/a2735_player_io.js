@@ -10,7 +10,7 @@ export function getMainHand(player){
 
 export function setMainHand(player,stack){
  const container=playerInventory(player);
- if(!container)return undefined;
+ if(!container)throw new Error('Grilling: player inventory unavailable');
  return container.setItem(player.selectedSlotIndex,stack);
 }
 
@@ -19,7 +19,10 @@ export function getOffHand(player){
 }
 
 export function setOffHand(player,stack){
- try{return player?.getComponent('minecraft:equippable')?.setEquipment(EquipmentSlot.Offhand,stack)}catch{return undefined}
+ const equipment=player?.getComponent('minecraft:equippable');
+ if(!equipment)throw new Error('Grilling: player equipment unavailable');
+ if(equipment.setEquipment(EquipmentSlot.Offhand,stack)!==true)throw new Error('Grilling: offhand write rejected');
+ return true;
 }
 
 export function getHand(player,hand){
@@ -45,4 +48,21 @@ export function findHandEntry(player,itemId){
 
 export function isCreative(player){
  try{return player?.getGameMode?.()===GameMode.Creative}catch{return false}
+}
+
+// Pin the actual storage slot before a transaction, including its rollback.
+// Getters above remain tolerant for display probes; transactional access is strict.
+export function captureWritableHand(player,hand){
+ if(hand==='off'){
+  const equipment=player.getComponent('minecraft:equippable');
+  if(!equipment)throw new Error('Grilling: player equipment unavailable');
+  const before=equipment.getEquipment(EquipmentSlot.Offhand)?.clone();
+  return {before,write(stack){
+   if(equipment.setEquipment(EquipmentSlot.Offhand,stack)!==true)throw new Error('Grilling: offhand write rejected');
+  }};
+ }
+ if(hand!=='main')throw new Error('Grilling: unknown hand');
+ const container=player.getComponent('minecraft:inventory')?.container,slot=player.selectedSlotIndex;
+ if(!container||!Number.isInteger(slot)||slot<0||slot>=container.size)throw new Error('Grilling: main-hand slot unavailable');
+ return {before:container.getItem(slot)?.clone(),write(stack){container.setItem(slot,stack)}};
 }

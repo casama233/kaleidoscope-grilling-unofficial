@@ -12,7 +12,16 @@ export const KITCHEN_KNIVES=Object.freeze([
  'kaleidoscope_cookery:netherite_kitchen_knife'
 ]);
 
-export function isKitchenKnife(id){return KITCHEN_KNIVES.includes(String(id??''))}
+export const KITCHEN_KNIFE_TAG='kaleidoscope_cookery:kitchen_knife';
+export function isKitchenKnife(id,tags=[]){
+ return KITCHEN_KNIVES.includes(String(id??'')) || (Array.isArray(tags)&&tags.includes(KITCHEN_KNIFE_TAG));
+}
+// Read only the real ItemStack. Caller retains all existing loot probabilities.
+export function isKitchenKnifeStack(stack){
+ if(!stack)return false;
+ if(isKitchenKnife(stack.typeId))return true;
+ try{return typeof stack.hasTag==='function'&&stack.hasTag(KITCHEN_KNIFE_TAG)===true}catch{return false}
+}
 
 export function stationKey(dimensionId,x,y,z){
  return `kc_station:${dimensionId}:${x},${y},${z}`;

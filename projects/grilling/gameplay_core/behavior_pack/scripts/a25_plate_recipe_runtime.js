@@ -5,6 +5,7 @@ import {world,system,ItemStack} from '@minecraft/server';
 import {
  SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
 } from './a24_skewering_core.js';
+import {RAW_SKEWER_TAG,GRILLED_SKEWER_TAG} from './skewer_compat_core.js';
 import {
  PLATE_ID,PLATE_BLOCK_ID,BOOK_ID,RECIPE_BLOCK_ID,PLATE_SKEWERS_KEY,BOOK_RECORD_KEY,PLATE_CAPACITY,
  normalizePlateRows,plateAdd,plateRemoveLast,isRecordableRecipe,makeBookRecord,bookIngredientSlots,planInventoryConsumption
@@ -83,7 +84,11 @@ function restoreStack(row){
  for(const id of keys)try{setItemProperty(out,id,props[id])}catch{}
  return out;
 }
-function isSkewer(stack){return !!stack&&(FIXED_IDS.has(stack.typeId)||stack.typeId===SECRET_ID)}
+function isSkewer(stack){
+ if(!stack)return false;
+ if(FIXED_IDS.has(stack.typeId)||stack.typeId===SECRET_ID)return true;
+ try{return !!(stack.hasTag?.(RAW_SKEWER_TAG)||stack.hasTag?.(GRILLED_SKEWER_TAG))}catch{return false}
+}
 function skewerIngredientIds(stack){return parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3).map(x=>x.id)}
 function isRecordableStack(stack){
  if(!stack)return false;const ingredients=skewerIngredientIds(stack);

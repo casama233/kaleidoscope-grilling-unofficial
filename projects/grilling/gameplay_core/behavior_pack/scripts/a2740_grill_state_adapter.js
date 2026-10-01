@@ -1,4 +1,5 @@
 import {world} from '@minecraft/server';
+import {stationContainer} from './family_station_storage.js';
 import {initialState,normalizeState} from './core_logic.js';
 
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
@@ -15,8 +16,8 @@ export function readGrillState(block){
 }
 
 export function occupiedGrillSlots(block){
- const c=block?.getComponent('minecraft:inventory')?.container;
- if(!c)return 0;
+ const c=stationContainer(block);
+ if(!c)throw new Error('Grill inventory unavailable; ticking paused');
  let n=0;
  for(let i=0;i<3;i++)if(c.getItem(i))n++;
  return n;

@@ -1,3 +1,7 @@
+import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
+import {rackSlotAtHit} from './a285_rack_quick_pick.js';
+import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
+import {interactionFeedback} from './a283_interaction_feedback.js';
 import {
  world,system,ItemStack,CommandPermissionLevel
 } from '@minecraft/server';
@@ -8,21 +12,27 @@ import {
 import {
  ADVANCED_RACK_ITEM_ID,ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,RACK_RANGE,
  rackPlacementCandidates,rackCanPlace,rackCanonicalFilter,rackFilterMatches,
- bindingInRange
+ bindingInRange,RACK_PAYLOAD_KEY
 } from './a2746_advanced_rack_core.js';
 import {
  rackContainer,readRackFilters,writeRackFilters,clearRackFilters,
  readRackItems,writeRackItems,clearRackItems,syncRackDisplay
 } from './a2746_rack_state_adapter.js';
-import {readRackPayloadItem,writeRackPayloadItem} from './a2746_rack_item_codec.js';
+import {readRackPayloadItem,writeRackPayloadItem,encodeRackPayload} from './a2746_rack_item_codec.js';
+import {awardNeatAndOrderly} from './a2756_advancement_event_runtime.js';
 
 const BIND_PREFIX='kaleidoscope_grilling:rack_binding_';
 
 function loc(block){return {x:block.x,y:block.y,z:block.z}}
 function tags(stack){try{return stack?.getTags?.()??[]}catch{return []}}
-function message(player,text){try{player.onScreenDisplay.setActionBar(text)}catch{}}
+const message=interactionFeedback;
 function resolveRack(dimension,location){
  try{const b=dimension.getBlock(location);return b?.typeId===ADVANCED_RACK_BLOCK_ID?b:undefined}catch{return undefined}
+}
+function rackInUseRange(player,block){
+ if(!player||!block||player.dimension.id!==block.dimension.id)return false;
+ const dx=block.x+.5-player.location.x,dy=block.y+.5-player.location.y,dz=block.z+.5-player.location.z;
+ return dx*dx+dy*dy+dz*dz<=64;
 }
 function bindingKey(slot){return BIND_PREFIX+slot}
 function readBinding(player,hotbarSlot){
@@ -208,7 +218,7 @@ function slotButton(slot,stored,filter){
 }
 
 async function openSlotForm(player,dimension,location,slot){
- const block=resolveRack(dimension,location);if(!block)return;
+ const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
  const c=rackContainer(block),filters=readRackFilters(block),stored=c?.getItem(slot);
  const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
  form.body('§7槽位 '+(slot+1)+' · '+(slot<5?'調料':'工具')+'\n'+filterLabel(filters[slot]));
@@ -219,19 +229,19 @@ async function openSlotForm(player,dimension,location,slot){
  form.button('§7返回');
  let r;try{r=await form.show(player)}catch{return}
  if(r.canceled)return;
- const live=resolveRack(dimension,location);if(!live)return;
+ const live=resolveRack(dimension,location);if(!live||!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return;}
  if(r.selection===0){if(!swapWithHotbar(player,live,slot))message(player,'§c無法交換：請確認槽位分類與背包空間')}
  else if(r.selection===1){if(!depositSelected(player,live,slot))message(player,'§c無法存入：物品分類或篩選不符合')}
  else if(r.selection===2){if(!withdrawToInventory(player,live,slot))message(player,'§c背包沒有足夠空間')}
  else if(r.selection===3){
   const lc=rackContainer(live),lf=readRackFilters(live);
   if(lc?.getItem(slot))message(player,'§c槽位有物品時不能清除篩選');
-  else{lf[slot]=null;writeRackFilters(live,lf);message(player,'§a已清除槽位 '+(slot+1)+' 的篩選')}
+  else{lf[slot]=null;writeRackFilters(live,lf);}
  }else if(r.selection===4){system.run(()=>openRackForm(player,dimension,location))}
 }
 
 export async function openRackForm(player,dimension,location){
- const block=resolveRack(dimension,location);if(!block)return;
+ const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
  const c=rackContainer(block),filters=readRackFilters(block);if(!c)return;
  const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
  form.body({translate:'ui.kaleidoscope_grilling.advanced_rack.hint'});
@@ -242,28 +252,34 @@ export async function openRackForm(player,dimension,location){
  if(r.selection>=0&&r.selection<RACK_COMPARTMENTS)system.run(()=>openSlotForm(player,dimension,location,r.selection));
  else if(r.selection===RACK_COMPARTMENTS){
   const live=resolveRack(dimension,location);
-  if(live&&depositMatching(player,live))message(player,'§a已存入所有符合既有篩選的物品');
-  else message(player,'§7沒有可存入的符合物品');
+  if(live&&!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return}
+  if(!live||!depositMatching(player,live))message(player,'§7沒有可存入的符合物品');
  }
 }
 
 function restorePlacedRack(block,item){
- const payload=readRackPayloadItem(item);
- writeRackItems(block,payload.items);
- writeRackFilters(block,payload.filters);
- syncRackDisplay(block);
+ const raw=item.getDynamicProperty(RACK_PAYLOAD_KEY),payload=readRackPayloadItem(item);
+ if(raw!==undefined&&encodeRackPayload(payload.items,payload.filters)!==raw)
+  throw new Error('Packed rack metadata cannot round-trip; refusing partial restore');
+ const existing=readRackItems(block);
+ if(existing.some(Boolean))throw new Error('Refusing to overwrite occupied backing inventory');
+ if(!writeRackItems(block,payload.items)||!writeRackFilters(block,payload.filters)){
+  quarantineStation(block,'packed placement commit incomplete');
+  throw new Error('Packed rack restore incomplete; inventory quarantined');
+ }
+ syncRackDisplay(block);return true;
 }
 
 function scheduleRackPlacement(event){
  if(event.isFirstEvent===false||event.itemStack?.typeId!==ADVANCED_RACK_ITEM_ID)return;
- const snapshot=event.itemStack.clone(),dimension=event.block.dimension;
+ const snapshot=event.itemStack.clone(),dimension=event.block.dimension,player=event.player;
  const candidates=rackPlacementCandidates(event.block.location,event.blockFace)
   .map(location=>({location,wasRack:dimension.getBlock(location)?.typeId===ADVANCED_RACK_BLOCK_ID}));
  system.run(()=>{
   for(const row of candidates){
    if(row.wasRack)continue;
    const block=dimension.getBlock(row.location);
-   if(block?.typeId===ADVANCED_RACK_BLOCK_ID){restorePlacedRack(block,snapshot);return}
+   if(block?.typeId===ADVANCED_RACK_BLOCK_ID){restorePlacedRack(block,snapshot);awardNeatAndOrderly(player);return}
   }
  });
 }
@@ -275,10 +291,26 @@ function createRackDrop(block){
 }
 function manuallyBreakRack(block,drop=true){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return false;
- const dimension=block.dimension,location=loc(block),item=createRackDrop(block);
- clearRackItems(block);clearRackFilters(block);
- try{block.setType('minecraft:air')}catch{return false}
- if(drop)try{dimension.spawnItem(item,{x:location.x+.5,y:location.y+.35,z:location.z+.5})}catch{}
+ const dimension=block.dimension,location=loc(block),permutation=block.permutation;
+ let items,filters,item,escrow;
+ try{
+  items=readRackItems(block);filters=readRackFilters(block);
+  const raw=encodeRackPayload(items,filters);
+  item=writeRackPayloadItem(new ItemStack(ADVANCED_RACK_ITEM_ID,1),items,filters);
+  if(item.getDynamicProperty(RACK_PAYLOAD_KEY)!==raw)throw new Error('Packed rack payload was not saved');
+  const check=readRackPayloadItem(item);
+  if(encodeRackPayload(check.items,check.filters)!==raw)throw new Error('Rack item metadata cannot round-trip');
+  if(drop)escrow=dimension.spawnItem(item,{x:location.x+.5,y:location.y+.35,z:location.z+.5});
+ }catch(error){console.warn('[Grilling rack break preparation] '+error);return false}
+ try{
+  if(!clearRackItems(block)||!clearRackFilters(block))throw new Error('rack state commit failed');
+  block.setType('minecraft:air');
+ }catch(error){
+  try{escrow?.remove()}catch(cleanup){quarantineStation(block,'escrow removal unconfirmed');console.warn('[Grilling rack quarantine] '+cleanup);return false}
+  try{const live=dimension.getBlock(location);live.setPermutation(permutation);if(!writeRackItems(live,items)||!writeRackFilters(live,filters))throw new Error('rollback commit failed')}catch(restore){quarantineStation(block,'rollback incomplete');console.warn('[Grilling rack rollback] '+restore)}
+  console.warn('[Grilling rack break] '+error);return false;
+ }
+ try{retireEmptyStationContainer(dimension.getBlock(location))}catch(error){console.warn('[Grilling storage retirement] '+error)}
  return true;
 }
 
@@ -295,9 +327,19 @@ function nearestRack(player){
 }
 
 world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
+ if(event.cancel)return;
  if(event.block.typeId===ADVANCED_RACK_BLOCK_ID){
   event.cancel=true;
-  if(event.isFirstEvent!==false){const p=event.player,d=event.block.dimension,l=loc(event.block);system.run(()=>openRackForm(p,d,l))}
+  if(event.isFirstEvent!==false){
+   const p=event.player,d=event.block.dimension,l=loc(event.block);
+   if(p.isSneaking){
+    const slot=rackSlotAtHit(event.block.permutation.getState('minecraft:cardinal_direction'),event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
+    system.run(()=>{
+     const live=resolveRack(d,l);if(slot<0||!live||!rackInUseRange(p,live)||!interactionIntentStillCurrent(p,intent))return;
+     if(!swapWithHotbar(p,live,slot))message(p,'§7這個槽位是空的，或背包沒有足夠空間');
+    });
+   }else system.run(()=>openRackForm(p,d,l));
+  }
   return;
  }
  try{scheduleRackPlacement(event)}catch{}

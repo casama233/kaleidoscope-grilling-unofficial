@@ -1,10 +1,10 @@
 {
   "schema_version": 3,
-  "version": "0.3.0",
+  "version": "0.3.2",
   "revision": "a3_0_0",
   "module_id": "kg_a1:grilling",
   "order": 300,
-  "icon": "textures/ui/kg_grilling/guide_grill",
+  "icon": "textures/ui/kg_grilling/grill_legged_lit",
   "locales": [
     "zh_CN",
     "zh_TW",
@@ -52,7 +52,7 @@
         "zh_TW": "工作站",
         "en_US": "Workstations"
       },
-      "icon": "textures/ui/kg_grilling/guide_grill"
+      "icon": "textures/ui/kg_grilling/grill_legged_lit"
     },
     {
       "id": "food_encyclopedia",
@@ -70,7 +70,7 @@
         "zh_TW": "工具與裝備",
         "en_US": "Tools & Gear"
       },
-      "icon": "textures/ui/kg_grilling/guide_seasoning"
+      "icon": "textures/ui/kg_grilling/catalog/special_seasoning"
     },
     {
       "id": "storage_utilities",
@@ -2900,7 +2900,7 @@
         "projects/grilling/guide/content.a2.json#guide_quick_start"
       ],
       "acquisition": "not_applicable",
-      "icon": "textures/ui/kg_grilling/guide_grill"
+      "icon": "textures/ui/kg_grilling/grill_legged_lit"
     },
     {
       "id": "kg_a1:guide_hot_food",

@@ -1,6 +1,7 @@
 import {VANILLA_FOOD_BEHAVIOR} from './a285_vanilla_food_data.js';
 import {effectsForStandaloneFood} from './a2732_standalone_food_effect_core.js';
 import {COOKED_EFFECTS,RAW_NAUSEA} from './data.js';
+import {applySecretBehaviorExtension} from './secret_compat_core.js';
 
 // Explicit compatibility data, never a forged itemCompleteUse event. Only edible
 // ingredients inherit finish-use effects, matching Java SecretSkewerItem.
@@ -15,9 +16,12 @@ export function ingredientBehavior(row){
   effects.push({kind:'native',effect:'nausea',ticks:row.id.endsWith('mysterious_skewer')?100:60});
  if(row.id==='kaleidoscope_grilling:dark_grilling')effects.push({kind:'native',effect:'blindness',ticks:200});
  if(row.id==='kaleidoscope_grilling:sichuan_pepper')effects.push({kind:'persistent_fx',effect:'numb',ticks:200});
- return {effects,convertTo:row.convertTo||vanilla?.convertTo||'',
+ const convertTo=row.convertTo||vanilla?.convertTo||'';
+ return applySecretBehaviorExtension({
+  effects,convertTo,remainder:convertTo?{id:convertTo,count:1}:null,
   clearPoison:row.id==='minecraft:honey_bottle',teleport:row.id==='minecraft:chorus_fruit',
-  ordinary:row.id==='kaleidoscope_grilling:ordinary_skewer'};
+  ordinary:row.id==='kaleidoscope_grilling:ordinary_skewer'
+ },row);
 }
 
 export function rolledIngredientEffects(row,random=Math.random){

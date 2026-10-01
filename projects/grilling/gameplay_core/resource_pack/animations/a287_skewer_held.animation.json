@@ -4,7 +4,7 @@
     "animation.kg_a287.skewer_fp_right": {
       "loop": true,
       "bones": {
-        "grip": {
+        "skewer_pose": {
           "position": [
             -1,
             7.75,
@@ -20,13 +20,20 @@
             0.8,
             0.8
           ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
         }
       }
     },
     "animation.kg_a287.skewer_fp_left": {
       "loop": true,
       "bones": {
-        "grip": {
+        "skewer_pose": {
           "position": [
             -1.5,
             7.25,
@@ -42,17 +49,24 @@
             0.8,
             0.8
           ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
         }
       }
     },
     "animation.kg_a287.skewer_tp_right": {
       "loop": true,
       "bones": {
-        "grip": {
+        "skewer_pose": {
           "position": [
-            0.75,
-            6.25,
-            5.5
+            0,
+            0,
+            0
           ],
           "rotation": [
             -98.57,
@@ -64,17 +78,24 @@
             0.8,
             0.8
           ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            -1,
+            6
+          ]
         }
       }
     },
     "animation.kg_a287.skewer_tp_left": {
       "loop": true,
       "bones": {
-        "grip": {
+        "skewer_pose": {
           "position": [
-            0.75,
-            6.25,
-            5.5
+            0,
+            0,
+            0
           ],
           "rotation": [
             -98.57,
@@ -85,6 +106,13 @@
             0.8,
             0.8,
             0.8
+          ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            -1,
+            6
           ]
         }
       }

@@ -89,7 +89,7 @@ export function inventoryGains(before=[],after=[]){
 }
 export function metadataPlan(kind,state={}){
  const normalized=normalizeCuisineState(state);
- if(kind==='pot')return {seasoning:[...normalized.seasoning],hotTicks:potHotTicks(normalized.oilType)};
+ if(kind==='pot')return {seasoning:[...normalized.seasoning],hotTicks:potHotTicks(normalized.oilType||'default')};
  if(kind==='stockpot')return {seasoning:[...normalized.seasoning],hotTicks:STOCKPOT_HOT_TICKS};
  return {seasoning:[],hotTicks:0};
 }

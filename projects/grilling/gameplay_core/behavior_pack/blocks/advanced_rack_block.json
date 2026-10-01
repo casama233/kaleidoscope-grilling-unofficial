@@ -23,11 +23,6 @@
     },
     "components": {
       "minecraft:display_name": "tile.kaleidoscope_grilling:advanced_rack.name",
-      "minecraft:block_entity": {
-        "container": {
-          "slot_count": 9
-        }
-      },
       "minecraft:geometry": "geometry.kg_a1.advanced_rack_0",
       "minecraft:material_instances": {
         "*": {

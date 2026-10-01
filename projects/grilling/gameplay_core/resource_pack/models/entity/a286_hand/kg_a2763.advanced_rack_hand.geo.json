@@ -22,7 +22,25 @@
             24,
             0
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)",
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        },
+        {
+          "name": "rack_pose",
+          "parent": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ]
+        },
+        {
+          "name": "rack_model",
+          "parent": "rack_pose",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
           "cubes": [
             {
               "origin": [

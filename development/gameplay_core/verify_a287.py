@@ -1,6 +1,6 @@
 """All held binding paths and pose dispatch. Does not simulate a Minecraft client."""
 from pathlib import Path
-import ast,json,re
+import ast,json,re,subprocess
 import a287_binding_repair as repair
 from verify_a285 import survival_gate
 from verify_a284 import eating_gate
@@ -34,15 +34,27 @@ def binding_assets():
      cases+=1
     selected.append(expected)
   for ref in d['geometry'].values():
-   refs.add(ref);g=idx[ref];assert len(g['bones'])==1,ref
+   refs.add(ref);g=idx[ref]
    b=g['bones'][0];assert b['name']=='grip' and b['pivot']==[0,24,0]
    assert b['binding']=='q.item_slot_to_bone_name(context.item_slot)' and 'parent' not in b
-   assert b.get('cubes')
-   for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
-   # Flattening must retain every source cube, including its UV and local rotation.
    if ref.startswith('geometry.kg_a287.'):
+    # A2.8.14 splits binding, display pose and handle-origin correction.
+    assert len(g['bones'])==3 and not b.get('cubes'),ref
+    pose,model=g['bones'][1:]
+    assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
+    assert model['name']=='skewer_model' and model['parent']=='skewer_pose' and model['pivot']==[0,24,0]
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'skewer_pose','skewer_model'},anim
     oldref=ref.replace('kg_a287.','kg_a283.');old=idx[oldref]
-    assert b['cubes']==[c for bone in old['bones'] for c in bone.get('cubes',[])],ref
+    assert model['cubes']==[c for bone in old['bones'] for c in bone.get('cubes',[])],ref
+   elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':
+    assert len(g['bones'])==3 and not b.get('cubes'),ref
+    pose,model=g['bones'][1:]
+    assert pose=={'name':'rack_pose','parent':'grip','pivot':[0,24,0]}
+    assert model['name']=='rack_model' and model['parent']=='rack_pose' and model['pivot']==[0,24,0]
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'rack_pose','rack_model'},anim
+   else:
+    assert len(g['bones'])==1 and b.get('cubes'),ref
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
   if p.name.endswith('_skewer.attachable.json'):
    old=repair.source(p);old=old['minecraft:attachable']['description']
    assert d['scripts']['pre_animation']==old['scripts']['pre_animation']
@@ -98,5 +110,43 @@ def plant_gate():
    for vector in vectors:
     assert all(v==0 or isinstance(v,str) and v.endswith(' : 0.0') for v in vector),key
  print('A287 single-sided plant material instances:',count)
+def secret_compat_gate():
+ main=(BP/'scripts/main.js').read_text()
+ assert 'VANILLA_SMOKED' not in main
+ assert 'resolveSecretSmokedId(row)' in main
+ assert "emitSecretIngredientConsumed(player,row)" in main
+ runtime=(BP/'scripts/secret_compat_runtime.js').read_text()
+ for event in (
+  'kaleidoscope_grilling:register_secret_smoking',
+  'kaleidoscope_grilling:register_secret_food_behavior',
+  'kaleidoscope_grilling:register_secret_compat',
+  'kaleidoscope_grilling:secret_ingredient_consumed',
+ ):
+  assert event in runtime,event
+ subprocess.run(['node',str(Path(__file__).with_name('test_secret_compat_core.mjs'))],check=True)
+ print('A287 secret-skewer extensible smoking/finish-use compatibility: PASS')
+
+def parity_batch2_gate():
+ main=(BP/'scripts/main.js').read_text()
+ assert 'compactMatchingHotFood' in main and 'isFoodStack(e.itemStack)' in main
+ cuisine=(BP/'scripts/a2750_cookery_cuisine_runtime.js').read_text()
+ assert 'kaleidoscope_grilling:cookery_output_ready' not in cuisine  # event constant stays in the contract module
+ assert 'COOKERY_OUTPUT_READY_EVENT' in cuisine and 'applyAuthoritativeCookeryOutput' in cuisine
+ subprocess.run(['node','--experimental-vm-modules',str(Path(__file__).with_name('test_hot_food_manual_merge.mjs'))],check=True)
+ subprocess.run(['node',str(Path(__file__).with_name('test_cookery_output_contract_core.mjs'))],check=True)
+ print('A287 generic hot-food manual merge and authoritative Cookery output contract: PASS')
+
+def parity_batch3_gate():
+ oil=(BP/'scripts/a23_oil_world.js').read_text()
+ assert 'MAX_SOURCES' not in oil and 'slice(0,MAX_SOURCES)' not in oil
+ assert 'getDynamicPropertyIds' in oil and 'FLOW_SOURCE_BUDGET' in oil and 'heightRange' in oil
+ main=(BP/'scripts/main.js').read_text()
+ assert 'skewerIngredientDecision' in main and 'customSkewerCookedId' in main and 'isCompatRawSkewer' in main
+ plate=(BP/'scripts/a25_plate_recipe_runtime.js').read_text()
+ assert 'RAW_SKEWER_TAG' in plate and 'GRILLED_SKEWER_TAG' in plate
+ subprocess.run(['node',str(Path(__file__).with_name('test_oil_source_registry_core.mjs'))],check=True)
+ subprocess.run(['node',str(Path(__file__).with_name('test_skewer_compat_core.mjs'))],check=True)
+ print('A287 per-source oil registry and declarative SkewerCompat parity: PASS')
+
 if __name__=='__main__':
- plant_gate();eating_gate();survival_gate();previous_gate()
+ plant_gate();secret_compat_gate();parity_batch2_gate();parity_batch3_gate();eating_gate();survival_gate();previous_gate()

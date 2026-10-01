@@ -1,4 +1,5 @@
 import {world} from '@minecraft/server';
+import {stationContainer} from './family_station_storage.js';
 import {
  ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,normalizeRackFilters,rackDisplayLevel
 } from './a2746_advanced_rack_core.js';
@@ -9,7 +10,7 @@ export function rackFiltersKey(block){
 }
 export function rackContainer(block){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return undefined;
- try{return block.getComponent('minecraft:inventory')?.container}catch{return undefined}
+ return stationContainer(block);
 }
 export function readRackFilters(block){
  try{
@@ -25,20 +26,23 @@ export function clearRackFilters(block){
 }
 export function readRackItems(block){
  const c=rackContainer(block),out=Array(RACK_COMPARTMENTS).fill(undefined);
- if(!c)return out;
- for(let i=0;i<RACK_COMPARTMENTS;i++)try{out[i]=c.getItem(i)?.clone()}catch{}
+ if(!c)throw new Error('Rack inventory unavailable; not an empty rack');
+ for(let i=0;i<RACK_COMPARTMENTS;i++)out[i]=c.getItem(i)?.clone();
  return out;
 }
 export function writeRackItems(block,items){
  const c=rackContainer(block);if(!c)return false;
- for(let i=0;i<RACK_COMPARTMENTS;i++)try{c.setItem(i,items?.[i]?.clone())}catch{}
+ const old=Array.from({length:RACK_COMPARTMENTS},(_,i)=>c.getItem(i)?.clone());
+ const next=Array.from({length:RACK_COMPARTMENTS},(_,i)=>items?.[i]?.clone());
+ try{for(let i=0;i<RACK_COMPARTMENTS;i++)c.setItem(i,next[i]);}
+ catch(error){
+  let restored=true;for(let i=0;i<RACK_COMPARTMENTS;i++)try{c.setItem(i,old[i])}catch{restored=false}
+  if(!restored)throw new Error('Rack inventory rollback failed; manual recovery required');
+  return false;
+ }
  syncRackDisplay(block);return true;
 }
-export function clearRackItems(block){
- const c=rackContainer(block);if(!c)return false;
- for(let i=0;i<RACK_COMPARTMENTS;i++)try{c.setItem(i,undefined)}catch{}
- syncRackDisplay(block);return true;
-}
+export function clearRackItems(block){return writeRackItems(block,[]);}
 export function syncRackDisplay(block){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return 0;
  const items=readRackItems(block),level=rackDisplayLevel(items.map(Boolean));

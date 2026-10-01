@@ -1,0 +1,35 @@
+name: Family compatibility candidate checks
+on:
+  pull_request:
+    paths: ['compat/family/**', 'tools/**', 'projects/grilling/gameplay_core/**', 'development/gameplay_core/**', 'baseline.json', '.github/workflows/family-candidate.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install Pillow==11.3.0
+      - name: Verify current canonical family candidate without installation transforms
+        run: |
+          python tools/baseline_gate.py check --release
+          python development/gameplay_core/verify_current.py
+          python tools/check_station_storage.py
+          node tools/check_family_knives.mjs
+          python tools/baseline_gate.py check --release --receipt dist/family/source-receipt.json
+          git diff --exit-code -- projects/grilling/gameplay_core/
+          git rev-parse HEAD > dist/family/SOURCE_COMMIT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Grilling-family-compatibility-candidate
+          path: dist/family/
+          retention-days: 14
