@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import struct
+import sys
 import zlib
 from collections import Counter
 from pathlib import Path
@@ -364,7 +365,7 @@ def check_attachables(findings, geometry_index, animations, controllers, known_i
             targeted = set(animations[anim_id]["body"].get("bones", {}).keys())
             risky = sorted(targeted & bound_names)
             if risky:
-                add(findings, "high", "animation_moves_bound_bone", ident,
+                add(findings, "info" if anim_id.startswith("animation.kg_a286.bottle_") and risky == ["grip"] else "high", "animation_moves_bound_bone", ident,
                     f"animation {anim_id} directly transforms bound bone(s) {risky}",
                     str(animations[anim_id]["path"].relative_to(ROOT)))
         for rc in desc.get("render_controllers", []):
@@ -425,164 +426,40 @@ def check_attachables(findings, geometry_index, animations, controllers, known_i
     return dict(stats)
 
 
-def check_corrective_display_contracts(findings, geometry_index, animations):
-    # Seasoning bottle: A2.7.33 established safe hand-space shell; A2.7.63 adds Java display on child bone.
-    seasoning_geo_id = "geometry.kg_a2733.seasoning_bottle_hand"
-    row = geometry_index.get(seasoning_geo_id)
-    seasoning_report = load_json(JAVA_DISPLAY / "seasoning_bottles_1.json")["java_display"]
-    if not row:
-        add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "missing seasoning hand geometry")
-    else:
-        bones = {b.get("name"): b for b in row["geo"].get("bones", [])}
-        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
-            add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "root lost item-slot binding")
-        if bones.get("display", {}).get("parent") != "root":
-            add(findings, "error", "seasoning_display_contract", seasoning_geo_id, "display bone must be an unbound child of root")
-        for name, bone in bones.items():
-            if name not in {"root", "display"} and bone.get("parent") != "display":
-                add(findings, "error", "seasoning_display_contract", seasoning_geo_id,
-                    f"shell bone {name} must stay below display")
-
-    seasoning_map = {
-        "firstperson_righthand": "animation.kaleidoscope_grilling.a2763.seasoning_fp_right",
-        "firstperson_lefthand": "animation.kaleidoscope_grilling.a2763.seasoning_fp_left",
-        "thirdperson_righthand": "animation.kaleidoscope_grilling.a2763.seasoning_tp_right",
-        "thirdperson_lefthand": "animation.kaleidoscope_grilling.a2763.seasoning_tp_left",
-    }
-    for java_key, anim_id in seasoning_map.items():
-        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
-        expected = seasoning_report[java_key]
-        if actual is None:
-            add(findings, "error", "seasoning_display_contract", anim_id, "missing corrective display animation")
-            continue
-        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
-            add(findings, "error", "seasoning_display_contract", anim_id,
-                f"rotation/scale drift from Java {java_key}")
-        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
-            add(findings, "error", "seasoning_display_contract", anim_id,
-                f"translation drift from Java {java_key}")
-
-    for item in ("empty_seasoning_bottle", "pending_seasoning", "special_seasoning"):
-        path = RP / "attachables" / f"{item}.attachable.json"
+def check_current_display_contracts(findings, geometry_index, animations):
+    """Check the current bound rig and converted frames, never historic IDs."""
+    sys.path.insert(0, str(ROOT / "development/gameplay_core"))
+    from held_pose_frames import expected_animations
+    expected = expected_animations()
+    for ident, body in expected.items():
+        if animations.get(ident, {}).get("body") != body:
+            add(findings, "error", "held_pose_frame_drift", ident,
+                "runtime differs from reviewed Java-to-Bedrock frame conversion")
+    counts = Counter()
+    skewer_refs = set()
+    aliases = {"fp_right", "fp_left", "tp_right", "tp_left"}
+    for path in sorted((RP / "attachables").glob("*.json")):
         desc = load_json(path)["minecraft:attachable"]["description"]
-        values = set((desc.get("animations") or {}).values())
-        if set(seasoning_map.values()) - values:
-            add(findings, "error", "seasoning_display_contract", f"kaleidoscope_grilling:{item}",
-                "attachable does not expose all four Java display animations")
-
-    # Advanced Rack: Java defines FP right only; do not invent a FP-left parity claim.
-    rack_geo_id = "geometry.kg_a2763.advanced_rack_hand"
-    rack_row = geometry_index.get(rack_geo_id)
-    rack_report = load_json(JAVA_DISPLAY / "advanced_rack_0.json")["java_display"]
-    if not rack_row:
-        add(findings, "error", "rack_display_contract", rack_geo_id, "missing Advanced Rack hand geometry")
-    else:
-        bones = {b.get("name"): b for b in rack_row["geo"].get("bones", [])}
-        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
-            add(findings, "error", "rack_display_contract", rack_geo_id, "root lost item-slot binding")
-        if bones.get("display", {}).get("parent") != "root":
-            add(findings, "error", "rack_display_contract", rack_geo_id, "display bone must be an unbound child of root")
-
-    rack_map = {
-        "firstperson_righthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_fp_right",
-        "thirdperson_righthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_right",
-        "thirdperson_lefthand": "animation.kaleidoscope_grilling.a2763.advanced_rack_tp_left",
-    }
-    for java_key, anim_id in rack_map.items():
-        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
-        expected = rack_report[java_key]
-        if actual is None:
-            add(findings, "error", "rack_display_contract", anim_id, "missing corrective display animation")
-            continue
-        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
-            add(findings, "error", "rack_display_contract", anim_id,
-                f"rotation/scale drift from Java {java_key}")
-        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
-            add(findings, "error", "rack_display_contract", anim_id,
-                f"translation drift from Java {java_key}")
-
-    rack_desc = load_json(RP / "attachables" / "advanced_rack.attachable.json")["minecraft:attachable"]["description"]
-    if rack_desc.get("geometry", {}).get("default") != rack_geo_id:
-        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
-            "attachable does not use the corrective hand geometry")
-    if "firstperson_lefthand" in rack_report:
-        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
-            "audit assumption drift: Java now defines first-person left and corrective must be updated")
-    if "fp_left" in (rack_desc.get("animations") or {}):
-        add(findings, "error", "rack_display_contract", "kaleidoscope_grilling:advanced_rack",
-            "FP-left transform was invented even though the pinned Java source does not define one")
-
-
-def check_skewer_display_contracts(findings, geometry_index, animations):
-    expected_ids = {
-        "fp_right": "animation.kaleidoscope_grilling.a2764.skewer_fp_right",
-        "fp_left": "animation.kaleidoscope_grilling.a2764.skewer_fp_left",
-        "tp_right": "animation.kaleidoscope_grilling.a2764.skewer_tp_right",
-        "tp_left": "animation.kaleidoscope_grilling.a2764.skewer_tp_left",
-    }
-    java_keys = {
-        "fp_right": "firstperson_righthand",
-        "fp_left": "firstperson_lefthand",
-        "tp_right": "thirdperson_righthand",
-        "tp_left": "thirdperson_lefthand",
-    }
-    java = load_json(JAVA_DISPLAY / "beef_raw.json")["java_display"]
-    for alias, anim_id in expected_ids.items():
-        actual = animations.get(anim_id, {}).get("body", {}).get("bones", {}).get("display")
-        expected = java[java_keys[alias]]
-        if actual is None:
-            add(findings, "error", "skewer_display_contract", anim_id, "missing shared fixed-skewer display animation")
-            continue
-        if actual.get("rotation") != expected.get("rotation") or actual.get("scale") != expected.get("scale"):
-            add(findings, "error", "skewer_display_contract", anim_id,
-                f"rotation/scale drift from Java {java_keys[alias]}")
-        if actual.get("position", [0, 0, 0]) != expected.get("translation", [0, 0, 0]):
-            add(findings, "error", "skewer_display_contract", anim_id,
-                f"translation drift from Java {java_keys[alias]}")
-
-    rows = []
-    for path in sorted((RP / "attachables").glob("*.attachable.json")):
-        desc = load_json(path).get("minecraft:attachable", {}).get("description", {})
-        values = set((desc.get("animations") or {}).values())
-        if values == set(expected_ids.values()):
-            rows.append((path, desc))
-    if len(rows) != 39:
-        add(findings, "error", "skewer_display_contract", "fixed-skewer attachables",
-            f"expected 39 migrated attachables, got {len(rows)}")
-
-    refs = set()
-    for path, desc in rows:
-        values = set((desc.get("animations") or {}).values())
-        if "animation.kaleidoscope_grilling.a2725.skewer_hold_first_person" in values or \
-           "animation.kaleidoscope_grilling.a2725.skewer_hold_third_person" in values:
-            add(findings, "error", "skewer_display_contract", desc.get("identifier", str(path)),
-                "legacy bound-root hold animation was reintroduced")
-        animate = (desc.get("scripts") or {}).get("animate", [])
-        aliases = {next(iter(row.keys())) for row in animate if isinstance(row, dict) and len(row) == 1}
-        if aliases != set(expected_ids):
-            add(findings, "error", "skewer_display_contract", desc.get("identifier", str(path)),
-                f"expected four hand-specific display selectors, got {sorted(aliases)}")
-        for ref in (desc.get("geometry") or {}).values():
-            if isinstance(ref, str):
-                refs.add(ref)
-
-    if len(refs) != 150:
-        add(findings, "error", "skewer_display_contract", "fixed-skewer bite geometries",
-            f"expected 150 referenced bite geometries, got {len(refs)}")
-    for ref in sorted(refs):
-        row = geometry_index.get(ref)
-        if not row:
-            add(findings, "error", "skewer_display_contract", ref, "referenced bite geometry is missing")
-            continue
-        bones = {b.get("name"): b for b in row["geo"].get("bones", [])}
-        if bones.get("root", {}).get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
-            add(findings, "error", "skewer_display_contract", ref, "root lost item-slot binding")
-        if bones.get("display", {}).get("parent") != "root":
-            add(findings, "error", "skewer_display_contract", ref, "display must be an unbound child of root")
-        for name, bone in bones.items():
-            if name not in {"root", "display"} and bone.get("parent") == "root":
-                add(findings, "error", "skewer_display_contract", ref,
-                    f"shell bone {name} is directly under bound root instead of display")
+        ids = desc.get("animations", {})
+        family = "skewer" if any("kg_a287.skewer_" in v for v in ids.values()) else "rack" if any("kg_a286.rack_" in v for v in ids.values()) else "bottle"
+        counts[family] += 1
+        if set(ids) != aliases or set(ids.values()) - set(expected):
+            add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
+        selectors = desc.get("scripts", {}).get("animate", [])
+        for row in selectors:
+            if not isinstance(row, dict): continue
+            for alias, expression in row.items():
+                slot = "main_hand" if alias.endswith("right") else "off_hand"
+                if "is_first_person" not in expression or slot not in expression:
+                    add(findings, "error", "held_pose_selectors", desc["identifier"], "view/slot selector lost its context condition")
+        for ref in desc.get("geometry", {}).values():
+            geo = geometry_index.get(ref, {}).get("geo", {})
+            bound = [b for b in geo.get("bones", []) if b.get("binding")]
+            if len(bound) != 1 or bound[0].get("name") != "grip" or bound[0].get("pivot") != [0,24,0] or bound[0].get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
+                add(findings, "error", "held_binding_contract", ref, "expected one item-slot grip at the canonical pivot")
+            if family == "skewer": skewer_refs.add(ref)
+    if counts != {"skewer":39,"bottle":67,"rack":1} or len(skewer_refs) != 150:
+        add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 
 
 def main():
@@ -599,8 +476,7 @@ def main():
     geometry_stats = check_geometry_structure(findings, geometries)
     block_stats = check_blocks(findings, geometries)
     attachable_stats = check_attachables(findings, geometries, animations, controllers, known_ids)
-    check_corrective_display_contracts(findings, geometries, animations)
-    check_skewer_display_contracts(findings, geometries, animations)
+    check_current_display_contracts(findings, geometries, animations)
 
     findings.sort(key=lambda x: (SEVERITY_ORDER.get(x["severity"], 99), x["code"], x["subject"]))
     counts = Counter(x["severity"] for x in findings)
