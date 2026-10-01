@@ -1,3 +1,5 @@
+import {planRackInsert,commitRackTransfer,depositInventorySlot} from './rack_transactions.js';
+import {slotWrite,remainderOf,planInventoryInsert} from './rack_transfer_plan.js';
 import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
 import {rackSlotAtHit} from './a285_rack_quick_pick.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
@@ -58,50 +60,6 @@ function slotRoom(stored,stack){
  return Math.max(0,stored.maxAmount-stored.amount);
 }
 
-function insertIntoRack(block,slot,stack,amount=stack?.amount??0){
- const c=rackContainer(block);if(!c||!stack)return 0;
- const filters=readRackFilters(block),filter=filters[slot];
- if(!rackCanPlace(slot,stack.typeId,tags(stack),filter))return 0;
- const stored=c.getItem(slot),room=slotRoom(stored,stack),move=Math.min(room,amount,stack.amount);
- if(move<=0)return 0;
- if(!filters[slot]){
-  filters[slot]=rackCanonicalFilter(stack.typeId,tags(stack));
-  writeRackFilters(block,filters);
- }
- if(!stored){const next=stack.clone();next.amount=move;c.setItem(slot,next)}
- else{const next=stored.clone();next.amount=stored.amount+move;c.setItem(slot,next)}
- syncRackDisplay(block);return move;
-}
-
-function canStoreInInventoryExcept(inv,excluded,stack){
- let remaining=stack.amount;
- for(let i=0;i<Math.min(36,inv?.size??0)&&remaining>0;i++){
-  if(i===excluded)continue;
-  const stored=inv.getItem(i);
-  if(!stored)remaining-=stack.maxAmount;
-  else if(stored.isStackableWith(stack))remaining-=Math.max(0,stored.maxAmount-stored.amount);
- }
- return remaining<=0;
-}
-function storeInInventoryExcept(inv,excluded,stack){
- let remaining=stack.clone();
- for(let i=0;i<Math.min(36,inv?.size??0)&&remaining;i++){
-  if(i===excluded)continue;
-  const stored=inv.getItem(i);
-  if(!stored||!stored.isStackableWith(remaining))continue;
-  const move=Math.min(remaining.amount,stored.maxAmount-stored.amount);
-  if(move<=0)continue;
-  const next=stored.clone();next.amount=stored.amount+move;inv.setItem(i,next);
-  if(move>=remaining.amount)remaining=undefined;
-  else{const r=remaining.clone();r.amount=remaining.amount-move;remaining=r}
- }
- for(let i=0;i<Math.min(36,inv?.size??0)&&remaining;i++){
-  if(i===excluded||inv.getItem(i))continue;
-  inv.setItem(i,remaining);remaining=undefined;
- }
- return remaining;
-}
-
 function matchingLocalReturnSlot(block,stack,excluded){
  const c=rackContainer(block),filters=readRackFilters(block);if(!c)return -1;
  for(let i=0;i<RACK_COMPARTMENTS;i++){
@@ -127,47 +85,38 @@ function swapWithHotbar(player,block,slot){
  if(held&&held.isStackableWith(requested)){
   const move=Math.min(requested.amount,held.maxAmount-held.amount);
   if(move>0){
-   const h=held.clone();h.amount=held.amount+move;inv.setItem(hot,h);
-   if(move>=requested.amount)c.setItem(slot,undefined);
-   else{const r=requested.clone();r.amount=requested.amount-move;c.setItem(slot,r)}
+   const h=held.clone();h.amount+=move;
+   if(!commitRackTransfer([block],[slotWrite(inv,hot,h),slotWrite(c,slot,remainderOf(requested,move))]))return false;
   }
-  writeBinding(player,hot,block,slot);syncRackDisplay(block);return true;
+  writeBinding(player,hot,block,slot);return true;
  }
-
- let returnTarget;
+ const blocks=[block],steps=[slotWrite(c,slot,undefined)];
  if(held){
-  returnTarget=boundRackForReturn(player,readBinding(player,hot),held,block,slot);
-  if(!returnTarget){
-   const local=matchingLocalReturnSlot(block,held,slot);
-   if(local>=0)returnTarget={block,slot:local};
+  let target=boundRackForReturn(player,readBinding(player,hot),held,block,slot);
+  if(!target){const local=matchingLocalReturnSlot(block,held,slot);if(local>=0)target={block,slot:local};}
+  if(target){
+   const plan=planRackInsert(target.block,target.slot,held);
+   if(!plan||plan.moved!==held.amount)return false;
+   steps.push(...plan.steps);blocks.push(target.block);
+  }else{
+   const plan=planInventoryInsert(inv,held,hot);if(plan.remainder)return false;
+   steps.push(...plan.steps);
   }
-  if(!returnTarget&&!canStoreInInventoryExcept(inv,hot,held))return false;
  }
-
- const replacement=requested.clone();
- c.setItem(slot,undefined);
- if(held){
-  if(returnTarget)insertIntoRack(returnTarget.block,returnTarget.slot,held,held.amount);
-  else storeInInventoryExcept(inv,hot,held);
- }
- inv.setItem(hot,replacement);
- writeBinding(player,hot,block,slot);syncRackDisplay(block);
- return true;
+ steps.push(slotWrite(inv,hot,requested));
+ if(!commitRackTransfer(blocks,steps))return false;
+ writeBinding(player,hot,block,slot);return true;
 }
 
 function depositSelected(player,block,slot){
- const held=getMainHand(player);if(!held)return false;
- const moved=insertIntoRack(block,slot,held,held.amount);if(moved<=0)return false;
- if(moved>=held.amount)setMainHand(player,undefined);
- else{const next=held.clone();next.amount=held.amount-moved;setMainHand(player,next)}
- return true;
+ const inv=playerInventory(player),index=player.selectedSlotIndex;
+ return !!inv&&depositInventorySlot(inv,index,block,slot)>0;
 }
 
 function withdrawToInventory(player,block,slot){
  const c=rackContainer(block),stored=c?.getItem(slot),inv=playerInventory(player);if(!c||!stored||!inv)return false;
- const remainder=inv.addItem(stored.clone());
- if(!remainder)c.setItem(slot,undefined);else c.setItem(slot,remainder);
- syncRackDisplay(block);return !remainder||remainder.amount<stored.amount;
+ const plan=planInventoryInsert(inv,stored);if(!plan.moved)return false;
+ return commitRackTransfer([block],[...plan.steps,slotWrite(c,slot,plan.remainder)]);
 }
 
 function findMatchingSlotWithRoom(block,stack){
@@ -186,17 +135,15 @@ function depositMatching(player,block){
   const stack=inv.getItem(hot),binding=readBinding(player,hot);
   if(!stack||!binding)continue;
   if(binding.dimension!==block.dimension.id||binding.x!==block.x||binding.y!==block.y||binding.z!==block.z)continue;
-  const move=insertIntoRack(block,binding.slot,stack,stack.amount);
+  const move=depositInventorySlot(inv,hot,block,binding.slot);
   if(move<=0)continue;
-  if(move>=stack.amount)inv.setItem(hot,undefined);else{const next=stack.clone();next.amount=stack.amount-move;inv.setItem(hot,next)}
   clearBinding(player,hot);changed=true;
  }
  for(let i=0;i<Math.min(36,inv.size);i++){
   const stack=inv.getItem(i);if(!stack)continue;
   if(i<9&&readBinding(player,i))continue;
   const slot=findMatchingSlotWithRoom(block,stack);if(slot<0)continue;
-  const move=insertIntoRack(block,slot,stack,stack.amount);if(move<=0)continue;
-  if(move>=stack.amount)inv.setItem(i,undefined);else{const next=stack.clone();next.amount=stack.amount-move;inv.setItem(i,next)}
+  const move=depositInventorySlot(inv,i,block,slot);if(move<=0)continue;
   changed=true;
  }
  return changed;
