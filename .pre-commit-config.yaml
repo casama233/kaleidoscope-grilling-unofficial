@@ -1,0 +1,18 @@
+# Read-only gates: do not autoformat assets or rewrite an immutable release.
+ci:
+  autofix_prs: false
+repos:
+  - repo: local
+    hooks:
+      - id: canonical-baseline
+        name: Verify immutable canonical release baseline
+        language: python
+        entry: python tools/baseline_gate.py check
+        pass_filenames: false
+        always_run: true
+      - id: canonical-json
+        name: Validate canonical and Java fixture JSON
+        language: python
+        entry: python tools/check_json.py
+        types: [json]
+        files: ^(projects/grilling/gameplay_core/(behavior_pack|resource_pack)/|development/gameplay_core/fixtures/)

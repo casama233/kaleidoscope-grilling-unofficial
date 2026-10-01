@@ -1,12 +1,12 @@
+import {FIXED_INGREDIENT_TAGS} from './java_ingredient_tags.js';
+import {HOST_FAT_CAPACITY as FAT_CAPACITY,GRILLING_FLUID_CAPACITY as FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS as OIL_BUCKET_POINTS} from './a2738_oil_contract_core.js';
 export const UNFINISHED_ID='kaleidoscope_grilling:unfinished_skewer';
 export const SECRET_ID='kaleidoscope_grilling:secret_skewer';
 export const SKEWER_INGREDIENTS_KEY='kaleidoscope_grilling:skewer_ingredients';
 export const SECRET_COOKED_KEY='kaleidoscope_grilling:secret_cooked';
 export const SECRET_COOKED_INGREDIENTS_KEY='kaleidoscope_grilling:secret_cooked_ingredients';
 export const SECRET_CREATOR_KEY='kaleidoscope_grilling:secret_creator';
-export const FAT_CAPACITY=256;
-export const FLUID_CAPACITY=64;
-export const OIL_BUCKET_POINTS=8;
+export {FAT_CAPACITY,FLUID_CAPACITY,OIL_BUCKET_POINTS};
 
 const RECIPES=Object.freeze([
  {id:'kaleidoscope_grilling:raw_beef_skewer',cooked:'kaleidoscope_grilling:grilled_beef_skewer',slots:[['kaleidoscope_grilling:beef_chunks'],['kaleidoscope_cookery:red_chili'],['kaleidoscope_grilling:beef_chunks']]},
@@ -31,21 +31,25 @@ const RECIPES=Object.freeze([
  {id:'kaleidoscope_grilling:ordinary_skewer',cooked:null,slots:[['minecraft:poisonous_potato'],['minecraft:spider_eye'],['minecraft:pufferfish']]}
 ]);
 
-function ids(rows){return rows.map(x=>typeof x==='string'?x:x?.id).filter(x=>typeof x==='string')}
-function slotMatches(id,selectors){return selectors.includes(id)}
-function matches(recipe,values){return recipe.slots.length===values.length&&values.every((id,i)=>slotMatches(id,recipe.slots[i]))}
-function prefix(recipe,values){return values.length<=recipe.slots.length&&values.every((id,i)=>slotMatches(id,recipe.slots[i]))}
+function identity(value){return typeof value==='string'?{id:value,tags:[]}:value??{id:'',tags:[]}}
+function ids(rows){return rows.map(x=>identity(x).id)}
+function slotMatches(value,selectors){
+ const row=identity(value),tags=new Set(Array.isArray(row.tags)?row.tags:[]);
+ return selectors.some(id=>row.id===id||(FIXED_INGREDIENT_TAGS[id]??[]).some(tag=>tags.has(tag)));
+}
+function matches(recipe,values){return recipe.slots.length===values.length&&values.every((value,i)=>slotMatches(value,recipe.slots[i]))}
+function prefix(recipe,values){return values.length<=recipe.slots.length&&values.every((value,i)=>slotMatches(value,recipe.slots[i]))}
 
 export function recipeTable(){return RECIPES.map(r=>({id:r.id,cooked:r.cooked,slots:r.slots.map(s=>[...s])}))}
-export function completedRecipe(rows){const values=ids(rows);return RECIPES.find(r=>matches(r,values))??null}
-export function canAppendConfigured(rows,nextId){const values=[...ids(rows),nextId];return RECIPES.some(r=>prefix(r,values))}
-export function isConfiguredIngredient(id){return RECIPES.some(r=>r.slots.some(slot=>slotMatches(id,slot)))}
-export function expectedSize(rows){const values=ids(rows);return RECIPES.filter(r=>prefix(r,values)).reduce((m,r)=>Math.max(m,r.slots.length),3)}
-export function appendOutcome(rows,nextId,edible=false,explicitAllow=false){
- const current=ids(rows);
+export function completedRecipe(rows){return RECIPES.find(r=>matches(r,rows))??null}
+export function canAppendConfigured(rows,next){return RECIPES.some(r=>prefix(r,[...rows,next]))}
+export function isConfiguredIngredient(value){return RECIPES.some(r=>r.slots.some(slot=>slotMatches(value,slot)))}
+export function expectedSize(rows){return RECIPES.filter(r=>prefix(r,rows)).reduce((m,r)=>Math.max(m,r.slots.length),3)}
+export function appendOutcome(rows,next,edible=false,explicitAllow=false){
+ const current=ids(rows),nextId=identity(next).id;
  if(!nextId||current.length>=3)return {ok:false,reason:'full'};
- if(!canAppendConfigured(current,nextId)&&!isConfiguredIngredient(nextId)&&!edible&&!explicitAllow)return {ok:false,reason:'not_skewerable'};
- const values=[...current,nextId],recipe=completedRecipe(values);
+ if(!canAppendConfigured(rows,next)&&!isConfiguredIngredient(next)&&!edible&&!explicitAllow)return {ok:false,reason:'not_skewerable'};
+ const identities=[...rows,next],values=ids(identities),recipe=completedRecipe(identities);
  if(recipe)return {ok:true,kind:'fixed',id:recipe.id,cooked:recipe.cooked,ingredients:values};
  if(values.length>=3)return {ok:true,kind:'secret',id:SECRET_ID,ingredients:values};
  return {ok:true,kind:'unfinished',id:UNFINISHED_ID,ingredients:values};
@@ -57,7 +61,7 @@ export function canonicalIngredients(id){
  const r=RECIPES.find(x=>x.id===id);return r?r.slots.map(slot=>slot[0]):[];
 }
 
-export function secretFood(rows,cooked=false){
+export function secretFood(rows,cooked=false,originalRows=rows){
  const foods=(rows??[]).map(x=>({
   id:String(x?.id??''),
   signature:String(x?.signature??x?.id??''),
@@ -67,7 +71,8 @@ export function secretFood(rows,cooked=false){
  if(!foods.length)return {nutrition:1,saturation:0,duplicate:false};
  let total=0,weighted=0,duplicate=false;
  const seen=new Set();
- for(const x of foods){total+=x.nutrition;weighted+=x.nutrition*x.saturation;if(seen.has(x.signature))duplicate=true;seen.add(x.signature)}
+ for(const x of originalRows??[]){const signature=String(x?.signature??x?.id??'');if(seen.has(signature))duplicate=true;seen.add(signature)}
+ for(const x of foods){total+=x.nutrition;weighted+=x.nutrition*x.saturation}
  let nutrition=Math.max(1,Math.floor(total*.6*(duplicate?.8:1))),saturation=Math.max(0,weighted/Math.max(1,total));
  if(!cooked){nutrition=Math.max(1,Math.floor(nutrition*.5));saturation*=.5}
  return {nutrition,saturation,duplicate};

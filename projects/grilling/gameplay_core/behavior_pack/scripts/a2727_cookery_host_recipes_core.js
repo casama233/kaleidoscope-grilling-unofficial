@@ -77,6 +77,12 @@ const RECIPES=Object.freeze([
   'kaleidoscope_grilling:onion','kaleidoscope_grilling:onion_powder',1,1.0),
  millstone('kaleidoscope_grilling:millstone/red_chili_powder',
   'kaleidoscope_cookery:red_chili','kaleidoscope_grilling:red_chili_powder',1,1.0),
+ millstone('kaleidoscope_grilling:millstone/green_chili_powder',
+  'kaleidoscope_cookery:green_chili','kaleidoscope_grilling:green_chili_powder',1,1.0),
+ millstone('kaleidoscope_grilling:millstone/houttuynia_powder',
+  'kaleidoscope_grilling:houttuynia','kaleidoscope_grilling:houttuynia_powder',1,1.0),
+ millstone('kaleidoscope_grilling:millstone/totem_powder',
+  'minecraft:totem_of_undying','kaleidoscope_grilling:totem_powder',1,1.0),
  ...wokRecipes().map(wok),
  ...stockpotRecipes().map(stockpot),
 ]);

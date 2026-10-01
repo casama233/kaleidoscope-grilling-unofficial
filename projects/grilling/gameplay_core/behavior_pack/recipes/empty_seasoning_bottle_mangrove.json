@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:empty_seasoning_bottle_mangrove"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " B ",
+      "GGG",
+      "GGG"
+    ],
+    "key": {
+      "B": {
+        "item": "minecraft:mangrove_button"
+      },
+      "G": {
+        "item": "minecraft:glass"
+      }
+    },
+    "result": {
+      "item": "kaleidoscope_grilling:empty_seasoning_bottle",
+      "count": 1
+    },
+    "unlock": [
+      {
+        "item": "minecraft:glass"
+      }
+    ]
+  }
+}

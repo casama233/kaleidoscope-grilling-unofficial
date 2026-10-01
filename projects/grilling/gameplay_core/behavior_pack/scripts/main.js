@@ -1,3 +1,4 @@
+import './dragon_powder_runtime.js';
 import './a288_parity_runtime.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
@@ -264,14 +265,15 @@ function threadOutcome(player){
  const food=heldMain(player),off=heldOff(player);if(!food||!off||player.isSneaking)return null;
  if(off.typeId!=='minecraft:stick'&&off.typeId!==UNFINISHED_ID&&!(off.typeId===SECRET_ID&&!isSecretCooked(off)))return null;
  const rows=off.typeId==='minecraft:stick'?[]:readSkewerRows(off);
- const configured=canAppendConfigured(rows,food.typeId)||isConfiguredIngredient(food.typeId);
+ const identity=ingredientSnapshot(food);
+ const configured=canAppendConfigured(rows,identity)||isConfiguredIngredient(identity);
  let explicitAllow=false;
  if(!configured){
-  const identity=ingredientSnapshot(food),decision=skewerIngredientDecision(identity);
+  const decision=skewerIngredientDecision(identity);
   if(decision==='deny')return null;
   explicitAllow=decision==='allow';
  }
- return appendOutcome(rows,food.typeId,isEdible(food),explicitAllow);
+ return appendOutcome(rows,identity,isEdible(food),explicitAllow);
 }
 function canDisassembleOff(player){const off=heldOff(player);return !!off&&isDisassemblableRaw(off.typeId,isSecretCooked(off))&&readSkewerRows(off).length>0}
 function threadCurrent(player){
