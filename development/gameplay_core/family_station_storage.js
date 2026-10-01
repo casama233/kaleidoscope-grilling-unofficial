@@ -1,4 +1,4 @@
-/** Persistent native ItemStacks for the two Grilling-owned stations.
+/** Persistent native ItemStacks for Grilling-owned stations and placed seasoning bottles.
  * The ledger belongs to this BP. It never reads Cookery's private properties.
  * Helpers are inventories, NOT disposable visual entities. Never regenerate a
  * missing/corrupt linked inventory as an empty one, or garbage-collect its items.
@@ -8,8 +8,10 @@ export const STORAGE_PREFIX='kaleidoscope_grilling:storage_v1/';
 export const STORAGE_OWNER='kaleidoscope_grilling:storage_owner_v1';
 export const STORAGE_TYPES=Object.freeze({
  'kaleidoscope_grilling:grill':Object.freeze({slots:3,entity:'kaleidoscope_grilling:inventory_grill_v1'}),
- 'kaleidoscope_grilling:advanced_rack_block':Object.freeze({slots:9,entity:'kaleidoscope_grilling:inventory_rack_v1'})
+ 'kaleidoscope_grilling:advanced_rack_block':Object.freeze({slots:9,entity:'kaleidoscope_grilling:inventory_rack_v1'}),
+ 'kaleidoscope_grilling:seasoning_bottle':Object.freeze({slots:4,entity:'kaleidoscope_grilling:inventory_seasoning_v1'})
 });
+const storageType=id=>/^kaleidoscope_grilling:seasoning_bottle_[1-4]$/.test(id)?'kaleidoscope_grilling:seasoning_bottle':id;
 export class StorageUnavailable extends Error {
  constructor(reason){super('Grilling storage unavailable: '+reason);this.name='StorageUnavailable';}
 }
@@ -66,8 +68,9 @@ function commitNewRecord(block,entity,mark){
 }
 export function stationContainer(block){
  if(!block)return undefined;
- const rule=STORAGE_TYPES[block.typeId];if(!rule)return undefined;
- const r=readRecord(block);
+ const type=storageType(block.typeId),rule=STORAGE_TYPES[type];if(!rule)return undefined;
+ let r=readRecord(block);
+ if(r?.retiredEmpty){finishEmptyRetirement(block,r);r=undefined;}
  if(r?.quarantine)fail('transaction quarantined; manual recovery required');
  let native;try{native=block.getComponent('minecraft:inventory')?.container}catch{}
  if(native){
@@ -75,16 +78,16 @@ export function stationContainer(block){
   if(native.size!==rule.slots)fail('legacy native inventory size mismatch');
   return native;
  }
- if(r){if(r.block!==block.typeId)fail('coordinate still belongs to another station');return resolve(block,r).c;}
+ if(r){if(r.block!==type)fail('coordinate still belongs to another station');return resolve(block,r).c;}
  const found=Object.values(STORAGE_TYPES).flatMap(t=>candidates(block,t.entity));
  if(found.length>1)fail('multiple orphan inventories; never merge or delete automatically');
  if(found.length===1){
   const mark=ownership(found[0]);
-  if(!mark||mark.v!==1||mark.block!==block.typeId||typeof mark.token!=='string'||!mark.token)fail('unrecognized orphan inventory');
+  if(!mark||mark.v!==1||mark.block!==type||typeof mark.token!=='string'||!mark.token)fail('unrecognized orphan inventory');
   return commitNewRecord(block,found[0],mark);
  }
  const entity=block.dimension.spawnEntity(rule.entity,anchor(block));
- const mark={v:1,key:storageKey(block),block:block.typeId,token:entity.id+':'+system.currentTick};
+ const mark={v:1,key:storageKey(block),block:type,token:entity.id+':'+system.currentTick};
  try{
   entity.setDynamicProperty(STORAGE_OWNER,JSON.stringify(mark));
   return commitNewRecord(block,entity,mark);
@@ -95,23 +98,45 @@ export function stationContainer(block){
   throw error;
  }
 }
-/** Call AFTER the station was removed and AFTER its item transaction succeeded. */
-export function retireEmptyStationContainer(block){
- const r=readRecord(block);if(!r)return true;
- if(r.quarantine)fail('transaction quarantined; not retiring inventory');
- if(block.typeId===r.block)fail('station is still present');
- const {entity,c}=resolve(block,r);
- for(let i=0;i<c.size;i++)if(c.getItem(i))fail('refusing to retire nonempty inventory');
- entity.remove();
+/** A durable empty-only tombstone permits cleanup retries, never item recovery. */
+function finishEmptyRetirement(block,r){
+ if(r.retiredEmpty!==true||r.quarantine)fail('unverified retirement record');
+ let entity=world.getEntity(r.entity);
+ if(!entity){
+  const found=candidates(block,STORAGE_TYPES[r.block].entity).filter(e=>ownership(e)?.token===r.token);
+  if(found.length>1)fail('duplicate retiring inventories');
+  entity=found[0];
+ }
+ if(entity){
+  const c=container(entity,r,block);
+  for(let i=0;i<c.size;i++)if(c.getItem(i))fail('refusing to retire nonempty inventory');
+  entity.remove();
+ }
  world.setDynamicProperty(r.key,undefined);
  if(world.getDynamicProperty(r.key)!==undefined)fail('retired ledger not cleared');
  return true;
 }
+/** Call AFTER the station was removed and AFTER its item transaction succeeded. */
+export function retireEmptyStationContainer(block){
+ const r=readRecord(block);if(!r)return true;
+ if(r.quarantine)fail('transaction quarantined; not retiring inventory');
+ if(r.retiredEmpty===true)return finishEmptyRetirement(block,r);
+ if(storageType(block.typeId)===r.block)fail('station is still present');
+ const {c}=resolve(block,r);
+ for(let i=0;i<c.size;i++)if(c.getItem(i))fail('refusing to retire nonempty inventory');
+ // Persist the empty proof BEFORE removal. A later failure can retry without
+ // treating a missing nonempty helper as empty or reconstructing lost items.
+ const retired={...r,retiredEmpty:true};
+ world.setDynamicProperty(r.key,JSON.stringify(retired));
+ if(world.getDynamicProperty(r.key)!==JSON.stringify(retired))fail('retirement intent not persisted');
+ return finishEmptyRetirement(block,retired);
+}
 /** Inspection creates no helpers and transfers no items. */
 export function inspectStationStorage(block){
  const r=readRecord(block);
- if(!r)return {linked:false};
+ if(!r)return {linked:false,orphans:Object.values(STORAGE_TYPES).flatMap(t=>candidates(block,t.entity)).length};
  if(r.quarantine)return {linked:true,quarantine:r.quarantine,block:r.block,entity:r.entity};
+ if(r.retiredEmpty===true)return {linked:true,retiredEmpty:true,block:r.block,entity:r.entity};
  const {entity,c}=resolve(block,r,false);
  return {linked:true,block:r.block,entity:entity.id,slots:c.size,occupied:c.size-c.emptySlotsCount};
 }
