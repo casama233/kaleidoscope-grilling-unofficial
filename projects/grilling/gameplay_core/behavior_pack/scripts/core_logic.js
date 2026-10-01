@@ -27,7 +27,7 @@ export function tickState(state,occupied,delta=1){
   if(s.phase<=2&&s.phaseTicks>=FINISHED_TICKS){
     s.phase=3;s.phaseTicks=0;events.push({kind:'overcooked'});
   }else if(s.phase===3&&s.phaseTicks>=BURNT_TICKS){
-    events.push({kind:'burn_to_charcoal'});return {state:initialState(),events};
+    events.push({kind:'burn_to_charcoal'});return {state:{...initialState(),lit:s.lit},events};
   }
   return {state:s,events};
 }

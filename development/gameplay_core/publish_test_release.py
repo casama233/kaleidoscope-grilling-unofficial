@@ -23,7 +23,7 @@ def main():
  status=ROOT/'docs'/f'STATUS-{version}.md'
  notes.write_text(f'# {version} 整合測試版\n\n此包直接由合併後 main 的 `{sha}` 建置並校驗。\n\n'
   'Minecraft / BDS / client visuals：**尚未實機驗收**。請先備份測試世界。\n\n'
-  '安裝 `.mcaddon`；原有 Cookery 1.0.6 依賴不變，煙火指南已在本體內，不需另外安裝指南包。\n\n'
+  '安裝 `.mcaddon`；需要公開版 Cookery 1.0.8（私人版 UUID 不可直接替換），煙火指南已在本體內，不需另外安裝指南包。\n\n'
   +(status.read_text(encoding='utf-8') if status.exists() else '')+'\n',encoding='utf-8')
  # Unique tag for each attempt; no deletion of older test builds or release assets.
  subprocess.run(['gh','release','create',tag,*map(str,assets),'--repo',REPO,'--target',sha,

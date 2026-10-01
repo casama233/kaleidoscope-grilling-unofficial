@@ -10,6 +10,8 @@ def main():
   ['node','--experimental-vm-modules','development/gameplay_core/test_a288_parity.mjs'],
   ['node','projects/grilling/gameplay_core/review/pure_checks.mjs'],
   ['node','tools/check_family_knives.mjs'],
+ ['node','development/gameplay_core/test_java_survival_parity.mjs'],
+ ['node','development/gameplay_core/test_dragon_powder_transaction.mjs'],
   [sys.executable,'tools/test_guide_icon_regression.py'],
   [sys.executable,'development/gameplay_core/test_skewer_hand_anchor.py'],
   [sys.executable,'tools/check_grilling_guide.py'],
