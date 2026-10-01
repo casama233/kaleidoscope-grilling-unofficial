@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.19
+## Current maintained baseline: 2.8.20
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.
 

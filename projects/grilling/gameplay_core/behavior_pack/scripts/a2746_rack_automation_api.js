@@ -1,3 +1,5 @@
+import {planRackInsert,commitRackTransfer} from './rack_transactions.js';
+import {slotWrite,remainderOf} from './rack_transfer_plan.js';
 import {
  ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,rackCanPlace,rackCanonicalFilter,rackFilterMatches
 } from './a2746_advanced_rack_core.js';
@@ -25,9 +27,7 @@ export function borrowAdvancedRackItem(dimension,location,predicate=()=>true,sim
   if(!stored||!predicate(stored))continue;
   const borrowed=cloneAmount(stored,1);
   if(!simulate){
-   if(stored.amount<=1)c.setItem(slot,undefined);
-   else{const next=stored.clone();next.amount=stored.amount-1;c.setItem(slot,next)}
-   syncRackDisplay(block);
+   if(!commitRackTransfer([block],[slotWrite(c,slot,remainderOf(stored,1))]))return {stack:undefined,receipt:undefined,success:false};
   }
   return {
    stack:borrowed,
@@ -47,11 +47,8 @@ export function returnAdvancedRackItem(dimension,receipt,returned,simulate=false
  for(const slot of slots){
   if(!canReturn(block,slot,returned))continue;
   if(!simulate){
-   const c=rackContainer(block),stored=c.getItem(slot),filters=readRackFilters(block);
-   if(!filters[slot]){filters[slot]=rackCanonicalFilter(returned.typeId,tags(returned));writeRackFilters(block,filters)}
-   if(!stored)c.setItem(slot,returned.clone());
-   else{const next=stored.clone();next.amount=stored.amount+returned.amount;c.setItem(slot,next)}
-   syncRackDisplay(block);
+   const plan=planRackInsert(block,slot,returned);
+   if(!plan||plan.moved!==returned.amount||!commitRackTransfer([block],plan.steps))return {success:false,remainder:returned.clone()};
   }
   return {success:true,remainder:undefined};
  }

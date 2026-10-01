@@ -5,11 +5,19 @@ import {
 } from './a2746_advanced_rack_core.js';
 
 function enc(n){return n<0?'m'+Math.abs(n):'p'+n}
+const transactionFaults=new Set();
+const faultKey=block=>rackFiltersKey(block)+'_transaction_fault';
+export function quarantineRackTransaction(block,reason){
+ const key=faultKey(block);transactionFaults.add(key);
+ world.setDynamicProperty(key,String(reason).slice(0,240));
+ if(!world.getDynamicProperty(key))throw new Error('Rack transaction fault could not persist');
+}
 export function rackFiltersKey(block){
  return 'kaleidoscope_grilling:rack_filters_'+block.dimension.id.replace(/[^a-z0-9]/gi,'_')+'_'+enc(block.x)+'_'+enc(block.y)+'_'+enc(block.z);
 }
 export function rackContainer(block){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return undefined;
+ if(transactionFaults.has(faultKey(block))||world.getDynamicProperty(faultKey(block)))throw new Error('Rack transaction quarantined; manual recovery required');
  return stationContainer(block);
 }
 export function readRackFilters(block){
@@ -19,7 +27,18 @@ export function readRackFilters(block){
  }catch{return normalizeRackFilters([])}
 }
 export function writeRackFilters(block,filters){
- try{world.setDynamicProperty(rackFiltersKey(block),JSON.stringify(normalizeRackFilters(filters)));return true}catch{return false}
+ try{const raw=JSON.stringify(normalizeRackFilters(filters));world.setDynamicProperty(rackFiltersKey(block),raw);return world.getDynamicProperty(rackFiltersKey(block))===raw}catch{return false}
+}
+export function captureRackFilters(block){
+ const key=rackFiltersKey(block),raw=world.getDynamicProperty(key);
+ if(raw!==undefined&&typeof raw!=='string')throw new Error('Unreadable rack filters');
+ const value=raw===undefined?[]:JSON.parse(raw);
+ if(!Array.isArray(value)||value.length>RACK_COMPARTMENTS||value.some((row,i)=>row!==null&&row!==undefined&&
+  (!row||typeof row!=='object'||row.kind!==(i<5?'seasoning':'tool')||typeof row.typeId!=='string'||!row.typeId.includes(':')||!['exact','oil_pot','seasoning_bottle'].includes(row.category))))throw new Error('Invalid rack filters');
+ return {filters:normalizeRackFilters(value),step(next){return {
+  apply:()=>writeRackFilters(block,next),
+  rollback:()=>{world.setDynamicProperty(key,raw);return world.getDynamicProperty(key)===raw;}
+ }}};
 }
 export function clearRackFilters(block){
  try{world.setDynamicProperty(rackFiltersKey(block),undefined);return true}catch{return false}
