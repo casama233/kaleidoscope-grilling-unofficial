@@ -18,8 +18,13 @@ def survival_gate():
     plate=script.split('function completePlateUse',1)[1].split('function completePending',1)[0]
     assert plate.index('secretRemainders') < plate.index('afterCommitted')
     assert 'captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex)' in script
-    assert 'SEASON_PLACE_CACHE.set(key(e.block)' in script
-    assert 'cached.playerId!==player.id' in script
+    # Native bottle placement replaces the old lossy four-field after-place cache.
+    assert 'beforeOnPlayerPlace:scheduleNativeBottlePlacement' in script
+    assert 'interactionIntentStillCurrent(player,intent)' in script
+    assert 'sameBottleTarget(block,target)' in script
+    assert 'copyOne(storage.before)' in script
+    assert 'SEASON_PLACE_CACHE' not in script
+    subprocess.run(['node','--test',str(Path(__file__).with_name('test_seasoning_native_storage.mjs'))],cwd=ROOT,check=True)
     for name in ['empty_seasoning_bottle','pending_seasoning','special_seasoning']+[p.stem for p in (BP/'items').glob('special_seasoning_r*_v*.json')]:
         recipe=json.loads((BP/f'recipes/clear_{name}.json').read_text())['minecraft:recipe_shapeless']
         assert recipe['ingredients']==[{'item':'kaleidoscope_grilling:'+name}]

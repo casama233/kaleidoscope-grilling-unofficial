@@ -47,6 +47,16 @@
       "senluo:grilling_bottle_place": {},
       "minecraft:connection_rule": {
         "accepts_connections_from": "none"
+      },
+      "minecraft:tick": {
+        "interval_range": [
+          1,
+          1
+        ],
+        "looping": true
+      },
+      "minecraft:movable": {
+        "movement_type": "immovable"
       }
     }
   }
