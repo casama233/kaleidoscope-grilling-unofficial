@@ -121,7 +121,7 @@
         "s111": "textures/grill_display/raw_sweet_potato_sheet_skewer_3",
         "s112": "textures/grill_display/raw_sweet_potato_sheet_skewer_4",
         "s113": "textures/grill_display/raw_sweet_potato_sheet_skewer_5",
-        "s114": "textures/items/secret_skewer"
+        "s114": "textures/a22_bites/ordinary_skewer_stage0"
       },
       "geometry": {
         "s0": "geometry.kg_station.grill.raw_beef_skewer",
@@ -238,7 +238,7 @@
         "s111": "geometry.kg_station.grill.raw_sweet_potato_sheet_skewer",
         "s112": "geometry.kg_station.grill.raw_sweet_potato_sheet_skewer",
         "s113": "geometry.kg_station.grill.raw_sweet_potato_sheet_skewer",
-        "s114": "geometry.kg_station.grill.secret_icon"
+        "s114": "geometry.kg_station.grill.secret_stick"
       },
       "scripts": {
         "initialize": [

@@ -1,0 +1,53 @@
+"""Reproducible held-item motion from reviewed Java Catmull-Rom curves.
+
+Uses a local motion bone atop the existing reviewed hand/view frames. Native
+Bedrock arm animation and Java's detached second-piece rendering differ; this
+conversion does not certify the client presentation.
+"""
+from pathlib import Path
+import json,math,re,argparse
+ROOT=Path(__file__).resolve().parents[1];P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
+FIX=ROOT/'development/gameplay_core/fixtures/java-eating-curves-1.1.1.json'
+def sample(times,values,t):
+ if t<=times[0]:return values[0]
+ if t>=times[-1]:return values[-1]
+ right=next(i for i,x in enumerate(times) if x>=t);left=right-1;u=(t-times[left])/(times[right]-times[left]);p0,p1,p2,p3=[values[i] for i in [max(0,left-1),left,right,min(len(times)-1,right+1)]]
+ return .5*((2*p1)+(-p0+p2)*u+(2*p0-5*p1+4*p2-p3)*u*u+(-p0+3*p1-3*p2+p3)*u*u*u)
+def curves(profile):
+ source=json.loads(FIX.read_text())['files'];sk=source['SkewerEatingAnimation.java']['arrays'];pearl=source['EnderPearlEatingAnimation.java']['arrays']
+ if profile=='ONE':return pearl,'ONE_RIGHT_TIMES','ONE_RIGHT_', 'ONE_RIGHT_TIMES','ONE_RIGHT_ROT_'
+ if profile=='THREE':return pearl,'RIGHT_POSITION_TIMES','RIGHT_POSITION_','RIGHT_ROTATION_TIMES','RIGHT_ROTATION_'
+ prefix={'TWO':'TWO_','THREE_ALT':'SQUID_','FOUR':''}[profile]
+ return sk,prefix+'POSITION_TIMES',prefix+'POSITION_',prefix+'ROTATION_TIMES',prefix+'ROTATION_'
+def animation_id(profile,hand):return 'animation.kg_eating.item.'+profile.lower()+'.'+hand
+def build():
+ animations={};profiles=['ONE','TWO','THREE','THREE_ALT','FOUR']
+ for profile in profiles:
+  a,pt,prefix,rt,rprefix=curves(profile);duration=5 if profile=='THREE' else 4.5
+  for hand in ['right','left']:
+   sign=1 if hand=='right' else -1;position={};rotation={}
+   for n in range(round(duration*20)+1):
+    t=n/20;pos=[sample(a[pt],a[prefix+c],t)-a[prefix+c][0] for c in 'XYZ'];rot=[sample(a[rt],a[rprefix+c],t)-a[rprefix+c][0] for c in 'XYZ']
+    # Source curve displacement, mirrored across the already bound hand rig.
+    position[f'{t:.2f}']=[round(-pos[0]*sign,6),round(-pos[1],6),round(pos[2],6)]
+    rotation[f'{t:.2f}']=[round(rot[0],6),round(-rot[1]*sign,6),round(rot[2]*sign,6)]
+   animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
+ output={RP/'animations/eating_motion.animation.json':{'format_version':'1.8.0','animations':animations}}
+ table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
+ for p in (RP/'attachables').glob('*.json'):
+  doc=json.loads(p.read_text());d=doc['minecraft:attachable']['description'];profile=table.get(d['identifier']);
+  if not profile or not d['identifier'].endswith('_skewer'):continue
+  for hand in ['right','left']:
+   alias='eat_'+hand;d['animations'][alias]=animation_id('THREE' if profile=='THREE_RANDOM' else profile,hand)
+  animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith('eat_') for k in row)]
+  animate += [{'eat_'+hand:"q.is_using_item && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"} for hand in ['right','left']]
+  d['scripts']['animate']=animate;output[p]=doc
+ return output
+def main():
+ p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');args=p.parse_args()
+ for path,value in build().items():
+  data=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
+  if args.check:assert path.read_text()==data,path
+  else:path.write_text(data)
+ print('Authored eating item motion: five profiles, both hands; client acceptance false')
+if __name__=='__main__':main()

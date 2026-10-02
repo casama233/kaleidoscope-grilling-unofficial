@@ -1,12 +1,14 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemRawLore,setItemLore} from './itemData.js';
+import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {heatLore,isHeatLore} from './localized_lore_core.js';
 import {world} from '@minecraft/server';
+import {readPublicFood,writePublicFood,isFoodPayloadLine} from './host_api/food_api_core.js';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 
 const HOT='kaleidoscope_grilling:hot_until';
 const IGNORE=new Set([
- HOT,'kaleidoscope_grilling:model_variants','kaleidoscope_grilling:creator',
+ HOT,SEASONING_LIST_KEY,'kaleidoscope_grilling:model_variants','kaleidoscope_grilling:creator',
  'kaleidoscope_grilling:creator_name','kaleidoscope_grilling:creator_uuid',
  'SkewerModelVariants','Creator','CreatorName','CreatorUuid'
 ]);
@@ -18,7 +20,7 @@ function norm(v){
  if(typeof v==='object')return Object.fromEntries(Object.keys(v).sort().map(k=>[k,norm(v[k])]));
  return String(v);
 }
-function baseLore(stack){return getItemRawLore(stack).filter(x=>!isHeatLore(x))}
+function baseLore(stack){return getItemRawLore(stack).filter(x=>!isHeatLore(x)&&!isFoodPayloadLine(x))}
 function props(stack,includeHot=false){
  let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
  return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=getItemProperty(stack,k)}catch{}return [k,norm(v)]});
@@ -34,13 +36,19 @@ export function isFoodStack(stack){
  try{if(stack.hasTag?.('minecraft:is_food'))return true}catch{}
  return isSkewer(stack);
 }
-export function mergeSignature(stack){return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),props:props(stack,false)})}
+export function mergeSignature(stack){
+ const publicFood=readPublicFood(stack);
+ // A damaged public record must never merge into another stack. Preserve its raw bytes.
+ const seasoning=publicFood.present?(publicFood.valid?publicFood.state.seasoning:{invalid:stack.getRawLore()}):normalizeSeasoningList(getItemProperty(stack,SEASONING_LIST_KEY));
+ return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),seasoning,props:props(stack,false)});
+}
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
-export function hotUntil(stack){try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}
+export function hotUntil(stack){const p=readPublicFood(stack);if(p.present)return p.valid?p.state.hotUntil:0;try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}
 export function isHot(stack,t=now()){return hotUntil(stack)>t}
 function bucket(t){return t-(((t%100)+100)%100)}
 function setHot(stack,remaining,t=now()){
  try{
+  const portable=readPublicFood(stack);if(portable.present&&!portable.valid)throw Error('public food unreadable');
   const lore=baseLore(stack);
   if(remaining>0)lore.push(heatLore(remaining/20));
   // Stable 2.9 ItemStack dynamic properties require a non-stackable/custom-data stack.
@@ -48,6 +56,7 @@ function setHot(stack,remaining,t=now()){
   setItemLore(stack,lore);
   if(remaining>0)setItemProperty(stack,HOT,bucket(t+remaining));
   else setItemProperty(stack,HOT,undefined);
+  if(portable.valid)writePublicFood(stack,{...portable.state,hotUntil:remaining>0?bucket(t+remaining):0});
  }catch{}
  return stack;
 }

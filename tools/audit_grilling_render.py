@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 
 import argparse
 import json
@@ -485,6 +486,10 @@ def check_current_display_contracts(findings, geometry_index, animations):
         family = "skewer" if desc["identifier"].endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
         counts[family] += 1
         expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
+        if family == "skewer":
+            table = json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)', (BP / 'scripts/data.js').read_text()).group(1))
+            profile = table.get(desc['identifier'], 'THREE').replace('THREE_RANDOM', 'THREE').lower()
+            expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
         if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
@@ -492,6 +497,8 @@ def check_current_display_contracts(findings, geometry_index, animations):
             alias: f"c.is_first_person == {1 if alias.startswith('fp') else 0} && c.item_slot == '{'main_hand' if alias.endswith('right') else 'off_hand'}'"
             for alias in aliases
         }
+        if family == "skewer":
+            required_selectors.update({f'eat_{hand}': "q.is_using_item && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
         actual_selectors = {}
         malformed = False
         for row in selectors:

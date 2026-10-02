@@ -1,5 +1,6 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {ItemStack} from '@minecraft/server';
+import {readPublicOil,createPublicOilPot} from './host_api/oil_api_core.js';
 import {
  COOKERY_EMPTY_ID,COOKERY_FILLED_ID,HOST_COUNT_KEY,GRILLING_TYPE_KEY,
  normalizeOilType,oilCapacity,normalizeOilCount,planOilConsumption,planTypedOilAddition
@@ -12,11 +13,15 @@ function dynamic(stack,key){
 export function readCookeryOilPot(stack,{legacyPlacementFallback=false}={}){
  const filled=stack?.typeId===COOKERY_FILLED_ID,empty=stack?.typeId===COOKERY_EMPTY_ID;
  if(!filled)return {filled:false,empty,type:'',count:0,capacity:0,valid:true};
+ const portable=readPublicOil(stack);
+ if(portable.source==='public_api')return {filled:true,empty:false,type:portable.state.type,count:portable.state.count,capacity:oilCapacity(portable.state.type),valid:true,revision:portable.state.revision,source:'public_api'};
+ if(portable.reason!=='host_snapshot_required')return {filled:true,empty:false,type:'',count:0,capacity:0,valid:false,reason:portable.reason};
  const typeProbe=dynamic(stack,GRILLING_TYPE_KEY),countProbe=dynamic(stack,HOST_COUNT_KEY);
  const type=normalizeOilType(typeProbe.value);
  const count=normalizeOilCount({filled:true,type,raw:countProbe.value,
   hasRaw:countProbe.ok&&countProbe.value!==undefined,legacyPlacementFallback});
- return {filled:true,empty:false,type,count,capacity:oilCapacity(type),valid:typeProbe.ok&&countProbe.ok};
+ const valid=typeProbe.ok&&countProbe.ok&&countProbe.value!==undefined&&(!typeProbe.value||typeProbe.value===type);
+ return {filled:true,empty:false,type,count,capacity:oilCapacity(type),valid,source:valid?'legacy_grilling':'await_host',reason:valid?undefined:'host_snapshot_required'};
 }
 export function readCookeryOilPotForPlacement(stack){return readCookeryOilPot(stack,{legacyPlacementFallback:true})}
 function oilLore(line){
@@ -26,19 +31,12 @@ function oilLore(line){
 export function buildCookeryOilPot(type,count,template=undefined){
  const normalizedType=normalizeOilType(type),cap=oilCapacity(normalizedType);
  const normalizedCount=Math.max(0,Math.min(cap,Math.floor(Number(count)||0)));
- if(normalizedCount<=0){
-  try{return new ItemStack(COOKERY_EMPTY_ID,1)}catch{return undefined}
- }
  try{
-  const out=template?.typeId===COOKERY_FILLED_ID?template.clone():new ItemStack(COOKERY_FILLED_ID,1);
-  out.amount=1;
-  const lore=out.getRawLore().filter(line=>!oilLore(line));
-  if(lore.length>=20)return undefined;
-  lore.push('§7Oil: '+normalizedCount+'/'+cap);
-  // Customize first, then persist. Never return an item with only half its oil payload.
-  setItemLore(out,lore);
-  setItemProperty(out,HOST_COUNT_KEY,normalizedCount);
-  setItemProperty(out,GRILLING_TYPE_KEY,normalizedType||undefined);
+  const out=createPublicOilPot(ItemStack,normalizedType,normalizedCount,template);
+  // Legacy Grilling properties are retired only in this pack's scope.
+  setItemProperty(out,HOST_COUNT_KEY,undefined);
+  setItemProperty(out,GRILLING_TYPE_KEY,undefined);
+  if(normalizedCount===0)return out;
   const result=readCookeryOilPot(out);
   if(!result.valid||result.type!==normalizedType||result.count!==normalizedCount)return undefined;
   return out;
@@ -46,7 +44,7 @@ export function buildCookeryOilPot(type,count,template=undefined){
 }
 export function planCookeryOilPotConsumption(stack,needed,requiredType=''){
  const state=readCookeryOilPot(stack);
- if(!state.valid)return {ok:false,reason:'stack_error'};
+ if(!state.valid)return {ok:false,reason:state.reason??'stack_error'};
  const plan=planOilConsumption(state,needed,requiredType);if(!plan.ok)return plan;
  let before;
  try{before=stack.clone()}catch{return {ok:false,reason:'stack_error',type:plan.type,count:plan.count}}
@@ -56,7 +54,7 @@ export function planCookeryOilPotConsumption(stack,needed,requiredType=''){
 }
 export function planCookeryTypedOilAddition(stack,incomingType,points){
  const state=readCookeryOilPot(stack);
- if(!state.valid)return {ok:false,reason:'stack_error'};
+ if(!state.valid)return {ok:false,reason:state.reason??'stack_error'};
  const plan=planTypedOilAddition(state,incomingType,points);if(!plan.ok)return plan;
  const next=buildCookeryOilPot(plan.type,plan.nextCount,stack);
  if(!next)return {ok:false,reason:'stack_error',type:plan.type,count:plan.count};

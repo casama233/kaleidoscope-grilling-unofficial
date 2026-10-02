@@ -101,7 +101,7 @@ function isRecordableStack(stack){
  if(!stack)return false;const ingredients=skewerIngredientIds(stack);
  return isRecordableRecipe(stack.typeId,ingredients.length);
 }
-function plateRowsFromItem(stack){return normalizePlateRows(parseRowsProperty(stack,PLATE_SKEWERS_KEY,PLATE_CAPACITY))}
+function plateRowsFromItem(stack){return normalizePlateRows(decodePlateStorage(getItemProperty(stack,PLATE_SKEWERS_KEY)))}
 function plateItem(rows,template){
  const clean=normalizePlateRows(rows);let out;
  try{out=template?.typeId===PLATE_ID?cloneOne(template):new ItemStack(PLATE_ID,1)}catch{return undefined}
@@ -114,6 +114,8 @@ function plateItem(rows,template){
 const plateFaults=new Set();
 function plateFaultKey(block){return posKey(PLATE_PREFIX,block)+'_transaction_fault'}
 function assertPlateAvailable(block){
+ const receipt=world.getDynamicProperty(posKey(PLATE_PREFIX,block)+'_delivery');
+ if(receipt&&JSON.parse(String(receipt)).phase!=='delivered')throw Error('Grilling: plate delivery requires recovery');
  const key=plateFaultKey(block);
  if(plateFaults.has(key)||world.getDynamicProperty(key)!==undefined)throw Error('Grilling: plate transaction quarantined');
 }
@@ -231,6 +233,8 @@ function breakPlate(block,player){
  const rows=readPlateBlock(block),loc={x:block.x+.5,y:block.y+.35,z:block.z+.5},dim=block.dimension,before=block.permutation;
  const drop=!creative(player)&&rows.length?plateItem(rows):undefined;
  if(!creative(player)&&rows.length&&!drop)throw Error('Grilling: plate drop could not be packed');
+ const receiptKey=posKey(PLATE_PREFIX,block)+'_delivery',receiptBefore=world.getDynamicProperty(receiptKey),receipt={phase:'prepared',saved:world.getDynamicProperty(posKey(PLATE_PREFIX,block)),drop:!!drop};
+ const journal=verifiedPlateStep({read:()=>world.getDynamicProperty(receiptKey),write:v=>world.setDynamicProperty(receiptKey,v),before:receiptBefore,after:JSON.stringify(receipt)});
  const signature=s=>s?metadataSignature({amount:s.amount,...captureSkewerMetadata(s)}):'';
  let escrow;
  const delivery={
@@ -258,7 +262,8 @@ function breakPlate(block,player){
   apply(){block.setType('minecraft:air');if(block.typeId!=='minecraft:air')throw Error('Grilling: plate removal rejected')},
   rollback(){block.setPermutation(before);if(block.typeId!==before.type.id||metadataSignature(block.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: plate removal rollback rejected')}
  };
- return plateTransaction(block,[delivery,clear,remove]);
+ const commitReceipt={apply(){receipt.phase='delivered';const value=JSON.stringify(receipt);world.setDynamicProperty(receiptKey,value);if(world.getDynamicProperty(receiptKey)!==value)throw Error('plate receipt commit');},rollback(){receipt.phase='prepared';world.setDynamicProperty(receiptKey,JSON.stringify(receipt));}};
+ return plateTransaction(block,[journal,delivery,clear,remove,commitReceipt]);
 }
 function recordBookFromSkewer(player,book,skewer,hand='main'){
  const custom=skewerIngredientIds(skewer),record=makeBookRecord(skewer.typeId,custom);
@@ -426,12 +431,17 @@ function detachUnsupportedRecipe(block){
 world.afterEvents.playerBreakBlock.subscribe(e=>{
  try{
   const dim=e.block.dimension,loc={...e.block.location};system.run(()=>{
+   const above=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});if(above?.typeId===PLATE_BLOCK_ID&&!hasSolidTop(dim.getBlock(loc)))breakPlate(above);
    for(const off of [{x:1,y:0,z:0},{x:-1,y:0,z:0},{x:0,y:0,z:1},{x:0,y:0,z:-1}]){
     const b=dim.getBlock({x:loc.x+off.x,y:loc.y,z:loc.z+off.z});if(b?.typeId===RECIPE_BLOCK_ID)detachUnsupportedRecipe(b);
    }
   });
  }catch{}
 });
+
+// Prepared or unknown crash outcomes require review; replay never grants a new plate.
+export function a25RetryPlateDelivery(){return false;}
+world.afterEvents.blockExplode.subscribe(e=>{const d=e.dimension??e.block.dimension,at={...e.block.location};system.run(()=>{try{const b=d.getBlock({x:at.x,y:at.y+1,z:at.z});if(b?.typeId===PLATE_BLOCK_ID&&!hasSolidTop(d.getBlock(at)))breakPlate(b);}catch(error){console.warn('[Grilling plate support] retained '+error)}});});
 
 export function a25ReadPlateBlock(block){return readPlateBlock(block)}
 export function a25ReadRecipeBlockSnapshot(block){

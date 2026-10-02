@@ -15,6 +15,7 @@ import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_in
 import {captureWritableHand} from './a2735_player_io.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {createOilPressRegistry} from './oil_press_registry.js';
+import {ensureOilHandPublished} from './oil_api_client.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';
@@ -172,6 +173,9 @@ function takeVatBucket(block,p,hand){
  oilTransaction(steps,[block]);return true;
 }
 function fillPotFromVat(block,p,hand,item){
+ if(block?.typeId!=='kaleidoscope_grilling:big_vat')return true;
+ if(!ensureOilHandPublished(p,hand,()=>fillPotFromVat(block,p,hand,held(p,hand))))return true;
+ item=held(p,hand);
  const v=readVat(block);if(!['canola','secret_chili','premium_chili'].includes(v.type))return false;
  const oil=readCookeryOilPot(item),type=item.typeId===COOKERY_FILLED?oil.type:'',count=item.typeId===COOKERY_FILLED?oil.count:0;
  const plan=potFillPlan(v,type,count);if(!plan.ok){msg(p,'§c大缸已滿、油壺已滿或油種不同');return true}

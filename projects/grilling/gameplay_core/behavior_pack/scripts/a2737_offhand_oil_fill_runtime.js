@@ -1,4 +1,5 @@
 import {interactionFeedback} from './a283_interaction_feedback.js';
+import {ensureOilHandPublished} from './oil_api_client.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {OIL_TYPES} from './a23_oil_world.js';
 import {readCookeryOilPot,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
@@ -17,6 +18,7 @@ function verifyPot(stack,type,count){
 }
 
 function fillOffhandPot(player,expectedBucketId){
+ if(!ensureOilHandPublished(player,'off',()=>fillOffhandPot(player,expectedBucketId)))return true;
  const main=getMainHand(player),off=getOffHand(player);
  if(main?.typeId!==expectedBucketId)return false;
  const type=oilTypeForBucketId(main.typeId,OIL_TYPES);if(!type)return false;

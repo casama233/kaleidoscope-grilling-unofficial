@@ -1,7 +1,10 @@
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
+import {ensureOilHandPublished} from './oil_api_client.js';
 import {OIL_BUCKET_POINTS} from './a24_skewering_core.js';
 import {COOKERY_EMPTY_ID as COOKERY_EMPTY,COOKERY_FILLED_ID as COOKERY_FILLED,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
 import {playerInventory as playerContainer,getMainHand as main,getOffHand as off,setHand,isCreative as creative} from './a2735_player_io.js';
+import {captureWritableHand} from './a2735_player_io.js';
+import {commitSteps} from './a277_grill_transaction_core.js';
 import {isInitialBlockPress} from './a275_grill_input_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {
@@ -46,14 +49,15 @@ function loadReg(){
 function readReg(){return loadReg()}
 function persistRow(row){
  const normalized=normalizeOilSourceRow(row,VALID_OIL_TYPES);if(!normalized)return false;
+ try{world.setDynamicProperty(oilSourcePropertyId(normalized),JSON.stringify(normalized));if(world.getDynamicProperty(oilSourcePropertyId(normalized))!==JSON.stringify(normalized))return false;}catch{return false}
  const rows=loadReg(),i=rows.findIndex(x=>x.k===normalized.k);
  if(i>=0)rows[i]=normalized;else rows.push(normalized);
- Object.assign(row,normalized);
- try{world.setDynamicProperty(oilSourcePropertyId(normalized),JSON.stringify(normalized));return true}catch{return false}
+ Object.assign(row,normalized);return true;
 }
 function removeRow(row){
+ world.setDynamicProperty(oilSourcePropertyId(row),undefined);
+ if(world.getDynamicProperty(oilSourcePropertyId(row))!==undefined)throw Error('oil registry removal');
  const rows=loadReg(),i=rows.findIndex(x=>x.k===row.k);if(i>=0)rows.splice(i,1);
- try{world.setDynamicProperty(oilSourcePropertyId(row),undefined)}catch{}
 }
 function isOil(id){return Object.hasOwn(BLOCK_TO_TYPE,id)}
 function level(block){try{return Number(block.permutation.getState('kaleidoscope_grilling:level')??0)}catch{return 0}}
@@ -70,8 +74,8 @@ function addItem(p,stack){const c=playerContainer(p);if(!c)return;const rem=c.ad
 function sourceRow(dim,loc,type){return {k:posKey(dim.id,loc.x,loc.y,loc.z),d:dim.id,x:loc.x,y:loc.y,z:loc.z,type,cells:[],nextTick:system.currentTick}}
 function registerSource(dim,loc,type){
  const rows=readReg(),k=posKey(dim.id,loc.x,loc.y,loc.z),found=rows.find(r=>r.k===k);
- if(found){found.type=type;found.nextTick=Math.min(found.nextTick||0,system.currentTick);persistRow(found);return}
- persistRow(sourceRow(dim,loc,type));
+ if(found)return persistRow({...found,type,nextTick:Math.min(found.nextTick||0,system.currentTick)});
+ return persistRow(sourceRow(dim,loc,type));
 }
 function sourceKeys(rows){return new Set(rows.map(r=>r.k))}
 function claimedByOther(rows,row,cell){return rows.some(r=>r!==row&&Array.isArray(r.cells)&&r.cells.includes(cell))}
@@ -81,7 +85,7 @@ function clearCells(row,rows){
  for(const cell of row.cells??[]){
   if(sources.has(cell)||claimedByOther(rows,row,cell))continue;
   const [,xs,ys,zs]=cell.split('|');const b=dim.getBlock({x:Number(xs),y:Number(ys),z:Number(zs)});
-  if(b&&b.typeId===OIL_TYPES[row.type]?.block)try{b.setType('minecraft:air')}catch{}
+  if(b&&b.typeId===OIL_TYPES[row.type]?.block){b.setType('minecraft:air');if(b.typeId===OIL_TYPES[row.type]?.block)throw Error('oil flow cleanup unacknowledged');}
  }
 }
 function compute(row,rows){
@@ -115,25 +119,43 @@ function compute(row,rows){
  row.cells=[...desiredKeys].filter(k=>k!==row.k);return true;
 }
 function faceTarget(e){const o=OFFSETS[e.blockFace]??[0,1,0],p=e.block.location;return {x:p.x+o[0],y:p.y+o[1],z:p.z+o[2]}}
+function oilTransfer(steps,block){
+ const result=commitSteps(steps);
+ if(!result.ok){console.warn('[Grilling oil transfer] '+String(result.error)+'; rollback='+result.rollbackErrors);if(result.rollbackErrors)try{world.setDynamicProperty('kaleidoscope_grilling:oil_transfer_fault:'+posKey(block.dimension.id,block.x,block.y,block.z),String(result.error))}catch{}}
+ return result.ok;
+}
+function transferAvailable(block){try{return world.getDynamicProperty('kaleidoscope_grilling:oil_transfer_fault:'+posKey(block.dimension.id,block.x,block.y,block.z))===undefined}catch{return false}}
 function placeFromBucket(player,dim,loc,type,hand){
- const b=dim.getBlock(loc);if(!b||!(b.typeId==='minecraft:air'||isOil(b.typeId)))return false;
- if(!setOil(b,type,0))return false;registerSource(dim,loc,type);
- if(!creative(player))setHand(player,hand,new ItemStack('minecraft:bucket',1));return true;
+ const b=dim.getBlock(loc);if(!b||!(b.typeId==='minecraft:air'||(b.typeId===OIL_TYPES[type]?.block&&level(b)>0))||!transferAvailable(b))return false;
+ const slot=captureWritableHand(player,hand);if(slot.before?.typeId!==OIL_TYPES[type]?.bucket)return false;
+ const before=b.permutation,steps=[];
+ if(!creative(player))steps.push({apply(){slot.write(new ItemStack('minecraft:bucket',1))},rollback(){slot.write(slot.before)}});
+ steps.push({apply(){if(!setOil(b,type,0))throw Error('oil placement rejected')},rollback(){b.setPermutation(before)}});
+ const row=sourceRow(dim,loc,type),registryId=oilSourcePropertyId(row),registryBefore=world.getDynamicProperty(registryId),cached=readReg().map(r=>({...r,cells:[...(r.cells??[])]}));
+ steps.push({apply(){if(!registerSource(dim,loc,type))throw Error('oil source registry rejected')},rollback(){world.setDynamicProperty(registryId,registryBefore);if(world.getDynamicProperty(registryId)!==registryBefore)throw Error('oil registry rollback');registryCache=cached;}});
+ if(!oilTransfer(steps,b))return false;try{dim.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',loc)}catch{};return true;
 }
 function takeSource(player,block,type,hand,toCookery=false){
- if(level(block)!==0)return false;
- const held=hand==='off'?off(player):main(player);
- let nextPot;
- if(toCookery){
-  const plan=planCookeryTypedOilAddition(held,type,OIL_BUCKET_POINTS);
-  if(!plan.ok)return false;
-  nextPot=plan.next;
- }
+ if(block?.typeId!==OIL_TYPES[type]?.block||level(block)!==0||!transferAvailable(block))return false;
+ if(toCookery&&!ensureOilHandPublished(player,hand,()=>takeSource(player,block,type,hand,true)))return false;
+ const slot=captureWritableHand(player,hand),held=slot.before;
+ let next;
+ if(toCookery){const plan=planCookeryTypedOilAddition(held,type,OIL_BUCKET_POINTS);if(!plan.ok)return false;next=plan.next;}
+ else{if(held?.typeId!=='minecraft:bucket'||held.amount<1)return false;next=new ItemStack(OIL_TYPES[type].bucket,1);}
+ const before=block.permutation,steps=[];
+ if(!toCookery&&(held.amount>1||creative(player))){
+  if(!creative(player)){const remaining=held.clone();remaining.amount--;steps.push({apply(){slot.write(remaining)},rollback(){slot.write(held)}});}
+  const bag=playerContainer(player);let target=-1,drop;
+  if(bag)for(let i=0;i<bag.size;i++)if(!bag.getItem(i)){target=i;break;}
+  steps.push({apply(){if(target>=0){bag.setItem(target,next);if(bag.getItem(target)?.typeId!==next.typeId)throw Error('filled bucket delivery');}else{drop=block.dimension.spawnItem(next,player.location);if(!drop||drop.getComponent('minecraft:item')?.itemStack?.typeId!==next.typeId)throw Error('bucket drop delivery');}},rollback(){if(target>=0)bag.setItem(target,undefined);else if(drop)drop.remove();else throw Error('bucket delivery outcome unknown');}});
+ }else steps.push({apply(){slot.write(next)},rollback(){slot.write(held)}});
+ steps.push({apply(){block.setType('minecraft:air')},rollback(){block.setPermutation(before)}});
+ if(!oilTransfer(steps,block))return false;
+ try{block.dimension.playSound(type==='premium_chili'?'bucket.fill_lava':'bucket.fill_water',block.location)}catch{}
+
  const rows=readReg(),k=posKey(block.dimension.id,block.x,block.y,block.z),row=rows.find(r=>r.k===k);
- try{block.setType('minecraft:air')}catch{return false}
- if(row){clearCells(row,rows);removeRow(row)}
- if(toCookery)setHand(player,hand,nextPot);else setHand(player,hand,new ItemStack(OIL_TYPES[type].bucket,1));
- return true;
+ // Keep the durable row until the flow worker acknowledges cleanup of every cell.
+ if(row){const next={...row,nextTick:system.currentTick};persistRow(next)}return true;
 }
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  if(e.cancel)return;

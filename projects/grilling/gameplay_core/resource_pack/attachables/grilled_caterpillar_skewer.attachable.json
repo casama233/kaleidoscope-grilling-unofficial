@@ -36,6 +36,12 @@
           },
           {
             "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"
+          },
+          {
+            "eat_right": "q.is_using_item && c.item_slot == 'main_hand'"
+          },
+          {
+            "eat_left": "q.is_using_item && c.item_slot == 'off_hand'"
           }
         ]
       },
@@ -46,7 +52,9 @@
         "fp_right": "animation.kg_a287.skewer_fp_right",
         "fp_left": "animation.kg_a287.skewer_fp_left",
         "tp_right": "animation.kg_a287.skewer_tp_right",
-        "tp_left": "animation.kg_a287.skewer_tp_left"
+        "tp_left": "animation.kg_a287.skewer_tp_left",
+        "eat_right": "animation.kg_eating.item.one.right",
+        "eat_left": "animation.kg_eating.item.one.left"
       }
     }
   }

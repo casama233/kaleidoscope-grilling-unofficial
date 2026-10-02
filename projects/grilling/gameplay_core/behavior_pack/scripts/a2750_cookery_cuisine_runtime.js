@@ -6,6 +6,7 @@ import {commitTwoParty} from './a277_grill_transaction_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {playerInventory,getMainHand,setMainHand,getHand,isCreative} from './a2735_player_io.js';
 import {readCookeryOilPot} from './a2734_cookery_oil_pot_adapter.js';
+import {readPublicFood} from './host_api/food_api_core.js';
 import {SEASONING_MAX_USES,SEASONING_USES_KEY} from './a2743_seasoning_contract_core.js';
 import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
 import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
@@ -34,11 +35,12 @@ function writeCuisineState(block,state){
  try{
   const normalized=normalizeCuisineState(state);
   const empty=!normalized.seasoning.length&&!normalized.oilType&&!normalized.lastOutputTick;
-  world.setDynamicProperty(cuisineStateKey(block),empty?undefined:JSON.stringify(normalized));return true;
+  world.setDynamicProperty(cuisineStateKey(block),empty?undefined:JSON.stringify(normalized));
+  system.sendScriptEvent('kaleidoscope_cookery:cuisine_metadata',JSON.stringify({api:1,station:{dimensionId:block.dimension.id,x:block.x,y:block.y,z:block.z},state:normalized}));return true;
  }catch{return false}
 }
 function clearCuisineAt(dimensionId,location){
- try{world.setDynamicProperty(cuisineStateKeyAt(dimensionId,location.x,location.y,location.z),undefined);return true}catch{return false}
+ try{world.setDynamicProperty(cuisineStateKeyAt(dimensionId,location.x,location.y,location.z),undefined);system.sendScriptEvent('kaleidoscope_cookery:cuisine_metadata',JSON.stringify({api:1,station:{dimensionId,...location},state:{seasoning:[],oilType:''}}));return true}catch{return false}
 }
 function hostHasOil(block){
  try{return block?.permutation?.getState('kaleidoscope_cookery:has_oil')===true}catch{return false}
@@ -73,6 +75,7 @@ function giveCustom(player,stack){
 function rewriteGain(player,gain,plan){
  const c=playerInventory(player);if(!c)return false;
  const current=c.getItem(gain.slot);
+ if(readPublicFood(current).present)return false;
  if(!current||current.typeId!==gain.id||current.amount<gain.count||!foodLike(current))return false;
  const custom=current.clone();custom.amount=gain.count;applyFoodMetadata(custom,plan);
  const remain=current.amount-gain.count;
@@ -161,6 +164,10 @@ export function applyAuthoritativeCookeryOutput(request){
   const dimension=world.getDimension(normalized.station.dimensionId);
   const location={x:normalized.station.x,y:normalized.station.y,z:normalized.station.z};
   const station=dimension.getBlock(location),kind=stationKind(station?.typeId);if(!kind)return false;
+  if(normalized.version===2){
+   const item=normalized.target.kind==='item_entity'?world.getEntity(normalized.target.entityId)?.getComponent('minecraft:item')?.itemStack:(()=>{const t=outputTarget(normalized);return t?.container.getItem(t.slot)})();
+   const portable=readPublicFood(item);return authoritativeTargetMatches(item,normalized.target)&&portable.valid&&JSON.stringify(portable.state)===JSON.stringify(normalized.metadata);
+  }
   const target=outputTarget(normalized);if(!target)return false;
   const current=target.container.getItem(target.slot);
   if(!authoritativeTargetMatches(current,normalized.target)||!foodLike(current))return false;
