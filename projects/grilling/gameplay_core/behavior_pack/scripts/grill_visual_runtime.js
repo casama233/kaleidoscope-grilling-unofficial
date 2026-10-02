@@ -1,3 +1,4 @@
+import {grillingConfig} from './server_config_runtime.js';
 import {world,system} from '@minecraft/server';
 import {peekStationContainer} from './family_station_storage.js';
 import {readGrillState} from './a2740_grill_state_adapter.js';
@@ -9,6 +10,8 @@ function audience(){
  return observers;
 }
 const displays=createGrillDisplayController({
+ maxHelpers:()=>grillingConfig().fixedGrillHelpers,
+ onCapacity(){if(system.currentTick-lastWarning>=1200){lastWarning=system.currentTick;console.warn('[Grilling grill display] render budget exceeded; storage unaffected; configure fixedGrillHelpers after workload validation')}},
  spawn:(block,location)=>block.dimension.spawnEntity(GRILL_FOOD_ENTITY,location),
  remove:entity=>{if(entity.isValid){entity.setProperty(NS+'ready',false);entity.remove();}},
  apply(entity,block,pose,plan,key){

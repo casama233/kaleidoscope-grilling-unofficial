@@ -1,3 +1,4 @@
+import {markStationContentsDirty} from './station_contents_visual_runtime.js';
 import {planRackInsert,commitRackTransfer,depositInventorySlot} from './rack_transactions.js';
 import {slotWrite,remainderOf,planInventoryInsert} from './rack_transfer_plan.js';
 import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
@@ -149,40 +150,39 @@ function depositMatching(player,block){
  return changed;
 }
 
+const ui=(key,withArgs=[])=>({translate:'ui.kaleidoscope_grilling.advanced_rack.'+key,with:withArgs});
 function filterLabel(filter){
- if(!filter)return '§8無篩選';
- if(filter.category==='oil_pot')return '§7油壺';
- if(filter.category==='seasoning_bottle')return '§7調料瓶';
- return '§7'+filter.typeId;
+ if(!filter)return ui('no_filter');
+ if(filter.category==='oil_pot')return ui('oil_pot');
+ if(filter.category==='seasoning_bottle')return ui('seasoning_bottle');
+ return {text:filter.typeId};
 }
 function slotButton(slot,stored,filter){
- const kind=slot<5?'§6調料':'§b工具';
- if(stored){
-  let key;try{key=stored.localizationKey}catch{}
-  return {rawtext:[{text:kind+' '+(slot+1)+' §8| §f'},key?{translate:key}:{text:stored.typeId},{text:' ×'+stored.amount}]};
- }
- return {text:kind+' '+(slot+1)+' §8| §8空 §7['+filterLabel(filter).replace(/§./g,'')+']'};
+ const parts=[ui(slot<5?'seasoning':'tool'),{text:' '+(slot+1)+' §8| §f'}];
+ if(stored){let key;try{key=stored.localizationKey}catch{};parts.push(key?{translate:key}:{text:stored.typeId},{text:' ×'+stored.amount});}
+ else parts.push(ui('empty'),{text:' §7['},filterLabel(filter),{text:']'});
+ return {rawtext:parts};
 }
 
 async function openSlotForm(player,dimension,location,slot){
  const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
  const c=rackContainer(block),filters=readRackFilters(block),stored=c?.getItem(slot);
  const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
- form.body('§7槽位 '+(slot+1)+' · '+(slot<5?'調料':'工具')+'\n'+filterLabel(filters[slot]));
- form.button('§e與目前快捷欄交換');
- form.button('§a存入目前快捷欄物品');
- form.button('§b取回到背包');
- form.button('§c清除篩選（槽位需為空）');
- form.button('§7返回');
+ form.body({rawtext:[ui('slot',[String(slot+1)]),{text:' · '},ui(slot<5?'seasoning':'tool'),{text:'\n'},filterLabel(filters[slot])]});
+ form.button(ui('swap'));
+ form.button(ui('insert'));
+ form.button(ui('withdraw'));
+ form.button(ui('clear_filter'));
+ form.button(ui('back'));
  let r;try{r=await form.show(player)}catch{return}
  if(r.canceled)return;
- const live=resolveRack(dimension,location);if(!live||!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return;}
- if(r.selection===0){if(!swapWithHotbar(player,live,slot))message(player,'§c無法交換：請確認槽位分類與背包空間')}
- else if(r.selection===1){if(!depositSelected(player,live,slot))message(player,'§c無法存入：物品分類或篩選不符合')}
- else if(r.selection===2){if(!withdrawToInventory(player,live,slot))message(player,'§c背包沒有足夠空間')}
+ const live=resolveRack(dimension,location);if(!live||!rackInUseRange(player,live)){message(player,ui('too_far'));return;}
+ if(r.selection===0){if(!swapWithHotbar(player,live,slot))message(player,ui('swap_failed'))}
+ else if(r.selection===1){if(!depositSelected(player,live,slot))message(player,ui('insert_failed'))}
+ else if(r.selection===2){if(!withdrawToInventory(player,live,slot))message(player,ui('inventory_full'))}
  else if(r.selection===3){
   const lc=rackContainer(live),lf=readRackFilters(live);
-  if(lc?.getItem(slot))message(player,'§c槽位有物品時不能清除篩選');
+  if(lc?.getItem(slot))message(player,ui('filter_occupied'));
   else{lf[slot]=null;writeRackFilters(live,lf);}
  }else if(r.selection===4){system.run(()=>openRackForm(player,dimension,location))}
 }
@@ -194,14 +194,26 @@ export async function openRackForm(player,dimension,location){
  form.body({translate:'ui.kaleidoscope_grilling.advanced_rack.hint'});
  for(let i=0;i<RACK_COMPARTMENTS;i++)form.button(slotButton(i,c.getItem(i),filters[i]));
  form.button({translate:'ui.kaleidoscope_grilling.advanced_rack.deposit'});
+ form.button(ui('manage'));
  let r;try{r=await form.show(player)}catch{return}
  if(r.canceled)return;
- if(r.selection>=0&&r.selection<RACK_COMPARTMENTS)system.run(()=>openSlotForm(player,dimension,location,r.selection));
+ if(r.selection>=0&&r.selection<RACK_COMPARTMENTS){
+  const live=resolveRack(dimension,location);if(live&&!rackInUseRange(player,live)){message(player,ui('too_far'));return;}if(live){if(!swapWithHotbar(player,live,r.selection))message(player,ui('swap_failed'));markStationContentsDirty(live);}
+ }else if(r.selection===RACK_COMPARTMENTS+1)system.run(()=>openRackManagement(player,dimension,location));
  else if(r.selection===RACK_COMPARTMENTS){
   const live=resolveRack(dimension,location);
-  if(live&&!rackInUseRange(player,live)){message(player,'§7距離廚具架太遠，操作已取消');return}
-  if(!live||!depositMatching(player,live))message(player,'§7沒有可存入的符合物品');
+  if(live&&!rackInUseRange(player,live)){message(player,ui('too_far'));return}
+  if(!live||!depositMatching(player,live))message(player,ui('no_match'));
  }
+}
+
+async function openRackManagement(player,dimension,location){
+ const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
+ const c=rackContainer(block),filters=readRackFilters(block);if(!c)return;
+ const form=new ActionFormData().title(ui('manage'));
+ for(let i=0;i<RACK_COMPARTMENTS;i++)form.button(slotButton(i,c.getItem(i),filters[i]));
+ let r;try{r=await form.show(player)}catch{return}
+ if(!r.canceled&&r.selection>=0&&r.selection<RACK_COMPARTMENTS)system.run(()=>openSlotForm(player,dimension,location,r.selection));
 }
 
 function restorePlacedRack(block,item){
@@ -214,7 +226,7 @@ function restorePlacedRack(block,item){
   quarantineStation(block,'packed placement commit incomplete');
   throw new Error('Packed rack restore incomplete; inventory quarantined');
  }
- syncRackDisplay(block);return true;
+ syncRackDisplay(block);markStationContentsDirty(block);return true;
 }
 
 function scheduleRackPlacement(event){
@@ -283,7 +295,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
     const slot=rackSlotAtHit(event.block.permutation.getState('minecraft:cardinal_direction'),event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
     system.run(()=>{
      const live=resolveRack(d,l);if(slot<0||!live||!rackInUseRange(p,live)||!interactionIntentStillCurrent(p,intent))return;
-     if(!swapWithHotbar(p,live,slot))message(p,'§7這個槽位是空的，或背包沒有足夠空間');
+     if(!swapWithHotbar(p,live,slot))message(p,ui('slot_unavailable'));
     });
    }else system.run(()=>openRackForm(p,d,l));
   }
@@ -316,7 +328,7 @@ system.beforeEvents.startup.subscribe(event=>{
   if(!player||player.typeId!=='minecraft:player')return;
   system.run(()=>{
    const rack=nearestRack(player);
-   if(!rack)message(player,'§c附近 8 格內找不到高級廚具架');
+   if(!rack)message(player,ui('not_found'));
    else openRackForm(player,rack.dimension,loc(rack));
   });
  });

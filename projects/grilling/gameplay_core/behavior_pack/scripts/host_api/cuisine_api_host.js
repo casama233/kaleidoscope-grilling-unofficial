@@ -22,7 +22,7 @@ export function createNativeSuspiciousStew(b,variant=Math.floor(Math.random()*11
  const stand=b.dimension.spawnEntity('kaleidoscope_grilling:equipment_visual',{x:b.x+.5,y:b.y+.5,z:b.z+.5});
  try{
   stand.runCommand('replaceitem entity @s slot.inventory 0 minecraft:suspicious_stew 1 '+variant);
-  const stack=stand.getComponent('minecraft:inventory')?.container?.getItem(0);if(stack?.typeId!=='minecraft:suspicious_stew')throw Error('native stew variant missing');return stack.clone();
+  const stack=stand.getComponent('minecraft:inventory')?.container?.getItem(0);if(stack?.typeId!=='minecraft:suspicious_stew')throw Error('native stew variant missing');writePublicFood(stack,{v:1,hotUntil:0,seasoning:[],nativeVariant:variant});return stack.clone();
  }finally{stand.remove();}
 }
 const fingerprint=s=>({id:s.typeId,amount:s.amount,name:s.nameTag,lore:s.getRawLore()});
@@ -44,6 +44,8 @@ export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,ta
   if(prior.phase!=='rolled_back')throw Error('cuisine receipt quarantined: '+receiptId);
  }
  const meta=readCuisineMetadata(b,data,kind),base=nativeStack?.clone()??new ItemStack(id,count);if(base.typeId!==id||base.amount!==count)throw Error('native output identity');
+ const outputMeta=readPublicFood(base);if(outputMeta.present&&!outputMeta.valid)throw Error('native output metadata unreadable');
+ if(outputMeta.valid&&outputMeta.state.nativeVariant!==undefined)meta.nativeVariant=outputMeta.state.nativeVariant;
  const stack=writePublicFood(base,meta);stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
  let slot=-1,target,entity;
  if(container)for(let i=0;i<container.size;i++)if(!container.getItem(i)){slot=i;break;}

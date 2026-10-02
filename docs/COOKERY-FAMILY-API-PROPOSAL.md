@@ -1,4 +1,4 @@
-# Cookery 家族 API 0.2.0：可供維護者採納的修復
+# Cookery 家族 API 0.2.3：可供維護者採納的修復
 
 2026-10-02。使用者要求擴充作者 API；此回饋稿尚未傳送給作者。原作者身份及 1.0.8 版本不變，收據明列 `upstream_extended`。原包 SHA256：`9e5b617cc4c7a08ecd429fb9e42ec10e8d40a1ed5fc1f6f6687c3aff8a45a5d5`。
 
@@ -15,6 +15,7 @@
 | oil snapshots | 作者發布旧物品／放置狀態；跨包不得讀作者私有 dynamic properties，不從可見 lore 猜容量 |
 | placed oil recovery | typed 放置／補充／回收保持油種與點數；不把 typed 油取成普通油脂；未確認投放隔離 |
 | cuisine output v2 | 作者在實際領料、原生容器或掉落上直接寫公開熱度／調味資料；持久 operation receipt 防重領 |
+| native aux projection | public food v1 選填 nativeVariant，出料及展示保留可公開驗證的資料變體；不讀作者私人模型資料 |
 | ingredient behaviors v1 | 作者主動登記食物效果、原生 `usingConvertsTo`、額外容器及辣椒傷害；不偽造 itemCompleteUse |
 | localized guide labels v1 | 原 renderer 與導航不變；附屬 names 及已登記製程使用當前語言 |
 
@@ -29,3 +30,7 @@
 儲存替身只驗證交易與故障回復。獨立 BDS 原生容器交換、物品資料及重啟是另一組證據；真人刷油、指南 UI、聲音、主副手／視角與生存取得不能從零玩家測試推定。任意第三方自訂食用回呼必須由該作者公開登記；本介面沒有宣稱重播所有 Java mod callbacks。原生可疑燉湯透過原生 inventory 指令建立資料變體，不用自訂同名食物偽装。
 
 `usingConvertsTo` 在無轉換容器的原生物品上可能拋出錯誤，因此讀取此選填欄位時獨立處理缺值，不能丟棄整筆食品效果。參照 [官方 ItemFoodComponent 文件](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemfoodcomponent?view=minecraft-bedrock-stable)。
+
+## A2.8.41 的變體契約
+
+`nativeVariant` 是 0–32767 的整數，缺值保留 v1 原行為；損壞值拒絕，不推斷私人資料。實際作者可疑燉湯建立時發布該值，交付熱度／調味時保留。煙火 station projection 以 `replaceitem ... <amount> <data>` 設定並用 `hasitem` 驗證。公開自訂模型可用 `registerStationProjection(itemId, stack => ({data}))` 登記；callback 收到實際物品的 clone，helper 不擁有／交付它。這是伺服器模組接口，跨包作者需在自己公開 API 提供可共享 metadata，沒有假稱能跨命名空間讀取私人 properties。

@@ -178,7 +178,6 @@ item.kaleidoscope_grilling:advanced_rack.name=Advanced Kitchen Rack
 container.kaleidoscope_grilling.advanced_rack=Advanced Kitchen Rack
 container.kaleidoscope_grilling.advanced_rack_shortcut=Advanced Rack Shortcut
 tooltip.kaleidoscope_grilling.advanced_rack.saved_contents=Saved contents:
-ui.kaleidoscope_grilling.advanced_rack.hint=5 seasoning compartments + 4 tool compartments. Empty slots keep their filter.
 ui.kaleidoscope_grilling.advanced_rack.deposit=Deposit all matching items
 message.kaleidoscope_grilling.rack_swap_failed=Rack swap failed
 message.kaleidoscope_grilling.rack_nothing_to_deposit=Nothing matches the rack filters
@@ -278,6 +277,36 @@ message.kg.oil_insufficient=Not enough oil.
 message.kg.output_unavailable=The output could not be confirmed; the station retains the batch record. Make inventory space and try again.
 
 message.kaleidoscope_grilling.skewer_book_missing=Missing: %s x%s
+tooltip.kaleidoscope_grilling.seasoning.uses=§7Uses: %s/%s
+tooltip.kaleidoscope_grilling.seasoning.ingredients=§7Ingredients: %s/%s
+tooltip.kaleidoscope_grilling.seasoning.ready=§eReady to shake
+tooltip.kaleidoscope_grilling.seasoning.missing_base=§7Missing base seasoning
+tooltip.kaleidoscope_grilling.creator=§7Made by: %s
+ui.kaleidoscope_grilling.advanced_rack.no_filter=No filter
+ui.kaleidoscope_grilling.advanced_rack.oil_pot=Oil pot
+ui.kaleidoscope_grilling.advanced_rack.seasoning_bottle=Seasoning bottle
+ui.kaleidoscope_grilling.advanced_rack.seasoning=§6Seasoning
+ui.kaleidoscope_grilling.advanced_rack.tool=§bTool
+ui.kaleidoscope_grilling.advanced_rack.empty=§8Empty
+ui.kaleidoscope_grilling.advanced_rack.slot=Slot %s
+ui.kaleidoscope_grilling.advanced_rack.swap=Swap with selected hotbar slot
+ui.kaleidoscope_grilling.advanced_rack.insert=Insert selected item
+ui.kaleidoscope_grilling.advanced_rack.withdraw=Return to inventory
+ui.kaleidoscope_grilling.advanced_rack.clear_filter=Clear filter (empty slot only)
+ui.kaleidoscope_grilling.advanced_rack.back=Back
+ui.kaleidoscope_grilling.advanced_rack.manage=Manage filters and contents
+ui.kaleidoscope_grilling.advanced_rack.too_far=Too far from the rack
+ui.kaleidoscope_grilling.advanced_rack.swap_failed=Cannot swap: check category and inventory space
+ui.kaleidoscope_grilling.advanced_rack.insert_failed=Item category or filter does not match
+ui.kaleidoscope_grilling.advanced_rack.inventory_full=Inventory full
+ui.kaleidoscope_grilling.advanced_rack.filter_occupied=Empty the slot before clearing its filter
+ui.kaleidoscope_grilling.advanced_rack.no_match=No matching items to insert
+ui.kaleidoscope_grilling.advanced_rack.slot_unavailable=Slot empty or inventory full
+ui.kaleidoscope_grilling.advanced_rack.not_found=No Advanced Rack within 8 blocks
+ui.kaleidoscope_grilling.advanced_rack.hint=Select a slot to swap immediately; sneak-click a physical slot for quick access. Filters are managed separately.
+
+tooltip.kaleidoscope_grilling.skewer.progress=§8Hand-threaded skewer %s/%s
+tooltip.kaleidoscope_grilling.skewer.ingredient=§7Ingredient %s:
 
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=Kaleidoscope Grilling

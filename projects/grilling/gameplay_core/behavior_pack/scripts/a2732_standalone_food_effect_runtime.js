@@ -1,3 +1,4 @@
+import {readEffects,writeEffects} from './effect_state_runtime.js';
 import {world,system} from '@minecraft/server';
 import {
  FX_KEY,effectsForStandaloneFood,nextPersistentUntil
@@ -6,23 +7,7 @@ import {
 function now(){
  try{return Number(world.getAbsoluteTime())||system.currentTick}catch{return system.currentTick}
 }
-function readFx(entity){
- try{
-  const raw=entity.getDynamicProperty(FX_KEY);
-  if(typeof raw!=='string')return {};
-  const value=JSON.parse(raw);
-  return value&&typeof value==='object'?value:{};
- }catch{return {}}
-}
-function writeFx(entity,fx){
- try{
-  const t=now(),clean={};
-  for(const [name,value] of Object.entries(fx)){
-   if(value&&Number(value.until)>t)clean[name]={until:Number(value.until),amp:Number(value.amp)||0};
-  }
-  entity.setDynamicProperty(FX_KEY,Object.keys(clean).length?JSON.stringify(clean):undefined);
- }catch{}
-}
+const readFx=readEffects,writeFx=writeEffects;
 function applyPersistent(entity,effect){
  const t=now(),fx=readFx(entity),current=Number(fx[effect.effect]?.until)||0;
  fx[effect.effect]={

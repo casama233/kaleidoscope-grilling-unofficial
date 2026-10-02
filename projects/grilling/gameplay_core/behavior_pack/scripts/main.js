@@ -1,3 +1,7 @@
+import './hot_lore_runtime.js';
+import {grillingConfig} from './server_config_runtime.js';
+import {seasoningLore,creatorLore} from './localized_lore_core.js';
+import {readEffects,writeEffects,clearEffects} from './effect_state_runtime.js';
 import {planDragonDamage,dragonHealthGain} from './dragon_health_core.js';
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
@@ -8,7 +12,7 @@ import {slotWrite} from './rack_transfer_plan.js';
 import {acknowledgedDrop,commitStationTransfer} from './grill_transfer.js';
 import './dragon_powder_runtime.js';
 import './a288_parity_runtime.js';
-import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
 import {stationContainer,retireEmptyStationContainer,quarantineStation,inspectStationStorage,storageKey as stationStorageKey} from './family_station_storage.js';
 import {rolledIngredientEffects} from './a285_ingredient_effects.js';
@@ -206,7 +210,7 @@ function give(player,stack){const c=mainContainer(player);if(!c)return;const rem
 function copyOne(stack){const out=stack.clone();out.amount=1;return out}
 function copyCustomData(from,to){
  try{if(from.nameTag)to.nameTag=from.nameTag}catch{}
- let lore=[];try{lore=getItemLore(from)}catch{}
+ let lore=[];try{lore=getItemRawLore(from)}catch{}
  let ids=[];try{ids=getItemPropertyIds(from)}catch{}
  try{if(lore.length)setItemLore(to,lore);else if(ids.length)setItemLore(to,['§r'])}catch{}
  for(const id of ids)try{setItemProperty(to,id,getItemProperty(from,id))}catch{}
@@ -256,13 +260,13 @@ function rowLabel(row){return String(row.id??'').replace(/^.*:/,'').replaceAll('
 function writeSkewerRows(stack,rows){
  const clean=(rows??[]).filter(x=>x&&typeof x.id==='string').slice(0,3);
  try{
-  setItemLore(stack,['§8手工穿串 '+clean.length+'/3',...clean.map(x=>'§7- '+rowLabel(x))]);
+  setItemLore(stack,[{translate:'tooltip.kaleidoscope_grilling.skewer.progress',with:[String(clean.length),'3']},...clean.map((row,index)=>{let name;try{const item=new ItemStack(row.id);name=item.localizationKey?{translate:item.localizationKey}:undefined}catch{}return {rawtext:[{translate:'tooltip.kaleidoscope_grilling.skewer.ingredient',with:[String(index+1)]},{text:' '},row.native?.name||row.name?{text:row.native?.name??row.name}:name??{text:row.id}]}})]);
   setItemProperty(stack,SKEWER_INGREDIENTS_KEY,JSON.stringify(clean));
  }catch{}
  return stack;
 }
 function setSecretCreator(stack,player){
- try{const creator={name:player.name,id:player.id};setItemProperty(stack,SECRET_CREATOR_KEY,JSON.stringify(creator));const lore=getItemLore(stack);lore.push('§7製作者: '+player.name);setItemLore(stack,lore)}catch{}
+ try{const creator={name:player.name,id:player.id};setItemProperty(stack,SECRET_CREATOR_KEY,JSON.stringify(creator));const lore=getItemRawLore(stack);lore.push(creatorLore(player.name));setItemLore(stack,lore)}catch{}
  return stack;
 }
 function cookedIngredientRows(rows){
@@ -448,7 +452,7 @@ function planSeasoningBottle(player,hand,needed){
  if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
  const nextUses=uses+needed;
  if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
- const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,['§7Uses: '+(16-nextUses)+'/16'])}catch{}
+ const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses))}catch{}
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 function handleGrill(block,player,hand='main'){
@@ -514,8 +518,8 @@ function bottleDataFromItem(stack){
 }
 function bottleItem(data){
  const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
- if(data.kind==='special'){setUses(stack,data.uses??0);try{setItemProperty(stack,SEASON_VARIANT_KEY,data.variant??0);setItemLore(stack,['§7Uses: '+(SEASONING_MAX_USES-(data.uses??0))+'/'+SEASONING_MAX_USES,'§7Ingredients: '+(data.ingredients?.length??0)+'/'+SEASONING_CAPACITY])}catch{}}
- else try{if(data.ingredients?.length)setItemLore(stack,['§7Ingredients: '+data.ingredients.length+'/'+SEASONING_CAPACITY,data.kind==='pending'?'§eReady to shake':'§7Missing base seasoning'])}catch{}
+ if(data.kind==='special'){setUses(stack,data.uses??0);try{setItemProperty(stack,SEASON_VARIANT_KEY,data.variant??0);setItemLore(stack,seasoningLore(SEASONING_MAX_USES-(data.uses??0),data.ingredients?.length??0))}catch{}}
+ else try{if(data.ingredients?.length)setItemLore(stack,seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind!=='pending'}))}catch{}
  if(JSON.stringify(bottleDataFromItem(stack))!==JSON.stringify({kind:data.kind,ingredients:data.ingredients??[],uses:data.uses??0,variant:data.variant??0}))throw new Error('Bottle reconstruction did not preserve its mechanic fields');
  return stack;
 }
@@ -678,8 +682,8 @@ function handleCustomBlockInteraction(block,player,intent){
  if(block.typeId===GRILL_ID)handleGrill(block,player,intent.hand);
  else handleSeasoningBlock(block,player,intent.hand);
 }
-function readFx(entity){try{const raw=entity.getDynamicProperty(FX_KEY);if(typeof raw!=='string')return {};const v=JSON.parse(raw);return v&&typeof v==='object'?v:{}}catch{return {}}}
-function writeFx(entity,fx){try{const clean={};for(const [k,v] of Object.entries(fx))if(v&&Number(v.until)>now())clean[k]={until:Number(v.until),amp:Number(v.amp)||0};entity.setDynamicProperty(FX_KEY,Object.keys(clean).length?JSON.stringify(clean):undefined)}catch{}}
+function readFx(entity){try{return readEffects(entity)}catch{return {}}}
+function writeFx(entity,fx){try{return writeEffects(entity,fx)}catch{return {}}}
 function fxGet(entity,name){const v=readFx(entity)[name];return v&&Number(v.until)>now()?v:null}
 function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx)}
 function fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx)}
@@ -731,7 +735,7 @@ function afterCommitted(player,id,meta,active,fullNative){
  awardEatItHot(player,id,meta.hot);
  awardMentalPreparationFailed(player,id);
  if(meta.hot){doubleNewNative(player,active.nativeBefore);doubleNewFx(player,active.fxBefore)}
- if(meta.hot&&fullNative&&active.saturationBefore!==undefined){const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(h&&sat){const gained=Math.max(0,sat.currentValue-active.saturationBefore);sat.setCurrentValue(Math.min(h.currentValue,active.saturationBefore+gained*1.25))}}
+ if(meta.hot&&fullNative&&active.saturationBefore!==undefined){const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(h&&sat){const gained=Math.max(0,sat.currentValue-active.saturationBefore);sat.setCurrentValue(Math.min(h.currentValue,active.saturationBefore+gained*grillingConfig().saturationMultiplier))}}
  if(meta.hot)applySeasoning(player,meta.seasonings);
  if(id==='kaleidoscope_grilling:grilled_golden_skewer')try{player.dimension.playSound('beacon.power',player.location)}catch{}
  if(id==='kaleidoscope_grilling:ordinary_skewer')applyOrdinary(player);
@@ -746,7 +750,7 @@ function hungerSettle(player,id,active){
  const consumed=copyOne(current),before=current.clone(),next=current.amount>1?current.clone():undefined;
  if(next)next.amount--;
  const oldH=h.currentValue,oldS=sat.currentValue,hunger=Math.min(h.effectiveMax,oldH+d.nutrition);
- const saturation=Math.min(hunger,oldS+d.nutrition*d.saturation*2*(active.meta.hot?1.25:1));
+ const saturation=Math.min(hunger,oldS+d.nutrition*d.saturation*2*(active.meta.hot?grillingConfig().saturationMultiplier:1));
  const write=stack=>{
   if(active.hand==='off'){
    const eq=player.getComponent('minecraft:equippable');
@@ -802,7 +806,7 @@ function completePending(player,stack){
  PENDING_USES.delete(player.id);stopSoundHandle(a.audio);
  const list=readSeasonings(stack);if(!hasSeasoningBase(list)){javaInteractionFeedback(player,'missing_base_seasoning');return}
  const variant=Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)),out=new ItemStack(specialSeasoningVisualId(0,variant),1);setSeasonings(out,list);setUses(out,0);
- setItemProperty(out,SEASON_VARIANT_KEY,variant);setItemLore(out,['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY]);
+ setItemProperty(out,SEASON_VARIANT_KEY,variant);setItemLore(out,seasoningLore(SEASONING_MAX_USES,list.length));
  if(JSON.stringify(readSeasonings(out))!==JSON.stringify(list)||getUses(out)!==0)throw new Error('Seasoning data write failed');
  if(commitEating({debit:()=>writeUseHand(player,a.use,out),reward:()=>{},restoreFood:()=>writeUseHand(player,a.use,a.stack),restoreNutrition:()=>{}})){seasoningFinished(player);awardSeasoningFinishedChallenges(player,list)}
 }
@@ -831,7 +835,7 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  try{a.audio=e.source.playSound('kg_imm.'+soundFor(profile))}catch{}
 });
 world.afterEvents.itemCompleteUse.subscribe(e=>{
- const id=e.itemStack?.typeId;if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
+ const id=e.itemStack?.typeId;if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});DRAGON_PENDING.delete(e.source.id);DRAGON_REPLAY.delete(e.source.id);return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
  if(id===PLATE_ID){completePlateUse(e.source,e.itemStack);return}
   dangerousPreservation(e.source,id);
   if(CUISINE_FOOD_SET.has(id)){
@@ -884,12 +888,14 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  }
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
+world.afterEvents.playerSpawn.subscribe(e=>{if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);DRAGON_PENDING.delete(e.player.id);DRAGON_REPLAY.delete(e.player.id)}});
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
 function canUseSecretSkewer(stack){
  try{const valid=rows=>rows.length===3&&rows.every(row=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)&&(!row.native||(row.native.version===1&&row.native.id===row.id)));return valid(readSkewerRows(stack))&&(!isSecretCooked(stack)||valid(readEffectiveSkewerRows(stack)))}catch{return false}
 }
 world.beforeEvents.itemUse.subscribe(e=>{
  if(e.cancel)return;
+ if(!grillingConfig().fullHungerEating&&(FOOD_DATA[e.itemStack?.typeId]||e.itemStack?.typeId===SECRET_ID)){const h=e.source.getComponent('minecraft:player.hunger');if(h&&h.currentValue>=h.effectiveMax){e.cancel=true;return}}
  if(e.itemStack?.typeId===SECRET_ID&&!canUseSecretSkewer(e.itemStack)){e.cancel=true;return}
  try{
   const action=skewerAction(e.source,e.itemStack);
@@ -964,7 +970,7 @@ function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecr
 system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
-  if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){advanceBites(p,active);showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.
+  if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
   const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);
@@ -973,7 +979,7 @@ system.runInterval(()=>{
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}
   if(system.currentTick%20===0){const db=fxGet(p,'dragon_blood');if(db){try{p.addEffect('health_boost',25,{amplifier:db.amp>0?1:0,showParticles:false})}catch{};if(dragonPool(p)<=0&&p.getDynamicProperty(DRAGON_POOL_KEY)===undefined)setDragonPool(p,2)}else setDragonPool(p,undefined)}
   const numb=fxGet(p,'numb');if(numb&&!ACTIVE_EATS.has(p.id)){if(system.currentTick%12===0)try{p.playAnimation('animation.kg_a22.player.numb',{blendOutTime:.08})}catch{};NUMB_VISUAL.add(p.id)}else if(!numb&&NUMB_VISUAL.delete(p.id)){try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}
-  if(system.currentTick%20===0){const m=heldMain(p),o=heldOff(p);if(m&&hotUntil(m)>0){refreshHotLore(m);setMain(p,m)}if(o&&hotUntil(o)>0){refreshHotLore(o);setOff(p,o)}}
+
  }catch{}}
 },1);
 
