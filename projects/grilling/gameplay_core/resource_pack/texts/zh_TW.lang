@@ -256,6 +256,8 @@ message.kg.oil_full=油壺已滿。
 message.kg.oil_insufficient=油量不足。
 message.kg.output_unavailable=出料狀態未能確認，設備已保留批次資料。請留出背包空間後再試。
 
+message.kaleidoscope_grilling.skewer_book_missing=缺少：%s×%s
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森羅物語：煙火
 guide.kg.intro=按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮可透過廚房砧板取得；首次燒烤可從魚串開始。

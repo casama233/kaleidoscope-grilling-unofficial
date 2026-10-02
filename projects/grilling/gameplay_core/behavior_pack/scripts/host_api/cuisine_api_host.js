@@ -68,7 +68,7 @@ export function giveCuisineOutput(b,p,data,id,count=1,kind='pot',{suspicious=fal
  try{
   const receipt=deliverCuisineOutput(b,data,id,count,kind,{container:p.getComponent('minecraft:inventory')?.container,playerId:p.id,dropLocation:p.location,operationId:portionOperation(data,kind),nativeStack:suspicious?createNativeSuspiciousStew(b):undefined});
   if(receipt.replayed)restoreCarrier(p);else carriers.delete(p.id);return receipt;
- }catch(e){try{restoreCarrier(p);p.sendMessage({translate:'message.kg.output_unavailable'})}catch{};throw e;}
+ }catch(e){try{restoreCarrier(p);console.warn('[Cookery cuisine API] output retained '+e)}catch{};throw e;}
 }
 export function recoverCuisineOutput(b,data){
  if(!data.result?.id||data.burnt)return false;

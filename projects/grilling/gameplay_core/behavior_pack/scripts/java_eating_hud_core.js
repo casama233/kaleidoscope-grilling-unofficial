@@ -8,7 +8,7 @@ export function javaEatingHudFrame({id,elapsed,duration,tick=0}){
  if(name==='mysterious_skewer')name+='_frame_'+(Math.floor(tick/4)%5);
  else if(name==='grilled_slime_skewer')name+='_cooked_frame_'+(Math.floor(tick/4)%5);
  else if(name.startsWith('raw_'))name+='_raw';
- else if(name.startsWith('grilled_'))name+='_cooked';
+ else if(name.startsWith('grilled_')||name==='ordinary_skewer')name+='_cooked';
  const icon=JAVA_EATING_ICONS[name]??255;
  return {width,ready,icon,duration,packet:EATING_PACKET_PREFIX+code(width)+code(+ready)+'§r§1'+code(duration)+code(icon)+code(+ready)+'§r'};
 }

@@ -5,11 +5,12 @@ export const JAVA_INTERACTION_KEYS=Object.freeze([
  'grill_need_seasoning','grill_ready_to_take','bottle_full','invalid_seasoning',
  'missing_base_seasoning','oil_type_mismatch','big_vat_status','big_vat_reject',
  'press_full','press_need_full_batch','press_status','press_vat_full',
- 'press_wrong_vat','press_no_vat'
+ 'press_wrong_vat','press_no_vat','skewer_book_missing'
 ]);
 export function javaInteractionMessage(key,args=[],red=false){
  if(!JAVA_INTERACTION_KEYS.includes(key))return undefined;
- const translated={translate:'message.kaleidoscope_grilling.'+key,with:args.map(String)};
+ const withArgs=args.some(x=>x&&typeof x==='object')?{rawtext:args.map(x=>x&&typeof x==='object'?x:{text:String(x)})}:args.map(String);
+ const translated={translate:'message.kaleidoscope_grilling.'+key,with:withArgs};
  return {rawtext:red?[{text:'§c'},translated,{text:'§r'}]:[translated]};
 }
 export function createFailureFeedbackGate(quietTicks=100){

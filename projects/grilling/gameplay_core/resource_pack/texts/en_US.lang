@@ -277,6 +277,8 @@ message.kg.oil_full=The oil pot is full.
 message.kg.oil_insufficient=Not enough oil.
 message.kg.output_unavailable=The output could not be confirmed; the station retains the batch record. Make inventory space and try again.
 
+message.kaleidoscope_grilling.skewer_book_missing=Missing: %s x%s
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=Kaleidoscope Grilling
 guide.kg.intro=Browse by item type and preparation method. Obtain Beef Chunks and Chicken Skin on the Cookery Chopping Board; a Fish Skewer is a simple first recipe.

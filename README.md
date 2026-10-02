@@ -1,5 +1,7 @@
 ## Current maintained baseline: 2.8.38
 
+[本版提示與圖形 HUD 修正／未完成項](docs/STATUS-A2.8.38.md)：以 Java 原作觸發、翻譯與圖形為準，移除自創文字條。
+
 Public oil and food output APIs, shared guide localization, native station contents and failure recovery: [release scope](docs/STATUS-A2.8.38.md). Real-client and Java platform differences are recorded separately.
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.

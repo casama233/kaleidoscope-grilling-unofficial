@@ -1,9 +1,10 @@
+import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw} from './plate_transaction_core.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
-import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack,EnchantmentType} from '@minecraft/server';
 import {
  UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
@@ -293,7 +294,7 @@ function craftFromBook(player,book,stickHand='off'){
  const before=Array.from({length:c.size},(_,i)=>c.getItem(i)?.clone()),oldOff=heldOff(player)?.clone();
  const inventory=before.map(s=>s?{id:s.typeId,count:s.amount,tags:s.getTags?.()??[]}:null);
  const planned=planInventoryConsumption(inventory,slots,[player.selectedSlotIndex]);
- if(!planned.ok){message(player,'§c缺少配方材料：'+(planned.missing??[]).join('/'));return false}
+ if(!planned.ok){const labels=[];for(const id of planned.missing??[]){if(labels.length)labels.push({text:'/'});labels.push(id.startsWith('#')?{text:id}:{translate:itemTranslationKey(id)})}javaInteractionFeedback(player,'skewer_book_missing',[{rawtext:labels},1]);return false}
  // Java intentionally copies the recorded secret recipe, not newly consumed metadata.
  let output;
  if(record.resultId===SECRET_ID&&record.recordedStack){
