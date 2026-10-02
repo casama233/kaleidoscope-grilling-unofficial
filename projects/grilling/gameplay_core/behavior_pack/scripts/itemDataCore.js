@@ -30,3 +30,5 @@ export function setItemProperty(stack,id,value){
 }
 export function getItemLore(stack){return visibleRaw(stack).map(text);}
 export function setItemLore(stack,lore){const id=token(stack);const clean=lore.filter(x=>!text(x).startsWith(PREFIX));stack.setLore(id?[...clean,{text:PREFIX+Array.from(id,c=>'§'+c).join('')+'§r'}]:clean);}
+
+export function getItemRawLore(stack){return visibleRaw(stack);}

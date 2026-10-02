@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:clear_skewer_recipe_book"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "kaleidoscope_grilling:skewer_recipe_book"
+      }
+    ],
+    "result": {
+      "item": "kaleidoscope_grilling:skewer_recipe_book",
+      "count": 1
+    },
+    "unlock": [
+      {
+        "item": "kaleidoscope_grilling:skewer_recipe_book"
+      }
+    ]
+  }
+}
