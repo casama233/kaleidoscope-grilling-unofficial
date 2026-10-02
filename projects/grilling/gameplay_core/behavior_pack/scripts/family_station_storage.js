@@ -132,6 +132,24 @@ export function retireEmptyStationContainer(block){
  return finishEmptyRetirement(block,retired);
 }
 /** Inspection creates no helpers and transfers no items. */
+export function peekStationContainer(block){
+ if(!block)return undefined;
+ const type=storageType(block.typeId),rule=STORAGE_TYPES[type];if(!rule)return undefined;
+ const r=readRecord(block);
+ if(r?.quarantine)fail('transaction quarantined; refusing display');
+ if(r?.retiredEmpty)return undefined;
+ let native;try{native=block.getComponent('minecraft:inventory')?.container}catch{}
+ if(native){
+  if(r)fail('both legacy native and managed inventory present');
+  if(native.size!==rule.slots)fail('legacy native inventory size mismatch');
+  return native;
+ }
+ if(!r)return undefined;
+ if(r.block!==type)fail('coordinate still belongs to another station');
+ return resolve(block,r,false).c;
+}
+
+/** Inspection creates no helpers and transfers no items. */
 export function inspectStationStorage(block){
  const r=readRecord(block);
  if(!r)return {linked:false,orphans:Object.values(STORAGE_TYPES).flatMap(t=>candidates(block,t.entity)).length};

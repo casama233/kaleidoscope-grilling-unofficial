@@ -1,0 +1,25 @@
+"""Grill storage-derived display; rendering acceptance requires a real client."""
+from pathlib import Path
+import json,subprocess,sys
+from verify_a2828 import main as baseline
+ROOT=Path(__file__).resolve().parents[2]
+def main():
+    baseline()
+    subprocess.run(['node','--test','development/gameplay_core/test_grill_visual.mjs'],cwd=ROOT,check=True)
+    subprocess.run([sys.executable,'tools/build_grill_display.py','--check'],cwd=ROOT,check=True)
+    p=ROOT/'projects/grilling/gameplay_core'
+    entity=json.loads((p/'behavior_pack/entities/grill_food_visual.json').read_text())['minecraft:entity']
+    assert 'minecraft:transient' in entity['components'] and 'minecraft:inventory' not in entity['components']
+    assert all(v['client_sync'] for v in entity['description']['properties'].values())
+    client=json.loads((p/'resource_pack/entity/grill_food_visual.entity.json').read_text())['minecraft:client_entity']['description']
+    assert len(client['textures'])==len(client['geometry'])==115
+    geo=json.loads((p/'resource_pack/models/entity/grill_display.geo.json').read_text())['minecraft:geometry']
+    assert len(geo)==20
+    assert not any('binding' in b for g in geo for b in g['bones'])
+    assert len({g['description']['identifier'] for g in geo})==20
+    runtime=(p/'behavior_pack/scripts/grill_visual_runtime.js').read_text()
+    assert 'peekStationContainer(block)' in runtime and 'stationContainer(block)' not in runtime
+    assert 'setItem(' not in runtime and 'setDynamicProperty(' not in runtime
+    assert 'tickGrill(e.block);tickGrillDisplay(e.block)' in (p/'behavior_pack/scripts/main.js').read_text()
+    print('A2.8.29 grill slots/stages/flip source PASS; client and full saved-world migration remain separate')
+if __name__=='__main__':main()
