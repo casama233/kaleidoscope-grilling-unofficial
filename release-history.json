@@ -208,5 +208,25 @@
       "sha256": "64766fa6c4617e3ce9554f25ba6222f453b0cc8577122af9d0994ced5c6a3f82",
       "files": 1600
     }
+  },
+  "2.8.33": {
+    "BP": {
+      "sha256": "a9e60aaf57f26d0823968f8f12b8e7df057805f932b40943cc1a279d2042ab74",
+      "files": 489
+    },
+    "RP": {
+      "sha256": "7bd228e6d18ec43b2dd536c9f3a8c895e281abdfffc556ce16c85da2332ac84b",
+      "files": 1600
+    }
+  },
+  "2.8.35": {
+    "BP": {
+      "sha256": "7f670cf1a852cfbf9fd305ec1e4b6217e290173ce7da310427e6aa9c468f42ba",
+      "files": 490
+    },
+    "RP": {
+      "sha256": "b76415a47eff069e20861a4b76a77ef4197a016d8ac2627831fb92c883180d3a",
+      "files": 1600
+    }
   }
 }
