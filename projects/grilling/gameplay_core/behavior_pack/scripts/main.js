@@ -1,3 +1,5 @@
+import {foodFacts} from './food_snapshot_core.js';
+import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {readNativeBottles,isNativeBottleItem} from './seasoning_native_storage.js';
 import {slotWrite} from './rack_transfer_plan.js';
 import {acknowledgedDrop,commitStationTransfer} from './grill_transfer.js';
@@ -13,7 +15,7 @@ import {
  skewerIngredientDecision,customSkewerCookedId,isCompatRawSkewer
 } from './skewer_compat_core.js';
 import './skewer_compat_runtime.js';
-import {EquipmentSlot,GameMode} from '@minecraft/server';
+import {EquipmentSlot,GameMode,EnchantmentType} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,eatingEventMatches,commitEating} from './a285_eating_transaction.js';
 import {completedUseStillCurrent} from './a2810_use_transaction.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
@@ -204,21 +206,24 @@ function copyCustomData(from,to){
  for(const id of ids)try{setItemProperty(to,id,getItemProperty(from,id))}catch{}
  return to;
 }
-function ingredientSnapshot(stack){
- let nutrition=0,saturation=0,convertTo='',edible=false;
- try{const food=stack.getComponent('minecraft:food');if(food){edible=true;nutrition=Number(food.nutrition)||0;saturation=Number(food.saturationModifier)||0;convertTo=String(food.usingConvertsTo??'')}}catch{}
+function ingredientSnapshot(stack,full=false){
+ let {nutrition,saturation,convertTo,edible}=foodFacts(stack);
+ if(stack.typeId===SECRET_ID){const food=secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack),readSkewerRows(stack));nutrition=food.nutrition;saturation=food.saturation;edible=true;}
  let tags=[];try{tags=(stack.getTags?.()??[]).map(String).filter(x=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(x)).slice(0,64)}catch{}
  let lore=[];try{lore=getItemLore(stack)}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
- const props=primitiveStackProps(stack),signature=JSON.stringify({id:stack.typeId,name,lore,props});
- return {id:stack.typeId,nutrition,saturation,convertTo,edible,name,lore,props,tags,signature};
+ const props=primitiveStackProps(stack),native=full?captureSkewerMetadata(stack):undefined;
+ const signature=native?metadataSignature(native):JSON.stringify({id:stack.typeId,name,lore,props});
+ return native?{id:stack.typeId,nutrition,saturation,convertTo,edible,tags,native}:{id:stack.typeId,nutrition,saturation,convertTo,edible,name,lore,props,tags,signature};
 }
 function restoreIngredient(row){
- let out;try{out=new ItemStack(row.id,1)}catch{return undefined}
- try{if(row.name)out.nameTag=row.name}catch{}
- const props=row.props&&typeof row.props==='object'?row.props:{},keys=Object.keys(props);
- try{if(Array.isArray(row.lore)&&row.lore.length)setItemLore(out,row.lore);else if(keys.length)setItemLore(out,['§r'])}catch{}
- for(const id of keys)try{setItemProperty(out,id,props[id])}catch{}
+ if(row?.native&&row.native.id!==row.id)throw Error('Grilling: ingredient identity mismatch');
+ if(row?.native)return restoreSkewerMetadata(row.native,(id,n)=>new ItemStack(id,n),id=>new EnchantmentType(id));
+ const out=new ItemStack(row.id,1),props=row.props&&typeof row.props==='object'?row.props:{};
+ if(row.name)out.nameTag=row.name;
+ const lore=Array.isArray(row.lore)?row.lore:[];setItemLore(out,lore);
+ for(const [id,value] of Object.entries(props))setItemProperty(out,id,value);
+ if((out.nameTag??'')!==(row.name??'')||JSON.stringify(getItemLore(out))!==JSON.stringify(lore)||metadataSignature(primitiveStackProps(out))!==metadataSignature(props))throw Error('Grilling: legacy ingredient metadata readback differs');
  return out;
 }
 function behaviorRemainder(behavior){
@@ -232,7 +237,11 @@ function behaviorRemainder(behavior){
  return out;
 }
 function readRowsFromKey(stack,key){
- try{const raw=getItemProperty(stack,key);if(typeof raw!=='string')return [];const rows=JSON.parse(raw);return Array.isArray(rows)?rows.filter(x=>x&&typeof x.id==='string').slice(0,3):[]}catch{return []}
+ const raw=getItemProperty(stack,key);if(raw===undefined)return [];
+ if(typeof raw!=='string')throw Error('Grilling: invalid ingredient data');
+ const rows=JSON.parse(raw);
+ if(!Array.isArray(rows)||rows.length>3||rows.some(x=>!x||typeof x.id!=='string'))throw Error('Grilling: invalid ingredient rows');
+ return rows;
 }
 function readSkewerRows(stack){return readRowsFromKey(stack,SKEWER_INGREDIENTS_KEY)}
 function isSecretCooked(stack){try{return stack?.typeId===SECRET_ID&&getItemProperty(stack,SECRET_COOKED_KEY)===true}catch{return false}}
@@ -251,11 +260,11 @@ function setSecretCreator(stack,player){
  return stack;
 }
 function cookedIngredientRows(rows){
- return (rows??[]).map(row=>{const id=resolveSecretSmokedId(row);if(!id)return row;try{return ingredientSnapshot(new ItemStack(id,1))}catch{return row}});
+ return (rows??[]).map(row=>{const id=resolveSecretSmokedId(row);if(!id)return row;try{const result=ingredientSnapshot(new ItemStack(id,1),true);return result.edible?result:row}catch{return row}});
 }
-function setCookedIngredientRows(stack,rows){try{setItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,JSON.stringify(cookedIngredientRows(rows)))}catch{}return stack}
+function setCookedIngredientRows(stack,rows){if(readRowsFromKey(stack,SECRET_COOKED_INGREDIENTS_KEY).length===3)return stack;const value=JSON.stringify(cookedIngredientRows(rows));setItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,value);if(getItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY)!==value)throw Error('Grilling: cooked ingredient data was not saved');return stack}
 function dynamicFood(stack){return stack?.typeId===SECRET_ID?secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack),readSkewerRows(stack)):FOOD_DATA[stack?.typeId]}
-function isEdible(stack){if(stack?.typeId==='kaleidoscope_grilling:sweet_potato_powder')return false;try{return !!stack?.getComponent('minecraft:food')}catch{return false}}
+function isEdible(stack){if(stack?.typeId==='kaleidoscope_grilling:sweet_potato_powder')return false;try{return foodFacts(stack).edible}catch{return false}}
 function threadOutcome(player){
  const food=heldMain(player),off=heldOff(player);if(!food||!off||player.isSneaking)return null;
  if(off.typeId!=='minecraft:stick'&&off.typeId!==UNFINISHED_ID&&!(off.typeId===SECRET_ID&&!isSecretCooked(off)))return null;
@@ -274,7 +283,8 @@ function canDisassembleOff(player){const off=heldOff(player);return !!off&&isDis
 function threadCurrent(player){
  const main=captureWritableHand(player,'main'),other=captureWritableHand(player,'off');
  const food=main.before,off=other.before,outcome=threadOutcome(player);if(!food||!off||!outcome?.ok)return false;
- const rows=off.typeId==='minecraft:stick'?[]:readSkewerRows(off),nextRows=[...rows,ingredientSnapshot(food)],next=new ItemStack(outcome.id,1);
+ const rows=off.typeId==='minecraft:stick'?[]:readSkewerRows(off),nextRows=[...rows,ingredientSnapshot(food,true)],next=new ItemStack(outcome.id,1);
+ restoreIngredient(nextRows[nextRows.length-1]); // Verify reconstructibility before either input is debited.
  writeSkewerRows(next,nextRows);if(outcome.kind==='secret')setSecretCreator(next,player);
  if(getItemProperty(next,SKEWER_INGREDIENTS_KEY)!==JSON.stringify(nextRows))throw new Error('Grilling: skewer data was not saved');
  if(outcome.kind==='secret'&&!getItemProperty(next,SECRET_CREATOR_KEY))throw new Error('Grilling: creator data was not saved');
@@ -360,7 +370,7 @@ function setUses(stack,n){try{setItemProperty(stack,SEASON_USES_KEY,Math.max(0,M
 function cookedStack(raw,state){
  let stack;
  if(raw.typeId===SECRET_ID){
-  stack=copyOne(raw);setCookedIngredientRows(stack,readSkewerRows(raw));try{setItemProperty(stack,SECRET_COOKED_KEY,true)}catch{}
+  stack=copyOne(raw);setCookedIngredientRows(stack,readSkewerRows(raw));setItemProperty(stack,SECRET_COOKED_KEY,true);if(!isSecretCooked(stack))throw Error('Grilling: cooked state was not saved');
  }else{
   const out=customSkewerCookedId(ingredientSnapshot(raw))||RAW_TO_COOKED[raw.typeId];
   if(!out)return new ItemStack(MYSTERIOUS_ID,1);
@@ -852,7 +862,12 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
+function canUseSecretSkewer(stack){
+ try{const valid=rows=>rows.length===3&&rows.every(row=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)&&(!row.native||(row.native.version===1&&row.native.id===row.id)));return valid(readSkewerRows(stack))&&(!isSecretCooked(stack)||valid(readEffectiveSkewerRows(stack)))}catch{return false}
+}
 world.beforeEvents.itemUse.subscribe(e=>{
+ if(e.cancel)return;
+ if(e.itemStack?.typeId===SECRET_ID&&!canUseSecretSkewer(e.itemStack)){e.cancel=true;return}
  try{
   const action=skewerAction(e.source,e.itemStack);
   if(action){e.cancel=true;scheduleSkewerAction(e.source,action);return}

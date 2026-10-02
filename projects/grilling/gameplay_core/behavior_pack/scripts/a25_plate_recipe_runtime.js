@@ -1,9 +1,11 @@
-import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+import {captureSkewerMetadata,restoreSkewerMetadata} from './skewer_item_snapshot.js';
+import {commitSteps} from './a277_grill_transaction_core.js';
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
-import {world,system,ItemStack} from '@minecraft/server';
+import {world,system,ItemStack,EnchantmentType} from '@minecraft/server';
 import {
- SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
+ UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
 } from './a24_skewering_core.js';
 import {RAW_SKEWER_TAG,GRILLED_SKEWER_TAG} from './skewer_compat_core.js';
 import {
@@ -67,21 +69,25 @@ function skewerFood(stack){
  if(stack.typeId===SECRET_ID){
   const rows=parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3);
   let cooked=false;try{cooked=getItemProperty(stack,SECRET_COOKED_KEY)===true}catch{}
-  return secretFood(rows,cooked);
+  const cookedRows=cooked?parseRowsProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,3):[];
+  return secretFood(cookedRows.length?cookedRows:rows,cooked,rows);
  }
  try{const food=stack.getComponent('minecraft:food');return {nutrition:Math.max(0,Number(food?.nutrition)||0),saturation:Math.max(0,Number(food?.saturationModifier)||0)}}catch{return {nutrition:0,saturation:0}}
 }
 function stackRow(stack){
  const food=skewerFood(stack),props=primitiveProps(stack);let lore=[],name='';
  try{lore=getItemLore(stack)}catch{}try{name=stack.nameTag??''}catch{}
- return {id:stack.typeId,name,lore,props,nutrition:food.nutrition,saturation:food.saturation};
+ return {id:stack.typeId,native:captureSkewerMetadata(stack),nutrition:food.nutrition,saturation:food.saturation};
 }
 function restoreStack(row){
- if(!row||typeof row.id!=='string')return undefined;let out;try{out=new ItemStack(row.id,1)}catch{return undefined}
- try{if(row.name)out.nameTag=row.name}catch{}
- const props=row.props&&typeof row.props==='object'?row.props:{},keys=Object.keys(props);
- try{if(Array.isArray(row.lore)&&row.lore.length)setItemLore(out,row.lore);else if(keys.length)setItemLore(out,['§r'])}catch{}
- for(const id of keys)try{setItemProperty(out,id,props[id])}catch{}
+ if(!row||typeof row.id!=='string')return undefined;
+ if(row.native&&row.native.id!==row.id)throw Error('Grilling: recorded identity mismatch');
+ if(row.native)return restoreSkewerMetadata(row.native,(id,n)=>new ItemStack(id,n),id=>new EnchantmentType(id));
+ const out=new ItemStack(row.id,1),props=row.props&&typeof row.props==='object'?row.props:{},lore=Array.isArray(row.lore)?row.lore:[];
+ if(row.name)out.nameTag=row.name;setItemLore(out,lore);
+ for(const [id,value] of Object.entries(props))setItemProperty(out,id,value);
+ if((out.nameTag??'')!==(row.name??'')||JSON.stringify(getItemLore(out))!==JSON.stringify(lore))throw Error('Grilling: legacy skewer metadata readback differs');
+ for(const [id,value] of Object.entries(props))if(JSON.stringify(getItemProperty(out,id))!==JSON.stringify(value))throw Error('Grilling: legacy skewer property readback differs');
  return out;
 }
 function isSkewer(stack){
@@ -98,9 +104,10 @@ function plateRowsFromItem(stack){return normalizePlateRows(parseRowsProperty(st
 function plateItem(rows,template){
  const clean=normalizePlateRows(rows);let out;
  try{out=template?.typeId===PLATE_ID?cloneOne(template):new ItemStack(PLATE_ID,1)}catch{return undefined}
- let lore=[];try{lore=getItemLore(out).filter(x=>!String(x).startsWith('§7Skewers:'))}catch{}
+ let lore=[];try{lore=getItemRawLore(out).filter(x=>!(typeof x==='string'?x:x?.text??'').startsWith('§7Skewers:'))}catch{}
  lore.push('§7Skewers: '+clean.length+'/'+PLATE_CAPACITY);
- try{setItemLore(out,lore);setItemProperty(out,PLATE_SKEWERS_KEY,JSON.stringify(clean))}catch{}
+ setItemLore(out,lore);const value=JSON.stringify(clean);setItemProperty(out,PLATE_SKEWERS_KEY,value);
+ if(getItemProperty(out,PLATE_SKEWERS_KEY)!==value)throw Error('Grilling: plate contents were not saved');
  return out;
 }
 function readPlateBlock(block){
@@ -110,7 +117,8 @@ function syncPlateCount(block,count){
  try{block.setPermutation(block.permutation.withState('kaleidoscope_grilling:plate_count',Math.max(0,Math.min(5,count|0))))}catch{}
 }
 function writePlateBlock(block,rows){
- const clean=normalizePlateRows(rows);world.setDynamicProperty(posKey(PLATE_PREFIX,block),JSON.stringify(clean));syncPlateCount(block,clean.length);
+ const clean=normalizePlateRows(rows),value=JSON.stringify(clean);world.setDynamicProperty(posKey(PLATE_PREFIX,block),value);
+ if(world.getDynamicProperty(posKey(PLATE_PREFIX,block))!==value)throw Error('Grilling: plate block write rejected');syncPlateCount(block,clean.length);
 }
 function clearPlateBlock(block){world.setDynamicProperty(posKey(PLATE_PREFIX,block))}
 function readBookRecord(book){
@@ -123,9 +131,10 @@ function readBookRecord(book){
 function bookItem(record,recordedStack,template){
  let out;try{out=template?.typeId===BOOK_ID?cloneOne(template):new ItemStack(BOOK_ID,1)}catch{return undefined}
  const value=record?{...record,recordedStack:recordedStack??record.recordedStack??null}:null;
- let lore=[];try{lore=getItemLore(out).filter(x=>!String(x).startsWith('§7Recipe:'))}catch{}
- lore.push(value?'§7Recipe: '+value.resultId:'§7Recipe: <empty>');
- try{setItemLore(out,lore);setItemProperty(out,BOOK_RECORD_KEY,value?JSON.stringify(value):undefined)}catch{}
+ let lore=[];try{lore=getItemRawLore(out).filter(x=>!(typeof x==='string'?x:x?.text??'').startsWith('§7Recipe:'))}catch{}
+ lore.push(value?('§7Recipe: '+value.resultId.replace(/^.*:/,'')).slice(0,50):'§7Recipe: <empty>');
+ setItemLore(out,lore);const serialized=value?JSON.stringify(value):undefined;setItemProperty(out,BOOK_RECORD_KEY,serialized);
+ if(getItemProperty(out,BOOK_RECORD_KEY)!==serialized)throw Error('Grilling: recipe record was not saved');
  return out;
 }
 function readRecipeBlock(block){
@@ -162,7 +171,9 @@ function handlePlateBlock(block,player,hand='main'){
  if(held&&isSkewer(held)){
   if(player.isSneaking&&hand==='off')return;
   const added=plateAdd(rows,stackRow(held));if(!added.ok){message(player,'§e烤串盤已滿 5/5');return}
-  if(!decrementHand(player,hand,1))return;writePlateBlock(block,added.rows);
+  if(!plateItem(added.rows))throw Error('Grilling: plate could not be reconstructed'); // Preflight item storage limits before taking any skewer.
+  const old=held.clone();const result=commitSteps([{apply(){writePlateBlock(block,added.rows);if(!decrementHand(player,hand,1))throw Error('Plate input changed')},rollback(){let failure;try{writePlateBlock(block,rows)}catch(e){failure=e}try{setHand(player,hand,old)}catch(e){failure=e}if(failure)throw failure}}]);
+  if(!result.ok){console.warn('[Grilling plate] '+result.error+'; rollback errors='+result.rollbackErrors);return}
   try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:1.1})}catch{};return;
  }
  if(held)return;
@@ -172,14 +183,17 @@ function handlePlateBlock(block,player,hand='main'){
 }
 function breakPlate(block,player){
  if(!block||block.typeId!==PLATE_BLOCK_ID)return;const rows=readPlateBlock(block),loc={x:block.x+.5,y:block.y+.35,z:block.z+.5},dim=block.dimension;
+ const drop=!creative(player)&&rows.length?plateItem(rows):undefined; // Construct before clearing saved data.
  clearPlateBlock(block);block.setType('minecraft:air');
- if(!creative(player)&&rows.length){const drop=plateItem(rows);if(drop)dim.spawnItem(drop,loc)}
+ if(drop)dim.spawnItem(drop,loc)
 }
 function recordBookFromSkewer(player,book,skewer,hand='main'){
  const custom=skewerIngredientIds(skewer),record=makeBookRecord(skewer.typeId,custom);
  if(!record){message(player,'§c這根串不能記錄成配方');return false}
  const out=bookItem(record,stackRow(skewer),book);if(!out)return false;
- if(hand==='off')setOff(player,out);else setMain(player,out);
+ const before=heldByHand(player,hand)?.clone();
+ const result=commitSteps([{apply(){setHand(player,hand,out);if(interactionStackSignature(heldByHand(player,hand))!==interactionStackSignature(out))throw Error('Recipe hand write rejected')},rollback(){setHand(player,hand,before)}}]);
+ if(!result.ok){console.warn('[Grilling record recipe] '+result.error+'; rollback errors='+result.rollbackErrors);return false}
  return true;
 }
 function consumePlan(player,plan){
@@ -187,32 +201,53 @@ function consumePlan(player,plan){
  for(const x of plan){const s=c.getItem(x.slot);if(!s||s.amount<x.count)return false}
  for(const x of plan){const s=c.getItem(x.slot);if(s.amount===x.count)c.setItem(x.slot,undefined);else{s.amount-=x.count;c.setItem(x.slot,s)}}return true;
 }
+function isRecipeStick(stack){
+ if(stack?.typeId==='minecraft:stick')return true;
+ if(stack?.typeId!==UNFINISHED_ID)return false;
+ const raw=getItemProperty(stack,SKEWER_INGREDIENTS_KEY);
+ return raw===undefined||(typeof raw==='string'&&raw.trim()==='[]');
+}
 function craftFromBook(player,book,stickHand='off'){
  const record=readBookRecord(book);if(!record){message(player,'§7這本烤串食譜尚未記錄配方');return false}
- const stick=stickHand==='main'?heldMain(player):heldOff(player);if(stick?.typeId!=='minecraft:stick'){message(player,stickHand==='main'?'§e主手需要木棍':'§e副手需要木棍');return false}
+ const stick=heldByHand(player,stickHand);if(!isRecipeStick(stick)){message(player,'§e需要木棍或空的未完成烤串');return false}
  const slots=bookIngredientSlots(record);if(!slots)return false;
- const c=mainContainer(player),inventory=[];if(!c)return false;
- for(let i=0;i<c.size;i++){const s=c.getItem(i);inventory.push(s?{id:s.typeId,count:s.amount}:null)}
+ const c=mainContainer(player);if(!c)return false;
+ const before=Array.from({length:c.size},(_,i)=>c.getItem(i)?.clone()),oldOff=heldOff(player)?.clone();
+ const inventory=before.map(s=>s?{id:s.typeId,count:s.amount}:null);
  const planned=planInventoryConsumption(inventory,slots,[player.selectedSlotIndex]);
  if(!planned.ok){message(player,'§c缺少配方材料：'+(planned.missing??[]).join('/'));return false}
- if(!consumePlan(player,planned.plan)||!(stickHand==='main'?decrementMain(player,1):decrementOff(player,1)))return false;
+ // Java intentionally copies the recorded secret recipe, not newly consumed metadata.
  let output;
  if(record.resultId===SECRET_ID&&record.recordedStack){
   output=restoreStack(record.recordedStack);
   if(output){
-   try{setItemProperty(output,SECRET_COOKED_KEY,false);setItemProperty(output,SECRET_CREATOR_KEY,player.name)}catch{}
-   try{const lore=getItemLore(output).filter(x=>!String(x).startsWith('§7製作者:'));lore.push('§7製作者: '+player.name);setItemLore(output,lore)}catch{}
+   setItemProperty(output,SECRET_COOKED_KEY,false);
+   setItemProperty(output,SECRET_CREATOR_KEY,JSON.stringify({name:player.name,id:player.id}));
+   const lore=getItemRawLore(output).filter(x=>!(typeof x==='string'?x:x?.text??'').startsWith('§7製作者:'));lore.push('§7製作者: '+player.name);setItemLore(output,lore);
   }
- }else try{output=new ItemStack(record.resultId,1)}catch{}
- if(!output)return false;give(player,output);
+ }else if(record.resultId!==SECRET_ID)output=new ItemStack(record.resultId,1);
+ if(!output)return false;
+ const result=commitSteps([{
+  apply(){
+   if(!consumePlan(player,planned.plan)||!decrementHand(player,stickHand,1))throw Error('Recipe inputs changed');
+   const leftover=c.addItem(output);if(leftover)throw Error('Make inventory space for the skewer');
+  },
+  rollback(){
+   let failures=0;
+   for(let i=0;i<before.length;i++)try{c.setItem(i,before[i])}catch{failures++}
+   try{setOff(player,oldOff)}catch{failures++}
+   if(failures)throw Error('Recipe rollback failed for '+failures+' writes');
+  }
+ }]);
+ if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);message(player,'§c製作未完成，已嘗試回復材料；請預留背包空位');return false}
  try{player.playSound('random.levelup',{volume:.45,pitch:1.5})}catch{}return true;
 }
 function handleBookAir(player,item){
  const main=heldMain(player),off=heldOff(player),hand=main?.typeId===BOOK_ID?'main':off?.typeId===BOOK_ID?'off':null;if(!hand)return;
  const book=hand==='main'?main:off,record=readBookRecord(book);
- if(record&&heldOff(player)?.typeId==='minecraft:stick'&&hand==='main'){craftFromBook(player,book);return}
+ if(record&&isRecipeStick(heldOff(player))&&hand==='main'){craftFromBook(player,book);return}
  if(!record&&hand==='main'&&isRecordableStack(off)){recordBookFromSkewer(player,book,off,'main');return}
- message(player,record?'§7副手放木棍即可按使用鍵自動取料製作':'§7副手放一根完整生串，再按使用鍵記錄配方');
+ message(player,record?'§7副手放空的未完成烤串即可按使用鍵自動取料製作':'§7副手放一根完整生串，再按使用鍵記錄配方');
 }
 function convertCookeryRecipe(player){
  const main=heldMain(player),off=heldOff(player);if(!main||!COOKERY_RECIPE_ITEMS.has(main.typeId)||!isRecordableStack(off))return false;
@@ -232,7 +267,7 @@ function placeRecipeBlock(support,face,player,book,hand='main'){
 function handleRecipeBlock(block,player,hand='main'){
  if(!block||block.typeId!==RECIPE_BLOCK_ID)return;
  const row=readRecipeBlock(block),book=restoreStack(row),held=heldByHand(player,hand);
- if(held?.typeId==='minecraft:stick'&&book){craftFromBook(player,book,hand);return}
+ if(isRecipeStick(held)&&book){craftFromBook(player,book,hand);return}
  if(held)return;
  clearRecipeBlock(block);block.setType('minecraft:air');if(book)give(player,book);
  try{block.dimension.playSound('random.pop',block.location,{volume:.6,pitch:.9})}catch{}
@@ -251,8 +286,8 @@ world.beforeEvents.itemUse.subscribe(e=>{
    e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
    system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜或副手烤串已變更');return}convertCookeryRecipe(p)});return;
   }
-  if(id!==BOOK_ID)return;e.cancel=true;const item=cloneOne(e.itemStack),offSignature=interactionStackSignature(heldOff(p));
-  system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜書或副手材料已變更');return}handleBookAir(p,item)});
+  if(id!==BOOK_ID)return;e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
+  system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜書或副手材料已變更');return}handleBookAir(p)});
  }catch{}
 });
 
@@ -266,7 +301,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
    e.cancel=true;if(!first)return;const loc={...block.location},dim=block.dimension;defer(()=>handlePlateBlock(dim.getBlock(loc),p,hand));return;
   }
   if(block.typeId===RECIPE_BLOCK_ID){
-   if(item&&item.typeId!=='minecraft:stick')return;
+   if(item&&!isRecipeStick(item))return;
    e.cancel=true;if(!first)return;const loc={...block.location},dim=block.dimension;defer(()=>handleRecipeBlock(dim.getBlock(loc),p,hand));return;
   }
   if(p.isSneaking&&hand==='main'&&item&&COOKERY_RECIPE_ITEMS.has(item.typeId)&&isRecordableStack(heldOff(p))){

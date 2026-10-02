@@ -1,3 +1,5 @@
+import {ingredientFoodFacts} from './food_snapshot_core.js';
+import {ingredientContentSignature} from './skewer_item_snapshot.js';
 import {FIXED_INGREDIENT_TAGS} from './java_ingredient_tags.js';
 import {HOST_FAT_CAPACITY as FAT_CAPACITY,GRILLING_FLUID_CAPACITY as FLUID_CAPACITY,GRILLING_OIL_BUCKET_POINTS as OIL_BUCKET_POINTS} from './a2738_oil_contract_core.js';
 export const UNFINISHED_ID='kaleidoscope_grilling:unfinished_skewer';
@@ -62,7 +64,7 @@ export function canonicalIngredients(id){
 }
 
 export function secretFood(rows,cooked=false,originalRows=rows){
- const foods=(rows??[]).map(x=>({
+ const foods=(rows??[]).map(ingredientFoodFacts).map(x=>({
   id:String(x?.id??''),
   signature:String(x?.signature??x?.id??''),
   nutrition:Math.max(0,Number(x?.nutrition)||0),
@@ -71,7 +73,7 @@ export function secretFood(rows,cooked=false,originalRows=rows){
  if(!foods.length)return {nutrition:1,saturation:0,duplicate:false};
  let total=0,weighted=0,duplicate=false;
  const seen=new Set();
- for(const x of originalRows??[]){const signature=String(x?.signature??x?.id??'');if(seen.has(signature))duplicate=true;seen.add(signature)}
+ for(const x of originalRows??[]){const signature=ingredientContentSignature(x);if(seen.has(signature))duplicate=true;seen.add(signature)}
  for(const x of foods){total+=x.nutrition;weighted+=x.nutrition*x.saturation}
  let nutrition=Math.max(1,Math.floor(total*.6*(duplicate?.8:1))),saturation=Math.max(0,weighted/Math.max(1,total));
  if(!cooked){nutrition=Math.max(1,Math.floor(nutrition*.5));saturation*=.5}

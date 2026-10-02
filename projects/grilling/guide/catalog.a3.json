@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "revision": "java_survival_20261001",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -2075,37 +2075,53 @@
         "en_US": "Skewer Recipe Book"
       },
       "body": {
-        "zh_CN": [
-          "取得：主手持 Cookery 空白食谱、副手持完整生串并使用，会消耗一份空白食谱，得到已记录的串谱；生串不消耗。",
-          "主手拿空串谱、副手拿完整生串并使用，可记录固定串或完整秘制串；被记录的串不会消耗。",
-          "记录后的串谱配合副手木棍使用，会从背包逐项寻找材料；缺料时不会部分扣料。",
-          "有记录的串谱可贴在方块水平侧面；拿木棍对墙上的串谱使用也会按同一配方快速制作。",
-          "烤串食谱的数据与自动穿串功能已存在，但公开 Cookery 1.0.8 没有旧接口的空白食谱物品，首次取得仍未接通。"
-        ],
         "zh_TW": [
-          "取得：主手持 Cookery 空白食譜、副手持完整生串並使用，會消耗一份空白食譜，得到已記錄的串譜；生串不消耗。",
-          "主手拿空串譜、副手拿完整生串並使用，可記錄固定串或完整秘製串；被記錄的串不會消耗。",
-          "記錄後的串譜配合副手木棍使用，會從背包逐項尋找材料；缺料時不會部分扣料。",
-          "有記錄的串譜可貼在方塊水平側面；拿木棍對牆上的串譜使用也會按同一配方快速製作。",
-          "烤串食譜的資料與自動穿串功能已存在，但公開 Cookery 1.0.8 沒有舊接口的空白食譜物品，首次取得仍未接通。"
+          "用 4 張紙排成 2×2 合成空白串譜。這是公開廚房缺少 Java 空白食譜物品時的基岩版取得方式。",
+          "主手拿空串譜、副手拿完整生串並使用，即可記錄配方；原串保留。",
+          "主手拿已記錄的串譜、副手拿空的未完成烤串並使用，會從背包取料製作；空串先由 1 根木棍合成。",
+          "有記錄的串譜可貼在方塊水平側面；主手拿木棍或空串對它使用也能製作。缺料或背包無空間時不製作。",
+          "單獨把串譜放進合成格可以清空記錄。秘製串配方依 Java 複製當時記錄的食材資料；不改用本次材料的資料。"
+        ],
+        "zh_CN": [
+          "用 4 张纸排成 2×2 合成空白串谱。这是公开厨房缺少 Java 空白食谱物品时的基岩版取得方式。",
+          "主手拿空串谱、副手拿完整生串并使用，即可记录配方；原串保留。",
+          "主手拿已记录的串谱、副手拿空的未完成烤串并使用，会从背包取料制作；空串先由 1 根木棍合成。",
+          "有记录的串谱可贴在方块水平侧面；主手拿木棍或空串对它使用也能制作。缺料或背包无空间时不制作。",
+          "单独把串谱放进合成格可以清空记录。秘制串配方依 Java 复制当时记录的食材数据；不改用本次材料的数据。"
         ],
         "en_US": [
-          "Use an empty Skewer Recipe Book in the main hand with a complete raw skewer in the off hand to record a fixed or complete Secret recipe without consuming the skewer.",
-          "Use a recorded book with a stick in the off hand to pull each ingredient from inventory. Missing ingredients do not cause a partial craft.",
-          "A recorded book can be placed on a horizontal block face; use a stick on the wall recipe to quick-craft the same way.",
-          "Recipe recording and auto-threading exist, but public Cookery 1.0.8 lacks the legacy blank recipe item. Initial survival acquisition remains blocked."
+          "Craft four paper in a 2×2 square into an empty Skewer Recipe Book. This Bedrock acquisition bridge replaces the blank recipe item absent from public Cookery.",
+          "Use the blank book in your main hand with a complete raw skewer in your offhand to record it. The original skewer is retained.",
+          "Use the recorded book with an empty Unfinished Skewer in your offhand to craft from inventory. Craft that empty starter from one stick first.",
+          "Place a recorded book on a horizontal block face, then use a stick or empty starter on it to craft. Missing ingredients or inventory space cancel crafting.",
+          "Craft a book by itself to clear its record. As in Java, secret recipes copy the recorded ingredient metadata rather than the newly consumed ingredients."
         ]
       },
       "kinds": [
         "item"
       ],
-      "recipes": [],
+      "recipes": [
+        {
+          "method": "Crafting",
+          "ingredients": [
+            "minecraft:paper",
+            "minecraft:paper",
+            "minecraft:paper",
+            "minecraft:paper"
+          ],
+          "result": "kaleidoscope_grilling:skewer_recipe_book",
+          "count": 1,
+          "time": 0
+        }
+      ],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/skewer_recipe_book.json",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_runtime.js",
-        "projects/grilling/guide/content.a2.json#guide_recipe_book"
+        "projects/grilling/guide/content.a2.json#guide_recipe_book",
+        "projects/grilling/gameplay_core/behavior_pack/recipes/skewer_recipe_book_blank.json",
+        "projects/grilling/gameplay_core/behavior_pack/recipes/clear_skewer_recipe_book.json"
       ],
-      "acquisition": "unverified",
+      "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/skewer_recipe_book",
       "stack": 1
     },
@@ -5467,7 +5483,8 @@
       "minecraft:cherry_button": "樱花木按钮",
       "minecraft:bamboo_button": "竹按钮",
       "minecraft:crimson_button": "绯红木按钮",
-      "minecraft:warped_button": "诡异木按钮"
+      "minecraft:warped_button": "诡异木按钮",
+      "minecraft:paper": "纸"
     },
     "zh_TW": {
       "kaleidoscope_cookery:caterpillar": "Caterpillar",
@@ -5646,7 +5663,8 @@
       "minecraft:cherry_button": "櫻花木按鈕",
       "minecraft:bamboo_button": "竹按鈕",
       "minecraft:crimson_button": "緋紅木按鈕",
-      "minecraft:warped_button": "扭曲木按鈕"
+      "minecraft:warped_button": "扭曲木按鈕",
+      "minecraft:paper": "紙"
     },
     "en_US": {
       "kaleidoscope_cookery:caterpillar": "Caterpillar",
@@ -5825,7 +5843,8 @@
       "minecraft:cherry_button": "Cherry Button",
       "minecraft:bamboo_button": "Bamboo Button",
       "minecraft:crimson_button": "Crimson Button",
-      "minecraft:warped_button": "Warped Button"
+      "minecraft:warped_button": "Warped Button",
+      "minecraft:paper": "Paper"
     }
   },
   "icon_sources": {
