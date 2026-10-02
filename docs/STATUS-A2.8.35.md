@@ -1,80 +1,16 @@
-# A2.8.35: original Java sprites and native sapling item
+# A2.8.35：餐盤破壞與爆炸交付
 
-The two chili-oil brush icons now use their exact released Java 1.1.1 PNGs,
-rather than copies of the canola brush. The legacy generator reads each pinned
-variant separately and fails if its source is missing. Item identifiers, stack
-limits, oil-tool semantics and hidden creative categories are unchanged.
+承接已合併的 A2.8.34，補齊另一條資料遺失路徑：破壞餐盤不再先清空世界資料再嘗試生成物品。
 
-Pepper sapling now has an explicit same-ID generated sprite item, replacing the
-implicit crossed-block inventory item. Its native block placer remains enabled;
-the block, dirt placement validation, stage reset and growth script are unchanged.
-The existing world texture is pixel-identical to Java and is not rewritten.
+- 先建立並讀回確認完整打包物品，再清除盤內資料與移除方塊。交付、世界屬性與方塊更新使用同一組回滾。
+- 保存五串各自的原生資料、名稱、RawMessage lore、屬性與順序。重複處理已移除餐盤不再生成第二盤。
+- 清資料或移除方塊失敗時，刪除暫存掉落物並還原原始資料及方塊狀態。
+- 生成掉落物的結果不明，或無法確認移除暫存物品時，持久隔離餐盤並停止自動重試，避免將來源再次交付。原始資料保留供人工核對。
+- 爆炸先從原生破壞清單取出餐盤，再執行同一個打包交易；其他方塊沿用原生爆炸處理。
+- 創造模式及空盤維持不生成打包掉落物的既有行為。
 
-All four original item JSONs and PNGs are pinned in
-`development/gameplay_core/fixtures/java-item-icons-1.1.1/source.json`, including
-source commit and release JAR SHA256. Six focused regression tests protect these
-routes, distinct variants, source bytes and preserved placement/growth resources.
-Previous rack, skewer, storage, recipe, guide and Board API regressions remain on.
-The guide payload has its own content version 0.3.9 from the concurrent A2.8.34.
+31 項來源回歸覆蓋 A2.8.34 的操作，以及打包、寫後故障、掉落物讀回不一致、重複破壞、生成結果不明及無法移除暫存物品。這些是儲存替身測試，不是 Minecraft 玩家。
 
-## Remaining oil-brushing view gap
+[獨立 BDS 證據](BDS-PLATE-DROP-20261002.json)已通過完整家族原檔載入／重啟，以及實際打包物品、五串 metadata、重複破壞、原生爆炸及掉落物重啟保留。首次探針錯將重啟查找限制在生成點八格內；掉落物移動後超出範圍，改用維度內物品查找後通過，失敗紀錄保留。探針使用 [Microsoft 的原生爆炸 API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/dimension?view=minecraft-bedrock-stable#createexplosion)，沒有模擬玩家。
 
-Java's oil pot overrides its model with the selected generated brush during use
-(first and third person); its first-person renderer applies a temporary brush
-stack and brush-specific poses. This port still animates the equipped oil pot.
-Hidden brush items are not temporarily equipped, so changing their hand_equipped
-flag alone cannot repair the active-use model. This patch fixes source sprites,
-not that separate animation gap. No native-client visual acceptance is claimed.
-
-No live deployment or complete Java parity is claimed.
-
-## Editor reference check
-
-Blockbench 5.2.1 opened the unmodified released premium brush item JSON from its
-normal assets hierarchy and resolved the 16x16 original texture. Its Generated
-Item Model notice, thin generated silhouette and GUI sprite were observed.
-Display mode was inspected as an editor reference only; Blockbench's parent
-preview/default lighting does not certify Minecraft inherited transforms or the
-port's active oil-pot renderer. Canonical assets were not re-exported from the
-editor, preserving exact upstream PNG bytes.
-
-## Concurrent source integration
-
-Preserves all 28 changed files from public main 1c9e0deaa2434466afec265b4ea8b931c9473e49
-(PR105, A2.8.34): transactional plate transfers, strict saved-data checks,
-Java placement direction, captured hand reads, native probe and guide corrections.
-Their full verifier runs before the new icon checks. A2.8.33 was an unpublished
-local candidate; its BDS report does not validate this combined runtime.
-
-## Active brush implementation boundary
-
-A resource-only attachable could target the two existing Cookery pot IDs without
-rewriting their items. It would need a reliable client-visible active hand and oil
-variant. The current oil_type/kc_oil_count values are ItemStack dynamic properties,
-not synced entity properties, and stable playAnimation has no variable map.
-Molang cross-entity variable reads require the owning entity's public declaration;
-adding that for players would require a player resource override. No such override
-or use of unrelated vanilla animation variables is introduced here.
-
-The last successful use legitimately converts a filled pot into its empty ID;
-any future presentation must retain the pre-consumption oil type and cover both
-IDs. An isolated native-client proof is required before implementing this signal
-bridge, followed by both hands, observer clients, depletion, repeated use and slot
-switching tests. BDS loading alone cannot certify it.
-
-References:
-- https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/playanimationoptions?view=minecraft-bedrock-stable
-- https://learn.microsoft.com/en-us/minecraft/creator/documents/molang/syntax-guide?view=minecraft-bedrock-stable
-- https://learn.microsoft.com/en-us/minecraft/creator/documents/attachables?view=minecraft-bedrock-stable
-
-## Combined runtime validation
-
-The full registered 2.8.35 gate passed, including public 2.8.34 plate transaction
-and orientation tests plus six hardened source-icon tests. All 330 relative script
-imports resolve. Exact source packaging and frozen baseline checks pass.
-
-The combined 16-pack family passed two isolated BDS 1.26.52.3 load/restart cycles,
-with no content/script errors and the persistence marker restored. Existing pack
-override and empty-allowlist warnings are recorded; no native guide overlay,
-player simulation, client rendering acceptance or live deployment was performed.
-See BDS-ITEM-ICONS-2.8.35.json for the exact archive hash and evidence.
+沒有宣稱跨儲存的程序終止原子性。真人渲染、手持與吃東西動畫、正式舊存檔遷移仍待驗收；正式 luosen 未套用本候選。其他工作分支的榨油／食物接口與內容顯示修復已保留。

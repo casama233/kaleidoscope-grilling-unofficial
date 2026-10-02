@@ -89,5 +89,7 @@
     "grilling": "2.8.35"
   },
   "grilling_source_commit": "fa7fabe",
-  "grilling_archive_sha256": "400c44c67ffe4722558d8f998a0c0b79744d280576dd2d6ded42e15006083768"
+  "grilling_archive_sha256": "400c44c67ffe4722558d8f998a0c0b79744d280576dd2d6ded42e15006083768",
+  "candidate_status": "private icon candidate, never published; superseded by 2.8.36",
+  "not_public_plate_drop_2_8_35": true
 }

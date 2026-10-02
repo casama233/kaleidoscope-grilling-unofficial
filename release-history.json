@@ -209,6 +209,16 @@
       "files": 1600
     }
   },
+  "2.8.35": {
+    "BP": {
+      "sha256": "6900f323faa44ca0b9df42306a54e05b2bdd1cd518374424d02aadf6c338bc48",
+      "files": 489
+    },
+    "RP": {
+      "sha256": "d645fc781ea71f9c5c42efda9272941fc3a123ec1effcf40a328da9b7dd6cf6f",
+      "files": 1600
+    }
+  },
   "2.8.33": {
     "BP": {
       "sha256": "a9e60aaf57f26d0823968f8f12b8e7df057805f932b40943cc1a279d2042ab74",
@@ -219,13 +229,13 @@
       "files": 1600
     }
   },
-  "2.8.35": {
+  "2.8.36": {
     "BP": {
-      "sha256": "7f670cf1a852cfbf9fd305ec1e4b6217e290173ce7da310427e6aa9c468f42ba",
+      "sha256": "51e6a56f92a95202ddb4999268365c7fa8a641fe3137c29c971de0b349d2dc22",
       "files": 490
     },
     "RP": {
-      "sha256": "b76415a47eff069e20861a4b76a77ef4197a016d8ac2627831fb92c883180d3a",
+      "sha256": "35e97b8a9f3641bffce02403ca72fe694f273215c51b2acbc6d8c7a5c5fb6078",
       "files": 1600
     }
   }

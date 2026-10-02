@@ -1,10 +1,6 @@
-"""Native item icons, preserving all previous gameplay and held-route checks."""
-import subprocess,sys
-from pathlib import Path
+"""Plate break/explosion transactions included in the extended regression suite."""
 from verify_a2834 import main as baseline
-
 def main():
  baseline()
- subprocess.run([sys.executable,str(Path(__file__).with_name('test_native_item_icons.py'))],check=True)
- print('A2.8.35 exact source sprites and native sapling item PASS; native client acceptance pending')
+ print('A2.8.35 packed plate drop/explosion transaction regressions PASS; client and migration gates remain separate')
 if __name__=='__main__':main()

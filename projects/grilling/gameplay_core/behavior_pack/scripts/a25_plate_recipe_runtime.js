@@ -227,10 +227,38 @@ function handlePlateBlock(block,player,hand='main'){
  try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:.9})}catch{}
 }
 function breakPlate(block,player){
- if(!block||block.typeId!==PLATE_BLOCK_ID)return;const rows=readPlateBlock(block),loc={x:block.x+.5,y:block.y+.35,z:block.z+.5},dim=block.dimension;
- const drop=!creative(player)&&rows.length?plateItem(rows):undefined; // Construct before clearing saved data.
- clearPlateBlock(block);block.setType('minecraft:air');
- if(drop)dim.spawnItem(drop,loc)
+ if(!block||block.typeId!==PLATE_BLOCK_ID)return false;
+ const rows=readPlateBlock(block),loc={x:block.x+.5,y:block.y+.35,z:block.z+.5},dim=block.dimension,before=block.permutation;
+ const drop=!creative(player)&&rows.length?plateItem(rows):undefined;
+ if(!creative(player)&&rows.length&&!drop)throw Error('Grilling: plate drop could not be packed');
+ const signature=s=>s?metadataSignature({amount:s.amount,...captureSkewerMetadata(s)}):'';
+ let escrow;
+ const delivery={
+  apply(){
+   if(!drop)return;
+   try{
+    escrow=dim.spawnItem(drop,loc);
+    if(!escrow?.isValid||signature(escrow.getComponent('minecraft:item')?.itemStack)!==signature(drop))throw Error('Grilling: plate drop readback differs');
+   }catch(error){
+    // A spawn call can fail after creating an inaccessible item. Never retry
+    // automatically when no returned entity exists to confirm its removal.
+    if(!escrow)quarantinePlate(block,'plate drop spawn outcome unknown');
+    throw error;
+   }
+  },
+  rollback(){
+   if(!escrow)return;
+   try{if(escrow.isValid)escrow.remove()}catch(error){if(escrow.isValid)throw error}
+   if(escrow.isValid)throw Error('Grilling: plate drop cleanup unconfirmed');
+  }
+ };
+ const key=posKey(PLATE_PREFIX,block),raw=world.getDynamicProperty(key);
+ const clear=verifiedPlateStep({read:()=>world.getDynamicProperty(key),write:value=>world.setDynamicProperty(key,value),before:raw,after:undefined});
+ const remove={
+  apply(){block.setType('minecraft:air');if(block.typeId!=='minecraft:air')throw Error('Grilling: plate removal rejected')},
+  rollback(){block.setPermutation(before);if(block.typeId!==before.type.id||metadataSignature(block.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: plate removal rollback rejected')}
+ };
+ return plateTransaction(block,[delivery,clear,remove]);
 }
 function recordBookFromSkewer(player,book,skewer,hand='main'){
  const custom=skewerIngredientIds(skewer),record=makeBookRecord(skewer.typeId,custom);
@@ -367,6 +395,22 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
   if(e.block.typeId===PLATE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakPlate(dim.getBlock(loc),p));return}
   if(e.block.typeId===RECIPE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakRecipe(dim.getBlock(loc),p));return}
  }catch{}
+});
+world.beforeEvents.explosion.subscribe(e=>{
+ if(e.cancel)return;
+ const keep=[],plates=[];
+ for(const block of e.getImpactedBlocks()){
+  if(block.typeId===PLATE_BLOCK_ID)plates.push({dimension:block.dimension,location:{...block.location}});
+  else keep.push(block);
+ }
+ if(!plates.length)return;
+ e.setImpactedBlocks(keep);
+ system.run(()=>{
+  // Another before-event subscriber may cancel after this one. Do not settle a
+  // cancelled or unreadable event; no storage/drop mutation has happened yet.
+  try{if(e.cancel!==false)return}catch(error){console.warn('[Grilling plate explosion status] '+error);return}
+  for(const row of plates)try{breakPlate(row.dimension.getBlock(row.location))}catch(error){console.warn('[Grilling plate explosion recovery] '+error)}
+ });
 });
 function recipeSupport(block){
  try{
