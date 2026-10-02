@@ -11,5 +11,5 @@ def main():
  writers=[p.name for p in scripts.rglob('*.js') if 'setActionBar' in p.read_text()]
  assert sorted(writers)==['a283_interaction_feedback.js','java_eating_hud_runtime.js'],writers
  assert 'eatingProgress' not in (scripts/'main.js').read_text()
- print('A2.8.38 immersion source contract PASS; no real-client acceptance claim')
+ print('A2.8.39 immersion source contract PASS; no real-client acceptance claim')
 if __name__=='__main__':main()
