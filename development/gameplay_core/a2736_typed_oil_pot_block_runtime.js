@@ -11,7 +11,7 @@ function notify(player){
  const last=notices.get(player.id)??-1000;
  if(system.currentTick-last<60)return;
  notices.set(player.id,system.currentTick);
- system.run(()=>{try{player.sendMessage({translate:'message.kg.oil_sync_pending'})}catch{}});
+ system.run(()=>{try{console.warn('[Grilling Oil API] typed oil snapshot pending')}catch{}});
 }
 world.afterEvents.playerLeave.subscribe(e=>notices.delete(e.playerId));
 function legacyTypedPot(block){
