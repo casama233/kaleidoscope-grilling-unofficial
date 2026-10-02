@@ -203,9 +203,16 @@ def source_snapshot() -> dict:
     # Published archives and compiler output are not verifier inputs. Everything
     # else, including untracked nonignored source, fixtures and CI config, is bound.
     outputs = ("artifacts/", "builds/", "dist/", "projects/grilling/gameplay_core/builds/")
+    # Pinned Dash 0.13.0 writes this build cache under each project root.
+    # Do not exclude .bridge broadly: extensions/compiler settings are inputs.
+    dash_caches = {
+        f"{prefix}.bridge/.dash.{mode}.json"
+        for prefix in ("", "projects/grilling/gameplay_core/")
+        for mode in ("production", "development")
+    }
     entries = []
     for relative in sorted(set(paths)):
-        if not relative or relative.startswith(outputs):
+        if not relative or relative.startswith(outputs) or relative in dash_caches:
             continue
         path = ROOT / relative
         entries.append([relative, hashlib.sha256(path.read_bytes()).hexdigest()])

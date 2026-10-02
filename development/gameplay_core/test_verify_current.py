@@ -119,6 +119,22 @@ class SourceReceiptTests(unittest.TestCase):
         self.export()
         gate.require_source_validation(self.receipt)
 
+    def test_dash_generated_caches_do_not_invalidate_source_receipt(self):
+        self.issue()
+        for project in (self.root, self.project):
+            cache = project / ".bridge/.dash.production.json"
+            cache.parent.mkdir(parents=True)
+            cache.write_text('{"generated":true}')
+        gate.require_source_validation(self.receipt)
+
+    def test_bridge_extension_changes_still_invalidate_source_receipt(self):
+        self.issue()
+        extension = self.project / ".bridge/extensions/plugin.js"
+        extension.parent.mkdir(parents=True)
+        extension.write_text("new compiler input")
+        with self.assertRaisesRegex(AssertionError, "source/HEAD changed"):
+            gate.require_source_validation(self.receipt)
+
     def test_export_drift_is_rejected_even_with_valid_source_receipt(self):
         self.issue()
         self.export()
