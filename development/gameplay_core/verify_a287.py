@@ -2,17 +2,22 @@
 from pathlib import Path
 import ast,json,re,subprocess
 import a287_binding_repair as repair
+import importlib.util
+_spec=importlib.util.spec_from_file_location('tools_build_eating',Path(__file__).resolve().parents[2]/'tools/build_eating_motion.py')
+_motion=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_motion)
 from verify_a285 import survival_gate
 from verify_a284 import eating_gate
 from verify_a283 import main as previous_gate
 RP=repair.RP;BP=repair.BP
 def load(p):return json.loads(p.read_text())
-def expression(expr,first,slot,bone,using=False):
+def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None):
  # Only the simple boolean Molang subset used by held pose dispatch is accepted.
  expr=expr.replace('q.item_slot_to_bone_name(context.item_slot)',repr(bone))
  for prefix in ('context','c'):
   expr=expr.replace(prefix+'.is_first_person',str(int(first))).replace(prefix+'.item_slot',repr(slot))
- expr=expr.replace('q.is_using_item',str(bool(using)))
+ if eat_hand is None:eat_hand=1 if slot=='main_hand' else 2
+ expr=expr.replace("q.property('kaleidoscope_grilling:eat_hand')",str(eat_hand))
+ expr=expr.replace('q.is_using_item',str(bool(using))).replace("q.property('kaleidoscope_grilling:eat_profile')",str(eat_profile))
  expr=expr.replace('&&',' and ').replace('||',' or ')
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
@@ -32,8 +37,13 @@ def binding_assets():
      matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
      assert matches==[expected],(p,first,slot,bone,matches)
-     using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True)]
-     assert using_matches==[expected]+(['eat_'+hand] if 'eat_'+hand in d['animations'] else []),(p,using_matches)
+     for profile in (3,4):
+      using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
+      eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
+      assert using_matches==[expected]+([eating] if eating in d['animations'] else []),(p,profile,using_matches)
+      for inactive in (0,2 if slot=='main_hand' else 1):
+       inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
+       assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
   for ref in d['geometry'].values():
@@ -49,6 +59,11 @@ def binding_assets():
     for alias,anim in d['animations'].items():assert set(animations[anim]['bones'])==({'skewer_model'} if alias.startswith('eat_') else {'skewer_pose','skewer_model'}),anim
     oldref=ref.replace('kg_a287.','kg_a283.');old=idx[oldref]
     assert model['cubes']==[c for bone in old['bones'] for c in bone.get('cubes',[])],ref
+   elif ref.startswith('geometry.kg_secret_held.'):
+    assert len(g['bones'])==3 and not b.get('cubes'),ref
+    pose,model=g['bones'][1:]
+    assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
+    assert model['name']=='skewer_model' and model['parent']=='skewer_pose',ref
    elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':
     assert len(g['bones'])==3 and not b.get('cubes'),ref
     pose,model=g['bones'][1:]
@@ -58,13 +73,16 @@ def binding_assets():
    else:
     assert len(g['bones'])==1 and b.get('cubes'),ref
     for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
-  if p.name.endswith('_skewer.attachable.json'):
+  if p.name.endswith('_skewer.attachable.json') and d['identifier']!='kaleidoscope_grilling:secret_skewer':
    old=repair.source(p);old=old['minecraft:attachable']['description']
-   assert d['scripts']['pre_animation']==old['scripts']['pre_animation']
+   profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
+   if profiles.get(d['identifier'])=='THREE_RANDOM':assert "q.property('kaleidoscope_grilling:eat_profile')" in d['scripts']['pre_animation'][0]
+   else:
+    assert [row.replace(_motion.ACTIVE_HAND,'q.is_using_item') for row in d['scripts']['pre_animation']]==old['scripts']['pre_animation']
    assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
    assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
- expected_count=106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
+ expected_count=107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
  assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)
  # Regression reproduction: old dispatch can select zero poses for a normalized bone name.
  old=repair.source(RP/'attachables/empty_seasoning_bottle.attachable.json')['minecraft:attachable']['description']

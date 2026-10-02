@@ -14,6 +14,7 @@ PROJECT = ROOT / "projects" / "grilling" / "gameplay_core"
 BP = PROJECT / "behavior_pack"
 RP = PROJECT / "resource_pack"
 JAVA_DISPLAY = ROOT / "projects" / "grilling" / "reports" / "java_display_transforms"
+DEPENDENCY_TEXTURES={row['texture'] for row in json.loads((ROOT/'development/gameplay_core/fixtures/secret-visual-catalog.json').read_text())['items'] if not row['source'].startswith('canonical')}
 
 SEVERITY_ORDER = {"error": 0, "high": 1, "medium": 2, "info": 3}
 VANILLA_TEXTURE_PATHS = {
@@ -422,7 +423,7 @@ def check_attachables(findings, geometry_index, animations, controllers, known_i
             if not isinstance(tex, str) or not tex.startswith("textures/"):
                 continue
             tex_path = RP / (tex + ".png")
-            if not tex_path.is_file():
+            if not tex_path.is_file() and tex not in DEPENDENCY_TEXTURES:
                 add(findings, "error", "missing_attachable_texture", ident,
                     f"texture alias {tex_name} points to missing {tex}.png", str(path.relative_to(ROOT)))
 
@@ -488,8 +489,10 @@ def check_current_display_contracts(findings, geometry_index, animations):
         expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
         if family == "skewer":
             table = json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)', (BP / 'scripts/data.js').read_text()).group(1))
-            profile = table.get(desc['identifier'], 'THREE').replace('THREE_RANDOM', 'THREE').lower()
+            requested=table.get(desc['identifier'],'THREE_RANDOM' if desc['identifier']=='kaleidoscope_grilling:secret_skewer' else 'THREE')
+            profile = requested.replace('THREE_RANDOM', 'THREE').lower()
             expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
+            if requested=='THREE_RANDOM':expected_ids.update({f'eat_alt_{hand}':f'animation.kg_eating.item.three_alt.{hand}' for hand in ['right','left']})
         if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
@@ -498,7 +501,12 @@ def check_current_display_contracts(findings, geometry_index, animations):
             for alias in aliases
         }
         if family == "skewer":
-            required_selectors.update({f'eat_{hand}': "q.is_using_item && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
+            required_selectors.update({f'eat_{hand}': "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
+            if requested=='THREE_RANDOM':
+                for hand in ['right','left']:
+                    using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+                    required_selectors['eat_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"
+                    required_selectors['eat_alt_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') == 4"
         actual_selectors = {}
         malformed = False
         for row in selectors:
@@ -530,8 +538,8 @@ def check_current_display_contracts(findings, geometry_index, animations):
                 if missing:
                     add(findings, "error", "held_animation_missing_bone", ref,
                         f"{anim_id} targets absent bones: {sorted(missing)}")
-            if family == "skewer": skewer_refs.add(ref)
-    if counts != {"skewer":39,"bottle":67} or len(skewer_refs) != 150:
+            if family == "skewer" and desc['identifier']!='kaleidoscope_grilling:secret_skewer': skewer_refs.add(ref)
+    if counts != {"skewer":40,"bottle":67} or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 
 

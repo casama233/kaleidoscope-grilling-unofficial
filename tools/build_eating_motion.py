@@ -8,6 +8,7 @@ from pathlib import Path
 import json,math,re,argparse
 ROOT=Path(__file__).resolve().parents[1];P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 FIX=ROOT/'development/gameplay_core/fixtures/java-eating-curves-1.1.1.json'
+ACTIVE_HAND="(q.is_using_item && ((c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_hand') == 1) || (c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_hand') == 2)))"
 def sample(times,values,t):
  if t<=times[0]:return values[0]
  if t>=times[-1]:return values[-1]
@@ -36,11 +37,24 @@ def build():
  table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
  for p in (RP/'attachables').glob('*.json'):
   doc=json.loads(p.read_text());d=doc['minecraft:attachable']['description'];profile=table.get(d['identifier']);
+  if d['identifier']=='kaleidoscope_grilling:secret_skewer':profile='THREE_RANDOM'
   if not profile or not d['identifier'].endswith('_skewer'):continue
   for hand in ['right','left']:
    alias='eat_'+hand;d['animations'][alias]=animation_id('THREE' if profile=='THREE_RANDOM' else profile,hand)
+   if profile=='THREE_RANDOM':d['animations']['eat_alt_'+hand]=animation_id('THREE_ALT',hand)
   animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith('eat_') for k in row)]
-  animate += [{'eat_'+hand:"q.is_using_item && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"} for hand in ['right','left']]
+  for hand in ['right','left']:
+   using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+   if profile=='THREE_RANDOM':
+    alternate="q.property('kaleidoscope_grilling:eat_profile') == 4"
+    animate += [{'eat_'+hand:using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"},{'eat_alt_'+hand:using+' && '+alternate}]
+   else:animate.append({'eat_'+hand:using})
+  if profile=='THREE_RANDOM':
+   first="q.item_in_use_duration >= 0.95833 ? 1 : 0"
+   normal="q.item_in_use_duration >= 3.54167 ? 3 : (q.item_in_use_duration >= 2.33333 ? 2 : ("+first+"))"
+   alt="q.item_in_use_duration >= 3.5 ? 3 : (q.item_in_use_duration >= 2.16667 ? 2 : ("+first+"))"
+   d['scripts']['pre_animation']=["v.kg_bite_stage = q.is_using_item ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? ("+alt+") : ("+normal+")) : 0;"]
+  d['scripts']['pre_animation']=[row.replace(ACTIVE_HAND,'q.is_using_item').replace('q.is_using_item',ACTIVE_HAND) for row in d['scripts']['pre_animation']]
   d['scripts']['animate']=animate;output[p]=doc
  return output
 def main():

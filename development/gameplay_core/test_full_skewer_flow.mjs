@@ -1,3 +1,4 @@
+import {finishedFoodMeta} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/food_finish_core.js';
 import {CONFIG_DEFAULTS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/server_config_core.js';
 /** Actual runtime bodies + storage-operation doubles. Not Minecraft/client evidence. */
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
@@ -37,7 +38,7 @@ function fixture(){
  const hunger={currentValue:0,effectiveMax:20,setCurrentValue(v){this.currentValue=v}},saturation={currentValue:0,setCurrentValue(v){this.currentValue=v}};
  const holder={id:'storage-adapter',name:'Storage adapter',selectedSlotIndex:0,isSneaking:false,dimension,location:block.location,playAnimation(){},getComponent:id=>id.endsWith('hunger')?hunger:id.endsWith('saturation')?saturation:undefined};
  const write=(hand,s)=>{if(hand==='off')off=s?.clone();else bag.setItem(0,s);if(failHand){failHand=false;throw Error('injected hand write')}};
- const ctx=vm.createContext({grillingConfig:()=>CONFIG_DEFAULTS,...data,...logic,...skewers,...items,...snapshots,...seasoning,...bottleVisuals,...oil,...tools,...heat,world,system:{get currentTick(){return tick}},ItemStack:Stack,foodFacts,primitiveStackProps,commitSteps,commitTwoParty,slotWrite,captureEatingIdentity,eatingStillCurrent,commitEating,
+ const ctx=vm.createContext({finishedFoodMeta,grillingConfig:()=>CONFIG_DEFAULTS,...data,...logic,...skewers,...items,...snapshots,...seasoning,...bottleVisuals,...oil,...tools,...heat,world,system:{get currentTick(){return tick}},ItemStack:Stack,foodFacts,primitiveStackProps,commitSteps,commitTwoParty,slotWrite,captureEatingIdentity,eatingStillCurrent,commitEating,
   console:{warn(){}},COOKERY_FILLED:oil.COOKERY_FILLED_ID,SEASON_USES_KEY:seasoning.SEASONING_USES_KEY,SEASON_VARIANT_KEY:seasoning.SEASONING_VARIANT_KEY,OIL_TOOLS:{},
   ...portableOil,...portableFood,ensureOilHandPublished:()=>true,OIL_TYPES:{canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}},heldMain:()=>bag.getItem(0),heldOff:()=>off,heldByHand:(_,hand)=>hand==='off'?off:bag.getItem(0),creative:()=>false,
   captureWritableHand:(_,hand)=>({before:(hand==='off'?off:bag.getItem(0))?.clone(),write:s=>write(hand,s)}),mainContainer:()=>bag,inv:()=>grill,occupied:()=>grill.rows.filter(Boolean).length,

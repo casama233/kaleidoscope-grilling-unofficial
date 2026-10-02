@@ -18,12 +18,13 @@ test('milk cures every active grilling effect except Java uncurable poisoning',(
 test('shared effect runtime avoids empty/unchanged writes and preserves extended duration',()=>{
  const dp=new Map();let writes=0,reads=0,tick=1,time=100;
  const entity={getDynamicProperty(k){reads++;return dp.get(k)},setDynamicProperty(k,v){writes++;if(v===undefined)dp.delete(k);else dp.set(k,v)}};
- const context={world:{getAbsoluteTime:()=>time},system:{get currentTick(){return tick}},activeEffects,effectPayload,milkEffects,FX_KEY};
+ const cleared=[],context={world:{getAbsoluteTime:()=>time},system:{get currentTick(){return tick}},activeEffects,effectPayload,milkEffects,FX_KEY,nativeDragonHealth:(actor,level)=>cleared.push([actor,level])};
  vm.runInNewContext(strip(fs.readFileSync(scriptRoot+'effect_state_runtime.js','utf8'))+';this.api={readEffects,writeEffects,clearEffects}',context);
  for(let i=0;i<20;i++)context.api.writeEffects(entity,context.api.readEffects(entity));assert.equal(writes,0);assert.equal(reads,1);
  context.api.writeEffects(entity,{dragon_blood:{until:200,amp:0},heavy_metal_poisoning:{until:400,amp:0}});assert.equal(writes,1);
  context.api.writeEffects(entity,context.api.readEffects(entity));assert.equal(writes,1);
  context.api.clearEffects(entity,{milk:true});assert.deepEqual(JSON.parse(dp.get(FX_KEY)),{heavy_metal_poisoning:{until:400,amp:0}});
+ assert.deepEqual(cleared,[[entity,undefined]]);
  context.api.clearEffects(entity);assert.equal(dp.get(FX_KEY),undefined);tick++;time=500;assert.equal(Object.keys(context.api.readEffects(entity)).length,0);
 });
 test('deadline queue orders work, replaces keys and cancels without visiting future keys',()=>{

@@ -1,6 +1,6 @@
-## Current maintained baseline: 2.8.43
+## Current maintained baseline: 2.8.45
 
-本版修正串串第一人稱手持的玩家骨架座標換算，保留第三人稱姿勢；詳見 [A2.8.43 客戶端問題追蹤](docs/STATUS-A2.8.43.md)。客戶端顯示仍待真人驗收。前版修復審查後的效果清除、精確熱期限、熱槽 lore、一層烤架交換、三語動態資訊、附近展示排程與公開 native aux。詳見 [A2.8.42 修復與剩餘差距](docs/STATUS-A2.8.42.md)；秘製動態 GUI、隨機進食曲線共享、龍血 max health 等價及真人多人體驗仍未完成。來源回歸／BDS／存檔演練與真人驗收分開記錄，新候選不沿用舊部署許可。
+本版修復食用完成時的熱度判定、服務端與模型共享的隨機吃法、可反覆治療的原生龍血生命上限，以及秘製串三食材手持顯示。包含 2.8.42 角色效果快取與 canonical 2.8.43 第一人稱框架修復。詳見 [當前修復與驗收矩陣](docs/CURRENT-REPAIR-STATUS.md) 與 [A2.8.45](docs/STATUS-A2.8.45.md)；真人驗收、秘製動態 GUI 及部分 Java 平台能力仍有缺口。
 
 [本版提示與圖形 HUD 修正／未完成項](docs/STATUS-A2.8.40.md)：以 Java 原作觸發、翻譯與圖形為準，移除自創文字條。
 
@@ -8,13 +8,13 @@ Public oil and food output APIs, shared guide localization, native station conte
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.
 
-> main 維護基線：**A2.8.40** — [正式來源修訂](docs/STATUS-A2.8.40.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
+> main 維護基線：**A2.8.45** — [正式來源修訂](docs/STATUS-A2.8.40.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
 
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**canonical runtime：A2.8.40，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
+**canonical runtime：A2.8.45，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 

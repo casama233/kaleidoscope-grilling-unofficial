@@ -14,7 +14,7 @@ def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 class HandAnchorTests(unittest.TestCase):
     def test_all_bite_stages_preserve_assets_and_bind_once(self):
-        refs={r for p in (RP/'attachables').glob('*_skewer.attachable.json') for r in load(p)['minecraft:attachable']['description']['geometry'].values()}
+        refs={r for p in (RP/'attachables').glob('*_skewer.attachable.json') if p.name!='secret_skewer.attachable.json' for r in load(p)['minecraft:attachable']['description']['geometry'].values()}
         seen=set()
         for p in (RP/'models/entity/a287_hand').glob('*.geo.json'):
             g=load(p)['minecraft:geometry'][0];seen.add(g['description']['identifier'])
@@ -30,6 +30,18 @@ class HandAnchorTests(unittest.TestCase):
             self.assertEqual(shaft['size'],[.5,.5,12.5])
         self.assertEqual(len(seen),150)
         self.assertEqual(refs,seen)
+    def test_secret_ingredients_share_the_existing_grip_and_stable_two_sided_faces(self):
+        geometries=load(RP/'models/entity/secret_held.geo.json')['minecraft:geometry']
+        refs=set(load(RP/'attachables/secret_skewer.attachable.json')['minecraft:attachable']['description']['geometry'].values())
+        self.assertEqual(refs,{g['description']['identifier'] for g in geometries})
+        for geo in geometries:
+            anchor,pose,model=geo['bones']
+            self.assertEqual(anchor,{'name':'grip','pivot':[0,24,0],'binding':'q.item_slot_to_bone_name(context.item_slot)'})
+            self.assertEqual(pose,{'name':'skewer_pose','parent':'grip','pivot':[0,24,0]})
+            self.assertEqual(model['parent'],'skewer_pose')
+            self.assertNotIn('texture_meshes',model)
+            if '.part_' in geo['description']['identifier']:
+                for cube in model.get('cubes',[]):self.assertEqual(set(cube['uv']),{'up','down'})
     def test_third_person_matches_java_corners_for_both_hands(self):
         animations=load(RP/ANIM)['animations']
         display=load(ROOT/'projects/grilling/reports/java_display_transforms/beef_raw.json')['java_display']

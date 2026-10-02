@@ -22,7 +22,7 @@
       },
       "scripts": {
         "pre_animation": [
-          "v.kg_bite_stage = q.is_using_item ? (q.item_in_use_duration >= 3.52083 ? 3 : (q.item_in_use_duration >= 2.25000 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0))) : 0;"
+          "v.kg_bite_stage = (q.is_using_item && ((c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_hand') == 1) || (c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_hand') == 2))) ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? (q.item_in_use_duration >= 3.5 ? 3 : (q.item_in_use_duration >= 2.16667 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0))) : (q.item_in_use_duration >= 3.54167 ? 3 : (q.item_in_use_duration >= 2.33333 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0)))) : 0;"
         ],
         "animate": [
           {
@@ -38,10 +38,16 @@
             "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"
           },
           {
-            "eat_right": "q.is_using_item && c.item_slot == 'main_hand'"
+            "eat_right": "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') != 4"
           },
           {
-            "eat_left": "q.is_using_item && c.item_slot == 'off_hand'"
+            "eat_alt_right": "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') == 4"
+          },
+          {
+            "eat_left": "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') != 4"
+          },
+          {
+            "eat_alt_left": "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') == 4"
           }
         ]
       },
@@ -54,7 +60,9 @@
         "tp_right": "animation.kg_a287.skewer_tp_right",
         "tp_left": "animation.kg_a287.skewer_tp_left",
         "eat_right": "animation.kg_eating.item.three.right",
-        "eat_left": "animation.kg_eating.item.three.left"
+        "eat_left": "animation.kg_eating.item.three.left",
+        "eat_alt_right": "animation.kg_eating.item.three_alt.right",
+        "eat_alt_left": "animation.kg_eating.item.three_alt.left"
       }
     }
   }

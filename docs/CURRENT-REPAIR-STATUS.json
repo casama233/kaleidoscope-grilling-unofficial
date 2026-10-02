@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "version": [
+    2,
+    8,
+    45
+  ],
+  "review": "comprehensive-review-20261002T151900Z",
+  "client_platforms": [
+    "Windows"
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "title": "HUD",
+      "canonical": "酒館 0.6.88／世界名酒 0.1.52 已修復 root panel 相容；本輪不改 HUD 原生根",
+      "remaining": "全家族 Windows 進食条、效果圖示、血量／飢餓條",
+      "client_accepted": false
+    },
+    {
+      "id": "F02",
+      "title": "效果生命週期",
+      "canonical": "2.8.41 奶／重生清除與 2.8.42 角色身份快取保留；2.8.45 同步解除原生龍血生命上限",
+      "remaining": "真人奶解除、中毒例外、死亡、重生、斷線再登入",
+      "client_accepted": false
+    },
+    {
+      "id": "F03",
+      "title": "熱食可見資訊",
+      "canonical": "2.8.41 背包熱槽排程與精確 lore 到期保留；食用權威期限在完成時重查",
+      "remaining": "背包、箱取出與主副手期限；關閉容器內現有 UI 的文字刷新仍受引擎限制",
+      "client_accepted": false
+    },
+    {
+      "id": "F04",
+      "title": "炒／燉完成結算",
+      "canonical": "2.8.45 六種料理完成時按權威期限計算熱度；deadline equality 按冷食",
+      "remaining": "真人跨期限完成食用",
+      "client_accepted": false
+    },
+    {
+      "id": "F05",
+      "title": "秘製串組合",
+      "canonical": "2.8.45 主副手各三食材 client_sync 索引、213 個已知食物圖示與三個獨立顯示槽；原始第三方圖像不複製入本庫",
+      "remaining": "Windows 實際呈現；動態背包 GUI、原作 tint／實體食材模型及未登記第三方食物仍未等價",
+      "client_accepted": false
+    },
+    {
+      "id": "F06",
+      "title": "隨機吃法",
+      "canonical": "2.8.45 每次共享 THREE／ALT 及正在使用的手；模型、咬點與扣料使用同一分支",
+      "remaining": "真人聲畫同步、中斷、雙手觀察；原生手臂及 Java 脫離第二截模型仍未等價",
+      "client_accepted": false
+    },
+    {
+      "id": "F07",
+      "title": "廚具架流程",
+      "canonical": "2.8.41 一層槽位直接交換／歸還與管理入口保留",
+      "remaining": "Windows 快速操作；Java CapsLock 按住／鬆開選單沒有同等 Bedrock 按鍵 API",
+      "client_accepted": false
+    },
+    {
+      "id": "F08",
+      "title": "內容投影與規模",
+      "canonical": "2.8.41 原生 aux／provider、附近優先、公平刷新與可持久預算保留",
+      "remaining": "真人變體及多人負載；原生每堆物品私有 aux 仍須 producer/provider 公開契約",
+      "client_accepted": false
+    },
+    {
+      "id": "F09",
+      "title": "龍血效果",
+      "canonical": "2.8.45 原生 health groups max 20／26／30；初次補 6／10、升級補 4、刷新不再治療；移除有限傷害池代理",
+      "remaining": "真玩家心形、護甲／傷害順序、奶／死亡與其他包效果相容；其他引擎代理效果未全面 Java 等價",
+      "client_accepted": false
+    },
+    {
+      "id": "F10",
+      "title": "要塞自然替換",
+      "canonical": "可靠結構边界／新生成區塊 callback 仍無可用穩定宿主；既有箱取得／栽種保留",
+      "remaining": "未實作自然 25% 替換；不得猜測附近方塊、替換玩家農場或冒稱自然生成完成",
+      "client_accepted": false
+    },
+    {
+      "id": "F11",
+      "title": "期限精度",
+      "canonical": "2.8.41 出料、寫入與合併保留精確 tick；2.8.45 完成判定採同一期限",
+      "remaining": "真人邊界食用及產出／合併",
+      "client_accepted": false
+    },
+    {
+      "id": "F12",
+      "title": "多語與瓶",
+      "canonical": "2.8.41 三語動態 lore／架文字與既有瓶變體保留",
+      "remaining": "Windows zh_TW／zh_CN／en_US、待搖瓶外觀",
+      "client_accepted": false
+    },
+    {
+      "id": "F13",
+      "title": "聲畫操作",
+      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch",
+      "remaining": "音量、聲源、停止、透明排序、雙人觀察均須 Windows 真人",
+      "client_accepted": false
+    },
+    {
+      "id": "F14",
+      "title": "配置與整合",
+      "canonical": "2.8.41 GameDirectors config／持久保存、展示預算與公開 producer/render API 保留",
+      "remaining": "全部 Java config、Create／女僕／KubeJS／JEI／Jade／Iceberg 等選用模組沒有同名 Bedrock 宿主；不作完整移植承諾",
+      "client_accepted": false
+    },
+    {
+      "id": "F15",
+      "title": "交付矩陣",
+      "canonical": "本頁與 CURRENT-REPAIR-STATUS.json 統一對應原審查 F01–F16；歷史 F01–F12／R01–R14 不混用",
+      "remaining": "正式部署與真人結果按具體完整收據另記，Git 合併不等同正式已更新",
+      "client_accepted": false
+    },
+    {
+      "id": "F16",
+      "title": "家族漂移與負載",
+      "canonical": "保留 canonical 2.8.42 修復與既有家族來源；家族組裝器拒絕重複 BP minecraft:player，逐檔收據保留唯一來源",
+      "remaining": "候選自身的 static／BDS／存檔演練／Windows client 四關；真人負載仍未完成",
+      "client_accepted": false
+    }
+  ],
+  "all_details_closed": false,
+  "production_ready": false,
+  "source_validation": {
+    "static": true,
+    "isolated_full_family_bds": true,
+    "native_nonplayer_health_probe": true,
+    "bds_version": "1.26.51.1",
+    "packs": 41,
+    "real_players": 0,
+    "simulated_players": false,
+    "client": false
+  }
+}
