@@ -1,3 +1,4 @@
+import {TimedWorkQueue} from './timed_work_queue.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {ensureOilHandPublished} from './oil_api_client.js';
 import {OIL_BUCKET_POINTS} from './a24_skewering_core.js';
@@ -22,7 +23,9 @@ const BLOCK_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).m
 const BUCKET_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.bucket,k])));
 const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,-1],South:[0,0,1]};
 const HORIZ=[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
-let registryCache;
+let registryCache,lastPersistWarning=-1200;const sourceIndex=new Map(),sourceSlots=new Map(),claimCells=new Map(),claims=new Map(),dueQueue=new TimedWorkQueue();
+function dropClaims(row){for(const cell of claimCells.get(row.k)??[]){const set=claims.get(cell);set?.delete(row.k);if(!set?.size)claims.delete(cell)}claimCells.delete(row.k)}
+function addClaims(row){claimCells.set(row.k,[...(row.cells??[])]);for(const cell of row.cells??[]){if(!claims.has(cell))claims.set(cell,new Set());claims.get(cell).add(row.k)}}
 
 function loadReg(){
  if(registryCache)return registryCache;
@@ -39,6 +42,7 @@ function loadReg(){
   }
  }catch{}
  registryCache=[...byKey.values()];
+ for(const [slot,row] of registryCache.entries()){sourceSlots.set(row.k,slot);row.nextTick=0;sourceIndex.set(row.k,row);addClaims(row);dueQueue.schedule(row.k,system.currentTick)}
  // Migrate A2.3's aggregate property only after all rows have been recovered.
  if(legacy.length)try{
   for(const row of legacy)world.setDynamicProperty(oilSourcePropertyId(row),JSON.stringify(row));
@@ -49,15 +53,20 @@ function loadReg(){
 function readReg(){return loadReg()}
 function persistRow(row){
  const normalized=normalizeOilSourceRow(row,VALID_OIL_TYPES);if(!normalized)return false;
- try{world.setDynamicProperty(oilSourcePropertyId(normalized),JSON.stringify(normalized));if(world.getDynamicProperty(oilSourcePropertyId(normalized))!==JSON.stringify(normalized))return false;}catch{return false}
- const rows=loadReg(),i=rows.findIndex(x=>x.k===normalized.k);
- if(i>=0)rows[i]=normalized;else rows.push(normalized);
+ // nextTick belongs to this server session, not the saved-world clock.
+ const key=oilSourcePropertyId(normalized),raw=JSON.stringify({...normalized,nextTick:0});
+ try{if(world.getDynamicProperty(key)!==raw)world.setDynamicProperty(key,raw);if(world.getDynamicProperty(key)!==raw)return false;}catch{return false}
+ const rows=loadReg(),old=sourceIndex.get(normalized.k),i=sourceSlots.get(normalized.k)??-1;
+ if(old)dropClaims(old);
+ if(i>=0)rows[i]=normalized;else{sourceSlots.set(normalized.k,rows.length);rows.push(normalized);}
+ sourceIndex.set(normalized.k,normalized);addClaims(normalized);dueQueue.schedule(normalized.k,normalized.nextTick);
  Object.assign(row,normalized);return true;
 }
 function removeRow(row){
  world.setDynamicProperty(oilSourcePropertyId(row),undefined);
  if(world.getDynamicProperty(oilSourcePropertyId(row))!==undefined)throw Error('oil registry removal');
- const rows=loadReg(),i=rows.findIndex(x=>x.k===row.k);if(i>=0)rows.splice(i,1);
+ const rows=loadReg(),old=sourceIndex.get(row.k),i=sourceSlots.get(row.k)??-1;if(i>=0){const last=rows.pop();if(i<rows.length){rows[i]=last;sourceSlots.set(last.k,i)}}sourceSlots.delete(row.k);
+ if(old)dropClaims(old);sourceIndex.delete(row.k);dueQueue.cancel(row.k);
 }
 function isOil(id){return Object.hasOwn(BLOCK_TO_TYPE,id)}
 function level(block){try{return Number(block.permutation.getState('kaleidoscope_grilling:level')??0)}catch{return 0}}
@@ -73,12 +82,12 @@ function canFlowInto(block,type,source=false){
 function addItem(p,stack){const c=playerContainer(p);if(!c)return;const rem=c.addItem(stack);if(rem)p.dimension.spawnItem(rem,p.location)}
 function sourceRow(dim,loc,type){return {k:posKey(dim.id,loc.x,loc.y,loc.z),d:dim.id,x:loc.x,y:loc.y,z:loc.z,type,cells:[],nextTick:system.currentTick}}
 function registerSource(dim,loc,type){
- const rows=readReg(),k=posKey(dim.id,loc.x,loc.y,loc.z),found=rows.find(r=>r.k===k);
+ const rows=readReg(),k=posKey(dim.id,loc.x,loc.y,loc.z),found=sourceIndex.get(k);
  if(found)return persistRow({...found,type,nextTick:Math.min(found.nextTick||0,system.currentTick)});
  return persistRow(sourceRow(dim,loc,type));
 }
-function sourceKeys(rows){return new Set(rows.map(r=>r.k))}
-function claimedByOther(rows,row,cell){return rows.some(r=>r!==row&&Array.isArray(r.cells)&&r.cells.includes(cell))}
+function sourceKeys(rows){return sourceIndex;}
+function claimedByOther(rows,row,cell){const set=claims.get(cell);return !!set&&(set.size>1||!set.has(row.k));}
 function clearCells(row,rows){
  let dim;try{dim=world.getDimension(row.d)}catch{return}
  const sources=sourceKeys(rows);
@@ -93,9 +102,9 @@ function compute(row,rows){
  let dim;try{dim=world.getDimension(row.d)}catch{return false}
  const source=dim.getBlock({x:row.x,y:row.y,z:row.z});
  if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}
- const queue=[{x:row.x,y:row.y,z:row.z,l:0}],seen=new Map(),desired=new Map();
- while(queue.length&&desired.size<FLOW_CELL_BUDGET){
-  const n=queue.shift(),k=posKey(row.d,n.x,n.y,n.z);
+ const queue=[{x:row.x,y:row.y,z:row.z,l:0}],seen=new Map(),desired=new Map();let head=0;
+ while(head<queue.length&&desired.size<FLOW_CELL_BUDGET){
+  const n=queue[head++],k=posKey(row.d,n.x,n.y,n.z);
   const old=seen.get(k);if(old!==undefined&&old<=n.l)continue;seen.set(k,n.l);
   const b=dim.getBlock({x:n.x,y:n.y,z:n.z});if(!b||(!canFlowInto(b,row.type)&&k!==row.k))continue;
   desired.set(k,{...n});
@@ -177,13 +186,14 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(!isOil(e.block.typeId))return;e.cancel=true;const dim=e.block.dimension,loc={...e.block.location};
  system.run(()=>{const b=dim.getBlock(loc);if(b&&isOil(b.typeId))try{b.setType('minecraft:air')}catch{}});
 });
+function persistNextCycle(row){if(persistRow(row))return;dropClaims(row);addClaims(row);dueQueue.schedule(row.k,row.nextTick);if(system.currentTick-lastPersistWarning>=1200){lastPersistWarning=system.currentTick;console.warn('[Grilling oil registry] state write unacknowledged; retaining retry schedule')}}
 system.runInterval(()=>{
  const rows=readReg(),now=system.currentTick;
- const due=rows.filter(row=>(row.nextTick??0)<=now)
-  .sort((a,b)=>(a.nextTick??0)-(b.nextTick??0)).slice(0,FLOW_SOURCE_BUDGET);
- for(const row of due){
+ const due=dueQueue.take(now,FLOW_SOURCE_BUDGET);
+ for(const key of due){
+  const row=sourceIndex.get(key);if(!row)continue;
   const def=OIL_TYPES[row.type];if(!def){removeRow(row);continue}
-  try{if(!compute(row,rows)){removeRow(row);continue}}catch{row.nextTick=now+def.interval;persistRow(row);continue}
-  row.nextTick=now+def.interval;persistRow(row);
+  try{if(!compute(row,rows)){removeRow(row);continue}}catch{row.nextTick=now+def.interval;persistNextCycle(row);continue}
+  row.nextTick=now+def.interval;persistNextCycle(row);
  }
 },1);

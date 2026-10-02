@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.40
+## Current maintained baseline: 2.8.41
+
+本版修復審查後的效果清除、精確熱期限、熱槽 lore、一層烤架交換、三語動態資訊、附近展示排程與公開 native aux。詳見 [A2.8.41 修復與剩餘差距](docs/STATUS-A2.8.41.md)；秘製動態 GUI、隨機進食曲線共享、龍血 max health 等價及真人多人體驗仍未完成。來源回歸／BDS／存檔演練與真人驗收分開記錄，新候選不沿用舊部署許可。
 
 [本版提示與圖形 HUD 修正／未完成項](docs/STATUS-A2.8.40.md)：以 Java 原作觸發、翻譯與圖形為準，移除自創文字條。
 

@@ -24,7 +24,7 @@ export function grillSlotLocation(block,slot,direction){
 }
 
 /** Transient rendering only: no item, inventory, ledger or block writes. */
-export function createGrillDisplayController({spawn,apply,remove,valid=e=>e.isValid,maxHelpers=1024,staleTicks=8}){
+export function createGrillDisplayController({spawn,apply,remove,valid=e=>e.isValid,maxHelpers=1024,staleTicks=8,onCapacity=()=>{}}){
  const rows=new Map();let count=0;
  function discard(row,slot){
   const old=row.helpers.get(slot);if(!old)return true;
@@ -47,7 +47,7 @@ export function createGrillDisplayController({spawn,apply,remove,valid=e=>e.isVa
     if(old&&!valid(old.entity)){if(!discard(row,slot))continue;old=undefined;}
     const pose=grillSlotLocation(block,slot,direction),signature=JSON.stringify({...pose,...plan});
     if(old?.signature===signature)continue;
-    if(!old){if(count>=maxHelpers)continue;old={entity:spawn(block,pose.location),signature:''};row.helpers.set(slot,old);count++;}
+    if(!old){if(count>=(typeof maxHelpers==='function'?maxHelpers():maxHelpers)){onCapacity(key,count);continue;}old={entity:spawn(block,pose.location),signature:''};row.helpers.set(slot,old);count++;}
     try{apply(old.entity,block,pose,plan,key);old.signature=signature;}
     catch{discard(row,slot);}
    }

@@ -8,7 +8,7 @@ import {readPublicFood,writePublicFood} from './host_api/food_api_core.js';
 
 export const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until';
 function now(){try{return Number(world.getAbsoluteTime())||system.currentTick}catch{return system.currentTick}}
-function bucketHot(until){return until-(((until%100)+100)%100)}
+function bucketHot(until){return Math.floor(until)}
 export function readFoodSeasonings(stack){
  const portable=readPublicFood(stack);if(portable.present)return portable.valid?normalizeSeasoningList(portable.state.seasoning):[];
  try{

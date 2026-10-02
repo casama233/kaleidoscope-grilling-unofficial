@@ -9,3 +9,12 @@ export function isHeatLore(line){
  const parts=line?.rawtext;
  return Array.isArray(parts)&&parts[0]?.text==='§c🔥 '&&parts[1]?.translate===HEAT_NAME_KEY;
 }
+
+export function seasoningLore(uses,ingredients,{pending=false,missingBase=false}={}){
+ const lines=[];
+ if(uses!==undefined)lines.push({translate:'tooltip.kaleidoscope_grilling.seasoning.uses',with:[String(uses),'16']});
+ if(ingredients!==undefined)lines.push({translate:'tooltip.kaleidoscope_grilling.seasoning.ingredients',with:[String(ingredients),'8']});
+ if(pending||missingBase)lines.push({translate:'tooltip.kaleidoscope_grilling.seasoning.'+(pending?'ready':'missing_base')});
+ return lines;
+}
+export function creatorLore(name){return {translate:'tooltip.kaleidoscope_grilling.creator',with:[String(name)]};}

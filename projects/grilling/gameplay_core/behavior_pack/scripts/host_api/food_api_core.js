@@ -3,7 +3,8 @@ export const FOOD_PAYLOAD_KEY='senluo.public.food.v1';
 const ID=/^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
 export function normalizePublicFood(raw){
  if(!raw||raw.v!==1||!Number.isSafeInteger(raw.hotUntil)||raw.hotUntil<0||!Array.isArray(raw.seasoning)||raw.seasoning.length>8||raw.seasoning.some(x=>typeof x!=='string'||!ID.test(x)))return undefined;
- return {v:1,hotUntil:raw.hotUntil,seasoning:[...raw.seasoning]};
+ if(raw.nativeVariant!==undefined&&(!Number.isInteger(raw.nativeVariant)||raw.nativeVariant<0||raw.nativeVariant>32767))return undefined;
+ return {v:1,hotUntil:raw.hotUntil,seasoning:[...raw.seasoning],...(raw.nativeVariant===undefined?{}:{nativeVariant:raw.nativeVariant})};
 }
 export function isFoodPayloadLine(row){return row&&typeof row==='object'&&row.translate===FOOD_PAYLOAD_KEY;}
 export function readPublicFood(stack){

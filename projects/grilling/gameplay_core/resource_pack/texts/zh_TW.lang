@@ -157,7 +157,6 @@ item.kaleidoscope_grilling:advanced_rack.name=高級廚具架
 container.kaleidoscope_grilling.advanced_rack=高級廚具架
 container.kaleidoscope_grilling.advanced_rack_shortcut=高級廚具架快捷介面
 tooltip.kaleidoscope_grilling.advanced_rack.saved_contents=已保存內容：
-ui.kaleidoscope_grilling.advanced_rack.hint=前5格為調料，後4格為工具；空槽會保留篩選。
 ui.kaleidoscope_grilling.advanced_rack.deposit=存入全部符合篩選的物品
 message.kaleidoscope_grilling.rack_swap_failed=廚具架交換失敗
 message.kaleidoscope_grilling.rack_nothing_to_deposit=沒有符合現有篩選的物品
@@ -257,6 +256,36 @@ message.kg.oil_insufficient=油量不足。
 message.kg.output_unavailable=出料狀態未能確認，設備已保留批次資料。請留出背包空間後再試。
 
 message.kaleidoscope_grilling.skewer_book_missing=缺少：%s×%s
+tooltip.kaleidoscope_grilling.seasoning.uses=§7用途：%s/%s
+tooltip.kaleidoscope_grilling.seasoning.ingredients=§7材料：%s/%s
+tooltip.kaleidoscope_grilling.seasoning.ready=§e可以開始搖勻
+tooltip.kaleidoscope_grilling.seasoning.missing_base=§7缺少基底調料
+tooltip.kaleidoscope_grilling.creator=§7製作者：%s
+ui.kaleidoscope_grilling.advanced_rack.no_filter=無篩選
+ui.kaleidoscope_grilling.advanced_rack.oil_pot=油壺
+ui.kaleidoscope_grilling.advanced_rack.seasoning_bottle=調料瓶
+ui.kaleidoscope_grilling.advanced_rack.seasoning=§6調料
+ui.kaleidoscope_grilling.advanced_rack.tool=§b工具
+ui.kaleidoscope_grilling.advanced_rack.empty=§8空
+ui.kaleidoscope_grilling.advanced_rack.slot=槽位 %s
+ui.kaleidoscope_grilling.advanced_rack.swap=與目前快捷欄交換
+ui.kaleidoscope_grilling.advanced_rack.insert=存入目前物品
+ui.kaleidoscope_grilling.advanced_rack.withdraw=取回到背包
+ui.kaleidoscope_grilling.advanced_rack.clear_filter=清除篩選（需空槽）
+ui.kaleidoscope_grilling.advanced_rack.back=返回
+ui.kaleidoscope_grilling.advanced_rack.manage=管理篩選與內容
+ui.kaleidoscope_grilling.advanced_rack.too_far=距離廚具架太遠
+ui.kaleidoscope_grilling.advanced_rack.swap_failed=無法交換：請確認分類及背包空間
+ui.kaleidoscope_grilling.advanced_rack.insert_failed=物品分類或篩選不符合
+ui.kaleidoscope_grilling.advanced_rack.inventory_full=背包空間不足
+ui.kaleidoscope_grilling.advanced_rack.filter_occupied=槽位有物品，不能清除篩選
+ui.kaleidoscope_grilling.advanced_rack.no_match=沒有符合的可存入物品
+ui.kaleidoscope_grilling.advanced_rack.slot_unavailable=槽位為空或背包空間不足
+ui.kaleidoscope_grilling.advanced_rack.not_found=8 格內沒有高級廚具架
+ui.kaleidoscope_grilling.advanced_rack.hint=點選槽位即可交換；潛行點架子上的槽位可快速操作。篩選另設管理。
+
+tooltip.kaleidoscope_grilling.skewer.progress=§8手工穿串 %s/%s
+tooltip.kaleidoscope_grilling.skewer.ingredient=§7原料 %s：
 
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森羅物語：煙火

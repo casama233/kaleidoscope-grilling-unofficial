@@ -1,3 +1,4 @@
+import {TimedWorkQueue} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/timed_work_queue.js';
 /** Executes canonical world-fluid transfers with storage doubles; no engine actors. */
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
@@ -10,7 +11,7 @@ function fixture(count=16,creative=false){const dp=new Map(),slots=[new Item('mi
  const bag={size:2,getItem:i=>slots[i]?.clone(),setItem(i,v){slots[i]=v?.clone();if(fault?.('slot'+i)){fault=undefined;throw Error('slot fault')}}};
  const dimension={id:'minecraft:overworld',getBlock:()=>block,playSound(){},spawnItem(s){const entity={getComponent:()=>({itemStack:s}),remove(){drops.splice(drops.indexOf(entity),1)}};drops.push(entity);return entity}};block.dimension=dimension;
  const signal={subscribe(){}};const world={getDynamicProperty:k=>dp.get(k),getDynamicPropertyIds:()=>[...dp.keys()],setDynamicProperty(k,v){if(v===undefined)dp.delete(k);else dp.set(k,v);if(fault?.('registry')){fault=undefined;throw Error('registry fault')}},getDimension:()=>dimension,beforeEvents:{playerInteractWithBlock:signal,playerBreakBlock:signal}};
- const context={...registry,posKey:registry.oilPosKey,commitSteps,world,system:{currentTick:100,runInterval(){}},console,ItemStack:Item,BlockPermutation:{resolve:(id,s)=>permutation(id,s[N+'level'])},creative:()=>creative,playerContainer:()=>bag,captureWritableHand(){const before=slots[0]?.clone();return {before,write:s=>bag.setItem(0,s)}},ensureOilHandPublished:()=>true};
+ const context={TimedWorkQueue,...registry,posKey:registry.oilPosKey,commitSteps,world,system:{currentTick:100,runInterval(){}},console,ItemStack:Item,BlockPermutation:{resolve:(id,s)=>permutation(id,s[N+'level'])},creative:()=>creative,playerContainer:()=>bag,captureWritableHand(){const before=slots[0]?.clone();return {before,write:s=>bag.setItem(0,s)}},ensureOilHandPublished:()=>true};
  let raw=fs.readFileSync('projects/grilling/gameplay_core/behavior_pack/scripts/a23_oil_world.js','utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport /g,'');vm.runInNewContext(raw+'\nthis.api={takeSource,placeFromBucket,registerSource,readReg};',context);
  return {api:context.api,block,dimension,slots,dp,drops,holder:{location:block.location},fail(fn){fault=fn}};
 }

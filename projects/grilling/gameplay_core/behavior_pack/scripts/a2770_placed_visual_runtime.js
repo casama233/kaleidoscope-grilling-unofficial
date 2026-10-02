@@ -1,3 +1,4 @@
+import {grillingConfig} from './server_config_runtime.js';
 import {world,system} from '@minecraft/server';
 import {visitUniqueTracked} from './a288_visual_budget_core.js';
 import {readPlacedSeasoningStack} from './a2743_seasoning_block_adapter.js';
@@ -28,7 +29,7 @@ function render(row,dimension,slot,type,location,rotation,plan){
  let entry=row.helpers.get(slot);
  if(entry&&(!entry.entity.isValid||entry.type!==type)){if(!dispose(row,slot))return;entry=undefined}
  if(!entry){
-  if(owned.size>=MAX_HELPERS)return;
+  if(owned.size>=grillingConfig().placedHelpers){warn('render budget exceeded; storage unaffected; configure placedHelpers after workload validation');return;}
   const entity=dimension.spawnEntity(type,location);
   entry={entity,id:entity.id,type,signature:''};row.helpers.set(slot,entry);owned.add(entity.id);
  }
