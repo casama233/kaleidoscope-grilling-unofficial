@@ -12,3 +12,5 @@ Verification distinguishes actual-runtime function tests with storage/event doub
 Beef chunks and chicken skin still lack exact Java public-host acquisition. The other 18 fixed ingredient chains have source-backed acquisition; that is not a claim of a complete survival playthrough. Secret-skewer models/full arbitrary ingredient metadata and optional integrations are outside this repair. No live deployment.
 
 Reconstructed focused suite: 33 actual-function storage/event tests passed. Full source gate and BDS results are recorded separately; earlier lost-workspace evidence is not substituted for this version.
+
+Final isolated BDS 1.26.52.3 / BSM 3.10.6 verification passed in four-pack Grilling+Cookery scope: two exact-load cycles without script errors, and a separate test-only native probe saved three full ItemStacks and a two-flip state, restarted the actual process, completed four flips, produced cooked outputs with metadata/heat/seasonings, and committed charcoal output/reset. No experimental creator features or simulated players. See BDS-CORE-SKEWER-20261002.json. This is not a full-family or client acceptance result.
