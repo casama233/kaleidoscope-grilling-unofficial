@@ -27,7 +27,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:grill.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.grill",
       "minecraft:geometry": "geometry.kg_a23.grill_flat",
       "minecraft:material_instances": {
         "*": {

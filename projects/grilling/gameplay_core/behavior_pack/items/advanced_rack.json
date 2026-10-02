@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:advanced_rack.name"
+        "value": "kaleidoscope_grilling.display.item.advanced_rack"
       },
       "minecraft:icon": {
         "textures": {

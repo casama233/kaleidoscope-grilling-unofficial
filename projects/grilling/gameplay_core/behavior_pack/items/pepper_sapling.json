@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "tile.kaleidoscope_grilling:pepper_sapling.name"
+        "value": "kaleidoscope_grilling.display.block.pepper_sapling"
       },
       "minecraft:icon": {
         "textures": {

@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:raw_sweet_potato_sheet.name"
+        "value": "kaleidoscope_grilling.display.item.raw_sweet_potato_sheet"
       },
       "minecraft:icon": {
         "textures": {

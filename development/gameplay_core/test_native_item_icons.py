@@ -31,7 +31,13 @@ class ItemIcons(unittest.TestCase):
   self.assertEqual(Image.open(SOURCE/'pepper_sapling.png').convert('RGBA').tobytes(),Image.open(RP/(texture+'.png')).convert('RGBA').tobytes())
   self.assertFalse((RP/'attachables/pepper_sapling.attachable.json').exists())
  def test_placed_sapling_and_growth_hooks_unchanged(self):
-  for name,expected in read(SOURCE/'source.json')['preserved_sha256'].items():self.assertEqual(expected,hashlib.sha256((ROOT/name).read_bytes()).hexdigest())
+  for name,expected in read(SOURCE/'source.json')['preserved_sha256'].items():
+   data=(ROOT/name).read_bytes()
+   # Inventory attribution changes only this string. Keep the original hash
+   # for every geometry, growth hook and remaining block definition byte.
+   if name.endswith('/blocks/pepper_sapling.json'):
+    data=data.replace(b'kaleidoscope_grilling.display.block.pepper_sapling',b'tile.kaleidoscope_grilling:pepper_sapling.name')
+   self.assertEqual(expected,hashlib.sha256(data).hexdigest(),name)
  def test_legacy_builder_uses_specific_sources(self):
   s=(Path(__file__).parent/'build.py').read_text();self.assertIn("shutil.copyfile(specific,rp/f'textures/items/{i}.png')",s);self.assertNotIn("shutil.copyfile(brush_src,rp/f'textures/items/{i}.png')",s)
 if __name__=='__main__':unittest.main()

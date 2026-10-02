@@ -22,7 +22,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:skewer_plate.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.skewer_plate",
       "minecraft:geometry": "geometry.kg_a25.skewer_plate",
       "minecraft:material_instances": {
         "*": {

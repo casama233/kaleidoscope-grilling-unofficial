@@ -17,7 +17,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:canola_oil.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.canola_oil",
       "minecraft:geometry": "geometry.kg_a23.oil_level_0",
       "minecraft:material_instances": {
         "*": {
