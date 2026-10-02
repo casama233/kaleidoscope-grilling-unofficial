@@ -57,12 +57,12 @@ export function captureWritableHand(player,hand){
   const equipment=player.getComponent('minecraft:equippable');
   if(!equipment)throw new Error('Grilling: player equipment unavailable');
   const before=equipment.getEquipment(EquipmentSlot.Offhand)?.clone();
-  return {before,write(stack){
+  return {before,read(){return equipment.getEquipment(EquipmentSlot.Offhand)},write(stack){
    if(equipment.setEquipment(EquipmentSlot.Offhand,stack)!==true)throw new Error('Grilling: offhand write rejected');
   }};
  }
  if(hand!=='main')throw new Error('Grilling: unknown hand');
  const container=player.getComponent('minecraft:inventory')?.container,slot=player.selectedSlotIndex;
  if(!container||!Number.isInteger(slot)||slot<0||slot>=container.size)throw new Error('Grilling: main-hand slot unavailable');
- return {before:container.getItem(slot)?.clone(),write(stack){container.setItem(slot,stack)}};
+ return {before:container.getItem(slot)?.clone(),read(){return container.getItem(slot)},write(stack){container.setItem(slot,stack)}};
 }

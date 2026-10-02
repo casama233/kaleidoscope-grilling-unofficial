@@ -1,4 +1,5 @@
-import {captureSkewerMetadata,restoreSkewerMetadata} from './skewer_item_snapshot.js';
+import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
+import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw} from './plate_transaction_core.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
@@ -12,7 +13,7 @@ import {
  PLATE_ID,PLATE_BLOCK_ID,BOOK_ID,RECIPE_BLOCK_ID,PLATE_SKEWERS_KEY,BOOK_RECORD_KEY,PLATE_CAPACITY,
  normalizePlateRows,plateAdd,plateRemoveLast,isRecordableRecipe,makeBookRecord,bookIngredientSlots,planInventoryConsumption
 } from './a25_plate_recipe_core.js';
-import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,setHand,isCreative as creative} from './a2735_player_io.js';
+import {playerInventory as mainContainer,getMainHand as heldMain,setMainHand as setMain,getOffHand as heldOff,setOffHand as setOff,getHand as heldByHand,setHand,isCreative as creative,captureWritableHand} from './a2735_player_io.js';
 import {isInitialBlockPress} from './a275_grill_input_core.js';
 import {stackIntentSignature as interactionStackSignature} from './a2762_interaction_intent_core.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
@@ -110,11 +111,44 @@ function plateItem(rows,template){
  if(getItemProperty(out,PLATE_SKEWERS_KEY)!==value)throw Error('Grilling: plate contents were not saved');
  return out;
 }
+const plateFaults=new Set();
+function plateFaultKey(block){return posKey(PLATE_PREFIX,block)+'_transaction_fault'}
+function assertPlateAvailable(block){
+ const key=plateFaultKey(block);
+ if(plateFaults.has(key)||world.getDynamicProperty(key)!==undefined)throw Error('Grilling: plate transaction quarantined');
+}
+function quarantinePlate(block,reason){
+ const key=plateFaultKey(block);plateFaults.add(key);
+ world.setDynamicProperty(key,String(reason));
+ if(world.getDynamicProperty(key)!==String(reason))throw Error('Grilling: plate quarantine did not persist');
+}
 function readPlateBlock(block){
- try{const raw=world.getDynamicProperty(posKey(PLATE_PREFIX,block));return normalizePlateRows(typeof raw==='string'?JSON.parse(raw):[])}catch{return []}
+ assertPlateAvailable(block);
+ return normalizePlateRows(decodePlateStorage(world.getDynamicProperty(posKey(PLATE_PREFIX,block))));
+}
+function plateStorageStep(block,rows){
+ assertPlateAvailable(block);
+ const key=posKey(PLATE_PREFIX,block),before=world.getDynamicProperty(key);
+ decodePlateStorage(before);decodePlateStorage(JSON.stringify(rows));
+ const step=verifiedPlateStep({read:()=>world.getDynamicProperty(key),write:value=>world.setDynamicProperty(key,value),before,after:JSON.stringify(normalizePlateRows(rows))});
+ return {
+  apply(){step.apply();syncPlateCount(block,rows.length)},
+  rollback(){step.rollback();if(block.typeId===PLATE_BLOCK_ID)syncPlateCount(block,decodePlateStorage(before).length)}
+ };
+}
+function plateHandStep(captured,next){
+ const signature=stack=>stack?metadataSignature({amount:stack.amount,...captureSkewerMetadata(stack)}):'';
+ return verifiedPlateStep({read:captured.read,write:stack=>captured.write(stack?.clone()),before:captured.before,after:next,signature});
+}
+function plateTransaction(block,steps){
+ const result=commitPlateSteps(steps,reason=>quarantinePlate(block,reason));
+ if(!result.ok)console.warn('[Grilling plate transaction] '+result.error);
+ return result.ok;
 }
 function syncPlateCount(block,count){
- try{block.setPermutation(block.permutation.withState('kaleidoscope_grilling:plate_count',Math.max(0,Math.min(5,count|0))))}catch{}
+ const expected=Math.max(0,Math.min(5,count|0));
+ block.setPermutation(block.permutation.withState('kaleidoscope_grilling:plate_count',expected));
+ if(block.permutation.getState('kaleidoscope_grilling:plate_count')!==expected)throw Error('Grilling: plate count rejected');
 }
 function writePlateBlock(block,rows){
  const clean=normalizePlateRows(rows),value=JSON.stringify(clean);world.setDynamicProperty(posKey(PLATE_PREFIX,block),value);
@@ -161,7 +195,15 @@ function placePlateOn(support,face,player,source,hand='main'){
  else if(isSkewer(source))rows=[stackRow(source)];
  else return false;
  if(!rows.length)return false;
- target.setType(PLATE_BLOCK_ID);writePlateBlock(target,rows);decrementHand(player,hand,1);
+ if(!plateItem(rows))throw Error('Grilling: plate contents cannot be packed');
+ assertPlateAvailable(target);
+ if(world.getDynamicProperty(posKey(PLATE_PREFIX,target))!==undefined)throw Error('Grilling: orphaned plate contents require recovery');
+ const captured=captureWritableHand(player,hand),before=target.permutation,facing=plateFacingFromYaw(player.getRotation().y);
+ if(interactionStackSignature(captured.before)!==interactionStackSignature(source))return false;
+ const next=captured.before?.clone();if(!next)return false;
+ const remainder=next.amount===1?undefined:next;if(remainder)remainder.amount--;
+ const place={apply(){target.setType(PLATE_BLOCK_ID);target.setPermutation(target.permutation.withState('minecraft:cardinal_direction',facing));if(target.typeId!==PLATE_BLOCK_ID||target.permutation.getState('minecraft:cardinal_direction')!==facing)throw Error('Grilling: plate placement rejected')},rollback(){target.setPermutation(before);if(target.typeId!==before.type.id||metadataSignature(target.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: plate placement rollback rejected')}};
+ if(!plateTransaction(target,[place,plateStorageStep(target,rows),...(creative(player)?[]:[plateHandStep(captured,remainder)])]))return false;
  try{target.dimension.playSound('dig.wood',target.location,{volume:.8,pitch:1})}catch{}
  return true;
 }
@@ -172,13 +214,16 @@ function handlePlateBlock(block,player,hand='main'){
   if(player.isSneaking&&hand==='off')return;
   const added=plateAdd(rows,stackRow(held));if(!added.ok){message(player,'§e烤串盤已滿 5/5');return}
   if(!plateItem(added.rows))throw Error('Grilling: plate could not be reconstructed'); // Preflight item storage limits before taking any skewer.
-  const old=held.clone();const result=commitSteps([{apply(){writePlateBlock(block,added.rows);if(!decrementHand(player,hand,1))throw Error('Plate input changed')},rollback(){let failure;try{writePlateBlock(block,rows)}catch(e){failure=e}try{setHand(player,hand,old)}catch(e){failure=e}if(failure)throw failure}}]);
-  if(!result.ok){console.warn('[Grilling plate] '+result.error+'; rollback errors='+result.rollbackErrors);return}
+  const captured=captureWritableHand(player,hand),next=captured.before?.clone();if(!next)return;
+  const remainder=next.amount===1?undefined:next;if(remainder)remainder.amount--;
+  if(!plateTransaction(block,[plateStorageStep(block,added.rows),...(creative(player)?[]:[plateHandStep(captured,remainder)])]))return;
   try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:1.1})}catch{};return;
  }
  if(held)return;
  const removed=plateRemoveLast(rows);if(!removed.ok)return;
- const stack=restoreStack(removed.removed);if(!stack)return;setHand(player,hand,stack);writePlateBlock(block,removed.rows);
+ const stack=restoreStack(removed.removed);if(!stack)return;
+ const captured=captureWritableHand(player,hand);if(captured.before)return;
+ if(!plateTransaction(block,[plateStorageStep(block,removed.rows),plateHandStep(captured,stack)]))return;
  try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:.9})}catch{}
 }
 function breakPlate(block,player){

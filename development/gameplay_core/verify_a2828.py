@@ -1,6 +1,6 @@
 """Immersion audio and truthful shared-guide regressions; client gate is separate."""
 from pathlib import Path
-import hashlib,json,subprocess
+import hashlib,json,subprocess,sys
 from verify_a2827 import main as baseline
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
@@ -37,6 +37,6 @@ def main():
         assert 'Hold a stick or unfinished skewer' not in json.dumps(catalog,ensure_ascii=False)
         language=(RP/'texts'/f'{locale}.lang').read_text()
         assert language.count('tooltip.kaleidoscope_grilling.smoky_warmth=')==1
-    subprocess.run(['python','tools/build_grilling_guide.py','--check'],cwd=ROOT,check=True)
+    subprocess.run([sys.executable,'tools/build_grilling_guide.py','--check'],cwd=ROOT,check=True)
     print('A2.8.28 original audio, scoped lifecycle and shared-guide regressions PASS; no client acceptance implied')
 if __name__=='__main__':main()
