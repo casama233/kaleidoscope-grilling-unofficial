@@ -11,6 +11,6 @@
 
 31 項來源回歸覆蓋 A2.8.34 的操作，以及打包、寫後故障、掉落物讀回不一致、重複破壞、生成結果不明及無法移除暫存物品。這些是儲存替身測試，不是 Minecraft 玩家。
 
-獨立 BDS 證據另行記錄實際打包物品、五串 metadata、重複破壞、原生爆炸及掉落物重啟保留。探針使用 [Microsoft 的原生爆炸 API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/dimension?view=minecraft-bedrock-stable#createexplosion)，沒有模擬玩家。
+[獨立 BDS 證據](BDS-PLATE-DROP-20261002.json)已通過完整家族原檔載入／重啟，以及實際打包物品、五串 metadata、重複破壞、原生爆炸及掉落物重啟保留。首次探針錯將重啟查找限制在生成點八格內；掉落物移動後超出範圍，改用維度內物品查找後通過，失敗紀錄保留。探針使用 [Microsoft 的原生爆炸 API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/dimension?view=minecraft-bedrock-stable#createexplosion)，沒有模擬玩家。
 
 沒有宣稱跨儲存的程序終止原子性。真人渲染、手持與吃東西動畫、正式舊存檔遷移仍待驗收；正式 luosen 未套用本候選。其他工作分支的榨油／食物接口與內容顯示修復已保留。

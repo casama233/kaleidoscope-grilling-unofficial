@@ -8,7 +8,7 @@ const check=(v,s)=>{if(!v)throw Error(s)},wait=t=>new Promise(r=>system.runTimeo
 system.runTimeout(async()=>{try{
  const d=world.getDimension('overworld');try{d.runCommand('tickingarea add circle 128 80 64 2 drop_qa true')}catch{}
  let b;for(let i=0;i<60;i++){await wait(10);try{b=d.getBlock({x:128,y:80,z:64})}catch{}if(b)break;}check(b,'native QA chunk');
- const origin={x:128.5,y:80.5,z:64.5},items=()=>d.getEntities({type:'minecraft:item',location:origin,maxDistance:8});
+ const origin={x:128.5,y:80.5,z:64.5},items=()=>d.getEntities({type:'minecraft:item'});
  const stackOf=e=>e.getComponent('minecraft:item')?.itemStack;
  if(world.getDynamicProperty(phase)===undefined){
   const food=new ItemStack(N+'grilled_beef_skewer');food.nameTag='Packed native keepsake';setItemLore(food,[{rawtext:[{translate:'other:keepsake'},{text:' 原始資料'}]}]);setItemProperty(food,'qa:drop_marker','preserved');
@@ -25,7 +25,7 @@ system.runTimeout(async()=>{try{
   world.setDynamicProperty(saved,metadataSignature(a25PlateRows(stackOf(drops[0]))));world.setDynamicProperty(phase,1);
   console.log('DROP_NATIVE_PASS '+JSON.stringify({phase:'saved',normalBreak:true,fiveRowsPacked:true,repeatNoOp:true,realExplosion:true,oneExplosionDrop:true,metadataPreserved:true,realPlayers:world.getAllPlayers().length,simulatedPlayers:false,client:false}));
  }else{
-  const drops=items().filter(e=>stackOf(e)?.typeId===N+'skewer_plate');check(drops.length===1,'one packed item survives restart');check(metadataSignature(a25PlateRows(stackOf(drops[0])))===world.getDynamicProperty(saved),'packed native metadata survives restart');check(b.typeId==='minecraft:air','removed block stays removed');
+  const drops=items().filter(e=>stackOf(e)?.typeId===N+'skewer_plate');check(drops.length===1,'one packed item survives restart; found '+JSON.stringify(items().map(e=>({id:stackOf(e)?.typeId,location:e.location}))));check(metadataSignature(a25PlateRows(stackOf(drops[0])))===world.getDynamicProperty(saved),'packed native metadata survives restart');check(b.typeId==='minecraft:air','removed block stays removed');
   console.log('DROP_NATIVE_PASS '+JSON.stringify({phase:'restored',onePackedDropPersisted:true,metadataPersisted:true,blockStaysRemoved:true,realPlayers:world.getAllPlayers().length,simulatedPlayers:false,client:false}));
  }
 }catch(e){console.error('DROP_NATIVE_FAIL '+e+' '+e.stack)}},100);
