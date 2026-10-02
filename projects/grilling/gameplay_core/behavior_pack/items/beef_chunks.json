@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:beef_chunks.name"
+        "value": "kaleidoscope_grilling.display.item.beef_chunks"
       },
       "minecraft:icon": {
         "textures": {

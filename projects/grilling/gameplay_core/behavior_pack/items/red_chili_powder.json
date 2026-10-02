@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:red_chili_powder.name"
+        "value": "kaleidoscope_grilling.display.item.red_chili_powder"
       },
       "minecraft:icon": {
         "textures": {

@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:wedding_candy.name"
+        "value": "kaleidoscope_grilling.display.item.wedding_candy"
       },
       "minecraft:icon": {
         "textures": {

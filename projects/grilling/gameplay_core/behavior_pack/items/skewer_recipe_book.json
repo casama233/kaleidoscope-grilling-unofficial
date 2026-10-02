@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:skewer_recipe_book.name"
+        "value": "kaleidoscope_grilling.display.item.skewer_recipe_book"
       },
       "minecraft:icon": {
         "textures": {

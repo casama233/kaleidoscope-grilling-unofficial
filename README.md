@@ -1,5 +1,6 @@
-## Current maintained baseline: 2.8.45
+## Current maintained baseline: 2.8.46
 
+本版統一煙火物品及工作站提示中的藍色斜體系列標籤；三語品名、指南分類與 2.8.45 的修復保留。詳見 [A2.8.46 物品標籤](docs/STATUS-A2.8.46.md)，真人提示顯示仍待確認。
 本版修復食用完成時的熱度判定、服務端與模型共享的隨機吃法、可反覆治療的原生龍血生命上限，以及秘製串三食材手持顯示。包含 2.8.42 角色效果快取與 canonical 2.8.43 第一人稱框架修復。詳見 [當前修復與驗收矩陣](docs/CURRENT-REPAIR-STATUS.md) 與 [A2.8.45](docs/STATUS-A2.8.45.md)；真人驗收、秘製動態 GUI 及部分 Java 平台能力仍有缺口。
 
 [本版提示與圖形 HUD 修正／未完成項](docs/STATUS-A2.8.40.md)：以 Java 原作觸發、翻譯與圖形為準，移除自創文字條。

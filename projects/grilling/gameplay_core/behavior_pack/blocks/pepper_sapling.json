@@ -15,7 +15,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:pepper_sapling.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.pepper_sapling",
       "minecraft:geometry": "geometry.kg_a1.pepper_sapling",
       "minecraft:material_instances": {
         "*": {

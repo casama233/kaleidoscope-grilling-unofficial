@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:grilled_squid_tentacle_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.grilled_squid_tentacle_skewer"
       },
       "minecraft:icon": {
         "textures": {

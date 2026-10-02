@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:dragon_egg_powder.name"
+        "value": "kaleidoscope_grilling.display.item.dragon_egg_powder"
       },
       "minecraft:icon": {
         "textures": {

@@ -5,7 +5,7 @@
       "identifier": "kaleidoscope_grilling:seasoning_bottle_4"
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:seasoning_bottle.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.seasoning_bottle",
       "minecraft:geometry": {
         "identifier": "geometry.kg_a2733.seasoning_bottles_4"
       },

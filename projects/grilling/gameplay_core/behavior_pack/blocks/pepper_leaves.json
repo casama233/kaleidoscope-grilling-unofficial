@@ -19,7 +19,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:pepper_leaves.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.pepper_leaves",
       "minecraft:geometry": "geometry.kg_a1.pepper_leaves",
       "minecraft:material_instances": {
         "*": {

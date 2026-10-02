@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:sour_spicy_noodles.name"
+        "value": "kaleidoscope_grilling.display.item.sour_spicy_noodles"
       },
       "minecraft:icon": {
         "textures": {
