@@ -83,6 +83,7 @@ import {captureWritableHand} from './a2735_player_io.js';
 import {captureTwoHandIntent,twoHandIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {seasoningBlockKey} from './a2743_seasoning_block_adapter.js';
 import {markPlacedVisualDirty} from './a2770_placed_visual_queue.js';
+import {tickGrillDisplay} from './grill_visual_runtime.js';
 import {isSpecialSeasoningId,specialSeasoningVisualId} from './a2766_special_seasoning_visual_core.js';
 import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
 
@@ -892,7 +893,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
 });
 // Stable Script API placement capture, including all materialized seasoning IDs.
 system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
- blockComponentRegistry.registerCustomComponent('kaleidoscope_grilling:grill_tick',{onTick(e){tickGrill(e.block)}});
+ blockComponentRegistry.registerCustomComponent('kaleidoscope_grilling:grill_tick',{onTick(e){tickGrill(e.block);tickGrillDisplay(e.block)}});
  blockComponentRegistry.registerCustomComponent('kaleidoscope_grilling:grill_legs_tick',{onTick(e){try{const above=e.block.above();if(above&&above.typeId!==GRILL_ID)e.block.setType('minecraft:air')}catch{}}});
  blockComponentRegistry.registerCustomComponent('senluo:grilling_bottle_place',{beforeOnPlayerPlace:scheduleNativeBottlePlacement,onTick(e){try{tickNativeBottleSupport(e.block)}catch(error){console.warn('[Grilling bottle support recovery] '+error)}}});
 });

@@ -1,0 +1,74 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grill_food_visual",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "kaleidoscope_grilling:ready": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:model": {
+          "type": "int",
+          "range": [
+            0,
+            114
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:flips": {
+          "type": "int",
+          "range": [
+            0,
+            4
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:hop": {
+          "type": "int",
+          "range": [
+            280,
+            380
+          ],
+          "default": 280,
+          "client_sync": true
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "kg_render_helper"
+        ]
+      },
+      "minecraft:transient": {},
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:collision_box": {
+        "width": 0,
+        "height": 0
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:fire_immune": {}
+    }
+  }
+}
