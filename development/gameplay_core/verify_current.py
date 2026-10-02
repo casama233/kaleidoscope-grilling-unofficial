@@ -73,6 +73,7 @@ VERIFIERS = {
     (2, 8, 39): "verify_a2839.py",
     (2, 8, 40): "verify_a2840.py",
     (2, 8, 41): "verify_a2841.py",
+    (2, 8, 42): "verify_a2842.py",
     (2, 8, 8): "verify_a288_local.py",
 }
 
