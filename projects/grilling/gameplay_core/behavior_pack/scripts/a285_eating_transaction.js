@@ -9,9 +9,14 @@ export function eatingIdentity(stack){
   lore:getItemLore(stack).filter(x=>!String(x).startsWith('§c🔥')),props});
 }
 export function captureEatingIdentity(stack,hand,slot){return {identity:eatingIdentity(stack),hand,slot}}
-export function eatingStillCurrent(use,current,slot){
- return !!use&&!!current&&(use.hand==='off'||use.slot===slot)&&use.identity===eatingIdentity(current);
+export function eatingEventMatches(use,stack,time){
+ if(!use||!stack)return false;const identity=eatingIdentity(stack);if(use.identity===identity)return true;
+ if(!Number.isFinite(time))return false;
+ try{const before=JSON.parse(use.identity),after=JSON.parse(identity),key='kaleidoscope_grilling:hot_until';if(Number(before.props[key])>0&&Number(before.props[key])<=time&&after.props[key]===undefined){delete before.props[key];return JSON.stringify(before)===JSON.stringify(after)}}catch{}
+ return false;
 }
+export function eatingStillCurrent(use,current,slot,time){return !!use&&!!current&&(use.hand==='off'||use.slot===slot)&&eatingEventMatches(use,current,time);}
+
 
 // No reward before a verified debit. A failed write cannot grant free nutrition.
 // Adapters throw on unavailable storage; rollback is attempted on every failure.
