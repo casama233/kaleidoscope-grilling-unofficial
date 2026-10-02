@@ -229,7 +229,7 @@ message.kg.board_knife=请用厨房刀切割。
 
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森罗物语：烟火
-guide.kg.intro=按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮的生存取得仍受阻；第一串请从鱼串开始。
+guide.kg.intro=按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮需要整套家族部署的砧板 API；未启用时，第一串可从鱼串开始。
 guide.kg.all=全部条目
 guide.kg.select=选择分类；食物按制作方式分组。
 guide.kg.back=返回

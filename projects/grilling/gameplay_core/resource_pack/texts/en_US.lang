@@ -250,7 +250,7 @@ message.kg.board_knife=Use a Kitchen Knife to cut.
 
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=Kaleidoscope Grilling
-guide.kg.intro=Browse by item type and preparation method. Acquisition, recipes, use and effects share one entry. Beef Chunks and Chicken Skin remain unavailable through normal survival acquisition; start with a Fish Skewer.
+guide.kg.intro=Browse by item type and cooking method for acquisition, recipes, use and effects. Beef chunks and chicken skin require the complete family Board API deployment; without it, start with fish skewers.
 guide.kg.all=All entries
 guide.kg.select=Choose a category; foods are grouped by preparation method.
 guide.kg.back=Back

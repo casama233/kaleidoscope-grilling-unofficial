@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.8",
-  "revision": "grill_visual_20261002",
+  "version": "0.3.9",
+  "revision": "plate_transactions_20261002",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",
@@ -18,7 +18,7 @@
   "ui": {
     "zh_CN": {
       "title": "森罗物语：烟火",
-      "intro": "按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮的生存取得仍受阻；第一串请从鱼串开始。",
+      "intro": "按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮需要整套家族部署的砧板 API；未启用时，第一串可从鱼串开始。",
       "all": "全部条目",
       "select": "选择分类；食物按制作方式分组。",
       "back": "返回",
@@ -27,7 +27,7 @@
     },
     "zh_TW": {
       "title": "森羅物語：煙火",
-      "intro": "按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮的生存取得仍受阻；第一串請從魚串開始。",
+      "intro": "按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮需要整套家族部署的砧板 API；未啟用時，第一串可從魚串開始。",
       "all": "全部條目",
       "select": "選擇分類；食物按製作方式分組。",
       "back": "返回",
@@ -36,7 +36,7 @@
     },
     "en_US": {
       "title": "Kaleidoscope Grilling",
-      "intro": "Browse by item type and preparation method. Acquisition, recipes, use and effects share one entry. Beef Chunks and Chicken Skin remain unavailable through normal survival acquisition; start with a Fish Skewer.",
+      "intro": "Browse by item type and cooking method for acquisition, recipes, use and effects. Beef chunks and chicken skin require the complete family Board API deployment; without it, start with fish skewers.",
       "all": "All entries",
       "select": "Choose a category; foods are grouped by preparation method.",
       "back": "Back",
