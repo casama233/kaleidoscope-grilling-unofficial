@@ -21,25 +21,28 @@ class Stack{
 }
 const N='kaleidoscope_grilling:',PLATE=N+'skewer_plate_block',food=()=>{const s=new Stack(N+'grilled_beef_skewer');s.nameTag='named food';s.lore=[{translate:'item.foreign.food',with:['保留']}];s.props['foreign:value']='preserve';return s;};
 function fixture(){
- const dp=new Map(),slots=new Map(),selected={value:0};let fault,quarantined=false;
+ const dp=new Map(),slots=new Map(),entities=[],events={};let fault;
  function write(k,v){if(v===undefined)dp.delete(k);else dp.set(k,v);if(fault?.(k,v))throw Error('post-write failure')}
  const permutation=(typeId,states={})=>({type:{id:typeId},getState:k=>states[k],getAllStates:()=>({...states}),withState(k,v){return permutation(typeId,{...states,[k]:v})}});
- const dimension={id:'minecraft:overworld',getBlock:()=>block,playSound(){}};
+ const dimension={id:'minecraft:overworld',getBlock:()=>block,playSound(){},spawnItem(stack){
+  const e={isValid:true,stack:stack.clone(),getComponent(){return {itemStack:fault?.('dropRead')?new Stack('minecraft:stone'):this.stack}},remove(){if(fault?.('dropRemoveBefore'))throw Error('drop removal unavailable');this.isValid=false;if(fault?.('dropRemove'))throw Error('drop cleanup post-write failure')}};
+  entities.push(e);if(fault?.('spawn'))throw Error('spawn outcome unknown');return e;
+ }};
  const block={x:0,y:80,z:0,location:{x:0,y:80,z:0},dimension,typeId:PLATE,permutation:permutation(PLATE,{[N+'plate_count']:0,'minecraft:cardinal_direction':'north'}),
   setPermutation(p){this.permutation=p;this.typeId=p.type.id;if(fault?.('block',p))throw Error('block post-write failure')},
-  setType(id){this.typeId=id;this.permutation=permutation(id,id===PLATE?{[N+'plate_count']:0,'minecraft:cardinal_direction':'north'}:{})}};
+  setType(id){this.typeId=id;this.permutation=permutation(id,id===PLATE?{[N+'plate_count']:0,'minecraft:cardinal_direction':'north'}:{});if(id==='minecraft:air'&&fault?.('remove'))throw Error('remove post-write failure')}};
  const holder={selectedSlotIndex:0,isSneaking:true,getRotation:()=>({y:90}),creative:false};
  const held=(p,h)=>slots.get(h==='off'?'off':p.selectedSlotIndex);
  const setHand=(p,h,s)=>{const key=h==='off'?'off':p.selectedSlotIndex;slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')};
  const captureWritableHand=(p,h)=>{const key=h==='off'?'off':p.selectedSlotIndex;return {before:slots.get(key)?.clone(),read:()=>slots.get(key),write(s){slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')}}};
  const c=vm.createContext({...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
-  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}}},afterEvents:{playerBreakBlock:{subscribe(){}}}},
+  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{playerBreakBlock:{subscribe(){}}}},
   system:{run(){}},console:{warn(){}},SECRET_ID:N+'secret_skewer',captureWritableHand,
-  heldByHand:held,setHand,creative:p=>p.creative,hasSolidTop:()=>true,
+  heldByHand:held,setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,
   interactionStackSignature:s=>s?JSON.stringify(s):'',interactionFeedback(){},UNFINISHED_ID:N+'unfinished_skewer'});
- vm.runInContext(source+'\nglobalThis.api={readPlateBlock,placePlateOn,handlePlateBlock,plateStorageStep,plateTransaction,posKey,plateFaultKey};',c);
+ vm.runInContext(source+'\nglobalThis.api={readPlateBlock,placePlateOn,handlePlateBlock,plateStorageStep,plateTransaction,posKey,plateFaultKey,breakPlate};',c);
  const api=c.api,key=api.posKey(N+'a25_plate_',block);
- return {dp,slots,block,holder,api,key,set fault(f){fault=f},oneFailure(target){let once=true;fault=k=>k===target&&once?(once=false,true):false},rows(n=1){const rows=Array.from({length:n},()=>({id:food().typeId,native:snapshot.captureSkewerMetadata(food()),nutrition:4,saturation:.4}));dp.set(key,JSON.stringify(rows));block.permutation=block.permutation.withState(N+'plate_count',n);return rows;}};
+ return {dp,slots,entities,events,block,holder,api,key,set fault(f){fault=f},oneFailure(target){let once=true;fault=k=>k===target&&once?(once=false,true):false},rows(n=1){const rows=Array.from({length:n},()=>({id:food().typeId,native:snapshot.captureSkewerMetadata(food()),nutrition:4,saturation:.4}));dp.set(key,JSON.stringify(rows));block.permutation=block.permutation.withState(N+'plate_count',n);return rows;}};
 }
 test('invalid saved rows are rejected, never filtered or truncated',()=>{
  for(const raw of [null,1,'{',JSON.stringify({}),JSON.stringify([null]),JSON.stringify([{id:'bad'}]),JSON.stringify([{id:'x:food',native:{version:2,id:'x:food'}}]),JSON.stringify([{id:'x:food',native:{version:1,id:'x:other'}}]),JSON.stringify(Array(6).fill({id:'x:food'}))])assert.throws(()=>tx.decodePlateStorage(raw));
@@ -97,4 +100,34 @@ test('native hand adapter pins original slot for read, apply and rollback',()=>{
 test('pre-write conflict preserves changed input instead of rolling it back',()=>{
  let value='other';const step=tx.verifiedPlateStep({read:()=>value,write:v=>{value=v},before:'old',after:'new'});
  assert.equal(tx.commitPlateSteps([step],()=>assert.fail()).ok,false);assert.equal(value,'other');
+});
+
+test('breaking a full plate delivers one packed item containing all native snapshots',()=>{
+ const f=fixture(),rows=f.rows(5);assert.equal(f.api.breakPlate(f.block),true);
+ assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.dp.has(f.key),false);const live=f.entities.filter(e=>e.isValid);assert.equal(live.length,1);
+ assert.deepEqual(JSON.parse(item.getItemProperty(live[0].stack,plate.PLATE_SKEWERS_KEY)).map(r=>r.native),rows.map(r=>r.native));
+ assert.equal(f.api.breakPlate(f.block),false);assert.equal(f.entities.filter(e=>e.isValid).length,1);
+});
+for(const target of ['dropRead','property','remove'])test('break '+target+' failure preserves plate and removes provisional drop',()=>{
+ const f=fixture();f.rows(3);const raw=f.dp.get(f.key),state=JSON.stringify(f.block.permutation.getAllStates());f.oneFailure(target==='property'?f.key:target);
+ assert.equal(f.api.breakPlate(f.block),false);assert.equal(f.block.typeId,PLATE);assert.equal(f.dp.get(f.key),raw);assert.equal(JSON.stringify(f.block.permutation.getAllStates()),state);assert.equal(f.entities.filter(e=>e.isValid).length,0);
+});
+test('spawn exception leaves contents intact and persists quarantine instead of retrying',()=>{
+ const f=fixture();f.rows(2);const raw=f.dp.get(f.key);f.oneFailure('spawn');assert.equal(f.api.breakPlate(f.block),false);assert.equal(f.dp.get(f.key),raw);assert.equal(f.block.typeId,PLATE);
+ assert.ok(f.dp.has(f.api.plateFaultKey(f.block)));assert.throws(()=>f.api.breakPlate(f.block),/quarantined/);assert.equal(f.entities.length,1);
+});
+test('creative and empty plate breaks do not generate a packed plate',()=>{
+ for(const creative of [false,true]){const f=fixture();if(creative)f.rows(2);f.holder.creative=creative;assert.equal(f.api.breakPlate(f.block,f.holder),true);assert.equal(f.entities.length,0);assert.equal(f.dp.has(f.key),false);assert.equal(f.block.typeId,'minecraft:air');}
+});
+test('explosion callback removes only plate blocks from native destruction',()=>{
+ const f=fixture();f.rows(2);const other={typeId:'minecraft:stone'};let kept;
+ f.events.explosion({getImpactedBlocks:()=>[other,f.block],setImpactedBlocks:r=>{kept=r}});
+ assert.equal(kept.length,1);assert.equal(kept[0],other);assert.equal(f.dp.has(f.key),true); // Before-event only schedules the actual transaction.
+});
+
+test('unconfirmed provisional drop cleanup blocks later break retries',()=>{
+ const f=fixture();f.rows(2);const raw=f.dp.get(f.key);let propertyOnce=true;
+ f.fault=k=>k==='dropRemoveBefore'||(k===f.key&&propertyOnce?(propertyOnce=false,true):false);
+ assert.throws(()=>f.api.breakPlate(f.block),/recovery required/);assert.equal(f.dp.get(f.key),raw);assert.equal(f.entities.filter(e=>e.isValid).length,1);
+ f.fault=undefined;assert.throws(()=>f.api.breakPlate(f.block),/quarantined/);assert.equal(f.entities.length,1);
 });
