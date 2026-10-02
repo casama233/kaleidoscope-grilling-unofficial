@@ -72,11 +72,12 @@ def render_assets():
   paths=row['textures'];paths=[paths] if isinstance(paths,str) else paths
   for path in paths:
    im=Image.open(RP/(path+'.png'));assert im.width==im.height,(key,im.size)
- assert len(list((RP/'attachables').glob('*.json')))==107
+ expected_count=106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
+ assert len(list((RP/'attachables').glob('*.json')))==expected_count
  assert not (RP/'attachables/big_vat.attachable.json').exists()
  for name in ('grill','oil_press'):
   g=load(RP/f'models/blocks/a283_item_{name}.geo.json')['minecraft:geometry'][0]
   assert g['item_display_transforms']==load(Path(__file__).parent/f'fixtures/a283/{name}.json')['display']
- return {'attachables':107,'single_bone_attachables':changed,'hand_geometries':len(refs),'openings_checked':10,'client_visuals_tested':False}
+ return {'attachables':expected_count,'single_bone_attachables':changed,'hand_geometries':len(refs),'openings_checked':10,'client_visuals_tested':False}
 if __name__=='__main__':
  eating_gate();survival_gate();previous_gate()
