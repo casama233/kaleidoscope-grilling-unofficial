@@ -1,8 +1,10 @@
-## Current maintained baseline: 2.8.47
+## Current maintained baseline: 2.8.49
 
-本候選另修正調味瓶第一人稱原生掛接座標；瓶殼與內容物分開驗證，詳見 [2.8.47 驗證範圍](docs/STATUS-A2.8.47.md)。保留 2.8.45 與 2.8.46 的進食、龍血、熱期限及系列標籤修改；客戶端顯示仍待驗收。
+本候選另修正調味瓶第一人稱原生掛接座標；瓶殼與內容物分開驗證，詳見 [2.8.49 驗證範圍](docs/STATUS-A2.8.49.md)。保留 2.8.47 進食手臂及 2.8.48 音效、粒子改動；客戶端顯示仍待驗收。
 
-本版統一煙火物品及工作站提示中的藍色斜體系列標籤；三語品名、指南分類與 2.8.45 的修復保留。詳見 [A2.8.46 物品標籤](docs/STATUS-A2.8.46.md)，真人提示顯示仍待確認。
+本版恢復原作烤爐、調料、榨油、黃金串與無敵效果的聲畫回饋；六種自有單粒發射器避免原版 emitter 爆量。保留既有 2.8.45／2.8.46 修復及 canonical 2.8.47 第三人稱進食抬手，詳見 [A2.8.48](docs/STATUS-A2.8.48.md) 與 [完整功能面審查](docs/PARITY-AUDIT-20261003.md)。Windows 聲畫驗收仍獨立記錄。
+
+前版統一煙火物品及工作站提示中的藍色斜體系列標籤；三語品名、指南分類與 2.8.45 的修復保留。詳見 [A2.8.46 物品標籤](docs/STATUS-A2.8.46.md)，真人提示顯示仍待確認。
 本版修復食用完成時的熱度判定、服務端與模型共享的隨機吃法、可反覆治療的原生龍血生命上限，以及秘製串三食材手持顯示。包含 2.8.42 角色效果快取與 canonical 2.8.43 第一人稱框架修復。詳見 [當前修復與驗收矩陣](docs/CURRENT-REPAIR-STATUS.md) 與 [A2.8.45](docs/STATUS-A2.8.45.md)；真人驗收、秘製動態 GUI 及部分 Java 平台能力仍有缺口。
 
 [本版提示與圖形 HUD 修正／未完成項](docs/STATUS-A2.8.40.md)：以 Java 原作觸發、翻譯與圖形為準，移除自創文字條。
@@ -11,13 +13,13 @@ Public oil and food output APIs, shared guide localization, native station conte
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.
 
-> main 維護基線：**A2.8.45** — [正式來源修訂](docs/STATUS-A2.8.40.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
+> main 維護基線：**A2.8.47** — [正式來源修訂](docs/STATUS-A2.8.40.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
 
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**canonical runtime：A2.8.45，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
+**canonical runtime：A2.8.47，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 

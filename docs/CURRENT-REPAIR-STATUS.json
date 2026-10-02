@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    45
+    48
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -48,8 +48,8 @@
     {
       "id": "F06",
       "title": "隨機吃法",
-      "canonical": "2.8.45 每次共享 THREE／ALT 及正在使用的手；模型、咬點與扣料使用同一分支",
-      "remaining": "真人聲畫同步、中斷、雙手觀察；原生手臂及 Java 脫離第二截模型仍未等價",
+      "canonical": "2.8.45 每次共享 THREE／ALT 與正在使用的手；模型、咬點和扣料使用同一分支。2.8.47 在原生抬手進度為零時補第三人稱使用手的抬手姿勢，停止使用即結束。",
+      "remaining": "Windows 抬手／咬點／聲畫同步、中斷、副手與雙人旁觀；原作精確手臂曲線與脫離第二截模型仍未等價。",
       "client_accepted": false
     },
     {
@@ -69,7 +69,7 @@
     {
       "id": "F09",
       "title": "龍血效果",
-      "canonical": "2.8.45 原生 health groups max 20／26／30；初次補 6／10、升級補 4、刷新不再治療；移除有限傷害池代理",
+      "canonical": "2.8.45 原生 health groups max 20／26／30；初次補 6／10、升級補 4、刷新不再治療；移除有限傷害池代理；最小原生非玩家測試經真正停服重啟，max 26／HP 16／等級標記及同步 properties 保留，重啟後刷新／升級／解除通過。",
       "remaining": "真玩家心形、護甲／傷害順序、奶／死亡與其他包效果相容；其他引擎代理效果未全面 Java 等價",
       "client_accepted": false
     },
@@ -97,7 +97,7 @@
     {
       "id": "F13",
       "title": "聲畫操作",
-      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch",
+      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch；2.8.47 補入第三人稱進食使用手抬手。 2.8.48 補单粒特效、黃金／無敵／成功盾與工作站音效。",
       "remaining": "音量、聲源、停止、透明排序、雙人觀察均須 Windows 真人",
       "client_accepted": false
     },
@@ -127,6 +127,19 @@
   "production_ready": false,
   "source_validation": {
     "static": true,
+    "isolated_full_family_bds": false,
+    "native_nonplayer_feedback_probe": false,
+    "simulated_players": false,
+    "client": false
+  },
+  "additional_review": "PARITY-AUDIT-20261003.md",
+  "previous_source_validation": {
+    "version": [
+      2,
+      8,
+      45
+    ],
+    "static": true,
     "isolated_full_family_bds": true,
     "native_nonplayer_health_probe": true,
     "bds_version": "1.26.51.1",
@@ -134,5 +147,23 @@
     "real_players": 0,
     "simulated_players": false,
     "client": false
-  }
+  },
+  "release_reconciliation": {
+    "canonical_predecessor": [
+      2,
+      8,
+      47
+    ],
+    "canonical_predecessor_commit": "e8c9358",
+    "withdrawn_feedback_candidate_commit": "cc57184b7e4579db136bb993f73382c177b93770",
+    "withdrawn_candidate_deployed": false,
+    "record": "RELEASE-COLLISION-20261003.md"
+  },
+  "repair_baseline_version": [
+    2,
+    8,
+    45
+  ],
+  "latest_runtime_version_is_authoritative_in": "baseline.json and Tavern family/upstream.lock.json; this is a source-review snapshot, not live acceptance",
+  "nonplayer_health_persistence_evidence": "evidence/dragon-health-persistence-2.8.45.json"
 }

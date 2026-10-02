@@ -1,7 +1,14 @@
 name: Canonical release baseline
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: grilling-baseline-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   baseline:
     runs-on: ubuntu-latest
@@ -14,5 +21,4 @@ jobs:
           python-version: '3.12'
       - run: python tools/baseline_gate.py check --release --history-base "${{ github.event.pull_request.base.sha || github.event.before }}"
       - run: python tools/test_baseline_gate.py
-      - run: python tools/bridge_project.py
-      - run: python tools/test_bridge_project.py
+      - run: python tools/test_release_claim.py

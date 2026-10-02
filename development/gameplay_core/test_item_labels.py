@@ -6,6 +6,7 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
 BASE='1cf16f39f449ee5ce95190ef9088e575d133f928'  # Merged 2.8.45 runtime, including the prior repairs.
+LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
 LABELS = {'en_US': 'Kaleidoscope Grilling', 'zh_CN': '森罗物语烟火',
           'zh_TW': '森羅物語煙火'}
 
@@ -57,14 +58,24 @@ def main():
             assert current[key].count(r'\n') == 1, 'Malformed tooltip newline'
     # All bottle states, existing stacks and block items resolve declaratively;
     # no inventory polling, scripted lore rewriting or host translations.
-    for path in (PROJECT / 'behavior_pack/scripts').rglob('*.js'):
+    # Check the historical label-only release itself. Later releases may add
+    # scripts, which did not exist at LABEL_BASE and must not be queried there.
+    released_paths = subprocess.check_output([
+        'git', 'ls-tree', '-r', '--name-only', LABEL_BASE, '--',
+        'projects/grilling/gameplay_core/behavior_pack/scripts',
+    ], cwd=ROOT, text=True).splitlines()
+    for relative in released_paths:
+        path = ROOT / relative
+        if path.suffix != '.js':
+            continue
         if path.relative_to(PROJECT / 'behavior_pack').as_posix() in (
                 'scripts/guide/payload.js', 'scripts/guide/publisher.js'):
             continue
-        assert path.read_bytes() == prior(path), 'Runtime script changed: ' + str(path)
+        released = subprocess.check_output(['git', 'show', LABEL_BASE + ':' + path.relative_to(ROOT).as_posix()], cwd=ROOT)
+        assert released == prior(path), 'Label release changed runtime script: ' + str(path)
     print(json.dumps({'inventory_items': counts['item'], 'named_blocks': counts['block'],
                       'display_aliases': len(aliases), 'locales': list(LABELS),
-                      'plain_names_preserved': True, 'runtime_behaviour_preserved': True,
+                      'plain_names_preserved': True, 'label_release_runtime_behaviour_preserved': True,
                       'client_rendering_accepted': False}, ensure_ascii=False))
 
 

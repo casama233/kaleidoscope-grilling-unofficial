@@ -1,0 +1,33 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_eating.player.native_right": {
+      "loop": true,
+      "animation_length": 5.0,
+      "blend_weight": "!variable.is_first_person && query.is_using_item && variable.use_item_startup_progress <= 0.0 && variable.use_item_interval_progress <= 0.0",
+      "bones": {
+        "rightarm": {
+          "rotation": [
+            -60.0,
+            -22.5,
+            -5.625
+          ]
+        }
+      }
+    },
+    "animation.kg_eating.player.native_left": {
+      "loop": true,
+      "animation_length": 5.0,
+      "blend_weight": "!variable.is_first_person && query.is_using_item && variable.use_item_startup_progress <= 0.0 && variable.use_item_interval_progress <= 0.0",
+      "bones": {
+        "leftarm": {
+          "rotation": [
+            -60.0,
+            22.5,
+            5.625
+          ]
+        }
+      }
+    }
+  }
+}

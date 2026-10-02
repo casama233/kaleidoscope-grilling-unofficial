@@ -341,12 +341,32 @@
   },
   "2.8.47": {
     "BP": {
-      "sha256": "a8997fa26c63b35552f92a2caf207c0b5befcddaaba29f7b2f5420079adff152",
+      "sha256": "37a3ca99a5726a736cb14120a0e57cc9a789ebc9cdbd64f46ef461fbb46dea2d",
       "files": 518
     },
     "RP": {
-      "sha256": "90157df30fc967094c0b8449bc8cf7bf607ac92b65821ba7cc8549b96a3308ef",
-      "files": 1662
+      "sha256": "c5a68498572ca8ded146de57f48ff272903e26f2eb9bfc022d9d8e96ad0461b4",
+      "files": 1663
+    }
+  },
+  "2.8.48": {
+    "BP": {
+      "sha256": "6f26e5c9974418849bcd13bcee272b45074cd6073862c53e2cda7edc0032030d",
+      "files": 523
+    },
+    "RP": {
+      "sha256": "9e5d3c5f24bb6fb59488f9a04fcb7891caca3a312aaa6a3ad6c92b1d79a78935",
+      "files": 1670
+    }
+  },
+  "2.8.49": {
+    "BP": {
+      "sha256": "516e6bc5522121d5f517de17790378c02d03248b5456f6ba0d89db1ab95db978",
+      "files": 523
+    },
+    "RP": {
+      "sha256": "06fc2758b3d2eea3eceb87318358e9964ad14579c486c5df76cbe1cf33c7b47b",
+      "files": 1670
     }
   }
 }

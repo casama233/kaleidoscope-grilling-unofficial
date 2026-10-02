@@ -4,6 +4,9 @@ on:
     paths: ['compat/family/**', 'tools/**', 'projects/grilling/gameplay_core/**', 'development/gameplay_core/**', 'baseline.json', '.github/workflows/family-candidate.yml']
 permissions:
   contents: read
+concurrency:
+  group: grilling-family-candidate-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   candidate:
     runs-on: ubuntu-latest
@@ -18,11 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: python -m pip install Pillow==11.3.0
       - name: Verify current canonical family candidate without installation transforms
         run: |
           python tools/baseline_gate.py check --release
-          python development/gameplay_core/verify_current.py
+          # Full functional source checks run once in Gameplay Core — Canonical.
           python tools/check_station_storage.py
           node tools/check_family_knives.mjs
           python tools/baseline_gate.py check --release --receipt dist/family/source-receipt.json

@@ -1,9 +1,14 @@
-"""Bottle native attachment regression; client acceptance remains separate."""
-import subprocess,sys
 from pathlib import Path
-from verify_a2846 import main as baseline
+import subprocess
+import sys
+from verify_a2846 import main as previous
+
+
 def main():
-    baseline()
-    subprocess.run([sys.executable,str(Path(__file__).with_name('test_native_bottle_fp.py'))],check=True)
-    print('A2.8.47 bottle native projection PASS; client rendering unaccepted')
-if __name__=='__main__':main()
+    previous()
+    subprocess.run([sys.executable, str(Path(__file__).with_name('test_eating_arms.py'))], check=True)
+    print('A2.8.47 third-person eating arm fallback PASS; human rendering unaccepted')
+
+
+if __name__ == '__main__':
+    main()

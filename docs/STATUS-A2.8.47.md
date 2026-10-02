@@ -1,29 +1,17 @@
-# A2.8.47 — bottle native first-person attachment frame
+# A2.8.47 第三人稱進食抬手
 
-Base source: `49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0` (2.8.46).
+使用者 2026-10-03 提供的影片中，2.8.43 的進食進度與烤串咬點持續更新，
+第三人稱的手仍留在腰間。先前依賴原生 `use_animation` 的做法，
+未提供原生 use-item progress 為零時的第三人稱手臂姿勢。
 
-## Fixed
+本版在煙火烤串開始進食的事件中，播放僅含正在使用之手臂旋轉的補充動畫。
+旋轉取自釘選 Mojang `animation.humanoid.use_item_progress` 的抬手姿勢，
+副手鏡射；只在第三人稱、正在使用物品且原生抬手進度為零時生效。
+第一人稱、原生已有的進食姿勢、另一隻手、身體與腿保留控制。
+鬆開使用或換物品即結束，不播全身歸零，不移動手臂骨骼位置，
+不替換玩家 RP 定義或其他附加包的動畫控制器。
 
-Seasoning bottles now use the same pinned Mojang arm/item socket basis as the repaired 2.8.43 skewers, instead of the Blockbench display-camera calibration. Only `bottle_fp_right` and `bottle_fp_left` change. Third-person, skewers, geometry, textures, materials and gameplay are unchanged. The advanced rack correctly remains a Java-generated sprite; unused historical rack poses are not reintroduced.
-
-## Evidence
-
-The fixed head-centered native projection passes all 266 bottle geometry/hand cases, checking shells and opaque contents separately. Replaying the previous bottle poses reproduces 132 misses (66 non-empty attachables in both hands; 42 unique contents geometries). This projection uses a fixed 16:9 envelope and is not a Minecraft rendering test.
-
-Actual Blockbench 5.2.1 local MCP calls created two temporary models from the canonical full seasoning bottle shell and contents geometries, loaded their original texture, and created a numeric preview pose directly from the candidate's right-hand transform, with Bedrock-to-editor axis conversion. Both models were inspected in Animate mode. These screenshots show standalone editor geometry and pose, not native hand/camera rendering or material compositing.
-
-![Bottle shell editor pose](render-audit/20261002-bottle/blockbench-shell.png)
-![Bottle contents editor pose](render-audit/20261002-bottle/blockbench-contents.png)
-
-## Checks
-
-- `test_native_bottle_fp.py`: 4 tests, 266 attachable/geometry/hand cases; old-pose failure reproduced; only two tracks changed
-- `test_held_pose_frames.py`: 4 tests, reproducible generated runtime and native projection coverage
-- Complete `verify_current.py` chain through 2.8.47 passed after fetching required historical commits; 391 relative imports checked
-- Baseline/version hashes, historical identity preservation and package export checked separately
-
-Minecraft client/FOV/VR, live installation and saved-world acceptance were not performed. Other eating-animation discrepancies remain open; this release candidate does not claim complete Java parity.
-
-The editor captures retain the provisional 2.8.44 model-tab name. Before publication the candidate was rebased onto newly merged 2.8.45 and renumbered 2.8.46; the inspected bottle geometry, texture and two pose tracks are identical. Existing 2.8.44/2.8.45 release identities and all incoming gameplay changes are preserved.
-
-A second integration retained the concurrently merged 2.8.46 series-label repair and assigned final candidate identity 2.8.47. The original locally proposed .44/.46 bottle identities were never released. Upstream release-history entries are unchanged.
+保留原作物品曲線與咬點、共享吃法、2.8.46 三語物品系列標籤。
+來源與作用範圍檢查、完整家族 BDS、存檔演練與真人渲染分開記錄。
+這是待真人測試的客戶端修復；不同皮膚骨架與多人觀看效果須由 live 回報確認，
+不能用腳本或 BDS 載入通過宣稱影片問題已獲真人驗收。
