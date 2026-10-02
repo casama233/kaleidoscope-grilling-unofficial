@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:houttuynia_powder.name"
+        "value": "kaleidoscope_grilling.display.item.houttuynia_powder"
       },
       "minecraft:icon": {
         "textures": {

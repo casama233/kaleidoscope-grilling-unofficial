@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:grilled_potato_slice_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.grilled_potato_slice_skewer"
       },
       "minecraft:icon": {
         "textures": {

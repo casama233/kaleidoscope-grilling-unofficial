@@ -33,7 +33,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:oil_press.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.oil_press",
       "minecraft:geometry": "geometry.kg_a26.oil_press_c0_s0",
       "minecraft:material_instances": {
         "*": {

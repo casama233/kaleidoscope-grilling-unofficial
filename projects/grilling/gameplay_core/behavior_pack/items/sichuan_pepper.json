@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:sichuan_pepper.name"
+        "value": "kaleidoscope_grilling.display.item.sichuan_pepper"
       },
       "minecraft:icon": {
         "textures": {

@@ -12,7 +12,7 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:skewer_recipe.name",
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.skewer_recipe",
       "minecraft:geometry": "geometry.kg_a25.skewer_recipe",
       "minecraft:material_instances": {
         "*": {

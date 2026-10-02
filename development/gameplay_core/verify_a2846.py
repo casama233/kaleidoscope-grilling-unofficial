@@ -1,9 +1,15 @@
-"""Bottle native attachment regression; client acceptance remains separate."""
-import subprocess,sys
+"""Inventory series attribution; inherited 2.8.45 regressions remain required."""
+import subprocess
+import sys
 from pathlib import Path
-from verify_a2845 import main as baseline
+from verify_a2845 import main as previous
+
+
 def main():
-    baseline()
-    subprocess.run([sys.executable,str(Path(__file__).with_name('test_native_bottle_fp.py'))],check=True)
-    print('A2.8.46 bottle native projection PASS; client rendering unaccepted')
-if __name__=='__main__':main()
+    previous()
+    subprocess.run([sys.executable, str(Path(__file__).with_name('test_item_labels.py'))], check=True)
+    print('A2.8.46 localized inventory labels PASS; human rendering remains separate')
+
+
+if __name__ == '__main__':
+    main()

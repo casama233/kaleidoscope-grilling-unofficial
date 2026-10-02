@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:raw_slime_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.raw_slime_skewer"
       },
       "minecraft:icon": {
         "textures": {

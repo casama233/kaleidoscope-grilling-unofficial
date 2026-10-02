@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:roasted_chicken_wing.name"
+        "value": "kaleidoscope_grilling.display.item.roasted_chicken_wing"
       },
       "minecraft:icon": {
         "textures": {

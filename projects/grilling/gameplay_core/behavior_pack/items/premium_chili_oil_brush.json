@@ -9,7 +9,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:premium_chili_oil_brush.name"
+        "value": "kaleidoscope_grilling.display.item.premium_chili_oil_brush"
       },
       "minecraft:icon": {
         "textures": {

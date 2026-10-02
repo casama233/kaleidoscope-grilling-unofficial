@@ -1,27 +1,21 @@
-# A2.8.46 — bottle native first-person attachment frame
+# A2.8.46 物品系列標籤
 
-Base source: `1cf16f39f449ee5ce95190ef9088e575d133f928` (2.8.45).
+煙火物品原先只有品名，缺少國味物品已有的藍色斜體系列來源。
+本版以包內的獨立顯示翻譯鍵，為 156 個物品定義（含調料瓶狀態）
+及 18 個已命名方塊定義加入第二行標籤。
 
-## Fixed
+| 語言 | 第二行 |
+| --- | --- |
+| 繁體中文 | 森羅物語煙火 |
+| 简体中文 | 森罗物语烟火 |
+| English | Kaleidoscope Grilling |
 
-Seasoning bottles now use the same pinned Mojang arm/item socket basis as the repaired 2.8.43 skewers, instead of the Blockbench display-camera calibration. Only `bottle_fp_right` and `bottle_fp_left` change. Third-person, skewers, geometry, textures, materials and gameplay are unchanged. The advanced rack correctly remains a Java-generated sprite; unused historical rack poses are not reintroduced.
+原有純品名翻譯鍵、指南六個主分類、配方、物品識別碼及動態資訊保留。
+既有物品由相同 identifier 解析新提示，不掃描玩家背包或重寫 lore。
+顯示資料完全在煙火自己的 BP/RP 中，不依賴伺服器的翻譯插件或其他包來補標籤。
+保留已合併的 2.8.45 修復；指南資料版本同步為 0.3.15。
 
-## Evidence
-
-The fixed head-centered native projection passes all 266 bottle geometry/hand cases, checking shells and opaque contents separately. Replaying the previous bottle poses reproduces 132 misses (66 non-empty attachables in both hands; 42 unique contents geometries). This projection uses a fixed 16:9 envelope and is not a Minecraft rendering test.
-
-Actual Blockbench 5.2.1 local MCP calls created two temporary models from the canonical full seasoning bottle shell and contents geometries, loaded their original texture, and created a numeric preview pose directly from the candidate's right-hand transform, with Bedrock-to-editor axis conversion. Both models were inspected in Animate mode. These screenshots show standalone editor geometry and pose, not native hand/camera rendering or material compositing.
-
-![Bottle shell editor pose](render-audit/20261002-bottle/blockbench-shell.png)
-![Bottle contents editor pose](render-audit/20261002-bottle/blockbench-contents.png)
-
-## Checks
-
-- `test_native_bottle_fp.py`: 4 tests, 266 attachable/geometry/hand cases; old-pose failure reproduced; only two tracks changed
-- `test_held_pose_frames.py`: 4 tests, reproducible generated runtime and native projection coverage
-- Complete `verify_current.py` chain through 2.8.46 passed after fetching required historical commits; 391 relative imports checked
-- Baseline/version hashes, historical identity preservation and package export checked separately
-
-Minecraft client/FOV/VR, live installation and saved-world acceptance were not performed. Other eating-animation discrepancies remain open; this release candidate does not claim complete Java parity.
-
-The editor captures retain the provisional 2.8.44 model-tab name. Before publication the candidate was rebased onto newly merged 2.8.45 and renumbered 2.8.46; the inspected bottle geometry, texture and two pose tracks are identical. Existing 2.8.44/2.8.45 release identities and all incoming gameplay changes are preserved.
+`test_item_labels.py` 核對全物品／已命名方塊覆蓋、三語標籤格式、
+舊翻譯鍵未改及 item/block 除顯示名稱外的能力未改；前版回歸仍必須通過。
+完整家族 BDS、存檔演練及逐檔部署收據分開保存。
+真人客戶端顏色、換行、不同介面模式仍待 live 回報；部署不等於真人驗收。

@@ -3,7 +3,7 @@ import itertools,json,unittest
 from pathlib import Path
 from held_pose_frames import RP,chain,translate,zyx,bone_matrix,point
 from test_native_skewer_fp import reference_frame,visible
-OLD=json.loads((Path(__file__).parent/'fixtures/bottle-frame-before-2.8.46.json').read_text())['animations']
+OLD=json.loads((Path(__file__).parent/'fixtures/bottle-frame-before-2.8.47.json').read_text())['animations']
 CURRENT=json.loads((RP/'animations/a286_held.animation.json').read_text())['animations']
 
 def projected(geometry,pose,hand):

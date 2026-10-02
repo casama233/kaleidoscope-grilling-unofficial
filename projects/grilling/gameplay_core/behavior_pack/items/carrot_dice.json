@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:carrot_dice.name"
+        "value": "kaleidoscope_grilling.display.item.carrot_dice"
       },
       "minecraft:icon": {
         "textures": {

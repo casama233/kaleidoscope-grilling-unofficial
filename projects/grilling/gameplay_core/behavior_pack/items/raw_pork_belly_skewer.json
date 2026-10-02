@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:raw_pork_belly_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.raw_pork_belly_skewer"
       },
       "minecraft:icon": {
         "textures": {

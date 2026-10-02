@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:canola_seeds.name"
+        "value": "kaleidoscope_grilling.display.item.canola_seeds"
       },
       "minecraft:icon": {
         "textures": {

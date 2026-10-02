@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:chicken_skin.name"
+        "value": "kaleidoscope_grilling.display.item.chicken_skin"
       },
       "minecraft:icon": {
         "textures": {

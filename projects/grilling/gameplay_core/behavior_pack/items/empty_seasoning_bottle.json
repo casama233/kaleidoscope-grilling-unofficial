@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:empty_seasoning_bottle.name"
+        "value": "kaleidoscope_grilling.display.item.empty_seasoning_bottle"
       },
       "minecraft:icon": {
         "textures": {

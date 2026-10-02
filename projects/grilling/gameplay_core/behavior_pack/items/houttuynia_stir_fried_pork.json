@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:houttuynia_stir_fried_pork.name"
+        "value": "kaleidoscope_grilling.display.item.houttuynia_stir_fried_pork"
       },
       "minecraft:icon": {
         "textures": {
