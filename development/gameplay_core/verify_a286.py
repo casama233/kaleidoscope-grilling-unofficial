@@ -72,7 +72,7 @@ def render_assets():
   paths=row['textures'];paths=[paths] if isinstance(paths,str) else paths
   for path in paths:
    im=Image.open(RP/(path+'.png'));assert im.width==im.height,(key,im.size)
- expected_count=106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
+ expected_count=107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
  assert len(list((RP/'attachables').glob('*.json')))==expected_count
  assert not (RP/'attachables/big_vat.attachable.json').exists()
  for name in ('grill','oil_press'):

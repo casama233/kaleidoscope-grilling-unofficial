@@ -51,6 +51,9 @@ class HeldPoseFrameTests(unittest.TestCase):
                             for corner in itertools.product((0,1),repeat=3):
                                 v=[origin[i]+corner[i]*size[i]for i in range(3)];v[0]*=-1
                                 positions.append(point(cm,v))
+                    if ref.startswith('geometry.kg_secret_held.part_') and ref.endswith('_0'):
+                        self.assertFalse(positions,ref) # Slot zero deliberately hides an unsupported ingredient.
+                        continue
                     self.assertTrue(positions,ref)
                     self.assertTrue(all(math.isfinite(v)for pnt in positions for v in pnt),ref)
                     visible=[v for v in positions if v[2]<-.1 and abs(v[0]/v[2])<1.3 and abs(v[1]/v[2])<.75]

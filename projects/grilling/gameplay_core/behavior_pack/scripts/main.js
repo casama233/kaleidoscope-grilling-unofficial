@@ -2,7 +2,10 @@ import './hot_lore_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
 import {readEffects,writeEffects,clearEffects} from './effect_state_runtime.js';
-import {planDragonDamage,dragonHealthGain} from './dragon_health_core.js';
+import {nativeDragonHealth,forgetDragonHealth} from './dragon_native_health.js';
+import {finishedFoodMeta} from './food_finish_core.js';
+import {eatingProfile,EAT_PROFILE_PROPERTY,EAT_HAND_PROPERTY} from './player_presentation_core.js';
+import {configureSecretHeldReader,syncSecretHeld} from './secret_held_runtime.js';
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
 import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
@@ -105,9 +108,8 @@ const DANGEROUS_FOODS=new Set(['minecraft:rotten_flesh','minecraft:chicken','min
 const BITE_TIMES=Object.freeze({
  ONE:[1.16667,3.08333],TWO:[0.95833,4.0],THREE:[0.95833,2.33333,3.54167],THREE_ALT:[0.95833,2.16667,3.5],FOUR:[0.95833,2.33333,3.45833,4.08333]
 });
-const NUMB_VISUAL=new Set(),DRAGON_REPLAY=new Set(),DRAGON_PENDING=new Map();
+const NUMB_VISUAL=new Set();
 const STORAGE_SORT_BLOCKS=new Set(['minecraft:chest','minecraft:trapped_chest','minecraft:barrel']);
-const DRAGON_POOL_KEY='kaleidoscope_grilling:dragon_pool';
 const OIL_TYPES=Object.freeze({canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}});
 function writeTickState(block,before,next){
  const state=normalizeState(next),beforeState=normalizeState(before);
@@ -699,15 +701,10 @@ function applyFixedEffect(player,id){
  if(e.effect.startsWith('kaleidoscope_cookery:'))fxSet(player,e.effect.split(':')[1],ticks);
 }
 function counts(list){const out={};for(const id of list){const kind=SEASONING_KINDS[id];if(kind)out[kind]=(out[kind]??0)+1}return out}
-function dragonPool(entity){try{return Math.max(0,Math.min(2,Number(entity.getDynamicProperty(DRAGON_POOL_KEY)??0)))}catch{return 0}}
-function setDragonPool(entity,value){try{entity.setDynamicProperty(DRAGON_POOL_KEY,value===undefined?undefined:Math.max(0,Math.min(2,Number(value)||0)))}catch{}}
 function applyDragonBlood(player,ticks,amp){
  const old=fxGet(player,'dragon_blood');amp=Math.max(amp,old?.amp??0);
  fxSet(player,'dragon_blood',Math.max(ticks,old?old.until-now():0),amp);
- if(!old)setDragonPool(player,2);
- try{player.addEffect('health_boost',Math.max(25,ticks),{amplifier:amp>0?1:0,showParticles:false})}catch{}
- const gain=dragonHealthGain(old?.amp,amp);
- if(gain>0)system.run(()=>{try{const hp=player.getComponent('minecraft:health');if(hp)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+gain))}catch{}});
+ nativeDragonHealth(player,amp,{heal:true});
 }
 
 function applySeasoning(player,list){
@@ -742,7 +739,7 @@ function afterCommitted(player,id,meta,active,fullNative){
 }
 function stackMeta(stack){return {hot:isHot(stack),seasonings:readSeasonings(stack),hotUntil:hotUntil(stack)}}
 function hungerSettle(player,id,active){
- active={...active,meta:{...active.meta,hot:active.meta.hot&&active.meta.hotUntil>now()}};
+ active={...active,meta:finishedFoodMeta(active.meta,now())};
  const current=heldByHand(player,active.hand);
  if(!current||current.typeId!==id||!eatingStillCurrent(active.use,current,player.selectedSlotIndex,now()))return false;
  const d=id===SECRET_ID?dynamicFood(current):FOOD_DATA[id],h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');
@@ -766,7 +763,7 @@ function hungerSettle(player,id,active){
  if(id===SECRET_ID)secretRemainders(player,consumed);
  afterCommitted(player,id,active.meta,active,false);return true;
 }
-function resolvedProfile(profile){return profile==='THREE_RANDOM'?(Math.random()<.5?'THREE':'THREE_ALT'):profile}
+function resolvedProfile(profile){return eatingProfile(profile).profile}
 function profileDuration(profile){return profile==='THREE'?100:90}
 function writeUseHand(player,use,stack){
  if(use.hand==='off'){
@@ -827,26 +824,28 @@ world.afterEvents.itemStartUse.subscribe(e=>{
    return;
   }
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
+  try{syncSecretHeld(e.source)}catch(error){console.warn('[Grilling held ingredients] '+error)}
   const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM',hand=captureInteractionIntent(e.source,e.itemStack).hand,profile=resolvedProfile(requested),meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
  const a={id,start:system.currentTick,nativeDuration:Math.max(0,Number(e.useDuration)||0),requested,profile,hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,biteTimes:BITE_TIMES[profile]??BITE_TIMES.THREE,nextBite:0,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined};
  stopSoundHandle(ACTIVE_EATS.get(e.source.id)?.audio);ACTIVE_EATS.set(e.source.id,a);
+ try{e.source.setProperty(EAT_PROFILE_PROPERTY,eatingProfile(profile).code);e.source.setProperty(EAT_HAND_PROPERTY,hand==='off'?2:1)}catch(error){console.warn('[Grilling eating profile] '+error)}
  // A284: minecraft:use_animation owns the eating pose in both views. The legacy
  // Java camera-space arm/item offsets detach third-person limbs and double-transform attachables.
  try{a.audio=e.source.playSound('kg_imm.'+soundFor(profile))}catch{}
 });
 world.afterEvents.itemCompleteUse.subscribe(e=>{
- const id=e.itemStack?.typeId;if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});DRAGON_PENDING.delete(e.source.id);DRAGON_REPLAY.delete(e.source.id);return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
+ const id=e.itemStack?.typeId;if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
  if(id===PLATE_ID){completePlateUse(e.source,e.itemStack);return}
   dangerousPreservation(e.source,id);
   if(CUISINE_FOOD_SET.has(id)){
    const a=CUISINE_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};
-   CUISINE_EATS.delete(e.source.id);afterCommitted(e.source,id,a.meta,a,true);return;
+   CUISINE_EATS.delete(e.source.id);a.meta=finishedFoodMeta(a.meta,now());afterCommitted(e.source,id,a.meta,a,true);return;
   }
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
  const a=ACTIVE_EATS.get(e.source.id);
  if(!a||a.id!==id||!eatingEventMatches(a.use,e.itemStack,now())||system.currentTick-a.start<a.nativeDuration)return;
- a.meta={...a.meta,hot:a.meta.hot&&a.meta.hotUntil>now()};
- stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);
+ a.meta=finishedFoodMeta(a.meta,now());
+ stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0)}catch{}
  if(id===SECRET_ID){addSecretNutrition(e.source,e.itemStack,{hot:false})}
  if(RAW_NAUSEA[id])try{e.source.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{e.source.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{e.source.addEffect('blindness',200,{showParticles:true})}catch{}
  if(id===SECRET_ID)secretRemainders(e.source,e.itemStack);
@@ -863,7 +862,7 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  if(a.start===system.currentTick&&SETTLED.get(id)===system.currentTick)return;
  const used=system.currentTick-a.start;stopEatSound(e.source,a.profile);
  // Let native completion win either event order; never delete a newer session.
- system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);if(e.itemStack&&used>=25&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
+ system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(e.itemStack&&used>=25&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
@@ -872,23 +871,9 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  const target=e.hurtEntity,cause=e.damageSource?.cause;
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;system.run(()=>{try{target.dimension.playSound('random.shield_block',target.location)}catch{}});return}
  if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
- const replay=DRAGON_REPLAY.delete(target.id);
- if(!replay){
-  const db=fxGet(target,'dragon_blood'),pool=dragonPool(target),plan=planDragonDamage(pool,e.damage,DRAGON_PENDING.get(target.id)??0);
-  if(db&&plan.absorbed>0){
-   // beforeEvents is read-only. Reserve in memory now; persist in a mutable tick.
-   DRAGON_PENDING.set(target.id,plan.pending);e.cancel=true;
-   const source=e.damageSource;
-   system.run(()=>{
-    setDragonPool(target,dragonPool(target)-plan.absorbed);
-    const left=Math.max(0,(DRAGON_PENDING.get(target.id)??0)-plan.absorbed);if(left)DRAGON_PENDING.set(target.id,left);else DRAGON_PENDING.delete(target.id);
-    if(plan.remaining>0)try{DRAGON_REPLAY.add(target.id);const opt={cause:source?.cause??'entityAttack'};if(source?.damagingEntity)opt.damagingEntity=source.damagingEntity;target.applyDamage(plan.remaining,opt)}catch{DRAGON_REPLAY.delete(target.id)}
-   });return;
-  }
- }
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
-world.afterEvents.playerSpawn.subscribe(e=>{if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);DRAGON_PENDING.delete(e.player.id);DRAGON_REPLAY.delete(e.player.id)}});
+world.afterEvents.playerSpawn.subscribe(e=>{if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
 function canUseSecretSkewer(stack){
  try{const valid=rows=>rows.length===3&&rows.every(row=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)&&(!row.native||(row.native.version===1&&row.native.id===row.id)));return valid(readSkewerRows(stack))&&(!isSecretCooked(stack)||valid(readEffectiveSkewerRows(stack)))}catch{return false}
@@ -977,7 +962,7 @@ system.runInterval(()=>{
   if(system.currentTick%5===0){if(fxGet(p,'mustard'))fleeCreepers(p);if(fxGet(p,'sulfur'))repelPhantoms(p)}
   if(fxGet(p,'tundra_strider')){try{const b=p.getBlockStandingOn();if(b&&TUNDRA_BLOCKS.has(b.typeId)){const v=p.getVelocity(),factor=tundraFactor(b.typeId);p.applyImpulse({x:v.x*(factor-1),y:0,z:v.z*(factor-1)});if(b.typeId==='minecraft:powder_snow'&&v.y<.02)p.applyImpulse({x:0,y:Math.min(.16,Math.max(.04,-v.y+.04)),z:0})}}catch{}}
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}
-  if(system.currentTick%20===0){const db=fxGet(p,'dragon_blood');if(db){try{p.addEffect('health_boost',25,{amplifier:db.amp>0?1:0,showParticles:false})}catch{};if(dragonPool(p)<=0&&p.getDynamicProperty(DRAGON_POOL_KEY)===undefined)setDragonPool(p,2)}else setDragonPool(p,undefined)}
+  const db=fxGet(p,'dragon_blood');nativeDragonHealth(p,db?.amp);
   const numb=fxGet(p,'numb');if(numb&&!ACTIVE_EATS.has(p.id)){if(system.currentTick%12===0)try{p.playAnimation('animation.kg_a22.player.numb',{blendOutTime:.08})}catch{};NUMB_VISUAL.add(p.id)}else if(!numb&&NUMB_VISUAL.delete(p.id)){try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}
 
  }catch{}}
@@ -985,7 +970,8 @@ system.runInterval(()=>{
 
 world.afterEvents.playerLeave.subscribe(({playerId})=>{
  for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,SETTLED,VIGOR_LAST,SNEAK_LAST,THREAD_LAST])cache.delete(playerId);
- NUMB_VISUAL.delete(playerId);DRAGON_REPLAY.delete(playerId);DRAGON_PENDING.delete(playerId);
+ NUMB_VISUAL.delete(playerId);forgetDragonHealth(playerId);
 });
 
 configureSecretVisuals(readEffectiveSkewerRows,restoreIngredient);
+configureSecretHeldReader(readEffectiveSkewerRows);

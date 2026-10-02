@@ -1,4 +1,5 @@
 import {world,system} from '@minecraft/server';
+import {nativeDragonHealth} from './dragon_native_health.js';
 import {FX_KEY,activeEffects,effectPayload,milkEffects} from './effect_lifecycle_core.js';
 const snapshots=new WeakMap(),identities=new Map();let identityTick=-1;
 const copyEffects=fx=>Object.fromEntries(Object.entries(fx).map(([k,v])=>[k,{...v}]));
@@ -21,6 +22,7 @@ export function writeEffects(entity,value){
  save(entity,{tick:system.currentTick,raw,effects});return copyEffects(effects);
 }
 export function clearEffects(entity,{milk=false}={}){
+ if(readEffects(entity).dragon_blood)nativeDragonHealth(entity,undefined);
  writeEffects(entity,milk?milkEffects(readEffects(entity),effectTime()):{});
  entity.setDynamicProperty('kaleidoscope_grilling:dragon_pool',undefined);
  discard(entity);

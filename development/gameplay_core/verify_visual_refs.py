@@ -14,12 +14,14 @@ KNOWN_VANILLA_TERRAIN_KEYS = {"still_water_grey", "still_lava"}
 def load(path: Path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
+DEPENDENCY_TEXTURES={row['texture'] for row in load(ROOT/'development/gameplay_core/fixtures/secret-visual-catalog.json')['items'] if not row['source'].startswith('canonical')}
+
 def asset_exists(raw: str) -> bool:
     value = str(raw or "").replace("\\", "/")
     if not value or value.startswith("http"):
         return False
     base = RP / value
-    if base.is_file():
+    if base.is_file() or value in DEPENDENCY_TEXTURES:
         return True
     return any((RP / f"{value}{ext}").is_file() for ext in (".png", ".tga", ".jpg", ".jpeg"))
 

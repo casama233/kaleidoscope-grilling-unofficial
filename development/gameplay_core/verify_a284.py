@@ -36,10 +36,13 @@ def eating_gate():
     skewers = 0
     for file in (RP / 'attachables').glob('*_skewer.attachable.json'):
         d = json.loads(file.read_text())['minecraft:attachable']['description']
-        assert 'controller.render.kg_a22.bite' in d['render_controllers'], file
+        if d['identifier'] == 'kaleidoscope_grilling:secret_skewer':
+            assert d['render_controllers'] == ['controller.render.kg_secret_held.stick'] + [f'controller.render.kg_secret_held.{i}' for i in range(3)], file
+        else:
+            assert 'controller.render.kg_a22.bite' in d['render_controllers'], file
         assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file
         skewers += 1
-    assert skewers == 39, skewers
+    assert skewers == (40 if (RP / 'attachables/secret_skewer.attachable.json').exists() else 39), skewers
     print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no scripted eating bone override')
 
 
