@@ -18,7 +18,7 @@ def prepare(output,all_held=False):
             index[ident]=g
             entries.append({'path':str(path),'relative':path.relative_to(ROOT).as_posix(),'index':i,'identifier':ident,'sha256':hashlib.sha256(raw).hexdigest()})
     animations={k:v for path in (RP/'animations').glob('*.json') for k,v in json.loads(path.read_text()).get('animations',{}).items()}
-    paths=sorted((RP/'attachables').glob('*.json')) if all_held else [RP/'attachables'/(name+'.attachable.json')for name in ['raw_beef_skewer','empty_seasoning_bottle','special_seasoning','advanced_rack']]
+    paths=sorted((RP/'attachables').glob('*.json')) if all_held else [RP/'attachables'/(name+'.attachable.json')for name in ['raw_beef_skewer','empty_seasoning_bottle','special_seasoning','grilled_beef_skewer']]
     held=[]
     for path in paths:
         a=json.loads(path.read_text())['minecraft:attachable']['description']

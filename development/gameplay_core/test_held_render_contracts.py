@@ -15,10 +15,10 @@ class HeldRenderContracts(unittest.TestCase):
   loader=audit.load_json
   def modified(path):
    doc=loader(path)
-   if path.name=='advanced_rack.attachable.json' and change:change(doc['minecraft:attachable']['description'])
+   if path.name=='raw_beef_skewer.attachable.json' and change:change(doc['minecraft:attachable']['description'])
    return doc
   geometry=copy.deepcopy(self.geometries)
-  if geometry_change:geometry_change(geometry['geometry.kg_a286.kg_a2763.advanced_rack_hand']['geo'])
+  if geometry_change:geometry_change(geometry[next(iter(loader(audit.RP/'attachables/raw_beef_skewer.attachable.json')['minecraft:attachable']['description']['geometry'].values()))]['geo'])
   findings=[]
   with patch.object(audit,'load_json',modified):audit.check_current_display_contracts(findings,geometry,self.animations)
   return {row['code'] for row in findings}

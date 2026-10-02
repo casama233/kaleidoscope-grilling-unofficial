@@ -61,7 +61,8 @@ def binding_assets():
    assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
    assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
- assert len(rows)==107 and cases==1284,(len(rows),cases)
+ expected_count=106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
+ assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)
  # Regression reproduction: old dispatch can select zero poses for a normalized bone name.
  old=repair.source(RP/'attachables/empty_seasoning_bottle.attachable.json')['minecraft:attachable']['description']
  assert not any(expression(expr,0,'main_hand','rightitem') for row in old['scripts']['animate'] for expr in row.values())

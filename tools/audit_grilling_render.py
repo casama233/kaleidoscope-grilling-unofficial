@@ -425,14 +425,11 @@ def check_attachables(findings, geometry_index, animations, controllers, known_i
                 add(findings, "error", "missing_attachable_texture", ident,
                     f"texture alias {tex_name} points to missing {tex}.png", str(path.relative_to(ROOT)))
 
-    # Known Java-display parity gaps that can be proven from committed reference data.
-    rack_report = JAVA_DISPLAY / "advanced_rack_0.json"
-    if rack_report.is_file():
-        report = load_json(rack_report)
-        if report.get("java_display") and "kaleidoscope_grilling:advanced_rack" not in attachable_ids:
-            add(findings, "high", "java_display_not_applied", "kaleidoscope_grilling:advanced_rack",
-                "Java Advanced Rack has explicit first/third-person transforms but the canonical RP has no held attachable",
-                str(rack_report.relative_to(ROOT)))
+    # Java advanced_rack is item/generated. The placed block's display fields
+    # must never be used to justify a custom held override.
+    if "kaleidoscope_grilling:advanced_rack" in attachable_ids:
+        add(findings, "error", "rack_wrong_world_model_override", "kaleidoscope_grilling:advanced_rack",
+            "Java rack item is generated sprite; remove the placed-block held override")
 
     for ident in sorted(attachable_ids):
         short = ident.split(":", 1)[-1]
@@ -527,7 +524,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
                     add(findings, "error", "held_animation_missing_bone", ref,
                         f"{anim_id} targets absent bones: {sorted(missing)}")
             if family == "skewer": skewer_refs.add(ref)
-    if counts != {"skewer":39,"bottle":67,"rack":1} or len(skewer_refs) != 150:
+    if counts != {"skewer":39,"bottle":67} or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 
 
