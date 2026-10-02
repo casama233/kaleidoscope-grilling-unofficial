@@ -9,7 +9,7 @@ def main():
  spec=json.loads((ROOT/'projects/grilling/gameplay_core/behavior_pack/host-extensions/board-api.json').read_text())
  current=json.loads((ROOT/'baseline.json').read_text())['version']
  if tuple(current)>=(2,8,37):
-  assert spec['version']==([0,2,1] if tuple(current)>=(2,8,38) else [0,2,0]) and len(spec['original_files'])==8 and len(spec['copies'])==8
+  assert spec['version']==([0,2,2] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,40) else [0,2,1] if tuple(current)>=(2,8,38) else [0,2,0]) and len(spec['original_files'])==8 and len(spec['copies'])==8
  else:
   assert spec['version']==[0,1,0] and len(spec['original_files'])==2 and len(spec['copies'])==2
  assert all('/manifest.json' not in p for p in spec['patched_files'])
