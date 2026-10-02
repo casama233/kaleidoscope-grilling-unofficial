@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "kaleidoscope_grilling:board-api-0.1.0",
+  "version": [
+    0,
+    1,
+    0
+  ],
+  "host_uuid": "d322809c-a51e-4742-bfc4-16d3c1491c9d",
+  "archive_sha256": "9e5b617cc4c7a08ecd429fb9e42ec10e8d40a1ed5fc1f6f6687c3aff8a45a5d5",
+  "original_files": {
+    "scripts/api/extensionRegistry.js": "9fd1c604a69825e684d8d0b0e68f584fba947073d70b3e22084f451c94351646",
+    "scripts/custom_components/blocks/directStation.js": "be855cfe437b036f8a6b706f58607385f4b1ca6e53cfdad5a2c3a28bbc5cff06"
+  },
+  "patched_files": {
+    "scripts/api/extensionRegistry.js": "d15c0758c3f2a0aed01d5831957c90019c1b83aaa9ed9cc4e9b1e8e1e1a09784",
+    "scripts/custom_components/blocks/directStation.js": "76df86b545f8b30b754591437063cf371dd6aa0a85329921d67ee04e29e49ba2"
+  },
+  "imports": {
+    "scripts/api/extensionRegistry.js": "import {BOARD_CAPABILITIES,registerBoardV2Recipe} from \"./board_api_runtime.js\";\n",
+    "scripts/custom_components/blocks/directStation.js": "import {handleBoardV2,recoverBoardV2} from \"../../api/board_api_runtime.js\";\n"
+  },
+  "insertions": [
+    {
+      "path": "scripts/api/extensionRegistry.js",
+      "anchor": "export const KC_EXTENSION_CAPABILITIES = Object.freeze([",
+      "position": "after",
+      "text": "\n ...BOARD_CAPABILITIES,"
+    },
+    {
+      "path": "scripts/api/extensionRegistry.js",
+      "anchor": " const kind=String(payload.kind??\"\");",
+      "position": "after",
+      "text": "\n if(kind===\"chopping_board_v2\")return registerBoardV2Recipe(payload);"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "function boardInteract(b,p){",
+      "position": "before",
+      "text": "function boardApiHost(){return {held,slot,load,save,raw:b=>world.getDynamicProperty(k(b)),builtin:BOARD_RECIPES,isKnife:isKitchenKnife,particles:emitBoardCutParticles,notice:msg,sound:(p,kind)=>playSoundAccessible(p,kind==='break'?'random.break':'dig.wood',{pitch:kind==='place'?1.2:kind==='release'?2+Math.random()*.2:1.8+Math.random()*.3})};}\n"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "function boardInteract(b,p){",
+      "position": "after",
+      "text": "if(handleBoardV2(b,p,boardApiHost()))return true;"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "function spillDirectStationContents(id,b,d){",
+      "position": "after",
+      "text": "\n if(recoverBoardV2(id,b,d,boardApiHost())){clearBoardExtension(b);clearDisplays(b);return;}"
+    }
+  ],
+  "copies": {
+    "scripts/host_api/board_api_core.js": "scripts/api/board_api_core.js",
+    "scripts/host_api/board_api_runtime.js": "scripts/api/board_api_runtime.js"
+  },
+  "expires": "2026-11-02",
+  "removal_condition": "Remove when the pinned author release implements tested built-in recipe selection and additive outputs with durable delivery; never apply to an unreviewed archive.",
+  "feedback": "docs/COOKERY-BOARD-API-PROPOSAL.md",
+  "authorization": "User explicitly requested author chopping-board API extension and live deployment on 2026-10-02."
+}

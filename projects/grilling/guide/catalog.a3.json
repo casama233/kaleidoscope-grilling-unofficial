@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.7",
+  "version": "0.3.8",
   "revision": "grill_visual_20261002",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -246,16 +246,13 @@
       },
       "body": {
         "zh_CN": [
-          "当前生存取得受阻：公开厨房 1.0.8 尚未提供可安全取得此材料的路径。请先选鱼串或土豆串。",
-          "Java 原版做法（本版尚未接通）：加工：用厨房刀在砧板切 4 次，得到 2 份牛肉块。"
+          "把生牛肉放到厨房砧板，用厨房刀切 4 次，再使用一次释放 2 份牛肉块。需搭配家族砧板 API 0.1.0；未安装扩充的厨房 1.0.8 仍产出牛杂。"
         ],
         "zh_TW": [
-          "目前生存取得受阻：公開廚房 1.0.8 尚未提供可安全取得此材料的路徑。請先選魚串或土豆串。",
-          "Java 原版做法（本版尚未接通）：加工：用廚房刀在砧板切 4 次，得到 2 份牛肉塊。"
+          "把生牛肉放到廚房砧板，用廚房刀切 4 次，再使用一次釋出 2 份牛肉塊。需搭配家族砧板 API 0.1.0；未安裝擴充的廚房 1.0.8 仍產出牛雜。"
         ],
         "en_US": [
-          "Survival acquisition is currently blocked with public Cookery 1.0.8. Start with a Fish or Potato Skewer instead.",
-          "Java reference only (unavailable here): Processing: four Kitchen Knife cuts on a Chopping Board yield two Beef Chunks."
+          "Place raw Beef on the Cookery Chopping Board, cut four times with a Kitchen Knife, then use once more to release two Beef Chunks. Requires family Board API 0.1.0; plain Cookery 1.0.8 still yields Cow Offal."
         ]
       },
       "kinds": [
@@ -274,9 +271,10 @@
       ],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/beef_chunks.json",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a279_beef_board_core.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a279_beef_board_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/host-extensions/board-api.json"
       ],
-      "acquisition": "unverified",
+      "acquisition": "implemented_with_host_extension",
       "icon": "textures/ui/kg_grilling/catalog/beef_chunks",
       "stack": 64
     },
@@ -526,16 +524,13 @@
       },
       "body": {
         "zh_CN": [
-          "当前生存取得受阻：公开厨房 1.0.8 尚未提供可安全取得此材料的路径。请先选鱼串或土豆串。",
-          "Java 原版做法（本版尚未接通）：在 Cookery 砧板用厨房刀完成生鸡肉的 4 次切割时，会额外掉落鸡皮。"
+          "把生鸡肉放到厨房砧板，用厨房刀切 4 次，再使用一次释放原有 2 份碎肉，并额外掉落 1～3 片鸡皮。需家族砧板 API 0.1.0；杀鸡不会给鸡皮。"
         ],
         "zh_TW": [
-          "目前生存取得受阻：公開廚房 1.0.8 尚未提供可安全取得此材料的路徑。請先選魚串或土豆串。",
-          "Java 原版做法（本版尚未接通）：在 Cookery 砧板用廚房刀完成生雞肉的 4 次切割時，會額外掉落雞皮。"
+          "把生雞肉放到廚房砧板，用廚房刀切 4 次，再使用一次釋出原有 2 份碎肉，並額外掉落 1～3 片雞皮。需家族砧板 API 0.1.0；殺雞不會給雞皮。"
         ],
         "en_US": [
-          "Survival acquisition is currently blocked with public Cookery 1.0.8. Start with a Fish or Potato Skewer instead.",
-          "Java reference only (unavailable here): Finish the 4-cut raw-chicken process on a Cookery Chopping Board with a kitchen knife to receive extra Chicken Skin."
+          "Place raw Chicken on the Cookery Chopping Board, cut four times with a Kitchen Knife, then use once more to release its original two Small Meat Cuts plus 1–3 Chicken Skin. Requires family Board API 0.1.0. Killing chickens does not yield skin."
         ]
       },
       "kinds": [
@@ -545,9 +540,10 @@
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/chicken_skin.json",
         "projects/grilling/guide/content.a2.json#guide_chicken_processing",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a2710_chicken_acquisition_runtime.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2710_chicken_acquisition_runtime.js",
+        "projects/grilling/gameplay_core/behavior_pack/host-extensions/board-api.json"
       ],
-      "acquisition": "unverified",
+      "acquisition": "implemented_with_host_extension",
       "icon": "textures/ui/kg_grilling/catalog/chicken_skin",
       "stack": 64
     },
@@ -3138,7 +3134,7 @@
       },
       "body": {
         "zh_TW": [
-          "第一串建議選魚串：釣得或取得 1 條生鱈魚或生鮭魚即可；牛肉塊與雞皮目前無法完整生存取得。",
+          "第一串建議選魚串：取得 1 條生鱈魚或生鮭魚即可。牛肉塊與雞皮也可依各自條目，用廚房砧板加工取得。",
           "先備妥燒烤架、打火石、裝油的油壺及完成的特製調料。油與調料取得請看「油壺」及「調料瓶」條目。",
           "用 1 根木棍合成空的未完成烤串，裝進副手；主手拿生魚，對方塊按使用鍵穿成生魚串。Windows 按使用鍵；觸控使用對方塊的互動操作。",
           "打火石點火 → 放入 1–3 根生串 → 裝油的油壺刷油；刷油按爐上根數消耗油量。",
@@ -3148,7 +3144,7 @@
           "需要自動穿串時，用 4 張紙排成 2×2 合成空白串譜，再到「串配方書」頁看錄製與製作。"
         ],
         "zh_CN": [
-          "第一串建议选鱼串：钓得或取得 1 条生鳕鱼或生鲑鱼即可；牛肉块与鸡皮目前无法完整生存取得。",
+          "第一串建议选鱼串：取得 1 条生鳕鱼或生鲑鱼即可。牛肉块与鸡皮也可依各自条目，用厨房砧板加工取得。",
           "先备妥烧烤架、打火石、装油的油壶及完成的特制调料。油与调料取得请看“油壶”及“调料瓶”条目。",
           "用 1 根木棍合成空的未完成烤串，装进副手；主手拿生鱼，对方块按使用键穿成生鱼串。Windows 按使用键；触控使用对方块的互动操作。",
           "打火石点火 → 放入 1–3 根生串 → 装油的油壶刷油；刷油按炉上根数消耗油量。",
@@ -3158,7 +3154,7 @@
           "需要自动穿串时，用 4 张纸排成 2×2 合成空白串谱，再到“串配方书”页看录制与制作。"
         ],
         "en_US": [
-          "Start with a Fish Skewer: obtain one raw Cod or Salmon. Beef Chunks and Chicken Skin do not yet have complete survival acquisition paths.",
+          "Start with a Fish Skewer: obtain one raw Cod or Salmon. Beef Chunks and Chicken Skin can also be obtained on the Cookery Chopping Board as described in their entries.",
           "Prepare a Grill, Flint and Steel, a filled Oil Pot and finished Special Seasoning first. See the Oil Pot and Seasoning Bottle entries for their prerequisites.",
           "Craft one stick into an empty Unfinished Skewer and equip it offhand. Hold the raw fish in the main hand and use it on a block. On Windows use the use key; on touch controls interact with the block.",
           "Light the grill → insert 1–3 raw skewers → brush with a filled Oil Pot. Oil costs one point per skewer.",
@@ -3240,7 +3236,7 @@
       },
       "body": {
         "zh_CN": [
-          "当前生存取得受阻：公开厨房 1.0.8 尚未提供可安全取得此材料的路径。请先选鱼串或土豆串。",
+          "把生牛肉放到厨房砧板，用厨房刀切 4 次，再使用一次释放 2 份牛肉块。需搭配家族砧板 API 0.1.0；未安装扩充的厨房 1.0.8 仍产出牛杂。",
           "营养：主面板为熟串。生串饱食 2 / 饱和度 1.2；熟串饱食 5 / 饱和度 6。",
           "材料顺序：牛肉块 → 红辣椒 → 牛肉块",
           "先用 1 根木棍合成空串，放进副手；主手拿食材，对方块使用，按材料顺序逐份穿入。 最短流程：打火石点火 → 放入 1–3 根生串 → 用装油的 Cookery 油壶刷油。",
@@ -3250,7 +3246,7 @@
           "没有烤熟的未完成串、固定生串和秘制生串都可潜行拆解，取回材料与木棍。"
         ],
         "zh_TW": [
-          "目前生存取得受阻：公開廚房 1.0.8 尚未提供可安全取得此材料的路徑。請先選魚串或土豆串。",
+          "把生牛肉放到廚房砧板，用廚房刀切 4 次，再使用一次釋出 2 份牛肉塊。需搭配家族砧板 API 0.1.0；未安裝擴充的廚房 1.0.8 仍產出牛雜。",
           "營養：主面板為熟串。生串飽食 2 / 飽和度 1.2；熟串飽食 5 / 飽和度 6。",
           "材料順序：牛肉塊 → 紅辣椒 → 牛肉塊",
           "先用 1 根木棍合成空串，放進副手；主手拿食材，對方塊使用，按材料順序逐份穿入。 最短流程：打火石點火 → 放入 1–3 根生串 → 用裝油的 Cookery 油壺刷油。",
@@ -3260,7 +3256,7 @@
           "沒有烤熟的未完成串、固定生串和秘製生串都可潛行拆解，取回材料與木棍。"
         ],
         "en_US": [
-          "Survival acquisition is currently blocked with public Cookery 1.0.8. Start with a Fish or Potato Skewer instead.",
+          "Place raw Beef on the Cookery Chopping Board, cut four times with a Kitchen Knife, then use once more to release two Beef Chunks. Requires family Board API 0.1.0; plain Cookery 1.0.8 still yields Cow Offal.",
           "Nutrition panel: cooked skewer. Raw: hunger 2, saturation 1.2; cooked: hunger 5, saturation 6.",
           "Ingredient order: Beef Chunks → Red Chili → Beef Chunks",
           "Craft an empty Unfinished Skewer from one stick and equip it offhand. Hold a skewerable ingredient in the main hand and use it on a block to add one ingredient. Shortest flow: light with Flint and Steel → insert 1–3 raw skewers → brush with a filled Cookery Oil Pot.",
@@ -3304,9 +3300,10 @@
         "projects/grilling/gameplay_core/behavior_pack/items/grilled_beef_skewer.json",
         "projects/grilling/guide/content.a2.json#guide_quick_start",
         "projects/grilling/guide/content.a2.json#guide_hot_food",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/core_logic.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/core_logic.js",
+        "projects/grilling/gameplay_core/behavior_pack/host-extensions/board-api.json"
       ],
-      "acquisition": "verified",
+      "acquisition": "implemented_with_host_extension",
       "icon": "textures/ui/kg_grilling/catalog/grilled_beef_skewer",
       "related_ids": [
         "kaleidoscope_grilling:raw_beef_skewer",
@@ -3451,7 +3448,7 @@
       },
       "body": {
         "zh_CN": [
-          "当前生存取得受阻：公开厨房 1.0.8 尚未提供可安全取得此材料的路径。请先选鱼串或土豆串。",
+          "把生鸡肉放到厨房砧板，用厨房刀切 4 次，再使用一次释放原有 2 份碎肉，并额外掉落 1～3 片鸡皮。需家族砧板 API 0.1.0；杀鸡不会给鸡皮。",
           "营养：主面板为熟串。生串饱食 2 / 饱和度 1；熟串饱食 4 / 饱和度 4。",
           "材料顺序：鸡皮 → 鸡皮",
           "先用 1 根木棍合成空串，放进副手；主手拿食材，对方块使用，按材料顺序逐份穿入。 最短流程：打火石点火 → 放入 1–3 根生串 → 用装油的 Cookery 油壶刷油。",
@@ -3461,7 +3458,7 @@
           "没有烤熟的未完成串、固定生串和秘制生串都可潜行拆解，取回材料与木棍。"
         ],
         "zh_TW": [
-          "目前生存取得受阻：公開廚房 1.0.8 尚未提供可安全取得此材料的路徑。請先選魚串或土豆串。",
+          "把生雞肉放到廚房砧板，用廚房刀切 4 次，再使用一次釋出原有 2 份碎肉，並額外掉落 1～3 片雞皮。需家族砧板 API 0.1.0；殺雞不會給雞皮。",
           "營養：主面板為熟串。生串飽食 2 / 飽和度 1；熟串飽食 4 / 飽和度 4。",
           "材料順序：雞皮 → 雞皮",
           "先用 1 根木棍合成空串，放進副手；主手拿食材，對方塊使用，按材料順序逐份穿入。 最短流程：打火石點火 → 放入 1–3 根生串 → 用裝油的 Cookery 油壺刷油。",
@@ -3471,7 +3468,7 @@
           "沒有烤熟的未完成串、固定生串和秘製生串都可潛行拆解，取回材料與木棍。"
         ],
         "en_US": [
-          "Survival acquisition is currently blocked with public Cookery 1.0.8. Start with a Fish or Potato Skewer instead.",
+          "Place raw Chicken on the Cookery Chopping Board, cut four times with a Kitchen Knife, then use once more to release its original two Small Meat Cuts plus 1–3 Chicken Skin. Requires family Board API 0.1.0. Killing chickens does not yield skin.",
           "Nutrition panel: cooked skewer. Raw: hunger 2, saturation 1; cooked: hunger 4, saturation 4.",
           "Ingredient order: Chicken Skin → Chicken Skin",
           "Craft an empty Unfinished Skewer from one stick and equip it offhand. Hold a skewerable ingredient in the main hand and use it on a block to add one ingredient. Shortest flow: light with Flint and Steel → insert 1–3 raw skewers → brush with a filled Cookery Oil Pot.",
@@ -3514,9 +3511,10 @@
         "projects/grilling/gameplay_core/behavior_pack/items/grilled_chicken_skin_skewer.json",
         "projects/grilling/guide/content.a2.json#guide_quick_start",
         "projects/grilling/guide/content.a2.json#guide_hot_food",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/core_logic.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/core_logic.js",
+        "projects/grilling/gameplay_core/behavior_pack/host-extensions/board-api.json"
       ],
-      "acquisition": "verified",
+      "acquisition": "implemented_with_host_extension",
       "icon": "textures/ui/kg_grilling/catalog/grilled_chicken_skin_skewer",
       "related_ids": [
         "kaleidoscope_grilling:raw_chicken_skin_skewer",
@@ -6300,14 +6298,14 @@
     "archive_sha256": "9e5b617cc4c7a08ecd429fb9e42ec10e8d40a1ed5fc1f6f6687c3aff8a45a5d5",
     "file_id": 8983314
   },
-  "acquisition_gaps": [
-    {
-      "item": "kaleidoscope_grilling:beef_chunks",
-      "reason": "Public Cookery 1.0.8 prioritizes its built-in beef chopping result. No safe override API is available; survival acquisition remains blocked."
-    },
-    {
-      "item": "kaleidoscope_grilling:chicken_skin",
-      "reason": "Public Cookery 1.0.8 has no authoritative chicken-chopping completion receipt. Extra skin drops cannot safely be added; survival acquisition remains blocked."
-    }
-  ]
+  "acquisition_gaps": [],
+  "host_extension": {
+    "id": "kaleidoscope_grilling:board-api-0.1.0",
+    "capability": "chopping_board_v2",
+    "version": "0.1.0",
+    "required_for": [
+      "kaleidoscope_grilling:beef_chunks",
+      "kaleidoscope_grilling:chicken_skin"
+    ]
+  }
 }

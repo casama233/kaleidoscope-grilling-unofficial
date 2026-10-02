@@ -50,3 +50,9 @@ Host unit tests and isolated BDS tests should cover:
 | Recipe update with a loaded board | Persisted operation retains its selected source and output plan |
 
 Grilling's follow-up can remain declarative: register the beef selection and chicken bonus only after negotiated support, update the existing shared guide acquisition pages, bump all exported identities/hashes and run the complete family gates. This proposal does not install a host patch, approve a runtime override or certify clients.
+
+## 2026-10-02 已實作的回饋候選
+
+使用者明確要求擴充作者 API 並部署 live。A2.8.31 以自主編寫的通用 `host_api/board_api_core.js`、`board_api_runtime.js` 實作 `chopping_board_v2` 能力；`host-extensions/board-api.json` 僅描述原作者 hash 鎖定的介面插入點。新增 replace / supplement、嚴格 builtin 基線匹配、配方衝突拒絕與持久投放收據；不複製作者原始完整腳本。
+
+可供作者採納的程式與介面均在本 canonical Git。這是公開回饋材料，尚未向作者傳送訊息或宣稱作者已採納。與普通 1.0.8 原包的既有缺陷重現見 acquisition reproduction；整套安裝須由家族收據登記，不能作為翻譯覆蓋。

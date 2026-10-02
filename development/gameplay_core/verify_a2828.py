@@ -26,7 +26,10 @@ def main():
     assert catalog['host_reference']['version']=='1.0.8'
     assert catalog['host_reference']['guide_sha256']=='49ea47f9dc7511af210562118c7d2164ab5e185296a5a8c8d678e7d7ff8dc959'
     assert len(catalog['categories'])<=32
-    assert {r['item'] for r in catalog['acquisition_gaps']}=={'kaleidoscope_grilling:beef_chunks','kaleidoscope_grilling:chicken_skin'}
+    if catalog.get('host_extension'):
+        assert catalog['acquisition_gaps']==[] and catalog['host_extension']['capability']=='chopping_board_v2'
+    else:
+        assert {r['item'] for r in catalog['acquisition_gaps']}=={'kaleidoscope_grilling:beef_chunks','kaleidoscope_grilling:chicken_skin'}
     quick=next(e for e in catalog['entries'] if e['id']=='kg_a1:guide_quick_start')
     for locale in catalog['locales']:
         assert len(quick['body'][locale])==8
