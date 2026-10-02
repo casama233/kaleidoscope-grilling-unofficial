@@ -47,6 +47,14 @@ def check_facts(s):
     host_count=0
     for reg in pure('a2727_cookery_host_recipes_core.js','recipeTable'):
         r=reg['payload']['recipe'];kind=reg['payload']['kind']
+        if kind=='chopping_board_v2':
+            require(s.get('host_extension',{}).get('capability')=='chopping_board_v2','Host API dependency missing')
+            if r['mode']=='replace':
+                require(any(x['method']=='Chopping Board' and x['ingredients']==[r['input']] and x['count']==r['count'] for x in owner[r['result']]['recipes']),'V2 board recipe drift')
+            else:
+                for o in r['bonusOutputs']:
+                    require(owner[o['id']]['acquisition']=='implemented_with_host_extension','Additive acquisition missing')
+            host_count+=1;continue
         if kind=='stockpot_flex':continue
         if kind=='millstone':
             for o in r['outputs']:
