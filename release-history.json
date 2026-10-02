@@ -341,12 +341,22 @@
   },
   "2.8.47": {
     "BP": {
-      "sha256": "e655bef297d5378d2c1a300a9203531c7bb471c308c05d50da1e385a249978bb",
+      "sha256": "37a3ca99a5726a736cb14120a0e57cc9a789ebc9cdbd64f46ef461fbb46dea2d",
+      "files": 518
+    },
+    "RP": {
+      "sha256": "c5a68498572ca8ded146de57f48ff272903e26f2eb9bfc022d9d8e96ad0461b4",
+      "files": 1663
+    }
+  },
+  "2.8.48": {
+    "BP": {
+      "sha256": "6f26e5c9974418849bcd13bcee272b45074cd6073862c53e2cda7edc0032030d",
       "files": 523
     },
     "RP": {
-      "sha256": "5b977b77aef9476b443449581770a26068cb8f10bf2dce41dab79bcfce24a076",
-      "files": 1669
+      "sha256": "9e5d3c5f24bb6fb59488f9a04fcb7891caca3a312aaa6a3ad6c92b1d79a78935",
+      "files": 1670
     }
   }
 }

@@ -2,7 +2,7 @@
 
 本次重新讀取 Java 1.1.1 / NeoForge 1.21.1 來源
 `9a1acdab27698457bec16c9362678e574895a28c`，並對照 canonical main
-`cad8651`（2.8.43）和本次候選差異。隨後以 2.8.45 main `1cf16f3` 和 2.8.46 系列標籤 `9e1bdb8` 為基底，保留兩輪差異。32 份直接讀取的 Java 檔案、連結、
+`cad8651`（2.8.43）和本次候選差異。隨後以 2.8.45 main `1cf16f3` 和 2.8.46 系列標籤 `9e1bdb8` 為基底，保留兩輪差異。其後正常合併 canonical 2.8.47／PR #121 (`e8c9358`) 第三人稱抬手修復；原 feedback 47 候選未部署並因碰撞撤回，最終內容使用全新 2.8.48，詳見 [版本處理紀錄](RELEASE-COLLISION-20261003.md)。32 份直接讀取的 Java 檔案、連結、
 SHA256 與特效參數記錄在
 [`immersion-feedback-java-1.1.1.json`](../development/gameplay_core/fixtures/immersion-feedback-java-1.1.1.json)。
 這份表涵蓋主要功能面，不能解讀成所有 Java 方法、所有第三方組合都已逐一執行。
@@ -18,7 +18,7 @@ SHA256 與特效參數記錄在
 | 油與熱源 | 三油熱時長 1200／12000／24000 ticks 已有；原作 `PremiumChiliOilBlock.animateTick` 有熔岩／火焰粒子 | 自訂油是腳本方塊流動，不是真 Java FluidType。熔岩辣椒油的原作環境粒子仍缺；沒有用任意高頻輪詢來假裝等價。 |
 | 調料 | `SeasoningBottleBlockEntity` 八料、四瓶；runtime 16 次使用、基底配方及頂瓶操作已存在 | 修正加入原料五粒 end rod、搖勻 12 粒 happy、原作音量；取瓶改播 bottle-place，堆瓶仍播 bottle-stack。 |
 | 熱食 | `FoodState` 熱度、調料條件、按數量加權合併，runtime 已有；25 tick 進食 checkpoint 已有 | runtime 2.8.41 保留單 tick 期限，而本次讀取的 Java source `bucket()` 仍是 100 ticks，屬既有已交付偏差，本次不暗中撤回。GUI 熱食徽標與未開啟第三方容器仍未完全還原。 |
-| 進食／手持 | `MultiBiteSkewerItem` 的 25 tick checkpoint、`SkewerEatingHud` 的 102×5／16 像素圖示與 runtime 原作 HUD 來源相符 | 2.8.43 為玩家骨架座標回歸，不能證明 Windows 畫面。五類動畫、主副手、走動、FOV、秘製串多食材與第三人稱均需真人。不得以編輯器投影通過代替。 |
+| 進食／手持 | `MultiBiteSkewerItem` 的 25 tick checkpoint、`SkewerEatingHud` 的 102×5／16 像素圖示與 runtime 原作 HUD 來源相符 | 2.8.43 為玩家骨架座標回歸，2.8.47 限定第三人稱／原生進度為零時補正在使用手臂旋轉；48 完整保留，仍不能證明 Windows 畫面。五類動畫、主副手、走動、FOV、秘製串多食材與第三人稱均需真人。不得以編輯器投影通過代替。 |
 | 黃金串 | `GoldenSkewerItem.afterFoodCommitted` 的 18 點螺旋 spark 完全缺失，beacon 音高／音量缺省 | 本次補 18 點、半徑 .65、高度 .25+i×.06 與原作事件速度、beacon .8/1.15。只在原有食物結算成功路徑觸發。 |
 | 無敵狀態 | `InvincibleHandler` 每十 tick 一粒周身 spark；受擊六 tick 節流、8 spark+4 end rod、體高 55% | 本次補齊；使用穩定 API `getAABB().extent.y*2`，並把不存在的 `random.shield_block` 改成官方 `item.shield.block`。傷害取消條件未改。 |
 | 普通串挑戰 | `CursedSkewerItem` 被盾擋住時有兩聲與 28 spark，runtime 原只有錯誤盾音效和一粒 | 成功盾分支本次補齊。致死分支的 Java damage-indicator／large-smoke 及完整聲畫仍缺，沒有以不同粒子冒充完成。 |
@@ -27,7 +27,7 @@ SHA256 與特效參數記錄在
 | 架子／容器 | `AdvancedRackBlockEntity` 九格；runtime 使用 native ItemStack 容器、個別所有權、metadata 與交易收據 | 選槽／篩選是 Bedrock 表單操作，並非原作 CapsLock 原生 GUI。需要真人測完整手持物品、多人與重啟；不可把 adapter 測試稱為存檔驗收。 |
 | 音效資產 | 已有 Java 正式 jar 的原始 OGG 與 SHA256，循環烤爐有獨立 handle／空爐停聲 | 本次修事件路由與音量。聲音方向、衰减、多爐混音與 Windows 多玩家聽感仍待驗，原聲檔存在不代表每个場景完整。 |
 | 粒子資產 | 原 vanilla `critical_hit_emitter` 是 steady 520/s、max 48；manual emitter 不能以呼叫次數當粒數；electric spark 需要 direction 參數 | 本次六個自有 `feedback_*` 一次一粒／零偏移，顯式提供三軸初速，不覆蓋 vanilla。保留 Mojang 版 sprite／motion 是 Bedrock 表現近似，並非 Java particle class 完整物理拷貝。 |
-| 指南／多語 | 依既有 Guide 標準：Cookery 內唯一 Grilling 入口、六類烹飪分類、三語名稱；不新增實體指南 | 本次不改宿主或指南 payload。頁面是否可達、圖片、三語排版、觸控與 Windows 真實操作仍需候選驗收。 |
+| 指南／多語 | 依既有 Guide 標準：Cookery 內唯一 Grilling 入口、六類烹飪分類、三語名稱；不新增實體指南 | 本次不改宿主或指南内容；payload 版本同步 0.3.17、revision 2848。頁面是否可達、圖片、三語排版、觸控與 Windows 真實操作仍需候選驗收。 |
 | 持久化／遷移 | Java BlockEntity save/load 對應 Bedrock 原生容器+own DP，並有來源與交易回歸 | 靜態功能存在不證明 luosen 存檔資料已遷移。本次只改聲畫；完整家族 static、BDS、saved_world_migration 通過後，依 2026-10-03 持續授權為該收據登記 deferred_client_acceptance，可先更新 live 開發測試；真人未驗證仍為 client=false、production_ready=false。 |
 | 選用模組／效能 | Java Create／Maid／KubeJS／JEI 等為獨立整合；Bedrock 有已登記公開 food/oil/render API、bounded helper 調度 | 未安裝 Java 模組的整合不能宣稱完整移植。真實 TPS、FPS、大量設備、多人粒子密度與長時間运行未由來源測試證明。 |
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.15",
-  "revision": "kg-guide-a3-2846",
+  "version": "0.3.17",
+  "revision": "kg-guide-a3-2848",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",

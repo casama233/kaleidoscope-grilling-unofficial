@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    47
+    48
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -48,8 +48,8 @@
     {
       "id": "F06",
       "title": "隨機吃法",
-      "canonical": "2.8.45 每次共享 THREE／ALT 及正在使用的手；模型、咬點與扣料使用同一分支",
-      "remaining": "真人聲畫同步、中斷、雙手觀察；原生手臂及 Java 脫離第二截模型仍未等價",
+      "canonical": "2.8.45 每次共享 THREE／ALT 及正在使用的手；模型、咬點與扣料使用同一分支；保留 canonical 2.8.47 的第三人稱原生進食進度為零時、僅限正在使用手臂的旋轉補充",
+      "remaining": "真人聲畫同步、中斷、雙手與第三人稱／皮膚／多人觀察；Java 脫離第二截模型仍未等價",
       "client_accepted": false
     },
     {
@@ -97,7 +97,7 @@
     {
       "id": "F13",
       "title": "聲畫操作",
-      "canonical": "保留原作 17 OGG 與 2.8.45 兩手／兩視角分支；2.8.47 補單粒特效、黃金／無敵／成功盾、工作站音效",
+      "canonical": "保留原作 17 OGG 與 2.8.45 兩手／兩視角分支；2.8.48 補單粒特效、黃金／無敵／成功盾、工作站音效",
       "remaining": "音量、聲源、停止、透明排序、雙人觀察均須 Windows 真人",
       "client_accepted": false
     },
@@ -147,5 +147,16 @@
     "real_players": 0,
     "simulated_players": false,
     "client": false
+  },
+  "release_reconciliation": {
+    "canonical_predecessor": [
+      2,
+      8,
+      47
+    ],
+    "canonical_predecessor_commit": "e8c9358",
+    "withdrawn_feedback_candidate_commit": "cc57184b7e4579db136bb993f73382c177b93770",
+    "withdrawn_candidate_deployed": false,
+    "record": "RELEASE-COLLISION-20261003.md"
   }
 }

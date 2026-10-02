@@ -831,8 +831,13 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  const a={id,start:system.currentTick,nativeDuration:Math.max(0,Number(e.useDuration)||0),requested,profile,hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,biteTimes:BITE_TIMES[profile]??BITE_TIMES.THREE,nextBite:0,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined};
  stopSoundHandle(ACTIVE_EATS.get(e.source.id)?.audio);ACTIVE_EATS.set(e.source.id,a);
  try{e.source.setProperty(EAT_PROFILE_PROPERTY,eatingProfile(profile).code);e.source.setProperty(EAT_HAND_PROPERTY,hand==='off'?2:1)}catch(error){console.warn('[Grilling eating profile] '+error)}
- // A284: minecraft:use_animation owns the eating pose in both views. The legacy
- // Java camera-space arm/item offsets detach third-person limbs and double-transform attachables.
+ // Native use_item_progress can remain zero for custom food in third person.
+ // Supply only its arm rotation there; retain native movement and the authored
+ // attachable curves. No camera-space limb translations or whole-player reset.
+ if(id.endsWith("_skewer")){
+  const slot=hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand';
+  try{e.source.playAnimation('animation.kg_eating.player.native_'+(hand==='off'?'left':'right'),{blendOutTime:.08,stopExpression:"!q.is_using_item || !q.is_item_name_any('"+slot+"','"+id+"')"})}catch(error){console.warn('[Grilling eating arm pose] '+error)}
+ }
  try{a.audio=e.source.playSound('kg_imm.'+soundFor(profile))}catch{}
 });
 world.afterEvents.itemCompleteUse.subscribe(e=>{
