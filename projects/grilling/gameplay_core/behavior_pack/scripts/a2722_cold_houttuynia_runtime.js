@@ -1,4 +1,4 @@
-import {interactionFeedback} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
  COLD_ID,HOUTTUYNIA_ID,CRAFTING_TABLE_ID,REQUIRED_OIL_TYPE,
@@ -47,7 +47,7 @@ export function tryCraftColdHouttuynia(player){
   setMain(player,afterMain);setOff(player,afterOff);
  }catch{
   try{setMain(player,beforeMain);setOff(player,beforeOff)}catch{}
-  message(player,'§c合成交易失敗，已嘗試回滾');return false;
+  interactionFailure(player,'§c合成交易失敗，已嘗試回滾');return false;
  }
  give(player,output);
  try{player.dimension.playSound('random.pop',player.location,{volume:.65,pitch:1.15})}catch{}

@@ -1,5 +1,5 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
-import {interactionFeedback} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID} from './data.js';
 import {commitTwoParty} from './a277_grill_transaction_core.js';
@@ -103,15 +103,15 @@ function applySeasoning(player,block){
  if(!plan.ok){message(player,'§7調料瓶內沒有可用調料');return true}
  // Prepare the replacement before either participant is changed.
  const inventory=playerInventory(player),slot=player.selectedSlotIndex;
- if(plan.mutate&&!inventory){message(player,'§c無法讀取背包，操作已取消');return true}
+ if(plan.mutate&&!inventory){interactionFailure(player,'§c無法讀取背包，操作已取消');return true}
  let next;
  if(plan.mutate){
   next=plan.replaceEmpty?new ItemStack(EMPTY_SEASONING_ID,1):retargetSpecialSeasoningStack(held,plan.nextUses,specialSeasoningVariant(held));
-  if(!next){message(player,'§c調料外觀狀態同步失敗，操作已取消');return true}
+  if(!next){interactionFailure(player,'§c調料外觀狀態同步失敗，操作已取消');return true}
   if(!plan.replaceEmpty)try{
    const lore=next.getRawLore().filter(x=>typeof x!=='string'||!x.startsWith('§7Uses:'));
    lore.unshift('§7Uses: '+(SEASONING_MAX_USES-plan.nextUses)+'/'+SEASONING_MAX_USES);setItemLore(next,lore);
-  }catch{message(player,'§c調料資料準備失敗，操作已取消');return true}
+  }catch{interactionFailure(player,'§c調料資料準備失敗，操作已取消');return true}
  }
  const key=cuisineStateKey(block),beforeRaw=world.getDynamicProperty(key);
  const state=stateBeforeSeasoning(stationKind(block.typeId),readCuisineState(block),hostHasOil(block));
@@ -123,7 +123,7 @@ function applySeasoning(player,block){
  );
  if(!result.ok){
   if(result.rollbackErrors)console.warn('[Grilling] seasoning rollback failed: '+result.rollbackErrors);
-  message(player,result.rollbackErrors?'§c操作失敗且回滾不完整，請查看 Content Log':'§c操作未完成，調料與鍋具狀態已回復');return true;
+  interactionFailure(player,result.rollbackErrors?'§c操作失敗且回滾不完整，請查看 Content Log':'§c操作未完成，調料與鍋具狀態已回復');return true;
  }
  try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}
  try{player.playSound('kg_imm.season',{volume:.85,pitch:1})}catch{}

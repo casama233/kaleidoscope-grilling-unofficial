@@ -1,5 +1,5 @@
-import {interactionFeedback} from './a283_interaction_feedback.js';
 import {ensureOilHandPublished} from './oil_api_client.js';
+import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {OIL_TYPES} from './a23_oil_world.js';
 import {readCookeryOilPot,planCookeryTypedOilAddition} from './a2734_cookery_oil_pot_adapter.js';
@@ -31,7 +31,7 @@ function fillOffhandPot(player,expectedBucketId){
  if(!plan.ok){message(player,'§c油壺內已有不同內容或容量不足');return true}
 
  let beforeMain,beforeOff;
- try{beforeMain=main.clone();beforeOff=off.clone()}catch{message(player,'§c油壺更新失敗');return true}
+ try{beforeMain=main.clone();beforeOff=off.clone()}catch{interactionFailure(player,'§c油壺更新失敗');return true}
 
  const keepBucket=creative(player);
  try{
@@ -39,7 +39,7 @@ function fillOffhandPot(player,expectedBucketId){
   if(!keepBucket)setMainHand(player,new ItemStack('minecraft:bucket',1));
  }catch{
   try{setMainHand(player,beforeMain);setOffHand(player,beforeOff)}catch{}
-  message(player,'§c油壺更新失敗，已嘗試回滾');return true;
+  interactionFailure(player,'§c油壺更新失敗，已嘗試回滾');return true;
  }
 
  const afterOff=getOffHand(player),afterMain=getMainHand(player);
@@ -47,7 +47,7 @@ function fillOffhandPot(player,expectedBucketId){
  const bucketOk=keepBucket?afterMain?.typeId===expectedBucketId:afterMain?.typeId==='minecraft:bucket';
  if(!potOk||!bucketOk){
   try{setMainHand(player,beforeMain);setOffHand(player,beforeOff)}catch{}
-  message(player,'§c油壺更新驗證失敗，已嘗試回滾');return true;
+  interactionFailure(player,'§c油壺更新驗證失敗，已嘗試回滾');return true;
  }
 
  try{player.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',{volume:.9,pitch:.8+.5*plan.nextCount/plan.capacity})}catch{}

@@ -14,6 +14,8 @@ Guide changes must also follow `docs/GUIDE-STANDARD.md`: shared host navigation,
 
 # Canonical baseline
 
+- HUD behaviour must follow the pinned original Java release: source-backed interaction messages keep their original triggers/keys/arguments; original graphical eating progress uses the original textures, dimensions and 25-tick checkpoint. Do not add polling text, numeric machine summaries, ASCII eating bars or arbitrary reminders. Java machine panels are disabled by default (HudControl.enabled); do not enable them as a substitute for client parity. Legacy interactionFeedback/eatingProgress stay silent; Java messages use javaInteractionFeedback and exceptional storage faults use interactionFailure for operator diagnostics only. Do not clear the shared actionbar on eating completion. Script/BDS checks cannot certify rendered client parity.
+
 - Follow `docs/BASELINE-MAINTENANCE.md`. Own fixes belong to canonical runtime; do not introduce gameplay transforms in a private builder or BSM hook.
 - A changed exported file requires a new release identity, lock/history update and functional verification. Never reuse the same version for different content.
 - Production deployment requires the family receipt, pinned upstream archives, client acceptance and explicit saved-world migration verification.

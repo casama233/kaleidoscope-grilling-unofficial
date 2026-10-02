@@ -105,7 +105,6 @@ hud.kaleidoscope_grilling.grill.timer=阶段时间：%1$s/%2$s tick
 hud.kaleidoscope_grilling.grill.flips=翻面：%1$s/%2$s
 hud.kaleidoscope_grilling.grill.seasoning.added=已撒调料 · 可以取出
 hud.kaleidoscope_grilling.grill.seasoning.none=未撒调料 · 暂不可正常取出
-message.kaleidoscope_grilling.grill_ready_to_take=烹饪已完成，等待取出！
 jade.kaleidoscope_grilling.grill.need_heat=待点燃烧烤架的炭火
 jade.kaleidoscope_grilling.grill.empty=等待放入烤串
 jade.kaleidoscope_grilling.grill.need_oil=等待刷油
@@ -226,6 +225,28 @@ tooltip.kaleidoscope_grilling.smoky_warmth=烟火气
 message.kg.board_retry=砧板暂时未完成，请重试。
 message.kg.board_quarantined=砧板产出状态待核对，请联系管理员。
 message.kg.board_knife=请用厨房刀切割。
+message.kaleidoscope_grilling.oiled=已为 %s 串烤串刷油
+message.kaleidoscope_grilling.no_brushable_skewers=当前没有可刷油的烤串
+message.kaleidoscope_grilling.not_enough_oil=油壶中的油不够
+message.kaleidoscope_grilling.no_seasonable_skewers=当前没有可撒料的烤串
+message.kaleidoscope_grilling.not_enough_seasoning=特制调料剩余次数不足
+message.kaleidoscope_grilling.grill_need_heat=待点燃烧烤架的炭火
+message.kaleidoscope_grilling.grill_need_oil=等待刷油
+message.kaleidoscope_grilling.grill_wait_flip=翻面中...（%1$s/%2$s）
+message.kaleidoscope_grilling.grill_need_seasoning=烹饪已完成，等待撒料
+message.kaleidoscope_grilling.grill_ready_to_take=烹饪已完成，等待取出！
+message.kaleidoscope_grilling.bottle_full=调料瓶已满
+message.kaleidoscope_grilling.invalid_seasoning=这种材料不能加入调料瓶
+message.kaleidoscope_grilling.missing_base_seasoning=缺少基础辅材，调料尚不能摇晃
+message.kaleidoscope_grilling.oil_type_mismatch=油壶已满或油种不同
+message.kaleidoscope_grilling.big_vat_status=容量：%1$s/%2$s 桶
+message.kaleidoscope_grilling.big_vat_reject=大缸已满或内容类型不符
+message.kaleidoscope_grilling.press_full=榨油器最多放入 4 个油饼
+message.kaleidoscope_grilling.press_need_full_batch=需要装满 4 个油饼才能压榨（当前 %s/%s）
+message.kaleidoscope_grilling.press_status=油饼：%1$s/4，压榨进度：%2$s/%3$s
+message.kaleidoscope_grilling.press_vat_full=附近大缸容量不足，压榨进度已保留
+message.kaleidoscope_grilling.press_wrong_vat=附近大缸内容类型不符，压榨进度已保留
+message.kaleidoscope_grilling.press_no_vat=附近没有可接收菜籽油的大缸，压榨进度已保留
 
 senluo.public.food.v1=
 message.kg.oil_unavailable=油壶资料尚未确认，物品与油量已保留。请稍后再试。
@@ -234,6 +255,8 @@ message.kg.oil_different_content=油种不同，不能混装。
 message.kg.oil_full=油壶已满。
 message.kg.oil_insufficient=油量不足。
 message.kg.output_unavailable=出料状态未能确认，设备已保留批次资料。请留出背包空间后再试。
+
+message.kaleidoscope_grilling.skewer_book_missing=缺少：%s×%s
 
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森罗物语：烟火

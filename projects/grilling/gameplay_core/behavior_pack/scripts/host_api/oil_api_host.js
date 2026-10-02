@@ -9,7 +9,7 @@ const key=(prefix,b)=>prefix+b.dimension.id+':'+b.x+','+b.y+','+b.z;
 const nativeKey=b=>'kc_oilpot:'+b.dimension.id+':'+b.x+','+b.y+','+b.z;
 const hand=p=>p?.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Mainhand);
 function emitBlock(b,state){try{system.sendScriptEvent('senluo:oil_block_snapshot',JSON.stringify({api:1,version:OIL_API_VERSION,station:location(b),state}));}catch(e){console.warn('[Cookery Oil API] snapshot deferred '+e)}}
-function notice(p,reason){try{p.sendMessage({translate:'message.kg.oil_'+reason})}catch{}}
+function notice(p,reason){try{console.warn('[Cookery Oil API] interaction retained: '+reason)}catch{}}
 function itemSame(a,b){return a?.typeId===b?.typeId&&a?.amount===b?.amount&&a?.nameTag===b?.nameTag&&JSON.stringify(a?.getRawLore())===JSON.stringify(b?.getRawLore());}
 export function readHostOilItem(stack,{legacyFull=false}={}){
  const portable=readPublicOil(stack);

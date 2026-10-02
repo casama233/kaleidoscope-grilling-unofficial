@@ -18,12 +18,12 @@ export function ensureOilHandPublished(player,hand,continueUse){
  const id=player.id+':'+(++sequence),signature=stable(stack),slot=player.selectedSlotIndex;
  pending.set(id,{player,hand,slot,signature,continueUse});
  system.sendScriptEvent('senluo:oil_snapshot_request',JSON.stringify({api:1,id,playerId:player.id,hand,expectedId:stack.typeId,expectedLore:JSON.stringify(stack.getRawLore())}));
- system.runTimeout(()=>{const r=pending.get(id);if(!r)return;pending.delete(id);try{player.sendMessage({translate:'message.kg.oil_unavailable'})}catch{}},60);return false;
+ system.runTimeout(()=>{const r=pending.get(id);if(!r)return;pending.delete(id);try{console.warn('[Grilling Oil API] host snapshot unavailable')}catch{}},60);return false;
 }
 system.afterEvents.scriptEventReceive.subscribe(ev=>{
  if(ev.id!=='senluo:oil_snapshot_response')return;
  try{const reply=JSON.parse(ev.message),r=pending.get(reply.id);if(!r||reply.api!==1)return;pending.delete(reply.id);
-  if(!reply.ok){r.player.sendMessage({translate:'message.kg.oil_unavailable'});return}
+  if(!reply.ok){console.warn('[Grilling Oil API] host snapshot rejected');return}
   if(r.player.selectedSlotIndex!==r.slot||stable(getHand(r.player,r.hand))!==r.signature||!readCookeryOilPot(getHand(r.player,r.hand)).valid)return;
   system.run(()=>{if((r.hand==='off'||r.player.selectedSlotIndex===r.slot)&&stable(getHand(r.player,r.hand))===r.signature&&readCookeryOilPot(getHand(r.player,r.hand)).valid)r.continueUse?.();});
  }catch(e){console.warn('[Grilling Oil API] deferred use retained '+e)}

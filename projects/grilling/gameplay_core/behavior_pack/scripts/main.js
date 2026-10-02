@@ -21,7 +21,8 @@ import './skewer_compat_runtime.js';
 import {EquipmentSlot,GameMode,EnchantmentType} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,eatingEventMatches,commitEating} from './a285_eating_transaction.js';
 import {completedUseStillCurrent} from './a2810_use_transaction.js';
-import {interactionFeedback,eatingProgress} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
+import {showJavaEatingHud} from './java_eating_hud_runtime.js';
 import './a2770_placed_visual_runtime.js';
 import './guide/main.js';
 import {world,system,ItemStack} from '@minecraft/server';
@@ -304,7 +305,7 @@ function threadCurrent(player){
   {apply(){other.write(next)},rollback(){other.write(off)}}
  ];
  if(delivery)steps.push(delivery);
- if(!transactionStatus(commitSteps(steps),'threading')){message(player,'§c穿串失敗，已嘗試回復原料');return false}
+ if(!transactionStatus(commitSteps(steps),'threading')){interactionFailure(player,'§c穿串失敗，已嘗試回復原料');return false}
  useSound(player,'pickup_item',.7,1.2);
  awardLookingThePart(player,outcome);
  return true;
@@ -317,7 +318,7 @@ function disassembleOff(player){
  const delivery=prepareOutputDelivery(player,outputs),next=reducedStack(off);
  if(!transactionStatus(commitSteps([
   {apply(){other.write(next)},rollback(){other.write(off)}},delivery
- ]),'disassembly')){message(player,'§c拆串失敗，已嘗試回復原料');return false}
+ ]),'disassembly')){interactionFailure(player,'§c拆串失敗，已嘗試回復原料');return false}
  useSound(player,'skewer_disassemble',.8);
  return true;
 }
@@ -328,7 +329,7 @@ function scheduleSkewerAction(player,action){
  system.run(()=>{
   if(THREAD_LAST.get(id)!==operation||!twoHandIntentStillCurrent(player,intent))return;
   try{if(action==='disassemble')disassembleOff(player);else threadCurrent(player)}
-  catch(error){console.warn('[Grilling skewer action] '+error);try{message(player,'§c操作未完成；請確認原料與副手狀態')}catch{}}
+  catch(error){console.warn('[Grilling skewer action] '+error);try{interactionFailure(player,'§c操作未完成；請確認原料與副手狀態')}catch{}}
  });return true;
 }
 function skewerAction(player,itemStack){
@@ -404,7 +405,7 @@ function extract(block,player,all=false){
  for(const row of rows){const slot=empty.shift();steps.push(slot!==undefined?slotWrite(target,slot,row.output):acknowledgedDrop(player.dimension,row.output,player.location));}
  if(rows.length===occupied(block))steps.push({apply:()=>resetBlock(block,state.lit),rollback:()=>writeState(block,state)});
  const result=commitStationTransfer(block,steps,'extract');
- if(!result.ok){message(player,'§c取串失敗；已回復可確認的內容，請查看紀錄');return 0}
+ if(!result.ok){interactionFailure(player,'§c取串失敗；已回復可確認的內容，請查看紀錄');return 0}
  blockSound(block,'pickup_item',.8);
  return rows.length;
 }
@@ -420,15 +421,15 @@ function restoreBrokenGrill(dim,loc,permutation,state,raws){
 function customBreak(block,player){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;
  const state=readState(block),kind=breakDisposition(state),c=inv(block),dim=block.dimension,loc={...block.location},permutation=block.permutation;
- if(!c){message(player,'§c烤架庫存暫不可用，未拆除');return}
+ if(!c){interactionFailure(player,'§c烤架庫存暫不可用，未拆除');return}
  const raws=[0,1,2].map(i=>c.getItem(i)),drops=[];
  try{
   for(const raw of raws)if(raw)drops.push(outputFor(raw,state,kind));
   if(!creative(player))drops.push(new ItemStack(GRILL_ID,1));
- }catch{message(player,'§c拆除失敗：無法建立掉落物');return}
+ }catch{interactionFailure(player,'§c拆除失敗：無法建立掉落物');return}
  const steps=drops.map((drop,i)=>acknowledgedDrop(dim,drop,{x:loc.x+.5,y:loc.y+(i===drops.length-1&&!creative(player)?.3:.4),z:loc.z+.5}));
  steps.push({apply(){clearContainer(block);clearState(block);removeGrillLegs(block);block.setType('minecraft:air')},rollback(){if(!restoreBrokenGrill(dim,loc,permutation,state,raws))throw new Error('Grill restore incomplete')}});
- if(!commitStationTransfer(block,steps,'break').ok){message(player,'§c拆除失敗；已回復可確認的內容，請查看紀錄');return}
+ if(!commitStationTransfer(block,steps,'break').ok){interactionFailure(player,'§c拆除失敗；已回復可確認的內容，請查看紀錄');return}
  try{removeGrillAudio(block)}catch{}
  try{retireEmptyStationContainer(dim.getBlock(loc))}catch(error){console.warn('[Grilling storage retirement] '+error)}
 }
@@ -455,8 +456,8 @@ function handleGrill(block,player,hand='main'){
  if(id==='minecraft:flint_and_steel'){
   if(!state.lit){
    const tool=planDamagedHand(player,hand,1),nextState=light(state,true);
-   if(!tool.ok){message(player,'§c點火失敗：打火石狀態無法提交');return}
-   if(!commitGrillAndHand(block,state,nextState,player,hand,tool.before,tool.next,tool.mutate)){message(player,'§c點火交易失敗，已嘗試回滾');return}
+   if(!tool.ok){interactionFailure(player,'§c點火失敗：打火石狀態無法提交');return}
+   if(!commitGrillAndHand(block,state,nextState,player,hand,tool.before,tool.next,tool.mutate)){interactionFailure(player,'§c點火交易失敗，已嘗試回滾');return}
    if(tool.broken)try{player.playSound('random.break',{volume:.8,pitch:1})}catch{}
    try{block.dimension.playSound('fire.ignite',block.location)}catch{}
   }
@@ -467,29 +468,29 @@ function handleGrill(block,player,hand='main'){
  }
  if(id===COOKERY_FILLED){
   if(!ensureOilHandPublished(player,hand,()=>handleGrill(block,player,hand)))return;
-  if(state.phase!==0||n<1){message(player,'§7現在不能刷油');return}
-  const oil=planCookeryOil(player,hand,n);if(!oil.ok){message(player,oil.reason==='insufficient'?'§c油量不足：需要 '+n+'，目前 '+oil.count:'§7需要森羅物語裝油的油壺');return}
+  if(state.phase!==0||n<1){javaInteractionFeedback(player,'no_brushable_skewers');return}
+  const oil=planCookeryOil(player,hand,n);if(!oil.ok){javaInteractionFeedback(player,oil.reason==='insufficient'?'not_enough_oil':'no_brushable_skewers');return}
   const result=brush(state,n,oil.heat);
   if(result.ok){
-   if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){message(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
-   awardGleamingWithOil(player);
+   if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){interactionFailure(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
+   awardGleamingWithOil(player);javaInteractionFeedback(player,'oiled',[n]);
    blockSound(block,'action_success',.65);
    try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}
   }return;
  }
  if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'action_success',.65);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}}return}
  if(isSpecialSeasoningId(id)){
-  if(state.phase!==2||state.seasoned||n<1){message(player,'§7現在不能撒料');return}
-  const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){message(player,bottle.reason==='insufficient'?'§c調料不足：爐上 '+n+' 串需要 '+n+' 次，剩 '+bottle.remaining+' 次':'§7需要完成的調料瓶');return}
+  if(state.phase!==2||state.seasoned||n<1){javaInteractionFeedback(player,'no_seasonable_skewers');return}
+  const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){javaInteractionFeedback(player,bottle.reason==='insufficient'?'not_enough_seasoning':'no_seasonable_skewers');return}
   const result=season(state,n,bottle.ingredients);
   if(result.ok){
-   if(!commitGrillAndHand(block,state,result.state,player,hand,bottle.before,bottle.next,bottle.mutate)){message(player,'§c撒料交易失敗，調料與烤架已嘗試回滾');return}
-   blockSound(block,'season',.85);
+   if(!commitGrillAndHand(block,state,result.state,player,hand,bottle.before,bottle.next,bottle.mutate)){interactionFailure(player,'§c撒料交易失敗，調料與烤架已嘗試回滾');return}
+   javaInteractionFeedback(player,'grill_ready_to_take',[],true);blockSound(block,'season',.85);
    try{player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}
   }return;
  }
  if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||isCompatRawSkewer(ingredientSnapshot(held))||(id===SECRET_ID&&!isSecretCooked(held)&&readSkewerRows(held).length===3))){
-  if(!state.lit){message(player,'§c需要先點火');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}
+  if(!state.lit){javaInteractionFeedback(player,'grill_need_heat');return}if(!canInsert(state,n)){message(player,'§7烤爐現在不能再放入生串');return}
   const c=inv(block);if(!c)return;const slot=[0,1,2].find(i=>!c.getItem(i));if(slot===undefined)return;
   const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before),inserted=copyOne(storage.before);
   const result=commitTwoParty(
@@ -497,13 +498,13 @@ function handleGrill(block,player,hand='main'){
    ()=>c.setItem(slot,undefined),()=>{if(!free)storage.write(storage.before)}
   );
   if(!result.ok&&result.rollbackErrors)quarantineStation(block,'insert skewer rollback incomplete');
-  if(!transactionStatus(result,'insert skewer'))message(player,'§c插串失敗，已嘗試回復烤架與原料');
+  if(!transactionStatus(result,'insert skewer'))interactionFailure(player,'§c插串失敗，已嘗試回復烤架與原料');
   else blockSound(block,'grill_flip',.75);
   return
  }
  if(id){message(player,'§7這個物品不能用在目前的烤爐階段');return}
- if(state.phase===1){const r=flip(state);if(r.ok){writeState(block,r.state);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.reach.'+hand,{blendOutTime:.1})}catch{}}else message(player,'§7翻面冷卻中');return}
- if(state.phase===0&&n>0){message(player,'§e還需要刷油');return}if(state.phase===2&&!state.seasoned){message(player,'§e還需要撒料');return}
+ if(state.phase===1){const r=flip(state);if(r.ok){writeState(block,r.state);javaInteractionFeedback(player,'grill_wait_flip',[r.state.flips,4]);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.reach.'+hand,{blendOutTime:.1})}catch{}}else message(player,'§7翻面冷卻中');return}
+ if(state.phase===0&&n>0){javaInteractionFeedback(player,'grill_need_oil');return}if(state.phase===2&&!state.seasoned){javaInteractionFeedback(player,'grill_need_seasoning');return}
  if(canExtract(state))extract(block,player,player.isSneaking)
 }
 function bottleDataFromItem(stack){
@@ -555,7 +556,7 @@ function pushBottle(block,player,held,hand='main'){
  const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
  const items=[...current.items,copyOne(storage.before)];
  const ok=commitBottleAndHand(block,current,items,storage,next,!free);
- if(!ok)message(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
+ if(!ok)interactionFailure(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
  else blockSound(block,'seasoning_bottle_stack',.8);return ok;
 }
 function handleSeasoningBlock(block,player,hand='main'){
@@ -565,13 +566,13 @@ function handleSeasoningBlock(block,player,hand='main'){
  const topItem=items.at(-1),top=bottleDataFromItem(topItem);
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
-  if(top.ingredients.length>=SEASONING_CAPACITY){message(player,'§c最上層調料瓶已滿 '+SEASONING_CAPACITY+'/'+SEASONING_CAPACITY);return}
+  if(top.ingredients.length>=SEASONING_CAPACITY){javaInteractionFeedback(player,'bottle_full');return}
   const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
   top.ingredients.push(id);
   // Java mutates the existing stack, except the explicit EMPTY -> PENDING promotion.
   if(top.kind==='empty'&&hasSeasoningBase(top.ingredients))items[items.length-1]=bottleItem({...top,kind:'pending'});
   else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');}
-  if(!commitBottleAndHand(block,current,items,storage,next,!free)){message(player,'§c加料失敗，已嘗試回復原料');return}
+  if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
   awardSeasoningMilestones(player,top.ingredients);
   blockSound(block,'action_success',.8);
   try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
@@ -581,11 +582,11 @@ function handleSeasoningBlock(block,player,hand='main'){
   const storage=captureWritableHand(player,hand);let item=items.pop();const data=bottleDataFromItem(item);
   if(storage.before)throw new Error('Grilling: take-bottle hand is no longer empty');
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
-  if(!commitBottleAndHand(block,current,items,storage,item))message(player,'§c取瓶失敗，已嘗試回復調料');
+  if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
   else blockSound(block,'seasoning_bottle_stack',.8);
   return;
  }
- message(player,'§7這不是可加入的調料或調料瓶');
+ javaInteractionFeedback(player,'invalid_seasoning');
 }
 function sameBottleTarget(block,snapshot){
  return block&&block.typeId===snapshot.typeId&&Object.entries(snapshot.states).every(([key,value])=>block.permutation.getState(key)===value);
@@ -799,7 +800,7 @@ function completePending(player,stack){
  const a=PENDING_USES.get(player.id);
  if(!a||!completedUseStillCurrent(a.use,stack,heldByHand(player,a.hand),player.selectedSlotIndex))return;
  PENDING_USES.delete(player.id);stopSoundHandle(a.audio);
- const list=readSeasonings(stack);if(!hasSeasoningBase(list)){message(player,'§c缺少基礎三料，不能完成調料');return}
+ const list=readSeasonings(stack);if(!hasSeasoningBase(list)){javaInteractionFeedback(player,'missing_base_seasoning');return}
  const variant=Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)),out=new ItemStack(specialSeasoningVisualId(0,variant),1);setSeasonings(out,list);setUses(out,0);
  setItemProperty(out,SEASON_VARIANT_KEY,variant);setItemLore(out,['§7Uses: '+SEASONING_MAX_USES+'/'+SEASONING_MAX_USES,'§7Ingredients: '+list.length+'/'+SEASONING_CAPACITY]);
  if(JSON.stringify(readSeasonings(out))!==JSON.stringify(list)||getUses(out)!==0)throw new Error('Seasoning data write failed');
@@ -841,7 +842,7 @@ world.afterEvents.itemCompleteUse.subscribe(e=>{
  const a=ACTIVE_EATS.get(e.source.id);
  if(!a||a.id!==id||!eatingEventMatches(a.use,e.itemStack,now())||system.currentTick-a.start<a.nativeDuration)return;
  a.meta={...a.meta,hot:a.meta.hot&&a.meta.hotUntil>now()};
- stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);if(a.hud)try{eatingProgress(e.source,'')}catch{};
+ stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);
  if(id===SECRET_ID){addSecretNutrition(e.source,e.itemStack,{hot:false})}
  if(RAW_NAUSEA[id])try{e.source.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{e.source.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{e.source.addEffect('blindness',200,{showParticles:true})}catch{}
  if(id===SECRET_ID)secretRemainders(e.source,e.itemStack);
@@ -858,7 +859,7 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  if(a.start===system.currentTick&&SETTLED.get(id)===system.currentTick)return;
  const used=system.currentTick-a.start;stopEatSound(e.source,a.profile);
  // Let native completion win either event order; never delete a newer session.
- system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);if(a.hud)try{eatingProgress(e.source,'')}catch{};if(e.itemStack&&used>=25&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
+ system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);if(e.itemStack&&used>=25&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
@@ -922,7 +923,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  }
  if(!customTarget)return;
  e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension,intent=customTarget?captureInteractionIntent(p,e.itemStack):null,bottleCapture=isSeasoningBlock(e.block.typeId)?bottleActionSnapshot(e.block):undefined;
- system.run(()=>{try{const target=dim.getBlock(loc);if(bottleCapture&&!bottleActionStillCurrent(target,bottleCapture))return;handleCustomBlockInteraction(target,p,intent)}catch(error){console.warn('[Grilling block action] '+error);try{message(p,'§c操作未完成；請查看紀錄並核對原料')}catch{}}});
+ system.run(()=>{try{const target=dim.getBlock(loc);if(bottleCapture&&!bottleActionStillCurrent(target,bottleCapture))return;handleCustomBlockInteraction(target,p,intent)}catch(error){console.warn('[Grilling block action] '+error);try{interactionFailure(p,'§c操作未完成；請查看紀錄並核對原料')}catch{}}});
 });
 world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID)resetBlock(e.block,false)});
 world.beforeEvents.explosion.subscribe(scheduleNativeBottleExplosion);
@@ -963,17 +964,7 @@ function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecr
 system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
-  if(active){
-   const current=heldByHand(p,active.hand);
-   if(current&&eatingStillCurrent(active.use,current,p.selectedSlotIndex,now())){
-    advanceBites(p,active); // Animation timing never debits food.
-    if(system.currentTick%4===0){
-     const used=system.currentTick-active.start,duration=profileDuration(active.profile),ready=used>=25,fill=Math.min(20,Math.floor(used/duration*20));
-     const bar=(ready?'§a':'§e')+'▰'.repeat(fill)+'§8'+'▱'.repeat(20-fill);
-     try{eatingProgress(p,(active.meta.hot&&active.meta.hotUntil>now()?'§6▣🔥▣ §r':'')+bar+(ready?' §a◆':' §8◇')+'§r');active.hud=true;}catch{}
-    }
-   }
- }
+  if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){advanceBites(p,active);showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
   const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);
