@@ -11,10 +11,10 @@ def eating_gate():
     assert 'playAnimation' not in food_start
     stop = script.split('world.afterEvents.itemStopUse.subscribe', 1)[1].split('world.beforeEvents.entityHurt.subscribe', 1)[0]
     assert 'playAnimation' not in stop
-    tick = script.split('if(active){advanceBites', 1)[1].split('writeFx(p,readFx(p))', 1)[0]
+    tick = script.split('const active=ACTIVE_EATS.get(p.id);', 1)[1].split('writeFx(p,readFx(p))', 1)[0]
     assert 'playAnimation' not in tick
-    assert 'hungerSettle(p,active.id,active)' in tick
-    assert 'used>=25&&used<profileDuration(a.profile)' in stop
+    assert 'advanceBites(p,active)' in tick and 'hungerSettle(' not in tick
+    assert 'if(ACTIVE_EATS.get(id)!==a)return' in stop and 'used>=25&&hungerSettle(e.source,a.id,a)' in stop
     for file in (BP / 'scripts').rglob('*.js'):
         assert 'animation.kg_imm.player.eat_' not in file.read_text(), file
     data = (BP / 'scripts/data.js').read_text()

@@ -1,14 +1,14 @@
-## Current maintained baseline: 2.8.21
+## Current maintained baseline: 2.8.25
 
 Canonical runtime and dependencies: [baseline.json](baseline.json). Build from this source; no private gameplay patch layer is required. Read [baseline maintenance](docs/BASELINE-MAINTENANCE.md) before importing historical artifacts or deploying.
 
-> main 維護基線：**A2.8.21** — [正式來源修訂](docs/STATUS-A2.8.21.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
+> main 維護基線：**A2.8.25** — [正式來源修訂](docs/STATUS-A2.8.25.md) · [全部問題追蹤](docs/REPAIR-TRACKER.md)。A2.8.10 結算修復與穩定 API adapter 已收回正常 runtime；整體 Java 功能及客戶端驗收尚未完成。
 
 # Kaleidoscope Grilling — unofficial Bedrock port
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**canonical runtime：A2.8.21，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，正式存檔遷移及客戶端持握驗收仍未完成。**
+**canonical runtime：A2.8.25，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，正式存檔遷移及客戶端持握驗收仍未完成。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 

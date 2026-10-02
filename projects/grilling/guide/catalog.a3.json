@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "revision": "java_survival_20261001",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -2734,17 +2734,17 @@
       },
       "body": {
         "zh_CN": [
-          "副手拿木棍或未完成烤串，主手拿可穿串食材，使用即可逐份穿入。",
+          "基岩版先用 1 根木棍合成 1 根空的未完成烤串，将它放进副手；主手拿食材，对方块按使用键逐份穿入。空串也可潜行使用拆回木棍。",
           "每串最多 3 份食材；命中固定配方时会立刻成为对应生串，三份仍未命中固定配方时会成为秘制烤串。",
           "没有烤熟的未完成串、固定生串和秘制生串都可潜行拆解，取回材料与木棍。"
         ],
         "zh_TW": [
-          "副手拿木棍或未完成烤串，主手拿可穿串食材，使用即可逐份穿入。",
+          "基岩版先用 1 根木棍合成 1 根空的未完成烤串，將它放進副手；主手拿食材，對方塊按使用鍵逐份穿入。空串也可潛行使用拆回木棍。",
           "每串最多 3 份食材；命中固定配方時會立刻成為對應生串，三份仍未命中固定配方時會成為秘製烤串。",
           "沒有烤熟的未完成串、固定生串和秘製生串都可潛行拆解，取回材料與木棍。"
         ],
         "en_US": [
-          "Hold a stick or unfinished skewer in the off hand and a skewerable ingredient in the main hand, then use it to add ingredients one at a time.",
+          "On Bedrock, craft 1 stick into 1 empty Unfinished Skewer and place it in the offhand. Hold an ingredient in the main hand and use a block to thread it. Sneak-use can refund an empty skewer as a stick.",
           "A skewer holds at most 3 ingredients. A matching fixed recipe resolves immediately; three ingredients that do not match a fixed recipe become a Secret Skewer.",
           "Uncooked unfinished, fixed-raw, and Secret skewers can be sneak-disassembled to recover their ingredients and stick."
         ]
@@ -2752,11 +2752,22 @@
       "kinds": [
         "item"
       ],
-      "recipes": [],
+      "recipes": [
+        {
+          "method": "Crafting",
+          "ingredients": [
+            "minecraft:stick"
+          ],
+          "result": "kaleidoscope_grilling:unfinished_skewer",
+          "count": 1,
+          "time": 0
+        }
+      ],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/unfinished_skewer.json",
         "projects/grilling/guide/content.a2.json#guide_threading",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/recipes/skewer_starter.json"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/unfinished_skewer",
@@ -3111,18 +3122,21 @@
       },
       "body": {
         "zh_CN": [
+          "基岩版先用 1 根木棍合成 1 根空的未完成烤串，将它放进副手；主手拿食材，对方块按使用键逐份穿入。空串也可潜行使用拆回木棍。",
           "最短流程：打火石点火 → 放入 1–3 根生串 → 用装油的 Cookery 油壶刷油。",
           "空手使用烧烤架翻面；每次翻面后约 1 秒才能再翻，共翻 4 次。",
           "第 4 次翻面后使用特制调料；刷油和撒料都会按架上烤串数量消耗。",
           "调味完成后空手取出；潜行空手可连续取出。烧烤阶段不能跳过。"
         ],
         "zh_TW": [
+          "基岩版先用 1 根木棍合成 1 根空的未完成烤串，將它放進副手；主手拿食材，對方塊按使用鍵逐份穿入。空串也可潛行使用拆回木棍。",
           "最短流程：打火石點火 → 放入 1–3 根生串 → 用裝油的 Cookery 油壺刷油。",
           "空手使用燒烤架翻面；每次翻面後約 1 秒才能再翻，共翻 4 次。",
           "第 4 次翻面後使用特製調料；刷油和撒料都會按架上烤串數量消耗。",
           "調味完成後空手取出；潛行空手可連續取出。燒烤階段不能跳過。"
         ],
         "en_US": [
+          "On Bedrock, craft 1 stick into 1 empty Unfinished Skewer and place it in the offhand. Hold an ingredient in the main hand and use a block to thread it. Sneak-use can refund an empty skewer as a stick.",
           "Shortest flow: light with Flint and Steel → insert 1–3 raw skewers → brush with a filled Cookery Oil Pot.",
           "Use an empty hand to flip. There is about a 1-second flip cooldown; flip 4 times total.",
           "After the fourth flip, use Special Seasoning. Oil points and seasoning uses are consumed per skewer on the grill.",
