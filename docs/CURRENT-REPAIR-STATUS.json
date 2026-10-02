@@ -124,5 +124,15 @@
     }
   ],
   "all_details_closed": false,
-  "production_ready": false
+  "production_ready": false,
+  "source_validation": {
+    "static": true,
+    "isolated_full_family_bds": true,
+    "native_nonplayer_health_probe": true,
+    "bds_version": "1.26.51.1",
+    "packs": 41,
+    "real_players": 0,
+    "simulated_players": false,
+    "client": false
+  }
 }
