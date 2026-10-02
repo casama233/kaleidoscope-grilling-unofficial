@@ -1,4 +1,4 @@
-import {SECRET_ID,recipeTable} from './a24_skewering_core.js';
+import {SECRET_ID,recipeTable,secretFood,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY} from './a24_skewering_core.js';
 
 export const PLATE_ID='kaleidoscope_grilling:skewer_plate';
 export const PLATE_BLOCK_ID='kaleidoscope_grilling:skewer_plate_block';
@@ -11,8 +11,30 @@ export const PLATE_CAPACITY=5;
 const RECIPES=Object.freeze(recipeTable());
 const RECORDABLE=new Set(RECIPES.map(x=>x.id));
 
+// Re-evaluate the cached display/ranking fields without reconstructing native
+// stacks, so this remains safe during beforeEvents and legacy plate reads.
+export function refreshPlateFood(row){
+ if(row?.id!==SECRET_ID)return row;
+ if(row.native&&(row.native.version!==1||row.native.id!==row.id))return row;
+ const props=row.native?.props??row.props??{};
+ try{
+  const raw=JSON.parse(props[SKEWER_INGREDIENTS_KEY]);
+  if(!Array.isArray(raw)||raw.length!==3||raw.some(x=>!x||typeof x.id!=='string'||!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(x.id)))return row;
+  const cooked=props[SECRET_COOKED_KEY]===true;
+  let effective=raw;
+  if(cooked&&props[SECRET_COOKED_INGREDIENTS_KEY]!==undefined){
+   if(typeof props[SECRET_COOKED_INGREDIENTS_KEY]!=='string')return row;
+   const saved=JSON.parse(props[SECRET_COOKED_INGREDIENTS_KEY]);
+   if(!Array.isArray(saved)||(saved.length!==0&&saved.length!==3)||saved.some(x=>!x||typeof x.id!=='string'||!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(x.id)))return row;
+   if(saved.length)effective=saved;
+  }
+  const food=secretFood(effective,cooked,raw);
+  return {...row,nutrition:food.nutrition,saturation:food.saturation};
+ }catch{return row}
+}
 function cleanRow(row){
  if(!row||typeof row.id!=='string'||!row.id)return null;
+ row=refreshPlateFood(row);
  return {...row,id:String(row.id),nutrition:Math.max(0,Number(row.nutrition)||0),saturation:Math.max(0,Number(row.saturation)||0)};
 }
 

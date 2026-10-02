@@ -1,11 +1,13 @@
 /** Test overlay only: real ItemStacks/container/restart, never simulated players. */
 import {world,system,ItemStack,EnchantmentType} from '@minecraft/server';
+import {a25PlateRows} from './a25_plate_recipe_runtime.js';
+import {plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {VANILLA_FOOD_NUTRITION} from './vanilla_food_nutrition.js';
 import {DEFAULT_SECRET_SMOKING_ITEMS,registerSecretSmoking} from './secret_compat_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {setItemProperty,getItemProperty,setItemLore} from './itemData.js';
 import {ingredientSnapshot,cookedIngredientRows,restoreIngredient} from './main.js';
-const check=(ok,label)=>{if(!ok)throw Error(label)},key='kaleidoscope_grilling:qa_parity26',wait=t=>new Promise(r=>system.runTimeout(r,t));
+const check=(ok,label)=>{if(!ok)throw Error(label)},key='kaleidoscope_grilling:qa_parity27',wait=t=>new Promise(r=>system.runTimeout(r,t));
 system.runTimeout(async()=>{try{
  const d=world.getDimension('overworld');try{d.runCommand('tickingarea add circle 0 80 64 2 parity_qa true')}catch{}
  let block;for(let i=0;i<60;i++){await wait(10);try{block=d.getBlock({x:3,y:80,z:64})}catch{}if(block)break}check(block,'chunk unavailable');
@@ -25,6 +27,9 @@ system.runTimeout(async()=>{try{
   const skewer=new ItemStack('kaleidoscope_grilling:secret_skewer');setItemProperty(skewer,'kaleidoscope_grilling:skewer_ingredients',JSON.stringify(rows));c.setItem(0,skewer);
   const book=new ItemStack('kaleidoscope_grilling:skewer_recipe_book');setItemProperty(book,'kaleidoscope_grilling:recipe_record',JSON.stringify({resultId:skewer.typeId,customIngredients:rows.map(r=>r.id),recordedStack:{id:skewer.typeId,native:captureSkewerMetadata(skewer)}}));c.setItem(1,book);
   c.setItem(2,new ItemStack('kaleidoscope_grilling:unfinished_skewer'));
+  const legacyRaw=['minecraft:apple','minecraft:carrot','minecraft:beef'].map(id=>({id,edible:false,nutrition:0,saturation:0}));
+  const props={'kaleidoscope_grilling:skewer_ingredients':JSON.stringify(legacyRaw),'kaleidoscope_grilling:secret_cooked':true,'kaleidoscope_grilling:secret_cooked_ingredients':JSON.stringify(legacyRaw.map((r,i)=>({...r,id:i===2?'minecraft:cooked_beef':r.id})))};
+  const oldPlate=new ItemStack('kaleidoscope_grilling:skewer_plate');setItemProperty(oldPlate,'kaleidoscope_grilling:plate_skewers',JSON.stringify([{id:'kaleidoscope_grilling:secret_skewer',nutrition:1,saturation:0,props},{id:'kaleidoscope_grilling:grilled_fish_skewer',nutrition:6,saturation:.6}]));c.setItem(3,oldPlate);
   world.setDynamicProperty(key,JSON.stringify(rows));console.log('PARITY_NATIVE_PASS '+JSON.stringify({stage:'saved',vanillaFoods:40,smokerMappings:11,nonfoodOutputRejected:true,fullStableMetadata:true,rawTranslatedLore:true,recipeBookSaved:true,simulatedPlayers:false}));
  }else{
   const c=block.getComponent('minecraft:inventory').container,rows=JSON.parse(getItemProperty(c.getItem(0),'kaleidoscope_grilling:skewer_ingredients'));
@@ -34,6 +39,7 @@ system.runTimeout(async()=>{try{
   const record=JSON.parse(getItemProperty(c.getItem(1),'kaleidoscope_grilling:recipe_record'));
   const restored=restoreSkewerMetadata(record.recordedStack.native,(id,n)=>new ItemStack(id,n),id=>new EnchantmentType(id));check(getItemProperty(restored,'kaleidoscope_grilling:skewer_ingredients')===previous,'recipe native snapshot survived restart');
   check(c.getItem(2).typeId==='kaleidoscope_grilling:unfinished_skewer','starter retained');
-  console.log('PARITY_NATIVE_PASS '+JSON.stringify({stage:'restored',vanillaFoods:40,smokerMappings:11,nonfoodOutputRejected:true,fullStableMetadata:true,smokerOutputs:true,recipeBookRestored:true,restartPreserved:true,simulatedPlayers:false}));
+  const migrated=a25PlateRows(c.getItem(3));check(migrated[0].nutrition===9&&plateHighestNutritionIndex(migrated)===0,'legacy plate cache ranking after restart');
+  console.log('PARITY_NATIVE_PASS '+JSON.stringify({stage:'restored',vanillaFoods:40,smokerMappings:11,nonfoodOutputRejected:true,fullStableMetadata:true,smokerOutputs:true,recipeBookRestored:true,legacyPlateRanking:true,restartPreserved:true,simulatedPlayers:false}));
  }
 }catch(e){console.error('PARITY_NATIVE_FAIL '+e+' '+e.stack)}},120);
