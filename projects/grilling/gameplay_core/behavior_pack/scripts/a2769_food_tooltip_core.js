@@ -1,4 +1,5 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+export {isHeatLore} from './localized_lore_core.js';
 // Java FoodTooltip.appendMaxim: DARK_GRAY + ITALIC; existing RP translation keys.
 export const MAXIM_ITEMS=Object.freeze([
  'sugared_tomato','pepper_honey','houttuynia_stir_fried_pork',
@@ -12,10 +13,6 @@ export function foodMaximKey(id){return KEYS.get(id)}
 export function readRawFoodLore(stack){
  // Do not flatten RawMessage translations through getLore(). A failed read is not empty lore.
  return stack.getRawLore();
-}
-export function isHeatLore(line){
- return typeof line==='string'?line.startsWith('§c🔥'):
-  !!line&&typeof line.text==='string'&&line.text.startsWith('§c🔥');
 }
 function ownMaxim(line){
  const parts=line?.rawtext;

@@ -1,6 +1,15 @@
 {
   "format_version": "1.14.0",
   "sound_definitions": {
+    "kg_imm.action_success": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/action_success",
+          "volume": 0.85
+        }
+      ]
+    },
     "kg_imm.grill_flip": {
       "category": "block",
       "sounds": [
@@ -33,6 +42,16 @@
         }
       ]
     },
+    "kg_imm.skewer_disassemble": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/pickup_item",
+          "volume": 0.85,
+          "pitch": 0.82
+        }
+      ]
+    },
     "kg_imm.season": {
       "category": "block",
       "sounds": [
@@ -42,11 +61,52 @@
       ]
     },
     "kg_imm.shake_seasoning": {
-      "category": "block",
+      "category": "player",
       "sounds": [
         {
           "name": "sounds/kg_imm/shake_seasoning",
           "stream": true
+        }
+      ]
+    },
+    "kg_imm.seasoning_bottle_place": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/glass_place_1"
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_2"
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_3",
+          "pitch": 1.2
+        }
+      ]
+    },
+    "kg_imm.seasoning_bottle_stack": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/glass_clink_1",
+          "weight": 3
+        },
+        {
+          "name": "sounds/kg_imm/glass_clink_2",
+          "weight": 3
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_1",
+          "weight": 1
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_2",
+          "weight": 1
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_3",
+          "weight": 1,
+          "pitch": 1.2
         }
       ]
     },

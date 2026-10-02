@@ -43,4 +43,13 @@ tools.setItem(0,t1);tools.setItem(1,t2);
 assert.equal(hot.compactMatchingHotFood(tools,t1.clone(),1000).changed,false);
 console.log('Generic manual hot-food merge: PASS');
 
+const keepsake={rawtext:[{text:'§c🔥 '},{translate:'example:keepsake'}]},translated=new Container(2);
+const tr1=heat(new ItemStack('minecraft:cooked_beef',1,true),600),tr2=heat(new ItemStack('minecraft:cooked_beef',1,true),600);
+for(const stack of [tr1,tr2])stack.setLore([keepsake,...stack.getRawLore()]);
+translated.setItem(0,tr1);translated.setItem(1,tr2);
+assert.equal(hot.compactMatchingHotFood(translated,tr1.clone(),1000).changed,true);
+assert.deepEqual(translated.getItem(0).getRawLore()[0],keepsake);
+assert.equal(translated.getItem(0).getRawLore()[1].rawtext[1].translate,'tooltip.kaleidoscope_grilling.smoky_warmth');
+console.log('Raw translated foreign lore survives heat refresh and merge: PASS');
+
 const failing=new Container(4),fa=heat(new ItemStack('minecraft:cooked_beef',2,true),1200),fb=heat(new ItemStack('minecraft:cooked_beef',1,true),600);failing.setItem(0,fa);failing.setItem(2,fb);const write=failing.setItem.bind(failing);let fail=true;failing.setItem=(i,s)=>{if(i===2&&fail){fail=false;throw Error('injected write');}write(i,s);};const rejected=hot.compactMatchingHotFood(failing,fa.clone(),1000);assert.equal(rejected.failed,true);assert.equal(failing.getItem(0).amount,2);assert.equal(failing.getItem(2).amount,1);assert.equal(data.getItemProperty(failing.getItem(0),'kaleidoscope_grilling:hot_until'),2200);console.log('Hot-food failed-write rollback: PASS');

@@ -11,7 +11,10 @@ SOURCE=ROOT/'projects/grilling/guide/catalog.a3.json'
 PROJECT=ROOT/'projects/grilling/gameplay_core'
 BP,RP=PROJECT/'behavior_pack',PROJECT/'resource_pack'
 LOCALES=('zh_CN','zh_TW','en_US')
-METHOD_LABELS={'Hand Threading':'穿串 / Threading','Grill':'燒烤 / Grill','Crafting':'合成 / Crafting','Furnace':'熔爐 / Furnace','Smoker':'煙燻爐 / Smoker','Campfire':'營火 / Campfire','Soul Campfire':'靈魂營火 / Soul Campfire'}
+# Public Cookery localizes its known station names. Unknown methods remain
+# canonical English; their localized steps are in mechanicsByLocale. API v1
+# does not accept per-locale recipe methods, so do not invent unsupported fields.
+METHOD_LABELS={'Crafting':'Crafting Table'}
 EXTERNAL_ICONS={'textures/items/redstone_dust','textures/items/gunpowder','textures/items/kc_oil_pot_filled'}
 ID=re.compile(r'^[a-z0-9_.-]+:[a-z0-9_./-]+$')
 
