@@ -12,7 +12,7 @@ Java 1.1.1 發行 JAR 的 SHA256、260 個使用到的原版模型／貼圖及�
 
 ## 驗證
 
-完整來源檢查通過；新增 10 個回歸情境涵蓋所有固定烤串階段、空槽、四向位置、狀態變更沿用 helper、可見範圍、卸載回收、顯示失敗及只讀儲存。隔離家族 BDS 載入、原生 property／metadata 與重啟證據將另行記錄。腳本與 BDS 驗證不能代替真人畫面。
+完整來源檢查通過；新增 10 個回歸情境涵蓋所有固定烤串階段、空槽、四向位置、狀態變更沿用 helper、可見範圍、卸載回收、顯示失敗及只讀儲存。16 個 canonical 家族包在未開啟實驗功能的新世界完成精確逐檔載入／重啟；另行隔離探針驗證三格 helper、六段 property、四向座標、原物品名稱／RawMessage 附註／食材 metadata、空槽清除與重啟再生，見 [JSON 收據](BDS-GRILL-DISPLAY-20261002.json)。這個 16 包候選不涵蓋正式伺服器的私有相容擴充。探針只傳入觀察座標，在探針世界暫停自動的零玩家清理回呼，使 property 能隔一 tick 讀回；沒有建立或偽造玩家。精確載入世界不含此覆蓋。第一個探針的同 tick 讀回失敗也留存；等待下一 tick 的依據見 [官方 Entity API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/entity?view=minecraft-bedrock-stable#getproperty)。腳本與 BDS 驗證不能代替真人畫面。
 
 ## 尚未結案
 
