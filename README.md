@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.37
+## Current maintained baseline: 2.8.38
 
 Public oil and food output APIs, shared guide localization, native station contents and failure recovery: [release scope](docs/STATUS-A2.8.37.md). Real-client and Java platform differences are recorded separately.
 

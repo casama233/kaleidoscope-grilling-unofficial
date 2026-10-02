@@ -11,7 +11,7 @@ function fixture(name){const properties=new Map(),faults=new Map(),emitted=[],su
  const world={getDynamicProperty:k=>properties.get(k),setDynamicProperty(k,v){if(faults.get(k)){faults.set(k,faults.get(k)-1);throw Error('property fault')}if(v===undefined)properties.delete(k);else properties.set(k,v)},getAbsoluteTime:()=>1000,getAllPlayers:()=>[],getEntity:id=>drops.find(d=>d.id===id),afterEvents:{playerSpawn:signal('spawn'),playerPlaceBlock:signal('place')},beforeEvents:{playerInteractWithBlock:signal('interact'),playerBreakBlock:signal('break'),explosion:signal('explosion')}};
  const system={currentTick:100,run(){},runTimeout(){},afterEvents:{scriptEventReceive:signal('script')},sendScriptEvent:(id,message)=>emitted.push({id,data:JSON.parse(message)})};
  const ctx={...oil,...food,world,system,ItemStack:Item,EquipmentSlot:{Mainhand:'Mainhand',Offhand:'Offhand'},GameMode:{Creative:'Creative'},console};
- let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil':'deliverCuisineOutput,readCuisineMetadata')+'};';vm.runInNewContext(code,ctx);
+ let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil,publishLegacyHostOil':'deliverCuisineOutput,readCuisineMetadata')+'};';vm.runInNewContext(code,ctx);
  const dim={id:'minecraft:overworld',getBlock:()=>block,spawnItem(s){const item=s.clone(),d={id:'drop'+drops.length,getComponent:()=>({itemStack:item}),remove(){drops.splice(drops.indexOf(d),1)}};drops.push(d);return d}};
  const block={dimension:dim,x:40,y:80,z:64,typeId:oil.EMPTY_POT,permutation:{getState:()=>false,withState(_k,v){this.getState=()=>v;return this}},setPermutation(p){this.permutation=p}};
  return {api:ctx.api,properties,faults,emitted,drops,block,Slot};}
@@ -62,4 +62,10 @@ test('station oil save failure restores the native slot and state before retry',
  const data={},host={save(_b,s){stored=structuredClone(s);if(once){once=false;throw Error('station save')}},load:()=>stored,sync(){}};
  assert.throws(()=>f.api.commitSharedStationOil(f.block,slot,data,host),/station save/);assert.equal(oil.readPublicOil(slot.getItem()).state.count,8);assert.deepEqual(stored,{});
  assert.equal(f.api.commitSharedStationOil(f.block,slot,data,host).ok,true);assert.equal(oil.readPublicOil(slot.getItem()).state.count,7);assert.equal(stored.oilTicks,12000);assert.equal(stored.grillingOilType,'secret_chili');
+});
+
+test('author snapshot certifies an unrecorded legacy filled pot as 256 while retaining strict public validation',()=>{
+ const f=fixture('oil_api_host.js'),legacy=new Item(oil.FILLED_POT);legacy.nameTag='Legacy filled';const next=f.api.publishLegacyHostOil(legacy);assert.equal(oil.readPublicOil(next).state.count,256);assert.equal(oil.readPublicOil(next).state.type,'');assert.equal(next.nameTag,'Legacy filled');
+ legacy.props.kc_oil_count=32;assert.equal(oil.readPublicOil(f.api.publishLegacyHostOil(legacy)).state.count,32);
+ const corrupt=oil.createPublicOilPot(Item,'canola',8);corrupt.lore.push(corrupt.lore.find(x=>typeof x==='string'&&x.includes('§r§0§r§3§r§6')));assert.throws(()=>f.api.publishLegacyHostOil(corrupt));
 });

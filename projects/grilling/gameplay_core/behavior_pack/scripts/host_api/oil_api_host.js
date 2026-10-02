@@ -26,7 +26,8 @@ export function publishHostOil(stack,count){
  out.setDynamicProperty(ITEM_KEY,count||undefined);return out;
 }
 export function publishLegacyHostOil(stack){
- const read=readHostOilItem(stack);if(!read.valid)throw Error(read.reason);
+ // The author explicitly defines a filled legacy can without saved quantity as full.
+ const read=readHostOilItem(stack,{legacyFull:true});if(!read.valid)throw Error(read.reason);
  if(read.source==='public_api')return stack.clone();
  const out=stack.clone();writePublicOil(out,read.state,{presentation:false});return out;
 }
