@@ -73,16 +73,14 @@ def make_pose(family, view, hand):
     size=pose.get('scale',[1,1,1]);rotation=xyz(r)
     if view=='tp':
         rotation=mul(rotate('x',-90),rotation)
-        if family=='skewer': position=[0,0,0] # retain the handle anchor
-        else:
-            arm=rotate('x',15)
-            base=chain(translate([5*sign,22,0]),arm,translate([sign,-31,1]))
-            target=chain(translate([6*sign,22,0]),arm,translate([0,-10,-2]),rotate('x',-90),translate(tr),xyz(r),scale(size),translate([-8,-8,-8]),translate(source_offset))
-            local=mul(rigid_inverse(base),target)
-            shifted=point(local,[0,24,0])
-            correction_transformed=[sum(local[i][j]*correction[j] for j in range(3))for i in range(3)]
-            position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
-            position[0]*=-1
+        arm=rotate('x',15)
+        base=chain(translate([5*sign,22,0]),arm,translate([sign,-31,1]))
+        target=chain(translate([6*sign,22,0]),arm,translate([0,-10,-2]),rotate('x',-90),translate(tr),xyz(r),scale(size),translate([-8,-8,-8]),translate(source_offset))
+        local=mul(rigid_inverse(base),target)
+        shifted=point(local,[0,24,0])
+        correction_transformed=[sum(local[i][j]*correction[j] for j in range(3))for i in range(3)]
+        position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
+        position[0]*=-1
     else:
         base,camera=calibration(hand)
         # Rack's untranslated Java FP slot lies outside this Bedrock camera.

@@ -213,7 +213,7 @@ function craftFromBook(player,book,stickHand='off'){
  const slots=bookIngredientSlots(record);if(!slots)return false;
  const c=mainContainer(player);if(!c)return false;
  const before=Array.from({length:c.size},(_,i)=>c.getItem(i)?.clone()),oldOff=heldOff(player)?.clone();
- const inventory=before.map(s=>s?{id:s.typeId,count:s.amount}:null);
+ const inventory=before.map(s=>s?{id:s.typeId,count:s.amount,tags:s.getTags?.()??[]}:null);
  const planned=planInventoryConsumption(inventory,slots,[player.selectedSlotIndex]);
  if(!planned.ok){message(player,'§c缺少配方材料：'+(planned.missing??[]).join('/'));return false}
  // Java intentionally copies the recorded secret recipe, not newly consumed metadata.
