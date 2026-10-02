@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    45
+    47
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -97,7 +97,7 @@
     {
       "id": "F13",
       "title": "聲畫操作",
-      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch",
+      "canonical": "保留原作 17 OGG 與 2.8.45 兩手／兩視角分支；2.8.47 補單粒特效、黃金／無敵／成功盾、工作站音效",
       "remaining": "音量、聲源、停止、透明排序、雙人觀察均須 Windows 真人",
       "client_accepted": false
     },
@@ -126,6 +126,19 @@
   "all_details_closed": false,
   "production_ready": false,
   "source_validation": {
+    "static": true,
+    "isolated_full_family_bds": false,
+    "native_nonplayer_feedback_probe": false,
+    "simulated_players": false,
+    "client": false
+  },
+  "additional_review": "PARITY-AUDIT-20261003.md",
+  "previous_source_validation": {
+    "version": [
+      2,
+      8,
+      45
+    ],
     "static": true,
     "isolated_full_family_bds": true,
     "native_nonplayer_health_probe": true,

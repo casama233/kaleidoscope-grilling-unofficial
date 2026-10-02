@@ -57,14 +57,18 @@ def main():
             assert current[key].count(r'\n') == 1, 'Malformed tooltip newline'
     # All bottle states, existing stacks and block items resolve declaratively;
     # no inventory polling, scripted lore rewriting or host translations.
-    for path in (PROJECT / 'behavior_pack/scripts').rglob('*.js'):
-        if path.relative_to(PROJECT / 'behavior_pack').as_posix() in (
-                'scripts/guide/payload.js', 'scripts/guide/publisher.js'):
-            continue
-        assert path.read_bytes() == prior(path), 'Runtime script changed: ' + str(path)
+    # The label-only release promised no script change. Later reviewed gameplay
+    # releases must retain the label contract without freezing all scripts at .45.
+    label_only_release = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_text())['header']['version']) == (2, 8, 46)
+    if label_only_release:
+        for path in (PROJECT / 'behavior_pack/scripts').rglob('*.js'):
+            if path.relative_to(PROJECT / 'behavior_pack').as_posix() in (
+                    'scripts/guide/payload.js', 'scripts/guide/publisher.js'):
+                continue
+            assert path.read_bytes() == prior(path), 'Runtime script changed: ' + str(path)
     print(json.dumps({'inventory_items': counts['item'], 'named_blocks': counts['block'],
                       'display_aliases': len(aliases), 'locales': list(LABELS),
-                      'plain_names_preserved': True, 'runtime_behaviour_preserved': True,
+                      'plain_names_preserved': True, 'label_only_runtime_equality_checked': label_only_release,
                       'client_rendering_accepted': False}, ensure_ascii=False))
 
 

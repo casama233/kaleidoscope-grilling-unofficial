@@ -1,5 +1,6 @@
 """Build bounded one-particle feedback using hash-pinned Mojang sample definitions."""
 from pathlib import Path
+import argparse
 import copy
 import hashlib
 import json
@@ -7,7 +8,7 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
 
-def build():
+def build(check=False):
     fixture = json.loads((ROOT / 'development/gameplay_core/fixtures/feedback-mojang-1.26.50.4.json').read_text())
     for row in fixture['files']:
         assert hashlib.sha256(row['text'].encode()).hexdigest() == row['sha256'], row['path']
@@ -27,8 +28,15 @@ def build():
         # Flame originally relies on its manual emitter for movement; make the
         # supplied event velocity effective in this standalone definition too.
         components.setdefault('minecraft:particle_motion_dynamic', {'linear_acceleration': [0, 0, 0]})
-        (RP / 'particles' / ('feedback_' + name + '.json')).write_text(json.dumps(data, indent=2) + '\n')
-    print('Built six owned instant-one particle definitions; renderer acceptance remains separate.')
+        path = RP / 'particles' / ('feedback_' + name + '.json')
+        expected = json.dumps(data, indent=2) + '\n'
+        if check:
+            assert path.read_text() == expected, 'Stale particle definition: ' + str(path)
+        else:
+            path.write_text(expected)
+    print(('Checked' if check else 'Built') + ' six owned instant-one particle definitions; renderer acceptance remains separate.')
 
 if __name__ == '__main__':
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--check', action='store_true')
+    build(parser.parse_args().check)
