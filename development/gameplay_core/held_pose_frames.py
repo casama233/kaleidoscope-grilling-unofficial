@@ -2,7 +2,7 @@
 
 Never copy Java XYZ Euler angles into Bedrock ZYX bone channels. This module
 uses Java display transforms and pinned Mojang player attachment offsets for
-skewer first person. Other families retain their editor calibration. Neither
+skewer and bottle first person. Unused rack poses retain their editor calibration. Neither
 mathematical projection nor editor calibration is Minecraft client acceptance.
 """
 import json
@@ -98,7 +98,7 @@ def make_pose(family, view, hand):
         position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
         position[0]*=-1
     else:
-        base,camera=(native_skewer_calibration(hand) if family=='skewer' else calibration(hand))
+        base,camera=(native_skewer_calibration(hand) if family in ('skewer','bottle') else calibration(hand))
         # Rack's untranslated Java FP slot lies outside this Bedrock camera.
         # Keep Java orientation/scale; adapt the placement into the visible hand
         # region. This explicit exception is covered by the viewport regression.

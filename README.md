@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.45
+## Current maintained baseline: 2.8.46
+
+本候選另修正調味瓶第一人稱原生掛接座標；瓶殼與內容物分開驗證，詳見 [2.8.46 驗證範圍](docs/STATUS-A2.8.46.md)。保留 2.8.45 的熱期限、進食與龍血改動；客戶端顯示仍待驗收。
 
 本版修復食用完成時的熱度判定、服務端與模型共享的隨機吃法、可反覆治療的原生龍血生命上限，以及秘製串三食材手持顯示。包含 2.8.42 角色效果快取與 canonical 2.8.43 第一人稱框架修復。詳見 [當前修復與驗收矩陣](docs/CURRENT-REPAIR-STATUS.md) 與 [A2.8.45](docs/STATUS-A2.8.45.md)；真人驗收、秘製動態 GUI 及部分 Java 平台能力仍有缺口。
 

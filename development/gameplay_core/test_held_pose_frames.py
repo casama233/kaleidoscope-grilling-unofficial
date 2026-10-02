@@ -36,7 +36,7 @@ class HeldPoseFrameTests(unittest.TestCase):
             desc=json.loads(p.read_text())['minecraft:attachable']['description']
             for hand in ('right','left'):
                 bones=expected[desc['animations']['fp_'+hand]]['bones']
-                base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith('animation.kg_a287.skewer') else calibration(hand))
+                base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith(('animation.kg_a287.skewer','animation.kg_a286.bottle')) else calibration(hand))
                 combined=chain(rigid_inverse(camera),base,translate([0,24,0]))
                 for bone in bones.values():combined=chain(combined,bone_matrix(bone))
                 combined=chain(combined,translate([0,-24,0]))
