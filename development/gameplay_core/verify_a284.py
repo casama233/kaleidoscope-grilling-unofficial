@@ -6,9 +6,19 @@ from verify_a283 import BP, RP, main as previous_gate
 def eating_gate():
     script = (BP / 'scripts/main.js').read_text()
     start = script.split('world.afterEvents.itemStartUse.subscribe', 1)[1].split('world.afterEvents.itemCompleteUse.subscribe', 1)[0]
-    # Pending seasoning has its separate shake; food must never invoke a player pose.
+    # Pending seasoning has its separate shake. Food may only supply the
+    # third-person native rotation fallback; legacy translated limbs stay banned.
     food_start = start.split('if(!FOOD_DATA[id]&&id!==SECRET_ID)return;', 1)[1]
-    assert 'playAnimation' not in food_start
+    if 'playAnimation' in food_start:
+        assert food_start.count('playAnimation') == 1
+        assert "playAnimation('animation.kg_eating.player.native_'" in food_start
+        poses = json.loads((RP / 'animations/eating_arms.animation.json').read_text())['animations']
+        for hand in ('right', 'left'):
+            pose = poses['animation.kg_eating.player.native_' + hand]
+            assert not pose.get('override_previous_animation', False)
+            assert '!variable.is_first_person' in pose['blend_weight']
+            assert set(pose['bones']) == {hand + 'arm'}
+            assert set(pose['bones'][hand + 'arm']) == {'rotation'}
     stop = script.split('world.afterEvents.itemStopUse.subscribe', 1)[1].split('world.beforeEvents.entityHurt.subscribe', 1)[0]
     assert 'playAnimation' not in stop
     tick = script.split('const active=ACTIVE_EATS.get(p.id);', 1)[1].split('writeFx(p,readFx(p))', 1)[0]
@@ -43,7 +53,7 @@ def eating_gate():
         assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file
         skewers += 1
     assert skewers == (40 if (RP / 'attachables/secret_skewer.attachable.json').exists() else 39), skewers
-    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no scripted eating bone override')
+    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no translated limb or whole-player override')
 
 
 if __name__ == '__main__':
