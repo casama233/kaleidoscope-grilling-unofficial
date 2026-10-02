@@ -1,5 +1,10 @@
 # Native model and held-display audit — 2026-10-01
 
+The skewer first-person editor calibration below is superseded by the
+[2.8.43 player-bone candidate repair](../../STATUS-A2.8.43.md) following a
+real client failure. These historical editor captures never certified
+Minecraft first-person visibility.
+
 ## Source and tool
 
 - Inspected canonical baseline: `6fe8864f323603ee1c833000045543e9105ed685` (2.8.17)

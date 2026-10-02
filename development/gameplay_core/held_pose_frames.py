@@ -1,8 +1,9 @@
 """Convert Java item display frames into Bedrock attachment frames.
 
 Never copy Java XYZ Euler angles into Bedrock ZYX bone channels. This module
-uses the official Blockbench 5.2.1 Java display and bound-attachable reference
-frames. Editor calibration is not Minecraft client acceptance.
+uses Java display transforms and pinned Mojang player attachment offsets for
+skewer first person. Other families retain their editor calibration. Neither
+mathematical projection nor editor calibration is Minecraft client acceptance.
 """
 import json
 import math
@@ -55,6 +56,21 @@ def calibration(hand):
     camera=chain(translate([0,19,-40]),xyz([-175.71084667,0,180]))
     return base,camera
 
+def native_skewer_calibration(hand):
+    """Mojang empty_hand arm/item basis, with the bound mesh pivot removed.
+
+    Right arm pivot [-5,22,0], position [13.5,-10,12], rotation
+    [95,-45,115]; rightItem pivot [-6,15,1]. empty_hand cancels the
+    item's Z offset and places its Y seven units below the arm pivot.
+    Offhand uses the mirrored basis; client acceptance covers both hands.
+    This is a head-centered projection model, not a renderer emulation.
+    """
+    sign=1 if hand=='right' else -1
+    arm=chain(translate([-8.5*sign,12,12]),zyx([-95,45*sign,115*sign]))
+    base=chain(arm,translate([sign,-7,0]),translate([0,-24,0]))
+    camera=chain(translate([0,24,0]),rotate('y',180))
+    return base,camera
+
 FAMILIES = {
     'skewer': ('beef_raw.json',[8,-24,8],'skewer_pose','skewer_model',[0,-1,6]),
     'bottle': ('seasoning_bottles_1.json',[8,-18,8],'grip',None,[0,0,0]),
@@ -82,7 +98,7 @@ def make_pose(family, view, hand):
         position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
         position[0]*=-1
     else:
-        base,camera=calibration(hand)
+        base,camera=(native_skewer_calibration(hand) if family=='skewer' else calibration(hand))
         # Rack's untranslated Java FP slot lies outside this Bedrock camera.
         # Keep Java orientation/scale; adapt the placement into the visible hand
         # region. This explicit exception is covered by the viewport regression.

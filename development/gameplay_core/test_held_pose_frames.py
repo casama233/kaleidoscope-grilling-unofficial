@@ -4,7 +4,7 @@ import json
 import math
 import unittest
 from held_pose_frames import (RP, expected_animations, make_pose, bone_matrix, chain,
-    translate, rotate, point, rigid_inverse, calibration, zyx)
+    translate, rotate, point, rigid_inverse, calibration, native_skewer_calibration, zyx)
 
 class HeldPoseFrameTests(unittest.TestCase):
     def test_runtime_is_reproducible_and_not_raw_java_euler(self):
@@ -36,7 +36,7 @@ class HeldPoseFrameTests(unittest.TestCase):
             desc=json.loads(p.read_text())['minecraft:attachable']['description']
             for hand in ('right','left'):
                 bones=expected[desc['animations']['fp_'+hand]]['bones']
-                base,camera=calibration(hand)
+                base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith('animation.kg_a287.skewer') else calibration(hand))
                 combined=chain(rigid_inverse(camera),base,translate([0,24,0]))
                 for bone in bones.values():combined=chain(combined,bone_matrix(bone))
                 combined=chain(combined,translate([0,-24,0]))
