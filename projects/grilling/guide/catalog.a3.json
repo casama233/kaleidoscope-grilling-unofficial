@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.6",
-  "revision": "immersion_guide_20261002",
+  "version": "0.3.7",
+  "revision": "grill_visual_20261002",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",

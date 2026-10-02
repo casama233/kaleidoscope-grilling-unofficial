@@ -1,0 +1,22 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_station.grill_flip": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "rotation": [
+            0,
+            0,
+            "-180*(q.property('kaleidoscope_grilling:flips')>0 && v.flip_progress<1 ? q.property('kaleidoscope_grilling:flips')-1+v.flip_progress : q.property('kaleidoscope_grilling:flips'))"
+          ],
+          "position": [
+            0,
+            "math.sin(180*v.flip_progress)*q.property('kaleidoscope_grilling:hop')/1000*16",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

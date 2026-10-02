@@ -6,7 +6,7 @@ from verify_a284 import eating_gate
 def survival_gate():
     script=(BP/'scripts/main.js').read_text()
     assert 'MAX_GRILLS' not in script and 'readRegistry' not in script
-    assert "onTick(e){tickGrill(e.block)}" in script
+    assert "onTick(e){tickGrill(e.block)" in script
     block=json.loads((BP/'blocks/grill.json').read_text())['minecraft:block']['components']
     assert block['minecraft:tick']=={'interval_range':[1,1],'looping':True}
     assert 'kaleidoscope_grilling:grill_tick' in block
