@@ -53,3 +53,8 @@ assert.equal(translated.getItem(0).getRawLore()[1].rawtext[1].translate,'tooltip
 console.log('Raw translated foreign lore survives heat refresh and merge: PASS');
 
 const failing=new Container(4),fa=heat(new ItemStack('minecraft:cooked_beef',2,true),1200),fb=heat(new ItemStack('minecraft:cooked_beef',1,true),600);failing.setItem(0,fa);failing.setItem(2,fb);const write=failing.setItem.bind(failing);let fail=true;failing.setItem=(i,s)=>{if(i===2&&fail){fail=false;throw Error('injected write');}write(i,s);};const rejected=hot.compactMatchingHotFood(failing,fa.clone(),1000);assert.equal(rejected.failed,true);assert.equal(failing.getItem(0).amount,2);assert.equal(failing.getItem(2).amount,1);assert.equal(data.getItemProperty(failing.getItem(0),'kaleidoscope_grilling:hot_until'),2200);console.log('Hot-food failed-write rollback: PASS');
+
+const {writePublicFood}=await import('../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js');
+const distinct=new Container(2),first=writePublicFood(new ItemStack('minecraft:cooked_beef'),{v:1,hotUntil:2200,seasoning:['minecraft:redstone']}),second=writePublicFood(new ItemStack('minecraft:cooked_beef'),{v:1,hotUntil:2200,seasoning:['minecraft:gunpowder']});
+distinct.setItem(0,first);distinct.setItem(1,second);assert.equal(hot.compactMatchingHotFood(distinct,first.clone(),1000).changed,false);assert.equal(distinct.getItem(0).amount,1);assert.equal(distinct.getItem(1).amount,1);
+console.log('Public seasonings prevent an incompatible heat merge: PASS');

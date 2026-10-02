@@ -10,3 +10,7 @@ export function interactionFeedback(player,text){
  try{player.onScreenDisplay.setActionBar(text);LAST.set(player.id,{tick:now})}catch{}
 }
 world.afterEvents.playerLeave.subscribe(e=>LAST.delete(e.playerId));
+
+// Java exposes active eating progress and the 25-tick release checkpoint.
+// Called only while the exact eating session is current, never by crosshair polling.
+export function eatingProgress(player,bar){try{player.onScreenDisplay.setActionBar(bar)}catch{}}

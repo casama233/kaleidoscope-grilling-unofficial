@@ -1,22 +1,28 @@
-# Java parity repair matrix
+# Java 1.1.1 與 A2.8.37 的差距／證據矩陣
 
-This matrix follows the twelve findings in the 2026-10-02 Java 1.1.1 audit. The canonical maintained source is 2.8.35. The audited production installation read during this batch is 2.8.31; a source fix does not change that installation or certify a real client. Each exported change has a unique release identity and must pass the family deployment gates.
+2026-10-02。A2.8.37 基於 main A2.8.36；來源修復不能推定 live 版本或真人驗收。部署版本及完整逐檔收據記於本輪 handoff。原作模組、基岩平台限制與待驗證的感受分开列出。
 
-| Finding | Source state | Remaining closure evidence/work |
+| 發現 | canonical 功能修復 | 仍需的真人證據／平台界線 |
 | --- | --- | --- |
-| F01 First empty skewer | Fixed in 2.8.25; crafted empty starter retained | Real survival first-skewer route and saved-world migration |
-| F02 Eating settlement | 2.8.25 removes animation-time debit and protects completion/stop identity; 2.8.28 stops only the associated audio | Real full/interrupted use, slot changes, reconnect and competing clients |
-| F03 Visible station contents | 2.8.29 adds three native grill slots, 19 fixed meshes, six original cooking stages and flip transition | 2.8.34 protects plate transfers and adds direction states; rack tools, plate meshes and secret/custom visuals are being developed separately; real client rendering remains required |
-| F04 Cooking/use audio | 2.8.28 connects original audio, restores six missing OGGs and scopes start/stop to station/use lifecycle | Real audibility, loudness, interruption, nearby observer and native chewing overlap |
-| F05 Acquisition gaps | Empty recipe book fixed in 2.8.26; beef/chicken acquisition added through reviewed Board API 0.1.0 in 2.8.31 | Requires complete family API assembly; unextended author host remains unchanged; verify survival acquisition on a real client |
-| F06 Guide onboarding/locales | 2.8.28 corrects first-skewer route, puts acquisition blockers first, uses recognized host method IDs and translated heat lore | Host-owned names and unsupported method labels; actual Windows/touch guide layout and navigation |
-| F07 Secret skewer presentation/food behavior | Metadata preservation and vanilla nutrition/smoker mapping improved in 2.8.26, plate ranking in 2.8.27 | Ingredient-composed appearance and complete registered custom-food behavior |
-| F08 Cookery automated output | Open | Authoritative host output receipt carrying oil, heat and seasoning through every supported output path |
-| F09 Eating presentation | Native eating pose, staged items and original audio retained; 1.25-second checkpoint now explained | Per-skewer animation parity and unobtrusive in-use completion cue with real client validation |
-| F10 Dragon blood/heat visuals | Bedrock amplifier differences disclosed in 2.8.28; translated heat lore supported | Equivalent health behavior and state-aware heat icon/frame |
-| F11 Worldgen/fluid/platform/multiplayer | Partial source/static/native evidence only | Real clients, world generation, transparency, fluid particles, both hands/views and contention |
-| F12 Maintenance/document drift | 2.8.28 records verified Cookery 1.0.8 reference, cooking guide standard and this matrix | 2.8.34 updates guide intro and plate safeguards; historical status documents are not current acceptance |
+| F01 第一根空串 | 生存合成空串，保留魚串起步路徑 | 實際生存採集／製作 |
+| F02 食用結算 | 開始／停止／完成身份校驗、唯一結算、扣料與營養回復、音效作用域 | 原生使用事件、换槽、斷線與多人 |
+| F03 設備內容 | 三槽烤爐 19 模型 × 六階段；架九槽、盤五槽、秘製三食材＋竹籤；盤拆除／爆炸持久收據 | 客戶端渲染、命中與透明排序；第三方原生資料驅動模型須公開 render API |
+| F04 音效 | 原作 17 OGG、13 事件及 21 定義，設備與使用生命週期控制保留 | 音量、附近觀察者、中斷／原生咀嚼重疊 |
+| F05 牛肉塊／雞皮 | Board API 保持四刀後取料、牛肉塊 ×2、原雞肉＋1–3 雞皮，交付確認／隔離 | 真玩家砧板操作；普通未擴充作者包沒有新配方能力 |
+| F06 指南 | 唯一章節、六根類、逐物品頁、三語名稱／製程、真實取得狀態；0.3.11 payload 與 publisher 同步 | Windows／觸控导航、返回、語言切換與多人隔離 |
+| F07 秘製串 | 食材快照／煙燻映射／營養／全部已登記食品效果、容器、辣椒傷害，設備食材組合 | 任意 Java mod callbacks 須作者契約；動態背包圖示與第一人稱組合未等價 |
+| F08 作者出料 | 油種、1200／12000／24000 ticks、調味直接寫實際出料；v2 operation receipts、原生燉湯變體、重試不重複給物 | 外部自動化必須調用公開交付 API；真玩家領料與食用效果 |
+| F09 食用呈現 | Java 五種曲線 × 雙手轉到既有 item 骨架，進食期間 1.25 秒門檻／熱度提示 | 原生手臂、Java 第二截物件未等價；随机 THREE／ALT 與 client 曲線尚缺共享選擇參數 |
+| F10 龍血／熱度 | 限額 2 點池耗盡保持零，原生增幅 4／8 加池達邏輯 6／10；升級補差量、同 tick 防重用；熱 lore／進食徽標 | 原生心形 HUD／Java health attribute 與動態物品框未等價；護甲／傷害感受需客戶端 |
+| F11 平台／世界 | 自有腳本油流保留；油源交易、整疊桶、混油拒絕／型別與放置容量已修 | Java FluidType、選用模組無同名等價；新區塊生成、流體粒子、主副手／視角及多人實測 |
+| F12 維護／文件 | 新版完整來源、受原 hash 鎖定 API 宣告、到期／移除條件、三語指南及當前矩陣；不以翻譯夾帶玩法 | 家族 exact receipt 的 static/BDS/saved-world/client 證據持续分開 |
 
-[2.8.29 grill implementation](STATUS-A2.8.29.md), [2.8.28 audio/guide implementation](STATUS-A2.8.28.md), [guide standard](GUIDE-STANDARD.md) and [baseline maintenance](BASELINE-MAINTENANCE.md) describe the current scope. Native API probes do not certify sound output, rendered screens or player interaction. No simulated players may stand in for client evidence. Full saved-world migration remains a separate gate even when isolated restart persistence passes.
+## 新發現的油壺阻斷
 
-The separately active source batch continues F03 station visuals and F08 oil/food output interfaces. A2.8.34 completes the plate placement/insertion/removal rollback paths; 2.8.35 adds verified packed drops for destruction and explosion. Sudden process termination and support-removal parity remain separate audits. F05 now has the reviewed family Board API; its real-client evidence remains separate. Family deployment uses the canonical Tavern family assembler and BSM admission guard after all required evidence is attached to the exact candidate.
+作者壺讀成 0、typed 放置變 256、混油、舊物品空快照、副手能力、耗盡身份、炒鍋扣油保存不一致，以及世界油源／桶堆疊失敗回復均已在來源處理。[API 回饋稿](COOKERY-FAMILY-API-PROPOSAL.md) 記錄原包重現及權威界線。作者身份不換成私服身份，未公開完整作者檔案。
+
+## 驗收解讀
+
+儲存替身驗證 canonical 處理函式與故障；獨立 BDS 驗證完整套件載入／重啟、原生物品／方塊／容器與跨包資料；正式世界副本驗證既有存檔載入／重啟與玩家記錄。以上不能寫成真人生存、音效或畫面已通過。使用者要求先部署 live 供驗收，以具體收據記錄 client deferred；不修改收據捏造通過。
+
+[本版修復範圍](STATUS-A2.8.37.md)、[guide contract](GUIDE-STANDARD.md)、[maintenance](BASELINE-MAINTENANCE.md)。本表明列仍未等價的部分，沒有宣稱所有 Java 功能已完整移植。

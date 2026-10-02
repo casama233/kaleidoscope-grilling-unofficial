@@ -227,9 +227,17 @@ message.kg.board_retry=砧板暫時未完成，請重試。
 message.kg.board_quarantined=砧板產出狀態待核對，請聯絡管理員。
 message.kg.board_knife=請用廚房刀切割。
 
+senluo.public.food.v1=
+message.kg.oil_unavailable=油壺資料尚未確認，物品與油量已保留。請稍後再試。
+message.kg.oil_sync_pending=正在同步舊油壺資料，請稍後再操作。
+message.kg.oil_different_content=油種不同，不能混裝。
+message.kg.oil_full=油壺已滿。
+message.kg.oil_insufficient=油量不足。
+message.kg.output_unavailable=出料狀態未能確認，設備已保留批次資料。請留出背包空間後再試。
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森羅物語：煙火
-guide.kg.intro=按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮需要整套家族部署的砧板 API；未啟用時，第一串可從魚串開始。
+guide.kg.intro=按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮可透過廚房砧板取得；首次燒烤可從魚串開始。
 guide.kg.all=全部條目
 guide.kg.select=選擇分類；食物按製作方式分組。
 guide.kg.back=返回
@@ -619,7 +627,8 @@ guide.kg.body.kg_a1:guide_recipe_golden.5=熟串效果：無敵 · 基礎 10 秒
 guide.kg.body.kg_a1:guide_recipe_golden.6=趁熱吃時，新獲得的固定烤串效果持續時間會翻倍，新增的飽和度提高 25%。 特製調料的附加效果只會在食物仍有煙火氣時觸發；它們不會再被煙火氣二次翻倍。冷掉後仍能吃，但不會觸發這些調料效果。
 guide.kg.body.kg_a1:guide_recipe_golden.7=沒有烤熟的未完成串、固定生串和秘製生串都可潛行拆解，取回材料與木棍。
 guide.kg.name.kaleidoscope_cookery:oil_pot_filled=Cookery 油壺：煙火油
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.1=取得：這是本體油壺，不是煙火新增物品；基礎油壺的製作見本體指南。以下只說明煙火油適配。
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.2=煙火油容量：64 點。主手油桶配合副手油壺可灌油；也可從油源或大缸取油，每桶增加 8 點。
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.3=刷油：用裝有對應煙火油的油壺點擊烤架；一次消耗量等於架上串數。不同油種不能混入同一壺。
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.1=取得：廚房油壺的製作請看本體指南；家族 API 讓普通油及煙火三油共用同一份內容資料。
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.2=普通油容量 256 點，煙火油容量 64 點。主手拿油桶、副手拿空壺按使用鍵，每桶加入 8 點；也可拿空壺從油源或大缸裝油。
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.3=放置油壺後可用同種煙火油桶補入，每桶 8 點；普通油、菜籽油、秘製辣椒油、高級辣椒油不能混合。特殊油的放置壺不會空手抽出普通油。
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.4=裝油壺點擊烤架刷油，耗油等於架上串數。普通油及菜籽油保溫 1 分鐘，秘製辣椒油 10 分鐘，高級辣椒油 20 分鐘。油用完會返還空壺，破壞放置壺會保留剩餘油種與數量。
 ## END GRILLING GUIDE A3 (generated)

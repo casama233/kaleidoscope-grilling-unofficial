@@ -90,12 +90,23 @@ def build(jar=None):
             texture_refs[key]=f'textures/grill_display/{name}_{stage}'
             geometry_refs[key]=geo['description']['identifier']
         indices[raw_id]=index
-    # Use the existing secret item icon while individual ingredient meshes are
-    # still absent. Do not borrow an unrelated fixed skewer's ingredients.
-    texture_refs['s114']='textures/items/secret_skewer'
-    geometry_refs['s114']='geometry.kg_station.grill.secret_icon'
-    geometries.append({'description':{'identifier':geometry_refs['s114'],'texture_width':16,'texture_height':16,'visible_bounds_width':2,'visible_bounds_height':2,'visible_bounds_offset':[0,.3,0]},
-        'bones':[{'name':'root','pivot':[0,0,0],'cubes':[{'origin':[-2,0,-2],'size':[4,0,4],'uv':{'up':{'uv':[0,0],'uv_size':[16,16]},'down':{'uv':[0,16],'uv_size':[16,-16]}}}]}]})
+    # A secret skewer displays its own stick; native helpers render its actual ingredients.
+    texture_refs['s114']='textures/a22_bites/ordinary_skewer_stage0'
+    geometry_refs['s114']='geometry.kg_station.grill.secret_stick'
+    secret = deepcopy(json.loads((RP/'models/entity/a22_bites/ordinary_skewer_stage0.geo.json').read_text())['minecraft:geometry'][0])
+    secret['description'].update(identifier=geometry_refs['s114'],visible_bounds_width=2,visible_bounds_height=2,visible_bounds_offset=[0,.3,0])
+    bones=[]
+    for bone in secret['bones']:
+        if bone['name']=='display':continue
+        if bone['name']=='root':bone.pop('binding',None)
+        else:
+            if bone.get('parent')=='display':bone['parent']='root'
+            if 'pivot' in bone:bone['pivot'][1]-=1
+            for cube in bone.get('cubes',[]):
+                cube['origin'][1]-=1
+                if 'pivot' in cube:cube['pivot'][1]-=1
+        bones.append(bone)
+    secret['bones']=bones;geometries.append(secret)
     output[RP/'models/entity/grill_display.geo.json']=dump({'format_version':'1.16.0','minecraft:geometry':geometries})
     prop=lambda k: "q.property('"+NS+k+"')"
     output[RP/'entity/grill_food_visual.entity.json']=dump({'format_version':'1.10.0','minecraft:client_entity':{'description':{

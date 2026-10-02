@@ -1,0 +1,192 @@
+/** Reviewed Cookery-owned adapter. Portable items; authoritative placed-state receipts. */
+import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
+import {EMPTY_POT,FILLED_POT,readPublicOil,writePublicOil,createPublicOilPot,normalizePublicOil,planPublicOilAddition,planPublicOilConsumption,OIL_API_VERSION} from './oil_api_core.js';
+const ITEM_KEY='kc_oil_count',PLACED_PREFIX='senluo:oil_api_placed:',RECEIPT_PREFIX='senluo:oil_api_recovery:';
+const BUCKETS=Object.freeze({'kaleidoscope_grilling:canola_oil_bucket':'canola','kaleidoscope_grilling:secret_chili_oil_bucket':'secret_chili','kaleidoscope_grilling:premium_chili_oil_bucket':'premium_chili'});
+const placement=new Map();
+const location=b=>({dimensionId:b.dimension.id,x:b.x,y:b.y,z:b.z});
+const key=(prefix,b)=>prefix+b.dimension.id+':'+b.x+','+b.y+','+b.z;
+const nativeKey=b=>'kc_oilpot:'+b.dimension.id+':'+b.x+','+b.y+','+b.z;
+const hand=p=>p?.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Mainhand);
+function emitBlock(b,state){try{system.sendScriptEvent('senluo:oil_block_snapshot',JSON.stringify({api:1,version:OIL_API_VERSION,station:location(b),state}));}catch(e){console.warn('[Cookery Oil API] snapshot deferred '+e)}}
+function notice(p,reason){try{p.sendMessage({translate:'message.kg.oil_'+reason})}catch{}}
+function itemSame(a,b){return a?.typeId===b?.typeId&&a?.amount===b?.amount&&a?.nameTag===b?.nameTag&&JSON.stringify(a?.getRawLore())===JSON.stringify(b?.getRawLore());}
+export function readHostOilItem(stack,{legacyFull=false}={}){
+ const portable=readPublicOil(stack);
+ if(!portable.handled||portable.valid||portable.reason!=='host_snapshot_required')return portable;
+ let raw;try{raw=stack.getDynamicProperty(ITEM_KEY)}catch{return {handled:true,valid:false,reason:'legacy_unreadable'}}
+ if(raw===undefined&&!legacyFull)return {handled:true,valid:false,reason:'unknown_legacy'};
+ const state=normalizePublicOil({v:1,type:'',count:raw===undefined?256:raw,revision:0});
+ return state?{handled:true,valid:true,state,source:'legacy_host'}:{handled:true,valid:false,reason:'legacy_invalid'};
+}
+export function publishHostOil(stack,count){
+ const prior=readPublicOil(stack);if(prior.handled&&!prior.valid&&prior.reason!=='host_snapshot_required')throw Error('oil payload invalid');
+ const type=count?(prior.state?.type??''):'';
+ const out=writePublicOil(stack,{v:1,type,count,revision:(prior.state?.revision??0)+1});
+ out.setDynamicProperty(ITEM_KEY,count||undefined);return out;
+}
+export function publishLegacyHostOil(stack){
+ const read=readHostOilItem(stack);if(!read.valid)throw Error(read.reason);
+ if(read.source==='public_api')return stack.clone();
+ const out=stack.clone();writePublicOil(out,read.state,{presentation:false});return out;
+}
+export function hostOilCountOverride(stack){
+ const p=readPublicOil(stack);return p.source==='public_api'?p.state.count:p.handled&&!p.valid&&p.reason!=='host_snapshot_required'?0:undefined;
+}
+const consumedOil=new Map();
+export function consumeSharedOilSlot(slot,points=1,creative=false){
+ try{
+  const held=slot?.hasItem()?slot.getItem():undefined,read=readHostOilItem(held,{legacyFull:true});
+  if(!read.valid||held?.typeId!==FILLED_POT)return {ok:false};
+  const plan=planPublicOilConsumption(read.state,points);if(!plan.ok)return plan;
+  const consumedType=read.state.type,heatTicks=consumedType==='premium_chili'?24000:consumedType==='secret_chili'?12000:1200;
+  if(creative)return {ok:true,consumedType,heatTicks,remaining:read.state.count};
+  const next=createPublicOilPot(ItemStack,plan.state.type,plan.state.count,held,plan.state.revision);next.setDynamicProperty(ITEM_KEY,plan.state.count||undefined);
+  const before=held.clone();try{slot.setItem(next);if(!itemSame(slot.getItem(),next))throw Error('oil hand readback')}catch(e){slot.setItem(before);throw e}return {ok:true,consumedType,heatTicks,remaining:plan.state.count};
+ }catch{return {ok:false};}
+}
+export function consumeSharedOilFromHeldPot(player){
+ const r=consumeSharedOilSlot(hand(player),1,player?.getGameMode?.()===GameMode.Creative);
+ if(r.ok)consumedOil.set(player.id,{...r,tick:system.currentTick});return r.ok;
+}
+/** The station save and the actual oil debit must acknowledge the same operation. */
+export function commitSharedStationOil(b,slot,data,host,{creative=false}={}){
+ const faultKey='senluo:oil_station_fault:'+key('',b);
+ if(world.getDynamicProperty(faultKey)!==undefined)throw Error('oil station requires recovery');
+ const before=slot?.hasItem()?slot.getItem():undefined,saved=JSON.parse(JSON.stringify(data));
+ const result=consumeSharedOilSlot(slot,1,creative);if(!result.ok)return result;
+ try{
+  data.oil=true;data.grillingOilType=result.consumedType;data.oilTicks=result.heatTicks;
+  host.save(b,data);const actual=host.load(b);
+  if(!actual.oil||actual.grillingOilType!==data.grillingOilType||actual.oilTicks!==data.oilTicks)throw Error('oil station save not acknowledged');
+  host.sync(b,data);return result;
+ }catch(error){
+  let rollback;
+  try{slot.setItem(before);if(!itemSame(slot.getItem(),before))throw Error('oil hand rollback');host.save(b,saved);host.sync(b,saved);Object.keys(data).forEach(k=>delete data[k]);Object.assign(data,saved);}catch(e){rollback=e;}
+  if(rollback)world.setDynamicProperty(faultKey,JSON.stringify({reason:String(error),rollback:String(rollback),state:saved}));
+  throw error;
+ }
+}
+export function handleSharedStationOil(b,p,data,host){
+ try{commitSharedStationOil(b,hand(p),data,host,{creative:p?.getGameMode?.()===GameMode.Creative});}catch(e){notice(p,'unavailable');console.warn('[Cookery Oil API] station retained '+e)}return true;
+}
+export function lastConsumedOil(player){
+ const r=consumedOil.get(player?.id);return r&&system.currentTick-r.tick<=2?r:{consumedType:'',heatTicks:1200};
+}
+function requireOilAvailable(b){const raw=world.getDynamicProperty(key(RECEIPT_PREFIX,b));if(raw){const receipt=JSON.parse(String(raw));if(['pending','quarantined'].includes(receipt.phase))throw Error('oil recovery unresolved');}}
+export function readSharedPlacedOil(b){
+ requireOilAvailable(b);
+ const raw=world.getDynamicProperty(key(PLACED_PREFIX,b));
+ if(raw!==undefined){const s=normalizePublicOil(JSON.parse(String(raw)));if(!s)throw Error('placed oil payload invalid');return s;}
+ const qty=world.getDynamicProperty(nativeKey(b));
+ let has=false;try{has=b.permutation.getState('kaleidoscope_cookery:has_oil')===true}catch{}
+ if(qty===undefined&&has)throw Error('unknown legacy placed oil');
+ const s=normalizePublicOil({v:1,type:'',count:qty??0,revision:0});if(!s)throw Error('invalid legacy placed oil');return s;
+}
+export function writeSharedPlacedOil(b,state){
+ const s=normalizePublicOil(state);if(!s)throw Error('placed oil schema');
+ const clockKey='senluo:oil_api_revision',revision=Math.max(s.revision,Number(world.getDynamicProperty(clockKey)??0)+1);if(!Number.isSafeInteger(revision))throw Error('oil revision');s.revision=revision;world.setDynamicProperty(clockKey,revision);
+ const raw=JSON.stringify(s);world.setDynamicProperty(key(PLACED_PREFIX,b),raw);if(world.getDynamicProperty(key(PLACED_PREFIX,b))!==raw)throw Error('placed oil write not acknowledged');
+ world.setDynamicProperty(nativeKey(b),s.count||undefined);if(Number(world.getDynamicProperty(nativeKey(b))??0)!==s.count)throw Error('native oil count write not acknowledged');
+ if(b.typeId===EMPTY_POT){b.setPermutation(b.permutation.withState('kaleidoscope_cookery:has_oil',s.count>0));if(b.permutation.getState('kaleidoscope_cookery:has_oil')!==(s.count>0))throw Error('oil visual state rejected');}
+ emitBlock(b,s);return s;
+}
+export function sharedPlacedCount(b){return readSharedPlacedOil(b).count;}
+export function updateSharedPlacedCount(b,count){
+ const previous=readSharedPlacedOil(b);return writeSharedPlacedOil(b,{v:1,type:count?previous.type:'',count,revision:previous.revision+1});
+}
+export function captureSharedOilPlacement(ev){
+ if(ev.block?.typeId===EMPTY_POT)requireOilAvailable(ev.block);
+ const slot=hand(ev.player),held=slot?.hasItem()?slot.getItem():undefined;
+ if(![EMPTY_POT,FILLED_POT].includes(held?.typeId))return;
+ const read=readHostOilItem(held,{legacyFull:true});if(!read.valid){ev.cancel=true;system.run(()=>notice(ev.player,'unavailable'));return;}
+ placement.set(ev.player.id,{tick:system.currentTick,state:read.state});system.runTimeout(()=>placement.delete(ev.player.id),16);
+}
+export function handleSharedPlacedOil(block,player,sound=()=>{}){
+ try{
+  const state=readSharedPlacedOil(block),slot=hand(player),held=slot?.hasItem()?slot.getItem():undefined;
+  if(!slot)return true;
+  if(!held){
+   if(state.type||state.count<=0)return true;
+   const n=Math.min(64,state.count),next={v:1,type:'',count:state.count-n,revision:state.revision+1};
+   mutateSharedOil(block,slot,state,next,undefined,new ItemStack('kaleidoscope_cookery:oil',n));sound(.8+Math.random()*.2);return true;
+  }
+  if(held.typeId!=='kaleidoscope_cookery:oil')return false;
+  if(state.type){notice(player,'different_content');return true;}
+  const n=Math.min(256-state.count,held.amount);if(n<=0)return true;
+  let after=held.clone();if(player.getGameMode()!==GameMode.Creative){if(n===held.amount)after=undefined;else after.amount-=n;}
+  mutateSharedOil(block,slot,state,{v:1,type:'',count:state.count+n,revision:state.revision+1},held,after);sound(.4+Math.random()*.2);return true;
+ }catch(e){notice(player,'unavailable');console.warn('[Cookery Oil API] interaction retained '+e);return true;}
+}
+function mutateSharedOil(block,slot,state,next,before,after){
+ try{slot.setItem(after);if(!itemSame(slot.getItem(),after))throw Error('oil hand write');writeSharedPlacedOil(block,next)}catch(error){
+  let rollback;try{slot.setItem(before);if(!itemSame(slot.getItem(),before))throw Error('oil hand rollback');writeSharedPlacedOil(block,state)}catch(e){rollback=e}
+  if(rollback)world.setDynamicProperty(key(RECEIPT_PREFIX,block),JSON.stringify({phase:'quarantined',state,reason:String(rollback)}));throw error;
+ }
+}
+export function fillSharedPlacedOil(block,slot,type,{creative=false}={}){
+ const before=slot.getItem();if(BUCKETS[before?.typeId]!==type||before.amount!==1)return {ok:false,reason:'different_content'};
+ const state=readSharedPlacedOil(block),plan=planPublicOilAddition(state,type,8);if(!plan.ok)return plan;
+ const after=creative?before.clone():new ItemStack('minecraft:bucket');
+ mutateSharedOil(block,slot,state,plan.state,before,after);
+ return {ok:true,state:plan.state};
+}
+export function recoverSharedOilPot(ev){
+ const b={dimension:ev.dimension,x:ev.block.x,y:ev.block.y,z:ev.block.z},state=readSharedPlacedOil(b);
+ const receiptKey=key(RECEIPT_PREFIX,b),creative=ev.player?.getGameMode?.()===GameMode.Creative;
+ const existing=world.getDynamicProperty(receiptKey);
+ if(existing&&['pending','quarantined'].includes(JSON.parse(String(existing)).phase))throw Error('previous oil recovery unresolved');
+ const receipt={phase:creative?'delivered':'pending',state,location:location(b),createdTick:system.currentTick};world.setDynamicProperty(receiptKey,JSON.stringify(receipt));
+ if(!creative){
+  const stack=createPublicOilPot(ItemStack,state.type,state.count,undefined,state.revision+1);
+  let drop;try{drop=b.dimension.spawnItem(stack,{x:b.x+.5,y:b.y+.5,z:b.z+.5});const actual=drop?.getComponent('minecraft:item')?.itemStack;if(!drop||!itemSame(actual,stack))throw Error('oil drop not acknowledged')}
+  catch(error){if(drop){try{drop.remove();receipt.phase='pending'}catch{receipt.phase='quarantined'}}else receipt.phase='quarantined';receipt.reason=String(error);world.setDynamicProperty(receiptKey,JSON.stringify(receipt));console.warn('[Cookery Oil API] recovery retained '+receiptKey);return true;}
+  receipt.phase='delivered';world.setDynamicProperty(receiptKey,JSON.stringify(receipt));
+ }
+ world.setDynamicProperty(key(PLACED_PREFIX,b));world.setDynamicProperty(nativeKey(b));emitBlock(b,undefined);return true;
+}
+function publishInventory(player){
+ const inventory=player.getComponent('minecraft:inventory')?.container;
+ if(inventory)for(let i=0;i<inventory.size;i++){const item=inventory.getItem(i);if(item?.typeId!==FILLED_POT||readPublicOil(item).source==='public_api')continue;const read=readHostOilItem(item);if(read.valid)inventory.setItem(i,publishLegacyHostOil(item));}
+ const slot=player.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Offhand),item=slot?.hasItem()?slot.getItem():undefined;
+ if(item?.typeId===FILLED_POT&&readPublicOil(item).source!=='public_api'&&readHostOilItem(item).valid)slot.setItem(publishLegacyHostOil(item));
+}
+world.afterEvents.playerSpawn.subscribe(ev=>system.runTimeout(()=>{try{publishInventory(ev.player)}catch(e){console.warn('[Cookery Oil API] legacy item retained '+e)}},20));
+system.runTimeout(()=>{for(const p of world.getAllPlayers())try{publishInventory(p)}catch{}},40);
+system.afterEvents.scriptEventReceive.subscribe(ev=>{
+ if(ev.id!=='senluo:oil_snapshot_request'&&ev.id!=='senluo:oil_block_query')return;
+ try{
+  const r=JSON.parse(ev.message);if(r.api!==1)return;
+  if(ev.id==='senluo:oil_block_query'){
+   const s=r.station,d=world.getDimension(s.dimensionId),b=d.getBlock({x:s.x,y:s.y,z:s.z});if(b?.typeId===EMPTY_POT){let state=readSharedPlacedOil(b);if(r.legacyType&&['canola','secret_chili','premium_chili'].includes(r.legacyType)&&!state.type&&state.count>0&&state.count<=64)state=writeSharedPlacedOil(b,{...state,type:r.legacyType,revision:state.revision+1});emitBlock(b,state);}return;
+  }
+  const p=world.getAllPlayers().find(x=>x.id===r.playerId),e=p?.getComponent('minecraft:equippable'),slot=e?.getEquipmentSlot(r.hand==='off'?EquipmentSlot.Offhand:EquipmentSlot.Mainhand);
+  let ok=false;if(slot?.hasItem()){const item=slot.getItem();if(item.typeId===r.expectedId&&JSON.stringify(item.getRawLore())===r.expectedLore){const next=publishLegacyHostOil(item);slot.setItem(next);ok=itemSame(slot.getItem(),next)}}
+  system.sendScriptEvent('senluo:oil_snapshot_response',JSON.stringify({api:1,id:r.id,ok}));
+ }catch(e){console.warn('[Cookery Oil API] snapshot retained '+e)}
+});
+world.beforeEvents.playerInteractWithBlock.subscribe(ev=>{
+ if(ev.cancel||ev.block?.typeId!==EMPTY_POT)return;
+ const type=BUCKETS[ev.itemStack?.typeId];if(!type)return;
+ ev.cancel=true;if(ev.isFirstEvent===false)return;
+ const p=ev.player,d=ev.block.dimension,loc={...ev.block.location},held=ev.itemStack.clone();
+ system.run(()=>{try{const b=d.getBlock(loc),slot=hand(p);if(b?.typeId!==EMPTY_POT||!slot?.hasItem()||!itemSame(slot.getItem(),held))return;const r=fillSharedPlacedOil(b,slot,type,{creative:p.getGameMode()===GameMode.Creative});if(!r.ok)notice(p,r.reason);else d.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',loc)}catch(e){notice(p,'unavailable');console.warn('[Cookery Oil API] fill retained '+e)}});
+});
+world.afterEvents.playerPlaceBlock.subscribe(ev=>{
+ if(ev.block.typeId!==EMPTY_POT)return;const cached=placement.get(ev.player.id);placement.delete(ev.player.id);
+ if(!cached||system.currentTick-cached.tick>12)return;
+ system.run(()=>{try{if(ev.block.typeId===EMPTY_POT)writeSharedPlacedOil(ev.block,cached.state)}catch(e){console.warn('[Cookery Oil API] placement retained '+e)}});
+});
+world.beforeEvents.playerBreakBlock.subscribe(ev=>{if(ev.block.typeId!==EMPTY_POT)return;try{readSharedPlacedOil(ev.block)}catch{ev.cancel=true;system.run(()=>notice(ev.player,'unavailable'))}});
+world.beforeEvents.explosion.subscribe(ev=>{ev.setImpactedBlocks(ev.getImpactedBlocks().filter(b=>{if(b.typeId!==EMPTY_POT)return true;try{return !!readSharedPlacedOil(b)}catch{return false}}))});
+
+export function retrySharedOilRecovery(b){
+ const receiptKey=key(RECEIPT_PREFIX,b),raw=world.getDynamicProperty(receiptKey);if(!raw)return {ok:false,reason:'missing'};
+ const receipt=JSON.parse(String(raw));if(receipt.phase!=='pending')return {ok:false,reason:receipt.phase};
+ if(b.dimension.getBlock({x:b.x,y:b.y,z:b.z})?.typeId===EMPTY_POT)return {ok:false,reason:'block_present'};
+ const state=normalizePublicOil(receipt.state);if(!state)throw Error('oil recovery state invalid');
+ const stack=createPublicOilPot(ItemStack,state.type,state.count,undefined,state.revision+1);let drop;
+ try{drop=b.dimension.spawnItem(stack,{x:b.x+.5,y:b.y+.5,z:b.z+.5});if(!drop||!itemSame(drop.getComponent('minecraft:item')?.itemStack,stack))throw Error('oil retry unacknowledged');}
+ catch(error){if(drop){try{drop.remove()}catch{receipt.phase='quarantined'}}else receipt.phase='quarantined';receipt.reason=String(error);world.setDynamicProperty(receiptKey,JSON.stringify(receipt));return {ok:false,reason:receipt.phase};}
+ receipt.phase='delivered';world.setDynamicProperty(receiptKey,JSON.stringify(receipt));world.setDynamicProperty(key(PLACED_PREFIX,b));world.setDynamicProperty(nativeKey(b));emitBlock(b,undefined);return {ok:true};
+}

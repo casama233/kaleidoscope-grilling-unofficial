@@ -7,11 +7,12 @@ from verify_a284 import eating_gate
 from verify_a283 import main as previous_gate
 RP=repair.RP;BP=repair.BP
 def load(p):return json.loads(p.read_text())
-def expression(expr,first,slot,bone):
+def expression(expr,first,slot,bone,using=False):
  # Only the simple boolean Molang subset used by held pose dispatch is accepted.
  expr=expr.replace('q.item_slot_to_bone_name(context.item_slot)',repr(bone))
  for prefix in ('context','c'):
   expr=expr.replace(prefix+'.is_first_person',str(int(first))).replace(prefix+'.item_slot',repr(slot))
+ expr=expr.replace('q.is_using_item',str(bool(using)))
  expr=expr.replace('&&',' and ').replace('||',' or ')
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
@@ -31,6 +32,8 @@ def binding_assets():
      matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
      assert matches==[expected],(p,first,slot,bone,matches)
+     using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True)]
+     assert using_matches==[expected]+(['eat_'+hand] if 'eat_'+hand in d['animations'] else []),(p,using_matches)
      cases+=1
     selected.append(expected)
   for ref in d['geometry'].values():
@@ -43,7 +46,7 @@ def binding_assets():
     pose,model=g['bones'][1:]
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose' and model['pivot']==[0,24,0]
-    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'skewer_pose','skewer_model'},anim
+    for alias,anim in d['animations'].items():assert set(animations[anim]['bones'])==({'skewer_model'} if alias.startswith('eat_') else {'skewer_pose','skewer_model'}),anim
     oldref=ref.replace('kg_a287.','kg_a283.');old=idx[oldref]
     assert model['cubes']==[c for bone in old['bones'] for c in bone.get('cubes',[])],ref
    elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':

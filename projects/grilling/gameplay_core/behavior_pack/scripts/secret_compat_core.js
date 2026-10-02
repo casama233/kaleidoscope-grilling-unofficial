@@ -70,6 +70,8 @@ function cleanBehavior(raw){
  return {
   mode:raw.mode==='replace'?'replace':'merge',
   effects,convertTo,remainder,
+  remainders:(Array.isArray(raw.remainders)?raw.remainders:[]).map(x=>cleanRemainder(x)).filter(Boolean).slice(0,8),
+  damage:Number.isFinite(raw.damage)?Math.max(0,Math.min(20,raw.damage)):0,
   clearPoison:!!raw.clearPoison,
   teleport:!!raw.teleport,
   ordinary:!!raw.ordinary
@@ -121,6 +123,8 @@ export function applySecretBehaviorExtension(base,row){
  return {
   ...seed,
   effects:ext.mode==='replace'?[...ext.effects]:[...(seed.effects??[]),...ext.effects],
+  remainders:ext.mode==='replace'?[...ext.remainders]:[...(seed.remainders??[]),...ext.remainders],
+  damage:ext.mode==='replace'?ext.damage:Math.max(seed.damage??0,ext.damage),
   convertTo,remainder,
   clearPoison:ext.mode==='replace'?ext.clearPoison:!!seed.clearPoison||ext.clearPoison,
   teleport:ext.mode==='replace'?ext.teleport:!!seed.teleport||ext.teleport,

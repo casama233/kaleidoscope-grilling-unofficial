@@ -17,9 +17,10 @@ for(const name of ['a2710_chicken_acquisition_core.js','a2710_chicken_acquisitio
 }
 for(const name of ['a279_beef_board_runtime.js','a2736_typed_oil_pot_block_runtime.js','a2739_cookery_oil_pot_block_adapter.js','a2710_chicken_acquisition_runtime.js']){
  const text=fs.readFileSync('projects/grilling/gameplay_core/behavior_pack/scripts/'+name,'utf8');
- assert.ok(!/world\.setDynamicProperty|spawnItem.*CHICKEN_SKIN|setPermutation|setType\(/.test(text),name);
+ assert.ok(!/spawnItem.*CHICKEN_SKIN|setPermutation|setType\(/.test(text),name);
  assert.ok(!/kc_station:|kc_oilpot:/.test(text),name);
 }
+const mirror=fs.readFileSync('projects/grilling/gameplay_core/behavior_pack/scripts/a2739_cookery_oil_pot_block_adapter.js','utf8');assert.ok(mirror.includes('world.setDynamicProperty(legacyKey,undefined)')&&mirror.includes('state.type===legacy||state.count===0'));
 console.log('PASS: 10 pure knife/tag cases, actual call-site wiring, paired sources, no private station writes; no player or ItemStack mock.');
 
 const guard=fs.readFileSync('projects/grilling/gameplay_core/behavior_pack/scripts/a2736_typed_oil_pot_block_runtime.js','utf8');

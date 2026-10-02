@@ -7,7 +7,7 @@ export const EVENTS = Object.freeze({
   end: 'kaleidoscope_cookery:guidebook_end'
 });
 export const SOURCE = 'kg_grilling';
-export const REVISION = 'plate_drop_20261002';
+export const REVISION = 'a3_0_11';
 export const CHUNK_SIZE = 1600;
 
 export function encodeMessages(payload) {

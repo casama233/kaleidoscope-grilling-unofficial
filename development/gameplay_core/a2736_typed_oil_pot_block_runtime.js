@@ -1,7 +1,9 @@
 import {world,system} from '@minecraft/server';
-import {interactionFeedback} from './a283_interaction_feedback.js';
 import {HOST_BLOCK_ID,typedOilBlockKey} from './a2736_typed_oil_pot_block_core.js';
 import {COOKERY_FILLED_ID,GRILLING_TYPE_KEY} from './a2734_cookery_oil_pot_core.js';
+import {readPublicOil} from './host_api/oil_api_core.js';
+import {ensureOilHandPublished} from './oil_api_client.js';
+import {readPlacedOilPotState} from './a2739_cookery_oil_pot_block_adapter.js';
 
 const notices=new Map();
 function notify(player){
@@ -9,7 +11,7 @@ function notify(player){
  const last=notices.get(player.id)??-1000;
  if(system.currentTick-last<60)return;
  notices.set(player.id,system.currentTick);
- system.run(()=>{try{interactionFeedback(player,'§c此特殊油壺暫停跨模組操作；資料與物品保留，請勿拆除。 / Typed oil-pot bridge unavailable; contents preserved.')}catch{}});
+ system.run(()=>{try{player.sendMessage({translate:'message.kg.oil_sync_pending'})}catch{}});
 }
 world.afterEvents.playerLeave.subscribe(e=>notices.delete(e.playerId));
 function legacyTypedPot(block){
@@ -23,21 +25,19 @@ function legacyTypedPot(block){
 }
 function typedHand(stack){
  if(stack?.typeId!==COOKERY_FILLED_ID)return false;
+ if(readPublicOil(stack).source==='public_api')return false;
  try{const type=stack.getDynamicProperty(GRILLING_TYPE_KEY);return type!==undefined&&type!==null&&type!=='';}
  catch{return true;}
 }
-function typedBucket(stack){return [
- 'kaleidoscope_grilling:canola_oil_bucket','kaleidoscope_grilling:secret_chili_oil_bucket',
- 'kaleidoscope_grilling:premium_chili_oil_bucket'].includes(stack?.typeId);}
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
- // Untyped host pots pass through untouched, including the host's own filling.
- // Block placing a Grilling-typed host item anywhere until the host can own it.
- // Our own station routers always cancel native placement and own the hand
- // transaction; do not break brushing/filling within Grilling while isolating
- // only the unsupported transfer into Cookery's placed-block inventory.
+ // Publish legacy Grilling metadata before permitting a native Cookery placement.
+ // Current public API items pass through to the author-owned placement transaction.
  const localOilUse=['kaleidoscope_grilling:grill','kaleidoscope_grilling:oil_press','kaleidoscope_grilling:big_vat'].includes(e.block?.typeId);
- if((typedHand(e.itemStack)&&!localOilUse)||legacyTypedPot(e.block)||(e.block?.typeId===HOST_BLOCK_ID&&typedBucket(e.itemStack))){
-  e.cancel=true;if(e.isFirstEvent!==false)notify(e.player);
+ if(legacyTypedPot(e.block)){
+  e.cancel=true;system.run(()=>readPlacedOilPotState(e.block));if(e.isFirstEvent!==false)notify(e.player);return;
+ }
+ if(typedHand(e.itemStack)&&!localOilUse){
+  e.cancel=true;system.run(()=>ensureOilHandPublished(e.player,'main',undefined));if(e.isFirstEvent!==false)notify(e.player);
  }
 });
 world.beforeEvents.playerBreakBlock.subscribe(e=>{

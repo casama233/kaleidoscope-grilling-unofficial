@@ -36,7 +36,7 @@ function fixture(savedDp){
  const setHand=(p,h,s)=>{const key=h==='off'?'off':p.selectedSlotIndex;slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')};
  const captureWritableHand=(p,h)=>{const key=h==='off'?'off':p.selectedSlotIndex;return {before:slots.get(key)?.clone(),read:()=>slots.get(key),write(s){slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')}}};
  const c=vm.createContext({...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
-  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{playerBreakBlock:{subscribe(){}}}},
+  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{blockExplode:{subscribe(){}},playerBreakBlock:{subscribe(){}}}},
   system:{run(fn){scheduled.push(fn)}},console:{warn(){}},SECRET_ID:N+'secret_skewer',captureWritableHand,
   heldByHand:held,setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,
   interactionStackSignature:s=>s?JSON.stringify(s):'',interactionFeedback(){},UNFINISHED_ID:N+'unfinished_skewer'});
@@ -153,3 +153,5 @@ test('persisted quarantine blocks transfers after production module reload',()=>
  const f=fixture();f.rows(2);f.fault=k=>k==='hand';assert.throws(()=>f.api.handlePlateBlock(f.block,f.holder),/recovery required/);
  const restored=fixture(f.dp);assert.throws(()=>restored.api.readPlateBlock(restored.block),/quarantined/);assert.equal(restored.entities.length,0);
 });
+
+test('prepared plate delivery survives module reload and prevents a second credit',()=>{const f=fixture();f.rows(2);f.dp.set(f.key+'_delivery',JSON.stringify({phase:'prepared',saved:f.dp.get(f.key)}));const restored=fixture(f.dp);assert.throws(()=>restored.api.breakPlate(restored.block),/delivery requires recovery/);assert.equal(restored.entities.length,0);});

@@ -248,9 +248,17 @@ message.kg.board_retry=The board operation did not finish. Please retry.
 message.kg.board_quarantined=Board delivery needs review. Contact an administrator.
 message.kg.board_knife=Use a Kitchen Knife to cut.
 
+senluo.public.food.v1=
+message.kg.oil_unavailable=Oil-pot data could not be confirmed; the item and contents are retained. Try again shortly.
+message.kg.oil_sync_pending=Synchronizing the legacy oil pot. Try again shortly.
+message.kg.oil_different_content=Different oil contents cannot be mixed.
+message.kg.oil_full=The oil pot is full.
+message.kg.oil_insufficient=Not enough oil.
+message.kg.output_unavailable=The output could not be confirmed; the station retains the batch record. Make inventory space and try again.
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=Kaleidoscope Grilling
-guide.kg.intro=Browse by item type and cooking method for acquisition, recipes, use and effects. Beef chunks and chicken skin require the complete family Board API deployment; without it, start with fish skewers.
+guide.kg.intro=Browse by item type and preparation method. Obtain Beef Chunks and Chicken Skin on the Cookery Chopping Board; a Fish Skewer is a simple first recipe.
 guide.kg.all=All entries
 guide.kg.select=Choose a category; foods are grouped by preparation method.
 guide.kg.back=Back
@@ -640,7 +648,8 @@ guide.kg.body.kg_a1:guide_recipe_golden.5=Cooked effect: Invincible · base 10 s
 guide.kg.body.kg_a1:guide_recipe_golden.6=When eaten hot, newly gained fixed skewer effects have double duration and newly gained saturation is increased by 25%. Special Seasoning effects only trigger while the food is still hot; Hot Food does not double those seasoning durations a second time. Cold food remains edible, but those seasoning effects do not activate.
 guide.kg.body.kg_a1:guide_recipe_golden.7=Uncooked unfinished, fixed-raw, and Secret skewers can be sneak-disassembled to recover their ingredients and stick.
 guide.kg.name.kaleidoscope_cookery:oil_pot_filled=Cookery Oil Pot: Grilling Oils
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.1=Acquisition: this is the host Oil Pot, not a new Grilling item. See the host guide for its base recipe; this page covers Grilling oil integration only.
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.2=Grilling-oil capacity: 64 points. Use a main-hand oil bucket with an offhand pot, or draw oil from a source/vat; each bucket supplies 8 points.
-guide.kg.body.kaleidoscope_cookery:oil_pot_filled.3=Brushing: use the filled pot on the grill. The action costs one oil point per loaded skewer. Different oils cannot be mixed in the same pot.
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.1=Use the host guide for the Oil Pot recipe. The family API shares one oil payload between Cookery and Grilling.
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.2=Fat capacity is 256 points; Grilling fluid capacity is 64. Hold an oil bucket in the main hand and an empty pot offhand, then use: each bucket adds 8 points. An empty pot can also draw from a source or Big Vat.
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.3=Placed pots accept matching oil buckets at 8 points each. Fat and the three Grilling oils cannot mix. Empty-hand clicks on a typed placed pot do not dispense fat.
+guide.kg.body.kaleidoscope_cookery:oil_pot_filled.4=Brush the grill with a filled pot: one point per loaded skewer. Fat and Canola retain heat for 1 minute, Chili for 10, Premium Chili for 20. Exhaustion returns an empty pot; breaking a placed pot preserves oil type and quantity.
 ## END GRILLING GUIDE A3 (generated)

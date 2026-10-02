@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.10",
-  "revision": "plate_drop_20261002",
+  "version": "0.3.11",
+  "revision": "a3_0_11",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",
@@ -18,7 +18,7 @@
   "ui": {
     "zh_CN": {
       "title": "森罗物语：烟火",
-      "intro": "按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮需要整套家族部署的砧板 API；未启用时，第一串可从鱼串开始。",
+      "intro": "按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮通过厨房砧板取得；首次烧烤可从鱼串开始。",
       "all": "全部条目",
       "select": "选择分类；食物按制作方式分组。",
       "back": "返回",
@@ -27,7 +27,7 @@
     },
     "zh_TW": {
       "title": "森羅物語：煙火",
-      "intro": "按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮需要整套家族部署的砧板 API；未啟用時，第一串可從魚串開始。",
+      "intro": "按物品類型與製作方式查閱；每項合併取得、配方、操作與效果。 牛肉塊與雞皮可透過廚房砧板取得；首次燒烤可從魚串開始。",
       "all": "全部條目",
       "select": "選擇分類；食物按製作方式分組。",
       "back": "返回",
@@ -36,7 +36,7 @@
     },
     "en_US": {
       "title": "Kaleidoscope Grilling",
-      "intro": "Browse by item type and cooking method for acquisition, recipes, use and effects. Beef chunks and chicken skin require the complete family Board API deployment; without it, start with fish skewers.",
+      "intro": "Browse by item type and preparation method. Obtain Beef Chunks and Chicken Skin on the Cookery Chopping Board; a Fish Skewer is a simple first recipe.",
       "all": "All entries",
       "select": "Choose a category; foods are grouped by preparation method.",
       "back": "Back",
@@ -5287,20 +5287,23 @@
         "en_US": "Cookery Oil Pot: Grilling Oils"
       },
       "body": {
-        "zh_CN": [
-          "取得：这是本体油壶，不是烟火新增物品；基础油壶的制作见本体指南。以下只说明烟火油适配。",
-          "烟火油容量：64 点。主手油桶配合副手油壶可灌油；也可从油源或大缸取油，每桶增加 8 点。",
-          "刷油：用装有对应烟火油的油壶点击烤架；一次消耗量等于架上串数。不同油种不能混入同一壶。"
-        ],
         "zh_TW": [
-          "取得：這是本體油壺，不是煙火新增物品；基礎油壺的製作見本體指南。以下只說明煙火油適配。",
-          "煙火油容量：64 點。主手油桶配合副手油壺可灌油；也可從油源或大缸取油，每桶增加 8 點。",
-          "刷油：用裝有對應煙火油的油壺點擊烤架；一次消耗量等於架上串數。不同油種不能混入同一壺。"
+          "取得：廚房油壺的製作請看本體指南；家族 API 讓普通油及煙火三油共用同一份內容資料。",
+          "普通油容量 256 點，煙火油容量 64 點。主手拿油桶、副手拿空壺按使用鍵，每桶加入 8 點；也可拿空壺從油源或大缸裝油。",
+          "放置油壺後可用同種煙火油桶補入，每桶 8 點；普通油、菜籽油、秘製辣椒油、高級辣椒油不能混合。特殊油的放置壺不會空手抽出普通油。",
+          "裝油壺點擊烤架刷油，耗油等於架上串數。普通油及菜籽油保溫 1 分鐘，秘製辣椒油 10 分鐘，高級辣椒油 20 分鐘。油用完會返還空壺，破壞放置壺會保留剩餘油種與數量。"
+        ],
+        "zh_CN": [
+          "取得：厨房油壶的制作请看本体指南；家族 API 让普通油及烟火三油共用同一份内容数据。",
+          "普通油容量 256 点，烟火油容量 64 点。主手拿油桶、副手拿空壶按使用键，每桶加入 8 点；也可拿空壶从油源或大缸装油。",
+          "放置油壶后可用同种烟火油桶补入，每桶 8 点；普通油、菜籽油、秘制辣椒油、高级辣椒油不能混合。特殊油的放置壶不会空手抽出普通油。",
+          "装油壶点击烤架刷油，耗油等于架上串数。普通油及菜籽油保温 1 分钟，秘制辣椒油 10 分钟，高级辣椒油 20 分钟。油用完返还空壶，破坏放置壶会保留剩余油种与数量。"
         ],
         "en_US": [
-          "Acquisition: this is the host Oil Pot, not a new Grilling item. See the host guide for its base recipe; this page covers Grilling oil integration only.",
-          "Grilling-oil capacity: 64 points. Use a main-hand oil bucket with an offhand pot, or draw oil from a source/vat; each bucket supplies 8 points.",
-          "Brushing: use the filled pot on the grill. The action costs one oil point per loaded skewer. Different oils cannot be mixed in the same pot."
+          "Use the host guide for the Oil Pot recipe. The family API shares one oil payload between Cookery and Grilling.",
+          "Fat capacity is 256 points; Grilling fluid capacity is 64. Hold an oil bucket in the main hand and an empty pot offhand, then use: each bucket adds 8 points. An empty pot can also draw from a source or Big Vat.",
+          "Placed pots accept matching oil buckets at 8 points each. Fat and the three Grilling oils cannot mix. Empty-hand clicks on a typed placed pot do not dispense fat.",
+          "Brush the grill with a filled pot: one point per loaded skewer. Fat and Canola retain heat for 1 minute, Chili for 10, Premium Chili for 20. Exhaustion returns an empty pot; breaking a placed pot preserves oil type and quantity."
         ]
       },
       "kinds": [
@@ -5309,9 +5312,11 @@
       "recipes": [],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2737_offhand_oil_fill_runtime.js",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_core.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/host_api/oil_api_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/host_api/oil_api_host.js"
       ],
-      "acquisition": "host_owned",
+      "acquisition": "implemented_with_host_extension",
       "icon": "textures/items/kc_oil_pot_filled",
       "related_ids": [
         "kaleidoscope_cookery:oil_pot"
