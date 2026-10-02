@@ -1,6 +1,6 @@
 # Java parity repair matrix
 
-This matrix follows the twelve findings in the 2026-10-02 Java 1.1.1 audit. The canonical maintained source is 2.8.34. The audited production installation read during this batch is 2.8.31; a source fix does not change that installation or certify a real client. Each exported change has a unique release identity and must pass the family deployment gates.
+This matrix follows the twelve findings in the 2026-10-02 Java 1.1.1 audit. The canonical maintained source is 2.8.35. The audited production installation read during this batch is 2.8.31; a source fix does not change that installation or certify a real client. Each exported change has a unique release identity and must pass the family deployment gates.
 
 | Finding | Source state | Remaining closure evidence/work |
 | --- | --- | --- |
@@ -19,4 +19,4 @@ This matrix follows the twelve findings in the 2026-10-02 Java 1.1.1 audit. The 
 
 [2.8.29 grill implementation](STATUS-A2.8.29.md), [2.8.28 audio/guide implementation](STATUS-A2.8.28.md), [guide standard](GUIDE-STANDARD.md) and [baseline maintenance](BASELINE-MAINTENANCE.md) describe the current scope. Native API probes do not certify sound output, rendered screens or player interaction. No simulated players may stand in for client evidence. Full saved-world migration remains a separate gate even when isolated restart persistence passes.
 
-The separately active source batch continues F03 station visuals and F08 oil/food output interfaces. A2.8.34 completes the plate placement/insertion/removal rollback paths; break/drop, support removal and explosion delivery still require a separate audit. F05 now has the reviewed family Board API; its real-client evidence remains separate. Family deployment uses the canonical Tavern family assembler and BSM admission guard after all required evidence is attached to the exact candidate.
+The separately active source batch continues F03 station visuals and F08 oil/food output interfaces. A2.8.34 completes the plate placement/insertion/removal rollback paths; 2.8.35 adds verified packed drops for destruction and explosion. Sudden process termination and support-removal parity remain separate audits. F05 now has the reviewed family Board API; its real-client evidence remains separate. Family deployment uses the canonical Tavern family assembler and BSM admission guard after all required evidence is attached to the exact candidate.
