@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
 def main():
     baseline()
-    subprocess.run(['node','--test','development/gameplay_core/test_immersion_audio.mjs','development/gameplay_core/test_localized_heat_lore.mjs','development/gameplay_core/test_pending_audio.mjs'],cwd=ROOT,check=True)
+    subprocess.run(['node','--test','development/gameplay_core/test_immersion_audio.mjs','development/gameplay_core/test_localized_heat_lore.mjs','development/gameplay_core/test_pending_audio.mjs','development/gameplay_core/test_full_skewer_flow.mjs'],cwd=ROOT,check=True)
     subprocess.run(['node','--experimental-vm-modules','development/gameplay_core/test_hot_food_manual_merge.mjs'],cwd=ROOT,check=True)
     proof=json.loads((ROOT/'development/gameplay_core/fixtures/released-audio-1.1.1.json').read_text())
     assert len(proof['assets'])==17 and len(proof['sound_events'])==13
