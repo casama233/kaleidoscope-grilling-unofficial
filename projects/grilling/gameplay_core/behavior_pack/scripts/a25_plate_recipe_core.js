@@ -1,3 +1,4 @@
+import {FIXED_INGREDIENT_TAGS} from './java_ingredient_tags.js';
 import {SECRET_ID,recipeTable,secretFood,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY} from './a24_skewering_core.js';
 
 export const PLATE_ID='kaleidoscope_grilling:skewer_plate';
@@ -92,14 +93,17 @@ export function bookIngredientSlots(record){
  if(!record||typeof record.resultId!=='string')return null;
  if(record.resultId===SECRET_ID){
   const custom=(record.customIngredients??[]).map(String).filter(Boolean).slice(0,3);
-  return custom.length===3?custom.map(id=>[id]):null;
+  return custom.length===3&&custom.every(id=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(id))?custom.map(id=>[id]):null;
  }
  const recipe=recipeForResult(record.resultId);
- return recipe?.slots??null;
+ return recipe?recipe.slots.map(slot=>[...new Set(slot.flatMap(id=>[id,...(FIXED_INGREDIENT_TAGS[id]??[]).map(tag=>'#'+tag)]))]):null;
 }
 
-export function selectorMatches(id,selector){
- return typeof id==='string'&&typeof selector==='string'&&!selector.startsWith('#')&&id===selector;
+export function selectorMatches(stack,selector){
+ if(typeof selector!=='string')return false;
+ const id=typeof stack==='string'?stack:stack?.id;
+ if(selector.startsWith('#'))return Array.isArray(stack?.tags)&&stack.tags.includes(selector.slice(1));
+ return typeof id==='string'&&id===selector;
 }
 
 export function planInventoryConsumption(inventory,slots,skipIndexes=[]){
@@ -114,7 +118,7 @@ export function planInventoryConsumption(inventory,slots,skipIndexes=[]){
    const stack=rows[i];if(!stack||typeof stack.id!=='string')continue;
    const count=Math.max(0,Number(stack.count)||0),used=reserved.get(i)??0;
    if(count<=used)continue;
-   if(acceptable.some(selector=>selectorMatches(stack.id,selector))){found=i;break}
+   if(acceptable.some(selector=>selectorMatches(stack,selector))){found=i;break}
   }
   if(found<0)return {ok:false,reason:'missing',missing:acceptable,ingredient,plan:[]};
   reserved.set(found,(reserved.get(found)??0)+1);

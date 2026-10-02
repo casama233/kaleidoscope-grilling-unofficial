@@ -3,7 +3,7 @@ import hashlib
 import json
 import math
 import unittest
-from held_pose_frames import make_pose
+from held_pose_frames import make_pose,chain,translate,rotate,xyz,scale,point,bone_matrix
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
@@ -30,19 +30,28 @@ class HandAnchorTests(unittest.TestCase):
             self.assertEqual(shaft['size'],[.5,.5,12.5])
         self.assertEqual(len(seen),150)
         self.assertEqual(refs,seen)
-    def test_third_person_handle_is_bound_for_both_hands_and_any_arm_pose(self):
+    def test_third_person_matches_java_corners_for_both_hands(self):
         animations=load(RP/ANIM)['animations']
-        for hand in ('right','left'):
+        display=load(ROOT/'projects/grilling/reports/java_display_transforms/beef_raw.json')['java_display']
+        for hand,sign in [('right',1),('left',-1)]:
             bones=animations[f'animation.kg_a287.skewer_tp_{hand}']['bones']
-            self.assertEqual(bones['skewer_pose']['position'],[0,0,0])
-            correction=bones['skewer_model']['position']
-            handle=[0,25,-6];pivot=[0,24,0]
-            relative=[h+c-p for h,c,p in zip(handle,correction,pivot)]
-            self.assertEqual(relative,[0,0,0])
-            # Any linear rotation/scale keeps this zero vector at the hand anchor.
-            # Native eat/sneak/walk arm motion therefore cannot amplify an offset.
-            for scale in (.8,1,1.25):
-                self.assertEqual([v*scale for v in relative],[0,0,0])
+            source=display['thirdperson_'+hand+'hand']
+            r=source['rotation'];r=[r[0],r[1]*sign,r[2]*sign]
+            t=source['translation'];t=[t[0]*sign,t[1],t[2]]
+            arm=rotate('x',15)
+            target=chain(translate([6*sign,22,0]),arm,translate([0,-10,-2]),rotate('x',-90),translate(t),xyz(r),scale(source['scale']),translate([-8,-8,-8]),translate([8,-24,8]))
+            base=chain(translate([5*sign,22,0]),arm,translate([sign,-31,1]))
+            actual=chain(base,translate([0,24,0]),bone_matrix(bones['skewer_pose']),bone_matrix(bones['skewer_model']),translate([0,-24,0]))
+            # Compare every bite-stage cube corner, including bamboo grip points.
+            import itertools
+            for path in (RP/'models/entity/a287_hand').glob('*.geo.json'):
+                model=load(path)['minecraft:geometry'][0]['bones'][2]
+                for cube in model['cubes']:
+                    for delta in itertools.product((0,1),repeat=3):
+                        vertex=[cube['origin'][i]+delta[i]*cube['size'][i] for i in range(3)]
+                        for a,b in zip(point(actual,vertex),point(target,vertex)):
+                            self.assertAlmostEqual(a,b,places=6)
+            self.assertNotEqual(bones['skewer_pose']['position'],[0,0,0])
     def test_first_person_display_uses_converted_frame(self):
         before=BEFORE['animations'];after=load(RP/ANIM)['animations']
         for hand in ('right','left'):

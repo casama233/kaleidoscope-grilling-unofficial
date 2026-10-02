@@ -319,6 +319,50 @@ def check_blocks(findings, geometry_index):
     return dict(stats)
 
 
+def check_item_visuals(findings, geometry_index):
+    """Item visuals use a distinct geometry/material chain from placed blocks."""
+    atlas = terrain_textures()
+    checked = 0
+    for path in sorted((BP / "blocks").rglob("*.json")):
+        block = load_json(path).get("minecraft:block", {})
+        ident = block.get("description", {}).get("identifier", path.name)
+        components = [block.get("components", {})] + [p.get("components", {}) for p in block.get("permutations", [])]
+        for comp in components:
+            if "minecraft:item_visual" not in comp:
+                continue
+            checked += 1
+            visual = comp["minecraft:item_visual"]
+            ref = geometry_ref(visual.get("geometry")) if isinstance(visual, dict) else None
+            row = geometry_index.get(ref)
+            if not row:
+                add(findings, "error", "missing_item_visual_geometry", ident, f"missing item geometry {ref}")
+                continue
+            mats = visual.get("material_instances", {})
+            if not isinstance(mats, dict) or not mats:
+                add(findings, "error", "missing_item_visual_material", ident, "item visual has no material instances")
+                continue
+            for bone in row["geo"].get("bones", []):
+                if bone.get("binding"):
+                    add(findings, "error", "item_visual_has_binding", ident, "native block-item geometry must not use an attachable binding")
+                for cube in bone.get("cubes", []):
+                    uv = cube.get("uv", {})
+                    if isinstance(uv, dict):
+                        for face in uv.values():
+                            slot = face.get("material_instance", "*") if isinstance(face, dict) else "*"
+                            if slot not in mats and "*" not in mats:
+                                add(findings, "error", "missing_item_visual_material", ident, f"missing item material slot {slot}")
+            for name, mat in mats.items():
+                texture = atlas.get(mat.get("texture")) if isinstance(mat, dict) else None
+                if not texture or not (RP / (texture + ".png")).is_file():
+                    add(findings, "error", "missing_item_visual_texture", ident, f"unresolved texture in item material {name}")
+            transforms = row["geo"].get("item_display_transforms")
+            if transforms is not None:
+                version = tuple(int(x) for x in load_json(row["path"])["format_version"].split("."))
+                if version < (1, 21, 0):
+                    add(findings, "error", "item_display_format", ident, "item_display_transforms requires geometry format 1.21.0 or newer")
+    return {"item_visuals": checked}
+
+
 def animation_aliases(attachable):
     return attachable.get("animations", {}) if isinstance(attachable.get("animations"), dict) else {}
 
@@ -441,22 +485,47 @@ def check_current_display_contracts(findings, geometry_index, animations):
     for path in sorted((RP / "attachables").glob("*.json")):
         desc = load_json(path)["minecraft:attachable"]["description"]
         ids = desc.get("animations", {})
-        family = "skewer" if any("kg_a287.skewer_" in v for v in ids.values()) else "rack" if any("kg_a286.rack_" in v for v in ids.values()) else "bottle"
+        family = "skewer" if desc["identifier"].endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
         counts[family] += 1
-        if set(ids) != aliases or set(ids.values()) - set(expected):
+        expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
+        if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
+        required_selectors = {
+            alias: f"c.is_first_person == {1 if alias.startswith('fp') else 0} && c.item_slot == '{'main_hand' if alias.endswith('right') else 'off_hand'}'"
+            for alias in aliases
+        }
+        actual_selectors = {}
+        malformed = False
         for row in selectors:
-            if not isinstance(row, dict): continue
-            for alias, expression in row.items():
-                slot = "main_hand" if alias.endswith("right") else "off_hand"
-                if "is_first_person" not in expression or slot not in expression:
-                    add(findings, "error", "held_pose_selectors", desc["identifier"], "view/slot selector lost its context condition")
+            if not isinstance(row, dict) or len(row) != 1:
+                malformed = True
+                continue
+            alias, expression = next(iter(row.items()))
+            if alias in actual_selectors:
+                malformed = True
+            actual_selectors[alias] = expression
+        if malformed or actual_selectors != required_selectors:
+            add(findings, "error", "held_pose_selectors", desc["identifier"],
+                "expected exactly one canonical selector for each first/third-person hand")
         for ref in desc.get("geometry", {}).values():
             geo = geometry_index.get(ref, {}).get("geo", {})
             bound = [b for b in geo.get("bones", []) if b.get("binding")]
             if len(bound) != 1 or bound[0].get("name") != "grip" or bound[0].get("pivot") != [0,24,0] or bound[0].get("binding") != "q.item_slot_to_bone_name(context.item_slot)":
                 add(findings, "error", "held_binding_contract", ref, "expected one item-slot grip at the canonical pivot")
+            bones = {bone.get("name"): bone for bone in geo.get("bones", [])}
+            if family in {"rack", "skewer"}:
+                for name, parent in ((family + "_pose", "grip"), (family + "_model", family + "_pose")):
+                    bone = bones.get(name, {})
+                    if bone.get("parent") != parent or bone.get("pivot") != [0, 24, 0]:
+                        add(findings, "error", "held_hierarchy_contract", ref,
+                            f"{name} must inherit {parent} at the hand pivot")
+            for anim_id in ids.values():
+                targets = set(animations.get(anim_id, {}).get("body", {}).get("bones", {}))
+                missing = targets - set(bones)
+                if missing:
+                    add(findings, "error", "held_animation_missing_bone", ref,
+                        f"{anim_id} targets absent bones: {sorted(missing)}")
             if family == "skewer": skewer_refs.add(ref)
     if counts != {"skewer":39,"bottle":67,"rack":1} or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
@@ -475,6 +544,7 @@ def main():
     known_ids = collect_ids()
     geometry_stats = check_geometry_structure(findings, geometries)
     block_stats = check_blocks(findings, geometries)
+    item_visual_stats = check_item_visuals(findings, geometries)
     attachable_stats = check_attachables(findings, geometries, animations, controllers, known_ids)
     check_current_display_contracts(findings, geometries, animations)
 
@@ -499,6 +569,7 @@ def main():
             "render_controllers": len(controllers),
             **geometry_stats,
             **block_stats,
+            **item_visual_stats,
             **attachable_stats,
         },
         "findings": findings,
