@@ -23,7 +23,7 @@ function fixture({hand='main',consumed=true,creative=false,failure,selected=3,sc
  const player={id:'p',selectedSlotIndex:selected,creative,getComponent(id){return id.endsWith('hunger')?hunger:id.endsWith('saturation')?sat:id.endsWith('equippable')?{setEquipment(_,v){write('off',v);return true;}}:null;}};
  const active={plate:plate.clone(),stack:pending.clone(),hand,use:captureEatingIdentity(plate,hand,3)};
  const plateMap=new Map([['p',active]]),pendingMap=new Map();
- const context={setItemProperty,setItemLore,PLATE_EATS:plateMap,PENDING_USES:pendingMap,completedUseStillCurrent,commitEating,
+ const context={setItemProperty,setItemLore,PLATE_EATS:plateMap,PENDING_USES:pendingMap,completedUseStillCurrent,commitEating,stopSoundHandle(){},seasoningFinished(){},
  heldByHand:(_,h)=>h==='off'?off:slots.get(player.selectedSlotIndex),creative:p=>p.creative,mainContainer:()=>({setItem(slot,v){write('main',v,slot);}}),EquipmentSlot:{Offhand:'off'},
  a25PlateRows:s=>structuredClone(s.rows),plateHighestNutritionIndex:r=>r.length?0:-1,
  a25RestoreStack:r=>{if(failure==='restore')return undefined;const s=new Stack(r.id);s.props=failure==='metadata'?{}:{...r.props};return s;},

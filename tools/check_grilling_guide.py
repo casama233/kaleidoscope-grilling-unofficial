@@ -103,7 +103,8 @@ def main():
     subprocess.run([sys.executable,str(ROOT/'tools/build_grilling_guide.py'),'--check'],check=True)
     facts=check_facts(s)
     require([c['id'] for c in s['categories'] if not c.get('parent')]==s['host_reference']['root_category_ids'],'Host taxonomy drift')
-    require(s['host_reference']['guide_sha256']=='acff33eec87add1c149aff3789b1b9ec62dd1ef642a5bc7d2b2f1b70dd6332ff','Host evidence drift')
+    require(s['host_reference']['version']=='1.0.8' and s['host_reference']['guide_sha256']=='49ea47f9dc7511af210562118c7d2164ab5e185296a5a8c8d678e7d7ff8dc959','Host evidence drift')
+    require(s['host_reference']['archive_sha256']=='9e5b617cc4c7a08ecd429fb9e42ec10e8d40a1ed5fc1f6f6687c3aff8a45a5d5' and s['host_reference']['file_id']==8983314,'Unverified original host archive')
     # The guide is part of the EXISTING product, not a guide pack.
     require(not (ROOT/'projects/grilling/integration/cookery106/behavior_pack/manifest.json').exists(),'Standalone guide BP resurrected')
     require(not (ROOT/'projects/grilling/integration/cookery106/resource_pack/manifest.json').exists(),'Standalone guide RP resurrected')

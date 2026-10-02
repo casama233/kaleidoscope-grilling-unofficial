@@ -10,6 +10,8 @@ Keep migration status honest: files in a local artifact are not automatically in
 
 The guide must remain one Grilling entry in the existing Cookery guide, not a new physical guidebook. Notebook tests with mock player adapters do not certify Minecraft persistence or guide UI integration. Asset previews do not certify engine rendering.
 
+Guide changes must also follow `docs/GUIDE-STANDARD.md`: shared host navigation, localized item pages, honest acquisition status and no host file replacement. Its six cooking categories are distinct from Tavern's seven brewing categories.
+
 # Canonical baseline
 
 - Follow `docs/BASELINE-MAINTENANCE.md`. Own fixes belong to canonical runtime; do not introduce gameplay transforms in a private builder or BSM hook.

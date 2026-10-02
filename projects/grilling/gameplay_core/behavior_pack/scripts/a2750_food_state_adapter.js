@@ -3,6 +3,7 @@ import {world,system} from '@minecraft/server';
 import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {readRawFoodLore,isHeatLore,applyFoodMaxim} from './a2769_food_tooltip_core.js';
 import './a2769_food_tooltip_runtime.js';
+import {heatLore} from './localized_lore_core.js';
 
 export const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until';
 function now(){try{return Number(world.getAbsoluteTime())||system.currentTick}catch{return system.currentTick}}
@@ -31,10 +32,10 @@ export function refreshHotLore(stack){
   if(until<=0)return stack;
   const left=Math.max(0,until-now());
   if(left<=0){setItemProperty(stack,HOT_UNTIL_KEY,undefined);setItemLore(stack,base);return stack}
-  const sec=Math.max(1,Math.ceil(left/20)),m=Math.floor(sec/60),ss=String(sec%60).padStart(2,'0');
+  const sec=Math.max(1,Math.ceil(left/20));
   // A full custom lore is not permission to discard a user's line.
   if(base.length>=20)return stack;
-  base.push('§c🔥 煙火氣 '+m+':'+ss);setItemLore(stack,base);
+  base.push(heatLore(sec));setItemLore(stack,base);
  }catch{}
  return stack;
 }
@@ -42,10 +43,10 @@ export function setHotFood(stack,ticks){
  if(!stack||ticks<=0)return stack;
  try{
   const until=bucketHot(now()+Math.max(1,Math.floor(Number(ticks)||0)));
-  const left=Math.max(1,until-now()),sec=Math.max(1,Math.ceil(left/20)),m=Math.floor(sec/60),ss=String(sec%60).padStart(2,'0');
+  const left=Math.max(1,until-now()),sec=Math.max(1,Math.ceil(left/20));
   const lore=readRawFoodLore(stack).filter(line=>!isHeatLore(line));
   if(lore.length>=20)return stack;
-  lore.push('§c🔥 煙火氣 '+m+':'+ss);
+  lore.push(heatLore(sec));
   setItemLore(stack,lore);
   setItemProperty(stack,HOT_UNTIL_KEY,until);
  }catch{}
