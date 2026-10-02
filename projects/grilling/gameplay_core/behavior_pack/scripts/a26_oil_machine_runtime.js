@@ -1,3 +1,5 @@
+import {interactionParticleBurst} from './immersion_particles_runtime.js';
+import {oilImpactPitch} from './immersion_particles_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {interactionFeedback,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
@@ -240,8 +242,8 @@ function startPress(block,p,amount){
  system.runTimeout(()=>{
   const b=dim.getBlock(loc);if(!b||b.typeId!==OIL_PRESS_ID)return;const current=readPress(b),hit=impactPress(current,amount);if(!hit.ok)return;
   writePress(b,hit.state);javaInteractionFeedback(p,'press_status',[hit.state.cakes,hit.state.progress,PRESS_REQUIRED_PROGRESS]);
-  try{dim.playSound('random.anvil_land',b.location,{volume:1.15,pitch:.88})}catch{}
-  try{for(let i=0;i<6;i++)dim.spawnParticle('minecraft:critical_hit_emitter',{x:b.x+.5+(Math.random()-.5)*.4,y:b.y+.9+(Math.random()-.5)*.2,z:b.z+.5+(Math.random()-.5)*.4})}catch{}
+  try{dim.playSound('random.anvil_land',b.location,{volume:1.15,pitch:oilImpactPitch()})}catch{}
+  interactionParticleBurst(dim,b.location,'oilPressImpact');
  },PRESS_IMPACT_TICK);
  return true;
 }

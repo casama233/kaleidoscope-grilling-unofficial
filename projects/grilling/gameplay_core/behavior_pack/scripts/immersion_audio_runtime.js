@@ -1,3 +1,4 @@
+import {interactionParticleBurst} from './immersion_particles_runtime.js';
 import {system} from '@minecraft/server';
 import {createGrillAudioController,stopSoundHandle} from './immersion_audio_core.js';
 
@@ -19,6 +20,6 @@ export function useSound(player,id,volume=1,pitch=1){
 }
 export function seasoningFinished(player){
  useSound(player,'action_success',.8);
- try{player.dimension.spawnParticle('minecraft:villager_happy',{x:player.location.x,y:player.location.y+1,z:player.location.z})}catch{}
+ interactionParticleBurst(player.dimension,player.location,'seasoningFinished');
 }
 export {stopSoundHandle};
