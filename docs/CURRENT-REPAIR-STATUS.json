@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    47
+    48
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -97,7 +97,7 @@
     {
       "id": "F13",
       "title": "聲畫操作",
-      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch；2.8.47 補入第三人稱進食使用手抬手。",
+      "canonical": "原作 17 OGG 與既有生命週期保留；2.8.45 修正兩手／兩視角分支 dispatch；2.8.47 補入第三人稱進食使用手抬手。 2.8.48 補单粒特效、黃金／無敵／成功盾與工作站音效。",
       "remaining": "音量、聲源、停止、透明排序、雙人觀察均須 Windows 真人",
       "client_accepted": false
     },
@@ -127,6 +127,19 @@
   "production_ready": false,
   "source_validation": {
     "static": true,
+    "isolated_full_family_bds": false,
+    "native_nonplayer_feedback_probe": false,
+    "simulated_players": false,
+    "client": false
+  },
+  "additional_review": "PARITY-AUDIT-20261003.md",
+  "previous_source_validation": {
+    "version": [
+      2,
+      8,
+      45
+    ],
+    "static": true,
     "isolated_full_family_bds": true,
     "native_nonplayer_health_probe": true,
     "bds_version": "1.26.51.1",
@@ -134,6 +147,17 @@
     "real_players": 0,
     "simulated_players": false,
     "client": false
+  },
+  "release_reconciliation": {
+    "canonical_predecessor": [
+      2,
+      8,
+      47
+    ],
+    "canonical_predecessor_commit": "e8c9358",
+    "withdrawn_feedback_candidate_commit": "cc57184b7e4579db136bb993f73382c177b93770",
+    "withdrawn_candidate_deployed": false,
+    "record": "RELEASE-COLLISION-20261003.md"
   },
   "repair_baseline_version": [
     2,

@@ -58,7 +58,16 @@ def main():
             assert current[key].count(r'\n') == 1, 'Malformed tooltip newline'
     # All bottle states, existing stacks and block items resolve declaratively;
     # no inventory polling, scripted lore rewriting or host translations.
-    for path in (PROJECT / 'behavior_pack/scripts').rglob('*.js'):
+    # Check the historical label-only release itself. Later releases may add
+    # scripts, which did not exist at LABEL_BASE and must not be queried there.
+    released_paths = subprocess.check_output([
+        'git', 'ls-tree', '-r', '--name-only', LABEL_BASE, '--',
+        'projects/grilling/gameplay_core/behavior_pack/scripts',
+    ], cwd=ROOT, text=True).splitlines()
+    for relative in released_paths:
+        path = ROOT / relative
+        if path.suffix != '.js':
+            continue
         if path.relative_to(PROJECT / 'behavior_pack').as_posix() in (
                 'scripts/guide/payload.js', 'scripts/guide/publisher.js'):
             continue

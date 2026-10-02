@@ -1,3 +1,5 @@
+import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';
+import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
@@ -480,11 +482,11 @@ function handleGrill(block,player,hand='main'){
   if(result.ok){
    if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){interactionFailure(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
    awardGleamingWithOil(player);javaInteractionFeedback(player,'oiled',[n]);
-   blockSound(block,'action_success',.65);
+   blockSound(block,'grill_flip',.75);
    try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}
   }return;
  }
- if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'action_success',.65);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}}return}
+ if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}}return}
  if(isSpecialSeasoningId(id)){
   if(state.phase!==2||state.seasoned||n<1){javaInteractionFeedback(player,'no_seasonable_skewers');return}
   const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){javaInteractionFeedback(player,bottle.reason==='insufficient'?'not_enough_seasoning':'no_seasonable_skewers');return}
@@ -563,7 +565,7 @@ function pushBottle(block,player,held,hand='main'){
  const items=[...current.items,copyOne(storage.before)];
  const ok=commitBottleAndHand(block,current,items,storage,next,!free);
  if(!ok)interactionFailure(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
- else blockSound(block,'seasoning_bottle_stack',.8);return ok;
+ else blockSound(block,'seasoning_bottle_stack',1);return ok;
 }
 function handleSeasoningBlock(block,player,hand='main'){
  const current=nativeBottles(block),items=current.items.map(x=>x.clone());
@@ -580,8 +582,8 @@ function handleSeasoningBlock(block,player,hand='main'){
   else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');}
   if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
   awardSeasoningMilestones(player,top.ingredients);
-  blockSound(block,'action_success',.8);
-  try{block.dimension.spawnParticle('minecraft:endrod',{x:block.x+.5,y:block.y+.7,z:block.z+.5})}catch{}
+  blockSound(block,'action_success',.65);
+  interactionParticleBurst(block.dimension,block.location,'seasoningAdded');
   return;
  }
  if(!id){
@@ -589,7 +591,7 @@ function handleSeasoningBlock(block,player,hand='main'){
   if(storage.before)throw new Error('Grilling: take-bottle hand is no longer empty');
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
-  else blockSound(block,'seasoning_bottle_stack',.8);
+  else blockSound(block,'seasoning_bottle_place',1);
   return;
  }
  javaInteractionFeedback(player,'invalid_seasoning');
@@ -629,7 +631,7 @@ function scheduleNativeBottlePlacement(e){
    const result=commitSteps(steps);if(!result.ok){
     bottleRollbackStatus(block,result);
     if(current?.created||freshPreflight)try{retireEmptyStationContainer(block)}catch(error){console.warn('[Grilling bottle placement cleanup] '+error)}
-   }else blockSound(block,'seasoning_bottle_place',.8);
+   }else blockSound(block,'seasoning_bottle_place',1);
   }catch(error){console.warn('[Grilling native bottle placement] '+error);}
  });
 }
@@ -723,7 +725,7 @@ function dangerousPreservation(player,itemId){if(!DANGEROUS_FOODS.has(itemId)||!
 function applyOrdinary(player){
  const challenged=!!fxGet(player,'invincible');if(challenged)fxClear(player,'invincible');
  const outcome=ordinaryChallengeOutcome(challenged,Math.random());
- if(outcome==='shield'){awardOrdinaryChallenge(player,outcome);try{player.dimension.playSound('random.shield_block',player.location);player.dimension.spawnParticle('minecraft:electric_spark_particle',{x:player.location.x,y:player.location.y+1,z:player.location.z})}catch{}return}
+ if(outcome==='shield'){awardOrdinaryChallenge(player,outcome);ordinaryShieldFeedback(player);return}
  if(outcome==='spear')awardOrdinaryChallenge(player,outcome);
  system.run(()=>{try{player.kill()}catch{try{player.applyDamage(100000,{cause:'override'})}catch{}}});
 }
@@ -734,7 +736,7 @@ function afterCommitted(player,id,meta,active,fullNative){
  if(meta.hot){doubleNewNative(player,active.nativeBefore);doubleNewFx(player,active.fxBefore)}
  if(meta.hot&&fullNative&&active.saturationBefore!==undefined){const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(h&&sat){const gained=Math.max(0,sat.currentValue-active.saturationBefore);sat.setCurrentValue(Math.min(h.currentValue,active.saturationBefore+gained*grillingConfig().saturationMultiplier))}}
  if(meta.hot)applySeasoning(player,meta.seasonings);
- if(id==='kaleidoscope_grilling:grilled_golden_skewer')try{player.dimension.playSound('beacon.power',player.location)}catch{}
+ if(id==='kaleidoscope_grilling:grilled_golden_skewer')goldenSkewerFeedback(player);
  if(id==='kaleidoscope_grilling:ordinary_skewer')applyOrdinary(player);
 }
 function stackMeta(stack){return {hot:isHot(stack),seasonings:readSeasonings(stack),hotUntil:hotUntil(stack)}}
@@ -874,7 +876,7 @@ world.afterEvents.itemStopUse.subscribe(e=>{
 world.afterEvents.playerLeave.subscribe(e=>{stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
 world.beforeEvents.entityHurt.subscribe(e=>{
  const target=e.hurtEntity,cause=e.damageSource?.cause;
- if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;system.run(()=>{try{target.dimension.playSound('random.shield_block',target.location)}catch{}});return}
+ if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
  if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
@@ -953,7 +955,7 @@ function burnGrillContents(block,beforeState,nextState){
 }
 // Block ticks resume on chunk reload; no global registration cap or unload deletion.
 function tickGrill(block){
- try{let state=readState(block),beforeState=state,before=state.phase;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){burnGrillContents(block,beforeState,state);return}if(before!==state.phase)try{block.dimension.playSound('fire.fire',block.location)}catch{};writeTickState(block,beforeState,state);if(state.lit&&system.currentTick%4===0){const p={x:block.x+.5+(Math.random()-.5)*.45,y:block.y+.35,z:block.z+.5+(Math.random()-.5)*.45};if(Math.random()<.35)block.dimension.spawnParticle('minecraft:basic_smoke_particle',p);if(Math.random()<.12)block.dimension.spawnParticle('minecraft:basic_flame_particle',p)}}catch(error){if(system.currentTick%1200===0)console.warn('[Grilling tick] '+error)}
+ try{let state=readState(block),beforeState=state;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){burnGrillContents(block,beforeState,state);return}writeTickState(block,beforeState,state);if(system.currentTick%4===0)grillAmbientParticles(block,state.lit)}catch(error){if(system.currentTick%1200===0)console.warn('[Grilling tick] '+error)}
  finally{try{updateGrillAudio(block,readState(block).lit,occupied(block))}catch{try{removeGrillAudio(block)}catch{}}}
 }
 function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecraft:ice','minecraft:packed_ice','minecraft:frosted_ice'].includes(id))return 1.11;return 1.3}
@@ -961,6 +963,7 @@ system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
   if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.
+  if(system.currentTick%10===0&&fxGet(p,'invincible'))invincibleAmbientFeedback(p);
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
   const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);

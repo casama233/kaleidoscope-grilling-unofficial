@@ -1,3 +1,4 @@
+import {useSound} from './immersion_audio_runtime.js';
 import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw} from './plate_transaction_core.js';
@@ -220,14 +221,14 @@ function handlePlateBlock(block,player,hand='main'){
   const captured=captureWritableHand(player,hand),next=captured.before?.clone();if(!next)return;
   const remainder=next.amount===1?undefined:next;if(remainder)remainder.amount--;
   if(!plateTransaction(block,[plateStorageStep(block,added.rows),...(creative(player)?[]:[plateHandStep(captured,remainder)])]))return;
-  try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:1.1})}catch{};return;
+  try{block.dimension.playSound('block.itemframe.add_item',block.location,{volume:.8,pitch:1})}catch{};return;
  }
  if(held)return;
  const removed=plateRemoveLast(rows);if(!removed.ok)return;
  const stack=restoreStack(removed.removed);if(!stack)return;
  const captured=captureWritableHand(player,hand);if(captured.before)return;
  if(!plateTransaction(block,[plateStorageStep(block,removed.rows),plateHandStep(captured,stack)]))return;
- try{block.dimension.playSound('random.pop',block.location,{volume:.7,pitch:.9})}catch{}
+ try{block.dimension.playSound('block.itemframe.remove_item',block.location,{volume:.8,pitch:1})}catch{}
 }
 function breakPlate(block,player){
  if(!block||block.typeId!==PLATE_BLOCK_ID)return false;
@@ -319,7 +320,7 @@ function craftFromBook(player,book,stickHand='off'){
   }
  }]);
  if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);interactionFailure(player,'§c製作未完成，已嘗試回復材料；請預留背包空位');return false}
- try{player.playSound('random.levelup',{volume:.45,pitch:1.5})}catch{}return true;
+ useSound(player,'action_success',.7,1);return true;
 }
 function handleBookAir(player,item){
  const main=heldMain(player),off=heldOff(player),hand=main?.typeId===BOOK_ID?'main':off?.typeId===BOOK_ID?'off':null;if(!hand)return;
@@ -341,7 +342,7 @@ function placeRecipeBlock(support,face,player,book,hand='main'){
  const record=readBookRecord(book);if(!record){message(player,'§c空白烤串食譜不能貼牆');return true}
  const target=blockAtOffset(support,faceOffset(face));if(!isAirReplaceable(target))return false;
  target.setType(RECIPE_BLOCK_ID);setFacing(target,f);writeRecipeBlock(target,book);decrementHand(player,hand,1);
- try{target.dimension.playSound('random.pop',target.location,{volume:.6,pitch:1})}catch{}return true;
+ try{target.dimension.playSound('block.itemframe.place',target.location,{volume:.8,pitch:1})}catch{}return true;
 }
 function handleRecipeBlock(block,player,hand='main'){
  if(!block||block.typeId!==RECIPE_BLOCK_ID)return;
@@ -349,7 +350,7 @@ function handleRecipeBlock(block,player,hand='main'){
  if(isRecipeStick(held)&&book){craftFromBook(player,book,hand);return}
  if(held)return;
  clearRecipeBlock(block);block.setType('minecraft:air');if(book)give(player,book);
- try{block.dimension.playSound('random.pop',block.location,{volume:.6,pitch:.9})}catch{}
+ try{block.dimension.playSound('block.itemframe.remove_item',block.location,{volume:.8,pitch:1})}catch{}
 }
 function breakRecipe(block,player){
  if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const row=readRecipeBlock(block),book=restoreStack(row),loc={x:block.x+.5,y:block.y+.5,z:block.z+.5},dim=block.dimension;

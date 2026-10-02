@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -79,6 +80,7 @@ VERIFIERS = {
     (2, 8, 45): "verify_a2845.py",
     (2, 8, 46): "verify_a2846.py",
     (2, 8, 47): "verify_a2847.py",
+    (2, 8, 48): "verify_a2848.py",
     (2, 8, 8): "verify_a288_local.py",
 }
 
@@ -192,10 +194,73 @@ def verify_compiled_exact() -> None:
                 assert path.read_bytes() == compiled.read_bytes(), rel
 
 
+def source_snapshot() -> dict:
+    """Bind functional results to this HEAD and all non-output checkout inputs."""
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    paths = subprocess.check_output(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=ROOT,
+    ).decode("utf-8").split("\0")
+    # Published archives and compiler output are not verifier inputs. Everything
+    # else, including untracked nonignored source, fixtures and CI config, is bound.
+    outputs = ("artifacts/", "builds/", "dist/", "projects/grilling/gameplay_core/builds/")
+    # Pinned Dash 0.13.0 writes this build cache under each project root.
+    # Do not exclude .bridge broadly: extensions/compiler settings are inputs.
+    dash_caches = {
+        f"{prefix}.bridge/.dash.{mode}.json"
+        for prefix in ("", "projects/grilling/gameplay_core/")
+        for mode in ("production", "development")
+    }
+    entries = []
+    for relative in sorted(set(paths)):
+        if not relative or relative.startswith(outputs) or relative in dash_caches:
+            continue
+        path = ROOT / relative
+        entries.append([relative, hashlib.sha256(path.read_bytes()).hexdigest()])
+    digest = hashlib.sha256(json.dumps(entries, separators=(",", ":")).encode("utf-8")).hexdigest()
+    return {"head": head, "input_sha256": digest, "input_files": len(entries)}
+
+
+def require_source_validation(path: Path) -> dict:
+    receipt = load(path)
+    assert receipt.get("schema_version") == 1, "unsupported source validation receipt"
+    assert receipt.get("scope") == "canonical-functional-source", "receipt is not functional source validation"
+    assert receipt.get("source") == source_snapshot(), "source/HEAD changed since functional validation"
+    return receipt
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Canonical verifier for the current Grilling gameplay core")
-    parser.add_argument("--compiled", action="store_true", help="also compare the real Dash output")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--compiled", action="store_true", help="run full functional checks and compare the real Dash output")
+    mode.add_argument("--compiled-only", action="store_true", help="compare Dash output after validating a prior functional receipt")
+    parser.add_argument("--write-source-validation", type=Path, help="write a functional source receipt outside the checkout after success")
+    parser.add_argument("--source-validation", type=Path, help="receipt required by --compiled-only for the same HEAD and source")
     args = parser.parse_args()
+
+    if args.compiled_only:
+        if args.source_validation is None or args.write_source_validation is not None:
+            parser.error("--compiled-only requires --source-validation and cannot write a functional receipt")
+        require_source_validation(args.source_validation)
+        major, minor, patch, imports = generic_gate()
+        verify_compiled_exact()
+        # Detect source changes during comparison as well as before it.
+        require_source_validation(args.source_validation)
+        print(
+            f"Canonical compiled export gate PASS: {major}.{minor}.{patch}; "
+            f"relative imports checked={imports}; same HEAD/source functional receipt verified; "
+            "functional suite not repeated"
+        )
+        return
+    if args.source_validation is not None:
+        parser.error("--source-validation is only valid with --compiled-only")
+    source_before = None
+    if args.write_source_validation is not None:
+        if args.write_source_validation.resolve().is_relative_to(ROOT.resolve()):
+            parser.error("write the source validation receipt outside the checkout")
+        # A failed rerun must not leave an older PASS available to later steps.
+        args.write_source_validation.unlink(missing_ok=True)
+        source_before = source_snapshot()
 
     major, minor, patch, imports = generic_gate()
     subprocess.run([sys.executable, str(DEV / "verify_visual_refs.py")], check=True)
@@ -214,6 +279,16 @@ def main() -> None:
     subprocess.run(command, check=True)
     if args.compiled:
         verify_compiled_exact()
+    if args.write_source_validation is not None:
+        assert source_before == source_snapshot(), "source/HEAD changed during functional validation"
+        receipt = {
+            "schema_version": 1,
+            "scope": "canonical-functional-source",
+            "version": list(version),
+            "source": source_before,
+        }
+        args.write_source_validation.parent.mkdir(parents=True, exist_ok=True)
+        args.write_source_validation.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     print(
         f"Canonical gameplay-core gate PASS: {major}.{minor}.{patch}; "
         f"relative imports checked={imports}; compiled={args.compiled}"
