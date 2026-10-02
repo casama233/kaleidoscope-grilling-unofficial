@@ -274,6 +274,9 @@
     },
     "sour_spicy_noodles": {
       "textures": "textures/items/sour_spicy_noodles"
+    },
+    "pepper_sapling": {
+      "textures": "textures/blocks/pepper_sapling"
     }
   }
 }

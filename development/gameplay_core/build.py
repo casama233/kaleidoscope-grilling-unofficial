@@ -198,9 +198,9 @@ def main():
                 raise RuntimeError(f'missing icon for {item_id}: {src}')
         shutil.copyfile(src,rp/f'textures/items/{item_id}.png')
         texdata[item_id]={'textures':f'textures/items/{item_id}'}
-    brush_src=SRC/'integration/immersion_lab/sources/common/src/main/resources/assets/kaleidoscope_grilling/textures/item/canola_oil_brush.png'
     for i in ('canola_oil_brush','secret_chili_oil_brush','premium_chili_oil_brush'):
-        shutil.copyfile(brush_src,rp/f'textures/items/{i}.png')
+        specific=ROOT/'development/gameplay_core/fixtures/java-item-icons-1.1.1'/f'{i}.png'
+        shutil.copyfile(specific,rp/f'textures/items/{i}.png')
         texdata[i]={'textures':f'textures/items/{i}'}
     for i in ('special_seasoning','empty_seasoning_bottle'):
         shutil.copyfile(support_icon,rp/f'textures/items/{i}.png')

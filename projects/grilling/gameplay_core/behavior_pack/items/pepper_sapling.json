@@ -1,0 +1,27 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:pepper_sapling",
+      "menu_category": {
+        "category": "nature",
+        "group": "kaleidoscope_cookery:itemGroup.name.crops"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "tile.kaleidoscope_grilling:pepper_sapling.name"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "pepper_sapling"
+        }
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:pepper_sapling",
+        "replace_block_item": true
+      }
+    }
+  }
+}

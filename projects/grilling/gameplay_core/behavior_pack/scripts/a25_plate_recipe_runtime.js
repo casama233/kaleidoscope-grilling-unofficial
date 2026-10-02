@@ -397,6 +397,7 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  }catch{}
 });
 world.beforeEvents.explosion.subscribe(e=>{
+ if(e.cancel)return;
  const keep=[],plates=[];
  for(const block of e.getImpactedBlocks()){
   if(block.typeId===PLATE_BLOCK_ID)plates.push({dimension:block.dimension,location:{...block.location}});
@@ -404,7 +405,12 @@ world.beforeEvents.explosion.subscribe(e=>{
  }
  if(!plates.length)return;
  e.setImpactedBlocks(keep);
- system.run(()=>{for(const row of plates)try{breakPlate(row.dimension.getBlock(row.location))}catch(error){console.warn('[Grilling plate explosion recovery] '+error)}});
+ system.run(()=>{
+  // Another before-event subscriber may cancel after this one. Do not settle a
+  // cancelled or unreadable event; no storage/drop mutation has happened yet.
+  try{if(e.cancel!==false)return}catch(error){console.warn('[Grilling plate explosion status] '+error);return}
+  for(const row of plates)try{breakPlate(row.dimension.getBlock(row.location))}catch(error){console.warn('[Grilling plate explosion recovery] '+error)}
+ });
 });
 function recipeSupport(block){
  try{
