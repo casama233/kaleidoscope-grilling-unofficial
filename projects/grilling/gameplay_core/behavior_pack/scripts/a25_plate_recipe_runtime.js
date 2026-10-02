@@ -3,7 +3,7 @@ import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
-import {interactionFeedback} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
 import {world,system,ItemStack,EnchantmentType} from '@minecraft/server';
 import {
  UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,secretFood,recipeTable
@@ -317,7 +317,7 @@ function craftFromBook(player,book,stickHand='off'){
    if(failures)throw Error('Recipe rollback failed for '+failures+' writes');
   }
  }]);
- if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);message(player,'§c製作未完成，已嘗試回復材料；請預留背包空位');return false}
+ if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);interactionFailure(player,'§c製作未完成，已嘗試回復材料；請預留背包空位');return false}
  try{player.playSound('random.levelup',{volume:.45,pitch:1.5})}catch{}return true;
 }
 function handleBookAir(player,item){

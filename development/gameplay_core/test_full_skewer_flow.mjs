@@ -41,7 +41,7 @@ function fixture(){
   ...portableOil,...portableFood,ensureOilHandPublished:()=>true,OIL_TYPES:{canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}},heldMain:()=>bag.getItem(0),heldOff:()=>off,heldByHand:(_,hand)=>hand==='off'?off:bag.getItem(0),creative:()=>false,
   captureWritableHand:(_,hand)=>({before:(hand==='off'?off:bag.getItem(0))?.clone(),write:s=>write(hand,s)}),mainContainer:()=>bag,inv:()=>grill,occupied:()=>grill.rows.filter(Boolean).length,
   readState:()=>structuredClone(state),writeState:(_b,s)=>state=structuredClone(s),resetBlock:(_b,lit)=>state={...logic.initialState(),lit},commitStationTransfer:(_b,steps)=>commitSteps(steps),quarantineStation(){throw Error('quarantine')},
-  blockSound:(_b,id)=>sounds.push(id),useSound:(_p,id)=>sounds.push(id),message:(_p,text)=>notices.push(text),awardLookingThePart(){},awardGleamingWithOil(){},
+  blockSound:(_b,id)=>sounds.push(id),useSound:(_p,id)=>sounds.push(id),message(){},javaInteractionFeedback:(_p,key)=>notices.push(key),interactionFailure:(_p,text)=>notices.push(text),awardLookingThePart(){},awardGleamingWithOil(){},
   isCompatRawSkewer:()=>false,customSkewerCookedId:()=>undefined,skewerIngredientDecision:()=>'',resolveSecretSmokedId,
   afterCommitted:(_p,id,meta)=>settlements.push({id,hot:meta.hot,seasonings:meta.seasonings}),RAW_NAUSEA:{},secretRemainders(){},now:()=>tick,
   prepareOutputDelivery:(_p,rows)=>({apply(){if(rows.length)throw Error('unexpected starter remainder')},rollback(){}})

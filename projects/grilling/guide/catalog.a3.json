@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.11",
-  "revision": "a3_0_11",
+  "version": "0.3.13",
+  "revision": "java_hud_20261002",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",

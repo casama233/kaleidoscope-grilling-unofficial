@@ -1,5 +1,5 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
-import {interactionFeedback} from './a283_interaction_feedback.js';
+import {interactionFeedback,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {
  PRESS_MAX_CAKES,PRESS_REQUIRED_PROGRESS,PRESS_COOLDOWN_TICKS,PRESS_IMPACT_TICK,PRESS_COMPLETION_DELAY,
@@ -145,7 +145,7 @@ function bucketDelivery(p,hand,output){
 function fillVatFromBucket(block,p,hand,item){
  const type=bucketType(item?.typeId);if(!type)return false;
  const v=readVat(block),next=vatInsert(v,type,1);
- if(!next.ok){msg(p,'§c大缸已滿或內容類型不符');return true}
+ if(!next.ok){javaInteractionFeedback(p,'big_vat_reject');return true}
  const storage=captureWritableHand(p,hand),free=creative(p);
  oilTransaction([
   {apply(){if(!free)storage.write(new ItemStack('minecraft:bucket',1))},rollback(){if(!free)storage.write(storage.before)}},
@@ -178,7 +178,7 @@ function fillPotFromVat(block,p,hand,item){
  item=held(p,hand);
  const v=readVat(block);if(!['canola','secret_chili','premium_chili'].includes(v.type))return false;
  const oil=readCookeryOilPot(item),type=item.typeId===COOKERY_FILLED?oil.type:'',count=item.typeId===COOKERY_FILLED?oil.count:0;
- const plan=potFillPlan(v,type,count);if(!plan.ok){msg(p,'§c大缸已滿、油壺已滿或油種不同');return true}
+ const plan=potFillPlan(v,type,count);if(!plan.ok){javaInteractionFeedback(p,'oil_type_mismatch');return true}
  const next=vatExtract(v,v.type,plan.buckets);if(!next.ok)return true;
  const pot=buildCookeryOilPot(plan.type,plan.nextCount,item);if(!pot)return true;
  const storage=captureWritableHand(p,hand);
@@ -203,7 +203,7 @@ function scanVat(press){
 }
 function broadcastPressFailure(block,status,source){
  const text=status==='FULL'?'§c附近大缸容量不足':status==='INCOMPATIBLE'?'§c附近大缸裝有不同流體':'§c附近沒有可接 4 桶菜籽油的大缸';
- if(source)msg(source,text);
+ if(source)javaInteractionFeedback(source,status==='FULL'?'press_vat_full':status==='INCOMPATIBLE'?'press_wrong_vat':'press_no_vat');
 }
 function residueEject(block,count){
  if(count<=0)return;let facing='north';try{facing=String(block.permutation.getState('minecraft:cardinal_direction')??'north')}catch{}
@@ -229,7 +229,7 @@ function finishPress(block,source){
 }
 function startPress(block,p,amount){
  const state=readPress(block);
- if(state.cakes<PRESS_MAX_CAKES){msg(p,'§e榨油器需要先放滿 4 個油餅（'+state.cakes+'/4）');return true}
+ if(state.cakes<PRESS_MAX_CAKES){javaInteractionFeedback(p,'press_need_full_batch',[state.cakes,4]);return true}
  if(state.waiting){finishPress(block,p);return true}
  const cd=key(PRESS_PREFIX,block)+'|'+p.id,now=system.currentTick;
  if(now<(PRESS_COOLDOWNS.get(cd)??-1))return true;
@@ -239,7 +239,7 @@ function startPress(block,p,amount){
  const dim=block.dimension,loc={...block.location};
  system.runTimeout(()=>{
   const b=dim.getBlock(loc);if(!b||b.typeId!==OIL_PRESS_ID)return;const current=readPress(b),hit=impactPress(current,amount);if(!hit.ok)return;
-  writePress(b,hit.state);
+  writePress(b,hit.state);javaInteractionFeedback(p,'press_status',[hit.state.cakes,hit.state.progress,PRESS_REQUIRED_PROGRESS]);
   try{dim.playSound('random.anvil_land',b.location,{volume:1.15,pitch:.88})}catch{}
   try{for(let i=0;i<6;i++)dim.spawnParticle('minecraft:critical_hit_emitter',{x:b.x+.5+(Math.random()-.5)*.4,y:b.y+.9+(Math.random()-.5)*.2,z:b.z+.5+(Math.random()-.5)*.4})}catch{}
  },PRESS_IMPACT_TICK);
@@ -251,12 +251,12 @@ function interactPress(block,p,item,hand=null){
  if(state.waiting||state.progress>=PRESS_REQUIRED_PROGRESS){finishPress(block,p);return}
  const actualHand=hand??(item?handFor(p,item.typeId):null);
  if(item?.typeId===OIL_CAKE_ID){
-  const x=pressAddCake(state);if(!x.ok){msg(p,'§e榨油器最多放 4 個油餅');return}
+  const x=pressAddCake(state);if(!x.ok){javaInteractionFeedback(p,'press_full');return}
   if(actualHand&&!decHand(p,actualHand,1))return;writePress(block,x.state);
   try{block.dimension.playSound('dig.grass',block.location,{volume:.8,pitch:1})}catch{};return;
  }
  const amount=toolProgress(item?.typeId,item?.getTags?.()??[]);if(amount>0){startPress(block,p,amount);return}
-
+ javaInteractionFeedback(p,'press_status',[state.cakes,state.progress,PRESS_REQUIRED_PROGRESS]);
 }
 function breakPress(block,p){
  assertOilMachineSafe(block);
@@ -274,7 +274,7 @@ function placePackedVat(support,face,p,item,hand=null){
 }
 function interactVat(block,p,item,hand=null){
  assertOilMachineSafe(block);
- const actualHand=hand??(item?handFor(p,item.typeId):null);if(!item){return}
+ const actualHand=hand??(item?handFor(p,item.typeId):null);if(!item){const v=readVat(block);javaInteractionFeedback(p,'big_vat_status',[v.buckets,VAT_CAPACITY_BUCKETS]);return}
  if((item.typeId===COOKERY_EMPTY||item.typeId===COOKERY_FILLED)&&actualHand&&fillPotFromVat(block,p,actualHand,item))return;
  if(bucketType(item.typeId)&&actualHand&&fillVatFromBucket(block,p,actualHand,item))return;
  if(item.typeId==='minecraft:bucket'&&actualHand&&takeVatBucket(block,p,actualHand))return;

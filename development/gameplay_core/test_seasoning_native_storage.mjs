@@ -39,7 +39,7 @@ function fixture(){
   context=vm.createContext({...core,...visuals,world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
    EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
    readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
-   markPlacedVisualDirty(){},blockSound(){},message(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
+   markPlacedVisualDirty(){},blockSound(){},message(){},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
    heldMain:()=>hand?.clone(),heldByHand:()=>hand?.clone(),creative:()=>mode==='creative',
    captureWritableHand(){const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
    captureInteractionIntent:()=>({hand:'main',signature:JSON.stringify(hand)}),interactionIntentStillCurrent:(_,intent)=>JSON.stringify(hand)===intent.signature});

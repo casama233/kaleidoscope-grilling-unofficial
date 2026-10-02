@@ -59,7 +59,7 @@ def feedback():
  hud=(BP/'scripts/a2739_crosshair_hud_runtime.js').read_text()
  assert 'runInterval' not in hud and 'setActionBar' not in hud
  owners=[p.name for p in (BP/'scripts').rglob('*.js') if 'setActionBar' in p.read_text()]
- assert owners==['a283_interaction_feedback.js'],owners
+ assert sorted(owners)==(['a283_interaction_feedback.js','java_eating_hud_runtime.js'] if (BP/'scripts/java_eating_hud_runtime.js').exists() else ['a283_interaction_feedback.js']),owners
  main=(BP/'scripts/main.js').read_text()
  assert 'world.beforeEvents.playerPlaceBlock' not in main
  assert "registerCustomComponent('senluo:grilling_bottle_place'" in main
