@@ -24,8 +24,20 @@ def number(n):
     if abs(n)<1e-8:n=0
     return format(n,'.8f').rstrip('0').rstrip('.') or '0'
 
+def rounded_channel(value):
+    # libm cancellation may produce either zero sign on different platforms.
+    value=round(value,8)
+    return 0.0 if value==0 else value
+
+def initial_euler(value):
+    # Choose one representative only at the first key. Wrapping every key
+    # would turn a continuous curve into a spurious full-spin interpolation.
+    value=(value+180.0)%360.0-180.0
+    if abs(abs(value)-180.0)<1e-8:return -180.0
+    return value
+
 def unwrap(values,previous):
-    if previous is None:return values
+    if previous is None:return [initial_euler(v) for v in values]
     return [v+360*round((old-v)/360)for v,old in zip(values,previous)]
 
 def sample_times():
@@ -54,18 +66,18 @@ def animations():
                 # through an attachable owning_entity geometry assumption.
                 # O is translation-only, so a child-origin delta can be moved
                 # unchanged into the normalized player item socket.
-                positions[key]=[round(a,8) for a in wide['position']]
+                positions[key]=[rounded_channel(a) for a in wide['position']]
                 socket_base=['0',"q.get_default_bone_pivot('"+arm+"',1) - q.get_default_bone_pivot('"+socket+"',1) - 7",
                              "-q.get_default_bone_pivot('"+socket+"',2)"]
                 socket_positions[key]=[base+' + ('+slim+' ? '+number(b-a)+' : 0)'
                                        for base,a,b in zip(socket_base,wide['position'],narrow['position'])]
                 rotation=unwrap(wide['rotation'],last_item);last_item=rotation
-                rotations[key]=[round(v,8)for v in rotation]
+                rotations[key]=[rounded_channel(v)for v in rotation]
                 target=native_arm_target(profile,t,sign)
                 at=point(target,[0,0,0]);at[0]*=-1
                 arm_positions[key]=[number(at[i])+" - q.get_default_bone_pivot('"+arm+"', "+str(i)+")"for i in range(3)]
                 rotation=unwrap(bedrock_rotation(target),last_arm);last_arm=rotation
-                arm_rotations[key]=[round(v,8)for v in rotation]
+                arm_rotations[key]=[rounded_channel(v)for v in rotation]
             common={'loop':'hold_on_last_frame','animation_length':4.5,'anim_time_update':SECONDS}
             item_animations[item_animation_id(profile,hand)]={**common,'bones':{
                 'skewer_pose':{'position':positions,'rotation':rotations,'scale':[1,1,1]},
