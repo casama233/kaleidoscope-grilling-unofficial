@@ -47,12 +47,17 @@ def main():
             count += 1
         counts[kind] = count
     assert counts == {'item': 156, 'block': 18}, counts
+    version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
+    public_keys = {'senluo.public.projection.v1'} if version >= (2, 8, 49) else set()
     for locale, label in LABELS.items():
         path = PROJECT / 'resource_pack/texts' / (locale + '.lang')
         old = language(prior(path))
         current = language(path.read_bytes())
         assert all(current.get(k) == v for k, v in old.items()), 'Plain names/guide text changed'
-        assert set(current) - set(old) == set(aliases), 'Unexpected localization override'
+        assert set(current) - set(old) == set(aliases) | public_keys, 'Unexpected localization override'
+        assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'
+        released = language(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
+        assert set(released) - set(old) == set(aliases), 'Historical label-only release drift'
         for key, plain in aliases.items():
             assert current[key] == old[plain] + r'\n' + '§9§o' + label + '§r', key
             assert current[key].count(r'\n') == 1, 'Malformed tooltip newline'
