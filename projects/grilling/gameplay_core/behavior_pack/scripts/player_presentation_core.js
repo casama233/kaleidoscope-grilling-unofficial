@@ -16,8 +16,14 @@ export const EAT_PROJECTION_PROPERTY='kaleidoscope_grilling:eat_projection';
 export const EAT_PROFILE_PROPERTY='kaleidoscope_grilling:eat_profile';
 export const EAT_HAND_PROPERTY='kaleidoscope_grilling:eat_hand';
 export const PROFILE_CODES=Object.freeze({ONE:1,TWO:2,THREE:3,THREE_ALT:4,FOUR:5});
-export function eatingProfile(requested,random01=Math.random()){
- const profile=requested==='THREE_RANDOM'?(random01<.5?'THREE':'THREE_ALT'):requested;
+export function eatingProfile(requested,random01=Math.random(),nativeDuration=0){
+ // Java chooses the random branch before getUseDuration. A Bedrock start
+ // event already owns the JSON duration; never assign its 100-tick session
+ // to THREE_ALT's 90-tick curve (or vice versa). Keep the item and metadata.
+ // Fixed-duration items therefore cannot reproduce Java's random duration.
+ const ticks=eatingNativeTicks(nativeDuration);
+ const profile=requested==='THREE_RANDOM'?
+  (ticks===100?'THREE':ticks===90?'THREE_ALT':random01<.5?'THREE':'THREE_ALT'):requested;
  if(!Object.hasOwn(PROFILE_CODES,profile))throw Error('Unknown eating profile');
  return {profile,code:PROFILE_CODES[profile],duration:profile==='THREE'?100:90};
 }

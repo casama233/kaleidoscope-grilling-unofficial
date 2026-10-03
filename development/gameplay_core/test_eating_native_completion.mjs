@@ -22,20 +22,25 @@ class Stack{
  getDynamicPropertyIds(){return Object.keys(this.props)}
  getDynamicProperty(key){return this.props[key]}
 }
-function fixture({creative=false,duration=90,profile='FOUR',start=100}={}){
+function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100}={}){
  const mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id;
  const callbacks={},queue=[],effects=[],properties=new Map(),nutrition={hunger:10,saturation:2};
  const counts={nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0};
- const state={stack:new Stack(),creative};state.stack.typeId=mealId;
+ const state={stack:new Stack(),other:new Stack(1),creative};state.stack.typeId=mealId;
+ state.other.typeId='minecraft:torch';state.other.nameTag='Keep opposite equipment';state.other.props={foreign:'unchanged'};
  const hunger={effectiveMax:20,get currentValue(){return nutrition.hunger},setCurrentValue(n){nutrition.hunger=n}};
  const saturation={get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
  const bag={setItem(_slot,stack){counts.manualWrites++;state.stack=stack?.clone()}};
- const player={id:'native-holder',selectedSlotIndex:3,setProperty:(key,value)=>properties.set(key,value),playAnimation(){},playSound(){return 1},addEffect:(...args)=>effects.push(args),getComponent:type=>type.endsWith('hunger')?hunger:type.endsWith('saturation')?saturation:undefined};
+ const equipment={setEquipment(_slot,stack){counts.manualWrites++;state.stack=stack?.clone();return true}};
+ const player={id:'native-holder',selectedSlotIndex:3,setProperty:(key,value)=>properties.set(key,value),playAnimation(){},playSound(){return 1},addEffect:(...args)=>effects.push(args),getComponent:type=>type.endsWith('hunger')?hunger:type.endsWith('saturation')?saturation:type.endsWith('equippable')?equipment:undefined};
  const ctx={...presentation,world:{afterEvents:Object.fromEntries(['itemStartUse','itemCompleteUse','itemStopUse'].map(name=>[name,{subscribe:fn=>callbacks[name]=fn}]))},system:{currentTick:start,run:fn=>queue.push(fn)},ACTIVE_EATS:new Map(),SETTLED:new Map(),PLATE_EATS:new Map(),PENDING_USES:new Map(),CUISINE_EATS:new Map(),CUISINE_FOOD_SET:new Set(),FOOD_DATA:{[mealId]:FOOD_DATA[mealId]},PROFILE_BY_ITEM:{[mealId]:PROFILE_BY_ITEM[mealId]},JAVA_FP_EATING_ITEMS:[mealId],PENDING_SEASONING:'pending',PLATE_ID:'plate',SECRET_ID:'secret',MYSTERIOUS_ID:'mystery',DARK_ID:'dark',RAW_NAUSEA:{},captureEatingIdentity,eatingEventMatches,eatingStillCurrent,commitEating,finishedFoodMeta,
-  now:()=>ctx.system.currentTick,captureInteractionIntent:()=>({hand:'main'}),syncSecretHeld(){},resolvedProfile:presentation.eatingProfile.bind(null),stackMeta:()=>({hot:false,seasonings:['salt'],hotUntil:0}),heldByHand:()=>state.stack?.clone(),copyOne:stack=>{const one=stack.clone();one.amount=1;return one},mainContainer:()=>bag,creative:()=>state.creative,grillingConfig:()=>({saturationMultiplier:1}),dangerousPreservation(){},stopSoundHandle(){},stopEatSound(){},soundFor:()=>'',secretRemainders(){},afterCommitted(_player,_id,_meta,_active,fullNative){counts[fullNative?'nativeRewards':'manualRewards']++}};
+  EquipmentSlot:{Offhand:'off'},now:()=>ctx.system.currentTick,captureInteractionIntent:()=>({hand}),syncSecretHeld(){},resolvedProfile:presentation.eatingProfile.bind(null),stackMeta:()=>({hot:false,seasonings:['salt'],hotUntil:0}),heldByHand:(_player,selectedHand)=>selectedHand===hand?state.stack?.clone():state.other.clone(),copyOne:stack=>{const one=stack.clone();one.amount=1;return one},mainContainer:()=>bag,creative:()=>state.creative,grillingConfig:()=>({saturationMultiplier:1}),advanceBites(){},dangerousPreservation(){},stopSoundHandle(){},stopEatSound(){},soundFor:()=>'',secretRemainders(){},afterCommitted(_player,_id,_meta,_active,fullNative){counts[fullNative?'nativeRewards':'manualRewards']++}};
  // Production resolvedProfile returns a string, while the imported selector
  // returns its validated descriptor. Keep the real selector and source shape.
- ctx.resolvedProfile=requested=>presentation.eatingProfile(requested).profile;
+ if(requested)ctx.PROFILE_BY_ITEM[mealId]=requested;
+ // Bind the actual production selector, including the captured native duration.
+ const selectorBegin=source.indexOf('function resolvedProfile('),selectorEnd=source.indexOf('function writeUseHand(',selectorBegin);
+ vm.runInNewContext(source.slice(selectorBegin,selectorEnd),ctx);
  const constants=source.match(/const MINIMUM_EAT_TICKS=\d+,RELEASE_CHECKPOINT_GRACE_TICKS=\d+;/)[0]+'\n'+source.match(/const BITE_TIMES=Object.freeze\(\{[\s\S]*?\}\);/)[0];
  vm.runInNewContext(constants+'\n'+source.slice(settleBegin,settleEnd)+'\n'+source.slice(begin,end),ctx);
  let event;
@@ -47,7 +52,13 @@ function fixture({creative=false,duration=90,profile='FOUR',start=100}={}){
  }
  function stop({tick=ctx.system.currentTick,remaining=0,stack=event.itemStack}={}){ctx.system.currentTick=tick;callbacks.itemStopUse({source:player,itemStack:stack,useDuration:remaining})}
  function flush(tick=ctx.system.currentTick+1){ctx.system.currentTick=tick;while(queue.length)queue.shift()()}
- return {ctx,state,counts,properties,nutrition,startUse,complete,stop,flush,get event(){return event}};
+ function tickPresentation(tick){
+  ctx.system.currentTick=tick;ctx.tickPlayer=player;
+  const tickBegin=source.indexOf('const active=ACTIVE_EATS.get(p.id);'),tickEnd=source.indexOf('if(system.currentTick%10',tickBegin);
+  assert.ok(tickBegin>=0&&tickEnd>tickBegin);
+  vm.runInNewContext('(()=>{const p=tickPlayer;'+source.slice(tickBegin,tickEnd)+'})();',ctx);
+ }
+ return {ctx,state,counts,properties,nutrition,player,startUse,complete,stop,flush,tickPresentation,get event(){return event}};
 }
 
 test('inclusive native boundary requires terminal zero and valid nonnegative ticks',()=>{
@@ -96,4 +107,62 @@ for(const delta of [23,24,25])test(`real hungerSettle production body retains re
  assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:delta>=24?1:0,nativeRewards:0,manualRewards:delta>=24?1:0});
  assert.equal(f.state.stack.amount,delta>=24?1:2);assert.equal(f.nutrition.hunger,delta>=24?15:10);
  f.complete({tick:190});assert.equal(f.counts.nativeRewards,0);
+});
+
+test('THREE_RANDOM production start follows its captured native duration without changing either stack',()=>{
+ for(const duration of [90,100]){
+  const f=fixture({duration,requested:'THREE_RANDOM'}),before=f.state.stack.clone(),a=f.startUse();
+  assert.equal(a.profile,duration===100?'THREE':'THREE_ALT');
+  assert.equal(presentation.eatingProfile(a.profile).duration,a.nativeDuration);
+  assert.equal(f.properties.get(presentation.EAT_PROFILE_PROPERTY),duration===100?3:4);
+  assert.deepEqual(f.state.stack,before);
+  assert.deepEqual(f.event.itemStack,before);
+  f.complete({nativeDebit:true});f.stop();f.flush();
+  assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
+ }
+});
+
+test('native duration alignment preserves explicit profiles and unbound Java random selection',()=>{
+ for(const random of [0,.49,.5,.99])for(const ticks of [90,100]){
+  const selected=presentation.eatingProfile('THREE_RANDOM',random,ticks);
+  assert.equal(selected.duration,ticks);
+  assert.equal(selected.profile,ticks===100?'THREE':'THREE_ALT');
+ }
+ for(const profile of ['ONE','TWO','THREE','THREE_ALT','FOUR']){
+  assert.equal(presentation.eatingProfile(profile,0,100).profile,profile);
+ }
+ assert.equal(presentation.eatingProfile('THREE_RANDOM',0).profile,'THREE');
+ assert.equal(presentation.eatingProfile('THREE_RANDOM',.99).profile,'THREE_ALT');
+});
+
+test('production presentation publishes elapsed ticks then masks a changed item or metadata',()=>{
+ for(const mutate of [f=>f.state.stack.typeId='minecraft:apple',f=>f.state.stack.props.marker='replacement',f=>f.player.selectedSlotIndex=4]){
+  const f=fixture();f.startUse();const other=f.state.other.clone();
+  f.tickPresentation(125);assert.equal(f.properties.get(presentation.EAT_ELAPSED_TICKS_PROPERTY),25);
+  mutate(f);f.tickPresentation(126);
+  for(const key of [presentation.EAT_PROFILE_PROPERTY,presentation.EAT_HAND_PROPERTY,presentation.EAT_NATIVE_TICKS_PROPERTY,presentation.EAT_ELAPSED_TICKS_PROPERTY])assert.equal(f.properties.get(key),0);
+  assert.equal(f.properties.get(presentation.EAT_PROJECTION_PROPERTY),false);
+  f.stop({tick:126,remaining:64});f.flush();
+  assert.equal(f.counts.manualWrites,0);assert.equal(f.counts.manualRewards,0);assert.equal(f.counts.nativeRewards,0);
+  assert.deepEqual(f.state.other,other);
+ }
+});
+
+for(const hand of ['main','off'])test(`release settlement preserves metadata and opposite equipment for ${hand} hand`,()=>{
+ const f=fixture({hand}),before=f.state.stack.clone(),other=f.state.other.clone();f.startUse();
+ assert.equal(f.properties.get(presentation.EAT_HAND_PROPERTY),hand==='off'?2:1);
+ f.stop({tick:124,remaining:66});f.stop({tick:124,remaining:66});f.flush();
+ assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:1,nativeRewards:0,manualRewards:1});
+ assert.equal(f.state.stack.amount,before.amount-1);
+ before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
+});
+
+test('measured 14-tick automatic repeat cannot settle a second serving or clear a new session',()=>{
+ const f=fixture({start:256800});f.startUse();f.stop({tick:256889});f.complete({tick:256889,nativeDebit:true});
+ f.ctx.system.currentTick=256890;const next=f.startUse();f.flush(256890);
+ assert.equal(f.ctx.ACTIVE_EATS.get('native-holder'),next);
+ f.stop({tick:256904,remaining:76});f.flush();
+ assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
+ assert.equal(f.state.stack.amount,1);
+ assert.equal(f.ctx.ACTIVE_EATS.size,0);
 });

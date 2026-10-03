@@ -14,7 +14,8 @@ import build_java_eating_projection as generator
 
 
 def node(source):
-    subprocess.run(['node','--input-type=module','-e',source],check=True)
+    # Large generated Molang tables exceed Windows' command-line limit.
+    subprocess.run(['node','--input-type=module'],input=source,text=True,check=True)
 
 
 class EatingObserverProjection(unittest.TestCase):
