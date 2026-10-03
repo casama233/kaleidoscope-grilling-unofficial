@@ -1,6 +1,6 @@
 /** Bounded server choices. These do not claim unavailable Java/client capabilities. */
-export const CONFIG_DEFAULTS=Object.freeze({saturationMultiplier:1.25,fullHungerEating:true,graphicalEatingHud:true,contentsHelpers:2048,fixedGrillHelpers:1024,placedHelpers:1024,contentsTargetsPerTick:8});
-const ranges={saturationMultiplier:[0,16],contentsHelpers:[32,8192],fixedGrillHelpers:[32,8192],placedHelpers:[32,8192],contentsTargetsPerTick:[1,32]};
+export const CONFIG_DEFAULTS=Object.freeze({saturationMultiplier:1.25,fullHungerEating:true,graphicalEatingHud:true,enableSmeltedFoodHeat:false,smeltedFoodSeconds:30,contentsHelpers:2048,fixedGrillHelpers:1024,placedHelpers:1024,contentsTargetsPerTick:8});
+const ranges={saturationMultiplier:[0,16],smeltedFoodSeconds:[1,86400],contentsHelpers:[32,8192],fixedGrillHelpers:[32,8192],placedHelpers:[32,8192],contentsTargetsPerTick:[1,32]};
 export function configValue(key,value){
  if(!Object.hasOwn(CONFIG_DEFAULTS,key))throw Error('Unknown Grilling option');
  if(typeof CONFIG_DEFAULTS[key]==='boolean'){
