@@ -13,11 +13,25 @@ export function primitiveStackProps(stack){
 
 export function stackIntentSignature(stack){
  if(!stack)return null;
+ // These capabilities distinguish otherwise identical stacks. An unreadable
+ // capability must reject capture, never masquerade as an empty/default value
+ // or null (which represents an actually empty hand to shared intent callers).
+ const keepOnDeath=stack.keepOnDeath,lockMode=stack.lockMode;
+ if(typeof keepOnDeath!=='boolean'||typeof lockMode!=='string'
+  ||typeof stack.getCanDestroy!=='function'||typeof stack.getCanPlaceOn!=='function')
+  throw new Error('Grilling: item intent capabilities unavailable');
+ const restrictions=(value)=>{
+  if(!Array.isArray(value)||value.some(id=>typeof id!=='string'))
+   throw new Error('Grilling: item intent restrictions unreadable');
+  return [...value].sort(); // Sort only a copy; never mutate native metadata.
+ };
+ const canDestroy=restrictions(stack.getCanDestroy()),canPlaceOn=restrictions(stack.getCanPlaceOn());
  const raw=primitiveStackProps(stack),props=Object.fromEntries(Object.keys(raw).sort().map(k=>[k,raw[k]]));
  let lore=[];try{lore=getItemLore(stack)}catch{}
  let name='';try{name=stack.nameTag??''}catch{}
  let damage=null;try{damage=Number(stack.getComponent('minecraft:durability')?.damage??0)}catch{}
- return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props,damage});
+ return JSON.stringify({id:stack.typeId,amount:Number(stack.amount)||1,name,lore,props,damage,
+  keepOnDeath,lockMode,canDestroy,canPlaceOn});
 }
 
 export function stackIntentDescriptor(stack){
@@ -31,5 +45,6 @@ export function captureInteractionIntentFromStacks(eventStack,mainStack,offStack
 }
 
 export function interactionIntentMatchesStacks(intent,mainStack,offStack,selectedSlot){
- return intentMatches(intent,stackIntentSignature(mainStack),stackIntentSignature(offStack),selectedSlot);
+ try{return intentMatches(intent,stackIntentSignature(mainStack),stackIntentSignature(offStack),selectedSlot)}
+ catch{return false} // A deferred action cannot verify an unreadable hand.
 }
