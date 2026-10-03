@@ -4004,8 +4004,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_0",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4041,58 +4041,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4104,8 +4104,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_1",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4141,58 +4141,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4204,8 +4204,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_2",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4241,58 +4241,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4304,8 +4304,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_3",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4341,58 +4341,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4404,8 +4404,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_4",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4441,58 +4441,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4504,8 +4504,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_5",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4541,58 +4541,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4604,8 +4604,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_6",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4641,58 +4641,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4704,8 +4704,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_7",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4741,58 +4741,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4804,8 +4804,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_8",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4841,58 +4841,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -4904,8 +4904,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_9",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -4941,58 +4941,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5004,8 +5004,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_10",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5041,58 +5041,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5104,8 +5104,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_11",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5141,58 +5141,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5204,8 +5204,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_12",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5241,58 +5241,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5304,8 +5304,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_13",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5341,58 +5341,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5404,8 +5404,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_14",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5441,58 +5441,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }
@@ -5504,8 +5504,8 @@
     {
       "description": {
         "identifier": "geometry.kg_a2770.pending_15",
-        "texture_width": 256,
-        "texture_height": 32,
+        "texture_width": 16,
+        "texture_height": 16,
         "visible_bounds_width": 3,
         "visible_bounds_height": 2,
         "visible_bounds_offset": [
@@ -5541,58 +5541,58 @@
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "east": {
                   "uv": [
-                    32,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "south": {
                   "uv": [
-                    64,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "west": {
                   "uv": [
-                    96,
+                    0,
                     0
                   ],
                   "uv_size": [
-                    32,
-                    32
+                    16,
+                    16
                   ]
                 },
                 "up": {
                   "uv": [
-                    160,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 },
                 "down": {
                   "uv": [
-                    192,
-                    32
+                    16,
+                    16
                   ],
                   "uv_size": [
-                    -32,
-                    -32
+                    -16,
+                    -16
                   ]
                 }
               }

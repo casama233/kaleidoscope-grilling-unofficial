@@ -1,6 +1,6 @@
 """Reproducible held-item motion from reviewed Java Catmull-Rom curves.
 
-Uses a local motion bone atop the existing reviewed hand/view frames. Native
+Uses a local first-person motion bone atop the reviewed hand frames. Native
 Bedrock arm animation and Java's detached second-piece rendering differ; this
 conversion does not certify the client presentation.
 """
@@ -48,7 +48,9 @@ def build():
    if profile=='THREE_RANDOM':d['animations']['eat_alt_'+hand]=animation_id('THREE_ALT',hand)
   animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith('eat_') for k in row)]
   for hand in ['right','left']:
-   using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+   # ItemInHandSkewerEatingMixin replaces renderArmWithItem, an FP renderer.
+   # Its camera-space arm displacements are not TP item-local transforms.
+   using="c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
    if profile=='THREE_RANDOM':
     alternate="q.property('kaleidoscope_grilling:eat_profile') == 4"
     animate += [{'eat_'+hand:using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"},{'eat_alt_'+hand:using+' && '+alternate}]

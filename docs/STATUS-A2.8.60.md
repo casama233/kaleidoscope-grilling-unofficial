@@ -18,4 +18,4 @@ The shared placer resolves all planned blocks before writing, rolls back partial
 - Actual chunk-border seed deferred without partial writes and resumed after the neighbor loaded
 - 1,048 native assertions, zero failures; BDS exited normally with no logged errors
 
-Detailed counts are in PEPPER-TREE-NATIVE-A2.8.60.json. Direct feature testing is distinct from automatic rule placement in new biome chunks. Client visuals, automatic fresh-chunk coverage and saved-world migration must be recorded separately. Full addon Java parity remains open.
+Detailed counts are in PEPPER-TREE-NATIVE-A2.8.60.json. A separate automatic natural-rule run scanned 200 previously unloaded chunks in two forests, produced three trees (12 logs, 66 leaves, zero residual seeds), and verified two complete interior crowns against Java topology. No manual feature calls or block edits were used; normal BDS exit and zero errors were recorded. See PEPPER-TREE-NATURAL-A2.8.60.json. All four GitHub checks passed on runtime candidate 4ee97f04e81dcdc2d00653e2bb907f6c1b1f0d6a. Client visuals and saved-world migration remain separate; full addon Java parity remains open.

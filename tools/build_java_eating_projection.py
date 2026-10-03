@@ -5,6 +5,7 @@ views keep their existing path until separately implemented and accepted.
 """
 from pathlib import Path
 import json
+import re
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'development/gameplay_core'))
@@ -50,8 +51,36 @@ def sample_times():
 def item_animation_id(profile,hand):return 'animation.kg_java_eating.item.'+profile.lower()+'.'+hand
 def player_animation_id(profile,hand):return 'animation.kg_java_eating.player.'+profile.lower()+'.'+hand
 
+def projection_items():
+    table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
+    items={profile:[] for profile in PROFILES}
+    for path in sorted((RP/'attachables').glob('*.json')):
+        d=json.loads(path.read_text())['minecraft:attachable']['description']
+        profile=table.get(d['identifier'])
+        if profile=='THREE_RANDOM':profile='THREE_ALT'
+        if profile in PROFILES and all(ref.startswith('geometry.kg_a287.kg_a22.') for ref in d['geometry'].values()):
+            items[profile].append(d['identifier'])
+    return items
+
+def held_profile_condition(profile,hand,items=None):
+    # Exact identities close the packet-order window where a previous eat
+    # property is still true after selecting a shaker or a different profile.
+    items=projection_items() if items is None else items
+    names=','.join("'"+ident+"'" for ident in items[profile])
+    slot='slot.weapon.mainhand' if hand=='right' else 'slot.weapon.offhand'
+    code=1 if hand=='right' else 2
+    return ("q.property('kaleidoscope_grilling:eat_profile') == "+str(CODES[profile])+
+            " && q.property('kaleidoscope_grilling:eat_hand') == "+str(code)+
+            " && q.is_item_name_any('"+slot+"',"+names+")")
+
+def projection_condition(items=None):
+    items=projection_items() if items is None else items
+    branches=['('+held_profile_condition(profile,hand,items)+')'
+              for profile in PROFILES for hand in ('right','left')]
+    return CONTEXT+' && ('+' || '.join(branches)+')'
+
 def animations():
-    item_animations={};player_animations={}
+    item_animations={};player_animations={};items=projection_items()
     for profile in PROFILES:
         for hand,sign in [('right',1),('left',-1)]:
             arm=hand+'arm';socket=hand+'item';other=('left'if hand=='right'else'right')+'item'
@@ -83,7 +112,7 @@ def animations():
                 'skewer_pose':{'position':positions,'rotation':rotations,'scale':[1,1,1]},
                 'skewer_model':{'position':[0,0,0],'rotation':[0,0,0],'scale':[1,1,1]}}}
             player_animations[player_animation_id(profile,hand)]={**common,'override_previous_animation':True,
-                'blend_weight':'variable.is_first_person && '+CONTEXT,
+                'blend_weight':'variable.is_first_person && '+CONTEXT+' && '+held_profile_condition(profile,hand,items),
                 'bones':{
                     arm:{'position':arm_positions,'rotation':arm_rotations},
                     socket:{'position':socket_positions,
@@ -116,7 +145,7 @@ def augment(output,profile_table):
             d['scripts']['animate'].append({alias:active})
     native=json.loads((ROOT/'development/gameplay_core/fixtures/native-first-person-controller-1.26.50.4.json').read_text())['controller']
     controller=json.loads(json.dumps(native))
-    owned="q.has_property('"+PROPERTY+"') && "+CONTEXT
+    owned="q.has_property('"+PROPERTY+"') && "+projection_condition()
     for row in controller['part_visibility']:
         for bone,expression in list(row.items()):
             if bone in ('rightArm','rightSleeve','leftArm','leftSleeve'):

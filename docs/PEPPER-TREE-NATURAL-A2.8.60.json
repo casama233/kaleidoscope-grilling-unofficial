@@ -1,0 +1,485 @@
+{
+  "schema": 1,
+  "draft_only": true,
+  "version": [
+    2,
+    8,
+    60
+  ],
+  "bds_version": "1.26.52.3",
+  "draft_receipt_sha256": "e0afd3dbddd35f84cc0fe7b43af0cf08880700003b3e2e8b67ae1bcabd68ff2d",
+  "current_runtime_matches_tested_draft": {
+    "behavior_pack": true,
+    "resource_pack": true
+  },
+  "natural_rule_proved": true,
+  "rule_id": "kaleidoscope_grilling:pepper_tree_worldgen_rule",
+  "rule_changed": false,
+  "manual_feature_calls": 0,
+  "manual_block_writes": 0,
+  "native_locate_results": [
+    {
+      "command_index": 1,
+      "native_result": "[2026-10-03 08:06:56:158 INFO] The nearest minecraft:forest is at block 19712, 64, 19840 (329 blocks away)",
+      "parsed": {
+        "x": 19712,
+        "y": 80,
+        "z": 19840
+      }
+    },
+    {
+      "command_index": 2,
+      "native_result": "[2026-10-03 08:07:13:163 INFO] The nearest minecraft:forest is at block 40032, 149, 19712 (289 blocks away)",
+      "parsed": {
+        "x": 40032,
+        "y": 80,
+        "z": 19712
+      }
+    }
+  ],
+  "bounded_scans": [
+    {
+      "attempt": 1,
+      "location": {
+        "x": 19712,
+        "y": 80,
+        "z": 19840
+      },
+      "side": 10,
+      "chunks": 100,
+      "newlyUnloadedBefore": 100,
+      "eligibleCenterSamples": 32,
+      "from": {
+        "x": 19632,
+        "y": -64,
+        "z": 19760
+      },
+      "to": {
+        "x": 19791,
+        "y": 319,
+        "z": 19919
+      },
+      "counts": {
+        "logs": 0,
+        "leaves": 0,
+        "seeds": 0,
+        "bridges": 0
+      },
+      "allTrunkBases": 0,
+      "interiorTrees": 0,
+      "tick": 1106
+    },
+    {
+      "attempt": 2,
+      "location": {
+        "x": 40032,
+        "y": 80,
+        "z": 19712
+      },
+      "side": 10,
+      "chunks": 100,
+      "newlyUnloadedBefore": 100,
+      "eligibleCenterSamples": 37,
+      "from": {
+        "x": 39952,
+        "y": -64,
+        "z": 19632
+      },
+      "to": {
+        "x": 40111,
+        "y": 319,
+        "z": 19791
+      },
+      "counts": {
+        "logs": 12,
+        "leaves": 66,
+        "seeds": 0,
+        "bridges": 0
+      },
+      "allTrunkBases": 3,
+      "interiorTrees": 2,
+      "tick": 1505
+    }
+  ],
+  "trees": [
+    {
+      "origin": {
+        "x": 40051,
+        "y": 139,
+        "z": 19686
+      },
+      "height": 3,
+      "logs": 4,
+      "leafCount": 21,
+      "fruiting": 7,
+      "biome": "minecraft:forest",
+      "biomeTags": [
+        "animal",
+        "forest",
+        "monster",
+        "overworld",
+        "bee_habitat",
+        "has_structure_abandoned_camp",
+        "oak_forest"
+      ],
+      "ground": "minecraft:grass_block",
+      "fullRingAndCrown": true,
+      "sourceCompatibleObstructions": [],
+      "errors": [],
+      "leaves": [
+        {
+          "x": -1,
+          "y": 2,
+          "z": -1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 1,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": 0,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 4,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 2,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": -1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "z": 0,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "z": 0,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        }
+      ]
+    },
+    {
+      "origin": {
+        "x": 40074,
+        "y": 129,
+        "z": 19744
+      },
+      "height": 3,
+      "logs": 4,
+      "leafCount": 24,
+      "fruiting": 8,
+      "biome": "minecraft:forest",
+      "biomeTags": [
+        "animal",
+        "forest",
+        "monster",
+        "overworld",
+        "bee_habitat",
+        "has_structure_abandoned_camp",
+        "oak_forest"
+      ],
+      "ground": "minecraft:grass_block",
+      "fullRingAndCrown": true,
+      "sourceCompatibleObstructions": [],
+      "errors": [],
+      "leaves": [
+        {
+          "x": -1,
+          "y": 2,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 1,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 2,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 4,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 2,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": -1,
+          "y": 3,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "z": -1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": -1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": 0,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "z": -1,
+          "fruiting": true,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": -1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "z": 0,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "z": 1,
+          "fruiting": false,
+          "persistent": false
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "z": 1,
+          "fruiting": true,
+          "persistent": false
+        }
+      ]
+    }
+  ],
+  "newly_unloaded_chunks_generated": 200,
+  "eligible_chunk_center_samples": 69,
+  "normal_stop": true,
+  "exit_code": 0,
+  "content_errors": [],
+  "client": false,
+  "saved_world_migration": false,
+  "canonical_final_family_admission": false,
+  "production_ready": false,
+  "simulated_players": false
+}

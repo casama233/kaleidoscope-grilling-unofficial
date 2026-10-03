@@ -170,5 +170,5 @@
       "files": 1673
     }
   },
-  "automatic_new_chunk_rule_coverage": "pending separate test"
+  "automatic_new_chunk_rule_coverage": "Separate natural-rule test passed; see PEPPER-TREE-NATURAL-A2.8.60.json"
 }

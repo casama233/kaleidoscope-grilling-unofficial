@@ -98,7 +98,7 @@ def entity(identifier,properties):
   'components':{'minecraft:type_family':{'family':['kg_render_helper']},'minecraft:transient':{},
    'minecraft:physics':{'has_gravity':False,'has_collision':False},
    'minecraft:collision_box':{'width':0,'height':0},'minecraft:pushable':{'is_pushable':False,'is_pushable_by_piston':False},
-   'minecraft:damage_sensor':{'triggers':[{'cause':'all','deals_damage':False}]},'minecraft:fire_immune':{}}}}
+   'minecraft:damage_sensor':{'triggers':[{'cause':'all','deals_damage':'no'}]},'minecraft:fire_immune':{}}}}
 
 def pending_assets(controllers,description,geometries):
  doc=model('kaleidoscope_grilling:item/pending_seasoning')
@@ -107,24 +107,31 @@ def pending_assets(controllers,description,geometries):
  full=model(choices[-1]['model'])
  tints={f['tintindex'] for e in full['elements'] for f in e.get('faces',{}).values() if 'tintindex' in f}
  assert tints==set(range(16)),('pending source tint indices',sorted(tints))
+ # The Java fill mask is opaque white. Select exact solid-color textures
+ # directly: a UV-animated atlas adds a texture-coordinate dependency to an
+ # otherwise constant source face and can expose transparent unused tiles.
+ mask=texture(full,'#fill')
+ assert mask.getextrema()==((255,255),)*4,'Java fill-mask changes require a new converter'
+ aliases=[]
+ for index,rgb in enumerate(TINT_VALUES):
+  key='pending_color_'+str(index)
+  description['textures'][key]='textures/a2770_placed/'+key
+  out(RP/('textures/a2770_placed/'+key+'.png'),png(Image.new('RGBA',(16,16),((rgb>>16)&255,(rgb>>8)&255,rgb&255,255))))
+  aliases.append('Texture.'+key)
  for tint in range(16):
   identifier='geometry.kg_a2770.pending_'+str(tint)
-  g,atlas=convert(full,identifier,tint=tint)
+  g,_=convert(full,identifier,tint=tint)
+  g['description']['texture_width']=g['description']['texture_height']=16
+  for bone in g['bones']:
+   for cube in bone.get('cubes',[]):
+    for face in cube['uv']:
+     cube['uv'][face]={'uv':[16,16],'uv_size':[-16,-16]} if face in ('up','down') else {'uv':[0,0],'uv_size':[16,16]}
   geometries.append(g);key='pending_'+str(tint)
   description['geometry'][key]=identifier
-  description['textures'][key]='textures/a2770_placed/'+key
-  rows=(len(TINT_VALUES)+TINT_COLUMNS-1)//TINT_COLUMNS
-  tiled=Image.new('RGBA',(atlas.width*TINT_COLUMNS,atlas.height*rows),(0,0,0,0))
-  red,green,blue,alpha=atlas.split()
-  for tile,rgb in enumerate(TINT_VALUES):
-   channels=[channel.point([int(i*factor/255) for i in range(256)]) for channel,factor in zip((red,green,blue),((rgb>>16)&255,(rgb>>8)&255,rgb&255))]
-   tinted=Image.merge('RGBA',(*channels,alpha))
-   tiled.paste(tinted,((tile%TINT_COLUMNS)*atlas.width,(tile//TINT_COLUMNS)*atlas.height))
-  out(RP/('textures/a2770_placed/'+key+'.png'),png(tiled))
   prop="q.property('"+NS+'color_'+str(tint)+"')"
   rc='controller.render.kg_a2770.'+key
-  controllers[rc]={'geometry':'Geometry.'+key,'materials':[{'*':'Material.default'}],
-   'textures':['Texture.'+key],'uv_anim':{'scale':[1/TINT_COLUMNS,1/rows],'offset':[f'math.mod({prop},{TINT_COLUMNS})/{TINT_COLUMNS}',f'math.floor({prop}/{TINT_COLUMNS})/{rows}']}}
+  controllers[rc]={'arrays':{'textures':{'Array.colors':aliases}},'geometry':'Geometry.'+key,
+   'materials':[{'*':'Material.default'}],'textures':['Array.colors['+prop+']']}
   description['render_controllers'].append({rc:"q.property('"+NS+"ready') && q.property('"+NS+"mode') == 1 && q.property('"+NS+"fill') > "+str(tint//2)})
 
 def seasoning_assets(controllers):
@@ -209,6 +216,12 @@ def ingredient_palette():
   if len(top)==1:
    rgb=top[0];top.append((int(((rgb>>16)&255)*.78)<<16)|(int(((rgb>>8)&255)*.78)<<8)|int((rgb&255)*.78))
   result[item['description']['identifier']]=top
+ # GUI icons can be rebaked independently from Java's particle sprites.
+ # The eight supported bottle ingredients use release-pinned particle samples,
+ # including vanilla ingredients absent from this pack's local item atlas.
+ pinned=load(ROOT/'development/gameplay_core/fixtures/java-seasoning-colors-1.1.1.json')
+ assert pinned['source_commit']==JAVA
+ for identifier,row in pinned['ingredients'].items():result[identifier]=row['rgb']
  return result
 
 def build():
@@ -220,7 +233,7 @@ def build():
  out(BP/'scripts/a2770_placed_visual_data.js',('export const INGREDIENT_COLORS=Object.freeze('+json.dumps(palette,ensure_ascii=False,sort_keys=True)+');\nexport const PLACED_TINT_INDEX=Object.freeze('+json.dumps({rgb:i for i,rgb in enumerate(TINT_VALUES)},sort_keys=True)+');\n').encode())
  source_index={'grilling_commit':JAVA,'cookery_model_blob':COOKERY_MODEL,'sources':SOURCES,
   'pending_palette_method':'Java center-half top-two colors for locally available item textures; Java fallback pair otherwise',
-  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked color atlas with standard uv_anim','seasoning_geometry_count':count,
+  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'direct opaque source-color textures','seasoning_geometry_count':count,
   'oil_overlay_inflate_model_units':[.01,.02]}
  out(VENDOR/'sources.json',source_index)
  return source_index
