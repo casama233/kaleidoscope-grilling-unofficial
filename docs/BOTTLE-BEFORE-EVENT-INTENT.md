@@ -1,0 +1,15 @@
+# Before-event metadata intent correction
+
+Native Tavern vodka_q4 use reproduced `ItemStack.getCanDestroy cannot be used in restricted execution` after metadata commit `5647650`. That commit read restriction getters from the shared signature during a before-event. Its source tests lacked phase restrictions and did not establish native usability.
+
+`stackIntentSignature` now captures before-safe identity without calling `getCanDestroy` or `getCanPlaceOn`. Native event/main/off clones are retained privately in WeakMaps; they preserve metadata without reading restricted getters. Deferred verification computes full signatures on the clones and current hands in the writable phase. Both hands must retain their captured metadata, and the fully resolved event hand must equal the original captured hand. The adapter applies the same clone/full-signature rule to two-hand gestures. Current signatures sort copied restriction arrays without modifying ItemStacks.
+
+The public intent shape and immediate `.hand` remain compatible with existing consumers. Deferred closures never switch hands after capture. If stacks differ only in restriction metadata and the before-safe identity provisionally selected the wrong hand, verification rejects that action. Completely indistinguishable hands also reject deferred uncertainty. Immediate after-event consumers retaining `.hand` still have the original ambiguity when only restricted metadata distinguishes the hands; this patch does not claim that case resolved. Unreadable clones or writable-phase capabilities conservatively reject deferred verification. Name/lore/DP/durability retain their previous tolerant signature-read semantics; this correction does not redesign their error handling.
+
+Ordinary main/off bottle, food and Tavern vodka interactions remain usable in phase-aware tests. The new test loads the actual core, adapter and player-I/O bodies; its restriction getters throw in before mode, including on clones. Capture invokes zero such getters. Each hand's restriction, keepOnDeath, lockMode, DP, lore, name and damage changes invalidate captured ordinary/two-hand intents. Offhand writes and rollback retain their captured equipment target independently of selected slot changes; changing the other hand makes an ordinary captured intent stale.
+
+```sh
+node --test development/gameplay_core/test_a2762_core.mjs development/gameplay_core/test_a2762_restricted.mjs development/gameplay_core/test_seasoning_native_hands.mjs
+```
+
+Results: 35 core, 34 phase-aware adapter and 28 native-stack-double tests pass. Including the held-visual and storage regressions, the combined five-file Node run passes 131 tests. These are source/API-double results. Native vodka/food/bottle interaction and the original ContentLog regression must be retested by the owner. Saved-world metadata persistence and actual Bedrock rendering remain separate acceptance requirements. No main/eating runtime, item IDs, recipes, metadata setters or manifests change in this correction.

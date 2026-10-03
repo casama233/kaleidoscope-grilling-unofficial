@@ -163,10 +163,10 @@ test('queued first placement rejects selected-slot change even with identical st
  f.player.selectedSlotIndex=1;f.flush();assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
  equal(f.inventory.getItem(0),s);equal(f.inventory.getItem(1),s);
 });
-test('offhand intent and captured offhand slot remain independent of selected main slot',()=>{
+test('offhand writable slot stays independent; changed main hand invalidates two-hand metadata intent',()=>{
  const f=fixture(),main=decorated(f,'empty'),off=decorated(f,'pending');f.set('main',main);f.set('off',off);
  const intent=f.api.captureInteractionIntent(f.player,off),captured=f.api.captureWritableHand(f.player,'off');
- assert.equal(intent.hand,'off');f.player.selectedSlotIndex=2;assert.equal(f.api.interactionIntentStillCurrent(f.player,intent),true);
+ assert.equal(intent.hand,'off');f.player.selectedSlotIndex=2;assert.equal(f.api.interactionIntentStillCurrent(f.player,intent),false);
  captured.write(undefined);equal(f.inventory.getItem(0),main);assert.equal(f.get('off'),undefined);
  captured.write(captured.before);equal(f.get('off'),off);equal(f.inventory.getItem(0),main);
 });
