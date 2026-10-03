@@ -315,7 +315,7 @@ function threadCurrent(player){
  ];
  if(delivery)steps.push(delivery);
  if(!transactionStatus(commitSteps(steps),'threading')){interactionFailure(player,'§c穿串失敗，已嘗試回復原料');return false}
- useSound(player,'pickup_item',.7,1.2);
+ useSound(player,'action_success',.7,1);
  awardLookingThePart(player,outcome);
  return true;
 }
@@ -342,7 +342,7 @@ function scheduleSkewerAction(player,action){
  });return true;
 }
 function skewerAction(player,itemStack){
- if(player.isSneaking&&canDisassembleOff(player))return 'disassemble';
+ if(player.isSneaking)return canDisassembleOff(player)?'disassemble':null;
  const main=heldMain(player);if(!main||!itemStack||itemStack.typeId!==main.typeId)return null;
  return threadOutcome(player)?.ok?'thread':null;
 }
@@ -377,7 +377,7 @@ function secretRemainders(player,stack){
 function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
- const gain=d.nutrition*d.saturation*2*(meta?.hot?1.25:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
+ const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
 }
 function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}
 function clearContainer(block){const c=inv(block);if(c)for(let i=0;i<3;i++)c.setItem(i,undefined)}
@@ -508,7 +508,7 @@ function handleGrill(block,player,hand='main'){
   );
   if(!result.ok&&result.rollbackErrors)quarantineStation(block,'insert skewer rollback incomplete');
   if(!transactionStatus(result,'insert skewer'))interactionFailure(player,'§c插串失敗，已嘗試回復烤架與原料');
-  else blockSound(block,'grill_flip',.75);
+  else blockSound(block,'action_success',.65,1);
   return
  }
  if(id){message(player,'§7這個物品不能用在目前的烤爐階段');return}
@@ -888,7 +888,6 @@ function canUseSecretSkewer(stack){
 }
 world.beforeEvents.itemUse.subscribe(e=>{
  if(e.cancel)return;
- if(!grillingConfig().fullHungerEating&&(FOOD_DATA[e.itemStack?.typeId]||e.itemStack?.typeId===SECRET_ID)){const h=e.source.getComponent('minecraft:player.hunger');if(h&&h.currentValue>=h.effectiveMax){e.cancel=true;return}}
  if(e.itemStack?.typeId===SECRET_ID&&!canUseSecretSkewer(e.itemStack)){e.cancel=true;return}
  try{
   const action=skewerAction(e.source,e.itemStack);
@@ -896,8 +895,14 @@ world.beforeEvents.itemUse.subscribe(e=>{
   if(e.source.isSneaking&&isHot(e.itemStack)&&!heldOff(e.source)&&isFoodStack(e.itemStack)){
    e.cancel=true;const p=e.source,intent=captureInteractionIntent(p,e.itemStack),sample=e.itemStack.clone();
    system.run(()=>{if(interactionIntentStillCurrent(p,intent)){const c=mainContainer(p);if(c)compactMatchingHotFood(c,sample)}});
+   return;
   }
  }catch{}
+ // Java non-eating interactions above retain priority, even at full hunger.
+ const edibleSkewer=!!FOOD_DATA[e.itemStack?.typeId]||e.itemStack?.typeId===SECRET_ID||e.itemStack?.typeId===PLATE_ID;
+ if(!edibleSkewer)return;
+ if(e.source.isSneaking){e.cancel=true;return;}
+ if(!grillingConfig().fullHungerEating){const h=e.source.getComponent('minecraft:player.hunger');if(h&&h.currentValue>=h.effectiveMax)e.cancel=true;}
 });
 world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
  try{const action=skewerAction(e.player,e.itemStack??heldMain(e.player));if(!action)return;e.cancel=true;scheduleSkewerAction(e.player,action)}catch{}

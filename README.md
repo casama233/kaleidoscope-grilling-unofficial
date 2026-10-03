@@ -1,6 +1,6 @@
-## Current maintained baseline: 2.8.52
+## Current maintained baseline: 2.8.53
 
-本候選修正調味瓶第一人稱原生掛接座標，保留已發布 2.8.51 整合介面及座標雜湊修復。瓶殼與內容物分開驗證，詳見 [2.8.52 驗證範圍](docs/STATUS-A2.8.52.md)；客戶端顯示仍待驗收。
+本候選修正潛行進食、烤串盤滿飽食限制、盤中熱食倍率及組串／插串音效，保留 2.8.52 調味瓶掛接修復。詳見 [2.8.53 驗證範圍](docs/STATUS-A2.8.53.md)；真人客戶端驗收仍獨立記錄。
 
 本版補齊跨包出料、逐堆變體、展示註冊與權威新生成宿主接口，詳見 [A2.8.51](docs/STATUS-A2.8.51.md) 及 [API v1](docs/BEDROCK-INTEGRATION-API.md)。完整保留 2.8.48 聲畫及第三人稱進食修復。原版要塞 callback、任意新圖像及 Windows 真人驗收仍另有界線。
 
