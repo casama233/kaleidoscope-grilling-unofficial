@@ -87,6 +87,7 @@ import './a2732_standalone_food_effect_runtime.js';
 import './a2747_wedding_candy_runtime.js';
 import './a2748_pepper_tree_runtime.js';
 import './a2759_pepper_worldgen_fruiting_runtime.js';
+import './a2860_pepper_worldgen_seed_runtime.js';
 import './a2750_cookery_cuisine_runtime.js';
 import {awardLookingThePart,awardGleamingWithOil,awardSeasoningMilestones,awardEatItHot} from './a2756_advancement_event_runtime.js';
 import {awardSeasoningFinishedChallenges,awardMentalPreparationFailed,awardMetalToleranceFailed,awardOrdinaryChallenge,ordinaryChallengeOutcome} from './a2758_advancement_challenge_runtime.js';

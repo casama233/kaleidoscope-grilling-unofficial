@@ -25,10 +25,20 @@ def language(data):
 
 def main():
     aliases = {}
+    version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     counts = {}
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            if path.name == 'pepper_worldgen_seed.json':
+                assert folder == 'blocks' and version >= (2, 8, 60)
+                seed = json.loads(path.read_bytes())['minecraft:block']
+                assert seed['description'] == {'identifier':'kaleidoscope_grilling:pepper_worldgen_seed'}
+                assert seed['components']['minecraft:display_name'] == 'kaleidoscope_grilling.display.block.pepper_log'
+                assert not (PROJECT / 'behavior_pack/items/pepper_worldgen_seed.json').exists()
+                # This later hidden worldgen carrier reuses an existing label;
+                # it is not part of the historical label-only release count.
+                continue
             before = json.loads(prior(path))
             after = json.loads(path.read_bytes())
             old = before['minecraft:' + kind]['components'].get('minecraft:display_name')

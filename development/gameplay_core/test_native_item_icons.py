@@ -1,5 +1,5 @@
 """Exact source sprites and same-ID sapling routing; no client simulation."""
-import hashlib,json,unittest
+import hashlib,json,unittest,base64,gzip
 from pathlib import Path
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[2];PACK=ROOT/'projects/grilling/gameplay_core';BP=PACK/'behavior_pack';RP=PACK/'resource_pack';SOURCE=Path(__file__).parent/'fixtures/java-item-icons-1.1.1'
@@ -33,6 +33,13 @@ class ItemIcons(unittest.TestCase):
  def test_placed_sapling_and_growth_hooks_unchanged(self):
   for name,expected in read(SOURCE/'source.json')['preserved_sha256'].items():
    data=(ROOT/name).read_bytes()
+   if tuple(read(BP/'manifest.json')['header']['version']) >= (2,8,60):
+    reviewed=read(Path(__file__).parent/'fixtures/pepper-growth-before-2.8.60.json')['changes']
+    self.assertEqual(set(reviewed),{'projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js'})
+    if name in reviewed:
+     row=reviewed[name];self.assertEqual(expected,row['before_sha256'])
+     self.assertEqual(row['after_sha256'],hashlib.sha256(data).hexdigest(),name)
+     data=gzip.decompress(base64.b64decode(row['before_gzip_base64']))
    # Inventory attribution changes only this string. Keep the original hash
    # for every geometry, growth hook and remaining block definition byte.
    if name.endswith('/blocks/pepper_sapling.json'):
