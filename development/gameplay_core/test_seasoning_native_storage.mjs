@@ -41,7 +41,7 @@ function fixture(){
    readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
    markPlacedVisualDirty(){},blockSound(){},message(){},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
    heldMain:()=>hand?.clone(),heldByHand:()=>hand?.clone(),creative:()=>mode==='creative',
-   captureWritableHand(){const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
+   captureWritableHand(_,which='main'){if(which==='off')return {before:undefined,write(){throw Error('Empty offhand fixture')}};const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
    captureInteractionIntent:()=>({hand:'main',signature:JSON.stringify(hand)}),interactionIntentStillCurrent:(_,intent)=>JSON.stringify(hand)===intent.signature});
   for(const name of ['family_station_storage.js','a2743_seasoning_block_adapter.js','seasoning_native_storage.js'])vm.runInContext(strip(read(name)),context);
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);

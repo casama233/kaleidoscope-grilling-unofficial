@@ -642,9 +642,20 @@ function scheduleNativeBottlePlacement(e){
  if(e.cancel)return;e.cancel=true;
  const player=e.player;if(!player||e.face!=='Up')return;
  const mode=player.getGameMode();if(mode!==GameMode.Survival&&mode!==GameMode.Creative)return;
- const held=heldMain(player);if(!held||!(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId)))return;
+ // This native placement event has no hand/itemStack. Never guess between
+ // two bottles sharing its block route, even when their metadata differs.
+ let intent;
+ try{
+  const main=captureWritableHand(player,'main').before,off=captureWritableHand(player,'off').before;
+  const isBottle=held=>!!held&&(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId));
+  const mainBottle=isBottle(main),offBottle=isBottle(off);
+  if(mainBottle===offBottle)return;
+  const hand=offBottle?'off':'main',held=offBottle?off:main;
+  intent=captureInteractionIntent(player,held);
+  if(intent?.hand!==hand)return;
+ }catch{return} // An unreadable hand cannot establish a unique source.
  const support=e.block.below();if(!hasSolidTop(support))return;
- const target=bottleTargetSnapshot(e.block),below=bottleTargetSnapshot(support),dimension=e.block.dimension,location={...e.block.location},proposed=e.permutationToPlace,intent=captureInteractionIntent(player,held);
+ const target=bottleTargetSnapshot(e.block),below=bottleTargetSnapshot(support),dimension=e.block.dimension,location={...e.block.location},proposed=e.permutationToPlace;
  system.run(()=>{
   let block,current,freshPreflight=false;
   try{

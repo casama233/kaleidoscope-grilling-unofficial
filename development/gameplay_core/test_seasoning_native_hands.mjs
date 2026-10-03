@@ -1,7 +1,7 @@
 /**
  * Canonical function-body integration with API doubles, not an engine certificate.
  * Run from repository root: node --test development/gameplay_core/test_seasoning_native_hands.mjs
- * First placement is main-only; offhand "place" below is canonical pushBottle.
+ * First placement requires one unambiguous bottle hand; API doubles are not GUI acceptance.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -26,17 +26,19 @@ function body(source,name){
  assert.equal(depth,0,name+' body is complete');return source.slice(start,end);
 }
 const N='kaleidoscope_grilling:',EMPTY=N+'empty_seasoning_bottle',PENDING=N+'pending_seasoning';
+const stackPhases=new WeakMap();
+function restrictionRead(stack,key){const phase=stackPhases.get(stack);if(phase){phase[key]++;if(phase.before)throw new ReferenceError('Restriction getter in before-event');}}
 class Stack{
  constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.maxAmount=1;this.props={};this.lore=[];this.canDestroy=[];this.canPlaceOn=[];}
- clone(){return Object.assign(new Stack(this.typeId,this.amount),structuredClone({...this}));}
+ clone(){const copy=Object.assign(new Stack(this.typeId,this.amount),structuredClone({...this}));if(stackPhases.has(this))stackPhases.set(copy,stackPhases.get(this));return copy;}
  getRawLore(){return structuredClone(this.lore);}
  getLore(){return this.lore.map(x=>typeof x==='string'?x:x.text??'');}
  setLore(v){this.lore=structuredClone(v);}
  getDynamicPropertyIds(){assert.equal(this.maxAmount,1);return Object.keys(this.props);}
  getDynamicProperty(k){assert.equal(this.maxAmount,1);return structuredClone(this.props[k]);}
  setDynamicProperty(k,v){assert.equal(this.maxAmount,1);if(v===undefined)delete this.props[k];else this.props[k]=structuredClone(v);}
- getCanDestroy(){return [...this.canDestroy];}setCanDestroy(v){this.canDestroy=[...v];}
- getCanPlaceOn(){return [...this.canPlaceOn];}setCanPlaceOn(v){this.canPlaceOn=[...v];}
+ getCanDestroy(){restrictionRead(this,'destroy');return [...this.canDestroy];}setCanDestroy(v){this.canDestroy=[...v];}
+ getCanPlaceOn(){restrictionRead(this,'place');return [...this.canPlaceOn];}setCanPlaceOn(v){this.canPlaceOn=[...v];}
  getComponent(){return undefined;}
 }
 const json=s=>JSON.stringify(s);
@@ -44,15 +46,17 @@ const equal=(a,b,message)=>assert.equal(json(a),json(b),message);
 
 function fixture(){
  const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[];
+ const phase={before:false,destroy:0,place:0};
  let serial=0,off,offFault;
- const makeContainer=size=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone();},setItem(i,s){this.rows[i]=s?.clone();}});
+ const withPhase=s=>{if(s)stackPhases.set(s,phase);return s;};
+ const makeContainer=size=>({size,rows:Array(size),getItem(i){return withPhase(this.rows[i]?.clone());},setItem(i,s){this.rows[i]=withPhase(s?.clone());}});
  const inventory=makeContainer(9);
- const equipment={getEquipment(slot){assert.equal(slot,'offhand');return off?.clone();},setEquipment(slot,s){
+ const equipment={getEquipment(slot){assert.equal(slot,'offhand');return withPhase(off?.clone());},setEquipment(slot,s){
   assert.equal(slot,'offhand');const fault=offFault;offFault=undefined;
-  if(fault?.after)off=s?.clone();
+  if(fault?.after)off=withPhase(s?.clone());
   if(fault?.kind==='throw')throw Error('Injected offhand write rejection');
   if(fault?.kind==='false')return false;
-  off=s?.clone();return true;
+  off=withPhase(s?.clone());return true;
  }};
  const permutation=(id,states={})=>({id,getAllStates:()=>({...states}),getState:k=>states[k]});
  function makeBlock(location){let p=permutation('minecraft:air');return {
@@ -102,14 +106,15 @@ function fixture(){
  const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
  const get=h=>h==='off'?equipment.getEquipment('offhand'):inventory.getItem(player.selectedSlotIndex);
  const set=(h,s)=>h==='off'?equipment.setEquipment('offhand',s):inventory.setItem(player.selectedSlotIndex,s);
- return {api,block,player,inventory,equipment,dp,entities,get,set,
+ return {api,block,player,inventory,equipment,dp,entities,get,set,phase,get queued(){return queue.length;},
   failOff(kind,after=false){offFault={kind,after};},
   flush(){while(queue.length)queue.shift()();},
+  queuePlace(){const e={block,player,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);return e;},
   placeMain(){const e={block,player,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;},
  };
 }
-function decorated(f,kind,{uses=0,variant=0,partial=1,marker=kind}={}){
- const s=new Stack(kind==='special'?visuals.specialSeasoningVisualId(uses,variant):kind==='pending'?PENDING:EMPTY);
+function decorated(f,kind,{uses=0,variant=0,partial=1,marker=kind,typeId}={}){
+ const s=new Stack(typeId??(kind==='special'?visuals.specialSeasoningVisualId(uses,variant):kind==='pending'?PENDING:EMPTY));
  Object.assign(s,{nameTag:'Original '+marker,keepOnDeath:true,lockMode:'inventory',opaqueNative:{marker}});
  s.setCanDestroy(['minecraft:dirt']);s.setCanPlaceOn(['minecraft:stone']);
  f.api.setItemLore(s,[{text:'Unrelated lore '+marker},{translate:'test.unrelated',with:['retained']}]);
@@ -120,7 +125,7 @@ function decorated(f,kind,{uses=0,variant=0,partial=1,marker=kind}={}){
 }
 function seedForOff(f){
  const seed=decorated(f,'empty',{partial:0,marker:'main seed'});f.set('main',seed);f.placeMain();
- const sentinel=decorated(f,'pending',{marker:'unchanged main'});f.set('main',sentinel);return {seed,sentinel};
+ const sentinel=decorated(f,'pending',{marker:'unchanged main',typeId:'minecraft:totem_of_undying'});f.set('main',sentinel);return {seed,sentinel};
 }
 
 for(const hand of ['main','off'])for(const kind of ['empty','pending','special']){
@@ -128,7 +133,7 @@ for(const hand of ['main','off'])for(const kind of ['empty','pending','special']
  for(const state of states)test(`${hand} ${kind} ${json(state)} place/pickup/replace preserves exact stack and opposite hand`,()=>{
   const f=fixture(),original=decorated(f,kind,state);let sentinel,seed;
   if(hand==='off')({seed,sentinel}=seedForOff(f));
-  else{sentinel=decorated(f,'pending',{marker:'unchanged off'});f.set('off',sentinel);}
+  else{sentinel=decorated(f,'pending',{marker:'unchanged off',typeId:'minecraft:totem_of_undying'});f.set('off',sentinel);}
   f.set(hand,original);
   if(hand==='main')f.placeMain();else assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),true);
   assert.equal(f.get(hand),undefined);equal(f.get(hand==='main'?'off':'main'),sentinel);
@@ -185,7 +190,43 @@ for(const kind of ['false','throw'])for(const after of [false,true])for(const ac
  else{f.api.handleSeasoningBlock(f.block,f.player,'off');equal(f.get('off'),original);}
 });
 
-test('first-placement component is explicitly main-only; it does not consume offhand',()=>{
- const f=fixture(),s=decorated(f,'pending');f.set('off',s);f.placeMain();
- assert.equal(f.block.typeId,'minecraft:air');equal(f.get('off'),s);assert.equal(f.entities.size,0);
+for(const kind of ['empty','pending','special'])for(const occupiedMain of [false,true])test(`unique off ${kind} first-place/pickup/replace preserves metadata; main occupied=${occupiedMain}`,()=>{
+ const f=fixture(),s=decorated(f,kind,{partial:2,uses:15,variant:7}),other=occupiedMain?decorated(f,'pending',{marker:'main sentinel',typeId:'minecraft:totem_of_undying'}):undefined;
+ if(kind==='pending')f.api.setFoodSeasonings(s,Object.keys(core.SEASONING_KINDS).slice(0,8));
+ f.set('main',other);f.set('off',s);f.phase.before=true;
+ assert.equal(f.queuePlace().cancel,true);assert.equal(f.queued,1);assert.equal(f.phase.destroy+f.phase.place,0);
+ f.phase.before=false;f.flush();assert.equal(f.get('off'),undefined);equal(f.get('main'),other);equal(f.api.nativeBottles(f.block).items[0],s);
+ // Canonical pickup-by-hand is tested as a double, not a claim about Java's MAIN_HAND pickup/UI.
+ f.api.handleSeasoningBlock(f.block,f.player,'off');equal(f.get('off'),s);equal(f.get('main'),other);assert.equal(f.block.typeId,'minecraft:air');
+ f.queuePlace();f.flush();equal(f.api.nativeBottles(f.block).items[0],s);equal(f.get('main'),other);
+});
+
+for(const difference of ['id','name','dp','restrictions','identical'])test(`two bottle first-placement candidates (${difference}) cancel without guessing or consuming`,()=>{
+ const f=fixture(),main=decorated(f,'pending',{marker:'same'}),off=main.clone();
+ if(difference==='id')off.typeId=EMPTY;
+ if(difference==='name')off.nameTag='Other bottle';
+ if(difference==='dp')f.api.setFoodSeasonings(off,core.BASE_SEASONINGS.slice(0,1));
+ if(difference==='restrictions')off.setCanDestroy(['minecraft:stone']);
+ f.set('main',main);f.set('off',off);f.phase.before=true;
+ assert.equal(f.queuePlace().cancel,true);assert.equal(f.queued,0);assert.equal(f.phase.destroy+f.phase.place,0);f.phase.before=false;f.flush();
+ assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);assert.equal(f.dp.size,0);equal(f.get('main'),main);equal(f.get('off'),off);
+});
+
+for(const hand of ['main','off'])for(const field of ['name','dp','restrictions'])test(`queued off first-placement rejects ${hand} ${field} change without touching either hand`,()=>{
+ const f=fixture(),original=decorated(f,'pending'),main=decorated(f,'pending',{marker:'main sentinel',typeId:'minecraft:totem_of_undying'});f.set('main',main);f.set('off',original);
+ f.phase.before=true;f.queuePlace();assert.equal(f.phase.destroy+f.phase.place,0);f.phase.before=false;
+ const changed=f.get(hand);if(field==='name')changed.nameTag='Changed';if(field==='dp')f.api.setItemProperty(changed,'other:string','changed');if(field==='restrictions')changed.setCanPlaceOn(['minecraft:dirt']);f.set(hand,changed);
+ const expectedMain=f.get('main'),expectedOff=f.get('off');f.flush();assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);equal(f.get('main'),expectedMain);equal(f.get('off'),expectedOff);
+});
+
+for(const unreadableHand of ['main','off'])test(`first placement cancels when ${unreadableHand} inventory read fails`,()=>{
+ const f=fixture(),s=decorated(f,'pending');f.set('off',s);const original=f.player.getComponent;
+ f.player.getComponent=id=>{if(id===(unreadableHand==='main'?'minecraft:inventory':'minecraft:equippable'))throw Error('Injected hand read');return original(id);};
+ assert.equal(f.queuePlace().cancel,true);assert.equal(f.queued,0);f.player.getComponent=original;equal(f.get('off'),s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
+});
+
+for(const kind of ['false','throw'])for(const after of [false,true])test(`off first placement write ${kind} ${after?'after':'before'} mutation rolls back native items and target`,()=>{
+ const f=fixture(),s=decorated(f,'special',{uses:15,variant:7}),main=decorated(f,'empty',{typeId:'minecraft:totem_of_undying'});f.set('main',main);f.set('off',s);f.queuePlace();f.failOff(kind,after);f.flush();
+ equal(f.get('main'),main);equal(f.get('off'),s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);assert.equal(f.dp.size,0);
+ f.queuePlace();f.flush();equal(f.api.nativeBottles(f.block).items[0],s);equal(f.get('main'),main);assert.equal(f.get('off'),undefined);
 });
