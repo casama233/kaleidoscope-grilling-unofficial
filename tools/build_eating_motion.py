@@ -66,11 +66,40 @@ def build():
   from build_java_eating_projection import augment
   output=augment(output,table)
  return output
+def mismatch_details(expected, actual, limit=20):
+ """Bounded diagnostics only; the full byte-for-byte check remains authoritative."""
+ def walk(a,b,pointer=''):
+  if type(a) is not type(b):
+   yield pointer,a,b
+  elif isinstance(a,dict):
+   for key in dict.fromkeys([*a,*b]):
+    escaped=str(key).replace('~','~0').replace('/','~1')
+    if key not in a or key not in b:yield pointer+'/'+escaped,a.get(key),b.get(key)
+    else:yield from walk(a[key],b[key],pointer+'/'+escaped)
+  elif isinstance(a,list):
+   if len(a)!=len(b):yield pointer+'/length',len(a),len(b)
+   for i,(x,y) in enumerate(zip(a,b)):yield from walk(x,y,pointer+'/'+str(i))
+  elif repr(a)!=repr(b):yield pointer,a,b
+ try:
+  from itertools import islice
+  rows=list(islice(walk(json.loads(expected),json.loads(actual)),limit))
+ except (ValueError,TypeError):rows=[]
+ if not rows:return 'Serialized text differs (including whitespace); no structural difference found'
+ lines=[]
+ for pointer,a,b in rows:
+  kind='value'
+  if isinstance(a,(int,float)) and isinstance(b,(int,float)):
+   if a==b==0:kind='signed zero'
+   elif abs(a-b)==360:kind='360-degree representative'
+  lines.append(f'{pointer}: committed={a!r}; generated={b!r} ({kind})')
+ return '\n'.join(lines)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');args=p.parse_args()
  for path,value in build().items():
   data=value if isinstance(value,str) else json.dumps(value,ensure_ascii=False,indent=2)+'\n'
-  if args.check:assert path.read_text()==data,path
+  if args.check:
+   existing=path.read_text()
+   assert existing==data,f'{path}\n{mismatch_details(existing,data)}'
   else:path.write_text(data)
  print('Authored eating item motion: five profiles, both hands; client acceptance false')
 if __name__=='__main__':main()
