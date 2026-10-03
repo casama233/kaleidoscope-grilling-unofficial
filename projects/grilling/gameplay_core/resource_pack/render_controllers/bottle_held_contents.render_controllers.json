@@ -18,10 +18,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_0",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_0": true
         }
       ],
       "textures": [
@@ -45,10 +56,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_1",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_1": true
         }
       ],
       "textures": [
@@ -72,10 +94,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_2",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_2": true
         }
       ],
       "textures": [
@@ -99,10 +132,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_3",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_3": true
         }
       ],
       "textures": [
@@ -126,10 +170,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_4",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_4": true
         }
       ],
       "textures": [
@@ -153,10 +208,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_5",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_5": true
         }
       ],
       "textures": [
@@ -180,10 +246,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_6",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_6": true
         }
       ],
       "textures": [
@@ -207,10 +284,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_7",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_7": true
         }
       ],
       "textures": [
@@ -234,10 +322,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_8",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_8": true
         }
       ],
       "textures": [
@@ -261,10 +360,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_9",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_9": true
         }
       ],
       "textures": [
@@ -288,10 +398,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_10",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_10": true
         }
       ],
       "textures": [
@@ -315,10 +436,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_11",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_11": true
         }
       ],
       "textures": [
@@ -342,10 +474,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_12",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_12": true
         }
       ],
       "textures": [
@@ -369,10 +512,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_13",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_13": true
         }
       ],
       "textures": [
@@ -396,10 +550,21 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_14",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_14": true
         }
       ],
       "textures": [
@@ -423,14 +588,47 @@
           ]
         }
       },
-      "geometry": "Geometry.pending_15",
+      "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
         }
       ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "pending_15": true
+        }
+      ],
       "textures": [
         "Array.colors[v.kg_bottle_layer_7]"
+      ]
+    },
+    "controller.render.kg_bottle_held.shell": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "grip": true
+        },
+        {
+          "shell": true
+        }
+      ],
+      "textures": [
+        "Texture.default"
       ]
     }
   }

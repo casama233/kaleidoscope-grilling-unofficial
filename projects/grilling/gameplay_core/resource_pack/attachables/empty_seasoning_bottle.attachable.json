@@ -5,7 +5,7 @@
       "identifier": "kaleidoscope_grilling:empty_seasoning_bottle",
       "materials": {
         "default": "entity_alphablend",
-        "contents": "entity_alphatest_one_sided"
+        "contents": "entity"
       },
       "textures": {
         "default": "textures/blocks/seasoning_bottle",
@@ -188,23 +188,7 @@
         "pending_color_176": "textures/a2770_placed/pending_color_176"
       },
       "geometry": {
-        "default": "geometry.kg_a286.kg_a2733.seasoning_bottle_hand",
-        "pending_0": "geometry.kg_bottle_held.pending_0",
-        "pending_1": "geometry.kg_bottle_held.pending_1",
-        "pending_2": "geometry.kg_bottle_held.pending_2",
-        "pending_3": "geometry.kg_bottle_held.pending_3",
-        "pending_4": "geometry.kg_bottle_held.pending_4",
-        "pending_5": "geometry.kg_bottle_held.pending_5",
-        "pending_6": "geometry.kg_bottle_held.pending_6",
-        "pending_7": "geometry.kg_bottle_held.pending_7",
-        "pending_8": "geometry.kg_bottle_held.pending_8",
-        "pending_9": "geometry.kg_bottle_held.pending_9",
-        "pending_10": "geometry.kg_bottle_held.pending_10",
-        "pending_11": "geometry.kg_bottle_held.pending_11",
-        "pending_12": "geometry.kg_bottle_held.pending_12",
-        "pending_13": "geometry.kg_bottle_held.pending_13",
-        "pending_14": "geometry.kg_bottle_held.pending_14",
-        "pending_15": "geometry.kg_bottle_held.pending_15"
+        "default": "geometry.kg_bottle_held.combined"
       },
       "render_controllers": [
         {
@@ -255,7 +239,7 @@
         {
           "controller.render.kg_bottle_held.pending_15": "v.kg_bottle_layer_7 > 0"
         },
-        "controller.render.kg_a2733.seasoning_bottle_hand"
+        "controller.render.kg_bottle_held.shell"
       ],
       "animations": {
         "fp_right": "animation.kg_a286.bottle_fp_right",

@@ -79,6 +79,12 @@ def binding_assets():
     pose,model=g['bones'][1:]
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose',ref
+   elif ref=='geometry.kg_bottle_held.combined':
+    assert len(g['bones'])==18 and not b.get('cubes'),ref
+    assert {child['name'] for child in g['bones'][1:]}=={'shell'}|{f'pending_{i}' for i in range(16)},ref
+    for child in g['bones'][1:]:
+     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child,ref
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
    elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':
     assert len(g['bones'])==3 and not b.get('cubes'),ref
     pose,model=g['bones'][1:]

@@ -3,9 +3,9 @@
   "minecraft:geometry": [
     {
       "description": {
-        "identifier": "geometry.kg_bottle_held.pending_0",
-        "texture_width": 16,
-        "texture_height": 16,
+        "identifier": "geometry.kg_bottle_held.combined",
+        "texture_width": 32,
+        "texture_height": 32,
         "visible_bounds_width": 3,
         "visible_bounds_height": 4,
         "visible_bounds_offset": [
@@ -17,6 +17,692 @@
       "bones": [
         {
           "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        },
+        {
+          "name": "shell",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                18,
+                -3
+              ],
+              "size": [
+                6,
+                6.5,
+                6
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    8.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    8.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -2.25,
+                24.5,
+                -2.25
+              ],
+              "size": [
+                4.5,
+                1.75,
+                4.5
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    0.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    8.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    8.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -1.5,
+                26.25,
+                -1.5
+              ],
+              "size": [
+                3.0,
+                2.0,
+                3.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    8.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    8.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    8.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    8.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -1.85,
+                27.1,
+                -2
+              ],
+              "size": [
+                3.6999999999999993,
+                0.5999999999999996,
+                0.34999999999999964
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -1.85,
+                27.1,
+                1.65
+              ],
+              "size": [
+                3.6999999999999993,
+                0.5999999999999996,
+                0.34999999999999964
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                1.65,
+                27.1,
+                -1.65
+              ],
+              "size": [
+                0.34999999999999964,
+                0.5999999999999996,
+                3.3000000000000007
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -2,
+                27.1,
+                -1.65
+              ],
+              "size": [
+                0.34999999999999964,
+                0.5999999999999996,
+                3.3000000000000007
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    24.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    32.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -1.9,
+                28.25,
+                -1.9
+              ],
+              "size": [
+                3.8000000000000007,
+                2.0,
+                3.8000000000000007
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    16.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    16.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    16.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    16.0,
+                    0.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    24.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    24.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -2,
+                20,
+                -3.06
+              ],
+              "size": [
+                4,
+                2.4000000000000004,
+                0.07999999999999918
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    16.0,
+                    8.0
+                  ],
+                  "uv_size": [
+                    8.0,
+                    8.0
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    24.0,
+                    16.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    24.0,
+                    16.0
+                  ],
+                  "uv_size": [
+                    -8.0,
+                    -8.0
+                  ]
+                }
+              }
+            }
+          ],
+          "parent": "grip"
+        },
+        {
+          "name": "pending_0",
           "pivot": [
             0,
             24,
@@ -41,8 +727,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -51,8 +737,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -61,8 +747,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -71,53 +757,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_1",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_1",
           "pivot": [
             0,
             24,
@@ -142,8 +812,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -152,8 +822,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -162,8 +832,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -172,53 +842,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_2",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_2",
           "pivot": [
             0,
             24,
@@ -243,8 +897,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -253,8 +907,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -263,8 +917,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -273,53 +927,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_3",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_3",
           "pivot": [
             0,
             24,
@@ -344,8 +982,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -354,8 +992,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -364,8 +1002,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -374,53 +1012,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_4",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_4",
           "pivot": [
             0,
             24,
@@ -445,8 +1067,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -455,8 +1077,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -465,8 +1087,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -475,53 +1097,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_5",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_5",
           "pivot": [
             0,
             24,
@@ -546,8 +1152,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -556,8 +1162,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -566,8 +1172,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -576,53 +1182,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_6",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_6",
           "pivot": [
             0,
             24,
@@ -647,8 +1237,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -657,8 +1247,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -667,8 +1257,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -677,53 +1267,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_7",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_7",
           "pivot": [
             0,
             24,
@@ -748,8 +1322,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -758,8 +1332,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -768,8 +1342,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -778,53 +1352,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_8",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_8",
           "pivot": [
             0,
             24,
@@ -849,8 +1407,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -859,8 +1417,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -869,8 +1427,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -879,53 +1437,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_9",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_9",
           "pivot": [
             0,
             24,
@@ -950,8 +1492,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -960,8 +1502,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -970,8 +1512,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -980,53 +1522,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_10",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_10",
           "pivot": [
             0,
             24,
@@ -1051,8 +1577,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1061,8 +1587,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1071,8 +1597,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1081,53 +1607,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_11",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_11",
           "pivot": [
             0,
             24,
@@ -1152,8 +1662,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1162,8 +1672,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1172,8 +1682,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1182,53 +1692,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_12",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_12",
           "pivot": [
             0,
             24,
@@ -1253,8 +1747,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1263,8 +1757,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1273,8 +1767,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1283,53 +1777,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_13",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_13",
           "pivot": [
             0,
             24,
@@ -1354,8 +1832,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1364,8 +1842,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1374,8 +1852,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1384,53 +1862,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_14",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_14",
           "pivot": [
             0,
             24,
@@ -1455,8 +1917,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1465,8 +1927,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1475,8 +1937,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1485,53 +1947,37 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
-        }
-      ]
-    },
-    {
-      "description": {
-        "identifier": "geometry.kg_bottle_held.pending_15",
-        "texture_width": 16,
-        "texture_height": 16,
-        "visible_bounds_width": 3,
-        "visible_bounds_height": 4,
-        "visible_bounds_offset": [
-          0,
-          1.5,
-          0
-        ]
-      },
-      "bones": [
+          "parent": "grip"
+        },
         {
-          "name": "grip",
+          "name": "pending_15",
           "pivot": [
             0,
             24,
@@ -1556,8 +2002,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "east": {
@@ -1566,8 +2012,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "south": {
@@ -1576,8 +2022,8 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "west": {
@@ -1586,34 +2032,34 @@
                     0
                   ],
                   "uv_size": [
-                    16,
-                    16
+                    32,
+                    32
                   ]
                 },
                 "up": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 },
                 "down": {
                   "uv": [
-                    16,
-                    16
+                    0,
+                    0
                   ],
                   "uv_size": [
-                    -16,
-                    -16
+                    32,
+                    32
                   ]
                 }
               }
             }
           ],
-          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+          "parent": "grip"
         }
       ]
     }

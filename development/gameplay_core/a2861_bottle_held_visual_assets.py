@@ -40,7 +40,16 @@ def build():
     source = load(RP / 'models/entity/a2770_placed/seasoning.geo.json')
     index = {g['description']['identifier']: g for g in source['minecraft:geometry']}
     shell = load(RP / 'models/entity/a286_hand/kg_a2733.seasoning_bottle_hand.geo.json')['minecraft:geometry'][0]
-    geometries = []
+    # One bound root owns both shell and fill. Separate geometry instances can
+    # otherwise receive different attachable pose transforms in the client.
+    combined = deepcopy(shell)
+    combined['description']['identifier'] = 'geometry.kg_bottle_held.combined'
+    shell_bone = deepcopy(shell['bones'][0])
+    shell_bone.update(name='shell', parent='grip')
+    shell_bone.pop('binding', None)
+    combined['bones'] = [
+        {'name': 'grip', 'pivot': [0, 24, 0],
+         'binding': 'q.item_slot_to_bone_name(context.item_slot)'}, shell_bone]
     controllers = {}
     result = {}
     for item in ['empty_seasoning_bottle', 'pending_seasoning']:
@@ -49,8 +58,8 @@ def build():
         desc = doc['minecraft:attachable']['description']
         # Both mechanic identities use the same empty shell plus their real
         # ordered ingredient layers. Pending no longer borrows a fixed r4 fill.
-        desc['geometry'] = {'default': 'geometry.kg_a286.kg_a2733.seasoning_bottle_hand'}
-        desc['materials']['contents'] = 'entity_alphatest_one_sided'
+        desc['geometry'] = {'default': 'geometry.kg_bottle_held.combined'}
+        desc['materials']['contents'] = 'entity'
         desc['render_controllers'] = []
         # item_slot exists in attachable animation context, but not render
         # controller context (confirmed by the actual .61 client error).
@@ -77,31 +86,33 @@ def build():
             desc['textures']['pending_color_' + str(idx)] = 'textures/a2770_placed/pending_color_' + str(idx)
         for tint in range(16):
             alias = 'pending_' + str(tint)
-            ident = 'geometry.kg_bottle_held.' + alias
-            desc['geometry'][alias] = ident
             layer, shade = divmod(tint, 2)
             value = 'v.kg_bottle_layer_' + str(layer)
             rc = 'controller.render.kg_bottle_held.' + alias
             desc['render_controllers'].append({rc: value + ' > 0'})
             textures = ['Texture.pending_color_' + str(color_index[str(pair[shade])]) for pair in pairs]
             controllers[rc] = {'arrays': {'textures': {'Array.colors': textures}},
-                'geometry': 'Geometry.' + alias, 'materials': [{'*': 'Material.contents'}],
+                'geometry': 'Geometry.default', 'materials': [{'*': 'Material.contents'}],
+                'part_visibility': [{'*': False}, {'grip': True}, {alias: True}],
                 'textures': ['Array.colors[' + value + ']']}
             if item == 'empty_seasoning_bottle':
-                g = deepcopy(index['geometry.kg_a2770.' + alias])
-                for key in ['visible_bounds_width', 'visible_bounds_height', 'visible_bounds_offset']:
-                    g['description'][key] = deepcopy(shell['description'][key])
-                g['description']['identifier'] = ident
-                for bone in g['bones']:
-                    bone['name'] = 'grip'
-                    bone['pivot'] = [0, 24, 0]
-                    bone['binding'] = 'q.item_slot_to_bone_name(context.item_slot)'
-                    for cube in bone.get('cubes', []):
-                        cube['origin'][1] += 18
-                geometries.append(g)
-        desc['render_controllers'].append('controller.render.kg_a2733.seasoning_bottle_hand')
+                bone = deepcopy(index['geometry.kg_a2770.' + alias]['bones'][0])
+                bone.update(name=alias, parent='grip', pivot=[0, 24, 0])
+                bone.pop('binding', None)
+                for cube in bone.get('cubes', []):
+                    cube['origin'][1] += 18
+                    # Solid palettes need no atlas offsets. Use this geometry's
+                    # texture dimensions so every sample stays in its texture.
+                    cube['uv'] = {face: {'uv': [0, 0], 'uv_size': [32, 32]}
+                                  for face in cube['uv']}
+                combined['bones'].append(bone)
+        desc['render_controllers'].append('controller.render.kg_bottle_held.shell')
         result[path] = doc
-    result[RP / 'models/entity/bottle_held_contents.geo.json'] = {'format_version': '1.16.0', 'minecraft:geometry': geometries}
+    controllers['controller.render.kg_bottle_held.shell'] = {
+        'geometry': 'Geometry.default', 'materials': [{'*': 'Material.default'}],
+        'part_visibility': [{'*': False}, {'grip': True}, {'shell': True}],
+        'textures': ['Texture.default']}
+    result[RP / 'models/entity/bottle_held_contents.geo.json'] = {'format_version': '1.16.0', 'minecraft:geometry': [combined]}
     result[RP / 'render_controllers/bottle_held_contents.render_controllers.json'] = {'format_version': '1.8.0', 'render_controllers': controllers}
     return result
 

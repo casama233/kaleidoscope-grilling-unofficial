@@ -108,7 +108,11 @@ def make_pose(family, view, hand):
         # region. This explicit exception is covered by the viewport regression.
         if family=='rack': tr=[-3*sign,4.5,-2]
         java=chain(translate([9.039*sign,15.682,20.8]),translate(tr),xyz(r),scale(size),translate([-8,-8,-8]))
-        target=chain(camera,translate([0,-24,-32.4]),java,translate(source_offset))
+        # The Java bottle rotation/.72 scale stay authored. Move its complete
+        # shell, cap and contents inward, upward and farther from the camera;
+        # the narrower full-model viewport gate covers both hands and aspects.
+        camera_offset=[-3*sign,5,-6] if family=='bottle' else [0,0,0]
+        target=chain(camera,translate(camera_offset),translate([0,-24,-32.4]),java,translate(source_offset))
         local=mul(rigid_inverse(base),target)
         position=point(local,[0,24,0]);position[1]-=24;position[0]*=-1
         rotation=mul(local,scale([1/x for x in size]))

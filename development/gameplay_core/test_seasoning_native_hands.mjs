@@ -1,0 +1,191 @@
+/**
+ * Canonical function-body integration with API doubles, not an engine certificate.
+ * Run from repository root: node --test development/gameplay_core/test_seasoning_native_hands.mjs
+ * First placement is main-only; offhand "place" below is canonical pushBottle.
+ */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+
+const root=fileURLToPath(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url));
+const moduleAt=n=>import(pathToFileURL(path.join(root,n)).href);
+const [core,visuals,tx,plans,support,intent]=await Promise.all([
+ moduleAt('a2743_seasoning_contract_core.js'),moduleAt('a2766_special_seasoning_visual_core.js'),
+ moduleAt('a277_grill_transaction_core.js'),moduleAt('rack_transfer_plan.js'),
+ moduleAt('blockSupport.js'),moduleAt('a276_grill_intent_core.js'),
+]);
+const read=n=>fs.readFileSync(path.join(root,n),'utf8');
+const strip=s=>s.replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(class|const|function|async))/g,'');
+function body(source,name){
+ const start=source.indexOf('function '+name+'(');assert.ok(start>=0,'Canonical function missing: '+name);
+ let i=source.indexOf('{',start),depth=1,end=i+1;
+ for(;depth&&end<source.length;end++){if(source[end]==='{')depth++;if(source[end]==='}')depth--;}
+ assert.equal(depth,0,name+' body is complete');return source.slice(start,end);
+}
+const N='kaleidoscope_grilling:',EMPTY=N+'empty_seasoning_bottle',PENDING=N+'pending_seasoning';
+class Stack{
+ constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.maxAmount=1;this.props={};this.lore=[];this.canDestroy=[];this.canPlaceOn=[];}
+ clone(){return Object.assign(new Stack(this.typeId,this.amount),structuredClone({...this}));}
+ getRawLore(){return structuredClone(this.lore);}
+ getLore(){return this.lore.map(x=>typeof x==='string'?x:x.text??'');}
+ setLore(v){this.lore=structuredClone(v);}
+ getDynamicPropertyIds(){assert.equal(this.maxAmount,1);return Object.keys(this.props);}
+ getDynamicProperty(k){assert.equal(this.maxAmount,1);return structuredClone(this.props[k]);}
+ setDynamicProperty(k,v){assert.equal(this.maxAmount,1);if(v===undefined)delete this.props[k];else this.props[k]=structuredClone(v);}
+ getCanDestroy(){return [...this.canDestroy];}setCanDestroy(v){this.canDestroy=[...v];}
+ getCanPlaceOn(){return [...this.canPlaceOn];}setCanPlaceOn(v){this.canPlaceOn=[...v];}
+ getComponent(){return undefined;}
+}
+const json=s=>JSON.stringify(s);
+const equal=(a,b,message)=>assert.equal(json(a),json(b),message);
+
+function fixture(){
+ const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[];
+ let serial=0,off,offFault;
+ const makeContainer=size=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone();},setItem(i,s){this.rows[i]=s?.clone();}});
+ const inventory=makeContainer(9);
+ const equipment={getEquipment(slot){assert.equal(slot,'offhand');return off?.clone();},setEquipment(slot,s){
+  assert.equal(slot,'offhand');const fault=offFault;offFault=undefined;
+  if(fault?.after)off=s?.clone();
+  if(fault?.kind==='throw')throw Error('Injected offhand write rejection');
+  if(fault?.kind==='false')return false;
+  off=s?.clone();return true;
+ }};
+ const permutation=(id,states={})=>({id,getAllStates:()=>({...states}),getState:k=>states[k]});
+ function makeBlock(location){let p=permutation('minecraft:air');return {
+  ...location,location:{...location},dimension,get typeId(){return p.id;},get permutation(){return p;},
+  get isAir(){return p.id==='minecraft:air';},get isLiquid(){return false;},getComponent(){return undefined;},
+  below(){return dimension.getBlock({...location,y:location.y-1});},
+  setType(id){p=permutation(id);},setPermutation(v){p=v;},
+ };}
+ const dimension={id:'minecraft:overworld',getBlock(location){
+  const k=[location.x,location.y,location.z].join('/');if(!blocks.has(k))blocks.set(k,makeBlock(location));return blocks.get(k);
+ },getEntities(q){return [...entities.values()].filter(e=>e.typeId===q.type&&Math.hypot(e.location.x-q.location.x,e.location.y-q.location.y,e.location.z-q.location.z)<=q.maxDistance);},
+ spawnEntity(typeId,location){
+  const properties=new Map(),c=makeContainer(4),id='helper'+(++serial);
+  const e={id,typeId,location:{...location},dimension,c,getDynamicProperty:k=>properties.get(k),
+   setDynamicProperty(k,v){if(v===undefined)properties.delete(k);else properties.set(k,v);},
+   getComponent:k=>k==='minecraft:inventory'?{container:c}:undefined,remove(){entities.delete(id);}};
+  entities.set(id,e);return e;
+ }};
+ const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){if(v===undefined)dp.delete(k);else dp.set(k,v);},getEntity:id=>entities.get(id)};
+ const player={isValid:true,dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,getGameMode:()=> 'survival',
+  getComponent:id=>id==='minecraft:inventory'?{container:inventory}:id==='minecraft:equippable'?equipment:undefined};
+ const context=vm.createContext({...core,...visuals,...tx,...plans,...support,...intent,
+  hostWorld:world,world,system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,
+  EquipmentSlot:{Offhand:'offhand'},GameMode:{Survival:'survival',Creative:'creative'},
+  console:{warn(){},error(){}},markPlacedVisualDirty(){},blockSound(){},message(){},
+  javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},interactionParticleBurst(){},transactionStatus:r=>r.ok,
+  EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
+  seasoningLore:()=>[],
+ });
+ const run=s=>vm.runInContext(s,context);
+ // Load the actual canonical implementations. Only unrelated visual/HUD effects are stubs.
+ run(strip(read('itemDataCore.js')));run('configureItemDataWorld(hostWorld)');
+ for(const name of ['host_api/food_api_core.js','a2735_player_io.js','a2762_interaction_intent_core.js'])run(strip(read(name)));
+ for(const [file,names] of [
+  ['a2750_food_state_adapter.js',['readFoodSeasonings','setFoodSeasonings']],
+  ['a2766_special_seasoning_visual_runtime.js',['bounded','specialSeasoningVariant']],
+  ['a2762_interaction_intent_adapter.js',['captureInteractionIntent','interactionIntentStillCurrent']],
+ ])run(names.map(n=>body(read(file),n)).join('\n'));
+ run('const heldMain=getMainHand,heldByHand=getHand,creative=isCreative,readSeasonings=readFoodSeasonings,setSeasonings=setFoodSeasonings;');
+ for(const name of ['family_station_storage.js','a2743_seasoning_block_adapter.js','seasoning_native_storage.js'])run(strip(read(name)));
+ run('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;');
+ const functions=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles',
+  'bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget',
+  'bottleTargetSnapshot','scheduleNativeBottlePlacement'];
+ run(functions.map(n=>body(read('main.js'),n)).join('\n'));
+ const api=run('({nativeBottles,pushBottle,handleSeasoningBlock,scheduleNativeBottlePlacement,bottleDataFromItem,captureWritableHand,captureInteractionIntent,interactionIntentStillCurrent,getItemProperty,setItemProperty,setItemLore,readFoodSeasonings,setFoodSeasonings})');
+ const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
+ const get=h=>h==='off'?equipment.getEquipment('offhand'):inventory.getItem(player.selectedSlotIndex);
+ const set=(h,s)=>h==='off'?equipment.setEquipment('offhand',s):inventory.setItem(player.selectedSlotIndex,s);
+ return {api,block,player,inventory,equipment,dp,entities,get,set,
+  failOff(kind,after=false){offFault={kind,after};},
+  flush(){while(queue.length)queue.shift()();},
+  placeMain(){const e={block,player,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;},
+ };
+}
+function decorated(f,kind,{uses=0,variant=0,partial=1,marker=kind}={}){
+ const s=new Stack(kind==='special'?visuals.specialSeasoningVisualId(uses,variant):kind==='pending'?PENDING:EMPTY);
+ Object.assign(s,{nameTag:'Original '+marker,keepOnDeath:true,lockMode:'inventory',opaqueNative:{marker}});
+ s.setCanDestroy(['minecraft:dirt']);s.setCanPlaceOn(['minecraft:stone']);
+ f.api.setItemLore(s,[{text:'Unrelated lore '+marker},{translate:'test.unrelated',with:['retained']}]);
+ for(const [k,v] of Object.entries({'other:boolean':true,'other:number':7,'other:string':marker,'other:vector':{x:1,y:2,z:3}}))f.api.setItemProperty(s,k,v);
+ f.api.setFoodSeasonings(s,kind==='empty'?core.BASE_SEASONINGS.slice(0,partial):[...core.BASE_SEASONINGS,'minecraft:redstone']);
+ if(kind==='special'){f.api.setItemProperty(s,core.SEASONING_USES_KEY,uses);f.api.setItemProperty(s,core.SEASONING_VARIANT_KEY,variant);}
+ return s;
+}
+function seedForOff(f){
+ const seed=decorated(f,'empty',{partial:0,marker:'main seed'});f.set('main',seed);f.placeMain();
+ const sentinel=decorated(f,'pending',{marker:'unchanged main'});f.set('main',sentinel);return {seed,sentinel};
+}
+
+for(const hand of ['main','off'])for(const kind of ['empty','pending','special']){
+ const states=kind==='special'?[{uses:0,variant:0},{uses:1,variant:7},{uses:15,variant:0},{uses:16,variant:7}]:kind==='empty'?[{partial:1},{partial:2}]:[{}];
+ for(const state of states)test(`${hand} ${kind} ${json(state)} place/pickup/replace preserves exact stack and opposite hand`,()=>{
+  const f=fixture(),original=decorated(f,kind,state);let sentinel,seed;
+  if(hand==='off')({seed,sentinel}=seedForOff(f));
+  else{sentinel=decorated(f,'pending',{marker:'unchanged off'});f.set('off',sentinel);}
+  f.set(hand,original);
+  if(hand==='main')f.placeMain();else assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),true);
+  assert.equal(f.get(hand),undefined);equal(f.get(hand==='main'?'off':'main'),sentinel);
+  equal(f.api.nativeBottles(f.block).items.at(-1),original);
+  f.api.handleSeasoningBlock(f.block,f.player,hand);equal(f.get(hand),original);equal(f.get(hand==='main'?'off':'main'),sentinel);
+  if(kind==='empty'){assert.equal(f.get(hand).typeId,EMPTY);equal(f.api.readFoodSeasonings(f.get(hand)),core.BASE_SEASONINGS.slice(0,state.partial));}
+  if(hand==='main')f.placeMain();else assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),true);
+  equal(f.api.nativeBottles(f.block).items.at(-1),original);equal(f.get(hand==='main'?'off':'main'),sentinel);
+  if(seed)equal(f.api.nativeBottles(f.block).items[0],seed,'Lower bottle stays unchanged');
+ });
+}
+for(const hand of ['main','off'])test(`${hand} EMPTY ingredient addition uses canonical DP and preserves unrelated metadata`,()=>{
+ const f=fixture();if(hand==='off')seedForOff(f);
+ const original=decorated(f,'empty',{partial:1});f.set(hand,original);
+ if(hand==='main')f.placeMain();else f.api.pushBottle(f.block,f.player,f.get(hand),hand);
+ const opposite=hand==='main'?'off':'main',sentinel=decorated(f,'pending',{marker:'other'});f.set(opposite,sentinel);
+ f.set(hand,new Stack(core.BASE_SEASONINGS[1]));f.api.handleSeasoningBlock(f.block,f.player,hand);
+ const expected=original.clone();f.api.setFoodSeasonings(expected,core.BASE_SEASONINGS.slice(0,2));
+ equal(f.api.nativeBottles(f.block).items.at(-1),expected);equal(f.get(opposite),sentinel);assert.equal(f.get(hand),undefined);
+});
+
+test('canonical writable main hand pins captured slot for write and rollback',()=>{
+ const f=fixture(),original=decorated(f,'pending'),other=decorated(f,'empty',{marker:'new selected slot'});
+ f.set('main',original);f.inventory.setItem(1,other);
+ const captured=f.api.captureWritableHand(f.player,'main');f.player.selectedSlotIndex=1;
+ captured.write(undefined);assert.equal(f.inventory.getItem(0),undefined);equal(f.get('main'),other);
+ captured.write(captured.before);equal(f.inventory.getItem(0),original);equal(f.get('main'),other);
+});
+test('queued first placement rejects selected-slot change even with identical stack',()=>{
+ const f=fixture(),s=decorated(f,'empty');f.set('main',s);f.inventory.setItem(1,s);
+ f.api.scheduleNativeBottlePlacement({block:f.block,player:f.player,face:'Up',permutationToPlace:{id:N+'seasoning_bottle_1',getAllStates:()=>({}),getState:()=>undefined},cancel:false});
+ f.player.selectedSlotIndex=1;f.flush();assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
+ equal(f.inventory.getItem(0),s);equal(f.inventory.getItem(1),s);
+});
+test('offhand intent and captured offhand slot remain independent of selected main slot',()=>{
+ const f=fixture(),main=decorated(f,'empty'),off=decorated(f,'pending');f.set('main',main);f.set('off',off);
+ const intent=f.api.captureInteractionIntent(f.player,off),captured=f.api.captureWritableHand(f.player,'off');
+ assert.equal(intent.hand,'off');f.player.selectedSlotIndex=2;assert.equal(f.api.interactionIntentStillCurrent(f.player,intent),true);
+ captured.write(undefined);equal(f.inventory.getItem(0),main);assert.equal(f.get('off'),undefined);
+ captured.write(captured.before);equal(f.get('off'),off);equal(f.inventory.getItem(0),main);
+});
+for(const kind of ['false','throw'])for(const after of [false,true])for(const action of ['push','pickup'])test(`offhand ${action} setEquipment ${kind} ${after?'after':'before'} mutation rolls back both parties`,()=>{
+ const f=fixture(),{seed,sentinel}=seedForOff(f),original=decorated(f,'special',{uses:15,variant:7});
+ f.set('off',original);
+ if(action==='pickup'){f.api.pushBottle(f.block,f.player,f.get('off'),'off');assert.equal(f.get('off'),undefined);}
+ const before=f.api.nativeBottles(f.block).items.map(s=>s.clone()),raw=[...f.dp.entries()].map(([k,v])=>[k,v]);
+ f.failOff(kind,after);
+ if(action==='push')assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),false);
+ else f.api.handleSeasoningBlock(f.block,f.player,'off');
+ equal(f.api.nativeBottles(f.block).items,before);equal(f.get('main'),sentinel);equal(f.api.nativeBottles(f.block).items[0],seed);
+ equal(f.get('off'),action==='push'?original:undefined);equal([...f.dp.entries()],raw);
+ // The one-shot write rejection was recovered; coordinate is still usable.
+ if(action==='push')assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),true);
+ else{f.api.handleSeasoningBlock(f.block,f.player,'off');equal(f.get('off'),original);}
+});
+
+test('first-placement component is explicitly main-only; it does not consume offhand',()=>{
+ const f=fixture(),s=decorated(f,'pending');f.set('off',s);f.placeMain();
+ assert.equal(f.block.typeId,'minecraft:air');equal(f.get('off'),s);assert.equal(f.entities.size,0);
+});

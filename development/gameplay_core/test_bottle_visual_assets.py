@@ -44,22 +44,48 @@ class BottleVisualAssets(unittest.TestCase):
     def test_held_layers_share_shell_socket_without_changing_native_id(self):
         placed={g['description']['identifier']:g for g in load(RP/'models/entity/a2770_placed/seasoning.geo.json')['minecraft:geometry']}
         geos=load(RP/'models/entity/bottle_held_contents.geo.json')['minecraft:geometry']
-        self.assertEqual(len(geos),16)
-        for tint,g in enumerate(geos):
-            root=g['bones'][0]
-            self.assertEqual(root['binding'],'q.item_slot_to_bone_name(context.item_slot)')
-            self.assertEqual(root['pivot'],[0,24,0])
-            c=root['cubes'][0];p=placed['geometry.kg_a2770.pending_'+str(tint)]['bones'][0]['cubes'][0]
+        self.assertEqual(len(geos),1)
+        g=geos[0];root=g['bones'][0]
+        self.assertEqual(g['description']['identifier'],'geometry.kg_bottle_held.combined')
+        self.assertEqual(root,{'name':'grip','pivot':[0,24,0],
+            'binding':'q.item_slot_to_bone_name(context.item_slot)'})
+        bones={b['name']:b for b in g['bones']}
+        self.assertEqual(set(bones),{'grip','shell'}|{f'pending_{i}' for i in range(16)})
+        shell=load(RP/'models/entity/a286_hand/kg_a2733.seasoning_bottle_hand.geo.json')['minecraft:geometry'][0]
+        self.assertEqual(bones['shell']['cubes'],shell['bones'][0]['cubes'])
+        for child in g['bones'][1:]:
+            self.assertEqual(child['parent'],'grip')
+            self.assertEqual(child['pivot'],root['pivot'])
+            self.assertNotIn('binding',child)
+            self.assertNotIn('rotation',child)
+        for tint in range(16):
+            c=bones['pending_'+str(tint)]['cubes'][0];p=placed['geometry.kg_a2770.pending_'+str(tint)]['bones'][0]['cubes'][0]
             self.assertEqual(c['origin'],[p['origin'][0],p['origin'][1]+18,p['origin'][2]])
             self.assertEqual(c['size'],p['size'])
+            self.assertEqual(set(c['uv']),set(p['uv']))
+            for uv in c['uv'].values():
+                self.assertEqual(uv,{'uv':[0,0],'uv_size':[32,32]})
+            # Every half-cuboid lies inside the physical bottle body before
+            # their common parent transform; this holds for FP and TP alike.
+            for axis in range(3):
+                self.assertGreaterEqual(c['origin'][axis],[-3,18,-3][axis])
+                self.assertLessEqual(c['origin'][axis]+c['size'][axis],[3,24.5,3][axis])
         for item in ['empty_seasoning_bottle','pending_seasoning']:
             d=load(RP/f'attachables/{item}.attachable.json')['minecraft:attachable']['description']
             self.assertEqual(d['identifier'],'kaleidoscope_grilling:'+item)
-            self.assertEqual(d['geometry']['default'],'geometry.kg_a286.kg_a2733.seasoning_bottle_hand')
+            self.assertEqual(d['geometry'],{'default':'geometry.kg_bottle_held.combined'})
+            self.assertEqual(d['materials']['contents'],'entity')
             self.assertEqual(len(d['render_controllers']),17)
             for tint,rc in enumerate(d['render_controllers'][:-1]):
                 condition=next(iter(rc.values()))
                 self.assertEqual(condition,'v.kg_bottle_layer_'+str(tint//2)+' > 0')
+        controllers=load(RP/'render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
+        for name,rc in controllers.items():
+            self.assertEqual(rc['geometry'],'Geometry.default')
+            visible={k:v for row in rc['part_visibility'] for k,v in row.items()}
+            child=name.rsplit('.',1)[-1]
+            self.assertEqual(visible,{'*':False,'grip':True,child:True})
+        self.assertEqual(controllers['controller.render.kg_bottle_held.shell']['materials'],[{'*':'Material.default'}])
 
     def test_render_context_uses_initialized_numeric_animation_variables(self):
         controllers=load(RP/'render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
