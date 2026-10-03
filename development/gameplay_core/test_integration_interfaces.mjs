@@ -89,6 +89,11 @@ test('64-bit hash matches independent fixed Java-long vectors including negative
  const vectors=[{x:0,y:0,z:0,selected:true},{x:1,y:64,z:0,selected:true},{x:-1,y:64,z:-1,selected:false},{x:2,y:64,z:0,selected:false},{x:15,y:64,z:0,selected:false},{x:30000000,y:127,z:-30000000,selected:false}];
  for(const {selected,...p} of vectors)assert.equal(fortress.fortressReplacementAt(p),selected,JSON.stringify(p));
 });
+test('portable hash matches all 277 Java-long modulo vectors including the native BDS failure coordinate',()=>{
+ const vectors=JSON.parse(fs.readFileSync(new URL('./fixtures/fortress-java-vectors.json',import.meta.url),'utf8'));
+ assert.equal(vectors.length,277);
+ for(const {mod,...point} of vectors){assert.equal(fortress.fortressHashModulo(point),mod,JSON.stringify(point));assert.equal(fortress.fortressReplacementAt(point),mod<25,JSON.stringify(point));}
+});
 test('partial native block writes roll back their original ages and leave a retryable receipt',()=>{
  let writes=0;const e=engine({fault(kind){if(kind==='block'&&++writes===1)throw Error('after block write')}});e.register();const position={x:1,y:64,z:0},block=e.wart(position,1),request={producerId:'test:producer',sequence:1,generation:{dimensionId:'minecraft:nether',structureId:'minecraft:fortress',isNewChunk:true,generatedAt:1000,chunk:{x:0,z:0},bounds:{min:position,max:position},positions:[position]}};
  assert.throws(()=>e.invoke('fresh_fortress',request),/after block write/);assert.equal(block.typeId,'minecraft:nether_wart');assert.equal(block.permutation.getState('age'),1);assert.equal(e.invoke('fresh_fortress',request).replaced,1);

@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    50
+    51
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -41,7 +41,7 @@
     {
       "id": "F05",
       "title": "秘製串組合",
-      "canonical": "2.8.45 主副手各三食材 client_sync 索引與 213 個已核對圖像保留；2.8.50 提供持久跨包 catalog 別名註冊與查核。",
+      "canonical": "2.8.45 主副手各三食材 client_sync 索引與 213 個已核對圖像保留；2.8.51 提供持久跨包 catalog 別名註冊與查核。",
       "remaining": "Windows 實際呈現；動態背包 GUI、原作 tint／實體食材模型及新作者圖像仍需資源包發行。",
       "client_accepted": false
     },
@@ -62,7 +62,7 @@
     {
       "id": "F08",
       "title": "內容投影與規模",
-      "canonical": "既有 bounded helper 排程保留；2.8.50 公開逐堆 projection carrier、跨包 provider 註冊與實際物品查核，兩堆同 ID 可保留不同 data。",
+      "canonical": "既有 bounded helper 排程保留；2.8.51 公開逐堆 projection carrier、跨包 provider 註冊與實際物品查核，兩堆同 ID 可保留不同 data。",
       "remaining": "作者須在真正 producer callback 公開實際 aux；私人資料不可推斷。變體與多人負載仍需 Windows 真人。",
       "client_accepted": false
     },
@@ -76,7 +76,7 @@
     {
       "id": "F10",
       "title": "要塞自然替換",
-      "canonical": "2.8.50 提供可信新生成宿主的 Nether fortress bounds／wart 座標接口，原 Java signed-long 哈希 25%、紅色與年齡映射、持久序號與失敗回復。",
+      "canonical": "2.8.51 提供可信新生成宿主的 Nether fortress bounds／wart 座標接口，原 Java signed-long 哈希 25%、紅色與年齡映射、持久序號與失敗回復。",
       "remaining": "原版新區塊／要塞 callback 仍無穩定來源；自動自然 25% 替換未完成，不能把人工批次測試當自然生成。",
       "client_accepted": false
     },
@@ -104,7 +104,7 @@
     {
       "id": "F14",
       "title": "配置與整合",
-      "canonical": "2.8.50 提供 producer／projection／held catalog／fresh generation 及確認／重啟收據 API；熔爐熱食 false／30 秒設定與既有 public oil／secret-food 接口保留。",
+      "canonical": "2.8.51 提供 producer／projection／held catalog／fresh generation 及確認／重啟收據 API；熔爐熱食 false／30 秒設定與既有 public oil／secret-food 接口保留。",
       "remaining": "原生熔爐仍需真正 producer 宿主 callback；Create／女僕／KubeJS／JEI／Jade／Iceberg 等 Java 選用模組未變成同名 Bedrock 模組。",
       "client_accepted": false
     },
