@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "candidate_version": "2.8.58",
+  "source_trees": {
+    "BP": {
+      "sha256": "f81c115b268d031769975eec7ee3627e2f0254f8f64d1a3e111ebe7b4bbb3806",
+      "files": 530
+    },
+    "RP": {
+      "sha256": "4f8267a54b77bdc816c32aebef475547eb6a54aebd91b06ba6e486e113e48e4b",
+      "files": 1673
+    }
+  },
+  "review_package_sha256": "c64b830af52b276c39b6f295cb54fbfe4fe3378b2d9759b1d78c8983ca04749b",
+  "canonical_functional_gate": "pass",
+  "relative_imports_checked": 418,
+  "source_regressions": {
+    "active_matrix": 8,
+    "native_clock": 5,
+    "offhand_idle": 5
+  },
+  "bridge_gui": {
+    "version": "2.7.54",
+    "imported_source_config_files": 2204,
+    "source_byte_drift": 0,
+    "built_BP_files": 530,
+    "built_RP_files": 1673,
+    "build_byte_drift": 0
+  },
+  "blockbench_mcp": {
+    "version": "1.10.0",
+    "actual_geometry_import": true,
+    "raw_beef_stage0_cubes": 5,
+    "raw_beef_stage0_groups": 3,
+    "animation_acceptance": false
+  },
+  "native_client": {
+    "version": "1.26.52.3",
+    "platform": "Android x86_64",
+    "mode": "Creative",
+    "four_mainhand_slim_and_wide": "scoped motion/bite/release observations passed",
+    "two_mainhand_slim": "scoped motion/bites, lower viewport edge still needs Java frame comparison",
+    "two_cancel_then_shaker_wide": "no stuck eating arm observed",
+    "offhand_idle_skewer_and_bottle_wide": "visible with empty or occupied main hand",
+    "offhand_eating": false,
+    "all_profile_java_parity": false
+  },
+  "family_bds": {
+    "packs": 16,
+    "overlaps": 19,
+    "native_report": {
+      "schema": 1,
+      "candidate_receipt": "family-90-56-58-reviewed",
+      "test_only_overlays": true,
+      "simulated_players": false,
+      "native_probes": {
+        "tavern": {
+          "checks": 24,
+          "fluids": 9,
+          "extensions": [
+            {
+              "source": "kaleidoscope_world_liquor",
+              "version": "0.1.56",
+              "recipes": 32,
+              "pages": 66,
+              "shakerInputs": 56
+            }
+          ],
+          "guide": {
+            "active": false,
+            "disposed": false,
+            "hostReady": true,
+            "dirty": true,
+            "successfulTransfers": 2,
+            "transmittedTransfers": 2,
+            "sendFailures": 0,
+            "messageCount": 286,
+            "revision": "c6_511e6086",
+            "acknowledgementAvailable": false,
+            "receiptConfirmed": false,
+            "deliveryState": "sent_unconfirmed"
+          },
+          "cookeryCapabilities": [
+            "chopping_board_v2",
+            "chopping_board_recipe_selection",
+            "chopping_board_multi_output",
+            "chopping_board_commit_receipt",
+            "oil_pot_portable_v1",
+            "oil_pot_snapshot_v1",
+            "oil_pot_placed_v1",
+            "cuisine_output_receipt_v2",
+            "secret_ingredient_consume_v1",
+            "guidebook_localized_labels_v1",
+            "secret_ingredient_behaviors_v1",
+            "wok",
+            "stockpot_exact",
+            "stockpot_flex",
+            "chopping_board",
+            "chopping_board_tool",
+            "steamer",
+            "teapot",
+            "millstone",
+            "guidebook_extensions",
+            "guidebook_entry_icons",
+            "display_rules",
+            "chopping_board_displays",
+            "chopping_board_native_models",
+            "chopping_board_auto_recovery",
+            "kitchen_knife_tag",
+            "shawarma"
+          ],
+          "client": false
+        },
+        "grilling": {
+          "nativeContainer": true,
+          "stackableMetadata": true,
+          "immutable": true,
+          "lore": true,
+          "unstackable": true,
+          "client": false
+        }
+      },
+      "errors": [],
+      "bds": true,
+      "client": false,
+      "saved_world_migration": false,
+      "production_ready": false,
+      "candidate_receipt_sha256": "80336c003406e9c8e7a9a4db9c8d2a62e7c9681297b3c9de3b1b42f9973e4eac"
+    }
+  },
+  "optional_mct_validation": "not completed",
+  "merged": false,
+  "release_published": false,
+  "live_deployed": false,
+  "production_ready": false
+}

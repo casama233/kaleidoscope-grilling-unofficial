@@ -5,12 +5,29 @@ from verify_a283 import BP, RP, main as previous_gate
 
 def eating_gate():
     script = (BP / 'scripts/main.js').read_text()
+    version = tuple(json.loads((BP / 'manifest.json').read_text())['header']['version'])
     start = script.split('world.afterEvents.itemStartUse.subscribe', 1)[1].split('world.afterEvents.itemCompleteUse.subscribe', 1)[0]
     # Pending seasoning has its separate shake. Food may only supply the
     # third-person native rotation fallback; legacy translated limbs stay banned.
     food_start = start.split('if(!FOOD_DATA[id]&&id!==SECRET_ID)return;', 1)[1]
     if 'playAnimation' in food_start:
-        assert food_start.count('playAnimation') == 1
+        if version >= (2, 8, 58):
+            assert food_start.count('playAnimation') == 2
+            assert "playAnimation('animation.kg_java_eating.player.'" in food_start
+            assert 'JAVA_FP_EATING_ITEMS.includes(id)' in food_start
+            projected = json.loads((RP / 'animations/java_eating_player.animation.json').read_text())['animations']
+            assert len(projected) == 6
+            for name, pose in projected.items():
+                hand = name.rsplit('.', 1)[1]
+                other = 'left' if hand == 'right' else 'right'
+                assert pose.get('override_previous_animation') is True
+                assert 'this' not in json.dumps(pose['bones'])
+                assert pose['blend_weight'].startswith('variable.is_first_person && ')
+                assert "q.property('kaleidoscope_grilling:eat_projection') == 1" in pose['blend_weight']
+                assert set(pose['bones']) == {hand+'arm', hand+'item', other+'item'}
+                assert pose['bones'][other+'item'] == {'scale': 0}
+        else:
+            assert food_start.count('playAnimation') == 1
         assert "playAnimation('animation.kg_eating.player.native_'" in food_start
         poses = json.loads((RP / 'animations/eating_arms.animation.json').read_text())['animations']
         for hand in ('right', 'left'):
@@ -25,7 +42,6 @@ def eating_gate():
     assert 'playAnimation' not in tick
     assert 'advanceBites(p,active)' in tick and 'hungerSettle(' not in tick
     assert 'if(ACTIVE_EATS.get(id)!==a)return' in stop
-    version = tuple(json.loads((BP / 'manifest.json').read_text())['header']['version'])
     if version >= (2, 8, 54):
         # Java's 25-tick visual checkpoint has a one-tick RELEASE-only grace.
         # Older immutable candidates retain their original exact assertion.
@@ -62,7 +78,7 @@ def eating_gate():
         assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file
         skewers += 1
     assert skewers == (40 if (RP / 'attachables/secret_skewer.attachable.json').exists() else 39), skewers
-    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no translated limb or whole-player override')
+    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; scoped limb channels, no whole-player override')
 
 
 if __name__ == '__main__':

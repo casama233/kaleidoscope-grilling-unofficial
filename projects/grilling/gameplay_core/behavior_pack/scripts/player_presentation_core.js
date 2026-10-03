@@ -1,3 +1,6 @@
+export const EAT_NATIVE_TICKS_PROPERTY='kaleidoscope_grilling:eat_native_ticks';
+export function eatingNativeTicks(value){const n=Number(value);return Number.isInteger(n)&&n>0&&n<=72000?n:0;}
+export const EAT_PROJECTION_PROPERTY='kaleidoscope_grilling:eat_projection';
 export const EAT_PROFILE_PROPERTY='kaleidoscope_grilling:eat_profile';
 export const EAT_HAND_PROPERTY='kaleidoscope_grilling:eat_hand';
 export const PROFILE_CODES=Object.freeze({ONE:1,TWO:2,THREE:3,THREE_ALT:4,FOUR:5});

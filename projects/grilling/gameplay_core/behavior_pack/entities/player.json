@@ -25,6 +25,20 @@
           "default": 0,
           "client_sync": true
         },
+        "kaleidoscope_grilling:eat_projection": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:eat_native_ticks": {
+          "type": "int",
+          "range": [
+            0,
+            72000
+          ],
+          "default": 0,
+          "client_sync": true
+        },
         "kaleidoscope_grilling:secret_main_0": {
           "type": "int",
           "range": [

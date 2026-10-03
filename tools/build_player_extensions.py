@@ -15,6 +15,9 @@ def build():
  props=entity['description'].setdefault('properties',{})
  props[PREFIX+'eat_profile']={'type':'int','range':[0,5],'default':0,'client_sync':True}
  props[PREFIX+'eat_hand']={'type':'int','range':[0,2],'default':0,'client_sync':True}
+ if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,58):
+  props[PREFIX+'eat_projection']={'type':'bool','default':False,'client_sync':True}
+  props[PREFIX+'eat_native_ticks']={'type':'int','range':[0,72000],'default':0,'client_sync':True}
  for hand in ['main','off']:
   for slot in range(3):props[PREFIX+'secret_'+hand+'_'+str(slot)]={'type':'int','range':[0,255],'default':0,'client_sync':True}
  groups=entity.setdefault('component_groups',{});events=entity.setdefault('events',{})

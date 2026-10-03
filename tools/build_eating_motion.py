@@ -5,7 +5,7 @@ Bedrock arm animation and Java's detached second-piece rendering differ; this
 conversion does not certify the client presentation.
 """
 from pathlib import Path
-import json,math,re,argparse
+import json,math,re,argparse,sys
 ROOT=Path(__file__).resolve().parents[1];P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 FIX=ROOT/'development/gameplay_core/fixtures/java-eating-curves-1.1.1.json'
 ACTIVE_HAND="(q.is_using_item && ((c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_hand') == 1) || (c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_hand') == 2)))"
@@ -22,6 +22,9 @@ def curves(profile):
  return sk,prefix+'POSITION_TIMES',prefix+'POSITION_',prefix+'ROTATION_TIMES',prefix+'ROTATION_'
 def animation_id(profile,hand):return 'animation.kg_eating.item.'+profile.lower()+'.'+hand
 def build():
+ modern=tuple(json.loads((BP/'manifest.json').read_text())['header']['version']) >= (2,8,58)
+ sys.path.insert(0,str(ROOT/'development/gameplay_core'))
+ from native_eating_clock import SECONDS,VARIABLE,ASSIGNMENT
  animations={};profiles=['ONE','TWO','THREE','THREE_ALT','FOUR']
  for profile in profiles:
   a,pt,prefix,rt,rprefix=curves(profile);duration=5 if profile=='THREE' else 4.5
@@ -32,13 +35,14 @@ def build():
     # Source curve displacement, mirrored across the already bound hand rig.
     position[f'{t:.2f}']=[round(-pos[0]*sign,6),round(-pos[1],6),round(pos[2],6)]
     rotation[f'{t:.2f}']=[round(rot[0],6),round(-rot[1]*sign,6),round(rot[2]*sign,6)]
-   animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
+   animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':SECONDS if modern else 'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
  output={RP/'animations/eating_motion.animation.json':{'format_version':'1.8.0','animations':animations}}
  table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
  for p in (RP/'attachables').glob('*.json'):
   doc=json.loads(p.read_text());d=doc['minecraft:attachable']['description'];profile=table.get(d['identifier']);
   if d['identifier']=='kaleidoscope_grilling:secret_skewer':profile='THREE_RANDOM'
   if not profile or not d['identifier'].endswith('_skewer'):continue
+  d['scripts']['pre_animation']=[row.replace(VARIABLE,'q.item_in_use_duration') for row in d['scripts']['pre_animation'] if not row.startswith(VARIABLE+' =')]
   for hand in ['right','left']:
    alias='eat_'+hand;d['animations'][alias]=animation_id('THREE' if profile=='THREE_RANDOM' else profile,hand)
    if profile=='THREE_RANDOM':d['animations']['eat_alt_'+hand]=animation_id('THREE_ALT',hand)
@@ -55,12 +59,17 @@ def build():
    alt="q.item_in_use_duration >= 3.5 ? 3 : (q.item_in_use_duration >= 2.16667 ? 2 : ("+first+"))"
    d['scripts']['pre_animation']=["v.kg_bite_stage = q.is_using_item ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? ("+alt+") : ("+normal+")) : 0;"]
   d['scripts']['pre_animation']=[row.replace(ACTIVE_HAND,'q.is_using_item').replace('q.is_using_item',ACTIVE_HAND) for row in d['scripts']['pre_animation']]
+  if modern:d['scripts']['pre_animation']=[ASSIGNMENT]+[row.replace('q.item_in_use_duration',VARIABLE) for row in d['scripts']['pre_animation']]
   d['scripts']['animate']=animate;output[p]=doc
+ if tuple(json.loads((BP/'manifest.json').read_text())['header']['version']) >= (2,8,58):
+  sys.path.insert(0,str(ROOT/'tools'))
+  from build_java_eating_projection import augment
+  output=augment(output,table)
  return output
 def main():
  p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');args=p.parse_args()
  for path,value in build().items():
-  data=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
+  data=value if isinstance(value,str) else json.dumps(value,ensure_ascii=False,indent=2)+'\n'
   if args.check:assert path.read_text()==data,path
   else:path.write_text(data)
  print('Authored eating item motion: five profiles, both hands; client acceptance false')

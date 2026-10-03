@@ -33,7 +33,8 @@ class NativeBottleFrames(unittest.TestCase):
   self.assertEqual(count,266)
  def test_old_frame_reproduces_missing_contents(self):
   failures=[(name,hand,ref) for name,hand,ref,g in cases() if not visible(projected(g,OLD['animation.kg_a286.bottle_fp_'+hand],hand))]
-  self.assertEqual(len(failures),132)
+  self.assertEqual(sum(hand=='right' for _,hand,_ in failures),66)
+  self.assertEqual(sum(hand=='left' for _,hand,_ in failures),133) # actual native left frame, not mirrored right arm
  def test_only_bottle_first_person_tracks_change(self):
   changed={name for name in CURRENT if CURRENT[name]!=OLD[name]}
   self.assertEqual(changed,{'animation.kg_a286.bottle_fp_right','animation.kg_a286.bottle_fp_left'})

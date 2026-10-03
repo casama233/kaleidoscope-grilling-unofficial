@@ -1,6 +1,122 @@
 {
-  "format_version": "1.8.0",
+  "source_commit": "cdb2fdd74cb6ba3a98d124d4ca832b8647803607",
   "animations": {
+    "animation.kg_a287.skewer_fp_right": {
+      "loop": true,
+      "bones": {
+        "skewer_pose": {
+          "position": [
+            -6.25821391,
+            2.56142024,
+            -7.02453992
+          ],
+          "rotation": [
+            -156.2944355,
+            -50.39542335,
+            101.63707322
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.kg_a287.skewer_fp_left": {
+      "loop": true,
+      "bones": {
+        "skewer_pose": {
+          "position": [
+            5.81925653,
+            2.53750372,
+            -7.22645645
+          ],
+          "rotation": [
+            -152.09619686,
+            57.10156666,
+            -100.02134508
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.kg_a287.skewer_tp_right": {
+      "loop": true,
+      "bones": {
+        "skewer_pose": {
+          "position": [
+            -0.09294629,
+            -2.29903733,
+            -3.68784924
+          ],
+          "rotation": [
+            171.60178562,
+            -2.24451015,
+            174.78346239
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            -1,
+            6
+          ]
+        }
+      }
+    },
+    "animation.kg_a287.skewer_tp_left": {
+      "loop": true,
+      "bones": {
+        "skewer_pose": {
+          "position": [
+            0.09294629,
+            -2.29903733,
+            -3.68784924
+          ],
+          "rotation": [
+            171.60178562,
+            2.24451015,
+            -174.78346239
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "skewer_model": {
+          "position": [
+            0,
+            -1,
+            6
+          ]
+        }
+      }
+    },
     "animation.kg_a286.bottle_fp_right": {
       "loop": true,
       "bones": {
@@ -28,14 +144,14 @@
       "bones": {
         "grip": {
           "position": [
-            -15.039,
-            4.242,
-            11.6
+            4.08499736,
+            2.72205883,
+            -2.95619792
           ],
           "rotation": [
-            0.0,
-            -60.25,
-            -0.0
+            33.13015565,
+            29.248287,
+            150.87586693
           ],
           "scale": [
             0.72,
