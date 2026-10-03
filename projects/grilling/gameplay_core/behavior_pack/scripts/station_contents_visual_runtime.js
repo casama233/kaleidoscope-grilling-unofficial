@@ -1,3 +1,4 @@
+import {advancedRackToolVisuals} from './advanced_rack_visual_core.js';
 import {stationProjection,registerStationProjection} from './station_projection_core.js';
 import {readPublicFood} from './host_api/food_api_core.js';
 import {captureSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
@@ -51,7 +52,13 @@ export function syncStationContentsVisual(block,observers){
  const seen=new Set();
  if(block.typeId==='kaleidoscope_grilling:advanced_rack_block'){
   const c=peekStationContainer(block);
-  for(let i=0;i<9;i++){const k='rack/'+i;seen.add(k);const upper=i<5,dx=upper?(i-2)*.14:(i-6.5)*.18;render(row,block,k,c?.getItem(i),pose(block,dx,upper?.61:.35,upper?-.12:-.27),0);}
+  // Java's spice_level block mesh already supplies the upper containers.
+  // Four lower slots remain storage, but only three non-empty tools have hooks.
+  // Keep the current native equipped-item Y/Z/pose until FIXED projection is
+  // separately calibrated; the source hook selection/X spacing is independent.
+  for(const {slot,stack,x} of advancedRackToolVisuals(i=>c?.getItem(i))){
+   const k='rack/'+slot;seen.add(k);render(row,block,k,stack,pose(block,x,.35,-.27),0);
+  }
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);
   for(let i=0;i<5;i++){const stack=rows[i]?a25RestoreStack(rows[i]):undefined,k='plate/'+i,dx=(i-2)*.14;
