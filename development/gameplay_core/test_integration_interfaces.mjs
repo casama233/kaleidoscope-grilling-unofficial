@@ -6,7 +6,7 @@ import * as fortress from '../../projects/grilling/gameplay_core/behavior_pack/s
 import {stationProjection} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/station_projection_core.js';
 import {readPublicFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
 import {normalizeConfig,configValue} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/server_config_core.js';
-class Stack{constructor(id='minecraft:cooked_beef',amount=1){this.typeId=id;this.amount=amount;this.lore=[];this.extra={foreign:'preserve'};}getRawLore(){return structuredClone(this.lore)}setLore(lore){this.lore=structuredClone(lore)}getComponent(k){return k==='minecraft:food'?{}:undefined}clone(){const n=new Stack(this.typeId,this.amount);Object.assign(n,structuredClone(this));return n;}}
+class Stack{constructor(id='minecraft:cooked_beef',amount=1){this.typeId=id;this.amount=amount;this.lore=[];this.extra={foreign:'preserve'};}getRawLore(){return structuredClone(this.lore)}setLore(lore){this.lore=structuredClone(lore)}getComponent(k){return k==='minecraft:food'&&this.typeId==='test:data_driven'?{}:undefined}clone(){const n=new Stack(this.typeId,this.amount);Object.assign(n,structuredClone(this));return n;}}
 const runtime='projects/grilling/gameplay_core/behavior_pack/scripts/integration_api_runtime.js';
 function engine({saved=new Map(),fault}={}){
  registry.resetIntegrationRegistry();const props=new Map(saved),items=[new Stack()],responses=[],events={},blocks=new Map();let config=normalizeConfig(),now=1000;
@@ -31,6 +31,11 @@ test('producer SDK preserves actual stack and exact deadlines; furnace option de
  assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{kind:'smoker'},1000,{enableSmeltedFoodHeat:true,smeltedFoodSeconds:30})).state.hotUntil,1600);
  assert.equal(configValue('smeltedFoodSeconds',86400),86400);assert.throws(()=>configValue('smeltedFoodSeconds',86401));
  input.lore=Array(20).fill('User lore');assert.throws(()=>stackAPI.prepareProducedFood(input,{},1000),/space/);assert.equal(input.lore.length,20);
+});
+test('native vanilla foods without a scripting food component use pinned Mojang definitions; nonfoods still reject',()=>{
+ for(const id of ['minecraft:suspicious_stew','minecraft:cooked_beef','minecraft:bread']){const input=new Stack(id);assert.equal(input.getComponent('minecraft:food'),undefined);assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{hotTicks:600},1000)).state.hotUntil,1600);}
+ assert.equal(readPublicFood(stackAPI.prepareProducedFood(new Stack('test:data_driven'),{},1000)).valid,true);
+ assert.throws(()=>stackAPI.prepareProducedFood(new Stack('minecraft:stone'),{},1000),/not edible/);
 });
 test('public projection supports two variants of one item and explicit catalog aliases after registry restore',()=>{
  registry.resetIntegrationRegistry();registry.registerProjectionDescriptor({itemId:'minecraft:cooked_beef',provider:'test:model'});

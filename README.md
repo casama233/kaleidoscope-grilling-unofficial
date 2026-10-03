@@ -1,6 +1,6 @@
-## Current maintained baseline: 2.8.49
+## Current maintained baseline: 2.8.50
 
-本版補齊跨包出料、逐堆變體、展示註冊與權威新生成宿主接口，詳見 [A2.8.49](docs/STATUS-A2.8.49.md) 及 [API v1](docs/BEDROCK-INTEGRATION-API.md)。完整保留 2.8.48 聲畫及第三人稱進食修復。原版要塞 callback、任意新圖像及 Windows 真人驗收仍另有界線。
+本版補齊跨包出料、逐堆變體、展示註冊與權威新生成宿主接口，詳見 [A2.8.50](docs/STATUS-A2.8.50.md) 及 [API v1](docs/BEDROCK-INTEGRATION-API.md)。完整保留 2.8.48 聲畫及第三人稱進食修復。原版要塞 callback、任意新圖像及 Windows 真人驗收仍另有界線。
 
 前版統一煙火物品及工作站提示中的藍色斜體系列標籤；三語品名、指南分類與 2.8.45 的修復保留。詳見 [A2.8.46 物品標籤](docs/STATUS-A2.8.46.md)，真人提示顯示仍待確認。
 本版修復食用完成時的熱度判定、服務端與模型共享的隨機吃法、可反覆治療的原生龍血生命上限，以及秘製串三食材手持顯示。包含 2.8.42 角色效果快取與 canonical 2.8.43 第一人稱框架修復。詳見 [當前修復與驗收矩陣](docs/CURRENT-REPAIR-STATUS.md) 與 [A2.8.45](docs/STATUS-A2.8.45.md)；真人驗收、秘製動態 GUI 及部分 Java 平台能力仍有缺口。

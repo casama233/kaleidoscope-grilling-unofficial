@@ -1,5 +1,6 @@
 /** Public, portable metadata. Producers call this on the actual output before handing it over. */
 import {normalizePublicFood,readPublicFood,writePublicFood} from './host_api/food_api_core.js';
+import {VANILLA_FOOD_NUTRITION} from './vanilla_food_nutrition.js';
 export const PROJECTION_KEY='senluo.public.projection.v1';
 export const ITEM_ID=/^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
 export function utf8Bytes(text){let size=0;for(const char of text){const point=char.codePointAt(0);size+=point<128?1:point<2048?2:point<65536?3:4;}return size;}
@@ -33,7 +34,7 @@ export function writePublicProjection(stack,raw){
 }
 export function prepareProducedFood(stack,{kind='cuisine',hotTicks=0,seasoning=[],nativeVariant,projection}={},now,config={}){
  if(!Number.isSafeInteger(now)||now<0||!['cuisine','furnace','smoker'].includes(kind)||!Number.isInteger(hotTicks)||hotTicks<0||hotTicks>1728000)throw Error('production schema');
- if(!stack?.getComponent('minecraft:food'))throw Error('output is not edible');
+ if(!stack?.getComponent('minecraft:food')&&!VANILLA_FOOD_NUTRITION[stack?.typeId])throw Error('output is not edible');
  const old=readPublicFood(stack);if(old.present&&!old.valid)throw Error('food metadata unreadable');
  const duration=kind==='cuisine'?hotTicks:config.enableSmeltedFoodHeat===true?(config.smeltedFoodSeconds??30)*20:0;
  const meta=normalizePublicFood({v:1,hotUntil:duration?now+duration:old.state?.hotUntil??0,seasoning,nativeVariant:nativeVariant??old.state?.nativeVariant});
