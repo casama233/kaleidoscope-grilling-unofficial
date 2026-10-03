@@ -51,6 +51,10 @@ def main():
             historical=json.loads(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
             historical['minecraft:'+kind]['components']['minecraft:display_name']=old
             assert historical == before, 'Historical label-only item behaviour changed: '+str(path)
+            if kind=='item' and path.stem=='secret_skewer':
+                duration=after['minecraft:item']['components']['minecraft:use_modifiers']
+                assert duration['use_duration']==5.0, 'Canonical THREE secret duration drift'
+                duration['use_duration']=before['minecraft:item']['components']['minecraft:use_modifiers']['use_duration']
             if kind=='item':
                 tags=after['minecraft:item']['components'].get('minecraft:tags',{}).get('tags',[])
                 tag='kaleidoscope_grilling:food_'+path.stem

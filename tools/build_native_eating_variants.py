@@ -12,6 +12,7 @@ def build():
  outputs={}
  for id in sorted(ids):
   name=id.split(':')[1];src=BP/'items'/f'{name}.json';doc=json.loads(src.read_text());item=doc['minecraft:item'];tag='kaleidoscope_grilling:food_'+name
+  item['components']['minecraft:use_modifiers']['use_duration']=5.0
   tags=item['components'].setdefault('minecraft:tags',{'tags':[]})['tags']
   if tag not in tags:tags.append(tag)
   outputs[src]=doc
