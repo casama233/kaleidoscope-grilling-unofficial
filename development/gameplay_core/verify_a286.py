@@ -73,7 +73,7 @@ def render_assets():
   for path in paths:
    im=Image.open(RP/(path+'.png'));assert im.width==im.height,(key,im.size)
  expected_count=107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
- assert len(list((RP/'attachables').glob('*.json')))==expected_count
+ assert len([p for p in (RP/'attachables').glob('*.json') if not p.stem.endswith('_java_three_alt.attachable')])==expected_count
  assert not (RP/'attachables/big_vat.attachable.json').exists()
  for name in ('grill','oil_press'):
   g=load(RP/f'models/blocks/a283_item_{name}.geo.json')['minecraft:geometry'][0]

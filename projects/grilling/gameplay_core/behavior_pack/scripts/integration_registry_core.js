@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {ITEM_ID} from './integration_stack_core.js';
 import {SECRET_VISUAL_SLOTS} from './secret_visual_catalog.js';
 const registry={producers:new Map(),projections:new Map(),held:new Map()};
@@ -19,7 +20,7 @@ export function registerHeldVisual(raw){
  if(!ITEM_ID.test(raw?.itemId??'')||!SECRET_VISUAL_SLOTS[raw.referenceItemId])throw Error('held visual requires a catalog reference; new textures require a resource release');
  return install(registry.held,raw.itemId,{itemId:raw.itemId,referenceItemId:raw.referenceItemId},128);
 }
-export const secretVisualIndex=id=>SECRET_VISUAL_SLOTS[registry.held.get(id)?.referenceItemId??id]??0;
+export const secretVisualIndex=id=>SECRET_VISUAL_SLOTS[registry.held.get(id)?.referenceItemId??canonicalFoodId(id)]??0;
 export function integrationRegistrySnapshot(){return Object.fromEntries(Object.entries(registry).map(([k,m])=>[k,[...m.values()]]));}
 export function restoreIntegrationRegistry(raw){
  resetIntegrationRegistry();try{

@@ -57,11 +57,11 @@ export function appendOutcome(rows,next,edible=false,explicitAllow=false){
  if(values.length>=3)return {ok:true,kind:'secret',id:SECRET_ID,ingredients:values};
  return {ok:true,kind:'unfinished',id:UNFINISHED_ID,ingredients:values};
 }
-export function cookedResultFor(id){return RECIPES.find(r=>r.id===id)?.cooked??null}
+export function cookedResultFor(id){return RECIPES.find(r=>r.id===canonicalFoodId(id))?.cooked??null}
 export function isFixedRaw(id){return RECIPES.some(r=>r.id===canonicalFoodId(id)&&r.cooked)}
 export function isDisassemblableRaw(id,cooked=false){return id===UNFINISHED_ID||isFixedRaw(id)||(canonicalFoodId(id)===SECRET_ID&&!cooked)}
 export function canonicalIngredients(id){
- const r=RECIPES.find(x=>x.id===id);return r?r.slots.map(slot=>slot[0]):[];
+ const r=RECIPES.find(x=>x.id===canonicalFoodId(id));return r?r.slots.map(slot=>slot[0]):[];
 }
 
 export function secretFood(rows,cooked=false,originalRows=rows){

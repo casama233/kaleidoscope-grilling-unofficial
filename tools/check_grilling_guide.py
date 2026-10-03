@@ -22,6 +22,12 @@ def check_facts(s):
     covered=0
     for path in (GAME/'items').glob('*.json'):
         item=load(path)['minecraft:item'];iid=item['description']['identifier']
+        if iid.endswith('_java_three_alt'):
+            base=iid.removesuffix('_java_three_alt')
+            require(base in owner and 'menu_category' not in item['description'],'Internal eating variant leaked '+iid)
+            original=load(GAME/'items'/(base.split(':')[-1]+'.json'))['minecraft:item']
+            require(item['components']['minecraft:food']==original['components']['minecraft:food'],'Variant food fact drift '+iid)
+            continue
         if iid in s['excluded_items']:
             require(iid.endswith('_oil_brush') and item['description']['menu_category']['category']=='none','Unexpected hidden item '+iid)
             continue
