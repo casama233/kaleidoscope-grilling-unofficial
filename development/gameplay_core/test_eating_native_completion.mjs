@@ -22,10 +22,10 @@ class Stack{
  getDynamicPropertyIds(){return Object.keys(this.props)}
  getDynamicProperty(key){return this.props[key]}
 }
-function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100,mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id,helperEmpty=false}={}){
+function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100,mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id,helperEmpty=false,amount=2}={}){
  const callbacks={},queue=[],effects=[],properties=new Map(),nutrition={hunger:10,saturation:2};
  const counts={nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0};
- const state={stack:new Stack(),other:new Stack(1),creative};state.stack.typeId=mealId;
+ const state={stack:new Stack(amount),other:new Stack(1),creative};state.stack.typeId=mealId;
  state.other.typeId='minecraft:torch';state.other.nameTag='Keep opposite equipment';state.other.props={foreign:'unchanged'};
  const hunger={effectiveMax:20,get currentValue(){return nutrition.hunger},setCurrentValue(n){nutrition.hunger=n}};
  const saturation={get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
@@ -42,7 +42,7 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
  // Bind the actual production selector, including the captured native duration.
  const selectorBegin=source.indexOf('function resolvedProfile('),selectorEnd=source.indexOf('function writeUseHand(',selectorBegin);
  vm.runInNewContext(source.slice(selectorBegin,selectorEnd),ctx);
- const constants=source.match(/const MINIMUM_EAT_TICKS=\d+,RELEASE_CHECKPOINT_GRACE_TICKS=\d+;/)[0]+'\n'+source.match(/const BITE_TIMES=Object.freeze\(\{[\s\S]*?\}\);/)[0];
+ const constants=source.match(/const BITE_TIMES=Object.freeze\(\{[\s\S]*?\}\);/)[0];
  vm.runInNewContext(constants+'\n'+source.slice(settleBegin,settleEnd)+'\n'+source.slice(begin,end),ctx);
  let event;
  function startUse(){event={source:player,itemStack:state.stack.clone(),useDuration:duration};callbacks.itemStartUse(event);return ctx.ACTIVE_EATS.get(player.id);}
@@ -103,10 +103,10 @@ test('old stop callback and terminal event cannot remove next-tick auto-repeat',
  assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
  assert.equal(f.properties.get(presentation.EAT_NATIVE_TICKS_PROPERTY),90);
 });
-for(const delta of [23,24,25])test(`real hungerSettle production body retains release${delta} eligibility`,()=>{
+for(const delta of [23,24,25,35,89])test(`production nonterminal release${delta} preserves the serving`,()=>{
  const f=fixture();f.startUse();f.stop({tick:100+delta,remaining:90-delta});f.flush();
- assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:delta>=24?1:0,nativeRewards:0,manualRewards:delta>=24?1:0});
- assert.equal(f.state.stack.amount,delta>=24?1:2);assert.equal(f.nutrition.hunger,delta>=24?15:10);
+ assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0});
+ assert.equal(f.state.stack.amount,2);assert.equal(f.nutrition.hunger,10);
  f.complete({tick:190});assert.equal(f.counts.nativeRewards,0);
 });
 
@@ -149,13 +149,12 @@ test('production presentation publishes elapsed ticks then masks a changed item 
  }
 });
 
-for(const hand of ['main','off'])test(`release settlement preserves metadata and opposite equipment for ${hand} hand`,()=>{
+for(const hand of ['main','off'])test(`cancel preserves metadata and opposite equipment for ${hand} hand`,()=>{
  const f=fixture({hand}),before=f.state.stack.clone(),other=f.state.other.clone();f.startUse();
  assert.equal(f.properties.get(presentation.EAT_HAND_PROPERTY),hand==='off'?2:1);
  f.stop({tick:124,remaining:66});f.stop({tick:124,remaining:66});f.flush();
- assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:1,nativeRewards:0,manualRewards:1});
- assert.equal(f.state.stack.amount,before.amount-1);
- before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
+ assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0});
+ assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
 });
 
 test('measured 14-tick automatic repeat cannot settle a second serving or clear a new session',()=>{
@@ -179,4 +178,31 @@ for(const hand of ['main','off'])for(const [mealId,profile,duration] of [['kalei
   assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
   before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
  }
+});
+
+for(const row of [
+ {mealId:'kaleidoscope_grilling:grilled_fish_skewer',profile:'ONE',duration:90,amount:1,start:390947,stop:390982,remaining:55,flush:390984},
+ {mealId:'kaleidoscope_grilling:grilled_ender_pearl_skewer',profile:'THREE',duration:100,amount:2,start:393804,stop:393840,remaining:64,flush:393842}
+])test(`root native cancellation ${row.profile} duration${row.duration} remaining${row.remaining} retains qty${row.amount}`,()=>{
+ const f=fixture({...row,helperEmpty:true}),before=f.state.stack.clone();
+ f.startUse();f.stop({tick:row.stop,remaining:row.remaining});
+ assert.deepEqual(f.state.stack,before,'Native stop has not consumed the serving');
+ f.flush(row.flush);
+ assert.deepEqual(f.state.stack,before,'Deferred stop must preserve the serving and all metadata');
+ assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0});
+ assert.deepEqual(f.nutrition,{hunger:10,saturation:2});assert.equal(f.ctx.SETTLED.size,0);
+ assert.equal(f.ctx.ACTIVE_EATS.size,0);assert.equal(f.properties.get(presentation.EAT_PROJECTION_PROPERTY),false);
+ for(const key of [presentation.EAT_PROFILE_PROPERTY,presentation.EAT_HAND_PROPERTY,presentation.EAT_NATIVE_TICKS_PROPERTY,presentation.EAT_ELAPSED_TICKS_PROPERTY])assert.equal(f.properties.get(key),0);
+});
+
+for(const duration of [90,100])for(const hand of ['main','off'])for(const creative of [false,true])test(`terminal stop fallback ${duration} ${hand} Creative=${creative} commits once`,()=>{
+ const f=fixture({duration,hand,creative}),before=f.state.stack.clone(),other=f.state.other.clone();f.startUse();
+ f.stop({tick:100+duration-1,remaining:0});f.stop({tick:100+duration-1,remaining:0});f.flush();
+ assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:creative?0:1,nativeRewards:0,manualRewards:1});
+ if(!creative)before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
+ f.complete({tick:100+duration});assert.equal(f.counts.nativeRewards,0);
+});
+for(const remaining of [0,1,-1,undefined,NaN,'0'])test(`early stop at delta35 cannot settle with remaining ${String(remaining)}`,()=>{
+ const f=fixture(),before=f.state.stack.clone();f.startUse();f.stop({tick:135,remaining});f.flush(500);
+ assert.deepEqual(f.state.stack,before);assert.equal(f.counts.manualWrites,0);assert.equal(f.counts.manualRewards,0);
 });
