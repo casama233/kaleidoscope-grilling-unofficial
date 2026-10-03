@@ -22,8 +22,7 @@ class Stack{
  getDynamicPropertyIds(){return Object.keys(this.props)}
  getDynamicProperty(key){return this.props[key]}
 }
-function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100}={}){
- const mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id;
+function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100,mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id,helperEmpty=false}={}){
  const callbacks={},queue=[],effects=[],properties=new Map(),nutrition={hunger:10,saturation:2};
  const counts={nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0};
  const state={stack:new Stack(),other:new Stack(1),creative};state.stack.typeId=mealId;
@@ -32,9 +31,11 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
  const saturation={get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
  const bag={setItem(_slot,stack){counts.manualWrites++;state.stack=stack?.clone()}};
  const equipment={setEquipment(_slot,stack){counts.manualWrites++;state.stack=stack?.clone();return true}};
- const player={id:'native-holder',selectedSlotIndex:3,setProperty:(key,value)=>properties.set(key,value),playAnimation(){},playSound(){return 1},addEffect:(...args)=>effects.push(args),getComponent:type=>type.endsWith('hunger')?hunger:type.endsWith('saturation')?saturation:type.endsWith('equippable')?equipment:undefined};
+ if(helperEmpty)state.other=undefined;
+ const animations=[];
+ const player={id:'native-holder',selectedSlotIndex:3,setProperty:(key,value)=>properties.set(key,value),playAnimation:(...args)=>animations.push(args),playSound(){return 1},addEffect:(...args)=>effects.push(args),getComponent:type=>type.endsWith('hunger')?hunger:type.endsWith('saturation')?saturation:type.endsWith('equippable')?equipment:undefined};
  const ctx={...presentation,world:{afterEvents:Object.fromEntries(['itemStartUse','itemCompleteUse','itemStopUse'].map(name=>[name,{subscribe:fn=>callbacks[name]=fn}]))},system:{currentTick:start,run:fn=>queue.push(fn)},ACTIVE_EATS:new Map(),SETTLED:new Map(),PLATE_EATS:new Map(),PENDING_USES:new Map(),CUISINE_EATS:new Map(),CUISINE_FOOD_SET:new Set(),FOOD_DATA:{[mealId]:FOOD_DATA[mealId]},PROFILE_BY_ITEM:{[mealId]:PROFILE_BY_ITEM[mealId]},JAVA_FP_EATING_ITEMS:[mealId],PENDING_SEASONING:'pending',PLATE_ID:'plate',SECRET_ID:'secret',MYSTERIOUS_ID:'mystery',DARK_ID:'dark',RAW_NAUSEA:{},captureEatingIdentity,eatingEventMatches,eatingStillCurrent,commitEating,finishedFoodMeta,
-  EquipmentSlot:{Offhand:'off'},now:()=>ctx.system.currentTick,captureInteractionIntent:()=>({hand}),syncSecretHeld(){},resolvedProfile:presentation.eatingProfile.bind(null),stackMeta:()=>({hot:false,seasonings:['salt'],hotUntil:0}),heldByHand:(_player,selectedHand)=>selectedHand===hand?state.stack?.clone():state.other.clone(),copyOne:stack=>{const one=stack.clone();one.amount=1;return one},mainContainer:()=>bag,creative:()=>state.creative,grillingConfig:()=>({saturationMultiplier:1}),advanceBites(){},dangerousPreservation(){},stopSoundHandle(){},stopEatSound(){},soundFor:()=>'',secretRemainders(){},afterCommitted(_player,_id,_meta,_active,fullNative){counts[fullNative?'nativeRewards':'manualRewards']++}};
+  EquipmentSlot:{Offhand:'off'},now:()=>ctx.system.currentTick,captureInteractionIntent:()=>({hand}),syncSecretHeld(){},resolvedProfile:presentation.eatingProfile.bind(null),stackMeta:()=>({hot:false,seasonings:['salt'],hotUntil:0}),heldByHand:(_player,selectedHand)=>selectedHand===hand?state.stack?.clone():state.other?.clone(),copyOne:stack=>{const one=stack.clone();one.amount=1;return one},mainContainer:()=>bag,creative:()=>state.creative,grillingConfig:()=>({saturationMultiplier:1}),advanceBites(){},dangerousPreservation(){},stopSoundHandle(){},stopEatSound(){},soundFor:()=>'',secretRemainders(){},afterCommitted(_player,_id,_meta,_active,fullNative){counts[fullNative?'nativeRewards':'manualRewards']++}};
  // Production resolvedProfile returns a string, while the imported selector
  // returns its validated descriptor. Keep the real selector and source shape.
  if(requested)ctx.PROFILE_BY_ITEM[mealId]=requested;
@@ -58,7 +59,7 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
   assert.ok(tickBegin>=0&&tickEnd>tickBegin);
   vm.runInNewContext('(()=>{const p=tickPlayer;'+source.slice(tickBegin,tickEnd)+'})();',ctx);
  }
- return {ctx,state,counts,properties,nutrition,player,startUse,complete,stop,flush,tickPresentation,get event(){return event}};
+ return {ctx,state,counts,properties,nutrition,animations,player,startUse,complete,stop,flush,tickPresentation,get event(){return event}};
 }
 
 test('inclusive native boundary requires terminal zero and valid nonnegative ticks',()=>{
@@ -165,4 +166,17 @@ test('measured 14-tick automatic repeat cannot settle a second serving or clear 
  assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
  assert.equal(f.state.stack.amount,1);
  assert.equal(f.ctx.ACTIVE_EATS.size,0);
+});
+
+for(const hand of ['main','off'])for(const [mealId,profile,duration] of [['kaleidoscope_grilling:grilled_fish_skewer','ONE',90],['kaleidoscope_grilling:grilled_ender_pearl_skewer','THREE',100]])test(`representative dual ${profile} ${hand} admits empty helper and preserves occupied helper`,()=>{
+ for(const helperEmpty of [false,true]){
+  const f=fixture({mealId,profile,duration,hand,helperEmpty}),before=f.state.stack.clone(),other=f.state.other?.clone();
+  f.startUse();
+  assert.equal(f.properties.get(presentation.EAT_PROJECTION_PROPERTY),helperEmpty);
+  assert.equal(f.animations.some(([name])=>name===`animation.kg_java_eating.player.${profile.toLowerCase()}.${hand==='off'?'left':'right'}`),helperEmpty);
+  assert.equal(f.counts.manualWrites,0);assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
+  f.complete({nativeDebit:true});f.stop();f.flush();
+  assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
+  before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
+ }
 });

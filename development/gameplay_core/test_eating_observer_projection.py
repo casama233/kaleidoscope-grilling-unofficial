@@ -68,11 +68,11 @@ for(const rows of scripts){
         node('''
 const expressions='''+json.dumps(expressions)+''',items='''+json.dumps(generator.projection_items())+''';
 for(const [profile,names] of Object.entries(items))for(const hand of ['right','left']){
- const code={TWO:2,THREE_ALT:4,FOUR:5}[profile],handCode=hand==='right'?1:2;
+ const code={ONE:1,TWO:2,THREE:3,THREE_ALT:4,FOUR:5}[profile],handCode=hand==='right'?1:2;
  const expression=expressions['animation.kg_java_eating.player.'+profile.toLowerCase()+'.'+hand];
  let held=names[0];
  const q={is_using_item:true,is_sneaking:0,is_swimming:0,is_gliding:0,is_riding:0,
- property:name=>({eat_projection:1,eat_profile:code,eat_hand:handCode})[name.split(':')[1]],
+ property:name=>({eat_projection:1,eat_profile:code,eat_hand:handCode})[name.split(':')[1]],is_item_equipped:()=>0,
  is_item_name_any:(slot,...ids)=>slot===(hand==='right'?'slot.weapon.mainhand':'slot.weapon.offhand')&&ids.includes(held)};
  const variable={is_first_person:true},evaluate=()=>Boolean(new Function('q','variable','return '+expression)(q,variable));
  if(!evaluate())throw Error('Valid selected profile masked');

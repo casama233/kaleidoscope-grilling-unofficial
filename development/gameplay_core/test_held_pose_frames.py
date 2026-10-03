@@ -41,6 +41,16 @@ class HeldPoseFrameTests(unittest.TestCase):
                 for bone in bones.values():combined=chain(combined,bone_matrix(bone))
                 combined=chain(combined,translate([0,-24,0]))
                 for ref in set(desc['geometry'].values()):
+                    if ref.startswith('geometry.kg_java_dual.piece.'):
+                        # The second RC hides food pieces while idle. Their use
+                        # frame, helper socket and visibility are checked by the
+                        # dedicated dual renderer suite, not the idle display.
+                        self.assertEqual(ref,desc['geometry']['java_piece'])
+                        self.assertEqual(ref,'geometry.kg_java_dual.piece.'+desc['identifier'].split(':')[1])
+                        self.assertIn('controller.render.kg_java_eating.piece',desc['render_controllers'])
+                        self.assertTrue(desc['scripts']['pre_animation'][-1].startswith('v.kg_java_piece_visible = '))
+                        self.assertIn('q.is_using_item',desc['scripts']['pre_animation'][-1])
+                        continue
                     positions=[]
                     for bone in index[ref]['bones']:
                         for cube in bone.get('cubes',[]):

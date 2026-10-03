@@ -98,10 +98,14 @@ def mismatch_details(expected, actual, limit=20):
 def main():
  p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');args=p.parse_args()
  for path,value in build().items():
+  if isinstance(value,bytes):
+   if args.check:assert path.read_bytes()==value,path
+   else:path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(value)
+   continue
   data=value if isinstance(value,str) else json.dumps(value,ensure_ascii=False,indent=2)+'\n'
   if args.check:
    existing=path.read_text()
    assert existing==data,f'{path}\n{mismatch_details(existing,data)}'
-  else:path.write_text(data)
+  else:path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data.encode('utf-8'))
  print('Authored eating item motion: five profiles, both hands; client acceptance false')
 if __name__=='__main__':main()

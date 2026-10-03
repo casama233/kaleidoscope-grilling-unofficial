@@ -1,22 +1,25 @@
 """Source-derived standing first-person branch; native clips are a separate gate.
 
-TWO/THREE_ALT/FOUR only. The helper-arm ONE/THREE branch and non-standing
-views keep their existing path until separately implemented and accepted.
+TWO/THREE_ALT/FOUR and two fixed ONE/THREE representatives. Native pixels,
+non-standing views and helper hands holding other items remain separate gates.
 """
 from pathlib import Path
 import json
 import re
 import sys
+from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'development/gameplay_core'))
 from java_active_eating_frames import (PROFILES,ARRAYS,active_child_bone,
     native_arm_target)
 from held_pose_frames import bedrock_rotation,point
 from native_eating_clock import SECONDS
+import build_java_dual_eating_projection as dual_renderer
 
 P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 PROPERTY='kaleidoscope_grilling:eat_projection'
-CODES={'TWO':2,'THREE_ALT':4,'FOUR':5}
+CODES={'ONE':1,'TWO':2,'THREE':3,'THREE_ALT':4,'FOUR':5}
+ALL_PROFILES=PROFILES+('ONE','THREE')
 # Eye height/camera calibration is deliberately bounded to upright normal use.
 CONTEXT=("q.is_using_item && q.property('"+PROPERTY+"') == 1 && "
          "q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0")
@@ -53,13 +56,16 @@ def player_animation_id(profile,hand):return 'animation.kg_java_eating.player.'+
 
 def projection_items():
     table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
-    items={profile:[] for profile in PROFILES}
+    items={profile:[] for profile in ALL_PROFILES}
     for path in sorted((RP/'attachables').glob('*.json')):
         d=json.loads(path.read_text())['minecraft:attachable']['description']
         profile=table.get(d['identifier'])
         if profile=='THREE_RANDOM':profile='THREE_ALT'
-        if profile in PROFILES and all(ref.startswith('geometry.kg_a287.kg_a22.') for ref in d['geometry'].values()):
+        # Existing generated piece aliases are not a new main-mesh admission.
+        if profile in PROFILES and all(ref.startswith('geometry.kg_a287.kg_a22.') for key,ref in d['geometry'].items() if key!='java_piece'):
             items[profile].append(d['identifier'])
+        elif d['identifier'] in dual_renderer.REPRESENTATIVES and all(ref.startswith('geometry.kg_a287.kg_a22.') for key,ref in d['geometry'].items() if key!='java_piece'):
+            items[dual_renderer.REPRESENTATIVES[d['identifier']]].append(d['identifier'])
     return items
 
 def held_profile_condition(profile,hand,items=None):
@@ -69,14 +75,15 @@ def held_profile_condition(profile,hand,items=None):
     names=','.join("'"+ident+"'" for ident in items[profile])
     slot='slot.weapon.mainhand' if hand=='right' else 'slot.weapon.offhand'
     code=1 if hand=='right' else 2
-    return ("q.property('kaleidoscope_grilling:eat_profile') == "+str(CODES[profile])+
+    condition=("q.property('kaleidoscope_grilling:eat_profile') == "+str(CODES[profile])+
             " && q.property('kaleidoscope_grilling:eat_hand') == "+str(code)+
             " && q.is_item_name_any('"+slot+"',"+names+")")
+    return condition+(' && '+dual_renderer.empty_helper(hand) if profile in ('ONE','THREE') else '')
 
 def projection_condition(items=None):
     items=projection_items() if items is None else items
     branches=['('+held_profile_condition(profile,hand,items)+')'
-              for profile in PROFILES for hand in ('right','left')]
+              for profile in ALL_PROFILES for hand in ('right','left')]
     return CONTEXT+' && ('+' || '.join(branches)+')'
 
 def animations():
@@ -118,6 +125,8 @@ def animations():
                     socket:{'position':socket_positions,
                             'rotation':[0,0,0]},
                     other:{'scale':0}}}
+    dual_items,dual_players=dual_renderer.animations(SimpleNamespace(**globals()),items)
+    item_animations.update(dual_items);player_animations.update(dual_players)
     return item_animations,player_animations
 
 def augment(output,profile_table):
@@ -128,14 +137,18 @@ def augment(output,profile_table):
     for path,doc in list(output.items()):
         if path.parent!=RP/'attachables':continue
         d=doc['minecraft:attachable']['description'];configured=profile_table.get(d['identifier'])
-        profile='THREE_ALT'if configured=='THREE_RANDOM'else configured
-        if profile not in PROFILES:continue
-        if not all(ref.startswith('geometry.kg_a287.kg_a22.')for ref in d['geometry'].values()):continue
+        profile=dual_renderer.REPRESENTATIVES.get(d['identifier'],'THREE_ALT'if configured=='THREE_RANDOM'else configured)
+        if profile not in ALL_PROFILES:continue
+        if profile in ('ONE','THREE') and d['identifier'] not in dual_renderer.REPRESENTATIVES:continue
+        if not all(ref.startswith('geometry.kg_a287.kg_a22.')for key,ref in d['geometry'].items() if key!='java_piece'):continue
         ids.append(d['identifier'])
         d['scripts']['animate']=[row for row in d['scripts']['animate']if not any(k.startswith('fp_eat_')for k in row)]
+        conditions=[]
         for hand,slot,code in [('right','main_hand',1),('left','off_hand',2)]:
             active=("c.is_first_person == 1 && "+CONTEXT+" && q.property('kaleidoscope_grilling:eat_profile') == "+str(CODES[profile])+
                     " && q.property('kaleidoscope_grilling:eat_hand') == "+str(code)+" && c.item_slot == '"+slot+"'")
+            if profile in ('ONE','THREE'):active+=' && '+held_profile_condition(profile,hand)
+            conditions.append(active)
             for row in d['scripts']['animate']:
                 if 'fp_'+hand in row:
                     row['fp_'+hand]="c.is_first_person == 1 && c.item_slot == '"+slot+"' && ("+active+") == 0"
@@ -143,6 +156,12 @@ def augment(output,profile_table):
                     if key in row:row[key]='('+row[key]+') && ('+active+') == 0'
             alias='fp_eat_'+hand;d['animations'][alias]=item_animation_id(profile,hand)
             d['scripts']['animate'].append({alias:active})
+        if profile in ('ONE','THREE'):
+            # Rebuilding an already generated document is idempotent.
+            d['render_controllers']=[ref for ref in d['render_controllers'] if ref!=dual_renderer.PIECE_CONTROLLER]
+            d['scripts']['pre_animation']=[row for row in d['scripts']['pre_animation'] if not row.startswith('v.kg_java_piece_visible = ')]
+            dual_renderer.attach_piece(output,SimpleNamespace(**globals()),d,profile,conditions)
+    output[RP/'render_controllers/java_eating_piece.render_controllers.json']=dual_renderer.controller()
     native=json.loads((ROOT/'development/gameplay_core/fixtures/native-first-person-controller-1.26.50.4.json').read_text())['controller']
     controller=json.loads(json.dumps(native))
     owned="q.has_property('"+PROPERTY+"') && "+projection_condition()
@@ -150,7 +169,7 @@ def augment(output,profile_table):
         for bone,expression in list(row.items()):
             if bone in ('rightArm','rightSleeve','leftArm','leftSleeve'):
                 hand=1 if bone.startswith('right')else 2
-                row[bone]='('+owned+") ? (q.property('kaleidoscope_grilling:eat_hand') == "+str(hand)+') : ('+expression+')'
+                row[bone]='('+owned+") ? (q.property('kaleidoscope_grilling:eat_profile') == 1 || q.property('kaleidoscope_grilling:eat_profile') == 3 || q.property('kaleidoscope_grilling:eat_hand') == "+str(hand)+') : ('+expression+')'
     output[RP/'render_controllers/java_eating_player.render_controllers.json']={'format_version':'1.8.0','render_controllers':{'controller.render.player.first_person':controller}}
     # Data-only eligibility: missing/failed/secret geometries never enable a
     # different player arm while their item remains on a legacy transform.

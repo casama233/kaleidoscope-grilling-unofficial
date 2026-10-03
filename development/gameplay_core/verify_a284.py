@@ -16,7 +16,9 @@ def eating_gate():
             assert "playAnimation('animation.kg_java_eating.player.'" in food_start
             assert 'JAVA_FP_EATING_ITEMS.includes(id)' in food_start
             projected = json.loads((RP / 'animations/java_eating_player.animation.json').read_text())['animations']
-            assert len(projected) == 6
+            dual=(RP/'render_controllers/java_eating_piece.render_controllers.json').exists()
+            profiles=('TWO','THREE_ALT','FOUR','ONE','THREE') if dual else ('TWO','THREE_ALT','FOUR')
+            assert set(projected)=={'animation.kg_java_eating.player.'+profile.lower()+'.'+hand for profile in profiles for hand in ('right','left')}
             for name, pose in projected.items():
                 hand = name.rsplit('.', 1)[1]
                 other = 'left' if hand == 'right' else 'right'
@@ -24,8 +26,13 @@ def eating_gate():
                 assert 'this' not in json.dumps(pose['bones'])
                 assert pose['blend_weight'].startswith('variable.is_first_person && ')
                 assert "q.property('kaleidoscope_grilling:eat_projection') == 1" in pose['blend_weight']
-                assert set(pose['bones']) == {hand+'arm', hand+'item', other+'item'}
-                assert pose['bones'][other+'item'] == {'scale': 0}
+                if name.split('.')[-2] in ('one','three'):
+                    assert set(pose['bones'])=={'rightarm','leftarm','rightitem','leftitem'}
+                    assert "q.is_item_equipped('"+('off_hand' if hand=='right' else 'main_hand')+"') == 0" in pose['blend_weight']
+                    for socket in ('rightitem','leftitem'):assert pose['bones'][socket]['scale']==[1,1,1] and pose['bones'][socket]['rotation']==[0,0,0]
+                else:
+                    assert set(pose['bones']) == {hand+'arm', hand+'item', other+'item'}
+                    assert pose['bones'][other+'item'] == {'scale': 0}
         else:
             assert food_start.count('playAnimation') == 1
         assert "playAnimation('animation.kg_eating.player.native_'" in food_start

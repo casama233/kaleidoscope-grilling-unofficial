@@ -104,3 +104,19 @@ def child_bone(profile, seconds, active_side=1, piece=False, slim=False):
     size = authored_pose(profile, seconds)[3][2] if piece else 1
     return {'position': [-location[0], location[1], location[2]],
             'rotation': bedrock_rotation(matrix), 'scale': [size]*3}
+
+def helper_socket_matrix(profile, seconds, active_side=1, slim=False, include_scale=True):
+    """Piece child of the helper's own normalized socket; no second ItemStack."""
+    side = -active_side
+    return chain(translate([-side, 7, 0]), REFLECT,
+                 rigid_inverse(java_arm(profile, seconds, side, False)),
+                 java_arm(profile, seconds, side, False, slim),
+                 java_item_child(profile, seconds, side, False, include_scale),
+                 translate([0, -8, 0]))
+
+def helper_socket_bone(profile, seconds, active_side=1, slim=False):
+    matrix = helper_socket_matrix(profile, seconds, active_side, slim, False)
+    location = point(helper_socket_matrix(profile, seconds, active_side, slim), [0, 0, 0])
+    size = authored_pose(profile, seconds)[3][2]
+    return {'position': [-location[0], location[1], location[2]],
+            'rotation': bedrock_rotation(matrix), 'scale': [size]*3}

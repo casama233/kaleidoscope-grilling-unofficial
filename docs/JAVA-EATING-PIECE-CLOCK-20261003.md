@@ -2,6 +2,8 @@
 
 This is an unfrozen source candidate for integration. BDS, compiled-pack and real-client acceptance remain separate. No live deployment, release or merge is part of this change.
 
+Follow-up: [the representative runtime renderer and final PR124 comparison](JAVA-DUAL-EATING-RENDERER-20261003.md) supersede the preparation-only state and historical PR124-head findings below. ONE/THREE are now wired for two fixed representatives. PR124 final head `ec6655e5` repairs several earlier alias gaps; the `6c71ac78` CI failure is historical evidence only.
+
 The starting candidate is the verified source-only handoff `a9e6a4ae7262e18b7e8cc68d9cb9e2b926cd40b1`, reconstructed over public `.60` commit `4ee97f04e81dcdc2d00653e2bb907f6c1b1f0d6a` / tree `d3e963b588245d4556d3da273722a9cd7d529808`. Its gzip SHA256 is `46644b459bb9af7a5a3c250522364dd3d7bc1b67b46603ef381280ed1f124f90`, decompressed patch SHA256 `2a3b8d900da6f3271841515caf414dc6fcb7a334b2603f12ab83478b16003c4b`. All 266 manifest paths were verified before repair. Windows CRLF conversion was corrected only where the normalized bytes matched the required hash exactly.
 
 ## Resulting behavior
