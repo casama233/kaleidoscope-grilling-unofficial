@@ -49,12 +49,7 @@ def eating_gate():
     assert 'playAnimation' not in tick
     assert 'advanceBites(p,active)' in tick and 'hungerSettle(' not in tick
     assert 'if(ACTIVE_EATS.get(id)!==a)return' in stop
-    if 'nativeEatingCompleted(a.start,stopTick,a.nativeDuration,remaining)' in stop:
-        assert 'const stopTick=system.currentTick,remaining=e.useDuration;' in stop
-        assert stop.index('const stopTick=') < stop.index('system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return')
-        assert 'e.itemStack&&nativeEatingCompleted(a.start,stopTick,a.nativeDuration,remaining)&&hungerSettle(e.source,a.id,a)' in stop
-        assert 'RELEASE_CHECKPOINT_GRACE_TICKS' not in stop
-    elif version >= (2, 8, 54):
+    if version >= (2, 8, 54):
         # Java's 25-tick visual checkpoint has a one-tick RELEASE-only grace.
         # Older immutable candidates retain their original exact assertion.
         assert 'const MINIMUM_EAT_TICKS=25,RELEASE_CHECKPOINT_GRACE_TICKS=1;' in script
