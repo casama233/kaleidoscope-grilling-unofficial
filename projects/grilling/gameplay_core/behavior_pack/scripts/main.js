@@ -102,6 +102,8 @@ import {isSpecialSeasoningId,specialSeasoningVisualId} from './a2766_special_sea
 import {retargetSpecialSeasoningStack,specialSeasoningVariant} from './a2766_special_seasoning_visual_runtime.js';
 
 const GRILL_LEGS_ID='kaleidoscope_grilling:grill_legs';
+// Java MultiBiteSkewerItem: readiness remains 25 ticks; release alone gets one tick of grace.
+const MINIMUM_EAT_TICKS=25,RELEASE_CHECKPOINT_GRACE_TICKS=1;
 const ACTIVE_EATS=new Map(),CUISINE_EATS=new Map(),PLATE_EATS=new Map(),PENDING_USES=new Map(),SETTLED=new Map(),VIGOR_LAST=new Map(),SNEAK_LAST=new Map(),THREAD_LAST=new Map();
 const CUISINE_FOOD_SET=new Set([...WOK_FOOD_IDS,...STOCKPOT_FOOD_IDS]);
 const FX_KEY='kaleidoscope_grilling:a21_fx';
@@ -869,8 +871,10 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  if(e.itemStack&&!eatingEventMatches(a.use,e.itemStack,now()))return;
  if(a.start===system.currentTick&&SETTLED.get(id)===system.currentTick)return;
  const used=system.currentTick-a.start;stopEatSound(e.source,a.profile);
+ // Capture elapsed at release, not in the deferred callback: a 23-tick release
+ // must not become eligible merely because cleanup runs a tick later.
  // Let native completion win either event order; never delete a newer session.
- system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(e.itemStack&&used>=25&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
+ system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
