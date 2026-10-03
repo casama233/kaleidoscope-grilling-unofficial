@@ -2,6 +2,8 @@
 from pathlib import Path
 import json
 import subprocess
+from copy import deepcopy
+from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
@@ -23,10 +25,18 @@ def language(data):
     return dict(rows)
 
 
+def current_behavior_expectation(before, kind, stem, version):
+    expected = deepcopy(before)
+    if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
+        expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
+    return expected
+
+
 def main():
     aliases = {}
     version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     counts = {}
+    bottle_eligibility = set()
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
@@ -52,11 +62,23 @@ def main():
             display = after['minecraft:' + kind]['components']['minecraft:display_name']
             assert (display['value'] if isinstance(display, dict) else display) == key, path
             after['minecraft:' + kind]['components']['minecraft:display_name'] = old
-            assert after == before, 'Non-display item/block behaviour changed: ' + str(path)
+            # Keep the historical label-only release fully immutable. Its
+            # item/block gate still allows no non-display differences at all.
+            historical = json.loads(subprocess.check_output(['git', 'show', LABEL_BASE + ':' + path.relative_to(ROOT).as_posix()], cwd=ROOT))
+            historical['minecraft:' + kind]['components']['minecraft:display_name'] = old
+            assert historical == before, 'Historical label release changed non-display behaviour: ' + str(path)
+            expected = current_behavior_expectation(before, kind, path.stem, version)
+            if version >= (2, 8, 61) and kind == 'item' and path.stem in BOTTLES:
+                assert after['minecraft:item']['components']['minecraft:allow_off_hand'] is True, path
+                bottle_eligibility.add(path.stem)
+            assert after == expected, 'Non-display item/block behaviour changed: ' + str(path)
             aliases[key] = value
             count += 1
         counts[kind] = count
     assert counts == {'item': 156, 'block': 18}, counts
+    if version >= (2, 8, 61):
+        assert bottle_eligibility == BOTTLES, 'Missing/unexpected bottle eligibility route'
+        assert check_authoring() == 67
     version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     public_keys = {'senluo.public.projection.v1'} if version >= (2, 8, 49) else set()
     for locale, label in LABELS.items():
