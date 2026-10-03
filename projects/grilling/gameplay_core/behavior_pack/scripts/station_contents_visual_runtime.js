@@ -6,12 +6,11 @@ export {registerStationProjection};
 import {VisualTargetQueue} from './visual_target_queue.js';
 import {grillingConfig} from './server_config_runtime.js';
 /** Transient native equipped-item renderers. Helpers never own or deliver station contents. */
-import {world,system,ItemStack} from '@minecraft/server';
+import {world,system} from '@minecraft/server';
 import {STORAGE_PREFIX,peekStationContainer} from './family_station_storage.js';
 import {a25ReadPlateBlock,a25RestoreStack} from './a25_plate_recipe_runtime.js';
 import {readGrillState} from './a2740_grill_state_adapter.js';
 import {grillVisualStage} from './grill_visual_core.js';
-import {resolveSecretSmokedId} from './secret_compat_core.js';
 const TYPE='kaleidoscope_grilling:equipment_visual',work=new VisualTargetQueue(),targets=work.targets;
 let reader,restore,helpers=0,lastWarning=-1200,indexing=false,lastCapacityWarning=-1200,lastAudience=-10;
 export function configureSecretVisuals(read,build){reader=read;restore=build;}
@@ -39,10 +38,10 @@ function render(row,b,k,stack,at,mode){
  try{old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});old.entity.setProperty('kaleidoscope_grilling:pose',mode);renderItemType(old.entity,stack);old.signature=signature;}catch(e){discard(row,k);throw e;}
 }
 function composed(row,b,k,stack,at,cooked,seen){
- const ingredients=reader?.(stack)??[];
+ const ingredients=reader?.(stack,cooked)??[];
  for(let i=0;i<3;i++){
   const name=k+'/'+i;seen.add(name);let food;
-  if(ingredients[i]){food=restore(ingredients[i]);if(cooked){const id=resolveSecretSmokedId(ingredients[i]);if(id&&id!==food.typeId)food=new ItemStack(id);}}
+  if(ingredients[i])food=restore(ingredients[i]);
   const offset=pose(b,at.dx,at.y,at.dz+(i-1)*.15);render(row,b,name,food,offset,2);
  }
 }
@@ -62,7 +61,7 @@ export function syncStationContentsVisual(block,observers){
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);
   for(let i=0;i<5;i++){const stack=rows[i]?a25RestoreStack(rows[i]):undefined,k='plate/'+i,dx=(i-2)*.14;
-   if(stack?.typeId==='kaleidoscope_grilling:secret_skewer')composed(row,block,k,stack,{dx,y:.15,dz:0},false,seen);
+   if(stack?.typeId==='kaleidoscope_grilling:secret_skewer')composed(row,block,k,stack,{dx,y:.15,dz:0},undefined,seen);
    else{seen.add(k);render(row,block,k,stack,pose(block,dx,.15,0),1);}
   }
  }else if(block.typeId==='kaleidoscope_grilling:grill'){

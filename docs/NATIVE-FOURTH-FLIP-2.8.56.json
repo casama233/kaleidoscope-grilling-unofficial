@@ -1,0 +1,51 @@
+{
+  "canonical_main_sha256": "1a5556c43ffdfbc0f60312e2d3354096d2c694aa428766c304233234906abb9b",
+  "test_only_source_overlay": true,
+  "simulated_players": false,
+  "client": false,
+  "production_ready": false,
+  "runs": [
+    {
+      "phase": "prepare",
+      "pass": true,
+      "errors": [],
+      "details": {
+        "nativeContainer": true,
+        "slots": 3,
+        "fourthFlip": true,
+        "uncookedStoredItem": true,
+        "rawMetadataPreserved": true,
+        "client": false
+      }
+    },
+    {
+      "phase": "restart",
+      "pass": true,
+      "errors": [],
+      "details": {
+        "nativeContainer": true,
+        "slots": 3,
+        "normalStopRestart": true,
+        "exactSnapshotPersistence": true,
+        "registryChangeIgnoredAfterSnapshot": true,
+        "nativeOutputPreparation": true,
+        "playerExtraction": false,
+        "client": false,
+        "productionWorldMigration": false
+      }
+    }
+  ],
+  "version": "2.8.56",
+  "bds_version": "1.26.52.3",
+  "canonical_source_trees": {
+    "BP": {
+      "sha256": "935ada99e843578bf21ced3fbeb4dd3f8cb9879445674bb7e386caade7a4db10",
+      "files": 529
+    },
+    "RP": {
+      "sha256": "110f8fa8fd8be49c39d3af132ad9a8755f01fcdbda51bb71e6f50120ec19b716",
+      "files": 1670
+    }
+  },
+  "canonical_pack_match_except_declared_test_overlay": true
+}

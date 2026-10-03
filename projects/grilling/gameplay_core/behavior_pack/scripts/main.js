@@ -261,8 +261,11 @@ function readRowsFromKey(stack,key){
  return rows;
 }
 function readSkewerRows(stack){return readRowsFromKey(stack,SKEWER_INGREDIENTS_KEY)}
+function validSecretIngredientRows(rows){return Array.isArray(rows)&&rows.length===3&&rows.every(row=>row&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)&&(!row.native||(row.native.version===1&&row.native.id===row.id)))}
 function isSecretCooked(stack){try{return stack?.typeId===SECRET_ID&&getItemProperty(stack,SECRET_COOKED_KEY)===true}catch{return false}}
-function readEffectiveSkewerRows(stack){if(isSecretCooked(stack)){const cooked=readRowsFromKey(stack,SECRET_COOKED_INGREDIENTS_KEY);if(cooked.length)return cooked}return readSkewerRows(stack)}
+// Default item/plate semantics follow Cooked. A grill renderer may explicitly
+// request cached cooked rows at visual stage >=4 without finishing the item.
+function readEffectiveSkewerRows(stack,preferCookedSnapshot=isSecretCooked(stack)){if(preferCookedSnapshot){const cooked=readRowsFromKey(stack,SECRET_COOKED_INGREDIENTS_KEY);if(cooked.length)return cooked}return readSkewerRows(stack)}
 function rowLabel(row){return String(row.id??'').replace(/^.*:/,'').replaceAll('_',' ')}
 function writeSkewerRows(stack,rows){
  const clean=(rows??[]).filter(x=>x&&typeof x.id==='string').slice(0,3);
@@ -279,7 +282,14 @@ function setSecretCreator(stack,player){
 function cookedIngredientRows(rows){
  return (rows??[]).map(row=>{const id=resolveSecretSmokedId(row);if(!id)return row;try{const result=ingredientSnapshot(new ItemStack(id,1),true);return result.edible?result:row}catch{return row}});
 }
-function setCookedIngredientRows(stack,rows){if(readRowsFromKey(stack,SECRET_COOKED_INGREDIENTS_KEY).length===3)return stack;const value=JSON.stringify(cookedIngredientRows(rows));setItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,value);if(getItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY)!==value)throw Error('Grilling: cooked ingredient data was not saved');return stack}
+function setCookedIngredientRows(stack,rows){
+ const cached=readRowsFromKey(stack,SECRET_COOKED_INGREDIENTS_KEY);
+ if(getItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY)!==undefined){if(!validSecretIngredientRows(cached))throw Error('Grilling: invalid cooked ingredient cache');return stack;}
+ if(!validSecretIngredientRows(rows))throw Error('Grilling: invalid raw ingredient rows');
+ const cooked=cookedIngredientRows(rows);if(!validSecretIngredientRows(cooked))throw Error('Grilling: invalid cooked ingredient snapshot');
+ const value=JSON.stringify(cooked);setItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,value);
+ if(getItemProperty(stack,SECRET_COOKED_INGREDIENTS_KEY)!==value)throw Error('Grilling: cooked ingredient data was not saved');return stack;
+}
 function dynamicFood(stack){return stack?.typeId===SECRET_ID?secretFood(readEffectiveSkewerRows(stack),isSecretCooked(stack),readSkewerRows(stack)):FOOD_DATA[stack?.typeId]}
 function isEdible(stack){if(stack?.typeId==='kaleidoscope_grilling:sweet_potato_powder')return false;try{return foodFacts(stack).edible}catch{return false}}
 function threadOutcome(player){
@@ -462,6 +472,26 @@ function planSeasoningBottle(player,hand,needed){
  const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses))}catch{}
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
+// The fourth successful flip freezes secret ingredient conversions in storage.
+// Do not set Cooked, heat or seasoning here: extraction owns those transitions.
+function commitGrillFlip(block,beforeState,nextState){
+ const steps=[];
+ try{
+  if(beforeState.phase===1&&beforeState.flips===3&&nextState.phase===2&&nextState.flips===4){
+   const c=inv(block);if(!c)throw Error('Grill inventory unavailable');
+   for(let slot=0;slot<3;slot++){
+    const raw=c.getItem(slot);if(raw?.typeId!==SECRET_ID)continue;
+    const next=raw.clone(),ingredients=readSkewerRows(next);
+    if(!validSecretIngredientRows(ingredients))throw Error('Grilling: invalid raw ingredient rows at fourth flip');
+    setCookedIngredientRows(next,ingredients);
+    steps.push(slotWrite(c,slot,next));
+   }
+  }
+  // Prepare every snapshot before the first mutation; state is committed last.
+  steps.push({apply:()=>writeState(block,nextState),rollback:()=>writeState(block,beforeState)});
+  return commitStationTransfer(block,steps,'flip snapshot').ok;
+ }catch(error){console.warn('[Grilling flip snapshot preparation] '+error);return false;}
+}
 function handleGrill(block,player,hand='main'){
  if(!block?.isValid||block.typeId!==GRILL_ID)return;let state=readState(block);const held=heldByHand(player,hand),id=held?.typeId,n=occupied(block);
  if(id==='minecraft:flint_and_steel'){
@@ -514,7 +544,7 @@ function handleGrill(block,player,hand='main'){
   return
  }
  if(id){message(player,'§7這個物品不能用在目前的烤爐階段');return}
- if(state.phase===1){const r=flip(state);if(r.ok){writeState(block,r.state);javaInteractionFeedback(player,'grill_wait_flip',[r.state.flips,4]);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.reach.'+hand,{blendOutTime:.1})}catch{}}else message(player,'§7翻面冷卻中');return}
+ if(state.phase===1){const r=flip(state);if(r.ok){if(!commitGrillFlip(block,state,r.state)){interactionFailure(player,'§c翻面失敗；已嘗試回復烤架與食材快照，請查看紀錄');return}javaInteractionFeedback(player,'grill_wait_flip',[r.state.flips,4]);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.reach.'+hand,{blendOutTime:.1})}catch{}}else message(player,'§7翻面冷卻中');return}
  if(state.phase===0&&n>0){javaInteractionFeedback(player,'grill_need_oil');return}if(state.phase===2&&!state.seasoned){javaInteractionFeedback(player,'grill_need_seasoning');return}
  if(canExtract(state))extract(block,player,player.isSneaking)
 }
@@ -888,7 +918,7 @@ world.beforeEvents.entityHurt.subscribe(e=>{
 world.afterEvents.playerSpawn.subscribe(e=>{if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
 function canUseSecretSkewer(stack){
- try{const valid=rows=>rows.length===3&&rows.every(row=>/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)&&(!row.native||(row.native.version===1&&row.native.id===row.id)));return valid(readSkewerRows(stack))&&(!isSecretCooked(stack)||valid(readEffectiveSkewerRows(stack)))}catch{return false}
+ try{return validSecretIngredientRows(readSkewerRows(stack))&&(!isSecretCooked(stack)||validSecretIngredientRows(readEffectiveSkewerRows(stack)))}catch{return false}
 }
 world.beforeEvents.itemUse.subscribe(e=>{
  if(e.cancel)return;
