@@ -1,24 +1,26 @@
-# Bottle candidate for native acceptance
+# Single-pass bottle candidate for native acceptance
 
-Source is the verified 2.8.61 handoff from `a9e6a4ae7262e18b7e8cc68d9cb9e2b926cd40b1`, applied over `4ee97f04e81dcdc2d00653e2bb907f6c1b1f0d6a`. The supplied manifest's 266 paths matched byte-for-byte before repair. Local snapshot parent `081761b871ddfcebe2f25c6dd1aff23121d9c257` preserves that candidate, including its unpublished eating fixes. The subsequent commit contains only this bottle repair.
+The verified unpublished 2.8.61 handoff is preserved by snapshot parent `081761b871ddfcebe2f25c6dd1aff23121d9c257`. This expansion follows probe commit `4d9cee9c0d8f256954b2e6b5148acf40f1ee09e1`; it changes bottle resource assets and source guards, preserving the owner's gameplay/eating work.
 
-EMPTY/PENDING now render shell and 16 Java half-cuboids from one geometry with one bound `grip` parent. Its child bones receive the same FP/TP pose. Each render pass selects only its child via `part_visibility`; opaque palette contents render before the blended shell. Palette colors and source cuboid bounds stay unchanged. The previous separately instanced geometry path could allow transform divergence; this is a source-level hypothesis awaiting native confirmation.
+Native feedback rejected the earlier combined-geometry/multiple-RC candidate: shell and contents still separated. Reordering only RCs changed positions and directions, supporting a pass-order-dependent transform/binding problem without proving animation replay. The owner's limited single-RC probe aligned partial2 and default finished8 in FP and TP. The full bottle was visible in that FP test (Alex, FOV60, 1180x664). Those observations certify the probe cases only.
 
-Both bottle FP positions move inward/upward/backward in the calibrated camera frame. Authored rotation and .72 scale remain unchanged. The old any-corner viewport test accepted models partly outside the screen; the new test checks every corner, all renderable children, near plane and both horizontal/vertical FOV conventions at aspect 1.49 and 16:9. This projection is not an engine emulation.
+All 67 production attachables now use one RC, one default geometry and one static atlas. EMPTY/PENDING have one bound grip, one shell child and 144 static color candidates: 16 Java half-cuboids times nine nonempty palette values. Eight existing numeric layer variables select one color per half; zero hides it. Both-hand pre-animation reads hand/owner context; the RC reads numeric `v.*` only. SPECIAL uses 64 combined fixed geometries preserving every original geometry fallback and texture choice; default SPECIAL shares r8/v0.
 
-No gameplay runtime, item IDs, recipes, native ItemStack storage, player properties, or skewer settlement were changed by this repair. In particular `main.js`, `player.json` and `verify_a2861.py` retain their exact handoff bytes. Existing 177 uniform opaque palette PNGs and pinned Java ingredient RGB values pass verification.
+The 128x128 atlas copies all four original 32x32 textures pixel-for-pixel across its first row. Fixed cube UVs shift horizontally to the corresponding original image; other cube data stays unchanged. Dynamic UVs sample opaque uniform tiles with an inset gutter. Pinned Java RGB, palette/tie order, the 177 placed palette PNGs and original fixed geometry/texture sources remain unchanged. Contents use opaque `entity`; shell uses `entity_alphablend` in the same RC. Historical source geometry/controller definitions remain for reproducibility; no bottle attachable invokes a multipass route.
 
-Targeted validation:
+The calibrated FP pose is retained. Source projection checks cover every renderable child, both hands, near plane and horizontal/vertical FOV interpretations at 1.49 and 16:9. This is mathematical validation, not an engine emulation.
+
+This render expansion leaves item IDs, recipes, ItemStack/DP storage, player properties, manifests and gameplay scripts unchanged. The before-event metadata API regression is a separate runtime fix requiring independent integration and testing.
+
+Validation:
 
 ```sh
-node --test development/gameplay_core/test_bottle_held_visual.mjs development/gameplay_core/test_seasoning_native_storage.mjs development/gameplay_core/test_seasoning_native_hands.mjs
-python -B -m unittest discover -s development/gameplay_core -p test_bottle_visual_assets.py -v
+python development/gameplay_core/a2861_bottle_held_visual_assets.py --check
+python development/gameplay_core/bottle_render_pass_probe.py --case one-rc-audit --output /private/bottle-one-rc-audit
 cd development/gameplay_core
-python -B -m unittest test_native_bottle_fp test_native_bottle_full_frustum test_native_offhand_idle test_held_pose_frames -v
+python -B -m unittest test_bottle_single_pass test_bottle_visual_assets test_native_bottle_fp test_native_bottle_full_frustum test_native_offhand_idle test_held_pose_frames -v
 ```
 
-Results: 96 Node tests, 4 palette/asset tests, and 25 hierarchy/frustum/pose tests pass. All 264 geometry routes and 328 renderable bone routes fit the four tested projection scenarios. Native hand fixtures cover DP/clone metadata and place-pickup-replace in both hands with independent containers; they do not certify saved-world persistence.
+Results: 37 Python tests pass (11 independent asset/reproducibility tests and 26 pose/frustum tests); `verify_a287.binding_assets` and `verify_a286.bottle_chain` pass. The independent audit checks all 67 routes, 65 geometries, 144 dynamic candidates, every fixed cube against frozen original routes and original RGBA samples. Both-hand projection checks cover 134 geometry routes and 840 potentially renderable bone routes. These results do not certify native rendering or saved-world persistence.
 
-Native acceptance remains required: EMPTY/PENDING with 0/1/2/3/4/8 ingredients, alternating different bottles in both hands, first/third person at 16:9, shell/content alignment, near-plane/full-bottle visibility, and saved-world place-pickup-replace. Also test full SPECIAL bottles and variants; they keep their existing fixed render routes while receiving the same FP position correction.
-
-Separate shared-runtime finding: the event hand-intent signature does not distinguish stacks differing only in lockMode, keepOnDeath, canDestroy or canPlaceOn. This can choose the wrong hand when both stacks otherwise match. This bottle render commit leaves that shared `main.js` path untouched for coordination with the owner's ongoing runtime changes. Native client rendering and this edge case remain unaccepted.
+Full production native acceptance remains required: EMPTY/PENDING 0/1/2/3/4/8 ingredients, unknown-value fallback, all SPECIAL variants, alternating different bottles in both hands, FP/TP, full-frustum visibility, shell/contents alignment, colors and saved-world place-pickup-replace with metadata. The owner performs client testing; no deployment or client control is part of this change.

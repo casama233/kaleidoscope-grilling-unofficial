@@ -24,7 +24,7 @@ class NativeOffhandIdle(unittest.TestCase):
    if hand!='left':continue
    self.assertFalse(visible(projected(g,OLD['animation.kg_a286.bottle_fp_left'],hand)),(name,ref));checked+=1
   version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
-  self.assertEqual(checked,132 if version>=(2,8,61) else 133)
+  self.assertEqual(checked,67 if version>=(2,8,61) else 133)
  def test_historical_bottle_routes_and_new_layer_delta_are_explicit(self):
   original={(name,ref):g for name,hand,ref,g in cases(legacy=True) if hand=='left'}
   self.assertEqual(len(original),133)
@@ -33,13 +33,15 @@ class NativeOffhandIdle(unittest.TestCase):
   version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
   if version<(2,8,61):return
   current={(name,ref):g for name,hand,ref,g in cases() if hand=='left'}
-  # Empty/pending now reference one bound rig with shell and all16 selectable
-  # half-layer children. Replacing their old1+2 refs with1+1 gives net -1.
+  # Production switches every item to one geometry and one render controller.
+  # Old133-per-hand shell/content refs stay pinned in the legacy fixture;
+  # current67 item routes use64 fixed variants plus one shared dynamic rig.
   combined={key:g for key,g in current.items() if key[1]=='geometry.kg_bottle_held.combined'}
   self.assertEqual({name for name,ref in combined},{'empty_seasoning_bottle.attachable.json','pending_seasoning.attachable.json'})
-  self.assertEqual(len(current)-len(original),-1)
-  self.assertEqual(len(set(current)-set(original)),2)
-  self.assertEqual(len(set(original)-set(current)),3)
+  self.assertEqual(len(current),67)
+  self.assertEqual(len(current)-len(original),-66)
+  self.assertEqual(len(set(current)-set(original)),67)
+  self.assertEqual(len(set(original)-set(current)),133)
   for (name,ref),g in combined.items():
    bound=[b for b in g['bones'] if b.get('binding')]
    self.assertEqual(len(bound),1)
@@ -48,8 +50,9 @@ class NativeOffhandIdle(unittest.TestCase):
    self.assertEqual(bound[0]['pivot'],[0,24,0])
    before=projected_by_bone(g,OLD['animation.kg_a286.bottle_fp_left'],'left')
    after=projected_by_bone(g,CURRENT['animation.kg_a286.bottle_fp_left'],'left')
-   self.assertEqual(set(after),{'grip','shell'}|{f'pending_{n}' for n in range(16)})
-   for bone in ('shell',*(f'pending_{n}' for n in range(16))):
+   parts={'shell'}|{f'pending_{tint}_color_{value}' for tint in range(16) for value in range(1,10)}
+   self.assertEqual(set(after),{'grip'}|parts)
+   for bone in parts:
     self.assertTrue(after[bone],(name,ref,bone))
     self.assertFalse(visible(before[bone]),(name,ref,bone))
     self.assertTrue(visible(after[bone]),(name,ref,bone))

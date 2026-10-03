@@ -42,6 +42,8 @@ class NativeBottleFullFrustum(unittest.TestCase):
             desc = json.loads(path.read_text())['minecraft:attachable']['description']
             filenames.add(path.name)
             self.assertTrue(desc['geometry'], path.name)
+            self.assertEqual(set(desc['geometry']), {'default'}, path.name)
+            self.assertEqual(len(desc['render_controllers']), 1, path.name)
             for alias, ref in desc['geometry'].items():
                 self.assertIsInstance(ref, str, (path.name, alias))
                 self.assertIn(ref, self.index, (path.name, alias, ref))
@@ -77,11 +79,12 @@ class NativeBottleFullFrustum(unittest.TestCase):
     def test_all_corners_horizontal60_aspect16by9(self):
         self.assert_complete(16 / 9, 'horizontal')
 
-    def test_combined_empty_pending_include_shell_and_each_half_layer(self):
+    def test_combined_empty_pending_include_shell_and_all_eight_layers_nine_colors(self):
         combined = 'geometry.kg_bottle_held.combined'
         geometry = self.index[combined]
-        expected = {'grip', 'shell'} | {f'pending_{n}' for n in range(16)}
+        expected = {'grip', 'shell'} | {f'pending_{tint}_color_{value}' for tint in range(16) for value in range(1, 10)}
         self.assertEqual({b['name'] for b in geometry['bones']}, expected)
+        self.assertEqual(len(geometry['bones']), 146)
         for filename in ('empty_seasoning_bottle.attachable.json', 'pending_seasoning.attachable.json'):
             desc = json.loads((RP / 'attachables' / filename).read_text())['minecraft:attachable']['description']
             self.assertEqual(set(desc['geometry'].values()), {combined})
@@ -91,6 +94,27 @@ class NativeBottleFullFrustum(unittest.TestCase):
                 self.assertFalse(points['grip'])
                 for bone in expected - {'grip'}:
                     self.assertTrue(points[bone], (filename, hand, bone))
+
+    def test_all_fixed_variants_have_one_geometry_and_shell_contents_children(self):
+        refs = set()
+        files = []
+        for name, hand, ref, geometry in self.routes:
+            if not ref.startswith('geometry.kg_bottle_held.fixed.'):
+                continue
+            refs.add(ref)
+            if hand == 'right':
+                files.append(name)
+            self.assertEqual(len(geometry['bones']), 3, ref)
+            self.assertEqual({b['name'] for b in geometry['bones']}, {'grip', 'shell', 'contents'}, ref)
+            self.assertFalse(geometry['bones'][0].get('cubes'), ref)
+            for bone in geometry['bones'][1:]:
+                self.assertEqual(bone['parent'], 'grip', ref)
+                self.assertEqual(bone['pivot'], [0, 24, 0], ref)
+                self.assertNotIn('binding', bone, ref)
+                self.assertTrue(bone.get('cubes'), ref)
+        self.assertEqual(refs, {f'geometry.kg_bottle_held.fixed.r{r}.v{v}' for r in range(1, 9) for v in range(8)})
+        self.assertEqual(len(files), 65)  #64 fixed variants plus default special.
+        self.assertEqual(len(self.routes), 134)  #67 items, one geometry in both hands.
 
     def test_only_two_fp_positions_change_rotation_scale_and_other_tracks_stay_pinned(self):
         fp = {'animation.kg_a286.bottle_fp_right', 'animation.kg_a286.bottle_fp_left'}

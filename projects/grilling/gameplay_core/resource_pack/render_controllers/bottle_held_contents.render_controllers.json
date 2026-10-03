@@ -1,620 +1,18 @@
 {
   "format_version": "1.8.0",
   "render_controllers": {
-    "controller.render.kg_bottle_held.pending_0": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
+    "controller.render.kg_bottle_held.dynamic": {
       "geometry": "Geometry.default",
       "materials": [
         {
           "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
         },
         {
-          "grip": true
-        },
-        {
-          "pending_0": true
+          "shell": "Material.default"
         }
       ],
       "textures": [
-        "Array.colors[v.kg_bottle_layer_0]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_1": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_1": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_0]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_2": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_2": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_1]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_3": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_3": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_1]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_4": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_4": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_2]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_5": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_5": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_2]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_6": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_6": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_3]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_7": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_7": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_3]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_8": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_8": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_4]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_9": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_9": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_4]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_10": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_10": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_5]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_11": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_11": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_5]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_12": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_12": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_6]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_13": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_13": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_6]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_14": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_79",
-            "Texture.pending_color_1",
-            "Texture.pending_color_63",
-            "Texture.pending_color_58",
-            "Texture.pending_color_50",
-            "Texture.pending_color_24",
-            "Texture.pending_color_97",
-            "Texture.pending_color_41",
-            "Texture.pending_color_72",
-            "Texture.pending_color_79"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_14": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_7]"
-      ]
-    },
-    "controller.render.kg_bottle_held.pending_15": {
-      "arrays": {
-        "textures": {
-          "Array.colors": [
-            "Texture.pending_color_118",
-            "Texture.pending_color_3",
-            "Texture.pending_color_15",
-            "Texture.pending_color_36",
-            "Texture.pending_color_161",
-            "Texture.pending_color_69",
-            "Texture.pending_color_109",
-            "Texture.pending_color_23",
-            "Texture.pending_color_16",
-            "Texture.pending_color_118"
-          ]
-        }
-      },
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.contents"
-        }
-      ],
-      "part_visibility": [
-        {
-          "*": false
-        },
-        {
-          "grip": true
-        },
-        {
-          "pending_15": true
-        }
-      ],
-      "textures": [
-        "Array.colors[v.kg_bottle_layer_7]"
-      ]
-    },
-    "controller.render.kg_bottle_held.shell": {
-      "geometry": "Geometry.default",
-      "materials": [
-        {
-          "*": "Material.default"
-        }
+        "Texture.default"
       ],
       "part_visibility": [
         {
@@ -625,6 +23,449 @@
         },
         {
           "shell": true
+        },
+        {
+          "pending_0_color_1": "v.kg_bottle_layer_0 == 1"
+        },
+        {
+          "pending_0_color_2": "v.kg_bottle_layer_0 == 2"
+        },
+        {
+          "pending_0_color_3": "v.kg_bottle_layer_0 == 3"
+        },
+        {
+          "pending_0_color_4": "v.kg_bottle_layer_0 == 4"
+        },
+        {
+          "pending_0_color_5": "v.kg_bottle_layer_0 == 5"
+        },
+        {
+          "pending_0_color_6": "v.kg_bottle_layer_0 == 6"
+        },
+        {
+          "pending_0_color_7": "v.kg_bottle_layer_0 == 7"
+        },
+        {
+          "pending_0_color_8": "v.kg_bottle_layer_0 == 8"
+        },
+        {
+          "pending_0_color_9": "v.kg_bottle_layer_0 == 9"
+        },
+        {
+          "pending_1_color_1": "v.kg_bottle_layer_0 == 1"
+        },
+        {
+          "pending_1_color_2": "v.kg_bottle_layer_0 == 2"
+        },
+        {
+          "pending_1_color_3": "v.kg_bottle_layer_0 == 3"
+        },
+        {
+          "pending_1_color_4": "v.kg_bottle_layer_0 == 4"
+        },
+        {
+          "pending_1_color_5": "v.kg_bottle_layer_0 == 5"
+        },
+        {
+          "pending_1_color_6": "v.kg_bottle_layer_0 == 6"
+        },
+        {
+          "pending_1_color_7": "v.kg_bottle_layer_0 == 7"
+        },
+        {
+          "pending_1_color_8": "v.kg_bottle_layer_0 == 8"
+        },
+        {
+          "pending_1_color_9": "v.kg_bottle_layer_0 == 9"
+        },
+        {
+          "pending_2_color_1": "v.kg_bottle_layer_1 == 1"
+        },
+        {
+          "pending_2_color_2": "v.kg_bottle_layer_1 == 2"
+        },
+        {
+          "pending_2_color_3": "v.kg_bottle_layer_1 == 3"
+        },
+        {
+          "pending_2_color_4": "v.kg_bottle_layer_1 == 4"
+        },
+        {
+          "pending_2_color_5": "v.kg_bottle_layer_1 == 5"
+        },
+        {
+          "pending_2_color_6": "v.kg_bottle_layer_1 == 6"
+        },
+        {
+          "pending_2_color_7": "v.kg_bottle_layer_1 == 7"
+        },
+        {
+          "pending_2_color_8": "v.kg_bottle_layer_1 == 8"
+        },
+        {
+          "pending_2_color_9": "v.kg_bottle_layer_1 == 9"
+        },
+        {
+          "pending_3_color_1": "v.kg_bottle_layer_1 == 1"
+        },
+        {
+          "pending_3_color_2": "v.kg_bottle_layer_1 == 2"
+        },
+        {
+          "pending_3_color_3": "v.kg_bottle_layer_1 == 3"
+        },
+        {
+          "pending_3_color_4": "v.kg_bottle_layer_1 == 4"
+        },
+        {
+          "pending_3_color_5": "v.kg_bottle_layer_1 == 5"
+        },
+        {
+          "pending_3_color_6": "v.kg_bottle_layer_1 == 6"
+        },
+        {
+          "pending_3_color_7": "v.kg_bottle_layer_1 == 7"
+        },
+        {
+          "pending_3_color_8": "v.kg_bottle_layer_1 == 8"
+        },
+        {
+          "pending_3_color_9": "v.kg_bottle_layer_1 == 9"
+        },
+        {
+          "pending_4_color_1": "v.kg_bottle_layer_2 == 1"
+        },
+        {
+          "pending_4_color_2": "v.kg_bottle_layer_2 == 2"
+        },
+        {
+          "pending_4_color_3": "v.kg_bottle_layer_2 == 3"
+        },
+        {
+          "pending_4_color_4": "v.kg_bottle_layer_2 == 4"
+        },
+        {
+          "pending_4_color_5": "v.kg_bottle_layer_2 == 5"
+        },
+        {
+          "pending_4_color_6": "v.kg_bottle_layer_2 == 6"
+        },
+        {
+          "pending_4_color_7": "v.kg_bottle_layer_2 == 7"
+        },
+        {
+          "pending_4_color_8": "v.kg_bottle_layer_2 == 8"
+        },
+        {
+          "pending_4_color_9": "v.kg_bottle_layer_2 == 9"
+        },
+        {
+          "pending_5_color_1": "v.kg_bottle_layer_2 == 1"
+        },
+        {
+          "pending_5_color_2": "v.kg_bottle_layer_2 == 2"
+        },
+        {
+          "pending_5_color_3": "v.kg_bottle_layer_2 == 3"
+        },
+        {
+          "pending_5_color_4": "v.kg_bottle_layer_2 == 4"
+        },
+        {
+          "pending_5_color_5": "v.kg_bottle_layer_2 == 5"
+        },
+        {
+          "pending_5_color_6": "v.kg_bottle_layer_2 == 6"
+        },
+        {
+          "pending_5_color_7": "v.kg_bottle_layer_2 == 7"
+        },
+        {
+          "pending_5_color_8": "v.kg_bottle_layer_2 == 8"
+        },
+        {
+          "pending_5_color_9": "v.kg_bottle_layer_2 == 9"
+        },
+        {
+          "pending_6_color_1": "v.kg_bottle_layer_3 == 1"
+        },
+        {
+          "pending_6_color_2": "v.kg_bottle_layer_3 == 2"
+        },
+        {
+          "pending_6_color_3": "v.kg_bottle_layer_3 == 3"
+        },
+        {
+          "pending_6_color_4": "v.kg_bottle_layer_3 == 4"
+        },
+        {
+          "pending_6_color_5": "v.kg_bottle_layer_3 == 5"
+        },
+        {
+          "pending_6_color_6": "v.kg_bottle_layer_3 == 6"
+        },
+        {
+          "pending_6_color_7": "v.kg_bottle_layer_3 == 7"
+        },
+        {
+          "pending_6_color_8": "v.kg_bottle_layer_3 == 8"
+        },
+        {
+          "pending_6_color_9": "v.kg_bottle_layer_3 == 9"
+        },
+        {
+          "pending_7_color_1": "v.kg_bottle_layer_3 == 1"
+        },
+        {
+          "pending_7_color_2": "v.kg_bottle_layer_3 == 2"
+        },
+        {
+          "pending_7_color_3": "v.kg_bottle_layer_3 == 3"
+        },
+        {
+          "pending_7_color_4": "v.kg_bottle_layer_3 == 4"
+        },
+        {
+          "pending_7_color_5": "v.kg_bottle_layer_3 == 5"
+        },
+        {
+          "pending_7_color_6": "v.kg_bottle_layer_3 == 6"
+        },
+        {
+          "pending_7_color_7": "v.kg_bottle_layer_3 == 7"
+        },
+        {
+          "pending_7_color_8": "v.kg_bottle_layer_3 == 8"
+        },
+        {
+          "pending_7_color_9": "v.kg_bottle_layer_3 == 9"
+        },
+        {
+          "pending_8_color_1": "v.kg_bottle_layer_4 == 1"
+        },
+        {
+          "pending_8_color_2": "v.kg_bottle_layer_4 == 2"
+        },
+        {
+          "pending_8_color_3": "v.kg_bottle_layer_4 == 3"
+        },
+        {
+          "pending_8_color_4": "v.kg_bottle_layer_4 == 4"
+        },
+        {
+          "pending_8_color_5": "v.kg_bottle_layer_4 == 5"
+        },
+        {
+          "pending_8_color_6": "v.kg_bottle_layer_4 == 6"
+        },
+        {
+          "pending_8_color_7": "v.kg_bottle_layer_4 == 7"
+        },
+        {
+          "pending_8_color_8": "v.kg_bottle_layer_4 == 8"
+        },
+        {
+          "pending_8_color_9": "v.kg_bottle_layer_4 == 9"
+        },
+        {
+          "pending_9_color_1": "v.kg_bottle_layer_4 == 1"
+        },
+        {
+          "pending_9_color_2": "v.kg_bottle_layer_4 == 2"
+        },
+        {
+          "pending_9_color_3": "v.kg_bottle_layer_4 == 3"
+        },
+        {
+          "pending_9_color_4": "v.kg_bottle_layer_4 == 4"
+        },
+        {
+          "pending_9_color_5": "v.kg_bottle_layer_4 == 5"
+        },
+        {
+          "pending_9_color_6": "v.kg_bottle_layer_4 == 6"
+        },
+        {
+          "pending_9_color_7": "v.kg_bottle_layer_4 == 7"
+        },
+        {
+          "pending_9_color_8": "v.kg_bottle_layer_4 == 8"
+        },
+        {
+          "pending_9_color_9": "v.kg_bottle_layer_4 == 9"
+        },
+        {
+          "pending_10_color_1": "v.kg_bottle_layer_5 == 1"
+        },
+        {
+          "pending_10_color_2": "v.kg_bottle_layer_5 == 2"
+        },
+        {
+          "pending_10_color_3": "v.kg_bottle_layer_5 == 3"
+        },
+        {
+          "pending_10_color_4": "v.kg_bottle_layer_5 == 4"
+        },
+        {
+          "pending_10_color_5": "v.kg_bottle_layer_5 == 5"
+        },
+        {
+          "pending_10_color_6": "v.kg_bottle_layer_5 == 6"
+        },
+        {
+          "pending_10_color_7": "v.kg_bottle_layer_5 == 7"
+        },
+        {
+          "pending_10_color_8": "v.kg_bottle_layer_5 == 8"
+        },
+        {
+          "pending_10_color_9": "v.kg_bottle_layer_5 == 9"
+        },
+        {
+          "pending_11_color_1": "v.kg_bottle_layer_5 == 1"
+        },
+        {
+          "pending_11_color_2": "v.kg_bottle_layer_5 == 2"
+        },
+        {
+          "pending_11_color_3": "v.kg_bottle_layer_5 == 3"
+        },
+        {
+          "pending_11_color_4": "v.kg_bottle_layer_5 == 4"
+        },
+        {
+          "pending_11_color_5": "v.kg_bottle_layer_5 == 5"
+        },
+        {
+          "pending_11_color_6": "v.kg_bottle_layer_5 == 6"
+        },
+        {
+          "pending_11_color_7": "v.kg_bottle_layer_5 == 7"
+        },
+        {
+          "pending_11_color_8": "v.kg_bottle_layer_5 == 8"
+        },
+        {
+          "pending_11_color_9": "v.kg_bottle_layer_5 == 9"
+        },
+        {
+          "pending_12_color_1": "v.kg_bottle_layer_6 == 1"
+        },
+        {
+          "pending_12_color_2": "v.kg_bottle_layer_6 == 2"
+        },
+        {
+          "pending_12_color_3": "v.kg_bottle_layer_6 == 3"
+        },
+        {
+          "pending_12_color_4": "v.kg_bottle_layer_6 == 4"
+        },
+        {
+          "pending_12_color_5": "v.kg_bottle_layer_6 == 5"
+        },
+        {
+          "pending_12_color_6": "v.kg_bottle_layer_6 == 6"
+        },
+        {
+          "pending_12_color_7": "v.kg_bottle_layer_6 == 7"
+        },
+        {
+          "pending_12_color_8": "v.kg_bottle_layer_6 == 8"
+        },
+        {
+          "pending_12_color_9": "v.kg_bottle_layer_6 == 9"
+        },
+        {
+          "pending_13_color_1": "v.kg_bottle_layer_6 == 1"
+        },
+        {
+          "pending_13_color_2": "v.kg_bottle_layer_6 == 2"
+        },
+        {
+          "pending_13_color_3": "v.kg_bottle_layer_6 == 3"
+        },
+        {
+          "pending_13_color_4": "v.kg_bottle_layer_6 == 4"
+        },
+        {
+          "pending_13_color_5": "v.kg_bottle_layer_6 == 5"
+        },
+        {
+          "pending_13_color_6": "v.kg_bottle_layer_6 == 6"
+        },
+        {
+          "pending_13_color_7": "v.kg_bottle_layer_6 == 7"
+        },
+        {
+          "pending_13_color_8": "v.kg_bottle_layer_6 == 8"
+        },
+        {
+          "pending_13_color_9": "v.kg_bottle_layer_6 == 9"
+        },
+        {
+          "pending_14_color_1": "v.kg_bottle_layer_7 == 1"
+        },
+        {
+          "pending_14_color_2": "v.kg_bottle_layer_7 == 2"
+        },
+        {
+          "pending_14_color_3": "v.kg_bottle_layer_7 == 3"
+        },
+        {
+          "pending_14_color_4": "v.kg_bottle_layer_7 == 4"
+        },
+        {
+          "pending_14_color_5": "v.kg_bottle_layer_7 == 5"
+        },
+        {
+          "pending_14_color_6": "v.kg_bottle_layer_7 == 6"
+        },
+        {
+          "pending_14_color_7": "v.kg_bottle_layer_7 == 7"
+        },
+        {
+          "pending_14_color_8": "v.kg_bottle_layer_7 == 8"
+        },
+        {
+          "pending_14_color_9": "v.kg_bottle_layer_7 == 9"
+        },
+        {
+          "pending_15_color_1": "v.kg_bottle_layer_7 == 1"
+        },
+        {
+          "pending_15_color_2": "v.kg_bottle_layer_7 == 2"
+        },
+        {
+          "pending_15_color_3": "v.kg_bottle_layer_7 == 3"
+        },
+        {
+          "pending_15_color_4": "v.kg_bottle_layer_7 == 4"
+        },
+        {
+          "pending_15_color_5": "v.kg_bottle_layer_7 == 5"
+        },
+        {
+          "pending_15_color_6": "v.kg_bottle_layer_7 == 6"
+        },
+        {
+          "pending_15_color_7": "v.kg_bottle_layer_7 == 7"
+        },
+        {
+          "pending_15_color_8": "v.kg_bottle_layer_7 == 8"
+        },
+        {
+          "pending_15_color_9": "v.kg_bottle_layer_7 == 9"
+        }
+      ]
+    },
+    "controller.render.kg_bottle_held.fixed": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.contents"
+        },
+        {
+          "shell": "Material.default"
         }
       ],
       "textures": [

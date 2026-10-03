@@ -25,13 +25,15 @@ def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,proj
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
  return bool(eval(compile(tree,'<pose-condition>','eval'),{'__builtins__':{}},{}))
 def binding_assets():
- idx={};animations={};rows=[];refs=set();cases=0
+ idx={};animations={};controllers={};rows=[];refs=set();cases=0
  version=tuple(load(BP/'manifest.json')['header']['version'])
  for p in (RP/'models').rglob('*.geo.json'):
   for g in load(p)['minecraft:geometry']:
    ref=g['description']['identifier'];assert ref not in idx,ref;idx[ref]=g
  for p in (RP/'animations').glob('*.json'):
   for key,a in load(p).get('animations',{}).items():assert key not in animations,key;animations[key]=a
+ for p in (RP/'render_controllers').glob('*.json'):
+  for key,body in load(p).get('render_controllers',{}).items():assert key not in controllers,key;controllers[key]=body
  for p in sorted((RP/'attachables').glob('*.json')):
   d=load(p)['minecraft:attachable']['description'];selected=[]
   for first in (0,1):
@@ -61,6 +63,13 @@ def binding_assets():
        assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
+  if d['animations'].get('fp_right')=='animation.kg_a286.bottle_fp_right' and version>=(2,8,61):
+   # Production bottles use one renderer instance; old multi-pass controller
+   # definitions may remain as unused source, but no item can reference them.
+   assert set(d['geometry'])=={'default'},p
+   assert len(d['render_controllers'])==1 and isinstance(d['render_controllers'][0],str),p
+   assert controllers[d['render_controllers'][0]]['geometry']=='Geometry.default',p
+   assert d['geometry']['default'].startswith('geometry.kg_bottle_held.'),p
   for ref in d['geometry'].values():
    refs.add(ref);g=idx[ref]
    b=g['bones'][0];assert b['name']=='grip' and b['pivot']==[0,24,0]
@@ -80,10 +89,17 @@ def binding_assets():
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose',ref
    elif ref=='geometry.kg_bottle_held.combined':
-    assert len(g['bones'])==18 and not b.get('cubes'),ref
-    assert {child['name'] for child in g['bones'][1:]}=={'shell'}|{f'pending_{i}' for i in range(16)},ref
+    assert len(g['bones'])==146 and not b.get('cubes'),ref
+    assert {child['name'] for child in g['bones'][1:]}=={'shell'}|{f'pending_{tint}_color_{value}' for tint in range(16) for value in range(1,10)},ref
     for child in g['bones'][1:]:
-     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child,ref
+     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child and child.get('cubes'),ref
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
+   elif ref.startswith('geometry.kg_bottle_held.fixed.'):
+    assert re.fullmatch(r'geometry\.kg_bottle_held\.fixed\.r[1-8]\.v[0-7]',ref),ref
+    assert len(g['bones'])==3 and not b.get('cubes'),ref
+    assert {child['name'] for child in g['bones'][1:]}=={'shell','contents'},ref
+    for child in g['bones'][1:]:
+     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child and child.get('cubes'),ref
     for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
    elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':
     assert len(g['bones'])==3 and not b.get('cubes'),ref

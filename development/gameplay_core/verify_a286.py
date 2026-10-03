@@ -20,10 +20,13 @@ def bottle_chain():
   checks.test_placed_bounds_and_opaque_palette_match_source()
   checks.test_generator_is_reproducible_and_player_budget_fits()
   special=load(RP/'attachables/special_seasoning.attachable.json')['minecraft:attachable']['description']
-  assert special['textures']=={'default':'textures/blocks/seasoning_bottle'}
-  assert special['render_controllers'][0]=='controller.render.kg_a286.contents'
-  assert special['materials']['contents']=='entity_alphatest_one_sided'
-  assert idx[special['geometry']['contents']]['bones'][0]['cubes']
+  assert special['textures']=={'default':'textures/held/bottle_shell_palette'}
+  assert special['geometry']=={'default':'geometry.kg_bottle_held.fixed.r8.v0'}
+  assert len(special['render_controllers'])==1
+  bones=idx[special['geometry']['default']]['bones']
+  assert len(bones)==3 and not bones[0].get('cubes')
+  assert {b['name'] for b in bones[1:]}=={'shell','contents'}
+  assert all(b.get('cubes') and b['parent']=='grip' and b['pivot']==[0,24,0] and 'binding' not in b for b in bones[1:])
   return
  for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):
   d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description'];ref=d['geometry']['default'];ids.append(ref)

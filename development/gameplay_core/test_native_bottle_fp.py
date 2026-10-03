@@ -5,6 +5,7 @@ from held_pose_frames import RP,chain,translate,zyx,bone_matrix,point
 from test_native_skewer_fp import reference_frame,visible
 OLD=json.loads((Path(__file__).parent/'fixtures/bottle-frame-before-2.8.52.json').read_text())['animations']
 CURRENT=json.loads((RP/'animations/a286_held.animation.json').read_text())['animations']
+LEGACY_FIXED=json.loads((Path(__file__).parent/'fixtures/bottle-fixed-source-routes.json').read_text())['routes']
 
 def vector(value,default):
  if value is None:value=default
@@ -73,10 +74,14 @@ def cases(legacy=False):
  for p in sorted((RP/'attachables').glob('*seasoning*.json')):
   desc=json.loads(p.read_text())['minecraft:attachable']['description']
   refs=set(desc['geometry'].values())
-  if legacy and desc['identifier']=='kaleidoscope_grilling:empty_seasoning_bottle':
-   refs={'geometry.kg_a286.kg_a2733.seasoning_bottle_hand'}
-  elif legacy and desc['identifier']=='kaleidoscope_grilling:pending_seasoning':
-   refs={'geometry.kg_a286.kg_a2766.special_seasoning.r4.v0','geometry.kg_a286.kg_a2766.special_seasoning.r4.v0.contents'}
+  if legacy:
+   if desc['identifier']=='kaleidoscope_grilling:empty_seasoning_bottle':
+    refs={'geometry.kg_a286.kg_a2733.seasoning_bottle_hand'}
+   elif desc['identifier']=='kaleidoscope_grilling:pending_seasoning':
+    refs={'geometry.kg_a286.kg_a2766.special_seasoning.r4.v0','geometry.kg_a286.kg_a2766.special_seasoning.r4.v0.contents'}
+   else:
+    # Exact source aliases preserve invalid-v fallbacks; never infer r/v refs.
+    refs=set(LEGACY_FIXED[desc['identifier']]['geometry'].values())
   for hand in ('right','left'):
    for ref in sorted(refs):
     yield p.name,hand,ref,index[ref]

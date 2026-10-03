@@ -44,13 +44,15 @@ class BottleVisualAssets(unittest.TestCase):
     def test_held_layers_share_shell_socket_without_changing_native_id(self):
         placed={g['description']['identifier']:g for g in load(RP/'models/entity/a2770_placed/seasoning.geo.json')['minecraft:geometry']}
         geos=load(RP/'models/entity/bottle_held_contents.geo.json')['minecraft:geometry']
-        self.assertEqual(len(geos),1)
+        self.assertEqual(len(geos),65)
         g=geos[0];root=g['bones'][0]
         self.assertEqual(g['description']['identifier'],'geometry.kg_bottle_held.combined')
         self.assertEqual(root,{'name':'grip','pivot':[0,24,0],
             'binding':'q.item_slot_to_bone_name(context.item_slot)'})
         bones={b['name']:b for b in g['bones']}
-        self.assertEqual(set(bones),{'grip','shell'}|{f'pending_{i}' for i in range(16)})
+        self.assertEqual(set(bones),{'grip','shell'}|{f'pending_{i}_color_{j}' for i in range(16) for j in range(1,10)})
+        self.assertEqual(g['description']['texture_width'],128)
+        self.assertEqual(g['description']['texture_height'],128)
         shell=load(RP/'models/entity/a286_hand/kg_a2733.seasoning_bottle_hand.geo.json')['minecraft:geometry'][0]
         self.assertEqual(bones['shell']['cubes'],shell['bones'][0]['cubes'])
         for child in g['bones'][1:]:
@@ -58,49 +60,48 @@ class BottleVisualAssets(unittest.TestCase):
             self.assertEqual(child['pivot'],root['pivot'])
             self.assertNotIn('binding',child)
             self.assertNotIn('rotation',child)
+        pairs=held.palette_pairs()
+        with Image.open(RP/(held.ATLAS+'.png')) as image:
+            atlas=image.convert('RGBA')
         for tint in range(16):
-            c=bones['pending_'+str(tint)]['cubes'][0];p=placed['geometry.kg_a2770.pending_'+str(tint)]['bones'][0]['cubes'][0]
-            self.assertEqual(c['origin'],[p['origin'][0],p['origin'][1]+18,p['origin'][2]])
-            self.assertEqual(c['size'],p['size'])
-            self.assertEqual(set(c['uv']),set(p['uv']))
-            for uv in c['uv'].values():
-                self.assertEqual(uv,{'uv':[0,0],'uv_size':[32,32]})
-            # Every half-cuboid lies inside the physical bottle body before
-            # their common parent transform; this holds for FP and TP alike.
-            for axis in range(3):
-                self.assertGreaterEqual(c['origin'][axis],[-3,18,-3][axis])
-                self.assertLessEqual(c['origin'][axis]+c['size'][axis],[3,24.5,3][axis])
+            for value in range(1,10):
+                c=bones[f'pending_{tint}_color_{value}']['cubes'][0]
+                p=placed[f'geometry.kg_a2770.pending_{tint}']['bones'][0]['cubes'][0]
+                self.assertEqual(c['origin'],[p['origin'][0],p['origin'][1]+18,p['origin'][2]])
+                self.assertEqual(c['size'],p['size'])
+                self.assertEqual(set(c['uv']),set(p['uv']))
+                rgb=pairs[value][tint%2]
+                rgba=((rgb>>16)&255,(rgb>>8)&255,rgb&255,255)
+                for uv in c['uv'].values():
+                    x,y=uv['uv'];self.assertEqual(uv['uv_size'],[8,8])
+                    self.assertEqual(atlas.crop((x,y,x+8,y+8)).getcolors(),[(64,rgba)])
+                for axis in range(3):
+                    self.assertGreaterEqual(c['origin'][axis],[-3,18,-3][axis])
+                    self.assertLessEqual(c['origin'][axis]+c['size'][axis],[3,24.5,3][axis])
         for item in ['empty_seasoning_bottle','pending_seasoning']:
             d=load(RP/f'attachables/{item}.attachable.json')['minecraft:attachable']['description']
             self.assertEqual(d['identifier'],'kaleidoscope_grilling:'+item)
             self.assertEqual(d['geometry'],{'default':'geometry.kg_bottle_held.combined'})
             self.assertEqual(d['materials']['contents'],'entity')
-            self.assertEqual(len(d['render_controllers']),17)
-            for tint,rc in enumerate(d['render_controllers'][:-1]):
-                condition=next(iter(rc.values()))
-                self.assertEqual(condition,'v.kg_bottle_layer_'+str(tint//2)+' > 0')
+            self.assertEqual(d['render_controllers'],['controller.render.kg_bottle_held.dynamic'])
+            self.assertEqual(d['textures'],{'default':held.ATLAS})
         controllers=load(RP/'render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
         for name,rc in controllers.items():
             self.assertEqual(rc['geometry'],'Geometry.default')
-            visible={k:v for row in rc['part_visibility'] for k,v in row.items()}
-            child=name.rsplit('.',1)[-1]
-            self.assertEqual(visible,{'*':False,'grip':True,child:True})
-        self.assertEqual(controllers['controller.render.kg_bottle_held.shell']['materials'],[{'*':'Material.default'}])
+            self.assertEqual(rc['textures'],['Texture.default'])
+            self.assertEqual(rc['materials'],[{'*':'Material.contents'},{'shell':'Material.default'}])
+        visible={k:v for row in controllers['controller.render.kg_bottle_held.dynamic']['part_visibility'] for k,v in row.items()}
+        self.assertEqual({k:v for k,v in visible.items() if not k.startswith('pending_')},{'*':False,'grip':True,'shell':True})
+        for tint in range(16):
+            for value in range(1,10):
+                self.assertEqual(visible[f'pending_{tint}_color_{value}'],f'v.kg_bottle_layer_{tint//2} == {value}')
 
     def test_render_context_uses_initialized_numeric_animation_variables(self):
         controllers=load(RP/'render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
-        ids=held.ingredient_ids()
-        data=(BP/'scripts/a2770_placed_visual_data.js').read_text()
-        palette=json.loads(re.search(r'INGREDIENT_COLORS=Object.freeze\((\{.*?\})\)',data).group(1))
-        color_index=json.loads(re.search(r'PLACED_TINT_INDEX=Object.freeze\((\{.*?\})\)',data).group(1))
-        pairs=[[0xB86B45,0xE0A56A]]+[palette[i] for i in ids]+[[0xB86B45,0xE0A56A]]
-        for tint in range(16):
-            rc=controllers['controller.render.kg_bottle_held.pending_'+str(tint)]
-            self.assertEqual(rc['textures'],['Array.colors[v.kg_bottle_layer_'+str(tint//2)+']'])
-            self.assertEqual(rc['arrays']['textures']['Array.colors'],
-                ['Texture.pending_color_'+str(color_index[str(pair[tint%2])]) for pair in pairs])
-            # No attachable-only context or entity query executes during texture
-            # selection. Index 0 is valid before the first pre_animation pass.
+        for rc in controllers.values():
+            # RC only selects static bones from initialized numeric variables.
+            self.assertNotIn('uv_anim',rc)
+            self.assertNotIn('arrays',rc)
             self.assertNotRegex(json.dumps(rc),r'\b(?:c|context|q|query)\.')
         for item in ['empty_seasoning_bottle','pending_seasoning']:
             d=load(RP/f'attachables/{item}.attachable.json')['minecraft:attachable']['description']
@@ -142,7 +143,7 @@ for(const slot of ['main_hand','off_hand']) {
 
     def test_generator_is_reproducible_and_player_budget_fits(self):
         for path,expected in held.build().items():
-            self.assertEqual(load(path),expected,path)
+            self.assertEqual(path.read_bytes() if isinstance(expected,bytes) else load(path),expected,path)
         props=load(BP/'entities/player.json')['minecraft:entity']['description']['properties']
         self.assertLessEqual(len(props),32)
         for hand in ['main','off']:

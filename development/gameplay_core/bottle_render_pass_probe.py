@@ -11,7 +11,7 @@ import json
 from PIL import Image
 import a2861_bottle_held_visual_assets as held
 
-CASES = ('shell-first', 'shell-only', 'rebuild-true', 'single-rc-two-layer')
+CASES = ('shell-first', 'shell-only', 'rebuild-true', 'single-rc-two-layer', 'one-rc-audit')
 
 
 def load(path):
@@ -46,10 +46,32 @@ def run(source, out, case):
             relative = path.relative_to(source).as_posix()
             attachables[relative] = read(relative)
 
-    if case in ('shell-first', 'shell-only'):
+    if case == 'one-rc-audit':
+        assert len(attachables) == 67
+        for doc in attachables.values():
+            d = doc['minecraft:attachable']['description']
+            assert len(d['render_controllers']) == 1
+            assert set(d['geometry']) == {'default'}
+            assert set(d['textures']) == {'default'}
+            assert d['materials']['default'] == 'entity_alphablend'
+            assert d['materials']['contents'] == 'entity'
+        controllers = read('render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
+        used = {doc['minecraft:attachable']['description']['render_controllers'][0]
+                for doc in attachables.values()}
+        assert used == set(controllers) == {'controller.render.kg_bottle_held.dynamic',
+                                            'controller.render.kg_bottle_held.fixed'}
+        for rc in controllers.values():
+            assert rc['geometry'] == 'Geometry.default'
+            assert rc['textures'] == ['Texture.default']
+            assert 'uv_anim' not in rc
+        g = read('models/entity/bottle_held_contents.geo.json')['minecraft:geometry']
+        assert len(g) == 65 and len(g[0]['bones']) == 146
+    elif case in ('shell-first', 'shell-only'):
         for relative, doc in attachables.items():
             d = doc['minecraft:attachable']['description']
             rc = d['render_controllers']
+            if len(rc) == 1:
+                raise ValueError('Order probes require the archived multipass RP; use one-rc-audit for the expanded RP')
             assert isinstance(rc[-1], str) and rc[-1] in (
                 'controller.render.kg_bottle_held.shell',
                 'controller.render.kg_a2733.seasoning_bottle_hand')
