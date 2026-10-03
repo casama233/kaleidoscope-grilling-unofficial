@@ -29,6 +29,12 @@ def main():
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            if kind == 'item' and path.stem.endswith('_java_three_alt'):
+                alt=json.loads(path.read_bytes())['minecraft:item']
+                base=json.loads(path.with_name(path.name.replace('_java_three_alt','')).read_bytes())['minecraft:item']
+                assert alt['components']['minecraft:display_name']==base['components']['minecraft:display_name'],path
+                assert 'menu_category' not in alt['description'],path
+                continue
             before = json.loads(prior(path))
             after = json.loads(path.read_bytes())
             old = before['minecraft:' + kind]['components'].get('minecraft:display_name')
@@ -42,6 +48,15 @@ def main():
             display = after['minecraft:' + kind]['components']['minecraft:display_name']
             assert (display['value'] if isinstance(display, dict) else display) == key, path
             after['minecraft:' + kind]['components']['minecraft:display_name'] = old
+            historical=json.loads(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
+            historical['minecraft:'+kind]['components']['minecraft:display_name']=old
+            assert historical == before, 'Historical label-only item behaviour changed: '+str(path)
+            if kind=='item':
+                tags=after['minecraft:item']['components'].get('minecraft:tags',{}).get('tags',[])
+                tag='kaleidoscope_grilling:food_'+path.stem
+                if tag in tags:
+                    tags.remove(tag)
+                    if not tags and 'minecraft:tags' not in before['minecraft:item']['components']:after['minecraft:item']['components'].pop('minecraft:tags')
             assert after == before, 'Non-display item/block behaviour changed: ' + str(path)
             aliases[key] = value
             count += 1
