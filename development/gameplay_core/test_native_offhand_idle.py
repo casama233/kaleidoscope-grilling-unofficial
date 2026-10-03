@@ -23,7 +23,31 @@ class NativeOffhandIdle(unittest.TestCase):
   for name,hand,ref,g in cases():
    if hand!='left':continue
    self.assertFalse(visible(projected(g,OLD['animation.kg_a286.bottle_fp_left'],hand)),(name,ref));checked+=1
-  self.assertEqual(checked,133)
+  version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
+  self.assertEqual(checked,164 if version>=(2,8,61) else 133)
+ def test_historical_bottle_routes_and_new_layer_delta_are_explicit(self):
+  original={(name,ref):g for name,hand,ref,g in cases(legacy=True) if hand=='left'}
+  self.assertEqual(len(original),133)
+  for (name,ref),g in original.items():
+   self.assertFalse(visible(projected(g,OLD['animation.kg_a286.bottle_fp_left'],'left')),(name,ref))
+  version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
+  if version<(2,8,61):return
+  current={(name,ref):g for name,hand,ref,g in cases() if hand=='left'}
+  # Empty/pending each gain16 half-layer routes. Pending also replaces its
+  # old r4 shell+contents pair with the shared empty shell: net +31 routes.
+  layers={key:g for key,g in current.items() if key[1].startswith('geometry.kg_bottle_held.pending_')}
+  self.assertEqual(len(layers),32)
+  self.assertEqual(len({ref for name,ref in layers}),16)
+  self.assertEqual(len(current)-len(original),31)
+  self.assertEqual(len(set(current)-set(original)),33)
+  self.assertEqual(len(set(original)-set(current)),2)
+  for (name,ref),g in layers.items():
+   b=g['bones'][0]
+   self.assertEqual(b['binding'],'q.item_slot_to_bone_name(context.item_slot)')
+   self.assertEqual(b['pivot'],[0,24,0])
+   self.assertEqual(len(b['cubes']),1)
+   self.assertFalse(visible(projected(g,OLD['animation.kg_a286.bottle_fp_left'],'left')),(name,ref))
+   self.assertTrue(visible(projected(g,CURRENT['animation.kg_a286.bottle_fp_left'],'left')),(name,ref))
  def test_native_equip_bob_and_slim_translation_are_inherited(self):
   for name,bone in [('animation.kg_a287.skewer_fp_left','skewer_pose'),('animation.kg_a286.bottle_fp_left','grip')]:
    pose=bone_matrix(CURRENT[name]['bones'][bone]);base=chain(reference_frame('left'),pose)

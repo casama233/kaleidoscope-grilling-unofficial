@@ -17,12 +17,17 @@ def projected(geometry,pose,hand):
     v=[cube['origin'][i]+corner[i]*cube['size'][i] for i in range(3)];v[0]*=-1;points.append(point(cm,v))
  return points
 
-def cases():
- index={g['description']['identifier']:g for p in (RP/'models/entity/a286_hand').glob('*.json') for g in json.loads(p.read_text())['minecraft:geometry']}
+def cases(legacy=False):
+ index={g['description']['identifier']:g for p in (RP/'models/entity').rglob('*.geo.json') for g in json.loads(p.read_text()).get('minecraft:geometry',[])}
  for p in sorted((RP/'attachables').glob('*seasoning*.json')):
   desc=json.loads(p.read_text())['minecraft:attachable']['description']
+  refs=set(desc['geometry'].values())
+  if legacy and desc['identifier']=='kaleidoscope_grilling:empty_seasoning_bottle':
+   refs={'geometry.kg_a286.kg_a2733.seasoning_bottle_hand'}
+  elif legacy and desc['identifier']=='kaleidoscope_grilling:pending_seasoning':
+   refs={'geometry.kg_a286.kg_a2766.special_seasoning.r4.v0','geometry.kg_a286.kg_a2766.special_seasoning.r4.v0.contents'}
   for hand in ('right','left'):
-   for ref in sorted(set(desc['geometry'].values())):
+   for ref in sorted(refs):
     yield p.name,hand,ref,index[ref]
 
 class NativeBottleFrames(unittest.TestCase):
@@ -30,11 +35,13 @@ class NativeBottleFrames(unittest.TestCase):
   count=0
   for name,hand,ref,g in cases():
    self.assertTrue(visible(projected(g,CURRENT['animation.kg_a286.bottle_fp_'+hand],hand)),(name,hand,ref));count+=1
-  self.assertEqual(count,266)
+  self.assertEqual(count,328)
  def test_old_frame_reproduces_missing_contents(self):
-  failures=[(name,hand,ref) for name,hand,ref,g in cases() if not visible(projected(g,OLD['animation.kg_a286.bottle_fp_'+hand],hand))]
+  # Preserve the original133-per-hand route inventory independently of the
+  # new partial-bottle contents. The retained r4 meshes remain source assets.
+  failures=[(name,hand,ref) for name,hand,ref,g in cases(legacy=True) if not visible(projected(g,OLD['animation.kg_a286.bottle_fp_'+hand],hand))]
   self.assertEqual(sum(hand=='right' for _,hand,_ in failures),66)
-  self.assertEqual(sum(hand=='left' for _,hand,_ in failures),133) # actual native left frame, not mirrored right arm
+  self.assertEqual(sum(hand=='left' for _,hand,_ in failures),133)
  def test_only_bottle_first_person_tracks_change(self):
   changed={name for name in CURRENT if CURRENT[name]!=OLD[name]}
   self.assertEqual(changed,{'animation.kg_a286.bottle_fp_right','animation.kg_a286.bottle_fp_left'})

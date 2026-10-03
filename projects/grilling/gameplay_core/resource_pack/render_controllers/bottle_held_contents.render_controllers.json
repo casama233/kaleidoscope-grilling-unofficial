@@ -1,0 +1,437 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_bottle_held.pending_0": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_0",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_0]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_1": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_1",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_0]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_2": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_2",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_1]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_3": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_3",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_1]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_4": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_4",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_2]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_5": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_5",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_2]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_6": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_6",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_3]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_7": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_7",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_3]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_8": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_8",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_4]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_9": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_9",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_4]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_10": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_10",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_5]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_11": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_11",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_5]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_12": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_12",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_6]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_13": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_13",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_6]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_14": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_79",
+            "Texture.pending_color_1",
+            "Texture.pending_color_63",
+            "Texture.pending_color_58",
+            "Texture.pending_color_50",
+            "Texture.pending_color_24",
+            "Texture.pending_color_97",
+            "Texture.pending_color_41",
+            "Texture.pending_color_72",
+            "Texture.pending_color_79"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_14",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_7]"
+      ]
+    },
+    "controller.render.kg_bottle_held.pending_15": {
+      "arrays": {
+        "textures": {
+          "Array.colors": [
+            "Texture.pending_color_118",
+            "Texture.pending_color_3",
+            "Texture.pending_color_15",
+            "Texture.pending_color_36",
+            "Texture.pending_color_161",
+            "Texture.pending_color_69",
+            "Texture.pending_color_109",
+            "Texture.pending_color_23",
+            "Texture.pending_color_16",
+            "Texture.pending_color_118"
+          ]
+        }
+      },
+      "geometry": "Geometry.pending_15",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Array.colors[v.kg_bottle_layer_7]"
+      ]
+    }
+  }
+}

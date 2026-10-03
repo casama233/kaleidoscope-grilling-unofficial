@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {nativeEatingCompleted} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/player_presentation_core.js';
 const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/main.js',import.meta.url),'utf8');
 const begin=source.indexOf('world.afterEvents.itemCompleteUse.subscribe(e=>{');
 const end=source.indexOf('// Native use poses cancel',begin);
@@ -12,8 +13,8 @@ function fixture(tick=24,{eventMatches=true,currentMatches=true,item=true}={}){
  const active={id:'fixed',start:0,nativeDuration:100,profile:'THREE',use:{},meta:{}};
  const ACTIVE_EATS=new Map([['player',active]]),SETTLED=new Map();
  const player={id:'player',setProperty(){}};
- const event={source:player,itemStack:item?{typeId:'fixed'}:undefined};
- const ctx={world:{afterEvents:{itemCompleteUse:{subscribe:f=>callbacks.complete=f},itemStopUse:{subscribe:f=>callbacks.stop=f}}},system:{currentTick:tick,run:f=>queue.push(f)},ACTIVE_EATS,SETTLED,PLATE_EATS:new Map(),PENDING_USES:new Map(),CUISINE_EATS:new Map(),CUISINE_FOOD_SET:new Set(),FOOD_DATA:{fixed:{}},PENDING_SEASONING:'pending',PLATE_ID:'plate',SECRET_ID:'secret',MYSTERIOUS_ID:'mystery',DARK_ID:'dark',RAW_NAUSEA:{},EAT_PROFILE_PROPERTY:'profile',EAT_HAND_PROPERTY:'hand',now:()=>ctx.system.currentTick,eatingEventMatches:()=>eventMatches,finishedFoodMeta:x=>x,dangerousPreservation(){},stopEatSound(){},stopSoundHandle(){},afterCommitted(){counts.native++},hungerSettle(){if(!currentMatches)return false;counts.manual++;return true}};
+ const event={source:player,itemStack:item?{typeId:'fixed'}:undefined,useDuration:0};
+ const ctx={world:{afterEvents:{itemCompleteUse:{subscribe:f=>callbacks.complete=f},itemStopUse:{subscribe:f=>callbacks.stop=f}}},system:{currentTick:tick,run:f=>queue.push(f)},ACTIVE_EATS,SETTLED,PLATE_EATS:new Map(),PENDING_USES:new Map(),CUISINE_EATS:new Map(),CUISINE_FOOD_SET:new Set(),FOOD_DATA:{fixed:{}},PENDING_SEASONING:'pending',PLATE_ID:'plate',SECRET_ID:'secret',MYSTERIOUS_ID:'mystery',DARK_ID:'dark',RAW_NAUSEA:{},EAT_PROFILE_PROPERTY:'profile',EAT_HAND_PROPERTY:'hand',nativeEatingCompleted,now:()=>ctx.system.currentTick,eatingEventMatches:()=>eventMatches,finishedFoodMeta:x=>x,dangerousPreservation(){},stopEatSound(){},stopSoundHandle(){},afterCommitted(){counts.native++},hungerSettle(){if(!currentMatches)return false;counts.manual++;return true}};
  const constants=source.match(/const MINIMUM_EAT_TICKS=\d+,RELEASE_CHECKPOINT_GRACE_TICKS=\d+;/);
  assert.ok(constants,'production release constants are defined');
  vm.runInNewContext(constants[0]+'\n'+source.slice(begin,end),ctx);

@@ -26,6 +26,7 @@ def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,proj
  return bool(eval(compile(tree,'<pose-condition>','eval'),{'__builtins__':{}},{}))
 def binding_assets():
  idx={};animations={};rows=[];refs=set();cases=0
+ version=tuple(load(BP/'manifest.json')['header']['version'])
  for p in (RP/'models').rglob('*.geo.json'):
   for g in load(p)['minecraft:geometry']:
    ref=g['description']['identifier'];assert ref not in idx,ref;idx[ref]=g
@@ -44,13 +45,17 @@ def binding_assets():
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
       projected='fp_eat_'+hand
       projected_code={'two':2,'three_alt':4,'four':5}.get(d['animations'].get(projected,'').split('.')[-2] if projected in d['animations'] else '')
-      expected_using=([projected] if first and profile==projected_code else [expected]+([eating] if eating in d['animations'] else [])) if tuple(load(BP/'manifest.json')['header']['version'])>=(2,8,58) else [expected]+([eating] if eating in d['animations'] else [])
+      # .61 corrects the renderer context: Java renderArmWithItem curves are
+      # first-person-only. Older immutable candidates retain their old guard.
+      local_eating=[eating] if eating in d['animations'] and (first or version<(2,8,61)) else []
+      expected_using=([projected] if first and profile==projected_code else [expected]+local_eating) if version>=(2,8,58) else [expected]+local_eating
       assert using_matches==expected_using,(p,profile,using_matches,expected_using)
       # Projection is independently synchronized, and every excluded posture
-      # must fall back to the old pose plus local eating animation.
+      # falls back to the native display. Local authored motion is FP-only in
+      # .61; third-person never inherits a camera-space item displacement.
       for projection,posture in [(False,None)]+[(True,s) for s in ('is_sneaking','is_swimming','is_gliding','is_riding')]:
        fallback=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
-       assert fallback==[expected]+([eating] if eating in d['animations'] else []),(p,profile,projection,posture,fallback)
+       assert fallback==[expected]+local_eating,(p,profile,projection,posture,fallback)
       for inactive in (0,2 if slot=='main_hand' else 1):
        inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
        assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)

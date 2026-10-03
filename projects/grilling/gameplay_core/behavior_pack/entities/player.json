@@ -39,6 +39,15 @@
           "default": 0,
           "client_sync": true
         },
+        "kaleidoscope_grilling:eat_elapsed_ticks": {
+          "type": "int",
+          "range": [
+            0,
+            72000
+          ],
+          "default": 0,
+          "client_sync": true
+        },
         "kaleidoscope_grilling:secret_main_0": {
           "type": "int",
           "range": [
@@ -89,6 +98,150 @@
           "range": [
             0,
             255
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_0": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_1": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_2": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_3": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_4": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_5": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_6": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_main_7": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_0": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_1": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_2": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_3": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_4": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_5": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_6": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:bottle_off_7": {
+          "type": "int",
+          "range": [
+            0,
+            9
           ],
           "default": 0,
           "client_sync": true

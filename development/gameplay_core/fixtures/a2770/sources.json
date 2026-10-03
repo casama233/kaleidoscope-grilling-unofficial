@@ -12,8 +12,8 @@
   },
   "pending_palette_method": "Java center-half top-two colors for locally available item textures; Java fallback pair otherwise",
   "pending_live_resource_pack_sampling": false,
-  "pending_palette_tiles": 169,
-  "pending_tint_mode": "baked color atlas with standard uv_anim",
+  "pending_palette_tiles": 177,
+  "pending_tint_mode": "direct opaque source-color textures",
   "seasoning_geometry_count": 56,
   "oil_overlay_inflate_model_units": [
     0.01,

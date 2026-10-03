@@ -71,6 +71,18 @@ test('empty with incomplete ingredients preserves metadata, explicit empty-to-pe
  const f=fixture(),s=decorated('empty');f.hand=s;f.place();
  for(let i=0;i<3;i++){f.hand=new Stack(core.BASE_SEASONINGS[i]);f.api.handleSeasoningBlock(f.block,f.holder);const stored=f.api.nativeBottles(f.block).items[0];assert.equal(stored.typeId,i<2?EMPTY:PENDING);assert.equal(stored.nameTag,i<2?s.nameTag:undefined);}
 });
+for(const kind of ['empty','pending'])test('partial '+kind+' add/pickup/replacement roundtrip preserves exact native ingredients and metadata',()=>{
+ const f=fixture(),s=decorated(kind);s.props[core.SEASONING_LIST_KEY]='[]';f.hand=s;f.place();
+ for(const id of ['minecraft:redstone',core.BASE_SEASONINGS[0]]){
+  f.hand=new Stack(id);f.api.handleSeasoningBlock(f.block,f.holder);
+ }
+ const stored=f.api.nativeBottles(f.block).items[0];
+ assert.equal(stored.typeId,kind==='empty'?EMPTY:PENDING);equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone',core.BASE_SEASONINGS[0]]);
+ assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);equal(stored.opaqueNative,s.opaqueNative);
+ f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
+ f.place();equal(f.api.nativeBottles(f.block).items[0],stored);
+ f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);
+});
 test('creative player break returns every native bottle without normalizing it',()=>{
  const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(core.BASE_SEASONINGS);f.hand=s;f.place();f.setMode('creative');assert.equal(f.api.breakNativeBottles(f.block),true);equal(f.drops[0].item,s);assert.equal(f.entities.size,0);assert.equal(f.block.typeId,'minecraft:air');
 });

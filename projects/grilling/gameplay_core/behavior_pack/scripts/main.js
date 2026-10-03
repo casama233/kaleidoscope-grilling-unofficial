@@ -2,13 +2,14 @@ import {JAVA_FP_EATING_ITEMS} from './java_eating_projection_items.js';
 import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
+import './bottle_held_visual_runtime.js';
 import './integration_api_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
 import {readEffects,writeEffects,clearEffects} from './effect_state_runtime.js';
 import {nativeDragonHealth,forgetDragonHealth} from './dragon_native_health.js';
 import {finishedFoodMeta} from './food_finish_core.js';
-import {eatingProfile,eatingNativeTicks,EAT_NATIVE_TICKS_PROPERTY,EAT_PROFILE_PROPERTY,EAT_HAND_PROPERTY,EAT_PROJECTION_PROPERTY} from './player_presentation_core.js';
+import {eatingProfile,eatingNativeTicks,eatingElapsedTicks,nativeEatingCompleted,EAT_ELAPSED_TICKS_PROPERTY,EAT_NATIVE_TICKS_PROPERTY,EAT_PROFILE_PROPERTY,EAT_HAND_PROPERTY,EAT_PROJECTION_PROPERTY} from './player_presentation_core.js';
 import {configureSecretHeldReader,syncSecretHeld} from './secret_held_runtime.js';
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
@@ -845,7 +846,7 @@ function completePending(player,stack){
  if(commitEating({debit:()=>writeUseHand(player,a.use,out),reward:()=>{},restoreFood:()=>writeUseHand(player,a.use,a.stack),restoreNutrition:()=>{}})){seasoningFinished(player);awardSeasoningFinishedChallenges(player,list)}
 }
 world.afterEvents.itemStartUse.subscribe(e=>{
- try{e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0)}catch{}
+ try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{}
  const id=e.itemStack?.typeId;
  if(id===PENDING_SEASONING){const hand=captureInteractionIntent(e.source,e.itemStack).hand;
   stopSoundHandle(PENDING_USES.get(e.source.id)?.audio);
@@ -898,9 +899,9 @@ world.afterEvents.itemCompleteUse.subscribe(e=>{
   }
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
  const a=ACTIVE_EATS.get(e.source.id);
- if(!a||a.id!==id||!eatingEventMatches(a.use,e.itemStack,now())||system.currentTick-a.start<a.nativeDuration)return;
+ if(!a||a.id!==id||!eatingEventMatches(a.use,e.itemStack,now())||!nativeEatingCompleted(a.start,system.currentTick,a.nativeDuration,e.useDuration))return;
  a.meta=finishedFoodMeta(a.meta,now());
- stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0)}catch{}
+ stopEatSound(e.source,a.profile);SETTLED.set(e.source.id,system.currentTick);ACTIVE_EATS.delete(e.source.id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{}
  if(id===SECRET_ID){addSecretNutrition(e.source,e.itemStack,{hot:false})}
  if(RAW_NAUSEA[id])try{e.source.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{e.source.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{e.source.addEffect('blindness',200,{showParticles:true})}catch{}
  if(id===SECRET_ID)secretRemainders(e.source,e.itemStack);
@@ -919,7 +920,7 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  // Capture elapsed at release, not in the deferred callback: a 23-tick release
  // must not become eligible merely because cleanup runs a tick later.
  // Let native completion win either event order; never delete a newer session.
- system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0)}catch{};if(e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
+ system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{};if(e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
@@ -930,7 +931,7 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
 });
-world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0)}catch{};if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
+world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
 function canUseSecretSkewer(stack){
  try{return validSecretIngredientRows(readSkewerRows(stack))&&(!isSecretCooked(stack)||validSecretIngredientRows(readEffectiveSkewerRows(stack)))}catch{return false}
@@ -1017,7 +1018,15 @@ function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecr
 system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   const active=ACTIVE_EATS.get(p.id);
-  if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.
+  if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){
+   // Do not assume a remote custom-item countdown matches the owner's clock.
+   // Replicate source session time; native food debit/reward stays event-owned.
+   p.setProperty(EAT_ELAPSED_TICKS_PROPERTY,eatingElapsedTicks(active.start,system.currentTick,active.nativeDuration));
+   advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick);
+  }else if(active){
+   // A replaced/switching serving must not leave a projected arm on another item.
+   p.setProperty(EAT_PROFILE_PROPERTY,0);p.setProperty(EAT_HAND_PROPERTY,0);p.setProperty(EAT_PROJECTION_PROPERTY,false);p.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);p.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);
+  } // Presentation never debits food.
   if(system.currentTick%10===0&&fxGet(p,'invincible'))invincibleAmbientFeedback(p);
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);

@@ -507,10 +507,10 @@ def check_current_display_contracts(findings, geometry_index, animations):
             for alias in aliases
         }
         if family == "skewer":
-            required_selectors.update({f'eat_{hand}': "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
+            required_selectors.update({f'eat_{hand}': "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
             if requested=='THREE_RANDOM':
                 for hand in ['right','left']:
-                    using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+                    using="c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
                     required_selectors['eat_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"
                     required_selectors['eat_alt_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') == 4"
         if projected:
