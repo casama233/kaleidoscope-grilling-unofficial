@@ -57,14 +57,14 @@ test('public native variant survives heat metadata rewrites and rejects invalid 
  for(const nativeVariant of [-1,1.5,32768,'7'])assert.equal(normalizePublicFood({v:1,hotUntil:0,seasoning:[],nativeVariant}),undefined);
 });
 test('render providers preserve the explicitly published item variant',()=>{
- const stack={typeId:'minecraft:suspicious_stew',getComponent(){},clone(){return {...this}}};assert.equal(stationProjection(stack,{nativeVariant:7}).data,7);
+ const stack={typeId:'minecraft:suspicious_stew',getRawLore(){return []},getComponent(){},clone(){return {...this}}};assert.equal(stationProjection(stack,{nativeVariant:7}).data,7);
  assert(registerStationProjection('test:custom',()=>({data:4})));assert(!registerStationProjection('test:custom',()=>({data:2})));
  assert.equal(stationProjection({...stack,typeId:'test:custom'},{}).data,4);assert.throws(()=>stationProjection(stack,{nativeVariant:32768}));
 });
 test('native equipment commands include and verify the declared aux data',()=>{
  const text=fs.readFileSync(scriptRoot+'station_contents_visual_runtime.js','utf8');const code=text.slice(text.indexOf('export function renderItemType('),text.indexOf('function pose('));const cmds=[];
  const ctx={stationProjection,readPublicFood:()=>({present:true,valid:true,state:{nativeVariant:7}})};vm.runInNewContext(code.replace('export ','' )+';this.run=renderItemType',ctx);
- const result=ctx.run({runCommand:c=>cmds.push(c)},{typeId:'minecraft:suspicious_stew',getComponent(){},clone(){return {...this}}});
+ const result=ctx.run({runCommand:c=>cmds.push(c)},{typeId:'minecraft:suspicious_stew',getRawLore(){return []},getComponent(){},clone(){return {...this}}});
  assert.equal(result.data,7);assert.equal(cmds[0],'replaceitem entity @s slot.weapon.mainhand 0 minecraft:suspicious_stew 1 7');assert(cmds[1].includes('data=7'));
 });
 

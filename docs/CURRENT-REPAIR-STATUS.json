@@ -3,7 +3,7 @@
   "version": [
     2,
     8,
-    48
+    49
   ],
   "review": "comprehensive-review-20261002T151900Z",
   "client_platforms": [
@@ -41,8 +41,8 @@
     {
       "id": "F05",
       "title": "秘製串組合",
-      "canonical": "2.8.45 主副手各三食材 client_sync 索引、213 個已知食物圖示與三個獨立顯示槽；原始第三方圖像不複製入本庫",
-      "remaining": "Windows 實際呈現；動態背包 GUI、原作 tint／實體食材模型及未登記第三方食物仍未等價",
+      "canonical": "2.8.45 主副手各三食材 client_sync 索引與 213 個已核對圖像保留；2.8.49 提供持久跨包 catalog 別名註冊與查核。",
+      "remaining": "Windows 實際呈現；動態背包 GUI、原作 tint／實體食材模型及新作者圖像仍需資源包發行。",
       "client_accepted": false
     },
     {
@@ -62,8 +62,8 @@
     {
       "id": "F08",
       "title": "內容投影與規模",
-      "canonical": "2.8.41 原生 aux／provider、附近優先、公平刷新與可持久預算保留",
-      "remaining": "真人變體及多人負載；原生每堆物品私有 aux 仍須 producer/provider 公開契約",
+      "canonical": "既有 bounded helper 排程保留；2.8.49 公開逐堆 projection carrier、跨包 provider 註冊與實際物品查核，兩堆同 ID 可保留不同 data。",
+      "remaining": "作者須在真正 producer callback 公開實際 aux；私人資料不可推斷。變體與多人負載仍需 Windows 真人。",
       "client_accepted": false
     },
     {
@@ -76,8 +76,8 @@
     {
       "id": "F10",
       "title": "要塞自然替換",
-      "canonical": "可靠結構边界／新生成區塊 callback 仍無可用穩定宿主；既有箱取得／栽種保留",
-      "remaining": "未實作自然 25% 替換；不得猜測附近方塊、替換玩家農場或冒稱自然生成完成",
+      "canonical": "2.8.49 提供可信新生成宿主的 Nether fortress bounds／wart 座標接口，原 Java signed-long 哈希 25%、紅色與年齡映射、持久序號與失敗回復。",
+      "remaining": "原版新區塊／要塞 callback 仍無穩定來源；自動自然 25% 替換未完成，不能把人工批次測試當自然生成。",
       "client_accepted": false
     },
     {
@@ -104,8 +104,8 @@
     {
       "id": "F14",
       "title": "配置與整合",
-      "canonical": "2.8.41 GameDirectors config／持久保存、展示預算與公開 producer/render API 保留",
-      "remaining": "全部 Java config、Create／女僕／KubeJS／JEI／Jade／Iceberg 等選用模組沒有同名 Bedrock 宿主；不作完整移植承諾",
+      "canonical": "2.8.49 提供 producer／projection／held catalog／fresh generation 及確認／重啟收據 API；熔爐熱食 false／30 秒設定與既有 public oil／secret-food 接口保留。",
+      "remaining": "原生熔爐仍需真正 producer 宿主 callback；Create／女僕／KubeJS／JEI／Jade／Iceberg 等 Java 選用模組未變成同名 Bedrock 模組。",
       "client_accepted": false
     },
     {
@@ -165,5 +165,12 @@
     45
   ],
   "latest_runtime_version_is_authoritative_in": "baseline.json and Tavern family/upstream.lock.json; this is a source-review snapshot, not live acceptance",
-  "nonplayer_health_persistence_evidence": "evidence/dragon-health-persistence-2.8.45.json"
+  "nonplayer_health_persistence_evidence": "evidence/dragon-health-persistence-2.8.45.json",
+  "integration_api": {
+    "version": 1,
+    "spec": "BEDROCK-INTEGRATION-API.md",
+    "vanilla_fortress_callback_installed": false,
+    "native_furnace_output_callback_installed": false,
+    "client_accepted": false
+  }
 }

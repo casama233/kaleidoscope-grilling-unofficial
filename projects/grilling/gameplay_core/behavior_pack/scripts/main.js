@@ -1,6 +1,7 @@
 import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
+import './integration_api_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
 import {readEffects,writeEffects,clearEffects} from './effect_state_runtime.js';

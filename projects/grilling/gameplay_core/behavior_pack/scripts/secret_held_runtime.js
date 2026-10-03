@@ -1,6 +1,6 @@
 import {world,system} from '@minecraft/server';
 import {getMainHand,getOffHand} from './a2735_player_io.js';
-import {SECRET_VISUAL_SLOTS} from './secret_visual_catalog.js';
+import {secretVisualIndex} from './integration_registry_core.js';
 let reader;const signatures=new Map();
 export function configureSecretHeldReader(read){reader=read;}
 export function syncSecretHeld(player){
@@ -8,7 +8,7 @@ export function syncSecretHeld(player){
  const rows={};
  for(const [hand,stack] of [['main',getMainHand(player)],['off',getOffHand(player)]]){
   const ingredients=stack?.typeId==='kaleidoscope_grilling:secret_skewer'?reader(stack):[];
-  for(let i=0;i<3;i++)rows['kaleidoscope_grilling:secret_'+hand+'_'+i]=SECRET_VISUAL_SLOTS[ingredients[i]?.id]??0;
+  for(let i=0;i<3;i++)rows['kaleidoscope_grilling:secret_'+hand+'_'+i]=secretVisualIndex(ingredients[i]?.id);
  }
  const signature=JSON.stringify(rows);if(signatures.get(player.id)===signature)return;
  for(const [key,value] of Object.entries(rows))player.setProperty(key,value);
