@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {useSound} from './immersion_audio_runtime.js';
 import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
@@ -69,7 +70,7 @@ function parseRowsProperty(stack,key,limit=5){
 }
 function skewerFood(stack){
  if(!stack)return {nutrition:0,saturation:0};
- if(stack.typeId===SECRET_ID){
+ if(canonicalFoodId(stack.typeId)===SECRET_ID){
   const rows=parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3);
   let cooked=false;try{cooked=getItemProperty(stack,SECRET_COOKED_KEY)===true}catch{}
   const cookedRows=cooked?parseRowsProperty(stack,SECRET_COOKED_INGREDIENTS_KEY,3):[];
@@ -95,7 +96,7 @@ function restoreStack(row){
 }
 function isSkewer(stack){
  if(!stack)return false;
- if(FIXED_IDS.has(stack.typeId)||stack.typeId===SECRET_ID)return true;
+ if(FIXED_IDS.has(canonicalFoodId(stack.typeId))||canonicalFoodId(stack.typeId)===SECRET_ID)return true;
  try{return !!(stack.hasTag?.(RAW_SKEWER_TAG)||stack.hasTag?.(GRILLED_SKEWER_TAG))}catch{return false}
 }
 function skewerIngredientIds(stack){return parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3).map(x=>x.id)}

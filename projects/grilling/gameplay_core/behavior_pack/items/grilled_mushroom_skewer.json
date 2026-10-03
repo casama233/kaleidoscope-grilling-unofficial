@@ -35,7 +35,8 @@
       },
       "minecraft:tags": {
         "tags": [
-          "minecraft:is_food"
+          "minecraft:is_food",
+          "kaleidoscope_grilling:food_grilled_mushroom_skewer"
         ]
       }
     }

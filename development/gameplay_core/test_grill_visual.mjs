@@ -1,3 +1,4 @@
+import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -62,7 +63,7 @@ test('removal failures retain cap accounting until a confirmed retry',()=>{
 test('display reads never allocate inventory, rebind its ledger or ignore quarantine',()=>{
  const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/family_station_storage.js',import.meta.url),'utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(class|const|function))/g,'');
  const data=new Map(),entities=new Map();let writes=0,spawns=0;
- const context=vm.createContext({world:{getDynamicProperty:k=>data.get(k),setDynamicProperty(){writes++;throw Error('display must not write');},getEntity:k=>entities.get(k)},system:{currentTick:0},console});vm.runInContext(source,context);
+ const context=vm.createContext({canonicalFoodId,world:{getDynamicProperty:k=>data.get(k),setDynamicProperty(){writes++;throw Error('display must not write');},getEntity:k=>entities.get(k)},system:{currentTick:0},console});vm.runInContext(source,context);
  const key='kaleidoscope_grilling:storage_v1/minecraft:overworld/0/80/0';
  const b={...block,typeId:'kaleidoscope_grilling:grill',getComponent(){},dimension:{...block.dimension,spawnEntity(){spawns++;},getEntities(){return [...entities.values()];}}};
  context.block=b;assert.equal(vm.runInContext('peekStationContainer(block)',context),undefined);

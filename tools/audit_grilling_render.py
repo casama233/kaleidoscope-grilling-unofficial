@@ -484,12 +484,13 @@ def check_current_display_contracts(findings, geometry_index, animations):
     for path in sorted((RP / "attachables").glob("*.json")):
         desc = load_json(path)["minecraft:attachable"]["description"]
         ids = desc.get("animations", {})
-        family = "skewer" if desc["identifier"].endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
-        counts[family] += 1
+        canonical_id = desc["identifier"].removesuffix("_java_three_alt")
+        family = "skewer" if canonical_id.endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
+        if canonical_id == desc["identifier"]: counts[family] += 1
         expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
         if family == "skewer":
             table = json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)', (BP / 'scripts/data.js').read_text()).group(1))
-            requested=table.get(desc['identifier'],'THREE_RANDOM' if desc['identifier']=='kaleidoscope_grilling:secret_skewer' else 'THREE')
+            requested=table.get(canonical_id,'THREE_RANDOM' if canonical_id=='kaleidoscope_grilling:secret_skewer' else 'THREE')
             profile = requested.replace('THREE_RANDOM', 'THREE').lower()
             expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
             if requested=='THREE_RANDOM':expected_ids.update({f'eat_alt_{hand}':f'animation.kg_eating.item.three_alt.{hand}' for hand in ['right','left']})
@@ -501,10 +502,10 @@ def check_current_display_contracts(findings, geometry_index, animations):
             for alias in aliases
         }
         if family == "skewer":
-            required_selectors.update({f'eat_{hand}': "q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
+            required_selectors.update({f'eat_{hand}': "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
             if requested=='THREE_RANDOM':
                 for hand in ['right','left']:
-                    using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+                    using="c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
                     required_selectors['eat_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"
                     required_selectors['eat_alt_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') == 4"
         actual_selectors = {}
@@ -538,7 +539,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
                 if missing:
                     add(findings, "error", "held_animation_missing_bone", ref,
                         f"{anim_id} targets absent bones: {sorted(missing)}")
-            if family == "skewer" and desc['identifier']!='kaleidoscope_grilling:secret_skewer': skewer_refs.add(ref)
+            if family == "skewer" and canonical_id!='kaleidoscope_grilling:secret_skewer': skewer_refs.add(ref)
     if counts != {"skewer":40,"bottle":67} or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 

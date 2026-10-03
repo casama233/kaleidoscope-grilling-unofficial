@@ -1,3 +1,4 @@
+import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 /** Fault-injected production functions; storage doubles are not Minecraft players. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -35,7 +36,7 @@ function fixture(savedDp){
  const held=(p,h)=>slots.get(h==='off'?'off':p.selectedSlotIndex);
  const setHand=(p,h,s)=>{const key=h==='off'?'off':p.selectedSlotIndex;slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')};
  const captureWritableHand=(p,h)=>{const key=h==='off'?'off':p.selectedSlotIndex;return {before:slots.get(key)?.clone(),read:()=>slots.get(key),write(s){slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')}}};
- const c=vm.createContext({...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
+ const c=vm.createContext({canonicalFoodId,...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
   world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{blockExplode:{subscribe(){}},playerBreakBlock:{subscribe(){}}}},
   system:{run(fn){scheduled.push(fn)}},console:{warn(){}},SECRET_ID:N+'secret_skewer',captureWritableHand,
   heldByHand:held,setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,
@@ -89,7 +90,7 @@ test('incomplete rollback persists quarantine and blocks later reads/transfers',
 });
 test('native hand adapter pins original slot for read, apply and rollback',()=>{
  const ioSource=fs.readFileSync(new URL('a2735_player_io.js',base),'utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(function|const))/g,'');
- const rows=new Map([[3,food()],[4,new Stack('minecraft:stone')]]),io=vm.createContext({EquipmentSlot:{Offhand:'off'}});
+ const rows=new Map([[3,food()],[4,new Stack('minecraft:stone')]]),io=vm.createContext({canonicalFoodId,EquipmentSlot:{Offhand:'off'}});
  vm.runInContext(ioSource+'\nglobalThis.capture=captureWritableHand;',io);
  const holder={selectedSlotIndex:3,getComponent:()=>({container:{size:36,getItem:k=>rows.get(k),setItem:(k,v)=>rows.set(k,v)}})};
  const bound=io.capture(holder,'main'),after=food();after.amount=2;

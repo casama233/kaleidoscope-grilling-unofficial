@@ -30,6 +30,7 @@ def binding_assets():
  for p in (RP/'animations').glob('*.json'):
   for key,a in load(p).get('animations',{}).items():assert key not in animations,key;animations[key]=a
  for p in sorted((RP/'attachables').glob('*.json')):
+  if p.stem.endswith('_java_three_alt.attachable'):continue
   d=load(p)['minecraft:attachable']['description'];selected=[]
   for first in (0,1):
    for slot,hand in [('main_hand','right'),('off_hand','left')]:
@@ -40,7 +41,7 @@ def binding_assets():
      for profile in (3,4):
       using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
-      assert using_matches==[expected]+([eating] if eating in d['animations'] else []),(p,profile,using_matches)
+      assert using_matches==[expected]+([eating] if first and eating in d['animations'] else []),(p,profile,using_matches)
       for inactive in (0,2 if slot=='main_hand' else 1):
        inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
        assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)

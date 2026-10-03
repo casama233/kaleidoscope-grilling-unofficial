@@ -1,0 +1,69 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grilled_squid_tentacle_skewer_java_three_alt",
+      "materials": {
+        "default": "entity_alphatest_one_sided"
+      },
+      "textures": {
+        "stage0": "textures/a22_bites/grilled_squid_tentacle_skewer_stage0",
+        "stage1": "textures/a22_bites/grilled_squid_tentacle_skewer_stage1",
+        "stage2": "textures/a22_bites/grilled_squid_tentacle_skewer_stage2",
+        "stage3": "textures/a22_bites/grilled_squid_tentacle_skewer_stage3",
+        "stage4": "textures/a22_bites/grilled_squid_tentacle_skewer_stage3"
+      },
+      "geometry": {
+        "stage0": "geometry.kg_a287.kg_a22.grilled_squid_tentacle_skewer.stage0",
+        "stage1": "geometry.kg_a287.kg_a22.grilled_squid_tentacle_skewer.stage1",
+        "stage2": "geometry.kg_a287.kg_a22.grilled_squid_tentacle_skewer.stage2",
+        "stage3": "geometry.kg_a287.kg_a22.grilled_squid_tentacle_skewer.stage3",
+        "stage4": "geometry.kg_a287.kg_a22.grilled_squid_tentacle_skewer.stage3"
+      },
+      "scripts": {
+        "pre_animation": [
+          "v.kg_bite_stage = (q.is_using_item && ((c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_hand') == 1) || (c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_hand') == 2))) ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? (q.item_in_use_duration >= 3.5 ? 3 : (q.item_in_use_duration >= 2.16667 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0))) : (q.item_in_use_duration >= 3.54167 ? 3 : (q.item_in_use_duration >= 2.33333 ? 2 : (q.item_in_use_duration >= 0.95833 ? 1 : 0)))) : 0;"
+        ],
+        "animate": [
+          {
+            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand'"
+          },
+          {
+            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand'"
+          },
+          {
+            "tp_right": "c.is_first_person == 0 && c.item_slot == 'main_hand'"
+          },
+          {
+            "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"
+          },
+          {
+            "eat_right": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') != 4"
+          },
+          {
+            "eat_alt_right": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') == 4"
+          },
+          {
+            "eat_left": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') != 4"
+          },
+          {
+            "eat_alt_left": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') == 4"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.kg_a22.bite"
+      ],
+      "animations": {
+        "fp_right": "animation.kg_a287.skewer_fp_right",
+        "fp_left": "animation.kg_a287.skewer_fp_left",
+        "tp_right": "animation.kg_a287.skewer_tp_right",
+        "tp_left": "animation.kg_a287.skewer_tp_left",
+        "eat_right": "animation.kg_eating.item.three.right",
+        "eat_left": "animation.kg_eating.item.three.left",
+        "eat_alt_right": "animation.kg_eating.item.three_alt.right",
+        "eat_alt_left": "animation.kg_eating.item.three_alt.left"
+      }
+    }
+  }
+}

@@ -388,5 +388,45 @@
       "sha256": "98b0151fa2f0730bace55a373bcb91b6ae12f594a6d04d8c7de7bff44b6bd533",
       "files": 1670
     }
+  },
+  "2.8.52": {
+    "BP": {
+      "sha256": "ed74a74633ecdf41911089bffbbfabf121cc474523ac2f357c58d2de9071d90a",
+      "files": 553
+    },
+    "RP": {
+      "sha256": "33198c83eacaae43a5b656579883388bc80c665fc2c629688022a77a26710c68",
+      "files": 1690
+    }
+  },
+  "2.8.53": {
+    "BP": {
+      "sha256": "f8f4d0f29bc107c8f8ef7b80172423deb4f491eb9191613e8a11351135cb89c7",
+      "files": 553
+    },
+    "RP": {
+      "sha256": "63cd83d7861e564a6ca1af4bb04a74eda2c26fc8de7afb3dd80a01f09d5ed9ba",
+      "files": 1690
+    }
+  },
+  "2.8.54": {
+    "BP": {
+      "sha256": "94f7b707802318d82bc3fe45a9f22969b99b8eff9bc43a23bbb3b171d730aa9c",
+      "files": 553
+    },
+    "RP": {
+      "sha256": "d25711b8c90d10c72d2c48fa16c9f96fd6d596a89361f8740e26e67834568ff0",
+      "files": 1690
+    }
+  },
+  "2.8.55": {
+    "BP": {
+      "sha256": "3721ef6c3451e4b341e0135218791ed816f428cf15a87462754410ec06d1d210",
+      "files": 553
+    },
+    "RP": {
+      "sha256": "2bbcf6de6ccb267a05ddeaae3e6ffde6a89c559f966e1a7ca0bc118d9bf9d749",
+      "files": 1690
+    }
   }
 }
