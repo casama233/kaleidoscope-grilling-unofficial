@@ -2,7 +2,7 @@
 
 Never copy Java XYZ Euler angles into Bedrock ZYX bone channels. This module
 uses Java display transforms and pinned Mojang player attachment offsets for
-skewer first person. Other families retain their editor calibration. Neither
+skewer and bottle first person. Unused rack poses retain their editor calibration. Neither
 mathematical projection nor editor calibration is Minecraft client acceptance.
 """
 import json
@@ -62,9 +62,13 @@ def native_skewer_calibration(hand):
     Right arm pivot [-5,22,0], position [13.5,-10,12], rotation
     [95,-45,115]; rightItem pivot [-6,15,1]. empty_hand cancels the
     item's Z offset and places its Y seven units below the arm pivot.
-    Offhand uses the mirrored basis; client acceptance covers both hands.
+    Native empty_hand does not mirror its right-arm pose onto the left arm.
+    The left branch uses the actual settled wide left socket. Native equip
+    lowering, bob and the slim shoulder offset remain inherited, not canceled.
     This is a head-centered projection model, not a renderer emulation.
     """
+    if hand=='left':
+        return chain(translate([-6,15,0]),translate([0,-24,0])), chain(translate([0,24,0]),rotate('y',180))
     sign=1 if hand=='right' else -1
     arm=chain(translate([-8.5*sign,12,12]),zyx([-95,45*sign,115*sign]))
     base=chain(arm,translate([sign,-7,0]),translate([0,-24,0]))
@@ -98,7 +102,7 @@ def make_pose(family, view, hand):
         position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
         position[0]*=-1
     else:
-        base,camera=(native_skewer_calibration(hand) if family=='skewer' else calibration(hand))
+        base,camera=(native_skewer_calibration(hand) if family in ('skewer','bottle') else calibration(hand))
         # Rack's untranslated Java FP slot lies outside this Bedrock camera.
         # Keep Java orientation/scale; adapt the placement into the visible hand
         # region. This explicit exception is covered by the viewport regression.

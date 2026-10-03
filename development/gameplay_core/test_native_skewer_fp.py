@@ -7,9 +7,18 @@ from held_pose_frames import RP, chain, translate, zyx, rotate, rigid_inverse, b
 
 FIXTURE = json.loads((Path(__file__).parent/'fixtures/native-fp-frame-1.26.50.4.json').read_text())
 
-def reference_frame(hand):
+def reference_frame(hand, slim=False, height=1, bob=(0,0,0)):
     # Independently assemble the public player hierarchy and empty_hand offsets.
     # Do not call the runtime generator's calibration or make_pose here.
+    if hand == 'left':
+        # Independently assemble actual native left bones. empty_hand has no
+        # leftarm pose; swap_item/bob/slim offsets remain on the native parent.
+        arm = FIXTURE['player_bones']['leftarm']['pivot']
+        item = FIXTURE['player_bones']['leftitem']['pivot']
+        camera = chain(translate(FIXTURE['native_camera_model']['pivot']),rotate('y',180))
+        parent = translate([-arm[0]+bob[0],arm[1]-(.5 if slim else 0)-10*(1-height)+bob[1],arm[2]+bob[2]])
+        socket = translate([-(item[0]-arm[0]),-7,0])
+        return chain(rigid_inverse(camera),parent,socket)
     sign = 1 if hand == 'right' else -1
     arm = FIXTURE['player_bones']['rightarm']['pivot']
     item = FIXTURE['player_bones']['rightitem']['pivot']

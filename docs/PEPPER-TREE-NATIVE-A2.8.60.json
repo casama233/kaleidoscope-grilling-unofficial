@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "draft_only": true,
+  "version": [
+    2,
+    8,
+    60
+  ],
+  "pack_count": 16,
+  "exact_runtime_matches_current_source": {
+    "behavior_pack": true,
+    "resource_pack": true
+  },
+  "draft_receipt_sha256": "e0afd3dbddd35f84cc0fe7b43af0cf08880700003b3e2e8b67ae1bcabd68ff2d",
+  "base_2859_receipt_sha256": "9b3ea0229eb3ac2d000b0f84f5d4faa63fe64a8ed4b52f55a0f5e5f514622a57",
+  "bds_version": "1.26.52.3",
+  "feature_id": "kaleidoscope_grilling:pepper_tree_worldgen",
+  "native_exact_feature_placements": 64,
+  "initial_seeds": 64,
+  "initial_logs": 0,
+  "grown_seeds": 0,
+  "grown_log_count": 224,
+  "grown_leaf_count": 1205,
+  "heights": {
+    "2": 32,
+    "3": 32
+  },
+  "initial_fruiting": {
+    "leaves": 1205,
+    "fruiting": 310,
+    "ratio": 0.2572614107883817
+  },
+  "native_random_tick_speed": 1000,
+  "random_tick_window": 200,
+  "retained_log_count": 224,
+  "retained_leaf_count": 1205,
+  "border_deferred_then_resumed": true,
+  "border_resumed": {
+    "index": "border",
+    "origin": {
+      "x": 2048,
+      "y": 160,
+      "z": 2055
+    },
+    "logs": 4,
+    "leaves": 22,
+    "seeds": 0,
+    "bridges": 0,
+    "fruiting": 7,
+    "persistent": 0
+  },
+  "negative_cases": [
+    {
+      "name": "invalid_soil",
+      "origin": {
+        "x": 1030,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": false,
+      "logs": 0,
+      "leaves": 0,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 0,
+      "persistent": 0,
+      "originType": "minecraft:air"
+    },
+    {
+      "name": "blocked_center",
+      "origin": {
+        "x": 1038,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": true,
+      "logs": 0,
+      "leaves": 0,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 0,
+      "persistent": 0,
+      "originType": "minecraft:air"
+    },
+    {
+      "name": "changed_origin",
+      "origin": {
+        "x": 1046,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": true,
+      "logs": 0,
+      "leaves": 0,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 0,
+      "persistent": 0,
+      "originType": "minecraft:chest"
+    },
+    {
+      "name": "ground_changed",
+      "origin": {
+        "x": 1054,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": true,
+      "logs": 0,
+      "leaves": 0,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 0,
+      "persistent": 0,
+      "originType": "minecraft:air"
+    },
+    {
+      "name": "side_obstruction",
+      "origin": {
+        "x": 1062,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": true,
+      "logs": 3,
+      "leaves": 19,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 3,
+      "persistent": 0,
+      "originType": "kaleidoscope_grilling:pepper_log"
+    },
+    {
+      "name": "direct_invalid_seed",
+      "origin": {
+        "x": 1070,
+        "y": 160,
+        "z": 1102
+      },
+      "placed": true,
+      "direct": "blocked",
+      "logs": 0,
+      "leaves": 0,
+      "seeds": 0,
+      "bridges": 0,
+      "fruiting": 0,
+      "persistent": 0,
+      "originType": "minecraft:air"
+    }
+  ],
+  "assertions_passed": 1048,
+  "assertions_failed": [],
+  "normal_stop": true,
+  "exit_code": 0,
+  "content_errors": [],
+  "client": false,
+  "saved_world_migration": false,
+  "canonical_final_family_admission": false,
+  "production_ready": false,
+  "simulated_players": false,
+  "qa_probe_sha256": "246776fb20c380e799ef40d74ff70af4142ed4df7f3f090dd932bab3e0f56433",
+  "native_run_stage": "Draft source subsequently frozen byte-identically as2.8.60",
+  "frozen_source_trees": {
+    "BP": {
+      "sha256": "ee69036ee26ccbcc52377f49431aadaf5ea0d8990a569079060526ee33abeb86",
+      "files": 532
+    },
+    "RP": {
+      "sha256": "0e738bb7b7ef53b2b357ff33f7fad07d357df09e808b919c90da06d7ae3229bd",
+      "files": 1673
+    }
+  },
+  "automatic_new_chunk_rule_coverage": "pending separate test"
+}

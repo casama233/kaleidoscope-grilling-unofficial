@@ -493,6 +493,12 @@ def check_current_display_contracts(findings, geometry_index, animations):
             profile = requested.replace('THREE_RANDOM', 'THREE').lower()
             expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
             if requested=='THREE_RANDOM':expected_ids.update({f'eat_alt_{hand}':f'animation.kg_eating.item.three_alt.{hand}' for hand in ['right','left']})
+        projected = None
+        if family == 'skewer' and tuple(load_json(BP/'manifest.json')['header']['version']) >= (2,8,58):
+            candidate = 'THREE_ALT' if requested == 'THREE_RANDOM' else requested
+            if candidate in ('TWO','THREE_ALT','FOUR') and all(ref.startswith('geometry.kg_a287.kg_a22.') for ref in desc['geometry'].values()):
+                projected = candidate
+                expected_ids.update({f'fp_eat_{hand}':f'animation.kg_java_eating.item.{candidate.lower()}.{hand}' for hand in ('right','left')})
         if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
@@ -507,6 +513,17 @@ def check_current_display_contracts(findings, geometry_index, animations):
                     using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
                     required_selectors['eat_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"
                     required_selectors['eat_alt_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') == 4"
+        if projected:
+            context = ("q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && "
+                       "q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0")
+            profile_code = {'TWO':2,'THREE_ALT':4,'FOUR':5}[projected]
+            for hand,slot,hand_code in [('right','main_hand',1),('left','off_hand',2)]:
+                active = ("c.is_first_person == 1 && "+context+" && q.property('kaleidoscope_grilling:eat_profile') == "+str(profile_code)+
+                          " && q.property('kaleidoscope_grilling:eat_hand') == "+str(hand_code)+" && c.item_slot == '"+slot+"'")
+                required_selectors['fp_'+hand] = "c.is_first_person == 1 && c.item_slot == '"+slot+"' && ("+active+") == 0"
+                for key in ('eat_'+hand,'eat_alt_'+hand):
+                    if key in required_selectors:required_selectors[key]='('+required_selectors[key]+') && ('+active+') == 0'
+                required_selectors['fp_eat_'+hand] = active
         actual_selectors = {}
         malformed = False
         for row in selectors:
