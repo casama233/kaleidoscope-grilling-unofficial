@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {GRILL_MODEL_INDEX} from './grill_visual_data.js';
 export const GRILL_FOOD_ENTITY='kaleidoscope_grilling:grill_food_visual';
 export const GRILL_DISPLAY_RANGE_SQ=48*48;
@@ -13,8 +14,8 @@ export function grillVisualStage(state){
 }
 export function grillSlotPlan(stack,state,slot){
  if(!stack||slot<0||slot>2)return undefined;
- const index=GRILL_MODEL_INDEX[stack.typeId];
- if(index===undefined&&stack.typeId!=='kaleidoscope_grilling:secret_skewer')return undefined;
+ const index=GRILL_MODEL_INDEX[canonicalFoodId(stack.typeId)];
+ if(index===undefined&&canonicalFoodId(stack.typeId)!=='kaleidoscope_grilling:secret_skewer')return undefined;
  return {model:index===undefined?114:index*6+grillVisualStage(state),flips:clamp(state?.flips,0,4),slot};
 }
 export function grillSlotLocation(block,slot,direction){

@@ -1,11 +1,14 @@
 """Reproducible held-item motion from reviewed Java Catmull-Rom curves.
 
-Uses a local motion bone atop the existing reviewed hand/view frames. Native
+Composes authored arm and item matrices in the reviewed held frame. Restricts
+first-person authored motion to first person; third person retains native use. Native
 Bedrock arm animation and Java's detached second-piece rendering differ; this
 conversion does not certify the client presentation.
 """
 from pathlib import Path
-import json,math,re,argparse
+import json,math,re,argparse,sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'development/gameplay_core'))
+from held_pose_frames import chain,translate,rotate,zyx,scale,mul,rigid_inverse,bedrock_rotation,bone_matrix
 ROOT=Path(__file__).resolve().parents[1];P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 FIX=ROOT/'development/gameplay_core/fixtures/java-eating-curves-1.1.1.json'
 ACTIVE_HAND="(q.is_using_item && ((c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_hand') == 1) || (c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_hand') == 2)))"
@@ -21,6 +24,37 @@ def curves(profile):
  prefix={'TWO':'TWO_','THREE_ALT':'SQUID_','FOUR':''}[profile]
  return sk,prefix+'POSITION_TIMES',prefix+'POSITION_',prefix+'ROTATION_TIMES',prefix+'ROTATION_'
 def animation_id(profile,hand):return 'animation.kg_eating.item.'+profile.lower()+'.'+hand
+def item_frame(profile,hand,t):
+ # Java ModelPart transforms compose Z/Y/X; item transforms compose X/Z,
+ # or X/Y/Z for the dual-arm profiles. These cannot be added as Euler deltas.
+ a,pt,prefix,rt,rprefix=curves(profile);m=1 if hand=='right' else -1
+ pos=[sample(a[pt],a[prefix+c],t) for c in 'XYZ'];r=[sample(a[rt],a[rprefix+c],t) for c in 'XYZ']
+ rotation=[-r[0],(-m if profile=='TWO' else m)*r[1],m*r[2]]
+ y=math.radians(rotation[1]);z=math.radians(rotation[2]);correction=[-m*math.cos(z)*math.cos(y),-m*math.sin(z)*math.cos(y),m*math.sin(y)]
+ arm=[-m*(4+pos[0])+correction[0],2-pos[1]+correction[1]+(2 if profile=='TWO' else 0),pos[2]+correction[2]]
+ parent=chain(translate(arm),zyx(rotation))
+ if profile=='ONE':
+  arm[1]+=3.8;rotation[2]-=m*7.5
+  parent=chain(translate(arm),zyx(rotation),translate([0,1,0]))
+  itemY=sample([0,.45833,1.29167],[0,0,-3],t);itemX=sample([.20833,.45833,1.29167],[12.5,0,29.5],t)
+ elif profile=='THREE':itemY=sample(a['MAIN_ITEM_POSITION_TIMES'],a['MAIN_ITEM_POSITION_Y'],t);itemX=sample(a['MAIN_ITEM_ROTATION_TIMES'],a['MAIN_ITEM_ROTATION_X'],t)
+ elif profile=='THREE_ALT':itemY=sample(a['SQUID_ITEM_POSITION_TIMES'],a['SQUID_ITEM_POSITION_Y'],t);itemX=sample(a['SQUID_ITEM_ROTATION_TIMES'],a['SQUID_ITEM_ROTATION_X'],t)
+ elif profile=='TWO':itemY=0;itemX=sample([.45833,.95833,1.20833],[0,12.5,0],t)
+ else:itemY=0;itemX=sample(a['ITEM_ROTATION_TIMES'],a['ITEM_ROTATION_X'],t)
+ itemZ=sample(a['TWO_ITEM_ROTATION_Z_TIMES'],a['TWO_ITEM_ROTATION_Z'],t) if profile=='TWO' else 0
+ if profile in ['ONE','THREE']:
+  local=chain(translate([-m*1.975+m,-8.925-itemY,-7.575]),rotate('x',180+itemX),translate([0,7,2]))
+ else:local=chain(translate([-m,9-itemY,-6]),rotate('x',180+itemX),rotate('z',m*itemZ),translate([0,7,2]))
+ # Convert authored Java frame into the existing Bedrock handed coordinate frame.
+ conversion=scale([-1,-1,1])
+ return chain(conversion,parent,local,conversion)
+def motion_frame(profile,hand,t):
+ held=json.loads((RP/'animations/a287_skewer_held.animation.json').read_text())['animations']['animation.kg_a287.skewer_fp_'+hand]['bones']['skewer_pose']
+ # The authored hold has uniform 0.8 scale. Remove it to invert a rigid basis;
+ # include its size in the translation when returning to the child frame.
+ basis=bone_matrix({**held,'scale':1});delta=chain(item_frame(profile,hand,t),rigid_inverse(item_frame(profile,hand,0)))
+ local=chain(rigid_inverse(basis),delta,basis);r=bedrock_rotation(local)
+ return [-local[0][3]/.8,local[1][3]/.8,local[2][3]/.8],r
 def build():
  animations={};profiles=['ONE','TWO','THREE','THREE_ALT','FOUR']
  for profile in profiles:
@@ -28,10 +62,12 @@ def build():
   for hand in ['right','left']:
    sign=1 if hand=='right' else -1;position={};rotation={}
    for n in range(round(duration*20)+1):
-    t=n/20;pos=[sample(a[pt],a[prefix+c],t)-a[prefix+c][0] for c in 'XYZ'];rot=[sample(a[rt],a[rprefix+c],t)-a[rprefix+c][0] for c in 'XYZ']
-    # Source curve displacement, mirrored across the already bound hand rig.
-    position[f'{t:.2f}']=[round(-pos[0]*sign,6),round(-pos[1],6),round(pos[2],6)]
-    rotation[f'{t:.2f}']=[round(rot[0],6),round(-rot[1]*sign,6),round(rot[2]*sign,6)]
+    t=n/20;pos,rot=motion_frame(profile,hand,t)
+    if n:
+     previous=list(rotation.values())[-1]
+     rot=[x+360*round((previous[i]-x)/360) for i,x in enumerate(rot)]
+    position[f'{t:.2f}']=[round(x,6) for x in pos]
+    rotation[f'{t:.2f}']=[round(x,6) for x in rot]
    animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
  output={RP/'animations/eating_motion.animation.json':{'format_version':'1.8.0','animations':animations}}
  table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
@@ -44,7 +80,7 @@ def build():
    if profile=='THREE_RANDOM':d['animations']['eat_alt_'+hand]=animation_id('THREE_ALT',hand)
   animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith('eat_') for k in row)]
   for hand in ['right','left']:
-   using="q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
+   using="c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
    if profile=='THREE_RANDOM':
     alternate="q.property('kaleidoscope_grilling:eat_profile') == 4"
     animate += [{'eat_'+hand:using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"},{'eat_alt_'+hand:using+' && '+alternate}]

@@ -1,7 +1,7 @@
 import {ingredientFoodFacts} from './food_snapshot_core.js';
 import {VANILLA_FOOD_BEHAVIOR} from './a285_vanilla_food_data.js';
 import {effectsForStandaloneFood} from './a2732_standalone_food_effect_core.js';
-import {COOKED_EFFECTS,RAW_NAUSEA} from './data.js';
+import {COOKED_EFFECTS,RAW_NAUSEA} from './eating_data_lookup.js';
 import {applySecretBehaviorExtension} from './secret_compat_core.js';
 
 // Explicit compatibility data, never a forged itemCompleteUse event. Only edible

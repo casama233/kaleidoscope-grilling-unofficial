@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {ingredientFoodFacts} from './food_snapshot_core.js';
 import {ingredientContentSignature} from './skewer_item_snapshot.js';
 import {FIXED_INGREDIENT_TAGS} from './java_ingredient_tags.js';
@@ -57,8 +58,8 @@ export function appendOutcome(rows,next,edible=false,explicitAllow=false){
  return {ok:true,kind:'unfinished',id:UNFINISHED_ID,ingredients:values};
 }
 export function cookedResultFor(id){return RECIPES.find(r=>r.id===id)?.cooked??null}
-export function isFixedRaw(id){return RECIPES.some(r=>r.id===id&&r.cooked)}
-export function isDisassemblableRaw(id,cooked=false){return id===UNFINISHED_ID||isFixedRaw(id)||(id===SECRET_ID&&!cooked)}
+export function isFixedRaw(id){return RECIPES.some(r=>r.id===canonicalFoodId(id)&&r.cooked)}
+export function isDisassemblableRaw(id,cooked=false){return id===UNFINISHED_ID||isFixedRaw(id)||(canonicalFoodId(id)===SECRET_ID&&!cooked)}
 export function canonicalIngredients(id){
  const r=RECIPES.find(x=>x.id===id);return r?r.slots.map(slot=>slot[0]):[];
 }

@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {stationProjection,registerStationProjection} from './station_projection_core.js';
 import {readPublicFood} from './host_api/food_api_core.js';
 import {captureSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
@@ -55,12 +56,12 @@ export function syncStationContentsVisual(block,observers){
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);
   for(let i=0;i<5;i++){const stack=rows[i]?a25RestoreStack(rows[i]):undefined,k='plate/'+i,dx=(i-2)*.14;
-   if(stack?.typeId==='kaleidoscope_grilling:secret_skewer')composed(row,block,k,stack,{dx,y:.15,dz:0},false,seen);
+   if(canonicalFoodId(stack?.typeId)==='kaleidoscope_grilling:secret_skewer')composed(row,block,k,stack,{dx,y:.15,dz:0},false,seen);
    else{seen.add(k);render(row,block,k,stack,pose(block,dx,.15,0),1);}
   }
  }else if(block.typeId==='kaleidoscope_grilling:grill'){
   const c=peekStationContainer(block),state=readGrillState(block);
-  for(let i=0;i<3;i++){const stack=c?.getItem(i);if(stack?.typeId==='kaleidoscope_grilling:secret_skewer')composed(row,block,'grill/'+i,stack,{dx:(i-1)*5/16,y:5/16+.025,dz:0},grillVisualStage(state)>=4,seen);}
+  for(let i=0;i<3;i++){const stack=c?.getItem(i);if(canonicalFoodId(stack?.typeId)==='kaleidoscope_grilling:secret_skewer')composed(row,block,'grill/'+i,stack,{dx:(i-1)*5/16,y:5/16+.025,dz:0},grillVisualStage(state)>=4,seen);}
  }else{clear(row);if(!row.parts.size)work.remove(key(block));return;}
  for(const k of [...row.parts.keys()])if(!seen.has(k))discard(row,k);
 }
