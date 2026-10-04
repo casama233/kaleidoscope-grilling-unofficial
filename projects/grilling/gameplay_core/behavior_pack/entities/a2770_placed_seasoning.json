@@ -39,146 +39,74 @@
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_0": {
+        "kaleidoscope_grilling:layer_0": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_1": {
+        "kaleidoscope_grilling:layer_1": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_2": {
+        "kaleidoscope_grilling:layer_2": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_3": {
+        "kaleidoscope_grilling:layer_3": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_4": {
+        "kaleidoscope_grilling:layer_4": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_5": {
+        "kaleidoscope_grilling:layer_5": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_6": {
+        "kaleidoscope_grilling:layer_6": {
           "type": "int",
           "range": [
             0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true
         },
-        "kaleidoscope_grilling:color_7": {
+        "kaleidoscope_grilling:layer_7": {
           "type": "int",
           "range": [
             0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_8": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_9": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_10": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_11": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_12": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_13": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_14": {
-          "type": "int",
-          "range": [
-            0,
-            176
-          ],
-          "default": 0,
-          "client_sync": true
-        },
-        "kaleidoscope_grilling:color_15": {
-          "type": "int",
-          "range": [
-            0,
-            176
+            9
           ],
           "default": 0,
           "client_sync": true

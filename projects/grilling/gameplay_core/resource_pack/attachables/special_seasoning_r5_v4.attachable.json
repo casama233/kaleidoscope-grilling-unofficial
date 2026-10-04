@@ -5,18 +5,16 @@
       "identifier": "kaleidoscope_grilling:special_seasoning_r5_v4",
       "materials": {
         "default": "entity_alphablend",
-        "contents": "entity_alphatest_one_sided"
+        "contents": "entity"
       },
       "textures": {
-        "default": "textures/blocks/seasoning_bottle"
+        "default": "textures/held/bottle_shell_palette"
       },
       "geometry": {
-        "default": "geometry.kg_a286.kg_a2766.special_seasoning.r5.v4",
-        "contents": "geometry.kg_a286.kg_a2766.special_seasoning.r5.v4.contents"
+        "default": "geometry.kg_bottle_held.fixed.r5.v4"
       },
       "render_controllers": [
-        "controller.render.kg_a286.contents",
-        "controller.render.kg_a2733.seasoning_bottle_hand"
+        "controller.render.kg_bottle_held.fixed"
       ],
       "animations": {
         "fp_right": "animation.kg_a286.bottle_fp_right",
@@ -29,23 +27,33 @@
       "scripts": {
         "animate": [
           {
-            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (q.property('kaleidoscope_grilling:season_hand') != 1 || q.property('kaleidoscope_grilling:season_phase') == 0)"
+            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && ((v.kg_season_season_hand == 1 && v.kg_season_season_phase != 0)) == 0"
           },
           {
-            "season_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (q.property('kaleidoscope_grilling:season_hand') == 1 && q.property('kaleidoscope_grilling:season_phase') != 0)"
+            "season_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (v.kg_season_season_hand == 1 && v.kg_season_season_phase != 0)"
           },
           {
             "tp_right": "c.is_first_person == 0 && c.item_slot == 'main_hand'"
           },
           {
-            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (q.property('kaleidoscope_grilling:season_hand') != 2 || q.property('kaleidoscope_grilling:season_phase') == 0)"
+            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && ((v.kg_season_season_hand == 2 && v.kg_season_season_phase != 0)) == 0"
           },
           {
-            "season_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (q.property('kaleidoscope_grilling:season_hand') == 2 && q.property('kaleidoscope_grilling:season_phase') != 0)"
+            "season_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (v.kg_season_season_hand == 2 && v.kg_season_season_phase != 0)"
           },
           {
             "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"
           }
+        ],
+        "initialize": [
+          "v.kg_season_season_hand = 0;",
+          "v.kg_season_season_phase = 0;",
+          "v.kg_season_pending_hand = 0;"
+        ],
+        "pre_animation": [
+          "v.kg_season_season_hand = (c.owning_entity->q.has_property('kaleidoscope_grilling:season_hand') ? c.owning_entity->q.property('kaleidoscope_grilling:season_hand') : 0);",
+          "v.kg_season_season_phase = (c.owning_entity->q.has_property('kaleidoscope_grilling:season_phase') ? c.owning_entity->q.property('kaleidoscope_grilling:season_phase') : 0);",
+          "v.kg_season_pending_hand = (c.owning_entity->q.has_property('kaleidoscope_grilling:pending_hand') ? c.owning_entity->q.property('kaleidoscope_grilling:pending_hand') : 0);"
         ]
       }
     }

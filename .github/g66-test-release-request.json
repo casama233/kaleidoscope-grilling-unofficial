@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "repository": "casama233/kaleidoscope-grilling-unofficial",
+  "repository_id": 1377218440,
+  "version": "A2.8.66",
+  "tag": "A2.8.66-test",
+  "mode": "exact-g66-only-prerelease",
+  "prerelease": true,
+  "make_latest": "false",
+  "require_functional_source_receipt": true,
+  "expected_source_tree_sha256": "dda19ac60805795f73eb18b35678e4331ae39b71f3d8faebf9828976185b4728",
+  "expected_artifacts": {
+    "mcaddon": {
+      "name": "Kaleidoscope_Grilling_A2.8.66_Review.mcaddon",
+      "sha256": "95030437902beccc885d922f14069b19126337ddb80c98c0f743f087c1353b41"
+    },
+    "brproject": {
+      "name": "Kaleidoscope_Grilling_A2.8.66_Review.brproject",
+      "sha256": "b005188194dba24e3ebe0a5fbdd5a2fc9641ea41ffb817d9d6f25b217bf9a01f"
+    }
+  },
+  "evidence_sha256": {
+    "docs/STATUS-A2.8.66.md": "f37ea3fd300b034aa1bca8a0aa3c9c49111485bf7c410f9265e072a06451005d",
+    "docs/NATIVE-SECRET-6504-20261004.json": "990b7745a307faecbc83ae2f90f18399e7913a946799683baffa6ccce71cd726",
+    "docs/G66-SOURCE-PROVENANCE-20261004.json": "2df5a8e6434a1c82f175371d78ecb1ecf931d654a982de8c5ae8f0c1d6f4b56e",
+    "docs/BDS-G66-T98-L63-20261004.json": "1cb588eff909debd8df53e8c87e7f5b210574cd4a9d983a881716230eb13da6d",
+    ".github/local-test-release-2.8.66.json": "125edacba42d6611052dbe04f7217c6ecf94fbae0a130b81836685f711672d94"
+  },
+  "complete_client_acceptance": false,
+  "java_all_view_parity": false,
+  "production_ready": false,
+  "saved_world_migration": false,
+  "scope": "Only Grilling G66. No Tavern/World Liquor release, family admission, or live deployment. Evidence excludes private images, worlds and raw logs.",
+  "public_base_commit": "81df62d2574c23175a8027fdcfdf1d3eec0a315b"
+}

@@ -35,7 +35,7 @@ def sha256(path: Path) -> str:
 def tree_hash(roots: list[tuple[str, Path]]) -> str:
     h = hashlib.sha256()
     for prefix, root in roots:
-        for path in sorted(p for p in root.rglob("*") if p.is_file() and not p.name.startswith(".")):
+        for path in sorted((p for p in root.rglob("*") if p.is_file() and not p.name.startswith(".")), key=lambda p: p.relative_to(root).parts):
             rel = f"{prefix}/{path.relative_to(root).as_posix()}"
             h.update(rel.encode("utf-8"))
             h.update(b"\0")
@@ -45,6 +45,9 @@ def tree_hash(roots: list[tuple[str, Path]]) -> str:
 
 def add_file(z: zipfile.ZipFile, source: Path, arcname: str) -> None:
     info = zipfile.ZipInfo(arcname, ZIP_TIME)
+    # Canonical archives were frozen on Linux; retain its ZIP host metadata
+    # on Windows runners too, rather than zipfile's platform-dependent default.
+    info.create_system = 3
     info.compress_type = zipfile.ZIP_DEFLATED
     info.external_attr = 0o100644 << 16
     z.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=6)
@@ -63,7 +66,7 @@ def make_zip(path: Path, roots: list[tuple[str, Path]], *, exclude_project_build
     path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(path, "w") as z:
         for prefix, root in roots:
-            for source in sorted(p for p in root.rglob("*") if p.is_file()):
+            for source in sorted((p for p in root.rglob("*") if p.is_file()), key=lambda p: p.relative_to(root).parts):
                 rel = source.relative_to(root)
                 if source.name.startswith("."):
                     continue
@@ -120,11 +123,11 @@ def main() -> None:
         "bds_tested": False,
         "client_visuals_tested": False,
     }
-    report.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    report.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     sums.write_text(
         f"{payload['mcaddon']['sha256']}  {mcaddon.name}\n"
         f"{payload['brproject']['sha256']}  {brproject.name}\n",
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 

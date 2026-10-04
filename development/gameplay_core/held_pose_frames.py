@@ -2,7 +2,7 @@
 
 Never copy Java XYZ Euler angles into Bedrock ZYX bone channels. This module
 uses Java display transforms and pinned Mojang player attachment offsets for
-skewer first person. Other families retain their editor calibration. Neither
+skewer and bottle first person. Unused rack poses retain their editor calibration. Neither
 mathematical projection nor editor calibration is Minecraft client acceptance.
 """
 import json
@@ -62,9 +62,13 @@ def native_skewer_calibration(hand):
     Right arm pivot [-5,22,0], position [13.5,-10,12], rotation
     [95,-45,115]; rightItem pivot [-6,15,1]. empty_hand cancels the
     item's Z offset and places its Y seven units below the arm pivot.
-    Offhand uses the mirrored basis; client acceptance covers both hands.
+    Native empty_hand does not mirror its right-arm pose onto the left arm.
+    The left branch uses the actual settled wide left socket. Native equip
+    lowering, bob and the slim shoulder offset remain inherited, not canceled.
     This is a head-centered projection model, not a renderer emulation.
     """
+    if hand=='left':
+        return chain(translate([-6,15,0]),translate([0,-24,0])), chain(translate([0,24,0]),rotate('y',180))
     sign=1 if hand=='right' else -1
     arm=chain(translate([-8.5*sign,12,12]),zyx([-95,45*sign,115*sign]))
     base=chain(arm,translate([sign,-7,0]),translate([0,-24,0]))
@@ -98,13 +102,17 @@ def make_pose(family, view, hand):
         position=[shifted[i]-[0,24,0][i]-correction_transformed[i] for i in range(3)]
         position[0]*=-1
     else:
-        base,camera=(native_skewer_calibration(hand) if family=='skewer' else calibration(hand))
+        base,camera=(native_skewer_calibration(hand) if family in ('skewer','bottle') else calibration(hand))
         # Rack's untranslated Java FP slot lies outside this Bedrock camera.
         # Keep Java orientation/scale; adapt the placement into the visible hand
         # region. This explicit exception is covered by the viewport regression.
         if family=='rack': tr=[-3*sign,4.5,-2]
         java=chain(translate([9.039*sign,15.682,20.8]),translate(tr),xyz(r),scale(size),translate([-8,-8,-8]))
-        target=chain(camera,translate([0,-24,-32.4]),java,translate(source_offset))
+        # The Java bottle rotation/.72 scale stay authored. Move its complete
+        # shell, cap and contents inward, upward and farther from the camera;
+        # the narrower full-model viewport gate covers both hands and aspects.
+        camera_offset=[-3*sign,5,-6] if family=='bottle' else [0,0,0]
+        target=chain(camera,translate(camera_offset),translate([0,-24,-32.4]),java,translate(source_offset))
         local=mul(rigid_inverse(base),target)
         position=point(local,[0,24,0]);position[1]-=24;position[0]*=-1
         rotation=mul(local,scale([1/x for x in size]))

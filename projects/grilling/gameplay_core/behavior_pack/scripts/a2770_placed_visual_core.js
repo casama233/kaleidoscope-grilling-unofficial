@@ -1,4 +1,6 @@
 // Derived display rules. Java: SeasoningBottleRenderer, ClientSetup, OilPotVisualState.
+import {bottleHeldVisualPlan} from './bottle_held_visual_core.js';
+import {PENDING_SEASONING_ID} from './a2743_seasoning_contract_core.js';
 export const PREFIX='kaleidoscope_grilling:';
 export const SEASON_ENTITY=PREFIX+'placed_seasoning_visual';
 export const OIL_ENTITY=PREFIX+'placed_oil_visual';
@@ -12,7 +14,8 @@ export function bottlePlan(row,palette={}){
  const fill=special?Math.ceil((16-integer(row.uses,0,16))/2):ingredients.length;
  if(fill===0)return undefined;
  return {mode:special?2:1,fill,variant:special?integer(row.variant,0,7):0,
-  colors:ingredients.map(id=>palette[id]||FALLBACK_COLORS)};
+  colors:ingredients.map(id=>Object.hasOwn(palette,id)?palette[id]:FALLBACK_COLORS),
+  layers:bottleHeldVisualPlan(special?undefined:PENDING_SEASONING_ID,ingredients)};
 }
 export function oilPlan(state){
  const oil=['canola','secret_chili','premium_chili'].indexOf(state?.type)+1;

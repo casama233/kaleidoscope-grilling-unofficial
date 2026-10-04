@@ -4,9 +4,9 @@ import {visitUniqueTracked} from './a288_visual_budget_core.js';
 import {readPlacedSeasoningStack} from './a2743_seasoning_block_adapter.js';
 import {readPlacedOilPotState} from './a2739_cookery_oil_pot_block_adapter.js';
 import {HOST_BLOCK_ID} from './a2736_typed_oil_pot_block_core.js';
-import {PREFIX,SEASON_ENTITY,OIL_ENTITY,FALLBACK_COLORS,isSeasoningBlock,bottlePlan,oilPlan,positions,decodeKey,rotationForStates} from './a2770_placed_visual_core.js';
+import {PREFIX,SEASON_ENTITY,OIL_ENTITY,isSeasoningBlock,bottlePlan,oilPlan,positions,decodeKey,rotationForStates} from './a2770_placed_visual_core.js';
 import {dirtyPlacedVisuals,visualLocationKey,markPlacedVisualDirty} from './a2770_placed_visual_queue.js';
-import {INGREDIENT_COLORS,PLACED_TINT_INDEX} from './a2770_placed_visual_data.js';
+import {INGREDIENT_COLORS} from './a2770_placed_visual_data.js';
 
 // Render-only, transient entities. No block replacement and no authoritative data on helpers.
 const tracked=new Map(),owned=new Set();
@@ -43,8 +43,7 @@ function render(row,dimension,slot,type,location,rotation,plan){
    entity.setProperty(PREFIX+'mode',plan.mode);
    entity.setProperty(PREFIX+'fill',plan.fill);
    entity.setProperty(PREFIX+'variant',plan.variant);
-   for(let i=0;i<8;i++)for(let shade=0;shade<2;shade++)
-    entity.setProperty(PREFIX+'color_'+(i*2+shade),PLACED_TINT_INDEX[(plan.colors[i]||FALLBACK_COLORS)[shade]]);
+   for(let i=0;i<8;i++)entity.setProperty(PREFIX+'layer_'+i,plan.layers[i]);
   }
   entity.setProperty(PREFIX+'ready',true);entry.signature=signature;
  }catch(error){dispose(row,slot);warn(error)}

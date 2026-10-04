@@ -33,11 +33,19 @@ def build():
  for src in (BP/'recipes').rglob('*.json'):
   doc=json.loads(src.read_text());before=copy.deepcopy(doc);ingredients(doc)
   if doc!=before:outputs[src]=doc
+ # Alternate attachables use the same authored clock and exact renderer gates
+ # as the motion generator. Neither command may overwrite them with a raw
+ # canonical clone and make the other command's --check fail.
+ from build_eating_motion import build as eating_motion
+ authored=eating_motion(outputs)
+ for src in list(outputs):
+  if src.parent==RP/'attachables':outputs[src]=authored[src]
  return outputs
 if __name__=='__main__':
  ap=argparse.ArgumentParser();ap.add_argument('--check',action='store_true');a=ap.parse_args()
- for p,d in build().items():
+ outputs=build()
+ for p,d in outputs.items():
   value=json.dumps(d,ensure_ascii=False,indent=2)+'\n'
   if a.check:assert p.read_text()==value,p
   else:p.write_text(value)
- print('Native alternate-profile items and preserved recipe tags:',len(build()))
+ print('Native alternate-profile items and preserved recipe tags:',len(outputs))

@@ -1,4 +1,4 @@
-import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
+import {canonicalFoodId,eatingItemId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import {finishedFoodMeta} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/food_finish_core.js';
 import {CONFIG_DEFAULTS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/server_config_core.js';
 /** Actual runtime bodies + storage-operation doubles. Not Minecraft/client evidence. */
@@ -54,7 +54,7 @@ function fixture(){
  vm.runInContext(strip(read('a2750_food_state_adapter.js')),ctx);
  vm.runInContext(strip(read('a2766_special_seasoning_visual_runtime.js')),ctx);
  vm.runInContext('const setHot=setHotFood,isHot=isHotFood,setSeasonings=setFoodSeasonings,readSeasonings=readFoodSeasonings;',ctx);
- const names=['copyOne','copyCustomData','reducedStack','planDamagedHand','transactionStatus','commitGrillAndHand','ingredientSnapshot','restoreIngredient','readRowsFromKey','readSkewerRows','isSecretCooked','readEffectiveSkewerRows','rowLabel','writeSkewerRows','setSecretCreator','dynamicFood','isEdible','threadOutcome','threadCurrent','getUses','setUses','heatForOil','planCookeryOil','planSeasoningBottle','cookedIngredientRows','setCookedIngredientRows','cookedStack','failedStack','outputFor','extract','handleGrill','hungerSettle'];
+ const names=['copyOne','copyCustomData','reducedStack','planDamagedHand','transactionStatus','commitGrillAndHand','commitGrillFlip','ingredientSnapshot','restoreIngredient','readRowsFromKey','readSkewerRows','validSecretIngredientRows','isSecretCooked','readEffectiveSkewerRows','rowLabel','writeSkewerRows','setSecretCreator','dynamicFood','isEdible','threadOutcome','threadCurrent','getUses','setUses','heatForOil','planCookeryOil','planSeasoningBottle','cookedIngredientRows','setCookedIngredientRows','cookedStack','failedStack','outputFor','extract','handleGrill','hungerSettle'];
  vm.runInContext(names.map(fn).join('\n')+';this.api={threadCurrent,handleGrill,extract,hungerSettle,readSkewerRows,readEffectiveSkewerRows,isSecretCooked,setSeasonings,buildCookeryOilPot,readCookeryOilPot,getUses,setUses,readSeasonings,isHot};',ctx);
  return {api:ctx.api,holder,block,grill,bag,sounds,settlements,notices,hunger,saturation,get main(){return bag.getItem(0)},set main(s){write('main',s)},get off(){return off},set off(s){write('off',s)},get state(){return state},failNextHand(){failHand=true},tick(n){tick+=n;state=logic.tickState(state,grill.rows.filter(Boolean).length,n).state},handle(){ctx.api.handleGrill(block,holder)},seasoning(){const s=new Stack(data.SEASONING_ID);ctx.api.setSeasonings(s,seasoning.BASE_SEASONINGS);ctx.api.setUses(s,0);return s}};
 }
@@ -78,4 +78,19 @@ test('ordinary configured skewer threads but cannot enter the raw cooking pipeli
  const f=fixture(),recipe=skewers.recipeTable().find(r=>!r.cooked),raw=thread(f,recipe);f.off=undefined;
  f.main=new Stack('minecraft:flint_and_steel');f.handle();f.main=raw;f.handle();
  assert.equal(f.grill.rows.filter(Boolean).length,0);assert.equal(f.main.typeId,recipe.id);assert.equal(f.state.phase,0);
+});
+
+
+test('actual alternate secret enters the grill, freezes fourth-flip ingredients and retains slot metadata on extraction and settlement',()=>{
+ const f=fixture(),recipe={id:skewers.SECRET_ID,slots:[['minecraft:apple'],['minecraft:carrot'],['minecraft:beef']]};
+ const raw=thread(f,recipe);raw.typeId=eatingItemId(skewers.SECRET_ID,true);raw.nameTag='kept alternate serving';raw.lore=[{text:'foreign lore'}];raw.keepOnDeath=true;raw.lockMode='slot';raw.destroy=['minecraft:stone'];raw.place=['minecraft:dirt'];items.setItemProperty(raw,'test:foreign','retained');
+ const before=snapshots.captureSkewerMetadata(raw);f.off=undefined;
+ const output=cook(f,raw);assert.equal(output.typeId,raw.typeId);assert.equal(output.amount,1);assert.equal(f.api.isSecretCooked(output),true);
+ assert.deepEqual([...f.api.readEffectiveSkewerRows(output)].map(r=>r.id),['minecraft:apple','minecraft:carrot','minecraft:cooked_beef']);
+ const after=snapshots.captureSkewerMetadata(output);
+ for(const key of ['id','name','damage','keepOnDeath','lockMode','canDestroy','canPlaceOn','enchantments'])assert.deepEqual(after[key],before[key]);
+ assert.equal(items.getItemProperty(output,'test:foreign'),'retained');assert.equal(items.getItemProperty(output,skewers.SKEWER_INGREDIENTS_KEY),items.getItemProperty(raw,skewers.SKEWER_INGREDIENTS_KEY));assert.equal(items.getItemProperty(output,skewers.SECRET_CREATOR_KEY),items.getItemProperty(raw,skewers.SECRET_CREATOR_KEY));
+ f.main=output;const active={hand:'main',use:captureEatingIdentity(output,'main',0),meta:{hot:true,hotUntil:2200,seasonings:[...seasoning.BASE_SEASONINGS]}};
+ assert.equal(f.api.hungerSettle(f.holder,skewers.SECRET_ID,active),true);assert.equal(f.main,undefined);assert.equal(f.hunger.currentValue,9);assert.equal(f.settlements.length,1);
+ assert.equal(f.api.hungerSettle(f.holder,skewers.SECRET_ID,active),false);
 });

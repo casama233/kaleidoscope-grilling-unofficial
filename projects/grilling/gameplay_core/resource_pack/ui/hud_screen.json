@@ -2,9 +2,9 @@
   "namespace": "hud",
   "kg_eating_expire": {
     "anim_type": "alpha",
-    "duration": 0.075,
+    "duration": 0.001,
     "from": 1,
-    "to": 1,
+    "to": 0,
     "destroy_at_end": "kg_eating_packet"
   },
   "kg_eating_packet": {
@@ -15,7 +15,6 @@
       "100%"
     ],
     "visible": "(not (($kg_text - '§r§0§r§0') = $kg_text))",
-    "alpha": "@hud.kg_eating_expire",
     "propagate_alpha": true,
     "controls": [
       {
@@ -9527,7 +9526,8 @@
           "visible": "(not (($kg_text - '§r§1§6§4§f§f§0§1') = $kg_text))"
         }
       }
-    ]
+    ],
+    "alpha": "@hud.kg_eating_start"
   },
   "kg_eating_factory": {
     "type": "panel",
@@ -9562,5 +9562,17 @@
   "hud_actionbar_text/actionbar_message": {
     "$kg_actionbar_text": "$actionbar_text",
     "visible": "((($kg_actionbar_text - '§r§0§r§0') = $kg_actionbar_text) and (($kg_actionbar_text - '§r[KT] 1:§') = $kg_actionbar_text) and (($kg_actionbar_text - '§r[KT] §b') = $kg_actionbar_text) and (not (('%.4s' * $kg_actionbar_text) = '!js.')))"
+  },
+  "kg_eating_start": {
+    "anim_type": "alpha",
+    "duration": 0,
+    "from": 0,
+    "to": 1,
+    "next": "@hud.kg_eating_hold"
+  },
+  "kg_eating_hold": {
+    "anim_type": "wait",
+    "duration": 0.075,
+    "next": "@hud.kg_eating_expire"
   }
 }
