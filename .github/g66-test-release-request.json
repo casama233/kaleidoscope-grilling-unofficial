@@ -4,7 +4,7 @@
   "repository_id": 1377218440,
   "version": "A2.8.66",
   "tag": "A2.8.66-test",
-  "mode": "exact-g66-only-prerelease",
+  "mode": "exact-g66-historical-prerelease",
   "prerelease": true,
   "make_latest": "false",
   "require_functional_source_receipt": true,
@@ -31,5 +31,8 @@
   "production_ready": false,
   "saved_world_migration": false,
   "scope": "Only Grilling G66. No Tavern/World Liquor release, family admission, or live deployment. Evidence excludes private images, worlds and raw logs.",
-  "public_base_commit": "81df62d2574c23175a8027fdcfdf1d3eec0a315b"
+  "public_base_commit": "81df62d2574c23175a8027fdcfdf1d3eec0a315b",
+  "staging_checkpoint": ".github/g66-staging-checkpoint.json",
+  "source_ref": "refs/heads/release/g66-historical-recovery-20261004",
+  "public_source_base": "15439bb80b74254a33fa98e823b2f2809ef07523"
 }
