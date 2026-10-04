@@ -108,11 +108,27 @@ def build():
       if isinstance(v,dict):bone[channel]={str(round(float(t)*.5/.8,8)):row for t,row in v.items()}
   out[p]=d
  return out
+def compare_motion(actual,expected):
+ # Windows and Linux libm can differ in the final trigonometric bits. This
+ # checks the derived matrices to 1e-10 model units/degrees, without changing
+ # or normalizing the committed runtime bytes. Baseline and compiler checks
+ # still compare those exact bytes. Keys, shape and nonnumeric data are exact.
+ if isinstance(expected,dict):
+  assert isinstance(actual,dict) and actual.keys()==expected.keys()
+  for key,value in expected.items():compare_motion(actual[key],value)
+ elif isinstance(expected,list):
+  assert isinstance(actual,list) and len(actual)==len(expected)
+  for first,second in zip(actual,expected):compare_motion(first,second)
+ elif type(expected) in [float,int]:
+  assert type(actual) in [float,int] and math.isclose(actual,expected,rel_tol=0,abs_tol=1e-10),(actual,expected)
+ else:assert type(actual)==type(expected) and actual==expected
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()
  for p,d in build().items():
   text=json.dumps(d,ensure_ascii=False,indent=2)+'\n'
-  if args.check:assert load(p)==d,str(p)
+  if args.check:
+   if p.name=='seasoning_held.animation.json':compare_motion(load(p),d)
+   else:assert load(p)==d,str(p)
   else:
    p.parent.mkdir(parents=True,exist_ok=True)
    if p.name in ['player_binding.animation.json','a21_shake.animation.json']:text=text.replace('\n','\r\n')
