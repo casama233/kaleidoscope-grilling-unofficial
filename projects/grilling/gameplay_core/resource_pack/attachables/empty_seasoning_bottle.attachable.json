@@ -7,30 +7,118 @@
         "default": "entity_alphablend"
       },
       "textures": {
-        "default": "textures/blocks/seasoning_bottle"
+        "default": "textures/blocks/seasoning_bottle",
+        "layer_0": "textures/a2770_placed/pending_0",
+        "layer_1": "textures/a2770_placed/pending_1",
+        "layer_2": "textures/a2770_placed/pending_2",
+        "layer_3": "textures/a2770_placed/pending_3",
+        "layer_4": "textures/a2770_placed/pending_4",
+        "layer_5": "textures/a2770_placed/pending_5",
+        "layer_6": "textures/a2770_placed/pending_6",
+        "layer_7": "textures/a2770_placed/pending_7",
+        "layer_8": "textures/a2770_placed/pending_8",
+        "layer_9": "textures/a2770_placed/pending_9",
+        "layer_10": "textures/a2770_placed/pending_10",
+        "layer_11": "textures/a2770_placed/pending_11",
+        "layer_12": "textures/a2770_placed/pending_12",
+        "layer_13": "textures/a2770_placed/pending_13",
+        "layer_14": "textures/a2770_placed/pending_14",
+        "layer_15": "textures/a2770_placed/pending_15"
       },
       "geometry": {
-        "default": "geometry.kg_a286.kg_a2733.seasoning_bottle_hand"
+        "default": "geometry.kg_a286.kg_a2733.seasoning_bottle_hand",
+        "layer_0": "geometry.kg_seasoning.held_0",
+        "layer_1": "geometry.kg_seasoning.held_1",
+        "layer_2": "geometry.kg_seasoning.held_2",
+        "layer_3": "geometry.kg_seasoning.held_3",
+        "layer_4": "geometry.kg_seasoning.held_4",
+        "layer_5": "geometry.kg_seasoning.held_5",
+        "layer_6": "geometry.kg_seasoning.held_6",
+        "layer_7": "geometry.kg_seasoning.held_7",
+        "layer_8": "geometry.kg_seasoning.held_8",
+        "layer_9": "geometry.kg_seasoning.held_9",
+        "layer_10": "geometry.kg_seasoning.held_10",
+        "layer_11": "geometry.kg_seasoning.held_11",
+        "layer_12": "geometry.kg_seasoning.held_12",
+        "layer_13": "geometry.kg_seasoning.held_13",
+        "layer_14": "geometry.kg_seasoning.held_14",
+        "layer_15": "geometry.kg_seasoning.held_15"
       },
       "render_controllers": [
-        "controller.render.kg_a2733.seasoning_bottle_hand"
+        "controller.render.kg_a2733.seasoning_bottle_hand",
+        {
+          "controller.render.kg_seasoning.held_0": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 0"
+        },
+        {
+          "controller.render.kg_seasoning.held_1": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 0"
+        },
+        {
+          "controller.render.kg_seasoning.held_2": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 1"
+        },
+        {
+          "controller.render.kg_seasoning.held_3": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 1"
+        },
+        {
+          "controller.render.kg_seasoning.held_4": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 2"
+        },
+        {
+          "controller.render.kg_seasoning.held_5": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 2"
+        },
+        {
+          "controller.render.kg_seasoning.held_6": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 3"
+        },
+        {
+          "controller.render.kg_seasoning.held_7": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 3"
+        },
+        {
+          "controller.render.kg_seasoning.held_8": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 4"
+        },
+        {
+          "controller.render.kg_seasoning.held_9": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 4"
+        },
+        {
+          "controller.render.kg_seasoning.held_10": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 5"
+        },
+        {
+          "controller.render.kg_seasoning.held_11": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 5"
+        },
+        {
+          "controller.render.kg_seasoning.held_12": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 6"
+        },
+        {
+          "controller.render.kg_seasoning.held_13": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 6"
+        },
+        {
+          "controller.render.kg_seasoning.held_14": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 7"
+        },
+        {
+          "controller.render.kg_seasoning.held_15": "(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_fill') : q.property('kaleidoscope_grilling:bottle_main_fill')) > 7"
+        }
       ],
       "animations": {
         "fp_right": "animation.kg_a286.bottle_fp_right",
-        "fp_left": "animation.kg_a286.bottle_fp_left",
         "tp_right": "animation.kg_a286.bottle_tp_right",
-        "tp_left": "animation.kg_a286.bottle_tp_left"
+        "season_right": "animation.kg_seasoning.item.sprinkle.right",
+        "fp_left": "animation.kg_a286.bottle_fp_left",
+        "tp_left": "animation.kg_a286.bottle_tp_left",
+        "season_left": "animation.kg_seasoning.item.sprinkle.left"
       },
       "scripts": {
         "animate": [
           {
-            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand'"
+            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (q.property('kaleidoscope_grilling:season_hand') != 1 || q.property('kaleidoscope_grilling:season_phase') == 0)"
           },
           {
-            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand'"
+            "season_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (q.property('kaleidoscope_grilling:season_hand') == 1 && q.property('kaleidoscope_grilling:season_phase') != 0)"
           },
           {
             "tp_right": "c.is_first_person == 0 && c.item_slot == 'main_hand'"
+          },
+          {
+            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (q.property('kaleidoscope_grilling:season_hand') != 2 || q.property('kaleidoscope_grilling:season_phase') == 0)"
+          },
+          {
+            "season_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (q.property('kaleidoscope_grilling:season_hand') == 2 && q.property('kaleidoscope_grilling:season_phase') != 0)"
           },
           {
             "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"

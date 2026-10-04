@@ -13,6 +13,16 @@ def load(p):return json.loads(p.read_text())
 def index():return {g['description']['identifier']:g for p in (RP/'models').rglob('*.geo.json') for g in load(p)['minecraft:geometry']}
 def bottle_chain():
  idx=index();ids=[];fill=[]
+ if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,56):
+  for name in ('empty_seasoning_bottle','pending_seasoning'):
+   d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description']
+   assert 'contents' not in d['geometry']
+   assert len([k for k in d['geometry'] if k.startswith('layer_')])==16
+   assert len(d['render_controllers'])==17
+   for n in range(16):assert d['textures']['layer_'+str(n)]=='textures/a2770_placed/pending_'+str(n)
+  d=load(RP/'attachables/special_seasoning.attachable.json')['minecraft:attachable']['description']
+  assert idx[d['geometry']['contents']]['bones'][0]['cubes'][0]['size']==[5,5,5]
+  return
  for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):
   d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description'];ref=d['geometry']['default'];ids.append(ref)
   g=idx[ref];assert len(g['bones'])==1

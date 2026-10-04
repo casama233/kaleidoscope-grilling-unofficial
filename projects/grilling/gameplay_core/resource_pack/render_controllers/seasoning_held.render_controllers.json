@@ -1,0 +1,341 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_seasoning.held_0": {
+      "geometry": "Geometry.layer_0",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_0"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_0') : q.property('kaleidoscope_grilling:bottle_main_0'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_0') : q.property('kaleidoscope_grilling:bottle_main_0'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_1": {
+      "geometry": "Geometry.layer_1",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_1"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_0') : q.property('kaleidoscope_grilling:bottle_main_0')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_0') : q.property('kaleidoscope_grilling:bottle_main_0')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_2": {
+      "geometry": "Geometry.layer_2",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_2"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_1') : q.property('kaleidoscope_grilling:bottle_main_1'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_1') : q.property('kaleidoscope_grilling:bottle_main_1'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_3": {
+      "geometry": "Geometry.layer_3",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_3"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_1') : q.property('kaleidoscope_grilling:bottle_main_1')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_1') : q.property('kaleidoscope_grilling:bottle_main_1')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_4": {
+      "geometry": "Geometry.layer_4",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_4"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_2') : q.property('kaleidoscope_grilling:bottle_main_2'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_2') : q.property('kaleidoscope_grilling:bottle_main_2'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_5": {
+      "geometry": "Geometry.layer_5",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_5"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_2') : q.property('kaleidoscope_grilling:bottle_main_2')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_2') : q.property('kaleidoscope_grilling:bottle_main_2')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_6": {
+      "geometry": "Geometry.layer_6",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_6"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_3') : q.property('kaleidoscope_grilling:bottle_main_3'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_3') : q.property('kaleidoscope_grilling:bottle_main_3'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_7": {
+      "geometry": "Geometry.layer_7",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_7"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_3') : q.property('kaleidoscope_grilling:bottle_main_3')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_3') : q.property('kaleidoscope_grilling:bottle_main_3')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_8": {
+      "geometry": "Geometry.layer_8",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_8"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_4') : q.property('kaleidoscope_grilling:bottle_main_4'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_4') : q.property('kaleidoscope_grilling:bottle_main_4'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_9": {
+      "geometry": "Geometry.layer_9",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_9"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_4') : q.property('kaleidoscope_grilling:bottle_main_4')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_4') : q.property('kaleidoscope_grilling:bottle_main_4')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_10": {
+      "geometry": "Geometry.layer_10",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_10"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_5') : q.property('kaleidoscope_grilling:bottle_main_5'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_5') : q.property('kaleidoscope_grilling:bottle_main_5'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_11": {
+      "geometry": "Geometry.layer_11",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_11"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_5') : q.property('kaleidoscope_grilling:bottle_main_5')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_5') : q.property('kaleidoscope_grilling:bottle_main_5')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_12": {
+      "geometry": "Geometry.layer_12",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_12"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_6') : q.property('kaleidoscope_grilling:bottle_main_6'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_6') : q.property('kaleidoscope_grilling:bottle_main_6'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_13": {
+      "geometry": "Geometry.layer_13",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_13"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_6') : q.property('kaleidoscope_grilling:bottle_main_6')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_6') : q.property('kaleidoscope_grilling:bottle_main_6')),177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_14": {
+      "geometry": "Geometry.layer_14",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_14"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_7') : q.property('kaleidoscope_grilling:bottle_main_7'))/177),8)/8",
+          "math.floor(math.floor((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_7') : q.property('kaleidoscope_grilling:bottle_main_7'))/177)/8)/23"
+        ]
+      }
+    },
+    "controller.render.kg_seasoning.held_15": {
+      "geometry": "Geometry.layer_15",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.layer_15"
+      ],
+      "uv_anim": {
+        "scale": [
+          0.125,
+          0.043478260869565216
+        ],
+        "offset": [
+          "math.mod(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_7') : q.property('kaleidoscope_grilling:bottle_main_7')),177),8)/8",
+          "math.floor(math.mod((c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:bottle_off_7') : q.property('kaleidoscope_grilling:bottle_main_7')),177)/8)/23"
+        ]
+      }
+    }
+  }
+}

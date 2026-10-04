@@ -10,7 +10,7 @@ from verify_a284 import eating_gate
 from verify_a283 import main as previous_gate
 RP=repair.RP;BP=repair.BP
 def load(p):return json.loads(p.read_text())
-def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None):
+def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,season_phase=0,season_hand=0,pending_hand=0):
  # Only the simple boolean Molang subset used by held pose dispatch is accepted.
  expr=expr.replace('q.item_slot_to_bone_name(context.item_slot)',repr(bone))
  for prefix in ('context','c'):
@@ -18,6 +18,7 @@ def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None):
  if eat_hand is None:eat_hand=1 if slot=='main_hand' else 2
  expr=expr.replace("q.property('kaleidoscope_grilling:eat_hand')",str(eat_hand))
  expr=expr.replace('q.is_using_item',str(bool(using))).replace("q.property('kaleidoscope_grilling:eat_profile')",str(eat_profile))
+ for key,value in [('season_phase',season_phase),('season_hand',season_hand),('pending_hand',pending_hand)]:expr=expr.replace("q.property('kaleidoscope_grilling:"+key+"')",str(value))
  expr=expr.replace('&&',' and ').replace('||',' or ')
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr

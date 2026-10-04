@@ -1,0 +1,1621 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_0",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                17.5,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_1",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                17.5,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_2",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                18.125,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_3",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                18.125,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_4",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                18.75,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_5",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                18.75,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_6",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                19.375,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_7",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                19.375,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_8",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                20,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_9",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                20,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_10",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                20.625,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_11",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                20.625,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_12",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                21.25,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_13",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                21.25,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_14",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                21.875,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    },
+    {
+      "description": {
+        "identifier": "geometry.kg_seasoning.held_15",
+        "texture_width": 256,
+        "texture_height": 32,
+        "visible_bounds_width": 3,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "grip",
+          "pivot": [
+            0,
+            24,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                21.875,
+                -2.5
+              ],
+              "size": [
+                2.5,
+                0.625,
+                5.0
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    32,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    64,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    96,
+                    0
+                  ],
+                  "uv_size": [
+                    32,
+                    32
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    160,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    192,
+                    32
+                  ],
+                  "uv_size": [
+                    -32,
+                    -32
+                  ]
+                }
+              }
+            }
+          ],
+          "binding": "q.item_slot_to_bone_name(context.item_slot)"
+        }
+      ]
+    }
+  ]
+}

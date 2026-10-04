@@ -10,6 +10,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'tools'))
 PROJECT = ROOT / "projects" / "grilling" / "gameplay_core"
 BP = PROJECT / "behavior_pack"
 RP = PROJECT / "resource_pack"
@@ -494,6 +495,9 @@ def check_current_display_contracts(findings, geometry_index, animations):
             profile = requested.replace('THREE_RANDOM', 'THREE').lower()
             expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
             if requested=='THREE_RANDOM':expected_ids.update({f'eat_alt_{hand}':f'animation.kg_eating.item.three_alt.{hand}' for hand in ['right','left']})
+        if family == 'bottle' and 'season_right' in ids:
+            from build_seasoning_held import dispatch
+            expected_ids, seasoning_selectors=dispatch(desc['identifier']=='kaleidoscope_grilling:pending_seasoning')
         if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
@@ -509,6 +513,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
                     required_selectors['eat_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') != 4"
                     required_selectors['eat_alt_'+hand]=using+" && q.property('kaleidoscope_grilling:eat_profile') == 4"
         actual_selectors = {}
+        if family == 'bottle' and 'season_right' in ids:required_selectors=seasoning_selectors
         malformed = False
         for row in selectors:
             if not isinstance(row, dict) or len(row) != 1:
