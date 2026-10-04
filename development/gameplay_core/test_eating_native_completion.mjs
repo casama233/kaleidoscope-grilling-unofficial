@@ -7,6 +7,7 @@ import * as presentation from '../../projects/grilling/gameplay_core/behavior_pa
 import {captureEatingIdentity,eatingEventMatches,eatingStillCurrent,commitEating} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_eating_transaction.js';
 import {finishedFoodMeta} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/food_finish_core.js';
 import {FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/data.js';
+import {supportsJavaEatingProjection,JAVA_FP_EATING_ITEMS_BY_PROFILE} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/java_eating_projection_items.js';
 
 const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/main.js',import.meta.url),'utf8');
 const begin=source.indexOf('world.afterEvents.itemStartUse.subscribe(e=>{');
@@ -25,7 +26,7 @@ class Stack{
 function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main',start=100,mealId=duration===100?'kaleidoscope_grilling:grilled_ender_pearl_skewer':id,helperEmpty=false,amount=2,realEffects=false}={}){
  const callbacks={},queue=[],effects=[],properties=new Map(),nutrition={hunger:10,saturation:2};
  const counts={nativeDebits:0,manualWrites:0,nativeRewards:0,manualRewards:0};
- const state={stack:new Stack(),other:new Stack(1),creative};state.stack.typeId=mealId;
+ const state={stack:new Stack(amount),other:new Stack(1),creative};state.stack.typeId=mealId;
  state.other.typeId='minecraft:torch';state.other.nameTag='Keep opposite equipment';state.other.props={foreign:'unchanged'};
  const hunger={effectiveMax:20,get currentValue(){return nutrition.hunger},setCurrentValue(n){nutrition.hunger=n}};
  const saturation={get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
@@ -38,6 +39,7 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
   EquipmentSlot:{Offhand:'off'},now:()=>ctx.system.currentTick,captureInteractionIntent:()=>({hand}),syncSecretHeld(){},resolvedProfile:presentation.eatingProfile.bind(null),stackMeta:()=>({hot:false,seasonings:['salt'],hotUntil:0}),heldByHand:(_player,selectedHand)=>selectedHand===hand?state.stack?.clone():state.other?.clone(),copyOne:stack=>{const one=stack.clone();one.amount=1;return one},mainContainer:()=>bag,creative:()=>state.creative,grillingConfig:()=>({saturationMultiplier:1}),advanceBites(){},dangerousPreservation(){},stopSoundHandle(){},stopEatSound(){},soundFor:()=>'',secretRemainders(){},afterCommitted(_player,_id,_meta,_active,fullNative){counts[fullNative?'nativeRewards':'manualRewards']++}};
  // Production resolvedProfile returns a string, while the imported selector
  // returns its validated descriptor. Keep the real selector and source shape.
+ ctx.supportsJavaEatingProjection=supportsJavaEatingProjection;
  if(requested)ctx.PROFILE_BY_ITEM[mealId]=requested;
  // Bind the actual production selector, including the captured native duration.
  const selectorBegin=source.indexOf('function resolvedProfile('),selectorEnd=source.indexOf('function writeUseHand(',selectorBegin);
@@ -223,5 +225,66 @@ for(const row of [
  assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
  assert.equal(f.counts.manualWrites,row.eligible?1:0);assert.equal(f.counts.manualRewards,row.eligible?1:0);
  assert.equal(f.nutrition.hunger,row.eligible?15:10);assert.equal(f.nutrition.saturation,row.eligible?6:0);
- assert.deepEqual(f.effects,row.eligible?[['strength',200,{showParticles:true}]]:[]);
+  assert.deepEqual(f.effects,row.eligible?[['strength',200,{showParticles:true}]]:[]);
+});
+
+test('production projection admission agrees with every serialized item/profile blend gate at its JSON duration',()=>{
+ const animations=JSON.parse(fs.readFileSync(new URL('../../projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json',import.meta.url),'utf8')).animations;
+ for(const [declared,items] of Object.entries(JAVA_FP_EATING_ITEMS_BY_PROFILE))for(const mealId of items)for(const hand of ['main','off']){
+  const item=JSON.parse(fs.readFileSync(new URL(`../../projects/grilling/gameplay_core/behavior_pack/items/${mealId.split(':')[1]}.json`,import.meta.url),'utf8'))['minecraft:item'];
+  const duration=Math.round(item.components['minecraft:use_modifiers'].use_duration*20);
+  const f=fixture({mealId,duration,hand,helperEmpty:true}),before=f.state.stack.clone(),a=f.startUse();
+  const name=`animation.kg_java_eating.player.${a.profile.toLowerCase()}.${hand==='off'?'left':'right'}`;
+  const q={is_using_item:true,is_sneaking:0,is_swimming:0,is_gliding:0,is_riding:0,is_item_equipped:()=>0,
+   property:key=>f.properties.get(key),is_item_name_any:(slot,...ids)=>slot===(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')&&ids.includes(mealId)};
+  // Supply projection=1 to ask whether the client's exact item/profile gate
+  // can admit the request, rather than letting a false server flag mask it.
+  const clientQuery={...q,property:key=>key===presentation.EAT_PROJECTION_PROPERTY?1:q.property(key)};
+  const expected=Boolean(new Function('q','variable','return '+animations[name].blend_weight)(clientQuery,{is_first_person:true}));
+  assert.equal(f.properties.get(presentation.EAT_PROJECTION_PROPERTY),expected,`${mealId} ${declared} -> ${a.profile} ${duration}`);
+  assert.equal(f.animations.some(([animation])=>animation===name),expected);
+  assert.equal(supportsJavaEatingProjection(mealId,a.profile),expected);
+  assert.deepEqual(f.state.stack,before);assert.equal(f.state.other,undefined);assert.equal(f.counts.manualWrites,0);
+ }
+ for(const badProfile of ['THREE_RANDOM','toString','constructor','unknown',undefined])assert.equal(supportsJavaEatingProjection(id,badProfile),false);
+ assert.equal(supportsJavaEatingProjection('minecraft:apple','FOUR'),false);
+ assert.ok(Object.isFrozen(JAVA_FP_EATING_ITEMS_BY_PROFILE));
+ for(const items of Object.values(JAVA_FP_EATING_ITEMS_BY_PROFILE))assert.ok(Object.isFrozen(items));
+});
+
+for(const [mealId,duration] of [['kaleidoscope_grilling:grilled_fish_skewer',90],['kaleidoscope_grilling:grilled_ender_pearl_skewer',100],['kaleidoscope_grilling:grilled_gluten_skewer',100]])for(const hand of ['main','off'])test(`production elapsed snapshots drive observer bites without owner countdown: ${mealId} ${hand}`,()=>{
+ const desc=JSON.parse(fs.readFileSync(new URL(`../../projects/grilling/gameplay_core/resource_pack/attachables/${mealId.split(':')[1]}.attachable.json`,import.meta.url),'utf8'))['minecraft:attachable'].description;
+ const f=fixture({mealId,duration,hand,helperEmpty:true}),a=f.startUse(),before=f.state.stack.clone();
+ const activeSlot=hand==='off'?'off_hand':'main_hand',c={is_first_person:0,item_slot:activeSlot};
+ const math={clamp:(value,lo,hi)=>Math.max(lo,Math.min(hi,value))};
+ const evaluate=(remaining,using=true)=>{
+  const v={},q={is_using_item:using,main_hand_item_use_duration:remaining,frame_alpha:.5,
+   is_sneaking:0,is_swimming:0,is_gliding:0,is_riding:0,property:key=>f.properties.get(key),
+   is_item_name_any:()=>true,is_item_equipped:()=>0};
+  new Function('q','c','math','v',desc.scripts.pre_animation.join('\n'))(q,c,math,v);return v;
+ };
+ const ticks=[0,...a.biteTimes.flatMap(t=>[Math.ceil(t*20)-1,Math.ceil(t*20)]),duration-1];
+ for(const elapsed of ticks){
+  f.tickPresentation(a.start+elapsed);
+  for(const remaining of [0,17,90,100,72000]){
+   c.item_slot=activeSlot;const v=evaluate(remaining);
+   assert.equal(v.kg_eat_seconds,elapsed/20);assert.equal(v.kg_bite_stage,a.biteTimes.filter(t=>t<=elapsed/20).length);
+   assert.equal(Boolean(v.kg_java_piece_visible),false);
+   c.item_slot=activeSlot==='main_hand'?'off_hand':'main_hand';assert.equal(evaluate(remaining).kg_bite_stage,0);
+  }
+ }
+ assert.deepEqual(f.state.stack,before);assert.equal(f.counts.manualWrites,0);assert.equal(f.counts.manualRewards,0);
+ c.item_slot=activeSlot;assert.equal(evaluate(0,false).kg_bite_stage,0,'Native stopped-use signal closes the bite gate before delayed cleanup');
+ f.complete({tick:a.start+duration-1,nativeDebit:true});f.stop();f.flush();
+ assert.equal(evaluate(0,false).kg_eat_seconds,0);assert.equal(evaluate(0,false).kg_bite_stage,0);
+ assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
+});
+
+for(const hand of ['main','off'])test(`native final single fish serving completes once and leaves no artificial helper stack: ${hand}`,()=>{
+ const f=fixture({mealId:'kaleidoscope_grilling:grilled_fish_skewer',duration:90,amount:1,hand,helperEmpty:true});
+ assert.equal(f.state.stack.amount,1);f.startUse();f.stop({tick:189});f.complete({tick:189,nativeDebit:true});f.flush();
+ assert.equal(f.state.stack,undefined);assert.equal(f.state.other,undefined);
+ assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});
+ f.complete({tick:190});f.stop({tick:190});f.flush();
+ assert.equal(f.counts.nativeRewards,1);assert.equal(f.counts.manualWrites,0);
 });

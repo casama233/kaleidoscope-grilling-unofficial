@@ -51,7 +51,7 @@ class NativeEatingClock(unittest.TestCase):
         subprocess.run(['node','--input-type=module','-e',js],check=True)
         s=(module.parent/'main.js').read_text()
         self.assertIn('eatingNativeTicks(a.nativeDuration)',s)
-        self.assertIn("if(eatingNativeTicks(a.nativeDuration)>0&&JAVA_FP_EATING_ITEMS.includes(id)",s)
+        self.assertIn("if(eatingNativeTicks(a.nativeDuration)>0&&supportsJavaEatingProjection(id,profile)",s)
         for key in ('itemStartUse','itemCompleteUse','itemStopUse','playerSpawn'):
             section=s.split('world.afterEvents.'+key+'.subscribe',1)[1].split('world.',1)[0]
             self.assertIn('EAT_NATIVE_TICKS_PROPERTY',section,key)

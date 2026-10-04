@@ -1,4 +1,4 @@
-import {JAVA_FP_EATING_ITEMS} from './java_eating_projection_items.js';
+import {supportsJavaEatingProjection} from './java_eating_projection_items.js';
 import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
@@ -870,7 +870,7 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  try{e.source.setProperty(EAT_PROFILE_PROPERTY,eatingProfile(profile).code);e.source.setProperty(EAT_HAND_PROPERTY,hand==='off'?2:1);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,eatingNativeTicks(a.nativeDuration))}catch(error){console.warn('[Grilling eating profile] '+error)}
  // Separate Java NONE-context first-person path. Do not replace the RP player
  // definition or reset body/head channels. The JSON branch gates upright use.
- if(eatingNativeTicks(a.nativeDuration)>0&&JAVA_FP_EATING_ITEMS.includes(id)&&['ONE','TWO','THREE','THREE_ALT','FOUR'].includes(profile)&&(!['ONE','THREE'].includes(profile)||!heldByHand(e.source,hand==='off'?'main':'off'))){
+ if(eatingNativeTicks(a.nativeDuration)>0&&supportsJavaEatingProjection(id,profile)&&(!['ONE','THREE'].includes(profile)||!heldByHand(e.source,hand==='off'?'main':'off'))){
   try{
    e.source.setProperty(EAT_PROJECTION_PROPERTY,true);
    e.source.playAnimation('animation.kg_java_eating.player.'+profile.toLowerCase()+'.'+(hand==='off'?'left':'right'),{

@@ -27,6 +27,21 @@ def value(expression,pivots,slim):
     return eval(expression,{'__builtins__':{}})
 
 class DualEatingRenderer(unittest.TestCase):
+    def test_one_serialized_helper_remains_constant_after_source_last_knot(self):
+        items=load(RP/'animations/java_eating_projection.animation.json')['animations']
+        players=load(RP/'animations/java_eating_player.animation.json')['animations']
+        for hand in ('right','left'):
+            piece=items[generator.item_animation_id('ONE',hand)]['bones']['dual_piece']
+            helper='left' if hand=='right' else 'right'
+            bones=players[generator.player_animation_id('ONE',hand)]['bones']
+            for channels in (piece,bones[helper+'arm'],bones[helper+'item']):
+                for name,values in channels.items():
+                    if not isinstance(values,dict):continue
+                    self.assertIn('2.75',values)
+                    for key,value in values.items():
+                        if float(key)>=2.75:self.assertEqual(value,values['2.75'],(hand,name,key))
+            self.assertEqual(piece['scale'],['v.kg_eat_seconds >= 1.16667 ? 1 : 0']*3)
+
     def test_serialized_both_arms_sockets_and_meshes_match_java(self):
         items=load(RP/'animations/java_eating_projection.animation.json')['animations']
         players=load(RP/'animations/java_eating_player.animation.json')['animations']

@@ -173,5 +173,10 @@ def augment(output,profile_table):
     output[RP/'render_controllers/java_eating_player.render_controllers.json']={'format_version':'1.8.0','render_controllers':{'controller.render.player.first_person':controller}}
     # Data-only eligibility: missing/failed/secret geometries never enable a
     # different player arm while their item remains on a legacy transform.
-    output[BP/'scripts/java_eating_projection_items.js']='// Fixed-geometry eligibility for the scoped Java first-person projection.\nexport const JAVA_FP_EATING_ITEMS=Object.freeze('+json.dumps(sorted(ids))+');\n'
+    output[BP/'scripts/java_eating_projection_items.js']=(
+        '// Fixed-geometry eligibility for the scoped Java first-person projection.\n'
+        'export const JAVA_FP_EATING_ITEMS=Object.freeze('+json.dumps(sorted(ids))+');\n'
+        'export const JAVA_FP_EATING_ITEMS_BY_PROFILE=Object.freeze(Object.fromEntries(Object.entries('
+        +json.dumps(projection_items())+').map(([profile,items])=>[profile,Object.freeze(items)])));\n'
+        'export function supportsJavaEatingProjection(id,profile){return Object.hasOwn(JAVA_FP_EATING_ITEMS_BY_PROFILE,profile)&&JAVA_FP_EATING_ITEMS_BY_PROFILE[profile].includes(id);}\n')
     return output

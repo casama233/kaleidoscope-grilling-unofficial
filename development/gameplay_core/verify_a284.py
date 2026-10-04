@@ -14,7 +14,7 @@ def eating_gate():
         if version >= (2, 8, 58):
             assert food_start.count('playAnimation') == 2
             assert "playAnimation('animation.kg_java_eating.player.'" in food_start
-            assert 'JAVA_FP_EATING_ITEMS.includes(id)' in food_start
+            assert 'supportsJavaEatingProjection(id,profile)' in food_start
             projected = json.loads((RP / 'animations/java_eating_player.animation.json').read_text())['animations']
             dual=(RP/'render_controllers/java_eating_piece.render_controllers.json').exists()
             profiles=('TWO','THREE_ALT','FOUR','ONE','THREE') if dual else ('TWO','THREE_ALT','FOUR')
