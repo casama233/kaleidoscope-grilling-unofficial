@@ -10,7 +10,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_original_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':13,'commits':13})
+  self.assertEqual(verify(),{'refs':14,'commits':14})
   self.assertEqual(set(inventory()),literal_refs())
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
