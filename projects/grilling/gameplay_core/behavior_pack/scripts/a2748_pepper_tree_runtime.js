@@ -2,7 +2,7 @@ import {overlappedBlockPositions} from './a285_contact_core.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {getMainHand,getOffHand,setHand,findHandEntry,isCreative} from './a2735_player_io.js';
 import {
- PEPPER_LOG_ID,PEPPER_LEAVES_ID,PEPPER_SAPLING_ID,SICHUAN_PEPPER_ID,
+ PEPPER_LOG_ID,PEPPER_LEAVES_ID,PEPPER_SAPLING_ID,SICHUAN_PEPPER_ID,PEPPER_WORLDGEN_SEED_ID,
  LEAVES_COMPONENT_ID,SAPLING_COMPONENT_ID,LOG_COMPONENT_ID,
  HAS_PEPPER_STATE,PERSISTENT_STATE,SAPLING_STAGE_STATE,LEAF_DECAY_DISTANCE,STING_INTERVAL_TICKS,
  shouldFruitPepperLeaf,harvestedPepperCount,saplingBonemealSucceeds,saplingRandomTickSucceeds,
@@ -32,11 +32,12 @@ function lightAbove(block){
  try{return Number(block.dimension.getLightLevel({x:block.x,y:block.y+1,z:block.z}))||0}catch{return 0}
 }
 function isDirt(block){
- try{return !!block?.hasTag('dirt')}catch{return ['minecraft:dirt','minecraft:grass_block','minecraft:coarse_dirt','minecraft:podzol','minecraft:dirt_with_roots','minecraft:mycelium'].includes(block?.typeId)}
+ try{if(block?.hasTag('dirt'))return true}catch{}
+ return ['minecraft:dirt','minecraft:grass_block','minecraft:coarse_dirt','minecraft:podzol','minecraft:dirt_with_roots','minecraft:mycelium'].includes(block?.typeId);
 }
 function isReplaceable(block,origin=false){
  if(!block)return false;
- if(origin&&block.typeId===PEPPER_SAPLING_ID)return true;
+ if(origin&&(block.typeId===PEPPER_SAPLING_ID||block.typeId===PEPPER_WORLDGEN_SEED_ID))return true;
  return REPLACEABLE.has(block.typeId);
 }
 function isAxe(stack){
@@ -94,19 +95,41 @@ function leafPermutation(hasPepper=false,persistent=false){
 function logPermutation(){
  return BlockPermutation.resolve(PEPPER_LOG_ID,{'minecraft:block_face':'up'});
 }
-function placePepperTree(sapling){
+export function placePepperTree(sapling){
  const h=pepperTreeHeight(Math.random()),d=sapling.dimension,o=sapling.location;
  if(!isDirt(at(d,o,0,-1,0)))return false;
  for(let y=0;y<h+3;y++)if(!isReplaceable(at(d,o,0,y,0),y===0))return false;
- const randomValues=Array.from({length:96},()=>Math.random()),plan=pepperTreePlan(h,randomValues);
+ const randomValues=Array.from({length:96},()=>Math.random()),plan=pepperTreePlan(h,randomValues),writes=[];
+ // Resolve every planned block before touching the trunk. Unloaded canopy
+ // neighbors must not silently turn a complete tree into a permanent stump.
+ for(const p of plan.logs){
+  const block=at(d,o,p.x,p.y,p.z);if(!block)return false;
+  writes.push({block,before:block.permutation,after:logPermutation()});
+ }
+ for(const p of plan.leaves){
+  const block=at(d,o,p.x,p.y,p.z);if(!block)return false;
+  if(block.typeId==='minecraft:air')writes.push({block,before:block.permutation,after:leafPermutation(p.hasPepper,false)});
+ }
+ const committed=[];
  try{
-  for(const p of plan.logs)d.setBlockPermutation({x:o.x+p.x,y:o.y+p.y,z:o.z+p.z},logPermutation());
-  for(const p of plan.leaves){
-   const b=at(d,o,p.x,p.y,p.z);if(!b||b.typeId!=='minecraft:air')continue;
-   d.setBlockPermutation(b.location,leafPermutation(p.hasPepper,false));
-  }
+  for(const entry of writes){committed.push(entry);entry.block.setPermutation(entry.after);}
   return true;
- }catch{return false}
+ }catch{
+  for(const entry of committed.reverse())try{entry.block.setPermutation(entry.before)}catch{}
+  return false;
+ }
+}
+export function growPepperWorldgenSeed(seed){
+ if(seed?.typeId!==PEPPER_WORLDGEN_SEED_ID)return 'not_seed';
+ const d=seed.dimension,o=seed.location,range=d.heightRange;
+ const discard=()=>{if(seed.typeId===PEPPER_WORLDGEN_SEED_ID)seed.setType('minecraft:air');return 'blocked';};
+ if(range&&(o.y-1<range.min||o.y+5>=range.max))return discard();
+ // Retain the invisible-to-catalog seed only while neighboring chunks are
+ // unavailable. Its local block tick retries; never scan or regrow player logs.
+ for(let x=-1;x<=1;x++)for(let y=-1;y<=5;y++)for(let z=-1;z<=1;z++)
+  if(!at(d,o,x,y,z))return 'deferred';
+ if(placePepperTree(seed))return 'grown';
+ return discard();
 }
 function advanceSapling(block){
  const stage=Number(state(block,SAPLING_STAGE_STATE,0))||0;

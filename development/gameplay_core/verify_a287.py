@@ -1,35 +1,49 @@
 """All held binding paths and pose dispatch. Does not simulate a Minecraft client."""
 from pathlib import Path
-import ast,json,re,subprocess
+import ast,json,re,subprocess,sys
 import a287_binding_repair as repair
 import importlib.util
 _spec=importlib.util.spec_from_file_location('tools_build_eating',Path(__file__).resolve().parents[2]/'tools/build_eating_motion.py')
 _motion=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_motion)
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
 from verify_a285 import survival_gate
 from verify_a284 import eating_gate
 from verify_a283 import main as previous_gate
 RP=repair.RP;BP=repair.BP
 def load(p):return json.loads(p.read_text())
-def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,season_phase=0,season_hand=0,pending_hand=0):
+def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,projection=None,posture=None,season_hand=0,season_phase=0,pending_hand=0):
  # Only the simple boolean Molang subset used by held pose dispatch is accepted.
  expr=expr.replace('q.item_slot_to_bone_name(context.item_slot)',repr(bone))
  for prefix in ('context','c'):
   expr=expr.replace(prefix+'.is_first_person',str(int(first))).replace(prefix+'.item_slot',repr(slot))
  if eat_hand is None:eat_hand=1 if slot=='main_hand' else 2
  expr=expr.replace("q.property('kaleidoscope_grilling:eat_hand')",str(eat_hand))
+ # The bottle selectors read use state from their owning player. Resolve only
+ # this exact context before the unqualified query; unknown contexts still
+ # fail the existing restricted AST gate. Legacy calls keep motion inactive.
+ expr=expr.replace('c.owning_entity->q.is_using_item',str(bool(using)))
+ for name,value,maximum in [('season_hand',season_hand,2),('season_phase',season_phase,10),('pending_hand',pending_hand,2)]:
+  assert type(value) is int and 0 <= value <= maximum,(name,value)
+  expr=re.sub(r'\bv\.kg_season_'+name+r'\b',str(value),expr)
  expr=expr.replace('q.is_using_item',str(bool(using))).replace("q.property('kaleidoscope_grilling:eat_profile')",str(eat_profile))
- for key,value in [('season_phase',season_phase),('season_hand',season_hand),('pending_hand',pending_hand)]:expr=expr.replace("q.property('kaleidoscope_grilling:"+key+"')",str(value))
+ expr=expr.replace("q.property('kaleidoscope_grilling:eat_projection')",str(int(using and eat_profile in (1,2,3,4,5) if projection is None else projection)))
+ expr=re.sub(r"q\.is_item_name_any\([^)]*\)",'True',expr)
+ expr=re.sub(r"q\.is_item_equipped\([^)]*\)",'0',expr)
+ for state in ('is_sneaking','is_swimming','is_gliding','is_riding'):expr=expr.replace('q.'+state,str(int(state==posture)))
  expr=expr.replace('&&',' and ').replace('||',' or ')
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
  return bool(eval(compile(tree,'<pose-condition>','eval'),{'__builtins__':{}},{}))
 def binding_assets():
- idx={};animations={};rows=[];refs=set();cases=0
+ idx={};animations={};controllers={};rows=[];refs=set();cases=0
+ version=tuple(load(BP/'manifest.json')['header']['version'])
  for p in (RP/'models').rglob('*.geo.json'):
   for g in load(p)['minecraft:geometry']:
    ref=g['description']['identifier'];assert ref not in idx,ref;idx[ref]=g
  for p in (RP/'animations').glob('*.json'):
   for key,a in load(p).get('animations',{}).items():assert key not in animations,key;animations[key]=a
+ for p in (RP/'render_controllers').glob('*.json'):
+  for key,body in load(p).get('render_controllers',{}).items():assert key not in controllers,key;controllers[key]=body
  for p in sorted((RP/'attachables').glob('*.json')):
   if p.stem.endswith('_java_three_alt.attachable'):continue
   d=load(p)['minecraft:attachable']['description'];selected=[]
@@ -39,18 +53,44 @@ def binding_assets():
      matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
      assert matches==[expected],(p,first,slot,bone,matches)
-     for profile in (3,4):
+     for profile in (1,2,3,4,5):
       using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
-      assert using_matches==[expected]+([eating] if first and eating in d['animations'] else []),(p,profile,using_matches)
+      projected='fp_eat_'+hand
+      projected_code={'one':1,'two':2,'three':3,'three_alt':4,'four':5}.get(d['animations'].get(projected,'').split('.')[-2] if projected in d['animations'] else '')
+      # .61 corrects the renderer context: Java renderArmWithItem curves are
+      # first-person-only. Older immutable candidates retain their old guard.
+      local_eating=[eating] if eating in d['animations'] and (first or version<(2,8,61)) else []
+      expected_using=([projected] if first and profile==projected_code else [expected]+local_eating) if version>=(2,8,58) else [expected]+local_eating
+      assert using_matches==expected_using,(p,profile,using_matches,expected_using)
+      # Projection is independently synchronized, and every excluded posture
+      # falls back to the native display. Local authored motion is FP-only in
+      # .61; third-person never inherits a camera-space item displacement.
+      for projection,posture in [(False,None)]+[(True,s) for s in ('is_sneaking','is_swimming','is_gliding','is_riding')]:
+       fallback=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
+       assert fallback==[expected]+local_eating,(p,profile,projection,posture,fallback)
       for inactive in (0,2 if slot=='main_hand' else 1):
        inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
        assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
+  if d['animations'].get('fp_right')=='animation.kg_a286.bottle_fp_right' and version>=(2,8,61):
+   # Production bottles use one renderer instance; old multi-pass controller
+   # definitions may remain as unused source, but no item can reference them.
+   assert set(d['geometry'])=={'default'},p
+   assert len(d['render_controllers'])==1 and isinstance(d['render_controllers'][0],str),p
+   assert controllers[d['render_controllers'][0]]['geometry']=='Geometry.default',p
+   assert d['geometry']['default'].startswith('geometry.kg_bottle_held.'),p
   for ref in d['geometry'].values():
    refs.add(ref);g=idx[ref]
    b=g['bones'][0];assert b['name']=='grip' and b['pivot']==[0,24,0]
+   if ref.startswith('geometry.kg_java_dual.piece.'):
+    from build_java_dual_eating_projection import PIECE_BINDING,REPRESENTATIVES
+    assert d['identifier'] in REPRESENTATIVES and ref==d['geometry']['java_piece']
+    assert b['binding']==PIECE_BINDING and 'parent' not in b
+    assert len(g['bones'])==2 and not b.get('cubes')
+    assert g['bones'][1]['name']=='dual_piece' and g['bones'][1]['parent']=='grip' and g['bones'][1]['pivot']==[0,24,0] and g['bones'][1]['cubes']
+    continue
    assert b['binding']=='q.item_slot_to_bone_name(context.item_slot)' and 'parent' not in b
    if ref.startswith('geometry.kg_a287.'):
     # A2.8.14 splits binding, display pose and handle-origin correction.
@@ -58,7 +98,10 @@ def binding_assets():
     pose,model=g['bones'][1:]
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose' and model['pivot']==[0,24,0]
-    for alias,anim in d['animations'].items():assert set(animations[anim]['bones'])==({'skewer_model'} if alias.startswith('eat_') else {'skewer_pose','skewer_model'}),anim
+    for alias,anim in d['animations'].items():
+     expected_bones={'skewer_model'} if alias.startswith('eat_') else {'skewer_pose','skewer_model'}
+     if alias.startswith('fp_eat_') and 'java_piece' in d['geometry']:expected_bones.add('dual_piece')
+     assert set(animations[anim]['bones'])==expected_bones,anim
     oldref=ref.replace('kg_a287.','kg_a283.');old=idx[oldref]
     assert model['cubes']==[c for bone in old['bones'] for c in bone.get('cubes',[])],ref
    elif ref.startswith('geometry.kg_secret_held.'):
@@ -66,6 +109,19 @@ def binding_assets():
     pose,model=g['bones'][1:]
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose',ref
+   elif ref=='geometry.kg_bottle_held.combined':
+    assert len(g['bones'])==146 and not b.get('cubes'),ref
+    assert {child['name'] for child in g['bones'][1:]}=={'shell'}|{f'pending_{tint}_color_{value}' for tint in range(16) for value in range(1,10)},ref
+    for child in g['bones'][1:]:
+     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child and child.get('cubes'),ref
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
+   elif ref.startswith('geometry.kg_bottle_held.fixed.'):
+    assert re.fullmatch(r'geometry\.kg_bottle_held\.fixed\.r[1-8]\.v[0-7]',ref),ref
+    assert len(g['bones'])==3 and not b.get('cubes'),ref
+    assert {child['name'] for child in g['bones'][1:]}=={'shell','contents'},ref
+    for child in g['bones'][1:]:
+     assert child['parent']=='grip' and child['pivot']==[0,24,0] and 'binding' not in child and child.get('cubes'),ref
+    for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
    elif ref=='geometry.kg_a286.kg_a2763.advanced_rack_hand':
     assert len(g['bones'])==3 and not b.get('cubes'),ref
     pose,model=g['bones'][1:]
@@ -78,11 +134,25 @@ def binding_assets():
   if p.name.endswith('_skewer.attachable.json') and d['identifier']!='kaleidoscope_grilling:secret_skewer':
    old=repair.source(p);old=old['minecraft:attachable']['description']
    profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
-   if profiles.get(d['identifier'])=='THREE_RANDOM':assert "q.property('kaleidoscope_grilling:eat_profile')" in d['scripts']['pre_animation'][0]
+   from native_eating_clock import VARIABLE,ASSIGNMENT
+   pre=d['scripts']['pre_animation']
+   if 'java_piece' in d['geometry']:
+    assert pre[-1].startswith('v.kg_java_piece_visible = ') and pre[-1].endswith(';')
+    pre=pre[:-1]
+   if tuple(load(BP/'manifest.json')['header']['version'])>=(2,8,58):
+    assert pre[0]==ASSIGNMENT
+    pre=[row.replace(VARIABLE,'q.item_in_use_duration') for row in pre[1:]]
+   if profiles.get(d['identifier'])=='THREE_RANDOM':assert "q.property('kaleidoscope_grilling:eat_profile')" in pre[0]
    else:
-    assert [row.replace(_motion.ACTIVE_HAND,'q.is_using_item') for row in d['scripts']['pre_animation']]==old['scripts']['pre_animation']
-   assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
-   assert set(d['geometry'])==set(old['geometry'])
+    assert [row.replace(_motion.ACTIVE_HAND,'q.is_using_item') for row in pre]==old['scripts']['pre_animation']
+   if 'java_piece' in d['geometry']:
+    from build_java_dual_eating_projection import PIECE_CONTROLLER
+    assert d['render_controllers']==old['render_controllers']+[PIECE_CONTROLLER]
+    assert {k:v for k,v in d['textures'].items() if k!='java_piece'}==old['textures']
+    assert set(d['geometry'])==set(old['geometry'])|{'java_piece'}
+   else:
+    assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
+    assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
  expected_count=107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
  assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)

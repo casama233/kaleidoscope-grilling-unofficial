@@ -5,12 +5,36 @@ from verify_a283 import BP, RP, main as previous_gate
 
 def eating_gate():
     script = (BP / 'scripts/main.js').read_text()
+    version = tuple(json.loads((BP / 'manifest.json').read_text())['header']['version'])
     start = script.split('world.afterEvents.itemStartUse.subscribe', 1)[1].split('world.afterEvents.itemCompleteUse.subscribe', 1)[0]
     # Pending seasoning has its separate shake. Food may only supply the
     # third-person native rotation fallback; legacy translated limbs stay banned.
     food_start = start.split('if(!FOOD_DATA[id]&&id!==SECRET_ID)return;', 1)[1]
     if 'playAnimation' in food_start:
-        assert food_start.count('playAnimation') == 1
+        if version >= (2, 8, 58):
+            assert food_start.count('playAnimation') == 2
+            assert "playAnimation('animation.kg_java_eating.player.'" in food_start
+            assert 'supportsJavaEatingProjection(e.itemStack.typeId,profile)' in food_start
+            projected = json.loads((RP / 'animations/java_eating_player.animation.json').read_text())['animations']
+            dual=(RP/'render_controllers/java_eating_piece.render_controllers.json').exists()
+            profiles=('TWO','THREE_ALT','FOUR','ONE','THREE') if dual else ('TWO','THREE_ALT','FOUR')
+            assert set(projected)=={'animation.kg_java_eating.player.'+profile.lower()+'.'+hand for profile in profiles for hand in ('right','left')}
+            for name, pose in projected.items():
+                hand = name.rsplit('.', 1)[1]
+                other = 'left' if hand == 'right' else 'right'
+                assert pose.get('override_previous_animation') is True
+                assert 'this' not in json.dumps(pose['bones'])
+                assert pose['blend_weight'].startswith('variable.is_first_person && ')
+                assert "q.property('kaleidoscope_grilling:eat_projection') == 1" in pose['blend_weight']
+                if name.split('.')[-2] in ('one','three'):
+                    assert set(pose['bones'])=={'rightarm','leftarm','rightitem','leftitem'}
+                    assert "q.is_item_equipped('"+('off_hand' if hand=='right' else 'main_hand')+"') == 0" in pose['blend_weight']
+                    for socket in ('rightitem','leftitem'):assert pose['bones'][socket]['scale']==[1,1,1] and pose['bones'][socket]['rotation']==[0,0,0]
+                else:
+                    assert set(pose['bones']) == {hand+'arm', hand+'item', other+'item'}
+                    assert pose['bones'][other+'item'] == {'scale': 0}
+        else:
+            assert food_start.count('playAnimation') == 1
         assert "playAnimation('animation.kg_eating.player.native_'" in food_start
         poses = json.loads((RP / 'animations/eating_arms.animation.json').read_text())['animations']
         for hand in ('right', 'left'):
@@ -24,7 +48,15 @@ def eating_gate():
     tick = script.split('const active=ACTIVE_EATS.get(p.id);', 1)[1].split('writeFx(p,readFx(p))', 1)[0]
     assert 'playAnimation' not in tick
     assert 'advanceBites(p,active)' in tick and 'hungerSettle(' not in tick
-    assert 'if(ACTIVE_EATS.get(id)!==a)return' in stop and 'used+1>=25&&hungerSettle(e.source,a.id,a)' in stop
+    assert 'if(ACTIVE_EATS.get(id)!==a)return' in stop
+    if version >= (2, 8, 54):
+        # Java's 25-tick visual checkpoint has a one-tick RELEASE-only grace.
+        # Older immutable candidates retain their original exact assertion.
+        assert 'const MINIMUM_EAT_TICKS=25,RELEASE_CHECKPOINT_GRACE_TICKS=1;' in script
+        assert 'const used=system.currentTick-a.start;' in stop
+        assert 'used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a)' in stop
+    else:
+        assert 'used>=25&&hungerSettle(e.source,a.id,a)' in stop
     for file in (BP / 'scripts').rglob('*.js'):
         assert 'animation.kg_imm.player.eat_' not in file.read_text(), file
     data = (BP / 'scripts/data.js').read_text()
@@ -53,7 +85,7 @@ def eating_gate():
         assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file
         skewers += 1
     assert skewers == (40 if (RP / 'attachables/secret_skewer.attachable.json').exists() else 39), skewers
-    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; no translated limb or whole-player override')
+    print(f'A284: {len(foods)} native eating items, {skewers} bite-stage attachables; scoped limb channels, no whole-player override')
 
 
 if __name__ == '__main__':

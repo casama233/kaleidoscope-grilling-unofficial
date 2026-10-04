@@ -1,3 +1,5 @@
+export const PEPPER_WORLDGEN_SEED_ID='kaleidoscope_grilling:pepper_worldgen_seed';
+export const WORLDGEN_SEED_COMPONENT_ID='kaleidoscope_grilling:pepper_worldgen_seed_logic';
 export const PEPPER_LOG_ID='kaleidoscope_grilling:pepper_log';
 export const PEPPER_LEAVES_ID='kaleidoscope_grilling:pepper_leaves';
 export const PEPPER_SAPLING_ID='kaleidoscope_grilling:pepper_sapling';
@@ -68,6 +70,9 @@ export function pepperTreePlan(height,randomValues=[]){
   add(x,h-1,z,false,0.6);
  }
  const bottom=h-2;
- if(bottom>0)for(const [x,z] of [[-1,0],[1,0],[0,-1],[0,1]])add(x,bottom,z,false,0.5);
+ // Java rolls once per sign, then places the two perpendicular cardinals.
+ if(bottom>0)for(const d of [-1,1])if(next()<0.5){
+  add(d,bottom,0,true);add(0,bottom,d,true);
+ }
  return {height:h,logs,leaves};
 }

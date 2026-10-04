@@ -30,6 +30,18 @@ class HeldRenderContracts(unittest.TestCase):
  def test_wrong_parent(self):self.assertIn('held_hierarchy_contract',self.check(geometry_change=lambda g:g['bones'][2].update(parent='grip')))
  def test_missing_animation_bone(self):self.assertIn('held_animation_missing_bone',self.check(geometry_change=lambda g:g['bones'][2].update(name='wrong_model')))
  def test_wrong_pivot(self):self.assertIn('held_hierarchy_contract',self.check(geometry_change=lambda g:g['bones'][1].update(pivot=[0,0,0])))
+ def test_active_pose_requires_eligibility(self):
+  def mutate(d):
+   for row in d['scripts']['animate']:
+    if 'fp_eat_right' in row:row['fp_eat_right']=row['fp_eat_right'].replace("q.property('kaleidoscope_grilling:eat_projection') == 1",'1')
+  if any('fp_eat_right' in row for row in audit.load_json(audit.RP/'attachables/raw_beef_skewer.attachable.json')['minecraft:attachable']['description']['scripts']['animate']):
+   self.assertIn('held_pose_selectors',self.check(mutate))
+ def test_active_and_idle_cannot_layer(self):
+  def mutate(d):
+   for row in d['scripts']['animate']:
+    if 'fp_right' in row:row['fp_right']="c.is_first_person == 1 && c.item_slot == 'main_hand'"
+  if 'fp_eat_right' in audit.load_json(audit.RP/'attachables/raw_beef_skewer.attachable.json')['minecraft:attachable']['description']['animations']:
+   self.assertIn('held_pose_selectors',self.check(mutate))
 class ItemVisualContracts(unittest.TestCase):
  def check(self,change=None):
   loader=audit.load_json

@@ -114,7 +114,7 @@ def main():
     write(BP/'items/empty_seasoning_bottle.json',empty)
     pending={'format_version':'1.26.30','minecraft:item':{'description':{'identifier':'kaleidoscope_grilling:pending_seasoning','menu_category':{'category':'items'}},'components':{
       'minecraft:display_name':{'value':'item.kaleidoscope_grilling:pending_seasoning.name'},
-      'minecraft:icon':{'textures':{'default':'pending_seasoning'}},'minecraft:max_stack_size':1,'minecraft:hand_equipped':True,
+      'minecraft:icon':{'textures':{'default':'pending_seasoning'}},'minecraft:max_stack_size':1,'minecraft:hand_equipped':True,'minecraft:allow_off_hand':True,
       'minecraft:use_modifiers':{'start_using':'always','use_duration':4.0,'movement_modifier':0.35},
       'minecraft:use_animation':{'value':'none'}
     }}}

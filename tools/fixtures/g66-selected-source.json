@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "format": "selected_git_source_objects_no_ref_updates",
+  "pack_sha256": "8fb5fc99ab3e1cebaf3b26eed5f8a51a69d5c1dcf5f50abd4cdc6188dce6425a",
+  "pack_bytes": 12827,
+  "object_count": 12,
+  "commits": [
+    "0996f05fd63ce37098d867d14b4760dad93d2501"
+  ],
+  "scope": "Original BASE0996 code evidence only: one commit, eight required source-path ancestor trees and three original code blobs. No parent history, docs/history/media/archive objects or private export inventories. Sibling source names/OIDs in the indispensable original ancestor trees are not their contents.",
+  "selected_blobs": {
+    "0996f05fd63ce37098d867d14b4760dad93d2501": {
+      "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer.attachable.json": {
+        "git_blob_sha1": "302bc86923b3ea56ad91f0fac1dd2ebeb3f1a555",
+        "sha256": "192024ea88424fe131354ab6f1ca9a55e6af0fd19cc5223ee4bf032cb65613f8",
+        "bytes": 16199
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer_java_three_alt.attachable.json": {
+        "git_blob_sha1": "e20d4d080d479fd239726478ddb9503a1520194d",
+        "sha256": "9622750bac60870e2c00523e6d1ea25388d8f05aaa507d9474474991dd47a7e9",
+        "bytes": 16214
+      },
+      "projects/grilling/gameplay_core/resource_pack/models/entity/secret_held.geo.json": {
+        "git_blob_sha1": "1b2ddec11d233d3844e3184a42789e7e9cc3cf51",
+        "sha256": "a1b003170ad46c011c7182c3197e2ecc0ddda9c2edef48d273408746e294fb7c",
+        "bytes": 10212
+      }
+    }
+  },
+  "exact_object_ids": [
+    "0996f05fd63ce37098d867d14b4760dad93d2501",
+    "0e0a93263d458378d9acdc6140a2866abce1db97",
+    "0e25745c5103d447701ac540ba8539200e9d3112",
+    "1b2ddec11d233d3844e3184a42789e7e9cc3cf51",
+    "23d135c56cd9a7eb76172e5f5658a20f4bf9acd0",
+    "302bc86923b3ea56ad91f0fac1dd2ebeb3f1a555",
+    "4051837608c46ebaccdb03ef77a45482f20efb47",
+    "915a7976bf9931287a72f447d37d35db32c632e3",
+    "9ce7f125486a83f0e139b57e263c0a90814f2d26",
+    "ca9a5e831f59dd6c65f75a04648477295564270d",
+    "e20d4d080d479fd239726478ddb9503a1520194d",
+    "fd0cf3b13dcd48baea52b9d15301da3535e14cff"
+  ]
+}

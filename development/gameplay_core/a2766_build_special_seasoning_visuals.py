@@ -70,6 +70,7 @@ def item_doc(variant: int, remaining: int) -> dict:
                 "minecraft:icon": {"textures": {"default": "special_seasoning"}},
                 "minecraft:max_stack_size": 1,
                 "minecraft:hand_equipped": True,
+                "minecraft:allow_off_hand": True,
                 "minecraft:block_placer": {
                     "block": "kaleidoscope_grilling:seasoning_bottle_1",
                     "replace_block_item": False,

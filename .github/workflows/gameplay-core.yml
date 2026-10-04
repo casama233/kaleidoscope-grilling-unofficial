@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/gameplay-core*.yml'
+      - '.github/g66-test-release-request.json'
       - '.github/workflows/family-candidate.yml'
       - 'compat/family/**'
       - 'baseline.json'
@@ -16,6 +17,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/gameplay-core*.yml'
+      - '.github/g66-test-release-request.json'
       - '.github/workflows/family-candidate.yml'
       - 'compat/family/**'
       - 'baseline.json'
@@ -59,10 +61,17 @@ jobs:
           # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
           # read straight from the fetched commit, then those commits are fetched
           # too, so a shallow clone still resolves every baseline.
-          BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
-          if [ -n "$BASELINES" ]; then git fetch --depth=1 origin $BASELINES; fi
           git checkout --detach "$EXPECTED_SHA"
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          # Connector snapshots retain selected original source SHA guards via
+          # a checksum-pinned pack. This imports evidence without changing refs.
+          python tools/source_provenance.py
+          BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          for baseline in $BASELINES; do
+            if ! git cat-file -e "$baseline^{commit}" 2>/dev/null; then
+              git fetch --depth=1 origin "$baseline"
+            fi
+          done
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -77,7 +86,13 @@ jobs:
       - name: Verify source receipt and compiled comparison regression guards
         shell: pwsh
         run: |
+          python tools/test_source_provenance.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python development/gameplay_core/test_verify_current.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python development/gameplay_core/test_package_current.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python development/gameplay_core/test_publish_test_release.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify canonical source once and record exact inputs

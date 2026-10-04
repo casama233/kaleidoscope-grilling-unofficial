@@ -24,8 +24,10 @@ def build():
    # Explicit opposing faces keep this icon cutout visible from both sides.
    if index:geo['bones'][2]['cubes']=[{'origin':[-1.92,24.75,1.08-slot*4],'size':[3.84,0,3.84],'uv':{'up':{'uv':[0,0],'uv_size':[16,16]},'down':{'uv':[16,0],'uv_size':[-16,16]}}}]
    geometries.append(geo);refs[name]=geo['description']['identifier']
-  # Property query identifiers are literal strings on both code paths.
-  prop="(c.item_slot == 'off_hand' ? q.property('kaleidoscope_grilling:secret_off_"+str(slot)+"') : q.property('kaleidoscope_grilling:secret_main_"+str(slot)+"'))"
+  # Render-controller context is not the owning player. Resolve the hand and
+  # player properties in attachable pre_animation, as the native-proven bottle
+  # route does; controllers consume only the resulting numeric local variable.
+  prop='v.kg_secret_ingredient_'+str(slot)
   controllers['controller.render.kg_secret_held.'+str(slot)]={'arrays':{'textures':{'Array.food':['Texture.stick']+['Texture.food_'+str(i) for i in range(1,len(rows)+1)]}},'geometry':prop+' == 0 ? Geometry.part_'+str(slot)+'_0 : Geometry.part_'+str(slot)+'_1','materials':[{'*':'Material.default'}],'textures':['Array.food['+prop+']'],'part_visibility':[{'skewer_model':'v.kg_bite_stage < '+str(slot+1)}]}
  controllers['controller.render.kg_secret_held.stick']={'geometry':'Geometry.stick','materials':[{'*':'Material.default'}],'textures':['Texture.stick']}
  attach={'format_version':'1.26.0','minecraft:attachable':{'description':{'identifier':'kaleidoscope_grilling:secret_skewer','materials':{'default':'entity_alphatest_one_sided'},'textures':textures,'geometry':refs,'scripts':{'pre_animation':[],'animate':[{key:"c.is_first_person == "+str(int(key.startswith('fp')))+" && c.item_slot == '"+('main_hand' if key.endswith('right') else 'off_hand')+"'"} for key in ['fp_right','fp_left','tp_right','tp_left']]},'animations':{key:'animation.kg_a287.skewer_'+key for key in ['fp_right','fp_left','tp_right','tp_left']},'render_controllers':['controller.render.kg_secret_held.stick']+['controller.render.kg_secret_held.'+str(slot) for slot in range(3)]}}}
@@ -36,7 +38,18 @@ def build():
   for key,value in existing.get('animations',{}).items():
    if key.startswith('eat_'):attach['minecraft:attachable']['description']['animations'][key]=value
   attach['minecraft:attachable']['description']['scripts']['animate'] += [row for row in existing.get('scripts',{}).get('animate',[]) if any(k.startswith('eat_') for k in row)]
-  attach['minecraft:attachable']['description']['scripts']['pre_animation']=existing.get('scripts',{}).get('pre_animation',[])
+  attach['minecraft:attachable']['description']['scripts']['pre_animation']=[s for s in existing.get('scripts',{}).get('pre_animation',[]) if not s.startswith('v.kg_secret_')]
+ scripts=attach['minecraft:attachable']['description']['scripts']
+ scripts['initialize']=['v.kg_secret_off_hand = 0;']
+ scripts['pre_animation'].append("v.kg_secret_off_hand = c.item_slot == 'off_hand';")
+ for slot in range(3):
+  var='v.kg_secret_ingredient_'+str(slot)
+  reads=[]
+  for hand in ['off','main']:
+   name='kaleidoscope_grilling:secret_'+hand+'_'+str(slot)
+   reads.append("(c.owning_entity->q.has_property('"+name+"') ? c.owning_entity->q.property('"+name+"') : 0)")
+  scripts['initialize'].append(var+' = 0;')
+  scripts['pre_animation'].append(var+' = math.floor(math.clamp((v.kg_secret_off_hand ? '+reads[0]+' : '+reads[1]+'), 0, '+str(len(rows))+'));')
  return {RP/'models/entity/secret_held.geo.json':{'format_version':'1.21.0','minecraft:geometry':geometries},RP/'render_controllers/secret_held.render_controllers.json':{'format_version':'1.8.0','render_controllers':controllers},target:attach,BP/'scripts/secret_visual_catalog.js':'// Generated, reviewed public icon slots; 0 means no supported mesh.\nexport const SECRET_VISUAL_SLOTS=Object.freeze('+json.dumps(table,separators=(',',':'),sort_keys=True)+');\n'}
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()

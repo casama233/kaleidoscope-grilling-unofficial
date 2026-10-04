@@ -13,15 +13,20 @@ def load(p):return json.loads(p.read_text())
 def index():return {g['description']['identifier']:g for p in (RP/'models').rglob('*.geo.json') for g in load(p)['minecraft:geometry']}
 def bottle_chain():
  idx=index();ids=[];fill=[]
- if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,56):
-  for name in ('empty_seasoning_bottle','pending_seasoning'):
-   d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description']
-   assert 'contents' not in d['geometry']
-   assert len([k for k in d['geometry'] if k.startswith('layer_') and k.removeprefix('layer_').isdigit()])==16
-   assert len(d['render_controllers'])==17
-   for n in range(16):assert d['textures']['layer_'+str(n)]=='textures/a2770_placed/pending_'+str(n)
-  d=load(RP/'attachables/special_seasoning.attachable.json')['minecraft:attachable']['description']
-  assert idx[d['geometry']['contents']]['bones'][0]['cubes'][0]['size']==[5,5,5]
+ if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,61):
+  from test_bottle_visual_assets import BottleVisualAssets
+  checks=BottleVisualAssets()
+  checks.test_held_layers_share_shell_socket_without_changing_native_id()
+  checks.test_placed_bounds_and_opaque_palette_match_source()
+  checks.test_generator_is_reproducible_and_player_budget_fits()
+  special=load(RP/'attachables/special_seasoning.attachable.json')['minecraft:attachable']['description']
+  assert special['textures']=={'default':'textures/held/bottle_shell_palette'}
+  assert special['geometry']=={'default':'geometry.kg_bottle_held.fixed.r8.v0'}
+  assert len(special['render_controllers'])==1
+  bones=idx[special['geometry']['default']]['bones']
+  assert len(bones)==3 and not bones[0].get('cubes')
+  assert {b['name'] for b in bones[1:]}=={'shell','contents'}
+  assert all(b.get('cubes') and b['parent']=='grip' and b['pivot']==[0,24,0] and 'binding' not in b for b in bones[1:])
   return
  for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):
   d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description'];ref=d['geometry']['default'];ids.append(ref)

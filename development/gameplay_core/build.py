@@ -240,7 +240,8 @@ def main():
               'minecraft:display_name':{'value':f'item.{NS}:{item_id}.name'},
               'minecraft:icon':{'textures':{'default':item_id}},
               'minecraft:max_stack_size':1,
-              'minecraft:hand_equipped':True
+              'minecraft:hand_equipped':True,
+              **({'minecraft:allow_off_hand':True} if item_id in {'empty_seasoning_bottle','special_seasoning'} else {})
             }
           }
         })

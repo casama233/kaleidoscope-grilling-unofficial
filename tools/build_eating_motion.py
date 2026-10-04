@@ -1,7 +1,6 @@
 """Reproducible held-item motion from reviewed Java Catmull-Rom curves.
 
-Composes authored arm and item matrices in the reviewed held frame. Restricts
-first-person authored motion to first person; third person retains native use. Native
+Uses a local first-person motion bone atop the reviewed hand frames. Native
 Bedrock arm animation and Java's detached second-piece rendering differ; this
 conversion does not certify the client presentation.
 """
@@ -55,7 +54,11 @@ def motion_frame(profile,hand,t):
  basis=bone_matrix({**held,'scale':1});delta=chain(item_frame(profile,hand,t),rigid_inverse(item_frame(profile,hand,0)))
  local=chain(rigid_inverse(basis),delta,basis);r=bedrock_rotation(local)
  return [-local[0][3]/.8,local[1][3]/.8,local[2][3]/.8],r
-def build():
+def build(attachable_overrides=None):
+ overrides={} if attachable_overrides is None else attachable_overrides
+ modern=tuple(json.loads((BP/'manifest.json').read_text())['header']['version']) >= (2,8,58)
+ sys.path.insert(0,str(ROOT/'development/gameplay_core'))
+ from native_eating_clock import SECONDS,VARIABLE,ASSIGNMENT
  animations={};profiles=['ONE','TWO','THREE','THREE_ALT','FOUR']
  for profile in profiles:
   a,pt,prefix,rt,rprefix=curves(profile);duration=5 if profile=='THREE' else 4.5
@@ -68,18 +71,33 @@ def build():
      rot=[x+360*round((previous[i]-x)/360) for i,x in enumerate(rot)]
     position[f'{t:.2f}']=[round(x,6) for x in pos]
     rotation[f'{t:.2f}']=[round(x,6) for x in rot]
-   animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
- output={RP/'animations/eating_motion.animation.json':{'format_version':'1.8.0','animations':animations}}
+   animations[animation_id(profile,hand)]={'loop':'hold_on_last_frame','animation_length':duration,'anim_time_update':SECONDS if modern else 'q.item_in_use_duration','bones':{'skewer_model':{'position':position,'rotation':rotation}}}
+ output={**overrides,RP/'animations/eating_motion.animation.json':{'format_version':'1.8.0','animations':animations}}
  table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
- for p in (RP/'attachables').glob('*.json'):
-  doc=json.loads(p.read_text());d=doc['minecraft:attachable']['description'];profile=table.get(d['identifier']);
-  if d['identifier']=='kaleidoscope_grilling:secret_skewer':profile='THREE_RANDOM'
-  if not profile or not d['identifier'].endswith('_skewer'):continue
+ paths=set((RP/'attachables').glob('*.json'))|{p for p in overrides if p.parent==RP/'attachables'}
+ for p in sorted(paths):
+  doc=json.loads(json.dumps(overrides[p])) if p in overrides else json.loads(p.read_text())
+  d=doc['minecraft:attachable']['description'];identifier=d['identifier'];suffix='_java_three_alt'
+  base=identifier[:-len(suffix)] if identifier.endswith(suffix) else identifier
+  profile=table.get(base)
+  if base=='kaleidoscope_grilling:secret_skewer':profile='THREE_RANDOM'
+  if not profile or (identifier!=base and profile!='THREE_RANDOM'):continue
+  # Reconstruct generated guards each pass. Ineligible canonical random items
+  # regain their legacy hold instead of retaining yesterday's ALT override.
+  d['animations']={k:v for k,v in d['animations'].items() if not k.startswith('fp_eat_')}
+  d['geometry'].pop('java_piece',None);d['textures'].pop('java_piece',None)
+  d['render_controllers']=[r for r in d['render_controllers'] if r!='controller.render.kg_java_eating.piece']
+  d['scripts']['pre_animation']=[row.replace(VARIABLE,'q.item_in_use_duration') for row in d['scripts']['pre_animation'] if not row.startswith((VARIABLE+' =','v.kg_java_piece_visible = '))]
   for hand in ['right','left']:
    alias='eat_'+hand;d['animations'][alias]=animation_id('THREE' if profile=='THREE_RANDOM' else profile,hand)
    if profile=='THREE_RANDOM':d['animations']['eat_alt_'+hand]=animation_id('THREE_ALT',hand)
-  animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith('eat_') for k in row)]
+  animate=[row for row in d['scripts']['animate'] if not any(str(k).startswith(('eat_','fp_eat_')) for k in row)]
+  for row in animate:
+   for hand,slot in [('right','main_hand'),('left','off_hand')]:
+    if 'fp_'+hand in row:row['fp_'+hand]="c.is_first_person == 1 && c.item_slot == '"+slot+"'"
   for hand in ['right','left']:
+   # ItemInHandSkewerEatingMixin replaces renderArmWithItem, an FP renderer.
+   # Its camera-space arm displacements are not TP item-local transforms.
    using="c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == "+str(1 if hand=='right' else 2)+" && c.item_slot == '"+('main_hand' if hand=='right' else 'off_hand')+"'"
    if profile=='THREE_RANDOM':
     alternate="q.property('kaleidoscope_grilling:eat_profile') == 4"
@@ -89,15 +107,57 @@ def build():
    first="q.item_in_use_duration >= 0.95833 ? 1 : 0"
    normal="q.item_in_use_duration >= 3.54167 ? 3 : (q.item_in_use_duration >= 2.33333 ? 2 : ("+first+"))"
    alt="q.item_in_use_duration >= 3.5 ? 3 : (q.item_in_use_duration >= 2.16667 ? 2 : ("+first+"))"
-   d['scripts']['pre_animation']=["v.kg_bite_stage = q.is_using_item ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? ("+alt+") : ("+normal+")) : 0;"]
+   # Secret ingredient owner reads are an independent held-render contract.
+   # Keep them when rebuilding the shared random-profile bite clock, including
+   # the native ALT clone. Otherwise a generator run silently hides the food.
+   secret_reads=[row for row in d['scripts']['pre_animation'] if row.startswith('v.kg_secret_')]
+   d['scripts']['pre_animation']=["v.kg_bite_stage = q.is_using_item ? (q.property('kaleidoscope_grilling:eat_profile') == 4 ? ("+alt+") : ("+normal+")) : 0;"]+secret_reads
   d['scripts']['pre_animation']=[row.replace(ACTIVE_HAND,'q.is_using_item').replace('q.is_using_item',ACTIVE_HAND) for row in d['scripts']['pre_animation']]
+  if modern:d['scripts']['pre_animation']=[ASSIGNMENT]+[row.replace('q.item_in_use_duration',VARIABLE) for row in d['scripts']['pre_animation']]
   d['scripts']['animate']=animate;output[p]=doc
+ if tuple(json.loads((BP/'manifest.json').read_text())['header']['version']) >= (2,8,58):
+  sys.path.insert(0,str(ROOT/'tools'))
+  from build_java_eating_projection import augment
+  output=augment(output,table)
  return output
+def mismatch_details(expected, actual, limit=20):
+ """Bounded diagnostics only; the full byte-for-byte check remains authoritative."""
+ def walk(a,b,pointer=''):
+  if type(a) is not type(b):
+   yield pointer,a,b
+  elif isinstance(a,dict):
+   for key in dict.fromkeys([*a,*b]):
+    escaped=str(key).replace('~','~0').replace('/','~1')
+    if key not in a or key not in b:yield pointer+'/'+escaped,a.get(key),b.get(key)
+    else:yield from walk(a[key],b[key],pointer+'/'+escaped)
+  elif isinstance(a,list):
+   if len(a)!=len(b):yield pointer+'/length',len(a),len(b)
+   for i,(x,y) in enumerate(zip(a,b)):yield from walk(x,y,pointer+'/'+str(i))
+  elif repr(a)!=repr(b):yield pointer,a,b
+ try:
+  from itertools import islice
+  rows=list(islice(walk(json.loads(expected),json.loads(actual)),limit))
+ except (ValueError,TypeError):rows=[]
+ if not rows:return 'Serialized text differs (including whitespace); no structural difference found'
+ lines=[]
+ for pointer,a,b in rows:
+  kind='value'
+  if isinstance(a,(int,float)) and isinstance(b,(int,float)):
+   if a==b==0:kind='signed zero'
+   elif abs(a-b)==360:kind='360-degree representative'
+  lines.append(f'{pointer}: committed={a!r}; generated={b!r} ({kind})')
+ return '\n'.join(lines)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');args=p.parse_args()
  for path,value in build().items():
-  data=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
-  if args.check:assert path.read_text()==data,path
-  else:path.write_text(data)
+  if isinstance(value,bytes):
+   if args.check:assert path.read_bytes()==value,path
+   else:path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(value)
+   continue
+  data=value if isinstance(value,str) else json.dumps(value,ensure_ascii=False,indent=2)+'\n'
+  if args.check:
+   existing=path.read_text()
+   assert existing==data,f'{path}\n{mismatch_details(existing,data)}'
+  else:path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data.encode('utf-8'))
  print('Authored eating item motion: five profiles, both hands; client acceptance false')
 if __name__=='__main__':main()
