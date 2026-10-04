@@ -1,7 +1,9 @@
 /** Author-owned output transactions; native food state travels with the actual output. */
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
 import {writePublicFood,readPublicFood,normalizePublicFood} from './food_api_core.js';
-export const CUISINE_CAPABILITIES=Object.freeze(['cuisine_output_receipt_v2','secret_ingredient_consume_v1']);
+export const CUISINE_CAPABILITIES=Object.freeze(['cuisine_output_receipt_v2','secret_ingredient_consume_v1','cuisine_configuration_v1']);
+const CONFIG_KEY='senluo:cuisine_heat_and_seasoning_v1';
+const cuisineEnabled=()=>world.getDynamicProperty(CONFIG_KEY)!==false;
 const META_PREFIX='senluo:cuisine_metadata:',RECEIPT_PREFIX='senluo:cuisine_output:';
 const key=b=>b.dimension.id+':'+b.x+','+b.y+','+b.z;
 const station=b=>({dimensionId:b.dimension.id,x:b.x,y:b.y,z:b.z});
@@ -11,6 +13,7 @@ export function beginCuisineCarrier(player){const slot=player.getComponent('mine
 function restoreCarrier(player){const r=carriers.get(player.id);if(r){r.slot.setItem(r.before);carriers.delete(player.id);}}
 export function nextCuisineBatch(b){const k=RECEIPT_PREFIX+key(b)+'_batch',n=Number(world.getDynamicProperty(k)??0)+1;if(!Number.isSafeInteger(n))throw Error('batch sequence');world.setDynamicProperty(k,n);return n;}
 export function readCuisineMetadata(b,data={},kind='pot'){
+ if(!cuisineEnabled())return {v:1,hotUntil:0,seasoning:[]};
  let state={seasoning:[],oilType:data.grillingOilType??(data.oil?'default':'')};
  const raw=world.getDynamicProperty(META_PREFIX+key(b));if(raw!==undefined)state={...state,...JSON.parse(String(raw))};
  const oilType=data.grillingOilType||state.oilType;
@@ -46,7 +49,7 @@ export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,ta
  const meta=readCuisineMetadata(b,data,kind),base=nativeStack?.clone()??new ItemStack(id,count);if(base.typeId!==id||base.amount!==count)throw Error('native output identity');
  const outputMeta=readPublicFood(base);if(outputMeta.present&&!outputMeta.valid)throw Error('native output metadata unreadable');
  if(outputMeta.valid&&outputMeta.state.nativeVariant!==undefined)meta.nativeVariant=outputMeta.state.nativeVariant;
- const stack=writePublicFood(base,meta);stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
+ const stack=writePublicFood(base,meta);if(meta.hotUntil>Number(world.getAbsoluteTime()))stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
  let slot=-1,target,entity;
  if(container)for(let i=0;i<container.size;i++)if(!container.getItem(i)){slot=i;break;}
  if(slot>=0){if(!playerId&&!targetBlock)throw Error('output block target missing');target=playerId?{kind:'player_slot',playerId,slot,expectedId:id,expectedAmount:count}:{kind:'block_slot',...station(targetBlock),slot,expectedId:id,expectedAmount:count};}
@@ -84,3 +87,12 @@ system.afterEvents.scriptEventReceive.subscribe(e=>{
   world.setDynamicProperty(k,JSON.stringify({seasoning:valid.seasoning,oilType:String(r.state.oilType??'')}));
  }catch(error){console.warn('[Cookery cuisine API] metadata retained '+error)}
 });
+
+system.afterEvents.scriptEventReceive.subscribe(e=>{
+ if(e.id!=='kaleidoscope_cookery:cuisine_config')return;
+ try{const request=JSON.parse(e.message);if(request.api!==1||typeof request.enabled!=='boolean')throw Error('invalid cuisine configuration');
+  world.setDynamicProperty(CONFIG_KEY,request.enabled);
+  if(world.getDynamicProperty(CONFIG_KEY)!==request.enabled)throw Error('cuisine configuration readback');
+ }catch(error){console.warn('[Cookery cuisine API] configuration retained '+error)}
+});
+system.run(()=>system.sendScriptEvent('kaleidoscope_grilling:cuisine_config_request','{"api":1}'));

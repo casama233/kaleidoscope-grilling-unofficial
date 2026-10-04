@@ -394,6 +394,8 @@ kaleidoscope_grilling.display.item.totem_powder=不死图腾粉\n§9§o森罗物
 kaleidoscope_grilling.display.item.unfinished_skewer=未完成烤串\n§9§o森罗物语烟火§r
 kaleidoscope_grilling.display.item.wedding_candy=喜糖\n§9§o森罗物语烟火§r
 
+message.kaleidoscope_grilling.cookery_integration_disabled=森罗厨房的热食与调料联动功能已关闭
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=森罗物语：烟火
 guide.kg.intro=按物品类型与制作方式查阅；每项合并取得、配方、操作与效果。 牛肉块与鸡皮通过厨房砧板取得；首次烧烤可从鱼串开始。
@@ -538,6 +540,7 @@ guide.kg.body.kaleidoscope_grilling:skewer_plate.1=取得：主手持烤串，�
 guide.kg.body.kaleidoscope_grilling:skewer_plate.2=烤串盘最多保存 5 串；拿烤串对盘使用可放入，空手使用会取回最后放入的一串。
 guide.kg.body.kaleidoscope_grilling:skewer_plate.3=直接食用装有多串的盘子时，会优先吃掉盘中基础饱食值最高的一串。
 guide.kg.body.kaleidoscope_grilling:skewer_plate.4=有内容的盘子可以潜行放置；打掉或收回时会保留盘内烤串数据。
+guide.kg.body.kaleidoscope_grilling:skewer_plate.5=桌面餐盘优先可由服务器设置关闭；关闭时，潜行手持烤串使用厨房桌子，会保留厨房原有的展示操作。
 guide.kg.name.kaleidoscope_grilling:skewer_recipe_book=串谱
 guide.kg.body.kaleidoscope_grilling:skewer_recipe_book.1=用 4 张纸排成 2×2 合成空白串谱。这是公开厨房缺少 Java 空白食谱物品时的基岩版取得方式。
 guide.kg.body.kaleidoscope_grilling:skewer_recipe_book.2=主手拿空串谱、副手拿完整生串并使用，即可记录配方；原串保留。
@@ -556,6 +559,7 @@ guide.kg.body.kaleidoscope_grilling:special_seasoning.4=对烧烤架撒料时，
 guide.kg.body.kaleidoscope_grilling:special_seasoning.5=搭配：红石提供速度，火药提供力量，折耳根粉延时；不死图腾粉与龙蛋粉提供特殊效果。各材料的数量门槛见其同名条目。
 guide.kg.body.kaleidoscope_grilling:special_seasoning.6=把一瓶调料单独放入合成格，可清空内容并取回空瓶；包含待摇瓶与已用过的完成调料。
 guide.kg.body.kaleidoscope_grilling:special_seasoning.7=空瓶合成：上排中央放木按钮，中排与下排各放三块玻璃；支持 Java 1.21.1 的全部十一种木按钮。
+guide.kg.body.kaleidoscope_grilling:special_seasoning.8=厨房料理的热食与调料联动可由服务器关闭。关闭后，炒锅与炖锅的新成品不再附加热度或调料；尝试撒料会提示已关闭，瓶子不会扣次数。烤炉的调料功能不受此设置影响。
 guide.kg.name.kaleidoscope_grilling:squid_tentacle=鱿鱼须
 guide.kg.body.kaleidoscope_grilling:squid_tentacle.1=取得：主手持 Cookery 厨房刀击杀普通鱿鱼，有机会掉落鱿鱼须；掠夺影响数量。
 guide.kg.name.kaleidoscope_grilling:sugared_tomato=糖拌番茄
@@ -585,6 +589,7 @@ guide.kg.body.kaleidoscope_grilling:grill.4=调味完成后空手取出；潜行
 guide.kg.body.kaleidoscope_grilling:grill.5=约 40 秒没有推进当前阶段，烤串会进入过熟状态；过熟串仍可空手取出，得到黑暗烧烤。
 guide.kg.body.kaleidoscope_grilling:grill.6=过熟后继续加热约 20 秒，架上内容会彻底烧成木炭。
 guide.kg.body.kaleidoscope_grilling:grill.7=如果暂时不想继续，先用铲子熄火；熄火时计时不会推进。 中途破坏：未刷油返生串；正常完成返熟串；过熟返黑暗烧烤；其它已刷油中间阶段返谜之烧烤。
+guide.kg.body.kaleidoscope_grilling:grill.8=服务器可选择原版食用模式：关闭独立进食动画后，烤串以 1.25 秒完成原生食用，不播放专属音效与进度条；松开取消不会额外扣串。
 guide.kg.name.kaleidoscope_grilling:oil_press=榨油器
 guide.kg.body.kaleidoscope_grilling:oil_press.1=先制作油饼：8 份菜籽粉围住 1 个小麦，可得到 1 个油饼；榨油器必须先装满 4 个油饼。
 guide.kg.body.kaleidoscope_grilling:oil_press.2=榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。

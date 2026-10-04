@@ -1,6 +1,6 @@
 from pathlib import Path
 import os,json,shutil,subprocess,time,hashlib
-import argparse
+import argparse,sys
 parser=argparse.ArgumentParser(description='Isolated native fourth-flip snapshot and normal-stop/restart probe; never production admission or simulated players.')
 parser.add_argument('--bds-root',type=Path,required=True)
 parser.add_argument('--family-candidate',type=Path,required=True)
@@ -10,6 +10,9 @@ parser.add_argument('--port',type=int,default=19356)
 a=parser.parse_args()
 if not 1024<=a.port<=65534:parser.error('port must be 1024..65534')
 ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'tools'))
+from baseline_gate import fingerprint
+runtime_trees={side:fingerprint(ROOT/'projects/grilling/gameplay_core'/side)[0] for side in ['behavior_pack','resource_pack']}
 BDS=a.bds_root.resolve()
 GRILL=ROOT/'projects/grilling/gameplay_core'
 BASE=a.family_candidate.resolve()
@@ -51,6 +54,6 @@ for phase,marker in [('prepare','NATIVE_SNAPSHOT_PREPARED '),('restart','NATIVE_
    if proc.poll() is None:proc.kill()
  text=log.read_text();matches=[x.split(marker,1)[1] for x in text.splitlines() if marker in x];errors=[x for x in text.splitlines() if ' ERROR]' in x or 'NATIVE_SNAPSHOT_FAIL' in x]
  result={'phase':phase,'pass':bool(matches) and not errors,'errors':errors,'details':json.loads(matches[-1]) if matches else None};reports.append(result)
- (OUT/'report.json').write_text(json.dumps({'canonical_main_sha256':canonical_sha,'test_only_source_overlay':True,'simulated_players':False,'client':False,'production_ready':False,'runs':reports},indent=2)+'\n')
+ (OUT/'report.json').write_text(json.dumps({'runtime_trees':runtime_trees,'family_receipt_sha256':hashlib.sha256((BASE/'family-receipt.json').read_bytes()).hexdigest(),'canonical_main_sha256':canonical_sha,'test_only_source_overlay':True,'simulated_players':False,'client':False,'production_ready':False,'runs':reports},indent=2)+'\n')
  print(json.dumps(result),flush=True)
  if not result['pass']:raise SystemExit(1)

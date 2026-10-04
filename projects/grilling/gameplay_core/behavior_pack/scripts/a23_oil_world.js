@@ -1,3 +1,5 @@
+import {premiumOilParticles} from './oil_ambient_core.js';
+import {emitParticles} from './immersion_particles_runtime.js';
 import {TimedWorkQueue} from './timed_work_queue.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {ensureOilHandPublished} from './oil_api_client.js';
@@ -23,7 +25,11 @@ const BLOCK_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).m
 const BUCKET_TO_TYPE=Object.freeze(Object.fromEntries(Object.entries(OIL_TYPES).map(([k,v])=>[v.bucket,k])));
 const OFFSETS={Up:[0,1,0],Down:[0,-1,0],East:[1,0,0],West:[-1,0,0],North:[0,0,-1],South:[0,0,1]};
 const HORIZ=[[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
-let registryCache,lastPersistWarning=-1200;const sourceIndex=new Map(),sourceSlots=new Map(),claimCells=new Map(),claims=new Map(),dueQueue=new TimedWorkQueue();
+let registryCache,lastPersistWarning=-1200,dueQueue=new TimedWorkQueue();const sourceIndex=new Map(),sourceSlots=new Map(),claimCells=new Map(),claims=new Map();
+function restoreRegistryCache(rows){
+ registryCache=rows;sourceIndex.clear();sourceSlots.clear();claimCells.clear();claims.clear();dueQueue=new TimedWorkQueue();
+ for(const [slot,row] of rows.entries()){sourceSlots.set(row.k,slot);sourceIndex.set(row.k,row);addClaims(row);dueQueue.schedule(row.k,row.nextTick??system.currentTick)}
+}
 function dropClaims(row){for(const cell of claimCells.get(row.k)??[]){const set=claims.get(cell);set?.delete(row.k);if(!set?.size)claims.delete(cell)}claimCells.delete(row.k)}
 function addClaims(row){claimCells.set(row.k,[...(row.cells??[])]);for(const cell of row.cells??[]){if(!claims.has(cell))claims.set(cell,new Set());claims.get(cell).add(row.k)}}
 
@@ -63,6 +69,7 @@ function persistRow(row){
  Object.assign(row,normalized);return true;
 }
 function removeRow(row){
+ ambientDeadlines.delete(row.k);
  world.setDynamicProperty(oilSourcePropertyId(row),undefined);
  if(world.getDynamicProperty(oilSourcePropertyId(row))!==undefined)throw Error('oil registry removal');
  const rows=loadReg(),old=sourceIndex.get(row.k),i=sourceSlots.get(row.k)??-1;if(i>=0){const last=rows.pop();if(i<rows.length){rows[i]=last;sourceSlots.set(last.k,i)}}sourceSlots.delete(row.k);
@@ -72,7 +79,9 @@ function isOil(id){return Object.hasOwn(BLOCK_TO_TYPE,id)}
 function level(block){try{return Number(block.permutation.getState('kaleidoscope_grilling:level')??0)}catch{return 0}}
 function setOil(block,type,lvl){
  const def=OIL_TYPES[type];if(!def)return false;
- try{block.setPermutation(BlockPermutation.resolve(def.block,{'kaleidoscope_grilling:level':Math.max(0,Math.min(7,lvl|0))}));return true}catch{return false}
+ const wanted=Math.max(0,Math.min(7,lvl|0));
+ try{if(block.typeId===def.block&&block.permutation.getState('kaleidoscope_grilling:level')===wanted)return true;
+  block.setPermutation(BlockPermutation.resolve(def.block,{'kaleidoscope_grilling:level':wanted}));return true}catch{return false}
 }
 function canFlowInto(block,type,source=false){
  if(!block)return false;if(block.typeId==='minecraft:air')return true;
@@ -100,16 +109,20 @@ function clearCells(row,rows){
 function compute(row,rows){
  const def=OIL_TYPES[row.type];if(!def)return false;
  let dim;try{dim=world.getDimension(row.d)}catch{return false}
- const source=dim.getBlock({x:row.x,y:row.y,z:row.z});
+ // Cache only during this synchronous source calculation, so later world changes
+ // and neighbouring source workers are always observed on the next call.
+ const blocks=new Map();
+ function blockAt(x,y,z){const key=posKey(row.d,x,y,z);if(!blocks.has(key))blocks.set(key,dim.getBlock({x,y,z}));return blocks.get(key)}
+ let minY=-64;try{minY=Number(dim.heightRange?.min??minY)}catch{}
+ const source=blockAt(row.x,row.y,row.z);
  if(!source)return true;if(source.typeId!==def.block||level(source)!==0){clearCells(row,rows);return false}
  const queue=[{x:row.x,y:row.y,z:row.z,l:0}],seen=new Map(),desired=new Map();let head=0;
  while(head<queue.length&&desired.size<FLOW_CELL_BUDGET){
   const n=queue[head++],k=posKey(row.d,n.x,n.y,n.z);
   const old=seen.get(k);if(old!==undefined&&old<=n.l)continue;seen.set(k,n.l);
-  const b=dim.getBlock({x:n.x,y:n.y,z:n.z});if(!b||(!canFlowInto(b,row.type)&&k!==row.k))continue;
+  const b=blockAt(n.x,n.y,n.z);if(!b||(!canFlowInto(b,row.type)&&k!==row.k))continue;
   desired.set(k,{...n});
-  let minY=-64;try{minY=Number(dim.heightRange?.min??minY)}catch{}
-  const below=n.y>minY?dim.getBlock({x:n.x,y:n.y-1,z:n.z}):undefined;
+  const below=n.y>minY?blockAt(n.x,n.y-1,n.z):undefined;
   if(n.y>minY&&canFlowInto(below,row.type)){
    queue.push({x:n.x,y:n.y-1,z:n.z,l:n.l});continue;
   }
@@ -118,11 +131,11 @@ function compute(row,rows){
  }
  const desiredKeys=new Set(desired.keys()),sourceSet=sourceKeys(rows);
  for(const [k,n] of desired){
-  if(k===row.k)continue;const b=dim.getBlock({x:n.x,y:n.y,z:n.z});if(b&&(b.typeId==='minecraft:air'||b.typeId===def.block))setOil(b,row.type,n.l);
+  if(k===row.k)continue;const b=blockAt(n.x,n.y,n.z);if(b&&(b.typeId==='minecraft:air'||b.typeId===def.block))setOil(b,row.type,n.l);
  }
  for(const cell of row.cells??[]){
   if(desiredKeys.has(cell)||sourceSet.has(cell)||claimedByOther(rows,row,cell))continue;
-  const [,xs,ys,zs]=cell.split('|');const b=dim.getBlock({x:Number(xs),y:Number(ys),z:Number(zs)});
+  const [,xs,ys,zs]=cell.split('|');const b=blockAt(Number(xs),Number(ys),Number(zs));
   if(b&&b.typeId===def.block&&level(b)>0)try{b.setType('minecraft:air')}catch{}
  }
  row.cells=[...desiredKeys].filter(k=>k!==row.k);return true;
@@ -141,7 +154,7 @@ function placeFromBucket(player,dim,loc,type,hand){
  if(!creative(player))steps.push({apply(){slot.write(new ItemStack('minecraft:bucket',1))},rollback(){slot.write(slot.before)}});
  steps.push({apply(){if(!setOil(b,type,0))throw Error('oil placement rejected')},rollback(){b.setPermutation(before)}});
  const row=sourceRow(dim,loc,type),registryId=oilSourcePropertyId(row),registryBefore=world.getDynamicProperty(registryId),cached=readReg().map(r=>({...r,cells:[...(r.cells??[])]}));
- steps.push({apply(){if(!registerSource(dim,loc,type))throw Error('oil source registry rejected')},rollback(){world.setDynamicProperty(registryId,registryBefore);if(world.getDynamicProperty(registryId)!==registryBefore)throw Error('oil registry rollback');registryCache=cached;}});
+ steps.push({apply(){if(!registerSource(dim,loc,type))throw Error('oil source registry rejected')},rollback(){world.setDynamicProperty(registryId,registryBefore);if(world.getDynamicProperty(registryId)!==registryBefore)throw Error('oil registry rollback');restoreRegistryCache(cached);}});
  if(!oilTransfer(steps,b))return false;try{dim.playSound(type==='premium_chili'?'bucket.empty_lava':'bucket.empty_water',loc)}catch{};return true;
 }
 function takeSource(player,block,type,hand,toCookery=false){
@@ -186,14 +199,30 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(!isOil(e.block.typeId))return;e.cancel=true;const dim=e.block.dimension,loc={...e.block.location};
  system.run(()=>{const b=dim.getBlock(loc);if(b&&isOil(b.typeId))try{b.setType('minecraft:air')}catch{}});
 });
+// At most eight source checks and sixteen emitted particles per server tick.
+// One sampled loaded cell per source per second; no whole-fluid visual scan.
+const ambientDeadlines=new Map();
+function oilAmbient(row,now,players){
+ if(row.type!=='premium_chili'||now<(ambientDeadlines.get(row.k)??0))return;
+ ambientDeadlines.set(row.k,now+20);
+ if(!players.some(p=>p.dimension.id===row.d&&Math.hypot(p.location.x-row.x,p.location.y-row.y,p.location.z-row.z)<=40))return;
+ const cells=row.cells??[],index=Math.floor(Math.random()*(cells.length+1));
+ const [,x,y,z]=(index<cells.length?cells[index]:row.k).split('|');
+ const dim=world.getDimension(row.d),loc={x:Number(x),y:Number(y),z:Number(z)},block=dim.getBlock(loc);
+ if(block?.typeId!==OIL_TYPES.premium_chili.block)return;
+ const above=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});if(above?.typeId!=='minecraft:air')return;
+ emitParticles(dim,loc,premiumOilParticles());
+}
 function persistNextCycle(row){if(persistRow(row))return;dropClaims(row);addClaims(row);dueQueue.schedule(row.k,row.nextTick);if(system.currentTick-lastPersistWarning>=1200){lastPersistWarning=system.currentTick;console.warn('[Grilling oil registry] state write unacknowledged; retaining retry schedule')}}
 system.runInterval(()=>{
  const rows=readReg(),now=system.currentTick;
  const due=dueQueue.take(now,FLOW_SOURCE_BUDGET);
+ const players=due.length?world.getAllPlayers():[];
  for(const key of due){
   const row=sourceIndex.get(key);if(!row)continue;
   const def=OIL_TYPES[row.type];if(!def){removeRow(row);continue}
   try{if(!compute(row,rows)){removeRow(row);continue}}catch{row.nextTick=now+def.interval;persistNextCycle(row);continue}
+  try{oilAmbient(row,now,players)}catch{}
   row.nextTick=now+def.interval;persistNextCycle(row);
  }
 },1);

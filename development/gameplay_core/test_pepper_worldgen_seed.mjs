@@ -88,3 +88,11 @@ test('Feature and registered hidden seed use the shared source-derived routine',
  assert(runtime.includes('growPepperWorldgenSeed(event.block)'));
  assert(readFileSync(new URL('scripts/main.js',bp),'utf8').includes("import './a2860_pepper_worldgen_seed_runtime.js'"));
 });
+
+test('worldgen preserves its seed after transient write failure and retries',()=>{
+ for(const failWrite of [1,2,4,9,16]){
+  const f=fixture({failWrite});assert.equal(f.api.growPepperWorldgenSeed(f.origin),'deferred');
+  assert.equal(f.origin.typeId,core.PEPPER_WORLDGEN_SEED_ID);assert.equal(f.count(core.PEPPER_LOG_ID).length,0);
+  assert.equal(f.api.growPepperWorldgenSeed(f.origin),'grown');assert.ok(f.count(core.PEPPER_LEAVES_ID).length>=13);
+ }
+});

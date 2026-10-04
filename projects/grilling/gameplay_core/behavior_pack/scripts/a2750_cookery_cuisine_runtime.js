@@ -1,6 +1,7 @@
+import {grillingConfig} from './server_config_runtime.js';
 import {beginSeasoningMotion} from './seasoning_motion_runtime.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
-import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID} from './eating_data_lookup.js';
 import {commitTwoParty} from './a277_grill_transaction_core.js';
@@ -98,6 +99,7 @@ function setUses(stack,n){
  try{setItemProperty(stack,SEASONING_USES_KEY,Math.max(0,Math.min(SEASONING_MAX_USES,n|0)))}catch{}return stack;
 }
 function applySeasoning(player,block){
+ if(!grillingConfig().enableCookeryFoodHeatAndSeasoning){javaInteractionFeedback(player,'cookery_integration_disabled');return true;}
  const held=getMainHand(player);if(!isSpecialSeasoningId(held?.typeId))return false;
  const ingredients=readFoodSeasonings(held),uses=readUses(held);
  const plan=planSeasoningUse({ingredients,uses,creative:isCreative(player)});
@@ -131,6 +133,7 @@ function applySeasoning(player,block){
  return true;
 }
 function finishHostInteraction(player,dimension,location,kind,beforeInventory,beforeHasOil,candidateOil,stateBefore){
+ if(!grillingConfig().enableCookeryFoodHeatAndSeasoning)return;
  const block=dimension.getBlock(location),afterInventory=snapshotInventory(player),gains=inventoryGains(beforeInventory,afterInventory);
  const afterHasOil=kind==='pot'&&block?.typeId===COOKERY_POT_ID?hostHasOil(block):false;
  if(kind==='pot'){
@@ -169,6 +172,7 @@ export function applyAuthoritativeCookeryOutput(request){
    const item=normalized.target.kind==='item_entity'?world.getEntity(normalized.target.entityId)?.getComponent('minecraft:item')?.itemStack:(()=>{const t=outputTarget(normalized);return t?.container.getItem(t.slot)})();
    const portable=readPublicFood(item);return authoritativeTargetMatches(item,normalized.target)&&portable.valid&&JSON.stringify(portable.state)===JSON.stringify(normalized.metadata);
   }
+  if(!grillingConfig().enableCookeryFoodHeatAndSeasoning)return true;
   const target=outputTarget(normalized);if(!target)return false;
   const current=target.container.getItem(target.slot);
   if(!authoritativeTargetMatches(current,normalized.target)||!foodLike(current))return false;
@@ -195,7 +199,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
    event.cancel=true;if(!isFirst(event))return;const dimension=event.block.dimension,location={...event.block.location};
    system.run(()=>{if(!interactionIntentStillCurrent(player,intent)){message(player,'§7操作已取消：手持物品已改變');return}const block=dimension.getBlock(location);if(block&&stationKind(block.typeId)===kind)applySeasoning(player,block)});return;
   }
-  if(!isFirst(event))return;
+  if(!isFirst(event)||!grillingConfig().enableCookeryFoodHeatAndSeasoning)return;
   const dimension=event.block.dimension,location={...event.block.location};
   const stateBefore=readCuisineState(event.block),beforeInventory=snapshotInventory(player);
   const beforeHasOil=kind==='pot'?hostHasOil(event.block):false,candidateOil=kind==='pot'?typedHeldOil(used):'';

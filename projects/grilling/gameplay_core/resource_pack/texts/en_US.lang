@@ -415,6 +415,8 @@ kaleidoscope_grilling.display.item.totem_powder=Totem Powder\n§9§oKaleidoscope
 kaleidoscope_grilling.display.item.unfinished_skewer=Unfinished Skewer\n§9§oKaleidoscope Grilling§r
 kaleidoscope_grilling.display.item.wedding_candy=Wedding Candy\n§9§oKaleidoscope Grilling§r
 
+message.kaleidoscope_grilling.cookery_integration_disabled=Kaleidoscope Cookery hot-food and seasoning integration is disabled
+
 ## BEGIN GRILLING GUIDE A3 (generated)
 guide.kg.title=Kaleidoscope Grilling
 guide.kg.intro=Browse by item type and preparation method. Obtain Beef Chunks and Chicken Skin on the Cookery Chopping Board; a Fish Skewer is a simple first recipe.
@@ -559,6 +561,7 @@ guide.kg.body.kaleidoscope_grilling:skewer_plate.1=Acquisition: sneak-use a main
 guide.kg.body.kaleidoscope_grilling:skewer_plate.2=A Skewer Plate stores up to 5 skewers. Use a skewer on it to add one; use an empty hand to remove the most recently inserted skewer.
 guide.kg.body.kaleidoscope_grilling:skewer_plate.3=Eating from a plate with several skewers consumes the one with the highest base nutrition first.
 guide.kg.body.kaleidoscope_grilling:skewer_plate.4=A non-empty plate can be sneak-placed, and its stored skewer data is preserved when carried again.
+guide.kg.body.kaleidoscope_grilling:skewer_plate.5=The server can disable plate priority on Cookery tables. Sneak-using a held skewer then keeps Cookery’s original table display interaction.
 guide.kg.name.kaleidoscope_grilling:skewer_recipe_book=Skewer Recipe Book
 guide.kg.body.kaleidoscope_grilling:skewer_recipe_book.1=Craft four paper in a 2×2 square into an empty Skewer Recipe Book. This Bedrock acquisition bridge replaces the blank recipe item absent from public Cookery.
 guide.kg.body.kaleidoscope_grilling:skewer_recipe_book.2=Use the blank book in your main hand with a complete raw skewer in your offhand to record it. The original skewer is retained.
@@ -577,6 +580,7 @@ guide.kg.body.kaleidoscope_grilling:special_seasoning.4=Seasoning a grill costs 
 guide.kg.body.kaleidoscope_grilling:special_seasoning.5=Mixing: Redstone grants Speed, Gunpowder grants Strength, and Houttuynia Powder extends effects. Totem and Dragon Egg Powders add special effects; see their material entries for thresholds.
 guide.kg.body.kaleidoscope_grilling:special_seasoning.6=Place one seasoning bottle alone in a crafting grid to discard its contents and recover an empty bottle. Pending and partially used bottles are supported.
 guide.kg.body.kaleidoscope_grilling:special_seasoning.7=Empty bottle: one wooden button centered above two full rows of glass. All eleven Java 1.21.1 wooden button variants are supported.
+guide.kg.body.kaleidoscope_grilling:special_seasoning.8=The server can disable hot-food and seasoning integration for Cookery dishes. New pot and stockpot outputs then receive no added heat or seasoning. Seasoning attempts show a disabled message without using the bottle. Grill seasoning is unchanged.
 guide.kg.name.kaleidoscope_grilling:squid_tentacle=Squid Tentacle
 guide.kg.body.kaleidoscope_grilling:squid_tentacle.1=Acquisition: kill a normal squid while holding a Cookery Kitchen Knife in the main hand for a chance of tentacle drops; Looting affects the count.
 guide.kg.name.kaleidoscope_grilling:sugared_tomato=Sugared Tomato
@@ -606,6 +610,7 @@ guide.kg.body.kaleidoscope_grilling:grill.4=After seasoning, use an empty hand t
 guide.kg.body.kaleidoscope_grilling:grill.5=If a stage is not advanced for about 40 seconds, the skewers become overcooked; they can still be extracted as Dark Grilling.
 guide.kg.body.kaleidoscope_grilling:grill.6=Keep an overcooked batch heating for about 20 more seconds and it burns into charcoal.
 guide.kg.body.kaleidoscope_grilling:grill.7=If you need to stop, extinguish the grill with a shovel. Timers do not advance while it is unlit. Breaking mid-process: unoiled returns raw skewers; completed returns cooked; overcooked returns Dark Grilling; other oiled intermediate stages return Mysterious Skewers.
+guide.kg.body.kaleidoscope_grilling:grill.8=The server can select vanilla eating mode. With custom eating animations disabled, skewers use a 1.25-second native use action without the custom sounds or progress bar. Releasing a cancelled use adds no extra item debit.
 guide.kg.name.kaleidoscope_grilling:oil_press=Wooden Oil Press
 guide.kg.body.kaleidoscope_grilling:oil_press.1=First make Oil Cake: surround 1 Wheat with 8 Canola Powder. The Oil Press must be loaded with all 4 cakes before pressing.
 guide.kg.body.kaleidoscope_grilling:oil_press.2=A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press.

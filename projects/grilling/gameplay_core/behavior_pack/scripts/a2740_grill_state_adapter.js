@@ -18,7 +18,8 @@ export function readGrillState(block){
 export function occupiedGrillSlots(block){
  const c=stationContainer(block);
  if(!c)throw new Error('Grill inventory unavailable; ticking paused');
- let n=0;
- for(let i=0;i<3;i++)if(c.getItem(i))n++;
- return n;
+ // Native occupancy does not clone every ItemStack just to count three slots.
+ const empty=c.emptySlotsCount;
+ if(c.size!==3||!Number.isInteger(empty)||empty<0||empty>3)throw new Error('Invalid grill inventory occupancy');
+ return 3-empty;
 }

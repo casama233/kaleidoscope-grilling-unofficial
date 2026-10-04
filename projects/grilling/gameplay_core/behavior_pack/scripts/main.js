@@ -1,3 +1,4 @@
+import {isPlainEatingId,SKEWER_EATING_IDS} from './eating_profile_ids.js';
 import {beginSeasoningMotion,syncSeasoningMotion} from './seasoning_motion_runtime.js';
 import {supportsJavaEatingProjection} from './java_eating_projection_items.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
@@ -151,12 +152,12 @@ function inv(block){return stationContainer(block)}
 function grillDirection(block){
  try{const d=String(block.permutation.getState('minecraft:cardinal_direction')??'north');return ['north','south','west','east'].includes(d)?d:'north'}catch{return 'north'}
 }
-function removeGrillLegs(block){
- try{const below=block.below();if(below?.typeId===GRILL_LEGS_ID)below.setType('minecraft:air')}catch{}
+function removeGrillLegs(block,below){
+ try{below??=block.below();if(below?.typeId===GRILL_LEGS_ID)below.setType('minecraft:air')}catch{}
 }
-function ensureGrillLegs(block){
- try{
-  const below=block.below();if(!below)return false;
+function ensureGrillLegs(block,below){
+ try{below??=block.below();
+  if(!below)return false;
   if(below.typeId!==GRILL_LEGS_ID&&below.typeId!=='minecraft:air')return false;
   if(below.typeId==='minecraft:air')below.setType(GRILL_LEGS_ID);
   let p=below.permutation,dir=grillDirection(block);
@@ -167,7 +168,7 @@ function ensureGrillLegs(block){
 function syncGrillPermutation(block,state){
  try{
   let below=block.below(),helper=below?.typeId===GRILL_LEGS_ID,supported=!helper&&(hasSolidTop(below)),legged=!supported,lit=!!state.lit;
-  if(legged)ensureGrillLegs(block);else removeGrillLegs(block);
+  if(legged)ensureGrillLegs(block,below);else if(helper)removeGrillLegs(block,below);
   let perm=block.permutation,changed=false;
   if(perm.getState('kaleidoscope_grilling:legged')!==legged){perm=perm.withState('kaleidoscope_grilling:legged',legged);changed=true}
   if(perm.getState('kaleidoscope_grilling:lit')!==lit){perm=perm.withState('kaleidoscope_grilling:lit',lit);changed=true}
@@ -917,8 +918,9 @@ world.afterEvents.itemStartUse.subscribe(e=>{
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
   try{syncSecretHeld(e.source)}catch(error){console.warn('[Grilling held ingredients] '+error)}
   const requested=PROFILE_BY_ITEM[id]??'THREE_RANDOM',hand=captureInteractionIntent(e.source,e.itemStack).hand,profile=resolvedProfile(selectedEatingProfile(requested,e.itemStack.typeId),e.useDuration),meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
- const a={id,start:system.currentTick,nativeDuration:Math.max(0,Number(e.useDuration)||0),requested,profile,hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,biteTimes:BITE_TIMES[profile]??BITE_TIMES.THREE,nextBite:0,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined};
+ const a={plain:isPlainEatingId(e.itemStack.typeId),id,start:system.currentTick,nativeDuration:Math.max(0,Number(e.useDuration)||0),requested,profile,hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,biteTimes:BITE_TIMES[profile]??BITE_TIMES.THREE,nextBite:0,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined};
  stopSoundHandle(ACTIVE_EATS.get(e.source.id)?.audio);ACTIVE_EATS.set(e.source.id,a);
+ if(a.plain)return; // JSON owns 25-tick vanilla use; no custom motion, sound or HUD.
  try{e.source.setProperty(EAT_PROFILE_PROPERTY,eatingProfile(profile).code);e.source.setProperty(EAT_HAND_PROPERTY,hand==='off'?2:1);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,eatingNativeTicks(a.nativeDuration))}catch(error){console.warn('[Grilling eating profile] '+error)}
  // Separate Java NONE-context first-person path. Do not replace the RP player
  // definition or reset body/head channels. The JSON branch gates upright use.
@@ -972,18 +974,33 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  // Capture elapsed at release, not in the deferred callback: a 23-tick release
  // must not become eligible merely because cleanup runs a tick later.
  // Let native completion win either event order; never delete a newer session.
- system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);forgetEatingItem(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{};if(e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
+ system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);forgetEatingItem(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{};if(!a.plain&&e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);});
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
-world.afterEvents.playerLeave.subscribe(e=>{forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
+world.afterEvents.playerLeave.subscribe(e=>{PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
+const PENDING_METAL_RESCUES=new Map();
 world.beforeEvents.entityHurt.subscribe(e=>{
+ if(e.cancel)return;
  const target=e.hurtEntity,cause=e.damageSource?.cause;
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
  if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
- const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');if(hm&&!fxGet(target,'heavy_metal_poisoning')&&hp&&e.damage>=hp.currentValue){e.cancel=true;system.run(()=>{fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);try{hp.setCurrentValue(1);target.dimension.playSound('random.totem',target.location)}catch{}})}
+ const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');
+ if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&hp.currentValue>0&&e.damage>=hp.currentValue){
+  // Reserve synchronously: deferred writes must not enqueue duplicate rescues.
+  // This remains a before-damage approximation, not a Java death-event hook.
+  const token={until:hm.until,amp:hm.amp};PENDING_METAL_RESCUES.set(target.id,token);e.cancel=true;
+  system.run(()=>{try{
+   if(PENDING_METAL_RESCUES.get(target.id)!==token)return;
+   const current=fxGet(target,'heavy_metal'),health=target.getComponent?.('minecraft:health');
+   // Milk, death, logout or effect replacement may invalidate a queued rescue.
+   if(!current||current.until!==token.until||current.amp!==token.amp||fxGet(target,'heavy_metal_poisoning')||!health||health.currentValue<=0)return;
+   fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);health.setCurrentValue(1);
+   target.dimension.playSound('random.totem',target.location);
+  }catch(error){console.warn('[Grilling heavy metal] '+error)}finally{if(PENDING_METAL_RESCUES.get(target.id)===token)PENDING_METAL_RESCUES.delete(target.id)}});
+ }
 });
-world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
+world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
 function canUseSecretSkewer(stack){
  try{return validSecretIngredientRows(readSkewerRows(stack))&&(!isSecretCooked(stack)||validSecretIngredientRows(readEffectiveSkewerRows(stack)))}catch{return false}
@@ -1004,6 +1021,13 @@ world.beforeEvents.itemUse.subscribe(e=>{
  const edibleSkewer=!!FOOD_DATA[e.itemStack?.typeId]||canonicalFoodId(e.itemStack?.typeId)===SECRET_ID||e.itemStack?.typeId===PLATE_ID;
  if(!edibleSkewer)return;
  if(e.source.isSneaking){e.cancel=true;return;}
+ const animations=grillingConfig().enableEatingAnimations;
+ if(SKEWER_EATING_IDS.has(canonicalFoodId(e.itemStack.typeId))&&isPlainEatingId(e.itemStack.typeId)===animations){
+  // A setting/item change can race the per-tick preparation. Refuse the wrong
+  // native duration, then prepare the still-captured hand before the next use.
+  e.cancel=true;const player=e.source,intent=captureInteractionIntent(player,e.itemStack);
+  system.run(()=>{if(interactionIntentStillCurrent(player,intent))prepareEatingItems(player,ACTIVE_EATS.has(player.id),grillingConfig().enableEatingAnimations)});return;
+ }
  if(!grillingConfig().fullHungerEating){const h=e.source.getComponent('minecraft:player.hunger');if(h&&h.currentValue>=h.effectiveMax)e.cancel=true;}
 });
 world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
@@ -1064,20 +1088,30 @@ function burnGrillContents(block,beforeState,nextState){
 }
 // Block ticks resume on chunk reload; no global registration cap or unload deletion.
 function tickGrill(block){
- try{let state=readState(block),beforeState=state;const result=tickState(state,occupied(block),1);state=result.state;if(result.events.some(x=>x.kind==='burn_to_charcoal')){burnGrillContents(block,beforeState,state);return}writeTickState(block,beforeState,state);if(system.currentTick%4===0)grillAmbientParticles(block,state.lit)}catch(error){if(system.currentTick%1200===0)console.warn('[Grilling tick] '+error)}
- finally{try{updateGrillAudio(block,readState(block).lit,occupied(block))}catch{try{removeGrillAudio(block)}catch{}}}
+ let audioState,audioOccupied;
+ try{
+  const before=readState(block),count=occupied(block),result=tickState(before,count,1);
+  if(result.events.some(x=>x.kind==='burn_to_charcoal')){burnGrillContents(block,before,result.state);return;}
+  audioState=writeTickState(block,before,result.state);audioOccupied=count;
+  if(system.currentTick%4===0)grillAmbientParticles(block,audioState.lit);
+ }catch(error){if(system.currentTick%1200===0)console.warn('[Grilling tick] '+error)}
+ finally{
+  // Tick and audio run synchronously. Reuse this tick's validated inventory;
+  // re-read only after a mutating burn transaction or an interrupted update.
+  try{if(audioState===undefined){audioState=readState(block);audioOccupied=occupied(block);}updateGrillAudio(block,audioState.lit,audioOccupied)}catch{try{removeGrillAudio(block)}catch{}}
+ }
 }
 function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecraft:ice','minecraft:packed_ice','minecraft:frosted_ice'].includes(id))return 1.11;return 1.3}
 system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   try{syncSeasoningMotion(p,PENDING_USES.get(p.id))}catch(error){if(system.currentTick%20===0)console.warn('[Grilling seasoning motion] '+error)}
   const active=ACTIVE_EATS.get(p.id);
-  try{prepareEatingItems(p,!!active)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}
+  try{prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}
   if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){
    // Do not assume a remote custom-item countdown matches the owner's clock.
    // Replicate source session time; native food debit/reward stays event-owned.
    p.setProperty(EAT_ELAPSED_TICKS_PROPERTY,eatingElapsedTicks(active.start,system.currentTick,active.nativeDuration));
-   if(!active.audioStarted&&(active.audioAttempts??0)<3&&system.currentTick%5===0)startEatingSound(p,active);advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick);
+   if(!active.plain&&!active.audioStarted&&(active.audioAttempts??0)<3&&system.currentTick%5===0)startEatingSound(p,active);!active.plain&&advanceBites(p,active);!active.plain&&grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick);
   }else if(active){
    // A replaced/switching serving must not leave a projected arm on another item.
    p.setProperty(EAT_PROFILE_PROPERTY,0);p.setProperty(EAT_HAND_PROPERTY,0);p.setProperty(EAT_PROJECTION_PROPERTY,false);p.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);p.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);

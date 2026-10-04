@@ -7,14 +7,14 @@ const base='projects/grilling/gameplay_core/behavior_pack/scripts/';
 class Item{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.lore=[];this.props={};}getRawLore(){return structuredClone(this.lore)}setLore(v){this.lore=structuredClone(v)}getDynamicProperty(k){return this.props[k]}getDynamicPropertyIds(){return Object.keys(this.props)}setDynamicProperty(k,v){if(v===undefined)delete this.props[k];else this.props[k]=v}clone(){const n=new Item(this.typeId,this.amount);Object.assign(n,structuredClone({...this}));return n}}
 class Slot{constructor(item){this.item=item?.clone();this.fail=0}hasItem(){return !!this.item}getItem(){return this.item?.clone()}setItem(s){if(this.fail-->0)throw Error('slot write fault');this.item=s?.clone()}}
 function fixture(name,savedProperties){const properties=new Map(savedProperties),faults=new Map(),emitted=[],subscriptions={},drops=[];
- const signal=key=>({subscribe(fn){subscriptions[key]=fn}});
+ const signal=key=>({subscribe(fn){(subscriptions[key]??=[]).push(fn)}});
  const world={getDynamicProperty:k=>properties.get(k),setDynamicProperty(k,v){if(faults.get(k)){faults.set(k,faults.get(k)-1);throw Error('property fault')}if(v===undefined)properties.delete(k);else properties.set(k,v)},getAbsoluteTime:()=>1000,getAllPlayers:()=>[],getEntity:id=>drops.find(d=>d.id===id),afterEvents:{playerSpawn:signal('spawn'),playerPlaceBlock:signal('place')},beforeEvents:{playerInteractWithBlock:signal('interact'),playerBreakBlock:signal('break'),explosion:signal('explosion')}};
  const system={currentTick:100,run(){},runTimeout(){},afterEvents:{scriptEventReceive:signal('script')},sendScriptEvent:(id,message)=>emitted.push({id,data:JSON.parse(message)})};
  const ctx={...oil,...food,world,system,ItemStack:Item,EquipmentSlot:{Mainhand:'Mainhand',Offhand:'Offhand'},GameMode:{Creative:'Creative'},console};
  let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'consumeSharedOilFromHeldPot,readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil,publishLegacyHostOil':'deliverCuisineOutput,readCuisineMetadata')+'};';vm.runInNewContext(code,ctx);
  const dim={id:'minecraft:overworld',getBlock:()=>block,spawnItem(s){const item=s.clone(),d={id:'drop'+drops.length,getComponent:()=>({itemStack:item}),remove(){drops.splice(drops.indexOf(d),1)}};drops.push(d);return d}};
  const block={dimension:dim,x:40,y:80,z:64,typeId:oil.EMPTY_POT,permutation:{getState:()=>false,withState(_k,v){this.getState=()=>v;return this}},setPermutation(p){this.permutation=p}};
- return {api:ctx.api,properties,faults,emitted,drops,block,Slot};}
+ return {api:ctx.api,properties,faults,emitted,drops,block,Slot,emitScript(event){for(const fn of subscriptions.script??[])fn(event)}};}
 test('public oil debits once, host ignores stale private count, and every typed oil empties correctly',()=>{
  const f=fixture('oil_api_host.js');for(const type of ['','canola','secret_chili','premium_chili']){
   const s=oil.createPublicOilPot(Item,type,3);s.props.kc_oil_count=256;const slot=new Slot(s);
@@ -145,4 +145,19 @@ test('author snapshot certifies an unrecorded legacy filled pot as 256 while ret
  const f=fixture('oil_api_host.js'),legacy=new Item(oil.FILLED_POT);legacy.nameTag='Legacy filled';const next=f.api.publishLegacyHostOil(legacy);assert.equal(oil.readPublicOil(next).state.count,256);assert.equal(oil.readPublicOil(next).state.type,'');assert.equal(next.nameTag,'Legacy filled');
  legacy.props.kc_oil_count=32;assert.equal(oil.readPublicOil(f.api.publishLegacyHostOil(legacy)).state.count,32);
  const corrupt=oil.createPublicOilPot(Item,'canola',8);corrupt.lore.push(corrupt.lore.find(x=>typeof x==='string'&&x.includes('§r§0§r§3§r§6')));assert.throws(()=>f.api.publishLegacyHostOil(corrupt));
+});
+
+test('Cookery configuration disables only new heat and seasoning, persists across reload and re-enables',()=>{
+ const f=fixture('cuisine_api_host.js');
+ const metaKey='senluo:cuisine_metadata:minecraft:overworld:40,80,64';
+ f.properties.set(metaKey,JSON.stringify({seasoning:['minecraft:redstone'],oilType:'premium_chili'}));
+ const config=enabled=>({id:'kaleidoscope_cookery:cuisine_config',message:JSON.stringify({api:1,enabled})});
+ f.emitScript(config(false));assert.deepEqual(JSON.parse(JSON.stringify(f.api.readCuisineMetadata(f.block))),{v:1,hotUntil:0,seasoning:[]});
+ const out=f.api.deliverCuisineOutput(f.block,{},'minecraft:bread',1,'pot',{operationId:'disabled:1'});
+ assert.equal(out.metadata.hotUntil,0);assert.equal(out.metadata.seasoning.length,0);
+ assert.equal(f.drops.length,1);assert.equal(f.drops[0].getComponent().itemStack.getRawLore().some(row=>JSON.stringify(row).includes('smoky_warmth')),false);
+ assert.equal(JSON.parse(f.properties.get(metaKey)).oilType,'premium_chili');
+ const g=fixture('cuisine_api_host.js',f.properties);assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,0);
+ g.emitScript(config('true'));assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,0);
+ g.emitScript(config(true));assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,25000);assert.equal(g.api.readCuisineMetadata(g.block).seasoning[0],'minecraft:redstone');
 });

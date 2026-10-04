@@ -1,3 +1,4 @@
+import {grillingConfig} from './server_config_runtime.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {useSound} from './immersion_audio_runtime.js';
 import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
@@ -193,6 +194,7 @@ function setFacing(block,face){
 }
 function placePlateOn(support,face,player,source,hand='main'){
  if(faceName(face)!=='up'||!player.isSneaking)return false;
+ if(support.typeId===COOKERY_TABLE&&!grillingConfig().interceptCookeryTableWhenPlacingPlate&&isSkewer(source))return false;
  if(support.typeId!==COOKERY_TABLE&&!hasSolidTop(support))return false;
  const target=blockAtOffset(support,{x:0,y:1,z:0});if(!isAirReplaceable(target))return false;
  let rows=[];
@@ -390,6 +392,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
   }
   if(p.isSneaking&&item&&(item.typeId===PLATE_ID||isSkewer(item))&&faceName(e.blockFace)==='up'){
    if(isSkewer(item)&&hand!=='main')return;
+   if(block.typeId===COOKERY_TABLE&&isSkewer(item)&&!grillingConfig().interceptCookeryTableWhenPlacingPlate)return;
    const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;if(!first)return;defer(()=>placePlateOn(dim.getBlock(loc),face,p,heldByHand(p,hand),hand));return;
   }
   if(item?.typeId===BOOK_ID&&['north','south','west','east'].includes(faceName(e.blockFace))){
