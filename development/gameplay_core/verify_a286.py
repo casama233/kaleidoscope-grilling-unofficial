@@ -17,7 +17,7 @@ def bottle_chain():
   for name in ('empty_seasoning_bottle','pending_seasoning'):
    d=load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description']
    assert 'contents' not in d['geometry']
-   assert len([k for k in d['geometry'] if k.startswith('layer_')])==16
+   assert len([k for k in d['geometry'] if k.startswith('layer_') and k.removeprefix('layer_').isdigit()])==16
    assert len(d['render_controllers'])==17
    for n in range(16):assert d['textures']['layer_'+str(n)]=='textures/a2770_placed/pending_'+str(n)
   d=load(RP/'attachables/special_seasoning.attachable.json')['minecraft:attachable']['description']

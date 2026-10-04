@@ -10,6 +10,7 @@ import argparse,json,math,re,sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'development/gameplay_core'))
 from held_pose_frames import chain,translate,xyz,scale,rigid_inverse,bedrock_rotation,bone_matrix,point
+from a2770_placed_visual_assets import bake_palette_geometry,geometry_bank
 P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 NS='kaleidoscope_grilling:'
 def load(p):return json.loads(p.read_text())
@@ -63,8 +64,14 @@ def build():
   slot=tint//2
   packed=f"(c.item_slot == 'off_hand' ? q.property('{NS}bottle_off_{slot}') : q.property('{NS}bottle_main_{slot}'))"
   index=f'math.floor({packed}/{count})' if tint%2==0 else f'math.mod({packed},{count})'
-  controllers['controller.render.kg_seasoning.held_'+str(tint)]={'geometry':'Geometry.layer_'+str(tint),'materials':[{'*':'Material.contents'}],'textures':['Texture.layer_'+str(tint)],'uv_anim':{'scale':[1/8,1/rows],'offset':[f'math.mod({index},8)/8',f'math.floor({index}/8)/{rows}']}}
- out[RP/'models/entity/seasoning_held.geo.json']={'format_version':'1.16.0','minecraft:geometry':geometries}
+  aliases=[]
+  for tile in range(count):
+   alias='layer_'+str(tint)+'_c'+str(tile);identifier=g['description']['identifier']+'_c'+str(tile)
+   geometries.append(bake_palette_geometry(g,identifier,tile,count));aliases.append('Geometry.'+alias)
+  array='Array.held_'+str(tint)+'_colors'
+  controllers['controller.render.kg_seasoning.held_'+str(tint)]={'arrays':{'geometries':{array:aliases}},
+   'geometry':f'{array}[math.clamp({index},0,{count-1})]','materials':[{'*':'Material.contents'}],'textures':['Texture.layer_'+str(tint)]}
+ out[RP/'models/entity/seasoning_held.geo.json']=geometry_bank(geometries)
  out[RP/'render_controllers/seasoning_held.render_controllers.json']={'format_version':'1.8.0','render_controllers':controllers}
  animations={}
  for hand in ['right','left']:
@@ -81,11 +88,12 @@ def build():
   pending=identifier==NS+'pending_seasoning';ids,selectors=dispatch(pending)
   a['animations']=ids;a['scripts']['animate']=[{k:v} for k,v in selectors.items()]
   if identifier in [NS+'empty_seasoning_bottle',NS+'pending_seasoning']:
-   a['materials']['contents']='kg_seasoning_atlas'
+   a['materials']['contents']='entity_alphatest_one_sided'
    a['geometry'].pop('contents',None)
    a['render_controllers']=['controller.render.kg_a2733.seasoning_bottle_hand']
    for tint in range(16):
     a['geometry']['layer_'+str(tint)]='geometry.kg_seasoning.held_'+str(tint)
+    for tile in range(count):a['geometry']['layer_'+str(tint)+'_c'+str(tile)]='geometry.kg_seasoning.held_'+str(tint)+'_c'+str(tile)
     a['textures']['layer_'+str(tint)]='textures/a2770_placed/pending_'+str(tint)
     fill=f"(c.item_slot == 'off_hand' ? q.property('{NS}bottle_off_fill') : q.property('{NS}bottle_main_fill'))"
     a['render_controllers'].append({'controller.render.kg_seasoning.held_'+str(tint):fill+' > '+str(tint//2)})
@@ -125,6 +133,10 @@ def compare_motion(actual,expected):
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()
  for p,d in build().items():
+  if isinstance(d,bytes):
+   if args.check:assert p.read_bytes()==d,str(p)
+   else:p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(d)
+   continue
   text=json.dumps(d,ensure_ascii=False,indent=2)+'\n'
   if args.check:
    if p.name=='seasoning_held.animation.json':compare_motion(load(p),d)
