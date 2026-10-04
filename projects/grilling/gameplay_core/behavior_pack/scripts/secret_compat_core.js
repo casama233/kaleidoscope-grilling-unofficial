@@ -1,6 +1,7 @@
 // Cross-addon compatibility registry for Java SecretSkewerItem parity.
 // Bedrock stable cannot query another pack's recipe manager at runtime, so the
 // port keeps the Java 1.1.1 built-ins here and exposes item/tag registrations.
+import {canonicalFoodId} from './eating_profile_ids.js';
 const ITEM_ID=/^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
 const EFFECT_ID=/^[a-z0-9_.:/-]+$/;
 
@@ -82,6 +83,8 @@ function rowTags(row){return Array.isArray(row?.tags)?row.tags.filter(validId).s
 function extensionFor(row){
  const id=rowId(row);
  if(behaviorItems.has(id))return behaviorItems.get(id);
+ const canonical=canonicalFoodId(id);
+ if(canonical!==id&&behaviorItems.has(canonical))return behaviorItems.get(canonical);
  for(const tag of rowTags(row))if(behaviorTags.has(tag))return behaviorTags.get(tag);
  return null;
 }

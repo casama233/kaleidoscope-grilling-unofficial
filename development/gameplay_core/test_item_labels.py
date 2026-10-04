@@ -2,6 +2,11 @@
 from pathlib import Path
 import json
 import subprocess
+from copy import deepcopy
+import re
+PROFILE_SOURCE=json.loads(re.search(r"PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)",subprocess.check_output(["git","show","d795c0e:projects/grilling/gameplay_core/behavior_pack/scripts/data.js"],cwd=Path(__file__).resolve().parents[2]).decode()).group(1))
+RANDOM_ITEMS={k.split(":")[1] for k,v in PROFILE_SOURCE.items() if v=="THREE_RANDOM"}|{"secret_skewer"}
+from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
@@ -23,17 +28,42 @@ def language(data):
     return dict(rows)
 
 
+def current_behavior_expectation(before, kind, stem, version):
+    expected = deepcopy(before)
+    if version >= (2, 8, 62) and kind == 'item' and stem in RANDOM_ITEMS:
+        c=expected['minecraft:item']['components']
+        c['minecraft:use_modifiers']['use_duration']=5.0
+        tags=c.setdefault('minecraft:tags',{'tags':[]})['tags']
+        tag='kaleidoscope_grilling:food_'+stem
+        if tag not in tags:tags.append(tag)
+    if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
+        expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
+    return expected
+
+
 def main():
     aliases = {}
+    version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     counts = {}
+    bottle_eligibility = set()
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
             if kind == 'item' and path.stem.endswith('_java_three_alt'):
+                assert version >= (2, 8, 62) and path.stem.removesuffix('_java_three_alt') in RANDOM_ITEMS
                 alt=json.loads(path.read_bytes())['minecraft:item']
                 base=json.loads(path.with_name(path.name.replace('_java_three_alt','')).read_bytes())['minecraft:item']
                 assert alt['components']['minecraft:display_name']==base['components']['minecraft:display_name'],path
                 assert 'menu_category' not in alt['description'],path
+                continue
+            if path.name == 'pepper_worldgen_seed.json':
+                assert folder == 'blocks' and version >= (2, 8, 60)
+                seed = json.loads(path.read_bytes())['minecraft:block']
+                assert seed['description'] == {'identifier':'kaleidoscope_grilling:pepper_worldgen_seed'}
+                assert seed['components']['minecraft:display_name'] == 'kaleidoscope_grilling.display.block.pepper_log'
+                assert not (PROJECT / 'behavior_pack/items/pepper_worldgen_seed.json').exists()
+                # This later hidden worldgen carrier reuses an existing label;
+                # it is not part of the historical label-only release count.
                 continue
             before = json.loads(prior(path))
             after = json.loads(path.read_bytes())
@@ -48,24 +78,23 @@ def main():
             display = after['minecraft:' + kind]['components']['minecraft:display_name']
             assert (display['value'] if isinstance(display, dict) else display) == key, path
             after['minecraft:' + kind]['components']['minecraft:display_name'] = old
-            historical=json.loads(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
-            historical['minecraft:'+kind]['components']['minecraft:display_name']=old
-            assert historical == before, 'Historical label-only item behaviour changed: '+str(path)
-            if kind=='item' and path.stem=='secret_skewer':
-                duration=after['minecraft:item']['components']['minecraft:use_modifiers']
-                assert duration['use_duration']==5.0, 'Canonical THREE secret duration drift'
-                duration['use_duration']=before['minecraft:item']['components']['minecraft:use_modifiers']['use_duration']
-            if kind=='item':
-                tags=after['minecraft:item']['components'].get('minecraft:tags',{}).get('tags',[])
-                tag='kaleidoscope_grilling:food_'+path.stem
-                if tag in tags:
-                    tags.remove(tag)
-                    if not tags and 'minecraft:tags' not in before['minecraft:item']['components']:after['minecraft:item']['components'].pop('minecraft:tags')
-            assert after == before, 'Non-display item/block behaviour changed: ' + str(path)
+            # Keep the historical label-only release fully immutable. Its
+            # item/block gate still allows no non-display differences at all.
+            historical = json.loads(subprocess.check_output(['git', 'show', LABEL_BASE + ':' + path.relative_to(ROOT).as_posix()], cwd=ROOT))
+            historical['minecraft:' + kind]['components']['minecraft:display_name'] = old
+            assert historical == before, 'Historical label release changed non-display behaviour: ' + str(path)
+            expected = current_behavior_expectation(before, kind, path.stem, version)
+            if version >= (2, 8, 61) and kind == 'item' and path.stem in BOTTLES:
+                assert after['minecraft:item']['components']['minecraft:allow_off_hand'] is True, path
+                bottle_eligibility.add(path.stem)
+            assert after == expected, 'Non-display item/block behaviour changed: ' + str(path)
             aliases[key] = value
             count += 1
         counts[kind] = count
     assert counts == {'item': 156, 'block': 18}, counts
+    if version >= (2, 8, 61):
+        assert bottle_eligibility == BOTTLES, 'Missing/unexpected bottle eligibility route'
+        assert check_authoring() == 67
     version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     public_keys = {'senluo.public.projection.v1'} if version >= (2, 8, 49) else set()
     for locale, label in LABELS.items():

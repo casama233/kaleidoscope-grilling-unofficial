@@ -1,3 +1,4 @@
+import {beginSeasoningMotion} from './seasoning_motion_runtime.js';
 import {world,system,ItemStack} from '@minecraft/server';
 import {EMPTY_SEASONING_ID,SEASONING_ID} from './data.js';
 import {playerInventory,getMainHand,setMainHand,isCreative} from './a2735_player_io.js';
@@ -102,7 +103,7 @@ function applySeasoning(player,block){
    setMainHand(player,next);
   }
  }
- try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}
+ try{beginSeasoningMotion(player,'main');player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:0})}catch{}
  try{player.playSound('kg_imm.season',{volume:.85,pitch:1})}catch{}
  message(player,'§a已向 Cookery 鍋具加入特製調料');return true;
 }

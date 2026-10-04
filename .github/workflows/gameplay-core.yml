@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/gameplay-core*.yml'
+      - '.github/g66-test-release-request.json'
       - '.github/workflows/family-candidate.yml'
       - 'compat/family/**'
       - 'baseline.json'
@@ -16,6 +17,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/gameplay-core*.yml'
+      - '.github/g66-test-release-request.json'
       - '.github/workflows/family-candidate.yml'
       - 'compat/family/**'
       - 'baseline.json'
@@ -34,7 +36,90 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  source:
+    # The exact validated Linux Pillow wheel owns all source/PNG byte gates.
+    if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Read exact confirmed repository commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'casama233/kaleidoscope-grilling-unofficial'
+          test "$GITHUB_REPOSITORY_ID" = '1377218440'
+          git init .
+          git config core.autocrlf false
+          git config gc.auto 0
+          git config maintenance.auto false
+          git config fetch.writeCommitGraph false
+          git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
+          git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
+          # Several verifiers compare the current files against historical baselines
+          # recorded by complete audited historical-source ref inventory. The tree is
+          # read straight from the fetched commit, then those commits are fetched
+          # too, so a shallow clone still resolves every baseline.
+          git checkout --detach "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          # Connector snapshots retain selected original source SHA guards via
+          # a checksum-pinned pack. This imports evidence without changing refs.
+          python tools/source_provenance.py
+          BASELINES=$(python tools/historical_source_refs.py list)
+          # Batch exact missing source pins so only one fetch updates .git/shallow.
+          missing=()
+          for baseline in $BASELINES; do
+            if ! git cat-file -e "$baseline^{commit}" 2>/dev/null; then
+              missing+=("$baseline")
+            fi
+          done
+          if ((${#missing[@]})); then
+            git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
+          fi
+          python tools/historical_source_refs.py verify
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+
+      - name: Install exact validated Linux PNG encoder wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --only-binary=:all: --require-hashes -r tools/fixtures/g66-pillow-linux-requirements.txt
+          python -c "import PIL; from PIL import features; print('Pillow', PIL.__version__, 'PNG zlib', features.version('zlib'), 'zlib-ng', features.version_feature('zlib_ng'))"
+
+      - name: Verify source and publication regression guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/test_source_provenance.py
+          python tools/test_historical_source_refs.py
+          python development/gameplay_core/test_verify_current.py
+          python development/gameplay_core/test_package_current.py
+          python development/gameplay_core/test_publish_test_release.py
+
+      - name: Verify full canonical source once and record exact inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python development/gameplay_core/verify_current.py --write-source-validation "$RUNNER_TEMP/grilling-source-validation.json"
+
+      - name: Transfer exact successful functional source receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Kaleidoscope-Grilling-Canonical-Source-Validation
+          path: ${{ runner.temp }}/grilling-source-validation.json
+          retention-days: 14
+          if-no-files-found: error
+
   canonical:
+    needs: source
     # One functional source run serves gameplay and family candidates. Pure
     # adapter regressions do not claim native BDS or human client acceptance.
     if: github.repository == 'casama233/kaleidoscope-grilling-unofficial' && github.repository_id == '1377218440'
@@ -53,16 +138,32 @@ jobs:
           test "$GITHUB_REPOSITORY_ID" = '1377218440'
           git init .
           git config core.autocrlf false
+          git config gc.auto 0
+          git config maintenance.auto false
+          git config fetch.writeCommitGraph false
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
-          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
-          # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
+          # recorded by complete audited historical-source ref inventory. The tree is
           # read straight from the fetched commit, then those commits are fetched
           # too, so a shallow clone still resolves every baseline.
-          BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
-          if [ -n "$BASELINES" ]; then git fetch --depth=1 origin $BASELINES; fi
           git checkout --detach "$EXPECTED_SHA"
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          # Connector snapshots retain selected original source SHA guards via
+          # a checksum-pinned pack. This imports evidence without changing refs.
+          python tools/source_provenance.py
+          BASELINES=$(python tools/historical_source_refs.py list)
+          # Batch exact missing source pins so only one fetch updates .git/shallow.
+          missing=()
+          for baseline in $BASELINES; do
+            if ! git cat-file -e "$baseline^{commit}" 2>/dev/null; then
+              missing+=("$baseline")
+            fi
+          done
+          if ((${#missing[@]})); then
+            git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
+          fi
+          python tools/historical_source_refs.py verify
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -71,19 +172,36 @@ jobs:
       - name: Install pinned asset-verifier dependency
         shell: pwsh
         run: |
-          python -m pip install Pillow==11.3.0
+          # Match the PNG encoder used by the frozen G66 source assets.
+          python -m pip install Pillow==12.3.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import PIL; from PIL import features; print('Pillow', PIL.__version__, 'PNG zlib', features.version('zlib'))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify source receipt and compiled comparison regression guards
         shell: pwsh
         run: |
+          python tools/test_source_provenance.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_historical_source_refs.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python development/gameplay_core/test_verify_current.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python development/gameplay_core/test_package_current.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python development/gameplay_core/test_publish_test_release.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Verify canonical source once and record exact inputs
+      - name: Read exact successful Linux functional source receipt
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: Kaleidoscope-Grilling-Canonical-Source-Validation
+          path: ${{ runner.temp }}
+
+      - name: Reject cross-platform source receipt or HEAD drift before compilation
         shell: pwsh
         run: |
-          python development/gameplay_core/verify_current.py --write-source-validation "$env:RUNNER_TEMP/grilling-source-validation.json"
+          python -c "import sys; from pathlib import Path; sys.path.insert(0, 'development/gameplay_core'); from verify_current import require_source_validation; require_source_validation(Path(r'$env:RUNNER_TEMP/grilling-source-validation.json'))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Download checksum-pinned official bridge Dash v1.2.0

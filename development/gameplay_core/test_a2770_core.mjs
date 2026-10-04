@@ -15,6 +15,15 @@ test('unfinished ingredients keep insertion order and individual layer colors',(
 });
 test('unknown ingredient uses Java fallback, not a random color',()=>assert.deepEqual(bottlePlan({kind:'empty',ingredients:['unknown']}).colors,[FALLBACK_COLORS]));
 test('pending fill clamps to eight ingredients',()=>assert.equal(bottlePlan({kind:'pending',ingredients:Array(12).fill('a')}).fill,8));
+test('placed ingredient indices match held rows, preserving repeats and order',()=>{
+ const ids=['kaleidoscope_grilling:dragon_egg_powder','kaleidoscope_grilling:green_chili_powder','kaleidoscope_grilling:houttuynia_powder','kaleidoscope_grilling:onion_powder','kaleidoscope_grilling:sichuan_pepper','kaleidoscope_grilling:totem_powder','minecraft:gunpowder','minecraft:redstone'];
+ for(const kind of ['empty','pending']){
+  assert.deepEqual(bottlePlan({kind,ingredients:ids}).layers,[1,2,3,4,5,6,7,8]);
+  assert.deepEqual(bottlePlan({kind,ingredients:['minecraft:redstone','minecraft:gunpowder','minecraft:redstone']}).layers,[8,7,8,0,0,0,0,0]);
+  assert.deepEqual(bottlePlan({kind,ingredients:['external:unknown','toString']}).layers,[9,9,0,0,0,0,0,0]);
+ }
+ assert.deepEqual(bottlePlan({kind:'special',uses:2,variant:5,ingredients:ids}).layers,Array(8).fill(0));
+});
 test('four different bottles retain independent fill and variant',()=>{
  const p=[{kind:'special',uses:0,variant:7},{kind:'special',uses:15,variant:3},{kind:'pending',ingredients:['a','b']},{kind:'empty',ingredients:[]}].map(x=>bottlePlan(x));
  assert.deepEqual(p.map(x=>x?.fill),[8,1,2,undefined]);assert.deepEqual(p.slice(0,2).map(x=>x.variant),[7,3]);

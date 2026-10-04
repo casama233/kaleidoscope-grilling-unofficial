@@ -1,39 +1,20 @@
-"""Ingredient layers and Java seasoning motion in the existing bound item frame.
+"""PR125 bound-bottle motion ported onto the G62 combined static-UV mesh.
 
-The Java view translation is adapted to Bedrock's visible idle anchor. Curves,
-duration, inversion and ordered tint layers come from the pinned Java source;
-the resulting client presentation still requires human acceptance.
+Derived from final PR125 head 769f8b2e08233e521536e93803045174baa751a5,
+tools/build_seasoning_held.py (blob f724de7b94d4af9d26e94d6651e8f4779dbc7a2c).
+Keep the established Bedrock idle anchor; no player socket compensation.
+Java main-hand curves are mirrored only as an explicit offhand fallback.
+This is a native-unaccepted candidate, not a camera-space parity claim.
 """
 from pathlib import Path
+import argparse,json,math,sys
 from copy import deepcopy
-import argparse,json,math,re,sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'development/gameplay_core'))
-from held_pose_frames import chain,translate,xyz,scale,rigid_inverse,bedrock_rotation,bone_matrix,point
-from a2770_placed_visual_assets import bake_palette_geometry,geometry_bank
+from held_pose_frames import chain,translate,xyz,scale,rigid_inverse,bedrock_rotation,bone_matrix,point,native_skewer_calibration
 P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 NS='kaleidoscope_grilling:'
 def load(p):return json.loads(p.read_text())
-def palette_size():
- return len(json.loads(re.search(r'PLACED_TINT_INDEX=Object.freeze\((.*)\);',(BP/'scripts/a2770_placed_visual_data.js').read_text()).group(1)))
-def dispatch(pending=False):
- ids={};selectors={}
- for hand,slot,code in [('right','main_hand',1),('left','off_hand',2)]:
-  fp=f"c.is_first_person == 1 && c.item_slot == '{slot}'"
-  season=f"(q.property('{NS}season_hand') == {code} && q.property('{NS}season_phase') != 0)"
-  shake=f"(q.is_using_item && q.property('{NS}pending_hand') == {code})" if pending else '0 == 1'
-  ids['fp_'+hand]='animation.kg_a286.bottle_fp_'+hand
-  ids['tp_'+hand]='animation.kg_a286.bottle_tp_'+hand
-  ids['season_'+hand]='animation.kg_seasoning.item.sprinkle.'+hand
-  # Explicit complementary selectors: one pose owns the entire grip at a time.
-  selectors['fp_'+hand]=fp+f" && (q.property('{NS}season_hand') != {code} || q.property('{NS}season_phase') == 0)"
-  if pending:
-   ids['shake_'+hand]='animation.kg_seasoning.item.shake.'+hand
-   selectors['fp_'+hand]+=f" && (q.is_using_item == 0 || q.property('{NS}pending_hand') != {code})"
-   selectors['shake_'+hand]=fp+' && '+shake+f" && (q.property('{NS}season_hand') != {code} || q.property('{NS}season_phase') == 0)"
-  selectors['season_'+hand]=fp+' && '+season
-  selectors['tp_'+hand]=f"c.is_first_person == 0 && c.item_slot == '{slot}'"
- return ids,selectors
 def motion(hand,t,shaking):
  sign=1 if hand=='right' else -1
  p=t/.5;wave=math.sin(t*20*1.8) if shaking else math.sin(p*math.pi*4)
@@ -50,77 +31,86 @@ def motion(hand,t,shaking):
  # Adapt those relative movements to the established visible Bedrock anchor.
  local[0][3]-=sign*wave*.08*16
  local[1][3]+=(arc-(1 if shaking else 0))*.10*16
+ if not shaking and hand=='right':
+  # Sprinkle-only camera-relative clearance. The active player clip supplies
+  # the exact settled Mojang basis, so a native click cannot swing this anchor.
+  # Keep authored scale/rotation/duration; move the inverted model away from HUD.
+  base,camera=native_skewer_calibration(hand)
+  frame=chain(rigid_inverse(base),camera)
+  origin=point(frame,[0,0,0]);shift=point(frame,[-1,3,-2])
+  for axis in range(3):local[axis][3]+=shift[axis]-origin[axis]
  rot=bedrock_rotation(chain(local,scale([1/.72]*3)))
  return {'position':[-local[0][3],local[1][3],local[2][3]],'rotation':rot,'scale':[.72]*3}
-def build():
- out={};controllers={};geometries=[];count=palette_size();rows=(count+7)//8
- placed=load(RP/'models/entity/a2770_placed/seasoning.geo.json')['minecraft:geometry']
- for tint in range(16):
-  g=deepcopy(next(g for g in placed if g['description']['identifier']=='geometry.kg_a2770.pending_'+str(tint)))
-  g['description']['identifier']='geometry.kg_seasoning.held_'+str(tint)
-  b=g['bones'][0];b.update(name='grip',pivot=[0,24,0],binding='q.item_slot_to_bone_name(context.item_slot)')
-  for cube in b['cubes']:cube['origin'][1]+=17
-  geometries.append(g)
-  slot=tint//2
-  packed=f"(c.item_slot == 'off_hand' ? q.property('{NS}bottle_off_{slot}') : q.property('{NS}bottle_main_{slot}'))"
-  index=f'math.floor({packed}/{count})' if tint%2==0 else f'math.mod({packed},{count})'
-  aliases=[]
-  for tile in range(count):
-   alias='layer_'+str(tint)+'_c'+str(tile);identifier=g['description']['identifier']+'_c'+str(tile)
-   geometries.append(bake_palette_geometry(g,identifier,tile,count));aliases.append('Geometry.'+alias)
-  array='Array.held_'+str(tint)+'_colors'
-  controllers['controller.render.kg_seasoning.held_'+str(tint)]={'arrays':{'geometries':{array:aliases}},
-   'geometry':f'{array}[math.clamp({index},0,{count-1})]','materials':[{'*':'Material.contents'}],'textures':['Texture.layer_'+str(tint)]}
- out[RP/'models/entity/seasoning_held.geo.json']=geometry_bank(geometries)
- out[RP/'render_controllers/seasoning_held.render_controllers.json']={'format_version':'1.8.0','render_controllers':controllers}
- animations={}
+
+def dispatch(desc):
+ identifier=desc['identifier']
+ if identifier==NS+'empty_seasoning_bottle':return
+ if identifier!=NS+'pending_seasoning' and not identifier.startswith(NS+'special_seasoning'):return
+ pending=identifier==NS+'pending_seasoning'
+ scripts=desc.setdefault('scripts',{})
+ for phase in ['initialize','pre_animation']:
+  scripts[phase]=[s for s in scripts.get(phase,[]) if not s.startswith('v.kg_season_')]
+ for name in ['season_hand','season_phase','pending_hand']:
+  variable='v.kg_season_'+name
+  prop=NS+name
+  scripts['initialize'].append(variable+' = 0;')
+  scripts['pre_animation'].append(variable+" = (c.owning_entity->q.has_property('"+prop+"') ? c.owning_entity->q.property('"+prop+"') : 0);")
+ ids={};selectors={}
+ for hand,slot,code in [('right','main_hand',1),('left','off_hand',2)]:
+  fp=f"c.is_first_person == 1 && c.item_slot == '{slot}'"
+  season=f"(v.kg_season_season_hand == {code} && v.kg_season_season_phase != 0)"
+  shake=f"(c.owning_entity->q.is_using_item && v.kg_season_pending_hand == {code})" if pending else '0'
+  ids['fp_'+hand]='animation.kg_a286.bottle_fp_'+hand
+  ids['tp_'+hand]='animation.kg_a286.bottle_tp_'+hand
+  ids['season_'+hand]='animation.kg_seasoning.item.sprinkle.'+hand
+  selectors['fp_'+hand]=fp+' && ('+season+') == 0'+(' && ('+shake+') == 0' if pending else '')
+  if pending:
+   ids['shake_'+hand]='animation.kg_seasoning.item.shake.'+hand
+   selectors['shake_'+hand]=fp+' && '+shake+' && ('+season+') == 0'
+  selectors['season_'+hand]=fp+' && '+season
+  selectors['tp_'+hand]=f"c.is_first_person == 0 && c.item_slot == '{slot}'"
+ desc['animations']=ids
+ scripts['animate']=[{k:v}for k,v in selectors.items()]
+
+def animations():
+ out={}
  for hand in ['right','left']:
   for shaking in [False,True]:
    duration=2*math.pi/1.8/20 if shaking else .5
-   samples=[duration*n/40 for n in range(41)] if shaking else [n/20 for n in range(11)]
+   samples=[duration*n/40 for n in range(41)] if shaking else [n/60 for n in range(31)]
    values={str(round(t,8)):motion(hand,t,shaking) for t in samples}
-   bone={key:{t:row[key] for t,row in values.items()} for key in ['position','rotation']};bone['scale']=[.72]*3
-   animations['animation.kg_seasoning.item.'+('shake' if shaking else 'sprinkle')+'.'+hand]={'loop':shaking,'animation_length':duration,'bones':{'grip':bone}}
- out[RP/'animations/seasoning_held.animation.json']={'format_version':'1.8.0','animations':animations}
- for p in (RP/'attachables').glob('*.json'):
-  d=load(p);a=d['minecraft:attachable']['description'];identifier=a['identifier']
-  if identifier not in [NS+'empty_seasoning_bottle',NS+'pending_seasoning'] and not identifier.startswith(NS+'special_seasoning'):continue
-  pending=identifier==NS+'pending_seasoning';ids,selectors=dispatch(pending)
-  a['animations']=ids;a['scripts']['animate']=[{k:v} for k,v in selectors.items()]
-  if identifier in [NS+'empty_seasoning_bottle',NS+'pending_seasoning']:
-   a['materials']['contents']='entity_alphatest_one_sided'
-   a['geometry'].pop('contents',None)
-   a['render_controllers']=['controller.render.kg_a2733.seasoning_bottle_hand']
-   for tint in range(16):
-    a['geometry']['layer_'+str(tint)]='geometry.kg_seasoning.held_'+str(tint)
-    for tile in range(count):a['geometry']['layer_'+str(tint)+'_c'+str(tile)]='geometry.kg_seasoning.held_'+str(tint)+'_c'+str(tile)
-    a['textures']['layer_'+str(tint)]='textures/a2770_placed/pending_'+str(tint)
-    fill=f"(c.item_slot == 'off_hand' ? q.property('{NS}bottle_off_fill') : q.property('{NS}bottle_main_fill'))"
-    a['render_controllers'].append({'controller.render.kg_seasoning.held_'+str(tint):fill+' > '+str(tint//2)})
-  out[p]=d
- # Authored third-person arm gestures must never move a first-person holder.
- for name,prefix in [('player_binding.animation.json','animation.kg_imm.player.season.'),('a21_shake.animation.json','animation.kg_a21.player.shake.')]:
-  p=RP/'animations'/name;d=load(p)
-  original=load(ROOT/'development/gameplay_core/fixtures/seasoning-arm-clips-2.8.55.json')[name]
-  for key,seed in original.items():
-   a=deepcopy(seed);d['animations'][key]=a
-   a.pop('override_previous_animation',None)
-   code=2 if key.endswith('.off') else 1
-   if name=='player_binding.animation.json':a['blend_weight']=f"!variable.is_first_person && q.property('{NS}season_hand') == {code} && q.property('{NS}season_phase') != 0"
-   else:a['blend_weight']=f"!variable.is_first_person && q.is_using_item && q.property('{NS}pending_hand') == {code}"
-   if name=='player_binding.animation.json':
-    a['animation_length']=.5
-    for bone in a['bones'].values():
-     bone.pop('position',None)
-     for channel,v in list(bone.items()):
-      if isinstance(v,dict):bone[channel]={str(round(float(t)*.5/.8,8)):row for t,row in v.items()}
-  out[p]=d
+   # Keep equivalent Euler representatives continuous across the generated keys.
+   previous=None
+   for row in values.values():
+    if previous is not None:row['rotation']=[v+360*round((old-v)/360)for old,v in zip(previous,row['rotation'])]
+    previous=row['rotation']
+   bone={key:{t:row[key]for t,row in values.items()}for key in ['position','rotation']}
+   bone['scale']=[.72]*3
+   out['animation.kg_seasoning.item.'+('shake'if shaking else 'sprinkle')+'.'+hand]={'loop':shaking,'animation_length':duration,'bones':{'grip':bone}}
+ return {'format_version':'1.8.0','animations':out}
+
+def sprinkle_anchor():
+ source=load(ROOT/'development/gameplay_core/fixtures/seasoning-native-sprinkle-frame-1.26.50.4.json')['empty_hand']
+ # Use exactly the already-validated idle socket basis, not a second camera
+ # calibration. Only this active main-hand sprinkle may own these two bones.
+ bones={key:deepcopy(source['bones'][key])for key in ['rightarm','rightitem']}
+ names=','.join("'"+load(path)['minecraft:attachable']['description']['identifier']+"'"for path in sorted((RP/'attachables').glob('special_seasoning*.json')))
+ gate=("variable.is_first_person && variable.is_using_vr == 0 && q.is_sneaking == 0 && q.is_swimming == 0 && "
+       "q.is_gliding == 0 && q.is_riding == 0 && q.property('"+NS+"season_hand') == 1 && "
+       "q.property('"+NS+"season_phase') > 0 && q.is_item_name_any('slot.weapon.mainhand',"+names+")")
+ return {'format_version':'1.8.0','animations':{'animation.kg_seasoning.player.sprinkle_anchor.right':{
+  'animation_length':.5,'override_previous_animation':True,'blend_weight':gate,'bones':bones}}}
+
+def build():
+ out={RP/'animations/seasoning_held.animation.json':animations()}
+ out[RP/'animations/seasoning_sprinkle_anchor.animation.json']=sprinkle_anchor()
+ for path in (RP/'attachables').glob('*seasoning*.json'):
+  doc=load(path);dispatch(doc['minecraft:attachable']['description']);out[path]=doc
  return out
+
 def compare_motion(actual,expected):
- # Windows and Linux libm can differ in the final trigonometric bits. This
- # checks the derived matrices to 1e-10 model units/degrees, without changing
- # or normalizing the committed runtime bytes. Baseline and compiler checks
- # still compare those exact bytes. Keys, shape and nonnumeric data are exact.
+ # Final PR125 portability guard: libm's last bits may differ by platform.
+ # Runtime export bytes and release receipts remain exact, never normalized.
  if isinstance(expected,dict):
   assert isinstance(actual,dict) and actual.keys()==expected.keys()
   for key,value in expected.items():compare_motion(actual[key],value)
@@ -130,20 +120,13 @@ def compare_motion(actual,expected):
  elif type(expected) in [float,int]:
   assert type(actual) in [float,int] and math.isclose(actual,expected,rel_tol=0,abs_tol=1e-10),(actual,expected)
  else:assert type(actual)==type(expected) and actual==expected
+
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()
- for p,d in build().items():
-  if isinstance(d,bytes):
-   if args.check:assert p.read_bytes()==d,str(p)
-   else:p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(d)
-   continue
-  text=json.dumps(d,ensure_ascii=False,indent=2)+'\n'
+ for path,doc in build().items():
   if args.check:
-   if p.name=='seasoning_held.animation.json':compare_motion(load(p),d)
-   else:assert load(p)==d,str(p)
-  else:
-   p.parent.mkdir(parents=True,exist_ok=True)
-   if p.name in ['player_binding.animation.json','a21_shake.animation.json']:text=text.replace('\n','\r\n')
-   p.write_bytes(text.encode())
- print('Seasoning layers and bound-item Java 10-tick motion generated; client pending')
+   if path.name=='seasoning_held.animation.json':compare_motion(load(path),doc)
+   else:assert load(path)==doc,path
+  else:path.write_text(json.dumps(doc,ensure_ascii=False,indent=2)+'\n')
+ print('PR125 motion-only port; G62 content/assets preserved; native acceptance pending')
 if __name__=='__main__':main()

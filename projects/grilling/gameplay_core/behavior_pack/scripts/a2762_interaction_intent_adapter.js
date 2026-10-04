@@ -1,5 +1,5 @@
 import {getMainHand,getOffHand,captureWritableHand} from './a2735_player_io.js';
-import {stackIntentSignature} from './a2762_interaction_intent_core.js';
+import {stackIntentSignature,captureStackIntentSnapshot,stackIntentSnapshotMatches} from './a2762_interaction_intent_core.js';
 import {makeTwoHandIntent,sameTwoHandIntent} from './a288_intent_core.js';
 import {
  primitiveStackProps,captureInteractionIntentFromStacks,interactionIntentMatchesStacks
@@ -16,14 +16,23 @@ export function interactionIntentStillCurrent(player,intent){
 }
 
 // A threading/disassembly gesture owns BOTH hands, not just its event item.
+const twoHandSnapshots=new WeakMap();
 export function captureTwoHandIntent(player){
  try{
   if(!player.isValid)return null;
-  const main=captureWritableHand(player,'main'),off=captureWritableHand(player,'off');
-  return makeTwoHandIntent(stackIntentSignature(main.before),stackIntentSignature(off.before),
+  // Native clones retain restricted capabilities without reading them here.
+  // Keep transactional capture strict: tolerant display getters can mask faults.
+  const main=captureWritableHand(player,'main').before,off=captureWritableHand(player,'off').before;
+  const intent=makeTwoHandIntent(stackIntentSignature(main),stackIntentSignature(off),
    player.selectedSlotIndex,player.dimension.id,player.isSneaking);
+  const snapshots={main:captureStackIntentSnapshot(main),off:captureStackIntentSnapshot(off)};
+  if(!intent||!snapshots.main.readable||!snapshots.off.readable)return null;
+  twoHandSnapshots.set(intent,snapshots);return intent;
  }catch{return null}
 }
 export function twoHandIntentStillCurrent(player,intent){
- return sameTwoHandIntent(intent,captureTwoHandIntent(player));
+ const saved=twoHandSnapshots.get(intent),current=captureTwoHandIntent(player);
+ const now=current&&twoHandSnapshots.get(current);
+ return !!saved&&!!now&&sameTwoHandIntent(intent,current)
+  &&stackIntentSnapshotMatches(saved.main,now.main.stack)&&stackIntentSnapshotMatches(saved.off,now.off.stack);
 }

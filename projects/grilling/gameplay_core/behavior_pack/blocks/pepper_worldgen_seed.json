@@ -1,0 +1,50 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:pepper_worldgen_seed"
+    },
+    "components": {
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.pepper_log",
+      "minecraft:geometry": "geometry.kg_a1.pepper_log",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kg_a2748_pepper_log",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.0
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 2.0
+      },
+      "minecraft:loot": "loot_tables/blocks/pepper_log.json",
+      "minecraft:tick": {
+        "interval_range": [
+          1,
+          20
+        ],
+        "looping": true
+      },
+      "kaleidoscope_grilling:pepper_worldgen_seed_logic": {},
+      "minecraft:placement_filter": {
+        "conditions": [
+          {
+            "allowed_faces": [
+              "up"
+            ],
+            "block_filter": [
+              "minecraft:dirt",
+              "minecraft:grass_block",
+              "minecraft:podzol",
+              "minecraft:coarse_dirt",
+              "minecraft:dirt_with_roots",
+              "minecraft:mycelium"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

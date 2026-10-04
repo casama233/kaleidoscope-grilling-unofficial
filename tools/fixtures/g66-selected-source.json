@@ -1,0 +1,488 @@
+{
+  "schema": 1,
+  "format": "selected_git_source_objects_no_ref_updates",
+  "pack_sha256": "fae2fc60c9bbe79afdd4c6491866f7405a11fc9ce74377e79e3ea1963b929e99",
+  "pack_bytes": 357419,
+  "object_count": 93,
+  "commits": [
+    "0996f05fd63ce37098d867d14b4760dad93d2501",
+    "cba67124a710f70e015ba55d306ff9f741dae9d6"
+  ],
+  "scope": "Original code comparison evidence only: two commits, necessary source-path ancestor trees and selected JSON code blobs for unchanged owner-context/seasoning guards. No parent history, docs/history/media/archive objects or private export inventories. Sibling names/OIDs in indispensable original ancestor trees are not their contents.",
+  "selected_blobs": {
+    "0996f05fd63ce37098d867d14b4760dad93d2501": {
+      "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer.attachable.json": {
+        "git_blob_sha1": "302bc86923b3ea56ad91f0fac1dd2ebeb3f1a555",
+        "sha256": "192024ea88424fe131354ab6f1ca9a55e6af0fd19cc5223ee4bf032cb65613f8",
+        "bytes": 16199
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer_java_three_alt.attachable.json": {
+        "git_blob_sha1": "e20d4d080d479fd239726478ddb9503a1520194d",
+        "sha256": "9622750bac60870e2c00523e6d1ea25388d8f05aaa507d9474474991dd47a7e9",
+        "bytes": 16214
+      },
+      "projects/grilling/gameplay_core/resource_pack/models/entity/secret_held.geo.json": {
+        "git_blob_sha1": "1b2ddec11d233d3844e3184a42789e7e9cc3cf51",
+        "sha256": "a1b003170ad46c011c7182c3197e2ecc0ddda9c2edef48d273408746e294fb7c",
+        "bytes": 10212
+      }
+    },
+    "cba67124a710f70e015ba55d306ff9f741dae9d6": {
+      "projects/grilling/gameplay_core/behavior_pack/entities/player.json": {
+        "git_blob_sha1": "fabfcb0cf20448fa8a0a2da92bd96aee9fce8822",
+        "sha256": "ad231fee6a49186074bb9c1b8608fd4c007c0a13bfa029c20ff58b818d07d7f1",
+        "bytes": 19661
+      },
+      "projects/grilling/gameplay_core/resource_pack/animations/a21_shake.animation.json": {
+        "git_blob_sha1": "da7f5dac6ab2858dc6a78fb31794698651041f40",
+        "sha256": "910a8f0b3dc30c95366a522c2795cf7a9fe28b7624d83f1cbb45b8a8b0d894e3",
+        "bytes": 1321
+      },
+      "projects/grilling/gameplay_core/resource_pack/animations/a286_held.animation.json": {
+        "git_blob_sha1": "545c2250b47c3f8b7a3916709d0fed7b80595d35",
+        "sha256": "9974c8ba85a8cdbceacd56e3a1cba2ed7da91d78ab3260919046efdc5d497c53",
+        "bytes": 3925
+      },
+      "projects/grilling/gameplay_core/resource_pack/animations/player_binding.animation.json": {
+        "git_blob_sha1": "e8f42e86295ea0185a2b6665bf54cdfc2011949e",
+        "sha256": "fb67166cec0652bb97862b173eb5c8cb267893c44a9bdf544e44ebddf768219e",
+        "bytes": 2994559
+      },
+      "projects/grilling/gameplay_core/resource_pack/animations/seasoning_held.animation.json": {
+        "git_blob_sha1": "e9301e8ca1217d123448e9d5174a6562de0c9ac9",
+        "sha256": "bffbef9c23b77ba97dbeca77020a16a202071d16219abc2a5b70bc14ad8f219f",
+        "bytes": 42284
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/empty_seasoning_bottle.attachable.json": {
+        "git_blob_sha1": "1e835404b5ebfa6ed5e11275854b89c9615eaa9f",
+        "sha256": "b00e3f06d9f630e0accbece5b941a6f5c62bbfb16b93d94ba5395cdb09c6fa71",
+        "bytes": 4782
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/pending_seasoning.attachable.json": {
+        "git_blob_sha1": "22ea3e0972d83b00e09ff0c26de262889e75cda1",
+        "sha256": "03a89cf4094053fe1cc65c737c764bfbfceef809e5261ecabbcdabf0d0d7f7ec",
+        "bytes": 6879
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning.attachable.json": {
+        "git_blob_sha1": "16ebbb9bef036c15165776944ee770dea6c929dd",
+        "sha256": "0268082ad47c3c3ee08a90bf93e78c472db9ee9cf7dcc2fbbc02ec04ccefa69f",
+        "bytes": 2622
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v0.attachable.json": {
+        "git_blob_sha1": "43f596462dd75c750817d1dbec0af82e11873c1d",
+        "sha256": "a3fa3daf520249f77b67479eee9827b5ac08820a2f0c75ebf49a6606b78c051c",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v1.attachable.json": {
+        "git_blob_sha1": "c61b7158cd6d6eebb34bd530894da3ea460bed85",
+        "sha256": "93b73115b88913691966c36161fcf0937ac57801d3800e100ac706501d9a92ab",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v2.attachable.json": {
+        "git_blob_sha1": "4226bc35ebb22672f503fce19a6e924d9c14beb0",
+        "sha256": "c22ac34501259ee12d3af2cd7b975999244d6e9c76e9cf8f37777dc84c17f034",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v3.attachable.json": {
+        "git_blob_sha1": "103150ff724736112cf810770b067a12f18c5583",
+        "sha256": "aa950313515be7f9435bd607f310baea105834615f8be32b397847a4eae5b46e",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v4.attachable.json": {
+        "git_blob_sha1": "50ac201d3d6a0beadb3be721de398dd4a1aa4551",
+        "sha256": "8796348b1e7bdbf6e9e0d60c9f45399642a6614d21e65c1551655a0473d27005",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v5.attachable.json": {
+        "git_blob_sha1": "cc8380a6a9cd18996d39396bdccf870cd7c0a860",
+        "sha256": "706e0c6a4de9a5c2b7090c9b521803f09007276397752b8665b850d26659bc46",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v6.attachable.json": {
+        "git_blob_sha1": "6a402d636e7dfb8b9a78096c53bfb34b7751639a",
+        "sha256": "c993cdf5cce91de47d67fc3056389bbdaa8ee92727b563c73a8dc55e501e1764",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r1_v7.attachable.json": {
+        "git_blob_sha1": "2e2199d2550dcd350e91e727ca9b7fc1fd305e29",
+        "sha256": "e411e3dc84ea255119c4ce145fba3f73d9f93ed16962f487b99d49430ca69c89",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v0.attachable.json": {
+        "git_blob_sha1": "410aff5cc43292e791824d8d8ced840de055a99b",
+        "sha256": "bdb70d09297c50a4a5d65e0a6475d85ff6eba7fa28bf4dc0252ca95f448c0061",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v1.attachable.json": {
+        "git_blob_sha1": "1a18a858a1ff708c02dbde58ec81c2981b250022",
+        "sha256": "adb26183c933b866bfdb8c48748407a25830fab426b01a17345d7070592c02ca",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v2.attachable.json": {
+        "git_blob_sha1": "ba875186451b52c9ef92c3305fad51420490582c",
+        "sha256": "6cb4c47f51f425b6c8e4af66e832eaa65a00b7d97c5780a0338d0fd80723ca4d",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v3.attachable.json": {
+        "git_blob_sha1": "678206ebe8e5dac156a72d772a2c3a88070990e7",
+        "sha256": "e79fccf77ccc44deccb01ad2ef6a9c96e5d480ae1663dabe0ded5a0fd8ca2531",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v4.attachable.json": {
+        "git_blob_sha1": "ac1161999e49b986717b7ed924f7a02ce574c4e2",
+        "sha256": "e6b25d8b384c4257a8ab6ad8656e0f8d716ef7ab415898bea7a4d2e70828bf71",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v5.attachable.json": {
+        "git_blob_sha1": "a3db16c6b859db90a1ef1317012692694e4d7289",
+        "sha256": "670179faecb239d3b86d3ab432efc4d823e28296f0cef3da75b14426af307f7a",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v6.attachable.json": {
+        "git_blob_sha1": "d7daa941c35f4373b4e18f5a1da37d98e4721a03",
+        "sha256": "9fedca3fc682528c5d1980456ef3c086318189f81f70b7c4f46ef54e85dd80ee",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r2_v7.attachable.json": {
+        "git_blob_sha1": "c46ee53eb6ff211f08d8128da7385993bbb33eec",
+        "sha256": "2d8dd1bda0aa9e396e26077c43cbadff2d16fb6e66a0db300aef738829f8ce4a",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v0.attachable.json": {
+        "git_blob_sha1": "f943133b3aa13dd28d48e32c10244af9fe3ddcdd",
+        "sha256": "9cee16bbab548a9674ad475419bf0425d1caa92db3ee0eb83183f22a30b7dc58",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v1.attachable.json": {
+        "git_blob_sha1": "a85fe807a82a79375b805bf7ace555d35b015b03",
+        "sha256": "7db5bf56e19bc9ea9d2c889ca7f2124d1db7d9b8aba64f9e3bdaad49812c1e30",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v2.attachable.json": {
+        "git_blob_sha1": "558dddbdb6f888e96d5bf32657708f4fff312790",
+        "sha256": "baf7917435cdef329d76f82b4b328ff08fd6948bbbd204267003320f1cc15b0f",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v3.attachable.json": {
+        "git_blob_sha1": "1e27b20d397029b3324c07fd6328e0b2bcc815d3",
+        "sha256": "416b985f1c1be83c564f41b34969e904fe64a259e76b8918c4b3e75ef4a87eb7",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v4.attachable.json": {
+        "git_blob_sha1": "e2083a53d1f1ac8c3fa1617b8524d448f38dc76b",
+        "sha256": "d71a8dc8e294e4a71fe982d5597e1d4cbe7e80bbef1b9f2d7f8aad4e650cc4da",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v5.attachable.json": {
+        "git_blob_sha1": "2e4cfd7d614c03c68a9aa0f084116c87b006a79e",
+        "sha256": "82b50cf4bf3e8574a46f5abc2ac841e73a91d459219691cb1453eb170adec4ce",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v6.attachable.json": {
+        "git_blob_sha1": "3cf930f7d22cb03e1af8289715d1979f1fe45ca6",
+        "sha256": "0f680658efc362e187f61e1a02bbda6947632503121e947aa4103d4d721dccaf",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r3_v7.attachable.json": {
+        "git_blob_sha1": "2080101aea915389679c89c3fa2db6490426a515",
+        "sha256": "5011b00adfe0a88bc2feabf0ed575fa0ef6173bf414f1224e7802b6c23fc623c",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v0.attachable.json": {
+        "git_blob_sha1": "9331209cebe5b8f342cc86fb325c734852e5131f",
+        "sha256": "dbd53017ddef1f9a6c7b903ef8e8e23046fa87f96ccf0db4a3d510afcb95dfe3",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v1.attachable.json": {
+        "git_blob_sha1": "bc618176172217545cd8813ae80fc812ce2f15c4",
+        "sha256": "a538ee0849057ee07844377b428aad0c066e77cbf4a8a583f052706e02753397",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v2.attachable.json": {
+        "git_blob_sha1": "8f76237255a88b2bf5d5cb6f7eae2975225cebf6",
+        "sha256": "e76e9679e6125d91e2d7306ae59f669e4402f8f472e74b10f7ad15cdb2acb5de",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v3.attachable.json": {
+        "git_blob_sha1": "cf93bee508c75d6b8d9a0013791d0f0dd0c8afa9",
+        "sha256": "96555b8e358d0002ae949e354bff71788d925643f301f997d4419a35c9046566",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v4.attachable.json": {
+        "git_blob_sha1": "01e05512043c18ba0aceabc61c56540a7e80ea24",
+        "sha256": "ea41f7ae499c61d9a37649fcb76b935b596d5bb8b271a9bcb3d8e8f906fd0042",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v5.attachable.json": {
+        "git_blob_sha1": "67a50e3ea3ec0dcaf2d4e8244daa080a642fd47a",
+        "sha256": "5ca1f08e5c4809046b0ac2fcd81461f64b82c604f4faedf6909568d15f6548a1",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v6.attachable.json": {
+        "git_blob_sha1": "f9153d34e4021545040a9080ce13e61c311d2be9",
+        "sha256": "a870d9ffd8e4a2ce3e25601b2ef9003a25109ba2916c7d99b74f5bdb30cb9e87",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r4_v7.attachable.json": {
+        "git_blob_sha1": "b5a657ae353d78195833d0b169279ed05bd4a190",
+        "sha256": "51ec3b609390345eb9bc628ad8f585eea9bc4e270ca7984316547d51fa586343",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v0.attachable.json": {
+        "git_blob_sha1": "4a5c9592f73896c67cd46c72e2894aa899891eaf",
+        "sha256": "d21392f5f8b99d53b7a69b8a06226db6791886990278222f7d5953a4432c5d47",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v1.attachable.json": {
+        "git_blob_sha1": "2b422b30a4e335da5be355e44160ecccdfe50aff",
+        "sha256": "ca60c5313c45d2906dba1da1c7ffb17e0834365b52ad4f3d62847fdd695c9ed7",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v2.attachable.json": {
+        "git_blob_sha1": "80c6b46139d76faac1c6b5cb82311ab55927f91d",
+        "sha256": "1362cca4636382cdf9d466ed428129b674080b7691d84d2b2943c0584386a6b7",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v3.attachable.json": {
+        "git_blob_sha1": "c296133df9412521686a21e5d640f70250da7f8b",
+        "sha256": "36c1a160cddbb9142bc3effc04a3044dcfa3ab4d72f6ac931698b61bb3bd1889",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v4.attachable.json": {
+        "git_blob_sha1": "de01086c3968619b046e24cb5a3cae321646f38f",
+        "sha256": "b665737680c676da177a6f213837774bd8cdb28f072e60904c421dd7feb1704a",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v5.attachable.json": {
+        "git_blob_sha1": "34be3b56a06f14c8dcc13a4be061dfa709d628e0",
+        "sha256": "50e6f1b8296209a9c5293d2f9356147f08758e857efba59e6059208b0c4396fd",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v6.attachable.json": {
+        "git_blob_sha1": "9bf24b4f405f2901b33832e1a9b5be45d7d3c78e",
+        "sha256": "a0b85da9e98642820080abab42a01ad14bc5e3349df0eb6e07057315d401a4ae",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r5_v7.attachable.json": {
+        "git_blob_sha1": "6798b8c7a2cf6fe6f986499495335386773f0468",
+        "sha256": "e6d990c7c467986b3977edfcefcb3f865ec227a0954b5d34bd66c27c99262007",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v0.attachable.json": {
+        "git_blob_sha1": "82c499374aa9a896efcdc74a22eeeca8b6e7f071",
+        "sha256": "2769a3e9ef7749fdcf379a3f179393861d9333c0d3d3621a015c310a1419e71b",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v1.attachable.json": {
+        "git_blob_sha1": "7925cbe62264db76f1d88e9f89f56044976b1c1d",
+        "sha256": "cfe5e95ec54cf3ca2123b38c7ef772cbd9771e033f7de63b2761535532ccce69",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v2.attachable.json": {
+        "git_blob_sha1": "33503fba49ce84487fd08dceb7940e548fe67f53",
+        "sha256": "4da67244cb8a1e11f92cbf3c55d07b6081fd185cf206d14261564065863da8fc",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v3.attachable.json": {
+        "git_blob_sha1": "40779d67361af4f694b412c85fb9f5c7fd693ae0",
+        "sha256": "1bb7520af32f699958de033636d30a66ef0b356437db680b496d3ba6fafbedbc",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v4.attachable.json": {
+        "git_blob_sha1": "c469caf143adc7c83a9a0468a8ad47155f697984",
+        "sha256": "2f5507b3ab2ceeaf4742fe17c049a5956e745095b40e5cf9aa4839b20f2fcbcd",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v5.attachable.json": {
+        "git_blob_sha1": "fee471a2320caf13c4996a3982ff65acfe2e9f26",
+        "sha256": "93e3c51f84c8ae3b61a4ea0716bbbac3ac9f8ab40f100d0f58572379e5054c9f",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v6.attachable.json": {
+        "git_blob_sha1": "b5112462cb4d378d4558f198f4026edb988b3ff1",
+        "sha256": "869f355c165b0f5fc275e6411861cd5f8b70436a756201916e644e1252ce390a",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r6_v7.attachable.json": {
+        "git_blob_sha1": "dab1fc5685a231d69a8d27f304f2a49d0e417b4d",
+        "sha256": "0c945c13ecdb05839080cd0658f9e50022ad45a166def9175ce69875a239d2da",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v0.attachable.json": {
+        "git_blob_sha1": "3402b07014dfa6134497cf6738072309d23b8e50",
+        "sha256": "616054447f4ca60ea33882326022d47c4a5779437d1b92203dd9ef71398ae0a2",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v1.attachable.json": {
+        "git_blob_sha1": "62ed328568ece8f56b78ab25982414f121b276ae",
+        "sha256": "39e38fe21e4db8be0d22fe2ba1c57ac3859c7b698ef845a58c284a706765469a",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v2.attachable.json": {
+        "git_blob_sha1": "fb4f37b492d8ef610bbef81c4a3d5f1fa1022979",
+        "sha256": "66a8b447eba3559f8a513b432260af282b6bb2d1d639668c1e4a49d327d94091",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v3.attachable.json": {
+        "git_blob_sha1": "f3bdeac1401821a1dec0ad03c231d21fd9d6d222",
+        "sha256": "7273c24261d95d951a1e89df40fa040102eadf5136328d6ea21e8a1fe19aec58",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v4.attachable.json": {
+        "git_blob_sha1": "6b4da39cee5fab887cce03c5c8d88cbe2e5cc0e5",
+        "sha256": "28326c4e424f83aea699cf0250d725b20eec39e89670b85716895ce8cadd9abb",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v5.attachable.json": {
+        "git_blob_sha1": "8ee19342075e8aad442acd2db7d3989e1336c150",
+        "sha256": "b5de3d270ee44bf3aa3db5b71e8c637c4dbb2169d1af41e1e5ed77c6850f1108",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v6.attachable.json": {
+        "git_blob_sha1": "b27840f63fee1cc069a8267e55033dea928e734d",
+        "sha256": "b69147d216532ed5734d900a241a7fd952fe648a34636fc5222a03644ecb44f9",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r7_v7.attachable.json": {
+        "git_blob_sha1": "ea06eb47e3a58f78b282f35026b9011f3caab0be",
+        "sha256": "f19e752d2c4f08ab91d53de6bb54e43c41824983d8836af0f5ea698463e7d62d",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v0.attachable.json": {
+        "git_blob_sha1": "4cc245bd4e007113bcca314072aeed9336b66e0a",
+        "sha256": "eb14c68c74329eba7c74aa56f5948e56b44cef39f627dd671a377f4c7f61ad6f",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v1.attachable.json": {
+        "git_blob_sha1": "b61c240f38d12ffaad1432d901b54067a9eda7ef",
+        "sha256": "ddcde40f26a9d07782eb095b90be3b80aa102707ec1e1daea5fad02f5cc3e997",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v2.attachable.json": {
+        "git_blob_sha1": "4d9094941dd2539e0f87fb6c5ab91e7254797a1b",
+        "sha256": "f5f76fc4f055e1104f4d555fa7dc02081ee4447eba13a6e0a7a15fd9e6138770",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v3.attachable.json": {
+        "git_blob_sha1": "9a73da5f16d6664ea5e74e1c3e9e1b941397bb95",
+        "sha256": "72bcf40cb9eaf95258e2222318f621130945fec3298bfe110ee4d0271e73cc32",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v4.attachable.json": {
+        "git_blob_sha1": "f839bd12f19b90ac37a536d9f12ddde35b741b55",
+        "sha256": "e4a82f676466d994c4addb34f4fcb7d246b0431257ddc38117a72ccd7f0d46e5",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v5.attachable.json": {
+        "git_blob_sha1": "ec26f7ff567d84ff6754ee3577c9faaed37b8698",
+        "sha256": "f86c71054d993fb256642f43dea2fe0edcaef46318408103c218f860c59077d3",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v6.attachable.json": {
+        "git_blob_sha1": "9931234623519c3b3f8e5b0acafa59b8c4a3e340",
+        "sha256": "772df0b8ba43b1b1bc89be56bb202c76cf204c0622fd3aeb54bd0ecc38ac4f5f",
+        "bytes": 2628
+      },
+      "projects/grilling/gameplay_core/resource_pack/attachables/special_seasoning_r8_v7.attachable.json": {
+        "git_blob_sha1": "55a17ef09f50145e482f0a543f892205bb708d6d",
+        "sha256": "cf3b113ecb0be6913448196d8792720057307a82846bf98d24cbd29d3401aef7",
+        "bytes": 2628
+      }
+    }
+  },
+  "exact_object_ids": [
+    "01e05512043c18ba0aceabc61c56540a7e80ea24",
+    "0740e647d4d0b80110158940fdab160bf5f2706b",
+    "0996f05fd63ce37098d867d14b4760dad93d2501",
+    "0b75853bee4aef59b018a09b69c7becbc81fb027",
+    "0d9be8cd26b3023c266fffc38cbf038157510d0b",
+    "0e0a93263d458378d9acdc6140a2866abce1db97",
+    "0e25745c5103d447701ac540ba8539200e9d3112",
+    "103150ff724736112cf810770b067a12f18c5583",
+    "118ae9558f2b9443eee16d41f1f610d73539886a",
+    "125e1bcef3bbda520fdb07a3f3456278e135f898",
+    "16ebbb9bef036c15165776944ee770dea6c929dd",
+    "1a18a858a1ff708c02dbde58ec81c2981b250022",
+    "1b2ddec11d233d3844e3184a42789e7e9cc3cf51",
+    "1e27b20d397029b3324c07fd6328e0b2bcc815d3",
+    "1e835404b5ebfa6ed5e11275854b89c9615eaa9f",
+    "2080101aea915389679c89c3fa2db6490426a515",
+    "22ea3e0972d83b00e09ff0c26de262889e75cda1",
+    "23d135c56cd9a7eb76172e5f5658a20f4bf9acd0",
+    "2b422b30a4e335da5be355e44160ecccdfe50aff",
+    "2e2199d2550dcd350e91e727ca9b7fc1fd305e29",
+    "2e4cfd7d614c03c68a9aa0f084116c87b006a79e",
+    "302bc86923b3ea56ad91f0fac1dd2ebeb3f1a555",
+    "33503fba49ce84487fd08dceb7940e548fe67f53",
+    "3402b07014dfa6134497cf6738072309d23b8e50",
+    "34be3b56a06f14c8dcc13a4be061dfa709d628e0",
+    "3cf930f7d22cb03e1af8289715d1979f1fe45ca6",
+    "4051837608c46ebaccdb03ef77a45482f20efb47",
+    "40779d67361af4f694b412c85fb9f5c7fd693ae0",
+    "410aff5cc43292e791824d8d8ced840de055a99b",
+    "4226bc35ebb22672f503fce19a6e924d9c14beb0",
+    "43f596462dd75c750817d1dbec0af82e11873c1d",
+    "4a5c9592f73896c67cd46c72e2894aa899891eaf",
+    "4cc245bd4e007113bcca314072aeed9336b66e0a",
+    "4d9094941dd2539e0f87fb6c5ab91e7254797a1b",
+    "50ac201d3d6a0beadb3be721de398dd4a1aa4551",
+    "545c2250b47c3f8b7a3916709d0fed7b80595d35",
+    "558dddbdb6f888e96d5bf32657708f4fff312790",
+    "55a17ef09f50145e482f0a543f892205bb708d6d",
+    "62ed328568ece8f56b78ab25982414f121b276ae",
+    "678206ebe8e5dac156a72d772a2c3a88070990e7",
+    "6798b8c7a2cf6fe6f986499495335386773f0468",
+    "67a50e3ea3ec0dcaf2d4e8244daa080a642fd47a",
+    "6a402d636e7dfb8b9a78096c53bfb34b7751639a",
+    "6b4da39cee5fab887cce03c5c8d88cbe2e5cc0e5",
+    "7925cbe62264db76f1d88e9f89f56044976b1c1d",
+    "80c6b46139d76faac1c6b5cb82311ab55927f91d",
+    "82c499374aa9a896efcdc74a22eeeca8b6e7f071",
+    "8ee19342075e8aad442acd2db7d3989e1336c150",
+    "8f76237255a88b2bf5d5cb6f7eae2975225cebf6",
+    "915a7976bf9931287a72f447d37d35db32c632e3",
+    "9331209cebe5b8f342cc86fb325c734852e5131f",
+    "9931234623519c3b3f8e5b0acafa59b8c4a3e340",
+    "9a73da5f16d6664ea5e74e1c3e9e1b941397bb95",
+    "9bf24b4f405f2901b33832e1a9b5be45d7d3c78e",
+    "9ce7f125486a83f0e139b57e263c0a90814f2d26",
+    "a3db16c6b859db90a1ef1317012692694e4d7289",
+    "a85fe807a82a79375b805bf7ace555d35b015b03",
+    "ac1161999e49b986717b7ed924f7a02ce574c4e2",
+    "b27840f63fee1cc069a8267e55033dea928e734d",
+    "b378f01daac9fa0de496afd726d045f3b41659d1",
+    "b5112462cb4d378d4558f198f4026edb988b3ff1",
+    "b5a657ae353d78195833d0b169279ed05bd4a190",
+    "b61c240f38d12ffaad1432d901b54067a9eda7ef",
+    "b645dc4fe42b9e1fac06a6f6d226d358c4834180",
+    "ba875186451b52c9ef92c3305fad51420490582c",
+    "bc618176172217545cd8813ae80fc812ce2f15c4",
+    "c296133df9412521686a21e5d640f70250da7f8b",
+    "c469caf143adc7c83a9a0468a8ad47155f697984",
+    "c46ee53eb6ff211f08d8128da7385993bbb33eec",
+    "c61b7158cd6d6eebb34bd530894da3ea460bed85",
+    "ca9a5e831f59dd6c65f75a04648477295564270d",
+    "cba67124a710f70e015ba55d306ff9f741dae9d6",
+    "cc8380a6a9cd18996d39396bdccf870cd7c0a860",
+    "cf93bee508c75d6b8d9a0013791d0f0dd0c8afa9",
+    "d746d1808348d5209aa42fd65a73876c0a025461",
+    "d7daa941c35f4373b4e18f5a1da37d98e4721a03",
+    "da7f5dac6ab2858dc6a78fb31794698651041f40",
+    "dab1fc5685a231d69a8d27f304f2a49d0e417b4d",
+    "de01086c3968619b046e24cb5a3cae321646f38f",
+    "e2083a53d1f1ac8c3fa1617b8524d448f38dc76b",
+    "e20d4d080d479fd239726478ddb9503a1520194d",
+    "e8f42e86295ea0185a2b6665bf54cdfc2011949e",
+    "e9301e8ca1217d123448e9d5174a6562de0c9ac9",
+    "ea06eb47e3a58f78b282f35026b9011f3caab0be",
+    "ec26f7ff567d84ff6754ee3577c9faaed37b8698",
+    "f3bdeac1401821a1dec0ad03c231d21fd9d6d222",
+    "f839bd12f19b90ac37a536d9f12ddde35b741b55",
+    "f9153d34e4021545040a9080ce13e61c311d2be9",
+    "f943133b3aa13dd28d48e32c10244af9fe3ddcdd",
+    "fabfcb0cf20448fa8a0a2da92bd96aee9fce8822",
+    "fb4f37b492d8ef610bbef81c4a3d5f1fa1022979",
+    "fd0cf3b13dcd48baea52b9d15301da3535e14cff",
+    "fee471a2320caf13c4996a3982ff65acfe2e9f26"
+  ]
+}

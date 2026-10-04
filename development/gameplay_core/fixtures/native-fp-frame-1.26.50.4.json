@@ -7,6 +7,12 @@
     "models/entity/player_armor.json": {
       "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/v1.26.50.4/resource_pack/models/entity/player_armor.json",
       "sha256": "f05bb7de47c09eab411e8f9778768c3110d176ca6c224a8c76c9488da353b78b"
+    },
+    "leftitem_native_skin": {
+      "client_version": "1.26.52.3",
+      "asset": "assets/skin_packs/vanilla/geometry.json",
+      "sha256": "e111c38d29b6e552ca471d20b1c74cef9afbf74e92e12efda97c28e4473953ea",
+      "note": "Numeric leftItem pivot only; no licensed skin assets redistributed"
     }
   },
   "player_bones": {
@@ -48,6 +54,14 @@
         5.0,
         22.0,
         0.0
+      ]
+    },
+    "leftitem": {
+      "parent": "leftArm",
+      "pivot": [
+        6,
+        15,
+        1
       ]
     }
   },

@@ -15,16 +15,19 @@ def build():
  props=entity['description'].setdefault('properties',{})
  props[PREFIX+'eat_profile']={'type':'int','range':[0,5],'default':0,'client_sync':True}
  props[PREFIX+'eat_hand']={'type':'int','range':[0,2],'default':0,'client_sync':True}
+ if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,58):
+  props[PREFIX+'eat_projection']={'type':'bool','default':False,'client_sync':True}
+  props[PREFIX+'eat_native_ticks']={'type':'int','range':[0,72000],'default':0,'client_sync':True}
+  props[PREFIX+'eat_elapsed_ticks']={'type':'int','range':[0,72000],'default':0,'client_sync':True}
  for hand in ['main','off']:
   for slot in range(3):props[PREFIX+'secret_'+hand+'_'+str(slot)]={'type':'int','range':[0,255],'default':0,'client_sync':True}
- from build_seasoning_held import palette_size
- count=palette_size()
- for hand in ['main','off']:
-  props[PREFIX+'bottle_'+hand+'_fill']={'type':'int','range':[0,8],'default':0,'client_sync':True}
-  for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,count*count-1],'default':0,'client_sync':True}
- for name,maximum in [('season_hand',2),('season_phase',10),('pending_hand',2)]:
-  props[PREFIX+name]={'type':'int','range':[0,maximum],'default':0,'client_sync':True}
- assert len(props)<=32,'Native player property limit exceeded'
+ if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,61):
+  for hand in ['main','off']:
+   for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,9],'default':0,'client_sync':True}
+ if (ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/seasoning_motion_runtime.js').is_file():
+  for name,maximum in [('season_hand',2),('season_phase',10),('pending_hand',2)]:
+   props[PREFIX+name]={'type':'int','range':[0,maximum],'default':0,'client_sync':True}
+ assert len(props)<=32,'Player client property limit exceeded'
  groups=entity.setdefault('component_groups',{});events=entity.setdefault('events',{})
  ids=[PREFIX+'dragon_health_'+str(i) for i in range(3)]
  for i,maximum in enumerate([20,26,30]):

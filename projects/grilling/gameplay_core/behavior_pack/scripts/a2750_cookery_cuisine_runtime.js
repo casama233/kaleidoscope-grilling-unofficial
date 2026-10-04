@@ -1,3 +1,4 @@
+import {beginSeasoningMotion} from './seasoning_motion_runtime.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
 import {interactionFeedback,interactionFailure} from './a283_interaction_feedback.js';
 import {world,system,ItemStack} from '@minecraft/server';
@@ -125,7 +126,7 @@ function applySeasoning(player,block){
   if(result.rollbackErrors)console.warn('[Grilling] seasoning rollback failed: '+result.rollbackErrors);
   interactionFailure(player,result.rollbackErrors?'§c操作失敗且回滾不完整，請查看 Content Log':'§c操作未完成，調料與鍋具狀態已回復');return true;
  }
- try{player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:.12})}catch{}
+ try{beginSeasoningMotion(player,'main');player.playAnimation('animation.kg_imm.player.season.main',{blendOutTime:0})}catch{}
  try{player.playSound('kg_imm.season',{volume:.85,pitch:1})}catch{}
  return true;
 }
