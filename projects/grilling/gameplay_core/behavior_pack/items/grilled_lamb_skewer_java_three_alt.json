@@ -1,0 +1,40 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grilled_lamb_skewer_java_three_alt"
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "kaleidoscope_grilling.display.item.grilled_lamb_skewer"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "grilled_lamb_skewer"
+        }
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:allow_off_hand": true,
+      "minecraft:hand_equipped": true,
+      "minecraft:use_modifiers": {
+        "start_using": "always",
+        "use_duration": 4.5,
+        "movement_modifier": 0.35
+      },
+      "minecraft:food": {
+        "can_always_eat": true,
+        "nutrition": 8,
+        "saturation_modifier": 0.8
+      },
+      "minecraft:use_animation": {
+        "value": "eat"
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_food",
+          "kaleidoscope_grilling:food_grilled_lamb_skewer"
+        ]
+      }
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import {canonicalFoodId,eatingItemId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
+import {FOOD_DATA as actualFoodData} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_data_lookup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -10,8 +12,8 @@ assert.ok(start>=0&&end>start);
 function fixture({id='fixed',sneak=false,full=true,allowFull=true,hot=false,action=null,cancel=false}={}){
  const calls=[];let callback;
  const p={isSneaking:sneak,getComponent:()=>({currentValue:full?20:10,effectiveMax:20})};
- const item={typeId:id,clone(){return this;}};
- vm.runInNewContext(source.slice(start,end),{world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},FOOD_DATA:{fixed:{}},SECRET_ID:'secret',PLATE_ID:'plate',grillingConfig:()=>({fullHungerEating:allowFull}),canUseSecretSkewer:()=>true,skewerAction:()=>action,scheduleSkewerAction:(_,a)=>calls.push(a),isHot:()=>hot,heldOff:()=>undefined,isFoodStack:()=>true,captureInteractionIntent:()=>({}),system:{run:f=>f()},interactionIntentStillCurrent:()=>true,mainContainer:()=>({}),compactMatchingHotFood:()=>calls.push('merge')});
+ const item={typeId:id==='secret'?'kaleidoscope_grilling:secret_skewer':id,clone(){return this;}};
+ vm.runInNewContext(source.slice(start,end),{canonicalFoodId,world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},FOOD_DATA:new Proxy({fixed:{}},{get:(target,key)=>target[key]??actualFoodData[key]}),SECRET_ID:'kaleidoscope_grilling:secret_skewer',PLATE_ID:'plate',grillingConfig:()=>({fullHungerEating:allowFull}),canUseSecretSkewer:()=>true,skewerAction:()=>action,scheduleSkewerAction:(_,a)=>calls.push(a),isHot:()=>hot,heldOff:()=>undefined,isFoodStack:()=>true,captureInteractionIntent:()=>({}),system:{run:f=>f()},interactionIntentStillCurrent:()=>true,mainContainer:()=>({}),compactMatchingHotFood:()=>calls.push('merge')});
  const e={source:p,itemStack:item,cancel};callback(e);return {e,calls};
 }
 test('crouching blocks ordinary fixed secret and plate eating',()=>{for(const id of ['fixed','secret','plate'])assert.equal(fixture({id,sneak:true}).e.cancel,true,id);});
@@ -27,3 +29,13 @@ test('thread and insertion use Java success events; oil and flip keep their own 
 
 const actionSource=source.slice(source.indexOf('function skewerAction('),source.indexOf('function secretRemainders('));
 test('actual dispatch never threads while crouching; disassembly retains priority',()=>{const ctx=vm.createContext({canDisassembleOff:p=>p.disassemble,heldMain:()=>({typeId:'food'}),threadOutcome:()=>({ok:true})});vm.runInContext(actionSource,ctx);assert.equal(ctx.skewerAction({isSneaking:true},{typeId:'food'}),null);assert.equal(ctx.skewerAction({isSneaking:true,disassemble:true},{typeId:'food'}),'disassemble');assert.equal(ctx.skewerAction({isSneaking:false},{typeId:'food'}),'thread');});
+
+
+test('actual hidden food and secret IDs retain crouch/full-hunger gates and interaction priority',()=>{
+ for(const base of ['kaleidoscope_grilling:grilled_gluten_skewer','kaleidoscope_grilling:ordinary_skewer','kaleidoscope_grilling:secret_skewer'])for(const id of [base,eatingItemId(base,true)]){
+  assert.equal(fixture({id,sneak:true}).e.cancel,true,id);
+  assert.equal(fixture({id,allowFull:false}).e.cancel,true,id);
+  assert.equal(fixture({id,allowFull:false,full:false}).e.cancel,false,id);
+  assert.deepEqual(fixture({id,sneak:true,allowFull:false,action:'disassemble'}).calls,['disassemble']);
+ }
+});

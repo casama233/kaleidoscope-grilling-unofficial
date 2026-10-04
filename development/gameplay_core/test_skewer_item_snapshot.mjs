@@ -1,3 +1,4 @@
+import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 /** Stable ItemStack API doubles, not simulated Minecraft players. */
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
@@ -31,11 +32,11 @@ test('separate damage and raw-lore contents have different ingredient identity',
 const src=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/main.js',import.meta.url),'utf8');
 function body(name){const start=src.indexOf('function '+name+'(');let end=src.indexOf('{',start)+1,n=1;for(;n;end++){if(src[end]==='{')n++;if(src[end]==='}')n--}return src.slice(start,end)}
 for(const kind of ['unmapped','invalid','nonfood','food'])test('actual smoking resolver preserves raw unless food result '+kind,()=>{
- const row={id:'test:raw',name:'Original',native:{marker:42}},ctx=vm.createContext({resolveSecretSmokedId:()=>kind==='unmapped'?null:'test:cooked',ItemStack:class{constructor(id){if(kind==='invalid')throw Error('missing');this.id=id}},ingredientSnapshot:s=>({id:s.id,edible:kind==='food',name:''})});
+ const row={id:'test:raw',name:'Original',native:{marker:42}},ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},resolveSecretSmokedId:()=>kind==='unmapped'?null:'test:cooked',ItemStack:class{constructor(id){if(kind==='invalid')throw Error('missing');this.id=id}},ingredientSnapshot:s=>({id:s.id,edible:kind==='food',name:''})});
  vm.runInContext(body('cookedIngredientRows')+';this.run=cookedIngredientRows',ctx);const out=ctx.run([row])[0];
  if(kind==='food'){assert.equal(out.id,'test:cooked');assert.equal(out.name,'');assert.equal(out.native,undefined)}else assert.equal(out,row);
 });
-test('raw rows preserve corruption instead of silently turning into empty skewers',()=>{const ctx=vm.createContext({getItemProperty:()=>'{bad'});vm.runInContext(body('readRowsFromKey')+';this.run=readRowsFromKey',ctx);assert.throws(()=>ctx.run({},'key'));});
+test('raw rows preserve corruption instead of silently turning into empty skewers',()=>{const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},getItemProperty:()=>'{bad'});vm.runInContext(body('readRowsFromKey')+';this.run=readRowsFromKey',ctx);assert.throws(()=>ctx.run({},'key'));});
 test('metadata verification happens before threading debits',()=>{const f=body('threadCurrent');assert.ok(f.indexOf('restoreIngredient(')<f.indexOf('main.write('));assert.ok(f.includes('ingredientSnapshot(food,true)'));});
 const {ingredientContentSignature}=await import('../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js');
 const {secretFood}=await import('../../projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js');

@@ -201,8 +201,14 @@ def oil_assets(controllers):
 
 def ingredient_palette():
  atlas=load(RP/'textures/item_texture.json')['texture_data'];result={}
+ profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
+ # PR124's owned duration aliases reuse the canonical Java item texture.
+ # They are not additional seasoning ingredients or Java palette identities.
+ aliases={identifier+'_java_three_alt' for identifier,profile in profiles.items() if profile=='THREE_RANDOM'}|{'kaleidoscope_grilling:secret_skewer_java_three_alt'}
  for file in sorted((BP/'items').glob('*.json')):
-  item=load(file)['minecraft:item'];icon=item.get('components',{}).get('minecraft:icon')
+  item=load(file)['minecraft:item']
+  if item['description']['identifier'] in aliases:continue
+  icon=item.get('components',{}).get('minecraft:icon')
   key=icon if isinstance(icon,str) else (icon or {}).get('texture',(icon or {}).get('textures',{}).get('default'))
   paths=atlas.get(key,{}).get('textures');path=paths[0] if isinstance(paths,list) else paths
   if not isinstance(path,str):continue

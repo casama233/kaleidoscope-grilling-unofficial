@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 import {FIXED_INGREDIENT_TAGS} from './java_ingredient_tags.js';
 import {SECRET_ID,recipeTable,secretFood,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY} from './a24_skewering_core.js';
 
@@ -15,7 +16,7 @@ const RECORDABLE=new Set(RECIPES.map(x=>x.id));
 // Re-evaluate the cached display/ranking fields without reconstructing native
 // stacks, so this remains safe during beforeEvents and legacy plate reads.
 export function refreshPlateFood(row){
- if(row?.id!==SECRET_ID)return row;
+ if(canonicalFoodId(row?.id)!==SECRET_ID)return row;
  if(row.native&&(row.native.version!==1||row.native.id!==row.id))return row;
  const props=row.native?.props??row.props??{};
  try{
@@ -74,7 +75,7 @@ export function plateEatHighest(rows){
 }
 
 export function isRecordableRecipe(id,ingredientCount=0){
- return RECORDABLE.has(String(id??''))||(id===SECRET_ID&&Number(ingredientCount)===3);
+ return RECORDABLE.has(String(canonicalFoodId(id)??''))||(canonicalFoodId(id)===SECRET_ID&&Number(ingredientCount)===3);
 }
 
 export function recipeForResult(id){
@@ -86,7 +87,7 @@ export function makeBookRecord(resultId,customIngredients=[]){
  const id=String(resultId??'');
  const custom=(Array.isArray(customIngredients)?customIngredients:[]).map(String).filter(Boolean).slice(0,3);
  if(!isRecordableRecipe(id,custom.length))return null;
- return {resultId:id,customIngredients:id===SECRET_ID?custom:[]};
+ return {resultId:canonicalFoodId(id),customIngredients:canonicalFoodId(id)===SECRET_ID?custom:[]};
 }
 
 export function bookIngredientSlots(record){

@@ -29,7 +29,10 @@ class HandAnchorTests(unittest.TestCase):
             self.assertEqual(shaft['origin'],[-.25,24.75,-8])
             self.assertEqual(shaft['size'],[.5,.5,12.5])
         self.assertEqual(len(seen),150)
-        self.assertEqual(refs,seen)
+        pieces={g['description']['identifier'] for p in (RP/'models/entity/java_eating_piece').glob('*.geo.json') for g in load(p)['minecraft:geometry']}
+        if (RP/'render_controllers/java_eating_piece.render_controllers.json').exists():
+            self.assertEqual(pieces,{'geometry.kg_java_dual.piece.grilled_fish_skewer','geometry.kg_java_dual.piece.grilled_ender_pearl_skewer'})
+        self.assertEqual(refs,seen|pieces)
     def test_secret_ingredients_share_the_existing_grip_and_stable_two_sided_faces(self):
         geometries=load(RP/'models/entity/secret_held.geo.json')['minecraft:geometry']
         refs=set(load(RP/'attachables/secret_skewer.attachable.json')['minecraft:attachable']['description']['geometry'].values())

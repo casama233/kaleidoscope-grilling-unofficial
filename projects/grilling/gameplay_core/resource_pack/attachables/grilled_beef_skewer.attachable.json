@@ -27,10 +27,10 @@
         ],
         "animate": [
           {
-            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand') == 0"
+            "fp_right": "c.is_first_person == 1 && c.item_slot == 'main_hand' && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:grilled_beef_skewer')) == 0"
           },
           {
-            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand') == 0"
+            "fp_left": "c.is_first_person == 1 && c.item_slot == 'off_hand' && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:grilled_beef_skewer')) == 0"
           },
           {
             "tp_right": "c.is_first_person == 0 && c.item_slot == 'main_hand'"
@@ -39,16 +39,16 @@
             "tp_left": "c.is_first_person == 0 && c.item_slot == 'off_hand'"
           },
           {
-            "eat_right": "(c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand') && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand') == 0"
+            "eat_right": "(c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand') && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:grilled_beef_skewer')) == 0"
           },
           {
-            "eat_left": "(c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand') && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand') == 0"
+            "eat_left": "(c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand') && (c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:grilled_beef_skewer')) == 0"
           },
           {
-            "fp_eat_right": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand'"
+            "fp_eat_right": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && c.item_slot == 'main_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 1 && q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:grilled_beef_skewer')"
           },
           {
-            "fp_eat_left": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand'"
+            "fp_eat_left": "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_projection') == 1 && q.is_sneaking == 0 && q.is_swimming == 0 && q.is_gliding == 0 && q.is_riding == 0 && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && c.item_slot == 'off_hand' && q.property('kaleidoscope_grilling:eat_profile') == 5 && q.property('kaleidoscope_grilling:eat_hand') == 2 && q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:grilled_beef_skewer')"
           }
         ]
       },

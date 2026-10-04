@@ -1,6 +1,8 @@
-## Current maintained baseline: 2.8.61
+## Current maintained baseline: 2.8.62
 
-本候選修正調味瓶取回後手持內容不可見，以及第三人稱烤串錯套第一人稱位移的問題；仍須完成原生客戶端回歸，詳見 [2.8.61 範圍](docs/STATUS-A2.8.61.md)。完整 Java 一致性尚未驗收。
+**2.8.62 為未 freeze 的開發整合候選**：整合正式 main 2.8.55 與後續進食／調味瓶來源，指南同步為 0.3.25。`native_acceptance=false`、`client=false`、`production_ready=false`；完整候選尚未完成原生驗收、正式 release/history gate、發版或部署。現有 frozen tree hashes 與 draft release-history 保留，與正式 main 的 2.8.52–2.8.55 歷史衝突須於 freeze 前協調。詳見 [2.8.62 開發狀態](docs/STATUS-A2.8.62.md)。
+
+前候選修正調味瓶取回後手持內容不可見，以及第三人稱烤串錯套第一人稱位移的問題；仍須完成原生客戶端回歸，詳見 [2.8.61 範圍](docs/STATUS-A2.8.61.md)。完整 Java 一致性尚未驗收。
 
 本候選修正自然生成花椒樹只有木頭的問題，改用與樹苗共用的 Java 樹形生成計畫，並保護區塊邊界及障礙物。原生 BDS 64 棵與 1,048 項斷言通過；詳見 [2.8.60 範圍](docs/STATUS-A2.8.60.md)。不會盲目補葉到玩家放置的木頭上。
 

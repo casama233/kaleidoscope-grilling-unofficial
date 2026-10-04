@@ -1,3 +1,4 @@
+import {canonicalFoodId} from './eating_profile_ids.js';
 // Versioned, fail-closed projection of metadata exposed by the stable ItemStack API.
 // This is not a serializer for inaccessible Java NBT or other packs' private data.
 import {getItemProperty,getItemPropertyIds,setItemProperty,getItemRawLore,setItemLore} from './itemDataCore.js';
@@ -58,9 +59,9 @@ export function restoreSkewerMetadata(data,createStack,enchantmentType){
 // Legacy rows have no native envelope; normalize defaults so upgrade alone does
 // not remove Java's repeated-ingredient penalty from otherwise identical food.
 export function ingredientContentSignature(row){
- if(!row?.native&&!('name' in (row??{}))&&!('lore' in (row??{}))&&!('props' in (row??{})))return String(row?.signature??row?.id??'');
+ if(!row?.native&&!('name' in (row??{}))&&!('lore' in (row??{}))&&!('props' in (row??{})))return String(canonicalFoodId(row?.signature??row?.id??''));
  const n=row.native??{};
- return metadataSignature({id:row.id,name:n.name??row.name??'',
+ return metadataSignature({id:canonicalFoodId(row.id),name:n.name??row.name??'',
   rawLore:(n.rawLore??row.lore??[]).map(x=>typeof x==='string'?{text:x}:x),props:n.props??row.props??{},
   damage:n.damage??0,enchantments:n.enchantments??[],keepOnDeath:n.keepOnDeath??false,
   lockMode:n.lockMode??'none',canDestroy:n.canDestroy??[],canPlaceOn:n.canPlaceOn??[]});

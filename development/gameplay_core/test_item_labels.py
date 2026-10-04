@@ -3,6 +3,9 @@ from pathlib import Path
 import json
 import subprocess
 from copy import deepcopy
+import re
+PROFILE_SOURCE=json.loads(re.search(r"PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)",subprocess.check_output(["git","show","d795c0e:projects/grilling/gameplay_core/behavior_pack/scripts/data.js"],cwd=Path(__file__).resolve().parents[2]).decode()).group(1))
+RANDOM_ITEMS={k.split(":")[1] for k,v in PROFILE_SOURCE.items() if v=="THREE_RANDOM"}|{"secret_skewer"}
 from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,6 +30,12 @@ def language(data):
 
 def current_behavior_expectation(before, kind, stem, version):
     expected = deepcopy(before)
+    if version >= (2, 8, 62) and kind == 'item' and stem in RANDOM_ITEMS:
+        c=expected['minecraft:item']['components']
+        c['minecraft:use_modifiers']['use_duration']=5.0
+        tags=c.setdefault('minecraft:tags',{'tags':[]})['tags']
+        tag='kaleidoscope_grilling:food_'+stem
+        if tag not in tags:tags.append(tag)
     if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
         expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
     return expected
@@ -40,6 +49,13 @@ def main():
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            if kind == 'item' and path.stem.endswith('_java_three_alt'):
+                assert version >= (2, 8, 62) and path.stem.removesuffix('_java_three_alt') in RANDOM_ITEMS
+                alt=json.loads(path.read_bytes())['minecraft:item']
+                base=json.loads(path.with_name(path.name.replace('_java_three_alt','')).read_bytes())['minecraft:item']
+                assert alt['components']['minecraft:display_name']==base['components']['minecraft:display_name'],path
+                assert 'menu_category' not in alt['description'],path
+                continue
             if path.name == 'pepper_worldgen_seed.json':
                 assert folder == 'blocks' and version >= (2, 8, 60)
                 seed = json.loads(path.read_bytes())['minecraft:block']

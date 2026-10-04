@@ -1,3 +1,4 @@
+import {canonicalFoodId,eatingItemId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 /** Production functions and storage/event doubles; not native player evidence. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -22,7 +23,7 @@ function fixture({flips=3,lit=false,stacks=[skewer(),skewer(),skewer()]}={}){
  const rows=stacks.map(x=>x?.clone()),sounds=[],notices=[],animations=[],writes=[];
  const container={getItem:i=>rows[i]?.clone(),setItem(i,s){rows[i]=s?.clone();writes.push(i);if(fail?.slot===i){if(!fail.permanent)fail=undefined;throw Error('slot write after mutation')}}};
  const player={playAnimation:()=>animations.push('animation')},block={isValid:true,typeId:'fixture:grill'};
- const ctx=vm.createContext({...logic,SECRET_ID,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SKEWER_INGREDIENTS_KEY,GRILL_ID:'fixture:grill',COOKERY_FILLED:'fixture:oil',OIL_TOOLS:{},FOOD_DATA:{},RAW_TO_COOKED:{},MYSTERIOUS_ID:'fixture:mystery',ItemStack:Stack,slotWrite,commitSteps,resolveSecretSmokedId,secretFood,
+ const ctx=vm.createContext({canonicalFoodId,...logic,SECRET_ID,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SKEWER_INGREDIENTS_KEY,GRILL_ID:'fixture:grill',COOKERY_FILLED:'fixture:oil',OIL_TOOLS:{},FOOD_DATA:{},RAW_TO_COOKED:{},MYSTERIOUS_ID:'fixture:mystery',ItemStack:Stack,slotWrite,commitSteps,resolveSecretSmokedId,secretFood,
   getItemProperty:(s,k)=>s.props[k],setItemProperty(s,k,v){s.props[k]=v;if(k===SECRET_COOKED_INGREDIENTS_KEY&&++metadataWrites===failMetadata)throw Error('metadata write after mutation')},
   ingredientSnapshot:s=>({id:s.typeId,nutrition:6,saturation:.6,edible:s.typeId!=='minecraft:stone',tags:[],native:{version:1,id:s.typeId,name:s.nameTag,damage:s.damage,props:structuredClone(s.props)}}),
   copyOne:s=>{const next=s.clone();next.amount=1;return next},setHot:s=>s.props.hot=true,setSeasonings:(s,a)=>s.props.seasonings=[...a],refreshHotLore:s=>s,
@@ -34,7 +35,7 @@ function fixture({flips=3,lit=false,stacks=[skewer(),skewer(),skewer()]}={}){
  const names=['readRowsFromKey','readSkewerRows','validSecretIngredientRows','isSecretCooked','readEffectiveSkewerRows','cookedIngredientRows','setCookedIngredientRows','dynamicFood','cookedStack','handleGrill'];
  if(source.includes('function commitGrillFlip('))names.push('commitGrillFlip');
  vm.runInContext(names.map(n=>fn(source,n)).join('\n'),ctx);
- return {ctx,rows,sounds,notices,animations,writes,block,player,get state(){return state},get metadataWrites(){return metadataWrites},get quarantined(){return quarantined},run:()=>ctx.handleGrill(block,player),failSlot(slot,permanent=false){fail={slot,permanent}},failState(){failState=true},failMetadata(n=1){failMetadata=n},get cached(){return rows.map(s=>s?.props[SECRET_COOKED_INGREDIENTS_KEY])},cooked:s=>ctx.cookedStack(s,state),visual(s,prefer){const shown=[];const v={reader:ctx.readEffectiveSkewerRows,restore:r=>Object.assign(new Stack(r.id),structuredClone(r.native??{})),resolveSecretSmokedId,ItemStack:Stack,pose:(_b,x,y,z)=>({x,y,z}),render:(_r,_b,_k,item)=>shown.push(item?.typeId)};vm.runInNewContext(fn(visual,'composed'),v);v.composed({},block,'grill/0',s,{dx:0,y:0,dz:0},prefer,new Set());return shown}};
+ return {ctx,rows,sounds,notices,animations,writes,block,player,get state(){return state},get metadataWrites(){return metadataWrites},get quarantined(){return quarantined},run:()=>ctx.handleGrill(block,player),failSlot(slot,permanent=false){fail={slot,permanent}},failState(){failState=true},failMetadata(n=1){failMetadata=n},get cached(){return rows.map(s=>s?.props[SECRET_COOKED_INGREDIENTS_KEY])},cooked:s=>ctx.cookedStack(s,state),visual(s,prefer){const shown=[];const v={canonicalFoodId,reader:ctx.readEffectiveSkewerRows,restore:r=>Object.assign(new Stack(r.id),structuredClone(r.native??{})),resolveSecretSmokedId,ItemStack:Stack,pose:(_b,x,y,z)=>({x,y,z}),render:(_r,_b,_k,item)=>shown.push(item?.typeId)};vm.runInNewContext(fn(visual,'composed'),v);v.composed({},block,'grill/0',s,{dx:0,y:0,dz:0},prefer,new Set());return shown}};
 }
 test('first three flips never create the cooked ingredient cache',()=>{for(const flips of [0,1,2]){const f=fixture({flips});f.run();assert.equal(f.state.flips,flips+1);assert.equal(f.metadataWrites,0);assert(f.cached.every(x=>x===undefined));}});
 test('fourth flip snapshots all secret slots even while unlit, without finishing the item',()=>{
@@ -69,3 +70,19 @@ test('malformed raw native identity refuses snapshot preparation',()=>{const row
 test('invalid newly generated cooked snapshot refuses preparation',()=>{const f=fixture();f.ctx.ingredientSnapshot=()=>({id:'fixture:bad',edible:true,native:{version:2,id:'fixture:bad'}});f.run();assert.equal(f.state.phase,1);assert.equal(f.writes.length,0);assert.equal(f.sounds.length,0);});
 
 test('valid cooked cache cannot hide malformed raw identity at fourth flip',()=>{const rows=rawRows();rows[0].id='not-an-item';const s=skewer(rows),cache=JSON.stringify([{id:'fixture:a'},{id:'fixture:b'},{id:'fixture:c'}]);s.props[SECRET_COOKED_INGREDIENTS_KEY]=cache;const f=fixture({stacks:[s]});f.run();assert.equal(f.state.phase,1);assert.equal(f.writes.length,0);assert.equal(f.rows[0].props[SECRET_COOKED_INGREDIENTS_KEY],cache);assert.equal(f.sounds.length,0);});
+
+
+test('actual alternate secret freezes all fourth-flip slots and retains native ID and metadata through cooking',()=>{
+ const original=skewer(),alternate=skewer();alternate.typeId=eatingItemId(SECRET_ID,true);alternate.amount=2;
+ alternate.props.foreign=JSON.stringify({marker:'unchanged'});alternate.damage=7;alternate.keepOnDeath=true;alternate.lockMode='slot';alternate.destroy=['minecraft:stone'];alternate.place=['minecraft:dirt'];
+ const f=fixture({stacks:[alternate,original,undefined]}),before=f.rows.map(s=>s?.clone());
+ f.run();assert.equal(f.state.phase,2);assert.equal(f.metadataWrites,2);assert.deepEqual(f.writes,[0,1]);
+ for(const index of [0,1]){
+  const stored=f.rows[index],cache=stored.props[SECRET_COOKED_INGREDIENTS_KEY];assert.equal(JSON.parse(cache)[0].id,'minecraft:cooked_beef');
+  const unchanged=stored.clone();delete unchanged.props[SECRET_COOKED_INGREDIENTS_KEY];assert.deepEqual(unchanged,before[index]);
+  const out=f.cooked(stored);assert.equal(out.typeId,before[index].typeId);assert.equal(out.amount,1);assert.equal(out.props[SECRET_COOKED_INGREDIENTS_KEY],cache);assert.equal(out.props[SECRET_COOKED_KEY],true);
+  for(const key of ['nameTag','lore','damage','keepOnDeath','lockMode','destroy','place'])assert.deepEqual(out[key],before[index][key]);
+  assert.equal(out.props.foreign,before[index].props.foreign);assert.equal(out.props[SKEWER_INGREDIENTS_KEY],before[index].props[SKEWER_INGREDIENTS_KEY]);
+ }
+ assert.equal(f.rows[2],undefined);
+});
