@@ -54,6 +54,10 @@ def texture(doc,key):
 
 def png(image):
  stream=io.BytesIO();image.save(stream,format='PNG',compress_level=9);return stream.getvalue()
+def geometry_bank(geometries):
+ # Keep generated palette variants one per line; the source generator and
+ # immutable baseline still check the exact exported bytes.
+ return ('{\n  "format_version": "1.16.0",\n  "minecraft:geometry": [\n'+',\n'.join('    '+json.dumps(g,ensure_ascii=False,separators=(',',':')) for g in geometries)+'\n  ]\n}\n').encode()
 def geo(identifier,cubes,width=32,height=32):
  return {'description':{'identifier':identifier,'texture_width':width,'texture_height':height,
   'visible_bounds_width':3,'visible_bounds_height':2,'visible_bounds_offset':[0,.5,0]},
@@ -100,6 +104,16 @@ def entity(identifier,properties):
    'minecraft:collision_box':{'width':0,'height':0},'minecraft:pushable':{'is_pushable':False,'is_pushable_by_piston':False},
    'minecraft:damage_sensor':{'triggers':[{'cause':'all','deals_damage':'no'}]},'minecraft:fire_immune':{}}}}
 
+def bake_palette_geometry(original,identifier,tile,count):
+ result=deepcopy(original)
+ description=result['description'];width=description['texture_width'];height=description['texture_height']
+ description.update(identifier=identifier,texture_width=width*TINT_COLUMNS,texture_height=height*((count+TINT_COLUMNS-1)//TINT_COLUMNS))
+ offset=[(tile%TINT_COLUMNS)*width,(tile//TINT_COLUMNS)*height]
+ for bone in result['bones']:
+  for cube in bone.get('cubes',[]):
+   for face in cube['uv'].values():face['uv']=[face['uv'][axis]+offset[axis] for axis in range(2)]
+ return result
+
 def pending_assets(controllers,description,geometries):
  doc=model('kaleidoscope_grilling:item/pending_seasoning')
  choices=[r for r in doc.get('overrides',[]) if r.get('predicate',{}).get(NS+'seasoning_fill')==1]
@@ -123,12 +137,19 @@ def pending_assets(controllers,description,geometries):
   out(RP/('textures/a2770_placed/'+key+'.png'),png(tiled))
   prop="q.property('"+NS+'color_'+str(tint)+"')"
   rc='controller.render.kg_a2770.'+key
-  controllers[rc]={'geometry':'Geometry.'+key,'materials':[{'*':'Material.layers'}],
-   'textures':['Texture.'+key],'uv_anim':{'scale':[1/TINT_COLUMNS,1/rows],'offset':[f'math.mod({prop},{TINT_COLUMNS})/{TINT_COLUMNS}',f'math.floor({prop}/{TINT_COLUMNS})/{rows}']}}
+  aliases=[]
+  for tile in range(len(TINT_VALUES)):
+   alias=key+'_c'+str(tile);variant=identifier+'_c'+str(tile)
+   description['geometry'][alias]=variant;aliases.append('Geometry.'+alias)
+   geometries.append(bake_palette_geometry(g,variant,tile,len(TINT_VALUES)))
+  array='Array.'+key+'_colors'
+  controllers[rc]={'arrays':{'geometries':{array:aliases}},
+   'geometry':f'{array}[math.clamp({prop},0,{len(TINT_VALUES)-1})]','materials':[{'*':'Material.layers'}],
+   'textures':['Texture.'+key]}
   description['render_controllers'].append({rc:"q.property('"+NS+"ready') && q.property('"+NS+"mode') == 1 && q.property('"+NS+"fill') > "+str(tint//2)})
 
 def seasoning_assets(controllers):
- desc={'identifier':NS+'placed_seasoning_visual','materials':{'default':'entity_alphatest','layers':'kg_seasoning_atlas'},
+ desc={'identifier':NS+'placed_seasoning_visual','materials':{'default':'entity_alphatest','layers':'entity_alphatest_one_sided'},
   'textures':{},'geometry':{},'render_controllers':[]}
  geometries=[];aliases=[]
  for r in range(1,9):
@@ -155,7 +176,7 @@ def seasoning_assets(controllers):
   'textures':[f'Array.colors[{variant}]']}
  desc['render_controllers'].append({rc:"q.property('"+NS+"ready') && q.property('"+NS+"mode') == 2"})
  pending_assets(controllers,desc,geometries)
- out(RP/'models/entity/a2770_placed/seasoning.geo.json',{'format_version':'1.16.0','minecraft:geometry':geometries})
+ out(RP/'models/entity/a2770_placed/seasoning.geo.json',geometry_bank(geometries))
  out(RP/'entity/a2770_placed_seasoning.entity.json',{'format_version':'1.10.0','minecraft:client_entity':{'description':desc}})
  properties={'mode':[0,2],'fill':[0,8],'variant':[0,7],**{f'color_{n}':[0,len(TINT_VALUES)-1] for n in range(16)}}
  out(BP/'entities/a2770_placed_seasoning.json',entity(desc['identifier'],properties))
@@ -228,12 +249,11 @@ def build():
  palette=ingredient_palette()
  TINT_VALUES=sorted({0xB86B45,0xE0A56A,*[color for pair in palette.values() for color in pair]})
  controllers={};count=seasoning_assets(controllers);oil_assets(controllers)
- out(RP/'materials/entity.material',{'materials':{'version':'1.0.0','kg_seasoning_atlas:entity_alphatest_one_sided':{'+defines':['USE_UV_ANIM']}}})
  out(RP/'render_controllers/a2770_placed.render_controllers.json',{'format_version':'1.8.0','render_controllers':controllers})
  out(BP/'scripts/a2770_placed_visual_data.js',('export const INGREDIENT_COLORS=Object.freeze('+json.dumps(palette,ensure_ascii=False,sort_keys=True)+');\nexport const PLACED_TINT_INDEX=Object.freeze('+json.dumps({rgb:i for i,rgb in enumerate(TINT_VALUES)},sort_keys=True)+');\n').encode())
  source_index={'grilling_commit':JAVA,'cookery_model_blob':COOKERY_MODEL,'sources':SOURCES,
   'pending_palette_method':'Java center-half top-two colors; all eight accepted ingredients covered, native sprites hash-pinned to Mojang',
-  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked color atlas with UV-enabled owned material and uv_anim','seasoning_geometry_count':count,
+  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked per-color geometry UVs with native material','seasoning_geometry_count':count,
   'oil_overlay_inflate_model_units':[.01,.02]}
  out(VENDOR/'sources.json',source_index)
  return source_index
