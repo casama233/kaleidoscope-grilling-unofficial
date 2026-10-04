@@ -98,7 +98,7 @@ def entity(identifier,properties):
   'components':{'minecraft:type_family':{'family':['kg_render_helper']},'minecraft:transient':{},
    'minecraft:physics':{'has_gravity':False,'has_collision':False},
    'minecraft:collision_box':{'width':0,'height':0},'minecraft:pushable':{'is_pushable':False,'is_pushable_by_piston':False},
-   'minecraft:damage_sensor':{'triggers':[{'cause':'all','deals_damage':False}]},'minecraft:fire_immune':{}}}}
+   'minecraft:damage_sensor':{'triggers':[{'cause':'all','deals_damage':'no'}]},'minecraft:fire_immune':{}}}}
 
 def pending_assets(controllers,description,geometries):
  doc=model('kaleidoscope_grilling:item/pending_seasoning')
