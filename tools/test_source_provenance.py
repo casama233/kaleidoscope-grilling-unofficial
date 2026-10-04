@@ -7,7 +7,7 @@ class SelectedSourceProvenanceTests(unittest.TestCase):
   for name in ('g66-selected-source.pack','g66-selected-source.json'):shutil.copy2(ROOT/'tools/fixtures'/name,r/'tools/fixtures'/name)
   return r
  def test_selected_original_blobs_import_exactly_without_refs(self):
-  r=self.fixture();result=ensure_provenance(r);self.assertEqual(result['commits'],1);self.assertEqual(result['objects'],12);self.assertFalse(result['refs_changed']);self.assertEqual(subprocess.run(['git','-C',str(r),'show-ref'],capture_output=True).stdout,b'');self.assertEqual(ensure_provenance(r),result)
+  r=self.fixture();result=ensure_provenance(r);self.assertEqual(result['commits'],2);self.assertEqual(result['objects'],93);self.assertFalse(result['refs_changed']);self.assertEqual(subprocess.run(['git','-C',str(r),'show-ref'],capture_output=True).stdout,b'');self.assertEqual(ensure_provenance(r),result)
  def test_changed_pack_rejected_before_import(self):
   r=self.fixture();p=r/'tools/fixtures/g66-selected-source.pack';p.write_bytes(p.read_bytes()+b'X')
   with self.assertRaisesRegex(AssertionError,'Corrupt'):ensure_provenance(r)

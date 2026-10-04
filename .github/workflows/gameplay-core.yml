@@ -62,7 +62,7 @@ jobs:
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
           git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
-          # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
+          # recorded by complete audited historical-source ref inventory. The tree is
           # read straight from the fetched commit, then those commits are fetched
           # too, so a shallow clone still resolves every baseline.
           git checkout --detach "$EXPECTED_SHA"
@@ -70,7 +70,7 @@ jobs:
           # Connector snapshots retain selected original source SHA guards via
           # a checksum-pinned pack. This imports evidence without changing refs.
           python tools/source_provenance.py
-          BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          BASELINES=$(python tools/historical_source_refs.py list)
           # Batch exact missing source pins so only one fetch updates .git/shallow.
           missing=()
           for baseline in $BASELINES; do
@@ -81,9 +81,7 @@ jobs:
           if ((${#missing[@]})); then
             git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
           fi
-          for baseline in $BASELINES; do
-            git cat-file -e "$baseline^{commit}"
-          done
+          python tools/historical_source_refs.py verify
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -101,6 +99,7 @@ jobs:
         run: |
           set -euo pipefail
           python tools/test_source_provenance.py
+          python tools/test_historical_source_refs.py
           python development/gameplay_core/test_verify_current.py
           python development/gameplay_core/test_package_current.py
           python development/gameplay_core/test_publish_test_release.py
@@ -145,7 +144,7 @@ jobs:
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
           git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
-          # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
+          # recorded by complete audited historical-source ref inventory. The tree is
           # read straight from the fetched commit, then those commits are fetched
           # too, so a shallow clone still resolves every baseline.
           git checkout --detach "$EXPECTED_SHA"
@@ -153,7 +152,7 @@ jobs:
           # Connector snapshots retain selected original source SHA guards via
           # a checksum-pinned pack. This imports evidence without changing refs.
           python tools/source_provenance.py
-          BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          BASELINES=$(python tools/historical_source_refs.py list)
           # Batch exact missing source pins so only one fetch updates .git/shallow.
           missing=()
           for baseline in $BASELINES; do
@@ -164,9 +163,7 @@ jobs:
           if ((${#missing[@]})); then
             git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
           fi
-          for baseline in $BASELINES; do
-            git cat-file -e "$baseline^{commit}"
-          done
+          python tools/historical_source_refs.py verify
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -185,6 +182,8 @@ jobs:
         shell: pwsh
         run: |
           python tools/test_source_provenance.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_historical_source_refs.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python development/gameplay_core/test_verify_current.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
