@@ -172,5 +172,8 @@
     "vanilla_fortress_callback_installed": false,
     "native_furnace_output_callback_installed": false,
     "client_accepted": false
-  }
+  },
+  "historical_snapshot": true,
+  "superseded_for_current_review_by": "JAVA-PARITY-AUDIT-20261005.md",
+  "current_review_receipt": "evidence/java-parity-audit-20261005.json"
 }
