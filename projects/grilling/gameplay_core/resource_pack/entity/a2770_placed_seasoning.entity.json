@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:placed_seasoning_visual",
       "materials": {
-        "default": "entity_alphatest"
+        "default": "entity_alphatest",
+        "layers": "kg_seasoning_atlas"
       },
       "textures": {
         "default": "textures/blocks/seasoning_bottle",

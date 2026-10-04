@@ -5,7 +5,7 @@
       "identifier": "kaleidoscope_grilling:pending_seasoning",
       "materials": {
         "default": "entity_alphablend",
-        "contents": "entity_alphatest_one_sided"
+        "contents": "kg_seasoning_atlas"
       },
       "textures": {
         "default": "textures/blocks/seasoning_bottle",

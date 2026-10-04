@@ -74,7 +74,7 @@
       "geometry": "Geometry.pending_0",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -95,7 +95,7 @@
       "geometry": "Geometry.pending_1",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -116,7 +116,7 @@
       "geometry": "Geometry.pending_2",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -137,7 +137,7 @@
       "geometry": "Geometry.pending_3",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -158,7 +158,7 @@
       "geometry": "Geometry.pending_4",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -179,7 +179,7 @@
       "geometry": "Geometry.pending_5",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -200,7 +200,7 @@
       "geometry": "Geometry.pending_6",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -221,7 +221,7 @@
       "geometry": "Geometry.pending_7",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -242,7 +242,7 @@
       "geometry": "Geometry.pending_8",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -263,7 +263,7 @@
       "geometry": "Geometry.pending_9",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -284,7 +284,7 @@
       "geometry": "Geometry.pending_10",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -305,7 +305,7 @@
       "geometry": "Geometry.pending_11",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -326,7 +326,7 @@
       "geometry": "Geometry.pending_12",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -347,7 +347,7 @@
       "geometry": "Geometry.pending_13",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -368,7 +368,7 @@
       "geometry": "Geometry.pending_14",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [
@@ -389,7 +389,7 @@
       "geometry": "Geometry.pending_15",
       "materials": [
         {
-          "*": "Material.default"
+          "*": "Material.layers"
         }
       ],
       "textures": [

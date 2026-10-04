@@ -15,7 +15,7 @@
   "pending_palette_method": "Java center-half top-two colors; all eight accepted ingredients covered, native sprites hash-pinned to Mojang",
   "pending_live_resource_pack_sampling": false,
   "pending_palette_tiles": 177,
-  "pending_tint_mode": "baked color atlas with standard uv_anim",
+  "pending_tint_mode": "baked color atlas with UV-enabled owned material and uv_anim",
   "seasoning_geometry_count": 56,
   "oil_overlay_inflate_model_units": [
     0.01,
