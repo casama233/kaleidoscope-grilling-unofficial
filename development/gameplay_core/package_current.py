@@ -35,7 +35,7 @@ def sha256(path: Path) -> str:
 def tree_hash(roots: list[tuple[str, Path]]) -> str:
     h = hashlib.sha256()
     for prefix, root in roots:
-        for path in sorted(p for p in root.rglob("*") if p.is_file() and not p.name.startswith(".")):
+        for path in sorted((p for p in root.rglob("*") if p.is_file() and not p.name.startswith(".")), key=lambda p: p.relative_to(root).parts):
             rel = f"{prefix}/{path.relative_to(root).as_posix()}"
             h.update(rel.encode("utf-8"))
             h.update(b"\0")
@@ -66,7 +66,7 @@ def make_zip(path: Path, roots: list[tuple[str, Path]], *, exclude_project_build
     path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(path, "w") as z:
         for prefix, root in roots:
-            for source in sorted(p for p in root.rglob("*") if p.is_file()):
+            for source in sorted((p for p in root.rglob("*") if p.is_file()), key=lambda p: p.relative_to(root).parts):
                 rel = source.relative_to(root)
                 if source.name.startswith("."):
                     continue

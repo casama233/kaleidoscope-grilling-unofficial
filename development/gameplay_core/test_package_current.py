@@ -1,7 +1,7 @@
 """ZIP bytes must retain the frozen Linux host metadata on Windows CI."""
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -35,6 +35,27 @@ class PackageDeterminismTests(unittest.TestCase):
                 self.assertEqual(entry.external_attr, 0o100644 << 16)
                 self.assertEqual(entry.date_time, pack.ZIP_TIME)
                 self.assertEqual(handle.read(entry), source.read_bytes())
+
+    def test_case_sensitive_component_order_survives_windows_path_comparison(self):
+        class WindowsComparisonPath(type(Path())):
+            def __lt__(self, other):
+                return PureWindowsPath(self) < PureWindowsPath(other)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / 'source'
+            names = ('A.txt', 'a/child.txt', 'a-b.txt', 'z.txt')
+            for name in names:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(name.encode('utf-8') + b'\n')
+            native = Path(temporary) / 'native.zip'
+            windows = Path(temporary) / 'windows.zip'
+            pack.make_zip(native, [('fixture', root)])
+            pack.make_zip(windows, [('fixture', WindowsComparisonPath(root))])
+            self.assertEqual(windows.read_bytes(), native.read_bytes())
+            with zipfile.ZipFile(windows) as handle:
+                self.assertEqual(handle.namelist(), ['fixture/' + name for name in names])
+            self.assertEqual(pack.tree_hash([('fixture', root)]),
+                             pack.tree_hash([('fixture', WindowsComparisonPath(root))]))
 
     @unittest.skipUnless(json.loads((pack.BP / "manifest.json").read_text())["header"]["version"] == [2, 8, 66], "Frozen hash regression only applies to G66")
     def test_frozen_archives_regenerate_exactly_without_mutating_artifacts(self):
