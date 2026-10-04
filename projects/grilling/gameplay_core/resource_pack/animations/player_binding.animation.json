@@ -87935,7 +87935,7 @@
           }
         }
       },
-      "blend_weight": "!variable.is_first_person"
+      "blend_weight": "!variable.is_first_person && q.property('kaleidoscope_grilling:season_hand') == 1 && q.property('kaleidoscope_grilling:season_phase') != 0"
     },
     "animation.kg_imm.player.season.off": {
       "animation_length": 0.5,
@@ -88439,7 +88439,7 @@
           }
         }
       },
-      "blend_weight": "!variable.is_first_person"
+      "blend_weight": "!variable.is_first_person && q.property('kaleidoscope_grilling:season_hand') == 2 && q.property('kaleidoscope_grilling:season_phase') != 0"
     },
     "animation.kg_imm.player.reach.main": {
       "animation_length": 0.91666,

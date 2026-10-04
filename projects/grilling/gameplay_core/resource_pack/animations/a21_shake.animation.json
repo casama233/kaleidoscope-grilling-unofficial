@@ -114,7 +114,7 @@
           }
         }
       },
-      "blend_weight": "!variable.is_first_person"
+      "blend_weight": "!variable.is_first_person && q.is_using_item && q.property('kaleidoscope_grilling:pending_hand') == 1"
     },
     "animation.kg_a21.player.shake.off": {
       "animation_length": 4.0,
@@ -229,7 +229,7 @@
           }
         }
       },
-      "blend_weight": "!variable.is_first_person"
+      "blend_weight": "!variable.is_first_person && q.is_using_item && q.property('kaleidoscope_grilling:pending_hand') == 2"
     }
   }
 }

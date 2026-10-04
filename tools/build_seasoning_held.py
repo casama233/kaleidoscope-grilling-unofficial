@@ -81,6 +81,7 @@ def build():
   pending=identifier==NS+'pending_seasoning';ids,selectors=dispatch(pending)
   a['animations']=ids;a['scripts']['animate']=[{k:v} for k,v in selectors.items()]
   if identifier in [NS+'empty_seasoning_bottle',NS+'pending_seasoning']:
+   a['materials']['contents']='entity_alphatest_one_sided'
    a['geometry'].pop('contents',None)
    a['render_controllers']=['controller.render.kg_a2733.seasoning_bottle_hand']
    for tint in range(16):
@@ -95,7 +96,10 @@ def build():
   original=load(ROOT/'development/gameplay_core/fixtures/seasoning-arm-clips-2.8.55.json')[name]
   for key,seed in original.items():
    a=deepcopy(seed);d['animations'][key]=a
-   a.pop('override_previous_animation',None);a['blend_weight']='!variable.is_first_person'
+   a.pop('override_previous_animation',None)
+   code=2 if key.endswith('.off') else 1
+   if name=='player_binding.animation.json':a['blend_weight']=f"!variable.is_first_person && q.property('{NS}season_hand') == {code} && q.property('{NS}season_phase') != 0"
+   else:a['blend_weight']=f"!variable.is_first_person && q.is_using_item && q.property('{NS}pending_hand') == {code}"
    if name=='player_binding.animation.json':
     a['animation_length']=.5
     for bone in a['bones'].values():
