@@ -36,8 +36,9 @@ export function prepareProducedFood(stack,{kind='cuisine',hotTicks=0,seasoning=[
  if(!Number.isSafeInteger(now)||now<0||!['cuisine','furnace','smoker'].includes(kind)||!Number.isInteger(hotTicks)||hotTicks<0||hotTicks>1728000)throw Error('production schema');
  if(!stack?.getComponent('minecraft:food')&&!VANILLA_FOOD_NUTRITION[stack?.typeId])throw Error('output is not edible');
  const old=readPublicFood(stack);if(old.present&&!old.valid)throw Error('food metadata unreadable');
- const duration=kind==='cuisine'?hotTicks:config.enableSmeltedFoodHeat===true?(config.smeltedFoodSeconds??30)*20:0;
- const meta=normalizePublicFood({v:1,hotUntil:duration?now+duration:old.state?.hotUntil??0,seasoning,nativeVariant:nativeVariant??old.state?.nativeVariant});
+ const cuisineDisabled=kind==='cuisine'&&config.enableCookeryFoodHeatAndSeasoning===false;
+ const duration=kind==='cuisine'?(cuisineDisabled?0:hotTicks):config.enableSmeltedFoodHeat===true?(config.smeltedFoodSeconds??30)*20:0;
+ const meta=normalizePublicFood({v:1,hotUntil:duration?now+duration:old.state?.hotUntil??0,seasoning:cuisineDisabled?(old.state?.seasoning??[]):seasoning,nativeVariant:nativeVariant??old.state?.nativeVariant});
  if(!meta)throw Error('production metadata');
  const output=stack.clone();writePublicFood(output,meta);if(projection)writePublicProjection(output,projection);return output;
 }

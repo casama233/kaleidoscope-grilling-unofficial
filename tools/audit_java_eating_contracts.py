@@ -25,6 +25,13 @@ def audit():
         item = read(path)['minecraft:item']
         identifier = item['description']['identifier']
         suffix = '_java_three_alt'
+        if identifier.endswith('_native_plain'):
+            canonical=identifier.removesuffix('_native_plain')
+            assert canonical in profiles or canonical=='kaleidoscope_grilling:secret_skewer'
+            assert item['components']['minecraft:use_modifiers']['use_duration']==1.25
+            assert item['components']['minecraft:use_animation']=={'value':'eat'}
+            rows.append({'item':identifier,'canonical_food_id':canonical,'requested':'VANILLA','native_ticks':25,'resolved_profile':'VANILLA','projection_admitted':False,'resolved_piece':None})
+            continue
         canonical = identifier.removesuffix(suffix)
         if canonical not in profiles and canonical != 'kaleidoscope_grilling:secret_skewer':
             continue

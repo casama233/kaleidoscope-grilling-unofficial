@@ -22,8 +22,8 @@ def check_facts(s):
     covered=0
     for path in (GAME/'items').glob('*.json'):
         item=load(path)['minecraft:item'];iid=item['description']['identifier']
-        if iid.endswith('_java_three_alt'):
-            base=iid.removesuffix('_java_three_alt')
+        if iid.endswith(('_java_three_alt','_native_plain')):
+            base=iid.removesuffix('_java_three_alt').removesuffix('_native_plain')
             require(base in owner and 'menu_category' not in item['description'],'Internal eating variant leaked '+iid)
             original=load(GAME/'items'/(base.split(':')[-1]+'.json'))['minecraft:item']
             require(item['components']['minecraft:food']==original['components']['minecraft:food'],'Variant food fact drift '+iid)

@@ -38,7 +38,13 @@ class ItemIcons(unittest.TestCase):
     self.assertEqual(set(reviewed),{'projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js'})
     if name in reviewed:
      row=reviewed[name];self.assertEqual(expected,row['before_sha256'])
-     self.assertEqual(row['after_sha256'],hashlib.sha256(data).hexdigest(),name)
+     after=row['after_sha256']
+     if tuple(read(BP/'manifest.json')['header']['version']) >= (2,8,67):
+      current=read(Path(__file__).parent/'fixtures/pepper-growth-2.8.67.json')['changes']
+      self.assertEqual(set(current),set(reviewed))
+      self.assertEqual(after,current[name]['before_sha256'])
+      after=current[name]['after_sha256']
+     self.assertEqual(after,hashlib.sha256(data).hexdigest(),name)
      data=gzip.decompress(base64.b64decode(row['before_gzip_base64']))
    # Inventory attribution changes only this string. Keep the original hash
    # for every geometry, growth hook and remaining block definition byte.

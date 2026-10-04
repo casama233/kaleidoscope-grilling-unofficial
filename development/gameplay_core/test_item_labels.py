@@ -5,6 +5,7 @@ import subprocess
 from copy import deepcopy
 import re
 PROFILE_SOURCE=json.loads(re.search(r"PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)",subprocess.check_output(["git","show","d795c0e:projects/grilling/gameplay_core/behavior_pack/scripts/data.js"],cwd=Path(__file__).resolve().parents[2]).decode()).group(1))
+ALL_EATING_ITEMS={k.split(':')[1] for k in PROFILE_SOURCE}|{'secret_skewer'}
 RANDOM_ITEMS={k.split(":")[1] for k,v in PROFILE_SOURCE.items() if v=="THREE_RANDOM"}|{"secret_skewer"}
 from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
@@ -36,6 +37,10 @@ def current_behavior_expectation(before, kind, stem, version):
         tags=c.setdefault('minecraft:tags',{'tags':[]})['tags']
         tag='kaleidoscope_grilling:food_'+stem
         if tag not in tags:tags.append(tag)
+    if version >= (2, 8, 67) and kind == 'item' and stem in ALL_EATING_ITEMS:
+        tags=expected['minecraft:item']['components'].setdefault('minecraft:tags',{'tags':[]})['tags']
+        tag='kaleidoscope_grilling:food_'+stem
+        if tag not in tags:tags.append(tag)
     if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
         expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
     return expected
@@ -49,6 +54,15 @@ def main():
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            if kind == 'item' and path.stem.endswith('_native_plain'):
+                assert version >= (2,8,67) and path.stem.removesuffix('_native_plain') in ALL_EATING_ITEMS
+                plain=json.loads(path.read_bytes())['minecraft:item']
+                expected=json.loads(path.with_name(path.name.replace('_native_plain','')).read_bytes())['minecraft:item']
+                expected['description']['identifier']+='_native_plain';expected['description'].pop('menu_category',None)
+                expected['components']['minecraft:use_modifiers']['use_duration']=1.25
+                expected['components']['minecraft:use_animation']={'value':'eat'}
+                assert plain==expected,path
+                continue
             if kind == 'item' and path.stem.endswith('_java_three_alt'):
                 assert version >= (2, 8, 62) and path.stem.removesuffix('_java_three_alt') in RANDOM_ITEMS
                 alt=json.loads(path.read_bytes())['minecraft:item']
@@ -102,7 +116,8 @@ def main():
         old = language(prior(path))
         current = language(path.read_bytes())
         assert all(current.get(k) == v for k, v in old.items()), 'Plain names/guide text changed'
-        assert set(current) - set(old) == set(aliases) | public_keys, 'Unexpected localization override'
+        config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
+        assert set(current) - set(old) == set(aliases) | public_keys | config_keys, 'Unexpected localization override'
         assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'
         released = language(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
         assert set(released) - set(old) == set(aliases), 'Historical label-only release drift'

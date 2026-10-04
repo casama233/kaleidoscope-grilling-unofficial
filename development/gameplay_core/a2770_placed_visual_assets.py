@@ -229,6 +229,7 @@ def ingredient_palette():
  # PR124's owned duration aliases reuse the canonical Java item texture.
  # They are not additional seasoning ingredients or Java palette identities.
  aliases={identifier+'_java_three_alt' for identifier,profile in profiles.items() if profile=='THREE_RANDOM'}|{'kaleidoscope_grilling:secret_skewer_java_three_alt'}
+ aliases|={identifier+'_native_plain' for identifier in {*profiles,'kaleidoscope_grilling:secret_skewer'}}
  for file in sorted((BP/'items').glob('*.json')):
   item=load(file)['minecraft:item']
   if item['description']['identifier'] in aliases:continue

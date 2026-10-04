@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {canonicalFoodId,eatingItemId,RANDOM_EATING_IDS,isAlternateEatingId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
+import {canonicalFoodId,eatingItemId,RANDOM_EATING_IDS,isAlternateEatingId,SKEWER_EATING_IDS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
 import {eatingIdentity} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_eating_transaction.js';
 import {configureItemDataWorld,setItemLore,setItemProperty} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/itemDataCore.js';
@@ -28,7 +28,7 @@ function serving(id){
 function fixture({main,off,random=.9,failure}={}){
  const state={main:main?.clone(),off:off?.clone()},writes=[],player={id:'prepared-holder',selectedSlotIndex:3};let draws=0,reject=failure;
  const math=Object.create(Math);math.random=()=>{draws++;return random};
- const ctx=vm.createContext({Math:math,ItemStack:Stack,EnchantmentType,canonicalFoodId,eatingItemId,RANDOM_EATING_IDS,isAlternateEatingId,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,eatingIdentity,
+ const ctx=vm.createContext({Math:math,ItemStack:Stack,EnchantmentType,canonicalFoodId,eatingItemId,RANDOM_EATING_IDS,isAlternateEatingId,SKEWER_EATING_IDS,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,eatingIdentity,
   getHand:(_player,hand)=>state[hand]?.clone(),setHand:(_player,hand,stack)=>{writes.push(hand);state[hand]=stack?.clone();if(reject==='throw'){reject=undefined;throw Error('injected write failure')}if(reject==='silent'){reject=undefined;state[hand].nameTag='lost metadata'}}});
  vm.runInContext(source.replace(/^import .*;\s*$/gm,'').replace(/\bexport /g,'')+'\nthis.api={prepareEatingItems,forgetEatingItem,selectedEatingProfile,copyEatingVariant};',ctx);
  return {api:ctx.api,state,writes,player,get draws(){return draws}};
@@ -63,4 +63,13 @@ for(const hand of ['main','off'])test(`preparation rechecks a changed serving wh
  f.state[hand].amount--;f.api.prepareEatingItems(f.player,false);assert.equal(f.draws,2);assert.equal(f.state[hand].amount,16);
  f.player.selectedSlotIndex++;f.api.prepareEatingItems(f.player,false);assert.equal(f.draws,hand==='main'?3:2);
  f.state[hand]=serving('minecraft:apple');f.api.prepareEatingItems(f.player,false);assert.equal(f.state[hand].typeId,'minecraft:apple');assert.equal(f.state[hand].amount,17);
+});
+for(const base of SKEWER_EATING_IDS)for(const hand of ['main','off'])test(`animation-off 25-tick variant preserves serving and returns to authored mode: ${base} ${hand}`,()=>{
+ const original=serving(base),f=fixture({[hand]:original}),expected={...captureSkewerMetadata(original),id:eatingItemId(base,false,false)};
+ f.api.prepareEatingItems(f.player,false,false);assert.equal(f.state[hand].typeId,expected.id);
+ assert.equal(metadataSignature(captureSkewerMetadata(f.state[hand])),metadataSignature(expected));assert.equal(f.state[hand].amount,17);
+ const writes=f.writes.length;f.api.prepareEatingItems(f.player,false,false);assert.equal(f.writes.length,writes);
+ f.api.prepareEatingItems(f.player,true,true);assert.equal(f.state[hand].typeId,expected.id);
+ f.api.prepareEatingItems(f.player,false,true);assert.equal(canonicalFoodId(f.state[hand].typeId),base);assert.notEqual(f.state[hand].typeId,expected.id);
+ assert.equal(metadataSignature(captureSkewerMetadata(f.state[hand])),metadataSignature({...expected,id:f.state[hand].typeId}));
 });

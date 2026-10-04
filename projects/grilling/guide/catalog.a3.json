@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.30",
-  "revision": "kg-guide-a3-2866",
+  "version": "0.3.31",
+  "revision": "kg-guide-a3-2867",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",
@@ -2032,19 +2032,22 @@
           "取得：主手持烤串，潜行对桌子或实心方块的顶面使用，可放成烤串盘；回收时保留盘内内容。",
           "烤串盘最多保存 5 串；拿烤串对盘使用可放入，空手使用会取回最后放入的一串。",
           "直接食用装有多串的盘子时，会优先吃掉盘中基础饱食值最高的一串。",
-          "有内容的盘子可以潜行放置；打掉或收回时会保留盘内烤串数据。"
+          "有内容的盘子可以潜行放置；打掉或收回时会保留盘内烤串数据。",
+          "桌面餐盘优先可由服务器设置关闭；关闭时，潜行手持烤串使用厨房桌子，会保留厨房原有的展示操作。"
         ],
         "zh_TW": [
           "取得：主手持烤串，潛行對桌子或實心方塊的頂面使用，可放成烤串盤；回收時保留盤內內容。",
           "烤串盤最多保存 5 串；拿烤串對盤使用可放入，空手使用會取回最後放入的一串。",
           "直接食用裝有多串的盤子時，會優先吃掉盤中基礎飽食值最高的一串。",
-          "有內容的盤子可以潛行放置；打掉或收回時會保留盤內烤串資料。"
+          "有內容的盤子可以潛行放置；打掉或收回時會保留盤內烤串資料。",
+          "桌面餐盤優先可由伺服器設定關閉；關閉時，潛行手持烤串使用廚房桌子，會保留廚房原有的展示操作。"
         ],
         "en_US": [
           "Acquisition: sneak-use a main-hand skewer on the top of a table or solid block to place a skewer plate. Recovering the plate preserves its contents.",
           "A Skewer Plate stores up to 5 skewers. Use a skewer on it to add one; use an empty hand to remove the most recently inserted skewer.",
           "Eating from a plate with several skewers consumes the one with the highest base nutrition first.",
-          "A non-empty plate can be sneak-placed, and its stored skewer data is preserved when carried again."
+          "A non-empty plate can be sneak-placed, and its stored skewer data is preserved when carried again.",
+          "The server can disable plate priority on Cookery tables. Sneak-using a held skewer then keeps Cookery’s original table display interaction."
         ]
       },
       "kinds": [
@@ -2285,7 +2288,8 @@
           "对烧烤架撒料时，每根架上烤串消耗 1 次；剩余次数不足时不会部分提交。",
           "搭配：红石提供速度，火药提供力量，折耳根粉延时；不死图腾粉与龙蛋粉提供特殊效果。各材料的数量门槛见其同名条目。",
           "把一瓶调料单独放入合成格，可清空内容并取回空瓶；包含待摇瓶与已用过的完成调料。",
-          "空瓶合成：上排中央放木按钮，中排与下排各放三块玻璃；支持 Java 1.21.1 的全部十一种木按钮。"
+          "空瓶合成：上排中央放木按钮，中排与下排各放三块玻璃；支持 Java 1.21.1 的全部十一种木按钮。",
+          "厨房料理的热食与调料联动可由服务器关闭。关闭后，炒锅与炖锅的新成品不再附加热度或调料；尝试撒料会提示已关闭，瓶子不会扣次数。烤炉的调料功能不受此设置影响。"
         ],
         "zh_TW": [
           "放置空調料瓶後，對最上層瓶子加入材料；每瓶最多記錄 8 份材料，世界中最多可疊放 4 瓶。",
@@ -2294,7 +2298,8 @@
           "對燒烤架撒料時，每根架上烤串消耗 1 次；剩餘次數不足時不會部分提交。",
           "搭配：紅石提供速度，火藥提供力量，折耳根粉延時；不死圖騰粉與龍蛋粉提供特殊效果。各材料的數量門檻見其同名條目。",
           "把一瓶調料單獨放入合成格，可清空內容並取回空瓶；包含待搖瓶與已用過的完成調料。",
-          "空瓶合成：上排中央放木按鈕，中排與下排各放三塊玻璃；支援 Java 1.21.1 的全部十一種木按鈕。"
+          "空瓶合成：上排中央放木按鈕，中排與下排各放三塊玻璃；支援 Java 1.21.1 的全部十一種木按鈕。",
+          "廚房料理的熱食與調料聯動可由伺服器關閉。關閉後，炒鍋與燉鍋的新成品不再附加熱度或調料；嘗試撒料會提示已關閉，瓶子不會扣次數。烤爐的調料功能不受此設定影響。"
         ],
         "en_US": [
           "Place an Empty Seasoning Bottle and add ingredients to the top bottle. Each bottle stores up to 8 ingredients, and up to 4 bottles can be stacked in the world.",
@@ -2303,7 +2308,8 @@
           "Seasoning a grill costs 1 use per skewer currently on the grill; insufficient remaining uses do not partially commit.",
           "Mixing: Redstone grants Speed, Gunpowder grants Strength, and Houttuynia Powder extends effects. Totem and Dragon Egg Powders add special effects; see their material entries for thresholds.",
           "Place one seasoning bottle alone in a crafting grid to discard its contents and recover an empty bottle. Pending and partially used bottles are supported.",
-          "Empty bottle: one wooden button centered above two full rows of glass. All eleven Java 1.21.1 wooden button variants are supported."
+          "Empty bottle: one wooden button centered above two full rows of glass. All eleven Java 1.21.1 wooden button variants are supported.",
+          "The server can disable hot-food and seasoning integration for Cookery dishes. New pot and stockpot outputs then receive no added heat or seasoning. Seasoning attempts show a disabled message without using the bottle. Grill seasoning is unchanged."
         ]
       },
       "kinds": [
@@ -2849,7 +2855,8 @@
           "调味完成后空手取出；潜行空手可连续取出。烧烤阶段不能跳过。",
           "约 40 秒没有推进当前阶段，烤串会进入过熟状态；过熟串仍可空手取出，得到黑暗烧烤。",
           "过熟后继续加热约 20 秒，架上内容会彻底烧成木炭。",
-          "如果暂时不想继续，先用铲子熄火；熄火时计时不会推进。 中途破坏：未刷油返生串；正常完成返熟串；过熟返黑暗烧烤；其它已刷油中间阶段返谜之烧烤。"
+          "如果暂时不想继续，先用铲子熄火；熄火时计时不会推进。 中途破坏：未刷油返生串；正常完成返熟串；过熟返黑暗烧烤；其它已刷油中间阶段返谜之烧烤。",
+          "服务器可选择原版食用模式：关闭独立进食动画后，烤串以 1.25 秒完成原生食用，不播放专属音效与进度条；松开取消不会额外扣串。"
         ],
         "zh_TW": [
           "最短流程：打火石點火 → 放入 1–3 根生串 → 用裝油的 Cookery 油壺刷油。",
@@ -2858,7 +2865,8 @@
           "調味完成後空手取出；潛行空手可連續取出。燒烤階段不能跳過。",
           "約 40 秒沒有推進目前階段，烤串會進入過熟狀態；過熟串仍可空手取出，得到黑暗燒烤。",
           "過熟後繼續加熱約 20 秒，架上內容會徹底燒成木炭。",
-          "如果暫時不想繼續，先用鏟子熄火；熄火時計時不會推進。 中途破壞：未刷油返生串；正常完成返熟串；過熟返黑暗燒烤；其它已刷油中間階段返謎之燒烤。"
+          "如果暫時不想繼續，先用鏟子熄火；熄火時計時不會推進。 中途破壞：未刷油返生串；正常完成返熟串；過熟返黑暗燒烤；其它已刷油中間階段返謎之燒烤。",
+          "伺服器可選擇原版食用模式：關閉獨立進食動畫後，烤串以 1.25 秒完成原生食用，不播放專屬音效與進度條；放開取消不會額外扣串。"
         ],
         "en_US": [
           "Shortest flow: light with Flint and Steel → insert 1–3 raw skewers → brush with a filled Cookery Oil Pot.",
@@ -2867,7 +2875,8 @@
           "After seasoning, use an empty hand to extract; sneak with an empty hand to extract repeatedly. Grill stages cannot be skipped.",
           "If a stage is not advanced for about 40 seconds, the skewers become overcooked; they can still be extracted as Dark Grilling.",
           "Keep an overcooked batch heating for about 20 more seconds and it burns into charcoal.",
-          "If you need to stop, extinguish the grill with a shovel. Timers do not advance while it is unlit. Breaking mid-process: unoiled returns raw skewers; completed returns cooked; overcooked returns Dark Grilling; other oiled intermediate stages return Mysterious Skewers."
+          "If you need to stop, extinguish the grill with a shovel. Timers do not advance while it is unlit. Breaking mid-process: unoiled returns raw skewers; completed returns cooked; overcooked returns Dark Grilling; other oiled intermediate stages return Mysterious Skewers.",
+          "The server can select vanilla eating mode. With custom eating animations disabled, skewers use a 1.25-second native use action without the custom sounds or progress bar. Releasing a cancelled use adds no extra item debit."
         ]
       },
       "kinds": [

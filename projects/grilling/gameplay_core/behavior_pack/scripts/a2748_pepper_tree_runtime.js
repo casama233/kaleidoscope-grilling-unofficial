@@ -95,7 +95,8 @@ function leafPermutation(hasPepper=false,persistent=false){
 function logPermutation(){
  return BlockPermutation.resolve(PEPPER_LOG_ID,{'minecraft:block_face':'up'});
 }
-export function placePepperTree(sapling){
+export function placePepperTree(sapling,outcome={}){
+ outcome.status="blocked";
  const h=pepperTreeHeight(Math.random()),d=sapling.dimension,o=sapling.location;
  if(!isDirt(at(d,o,0,-1,0)))return false;
  for(let y=0;y<h+3;y++)if(!isReplaceable(at(d,o,0,y,0),y===0))return false;
@@ -110,12 +111,14 @@ export function placePepperTree(sapling){
   const block=at(d,o,p.x,p.y,p.z);if(!block)return false;
   if(block.typeId==='minecraft:air')writes.push({block,before:block.permutation,after:leafPermutation(p.hasPepper,false)});
  }
- const committed=[];
+ const committed=[];outcome.status="deferred";
  try{
   for(const entry of writes){committed.push(entry);entry.block.setPermutation(entry.after);}
-  return true;
+  outcome.status="grown";return true;
  }catch{
-  for(const entry of committed.reverse())try{entry.block.setPermutation(entry.before)}catch{}
+  let rollbackFailures=0;
+  for(const entry of committed.reverse())try{entry.block.setPermutation(entry.before)}catch{rollbackFailures++}
+  if(rollbackFailures){outcome.status="fault";console.warn("[Grilling pepper tree] rollback failed for "+rollbackFailures+" blocks");}
   return false;
  }
 }
@@ -128,8 +131,10 @@ export function growPepperWorldgenSeed(seed){
  // unavailable. Its local block tick retries; never scan or regrow player logs.
  for(let x=-1;x<=1;x++)for(let y=-1;y<=5;y++)for(let z=-1;z<=1;z++)
   if(!at(d,o,x,y,z))return 'deferred';
- if(placePepperTree(seed))return 'grown';
- return discard();
+ const outcome={};if(placePepperTree(seed,outcome))return 'grown';
+ // A rejected native write is retryable after successful rollback; do not
+ // discard generation provenance as though the site were obstructed.
+ return outcome.status==='blocked'?discard():outcome.status;
 }
 function advanceSapling(block){
  const stage=Number(state(block,SAPLING_STAGE_STATE,0))||0;

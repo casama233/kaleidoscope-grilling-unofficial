@@ -25,7 +25,8 @@ const displays=createGrillDisplayController({
 });
 /** Called by the existing native grill tick, including restored/command blocks. */
 export function tickGrillDisplay(block){
- const key=grillVisualKey(block);displays.touch(key,system.currentTick);
+ // Updates already refresh seen every five ticks, below the eight-tick expiry.
+ // Avoid native location/identity reads on the four intervening ticks.
  if(system.currentTick%5!==0)return;
  syncGrillDisplay(block,audience());
 }

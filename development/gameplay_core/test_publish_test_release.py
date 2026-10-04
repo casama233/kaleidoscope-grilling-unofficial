@@ -8,12 +8,16 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import patch
 
 import publish_test_release as publish
 import package_current
 import verify_current
+
+# Final public G66 tree; later runtime versions must never be repackaged as G66.
+SOURCE_BASE = '1517ce1b21b25701df0e1b94bf8c4657b99ad096'
 
 
 class RequestTests(unittest.TestCase):
@@ -24,13 +28,23 @@ class RequestTests(unittest.TestCase):
         cls.cache = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls.cache.cleanup)
         cls.cached = Path(cls.cache.name)
+        historical = cls.cached / 'source'
+        historical.mkdir()
+        archive = subprocess.check_output(['git', 'archive', '--format=tar', SOURCE_BASE,
+                                          'projects/grilling/gameplay_core'], cwd=publish.ROOT)
+        with tarfile.open(fileobj=io.BytesIO(archive), mode='r:') as frozen:
+            frozen.extractall(historical, filter='data')
+        project = historical / 'projects/grilling/gameplay_core'
+        bp, rp = project / 'behavior_pack', project / 'resource_pack'
+        for side in (bp, rp):
+            assert json.loads((side / 'manifest.json').read_text())['header']['version'] == [2, 8, 66]
         request = json.loads((publish.ROOT / publish.REQUEST).read_text())
         cls.fixture_report = {'schema': 1, 'version': publish.G66, 'git_sha': 'a' * 40,
                               'source_tree_sha256': request['expected_source_tree_sha256'],
                               'minecraft_tested': False, 'bds_tested': False, 'client_visuals_tested': False}
         for key, roots, excluded in (
-            ('mcaddon', [('behavior_pack', package_current.BP), ('resource_pack', package_current.RP)], False),
-            ('brproject', [('', package_current.PROJECT)], True),
+            ('mcaddon', [('behavior_pack', bp), ('resource_pack', rp)], False),
+            ('brproject', [('', project)], True),
         ):
             expected = request['expected_artifacts'][key]
             path = cls.cached / expected['name']
