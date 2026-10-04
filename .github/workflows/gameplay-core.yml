@@ -2,7 +2,7 @@ name: Grilling Gameplay Core — Canonical
 
 on:
   push:
-    branches: [main]
+    branches: [main, release/g66-historical-recovery-20261004-v2]
     paths:
       - '.github/workflows/gameplay-core*.yml'
       - '.github/g66-test-release-request.json'
@@ -240,8 +240,8 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           overwrite: true
-      - name: Publish tested main as prerelease
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      - name: Publish exact tested source as prerelease
+        if: (github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) || (github.ref == 'refs/heads/release/g66-historical-recovery-20261004-v2' && github.event_name == 'push')
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}

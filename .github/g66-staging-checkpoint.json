@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "repository": "casama233/kaleidoscope-grilling-unofficial",
+  "repository_id": 1377218440,
+  "release_id": 403153035,
+  "original_tag": "A2.8.66-test",
+  "target_sha": "15439bb80b74254a33fa98e823b2f2809ef07523",
+  "original_name": "Kaleidoscope Grilling A2.8.66 Integrated Test",
+  "checkpoint_tag": "A2.8.66-test-staging-15439bb",
+  "checkpoint_name": "Kaleidoscope Grilling A2.8.66 UNPUBLISHED staging checkpoint 15439bb",
+  "assets": {
+    "BDS-G66-T98-L63-20261004.json": {
+      "id": 610385170,
+      "bytes": 1368,
+      "sha256": "1cb588eff909debd8df53e8c87e7f5b210574cd4a9d983a881716230eb13da6d"
+    },
+    "build-report.json": {
+      "id": 610385147,
+      "bytes": 777,
+      "sha256": "23fb9b9684f637f7ae66fb305388ee616f7c4cb41f22cc8205c2be55d5521c80"
+    },
+    "G66-SOURCE-PROVENANCE-20261004.json": {
+      "id": 610385178,
+      "bytes": 1501,
+      "sha256": "2df5a8e6434a1c82f175371d78ecb1ecf931d654a982de8c5ae8f0c1d6f4b56e"
+    },
+    "g66-test-release-request.json": {
+      "id": 610385189,
+      "bytes": 1704,
+      "sha256": "4b2b2c7f2aecfac89f8095b6a9f940fa2168c1c293d947c8f21889d868897c93"
+    },
+    "grilling-source-validation.json": {
+      "id": 610385192,
+      "bytes": 296,
+      "sha256": "7d3c452c31550b4aadcfe08f3aa79cadd71298095226fa8cc12e2b7f6d112539"
+    },
+    "Kaleidoscope_Grilling_A2.8.66_Review.brproject": {
+      "id": 610385138,
+      "bytes": 3663737,
+      "sha256": "b005188194dba24e3ebe0a5fbdd5a2fc9641ea41ffb817d9d6f25b217bf9a01f"
+    },
+    "Kaleidoscope_Grilling_A2.8.66_Review.mcaddon": {
+      "id": 610385144,
+      "bytes": 3356990,
+      "sha256": "95030437902beccc885d922f14069b19126337ddb80c98c0f743f087c1353b41"
+    },
+    "local-test-release-2.8.66.json": {
+      "id": 610385185,
+      "bytes": 926,
+      "sha256": "125edacba42d6611052dbe04f7217c6ecf94fbae0a130b81836685f711672d94"
+    },
+    "NATIVE-SECRET-6504-20261004.json": {
+      "id": 610385167,
+      "bytes": 3049,
+      "sha256": "990b7745a307faecbc83ae2f90f18399e7913a946799683baffa6ccce71cd726"
+    },
+    "RELEASE-ASSET-SHA256SUMS.txt": {
+      "id": 610385199,
+      "bytes": 1144,
+      "sha256": "050f31cb394ff4b566d1f9a08c9f743bb08ba4a39341f7ec0d231ec933b91887"
+    },
+    "release-notes.md": {
+      "id": 610385193,
+      "bytes": 3750,
+      "sha256": "3da35499f3d54ef1c895ce0cf6e4c9b7a68497633e2ca5b1257f1e51e18e67b2"
+    },
+    "SHA256SUMS.txt": {
+      "id": 610385143,
+      "bytes": 224,
+      "sha256": "10fffbd53c552e613c1c00d597ead8b7580fb1120166674abc9400e6fc0ea716"
+    },
+    "STATUS-A2.8.66.md": {
+      "id": 610385145,
+      "bytes": 1632,
+      "sha256": "f37ea3fd300b034aa1bca8a0aa3c9c49111485bf7c410f9265e072a06451005d"
+    }
+  },
+  "body_sha256": "3da35499f3d54ef1c895ce0cf6e4c9b7a68497633e2ca5b1257f1e51e18e67b2"
+}
