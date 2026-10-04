@@ -11,6 +11,7 @@ import {nativeDragonHealth,forgetDragonHealth} from './dragon_native_health.js';
 import {finishedFoodMeta} from './food_finish_core.js';
 import {eatingProfile,EAT_PROFILE_PROPERTY,EAT_HAND_PROPERTY} from './player_presentation_core.js';
 import {configureSecretHeldReader,syncSecretHeld} from './secret_held_runtime.js';
+import {beginSeasoningMotion,syncSeasoningHeld} from './seasoning_held_runtime.js';
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
 import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
@@ -498,7 +499,7 @@ function handleGrill(block,player,hand='main'){
   if(result.ok){
    if(!commitGrillAndHand(block,state,result.state,player,hand,bottle.before,bottle.next,bottle.mutate)){interactionFailure(player,'§c撒料交易失敗，調料與烤架已嘗試回滾');return}
    javaInteractionFeedback(player,'grill_ready_to_take',[],true);blockSound(block,'season',.85);
-   try{player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}
+   try{beginSeasoningMotion(player,hand);player.playAnimation('animation.kg_imm.player.season.'+hand,{blendOutTime:.12})}catch{}
   }return;
  }
  if(id&&(Object.hasOwn(RAW_TO_COOKED,id)||isCompatRawSkewer(ingredientSnapshot(held))||(id===SECRET_ID&&!isSecretCooked(held)&&readSkewerRows(held).length===3))){
@@ -820,6 +821,7 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  if(id===PENDING_SEASONING){const hand=captureInteractionIntent(e.source,e.itemStack).hand;
   stopSoundHandle(PENDING_USES.get(e.source.id)?.audio);
   PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:useSound(e.source,'shake_seasoning',.8)});
+  try{syncSeasoningHeld(e.source,PENDING_USES.get(e.source.id))}catch(error){console.warn('[Grilling seasoning hand] '+error)}
   try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{blendOutTime:.08})}catch{}return}
  if(id===PLATE_ID){
   const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0)return;
@@ -967,6 +969,7 @@ function tickGrill(block){
 function tundraFactor(id){if(id==='minecraft:blue_ice')return 1.1055;if(['minecraft:ice','minecraft:packed_ice','minecraft:frosted_ice'].includes(id))return 1.11;return 1.3}
 system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
+  try{syncSeasoningHeld(p,PENDING_USES.get(p.id))}catch(error){if(system.currentTick%20===0)console.warn('[Grilling seasoning hand] '+error)}
   const active=ACTIVE_EATS.get(p.id);
   try{prepareEatingItems(p,!!active)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}
   if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){if(!active.audioStarted&&(active.audioAttempts??0)<3&&system.currentTick%5===0)startEatingSound(p,active);advanceBites(p,active);grillingConfig().graphicalEatingHud&&showJavaEatingHud(p,active,system.currentTick)} // Presentation never debits food.

@@ -209,6 +209,18 @@ def ingredient_palette():
   if len(top)==1:
    rgb=top[0];top.append((int(((rgb>>16)&255)*.78)<<16)|(int(((rgb>>8)&255)*.78)<<8)|int((rgb&255)*.78))
   result[item['description']['identifier']]=top
+ # Native seasonings have no owned item JSON. Pin their actual Mojang sprites
+ # instead of silently coloring both redstone and gunpowder with the fallback.
+ native=load(VENDOR/'mojang/source.json')
+ for identifier,name in [('minecraft:redstone','redstone_dust'),('minecraft:gunpowder','gunpowder')]:
+  data=(VENDOR/'mojang'/f'{name}.png').read_bytes()
+  assert sha(data)==native['files'][name]['sha256']
+  SOURCES['mojang/'+name+'.png']=blob(data)
+  image=Image.open(io.BytesIO(data)).convert('RGBA');w,h=image.size
+  colors=Counter((r<<16)|(g<<8)|b for r,g,b,a in image.crop((w//4,h//4,3*w//4,3*h//4)).getdata() if a>=48)
+  pair=[color for color,count in colors.most_common(2)]
+  assert len(pair)==2,identifier
+  result[identifier]=pair
  return result
 
 def build():
@@ -219,7 +231,7 @@ def build():
  out(RP/'render_controllers/a2770_placed.render_controllers.json',{'format_version':'1.8.0','render_controllers':controllers})
  out(BP/'scripts/a2770_placed_visual_data.js',('export const INGREDIENT_COLORS=Object.freeze('+json.dumps(palette,ensure_ascii=False,sort_keys=True)+');\nexport const PLACED_TINT_INDEX=Object.freeze('+json.dumps({rgb:i for i,rgb in enumerate(TINT_VALUES)},sort_keys=True)+');\n').encode())
  source_index={'grilling_commit':JAVA,'cookery_model_blob':COOKERY_MODEL,'sources':SOURCES,
-  'pending_palette_method':'Java center-half top-two colors for locally available item textures; Java fallback pair otherwise',
+  'pending_palette_method':'Java center-half top-two colors; all eight accepted ingredients covered, native sprites hash-pinned to Mojang',
   'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked color atlas with standard uv_anim','seasoning_geometry_count':count,
   'oil_overlay_inflate_model_units':[.01,.02]}
  out(VENDOR/'sources.json',source_index)

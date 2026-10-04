@@ -17,6 +17,14 @@ def build():
  props[PREFIX+'eat_hand']={'type':'int','range':[0,2],'default':0,'client_sync':True}
  for hand in ['main','off']:
   for slot in range(3):props[PREFIX+'secret_'+hand+'_'+str(slot)]={'type':'int','range':[0,255],'default':0,'client_sync':True}
+ from build_seasoning_held import palette_size
+ count=palette_size()
+ for hand in ['main','off']:
+  props[PREFIX+'bottle_'+hand+'_fill']={'type':'int','range':[0,8],'default':0,'client_sync':True}
+  for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,count*count-1],'default':0,'client_sync':True}
+ for name,maximum in [('season_hand',2),('season_phase',10),('pending_hand',2)]:
+  props[PREFIX+name]={'type':'int','range':[0,maximum],'default':0,'client_sync':True}
+ assert len(props)<=32,'Native player property limit exceeded'
  groups=entity.setdefault('component_groups',{});events=entity.setdefault('events',{})
  ids=[PREFIX+'dragon_health_'+str(i) for i in range(3)]
  for i,maximum in enumerate([20,26,30]):
