@@ -228,7 +228,7 @@ def build():
  palette=ingredient_palette()
  TINT_VALUES=sorted({0xB86B45,0xE0A56A,*[color for pair in palette.values() for color in pair]})
  controllers={};count=seasoning_assets(controllers);oil_assets(controllers)
- out(RP/'materials/seasoning_atlas.material',{'materials':{'version':'1.0.0','kg_seasoning_atlas:entity_alphatest_one_sided':{'+defines':['USE_UV_ANIM']}}})
+ out(RP/'materials/entity.material',{'materials':{'version':'1.0.0','kg_seasoning_atlas:entity_alphatest_one_sided':{'+defines':['USE_UV_ANIM']}}})
  out(RP/'render_controllers/a2770_placed.render_controllers.json',{'format_version':'1.8.0','render_controllers':controllers})
  out(BP/'scripts/a2770_placed_visual_data.js',('export const INGREDIENT_COLORS=Object.freeze('+json.dumps(palette,ensure_ascii=False,sort_keys=True)+');\nexport const PLACED_TINT_INDEX=Object.freeze('+json.dumps({rgb:i for i,rgb in enumerate(TINT_VALUES)},sort_keys=True)+');\n').encode())
  source_index={'grilling_commit':JAVA,'cookery_model_blob':COOKERY_MODEL,'sources':SOURCES,

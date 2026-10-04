@@ -4,7 +4,9 @@ from verify_a2858 import main as previous
 from verify_a2856 import RP
 def main():
  previous()
- material=json.loads((RP/'materials/seasoning_atlas.material').read_text())['materials']
+ version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
+ path='entity.material' if version>=(2,8,60) else 'seasoning_atlas.material'
+ material=json.loads((RP/'materials'/path).read_text())['materials']
  assert material=={'version':'1.0.0','kg_seasoning_atlas:entity_alphatest_one_sided':{'+defines':['USE_UV_ANIM']}}
  placed=json.loads((RP/'entity/a2770_placed_seasoning.entity.json').read_text())['minecraft:client_entity']['description']
  assert placed['materials']['layers']=='kg_seasoning_atlas'
