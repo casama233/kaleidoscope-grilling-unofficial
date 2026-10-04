@@ -123,12 +123,12 @@ def pending_assets(controllers,description,geometries):
   out(RP/('textures/a2770_placed/'+key+'.png'),png(tiled))
   prop="q.property('"+NS+'color_'+str(tint)+"')"
   rc='controller.render.kg_a2770.'+key
-  controllers[rc]={'geometry':'Geometry.'+key,'materials':[{'*':'Material.default'}],
+  controllers[rc]={'geometry':'Geometry.'+key,'materials':[{'*':'Material.layers'}],
    'textures':['Texture.'+key],'uv_anim':{'scale':[1/TINT_COLUMNS,1/rows],'offset':[f'math.mod({prop},{TINT_COLUMNS})/{TINT_COLUMNS}',f'math.floor({prop}/{TINT_COLUMNS})/{rows}']}}
   description['render_controllers'].append({rc:"q.property('"+NS+"ready') && q.property('"+NS+"mode') == 1 && q.property('"+NS+"fill') > "+str(tint//2)})
 
 def seasoning_assets(controllers):
- desc={'identifier':NS+'placed_seasoning_visual','materials':{'default':'entity_alphatest'},
+ desc={'identifier':NS+'placed_seasoning_visual','materials':{'default':'entity_alphatest','layers':'kg_seasoning_atlas'},
   'textures':{},'geometry':{},'render_controllers':[]}
  geometries=[];aliases=[]
  for r in range(1,9):
@@ -228,11 +228,12 @@ def build():
  palette=ingredient_palette()
  TINT_VALUES=sorted({0xB86B45,0xE0A56A,*[color for pair in palette.values() for color in pair]})
  controllers={};count=seasoning_assets(controllers);oil_assets(controllers)
+ out(RP/'materials/seasoning_atlas.material',{'materials':{'version':'1.0.0','kg_seasoning_atlas:entity_alphatest_one_sided':{'+defines':['USE_UV_ANIM']}}})
  out(RP/'render_controllers/a2770_placed.render_controllers.json',{'format_version':'1.8.0','render_controllers':controllers})
  out(BP/'scripts/a2770_placed_visual_data.js',('export const INGREDIENT_COLORS=Object.freeze('+json.dumps(palette,ensure_ascii=False,sort_keys=True)+');\nexport const PLACED_TINT_INDEX=Object.freeze('+json.dumps({rgb:i for i,rgb in enumerate(TINT_VALUES)},sort_keys=True)+');\n').encode())
  source_index={'grilling_commit':JAVA,'cookery_model_blob':COOKERY_MODEL,'sources':SOURCES,
   'pending_palette_method':'Java center-half top-two colors; all eight accepted ingredients covered, native sprites hash-pinned to Mojang',
-  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked color atlas with standard uv_anim','seasoning_geometry_count':count,
+  'pending_live_resource_pack_sampling':False,'pending_palette_tiles':len(TINT_VALUES),'pending_tint_mode':'baked color atlas with UV-enabled owned material and uv_anim','seasoning_geometry_count':count,
   'oil_overlay_inflate_model_units':[.01,.02]}
  out(VENDOR/'sources.json',source_index)
  return source_index

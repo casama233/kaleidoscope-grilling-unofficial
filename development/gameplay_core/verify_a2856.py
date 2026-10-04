@@ -16,7 +16,9 @@ def main():
  assert len({tuple(colors[x]) for x in accepted})==8
  for name in ['pending_seasoning','special_seasoning','empty_seasoning_bottle']:
   d=json.loads((RP/f'attachables/{name}.attachable.json').read_text())['minecraft:attachable']['description']
-  if name in ['pending_seasoning','empty_seasoning_bottle']:assert d['materials']['contents']=='entity_alphatest_one_sided'
+  if name in ['pending_seasoning','empty_seasoning_bottle']:
+   version=tuple(json.loads((BP/'manifest.json').read_text())['header']['version'])
+   assert d['materials']['contents']==('kg_seasoning_atlas' if version >= (2,8,59) else 'entity_alphatest_one_sided')
   for first in [0,1]:
    for slot,hand,code in [('main_hand','right',1),('off_hand','left',2)]:
     for phase in range(11):

@@ -81,7 +81,7 @@ def build():
   pending=identifier==NS+'pending_seasoning';ids,selectors=dispatch(pending)
   a['animations']=ids;a['scripts']['animate']=[{k:v} for k,v in selectors.items()]
   if identifier in [NS+'empty_seasoning_bottle',NS+'pending_seasoning']:
-   a['materials']['contents']='entity_alphatest_one_sided'
+   a['materials']['contents']='kg_seasoning_atlas'
    a['geometry'].pop('contents',None)
    a['render_controllers']=['controller.render.kg_a2733.seasoning_bottle_hand']
    for tint in range(16):
