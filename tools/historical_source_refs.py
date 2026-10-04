@@ -28,7 +28,11 @@ def verify(root=ROOT):
   assert actual==expected,'Historical source ref changed: '+ref
  return {'refs':len(rows),'commits':len(set(rows.values()))}
 
+def encoded_listing(root=ROOT):
+ return ('\n'.join(sorted(set(inventory(root).values())))+'\n').encode('ascii')
+
 if __name__=='__main__':
- if sys.argv[1:]==['list']:print('\n'.join(sorted(set(inventory().values()))))
+ # Binary stdout keeps exact SHA tokens under Windows Python's CRLF text mode.
+ if sys.argv[1:]==['list']:sys.stdout.buffer.write(encoded_listing())
  elif sys.argv[1:]==['verify']:print(json.dumps(verify()))
  else:raise SystemExit('Use list or verify')

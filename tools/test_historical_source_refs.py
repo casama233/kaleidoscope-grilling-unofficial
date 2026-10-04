@@ -1,6 +1,6 @@
 from pathlib import Path
-import json,tempfile,unittest
-from historical_source_refs import ROOT,inventory,literal_refs,verify
+import io,json,tempfile,unittest
+from historical_source_refs import ROOT,encoded_listing,inventory,literal_refs,verify
 
 class HistoricalSourceRefsTests(unittest.TestCase):
  def fixture(self,text,rows):
@@ -18,6 +18,12 @@ class HistoricalSourceRefsTests(unittest.TestCase):
  def test_missing_short_ref_fails_closed(self):
   r=self.fixture("x=['git','show',f'abcdef12:{path}']",{'1'*40:'1'*40})
   with self.assertRaisesRegex(AssertionError,'absent'):inventory(r)
+ def test_listing_has_exact_lf_bytes_through_windows_text_stdout(self):
+  full='1'*40;r=self.fixture("BASE='"+full+"'",{full:full})
+  raw=io.BytesIO();stdout=io.TextIOWrapper(raw,encoding='utf-8',newline='\r\n')
+  stdout.buffer.write(encoded_listing(r));stdout.flush()
+  self.assertEqual(raw.getvalue(),full.encode()+b'\n');self.assertNotIn(b'\r',raw.getvalue())
+  stdout.detach()
  def test_invalid_full_sha_fails_closed(self):
   r=self.fixture("BASE='abcdef12'",{'abcdef12':'a'*39})
   with self.assertRaises(AssertionError):inventory(r)
