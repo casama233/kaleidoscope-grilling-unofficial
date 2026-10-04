@@ -37,7 +37,7 @@ import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './
 import {showJavaEatingHud} from './java_eating_hud_runtime.js';
 import './a2770_placed_visual_runtime.js';
 import './guide/main.js';
-import {world,system,ItemStack} from '@minecraft/server';
+import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './data.js';
 import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,canExtract,breakDisposition,outputKind} from './core_logic.js';
 import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
@@ -638,6 +638,31 @@ function sameBottleTarget(block,snapshot){
 function bottleTargetSnapshot(block){return {typeId:block.typeId,states:block.permutation.getAllStates(),permutation:block.permutation}}
 function bottleActionSnapshot(block){return {target:bottleTargetSnapshot(block),owner:world.getDynamicProperty(stationStorageKey(block)),projection:world.getDynamicProperty(seasoningBlockKey(block))}}
 function bottleActionStillCurrent(block,captured){return sameBottleTarget(block,captured.target)&&world.getDynamicProperty(stationStorageKey(block))===captured.owner&&world.getDynamicProperty(seasoningBlockKey(block))===captured.projection}
+// Supplement only known inert full-cube surfaces; hasSolidTop alone also accepts
+// interactive blocks and unknown addon blocks whose use must remain untouched.
+const bottleInteractionSupports=new Set([
+ 'stone','cobblestone','mossy_cobblestone','smooth_stone','granite','polished_granite',
+ 'diorite','polished_diorite','andesite','polished_andesite','deepslate',
+ 'cobbled_deepslate','polished_deepslate','tuff','calcite','dirt','coarse_dirt',
+ 'grass_block','podzol','rooted_dirt','netherrack','end_stone','obsidian','bedrock'
+].map(id=>'minecraft:'+id));
+const pendingBottlePlacements=new Set();
+function tryScheduleOffhandBottleInteraction(e){
+ if(e.cancel||e.isFirstEvent!==true||e.itemStack!=null||e.blockFace!=='Up')return false;
+ const player=e.player;if(!player||pendingBottlePlacements.has(player.id))return false;
+ try{
+  const mode=player.getGameMode();if(mode!==GameMode.Survival&&mode!==GameMode.Creative)return false;
+  const main=captureWritableHand(player,'main').before,off=captureWritableHand(player,'off').before;
+  if(main!==undefined||!isNativeBottleItem(off))return false;
+  const support=e.block;
+  if(!bottleInteractionSupports.has(support.typeId)||!hasSolidTop(support))return false;
+  const block=support.above();if(!block||block.typeId!=='minecraft:air')return false;
+  const intent=captureInteractionIntent(player,off);if(intent?.hand!=='off')return false;
+  const proposed=BlockPermutation.resolve(SEASONING_BLOCK);
+  if(!queueBottlePlacement(player,block,intent,proposed))return false;
+  e.cancel=true;return true;
+ }catch{return false}
+}
 function scheduleNativeBottlePlacement(e){
  if(e.cancel)return;e.cancel=true;
  const player=e.player;if(!player||e.face!=='Up')return;
@@ -655,11 +680,18 @@ function scheduleNativeBottlePlacement(e){
   if(intent?.hand!==hand)return;
  }catch{return} // An unreadable hand cannot establish a unique source.
  const support=e.block.below();if(!hasSolidTop(support))return;
- const target=bottleTargetSnapshot(e.block),below=bottleTargetSnapshot(support),dimension=e.block.dimension,location={...e.block.location},proposed=e.permutationToPlace;
- system.run(()=>{
+ queueBottlePlacement(player,e.block,intent,e.permutationToPlace);
+}
+// Both entry points preserve the original stack/hand, snapshots and transaction.
+// One pending action per player prevents duplicate callbacks, including rollback.
+function queueBottlePlacement(player,targetBlock,intent,proposed){
+ const key=player.id;if(typeof key!=='string'||!key||pendingBottlePlacements.has(key))return false;
+ const target=bottleTargetSnapshot(targetBlock),below=bottleTargetSnapshot(targetBlock.below()),dimension=targetBlock.dimension,location={...targetBlock.location},slot=player.selectedSlotIndex;
+ pendingBottlePlacements.add(key);
+ try{system.run(()=>{
   let block,current,freshPreflight=false;
   try{
-   if(player.isValid===false||player.dimension.id!==dimension.id||!interactionIntentStillCurrent(player,intent))return;
+   if(player.isValid===false||player.dimension.id!==dimension.id||player.selectedSlotIndex!==slot||!interactionIntentStillCurrent(player,intent))return;
    const mode=player.getGameMode();if(mode!==GameMode.Survival&&mode!==GameMode.Creative)return;
    if(Math.hypot(player.location.x-location.x-.5,player.location.y-location.y-.5,player.location.z-location.z-.5)>8)return;
    block=dimension.getBlock(location);if(!sameBottleTarget(block,target)||!sameBottleTarget(block.below(),below)||!hasSolidTop(block.below()))return;
@@ -679,8 +711,10 @@ function scheduleNativeBottlePlacement(e){
     bottleRollbackStatus(block,result);
     if(current?.created||freshPreflight)try{retireEmptyStationContainer(block)}catch(error){console.warn('[Grilling bottle placement cleanup] '+error)}
    }else blockSound(block,'seasoning_bottle_place',1);
-  }catch(error){console.warn('[Grilling native bottle placement] '+error);}
- });
+  }catch(error){console.warn('[Grilling bottle placement] '+error);}
+  finally{pendingBottlePlacements.delete(key);}
+ });}catch(error){pendingBottlePlacements.delete(key);throw error;}
+ return true;
 }
 function scheduleNativeBottleBreak(e){
  if(e.cancel||!isSeasoningBlock(e.block.typeId))return;e.cancel=true;
@@ -976,6 +1010,7 @@ system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
 });
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  if(e.cancel)return;
+ if(tryScheduleOffhandBottleInteraction(e))return;
  if(tryScheduleBeefBoardOverride(e))return;
  const skewerInput=skewerAction(e.player,e.itemStack??heldMain(e.player));
  if(skewerInput){e.cancel=true;if(isInitialBlockPress(e.isFirstEvent))scheduleSkewerAction(e.player,skewerInput);return}

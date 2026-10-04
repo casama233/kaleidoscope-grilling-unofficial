@@ -33,7 +33,7 @@ function fixture(){
  function permutation(id,states={}){return {id,getAllStates:()=>({...states}),getState:k=>states[k]};}
  function makeBlock(location){let p=permutation('minecraft:air');return {...location,location:{...location},dimension,get typeId(){return p.id},get permutation(){return p},get isAir(){return p.id==='minecraft:air'},get isLiquid(){return false},getComponent(){return undefined},below(){return dimension.getBlock({...location,y:location.y-1})},setType(id){mutate('block:'+location.y,()=>p=permutation(id))},setPermutation(v){mutate('block:'+location.y,()=>p=v)}};}
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){mutate(k,()=>v===undefined?dp.delete(k):dp.set(k,v))},getEntity:id=>entities.get(id)};
- const holder={dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
+ const holder={id:'test-player',dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
  let context,api;
  const load=()=>{
   context=vm.createContext({...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
@@ -46,7 +46,7 @@ function fixture(){
   for(const name of ['family_station_storage.js','a2743_seasoning_block_adapter.js','seasoning_native_storage.js'])vm.runInContext(strip(read(name)),context);
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);
   const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
-  const main=read('main.js');vm.runInContext(names.map(n=>fn(main,n)).join('\n'),context);
+  const main=read('main.js');vm.runInContext('const pendingBottlePlacements=new Set();\n'+fn(main,'queueBottlePlacement')+'\n'+names.map(n=>fn(main,n)).join('\n'),context);
   api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage})',context);
  };
  load();const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
