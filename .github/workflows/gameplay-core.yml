@@ -56,8 +56,11 @@ jobs:
           test "$GITHUB_REPOSITORY_ID" = '1377218440'
           git init .
           git config core.autocrlf false
+          git config gc.auto 0
+          git config maintenance.auto false
+          git config fetch.writeCommitGraph false
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
-          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
           # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
           # read straight from the fetched commit, then those commits are fetched
@@ -68,10 +71,18 @@ jobs:
           # a checksum-pinned pack. This imports evidence without changing refs.
           python tools/source_provenance.py
           BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          # Batch exact missing source pins so only one fetch updates .git/shallow.
+          missing=()
           for baseline in $BASELINES; do
             if ! git cat-file -e "$baseline^{commit}" 2>/dev/null; then
-              git fetch --depth=1 origin "$baseline"
+              missing+=("$baseline")
             fi
+          done
+          if ((${#missing[@]})); then
+            git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
+          fi
+          for baseline in $BASELINES; do
+            git cat-file -e "$baseline^{commit}"
           done
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -128,8 +139,11 @@ jobs:
           test "$GITHUB_REPOSITORY_ID" = '1377218440'
           git init .
           git config core.autocrlf false
+          git config gc.auto 0
+          git config maintenance.auto false
+          git config fetch.writeCommitGraph false
           git remote add origin https://github.com/casama233/kaleidoscope-grilling-unofficial.git
-          git fetch --depth=1 origin "$EXPECTED_SHA"
+          git fetch --no-auto-maintenance --depth=1 origin "$EXPECTED_SHA"
           # Several verifiers compare the current files against historical baselines
           # recorded as BASE='<sha>' in development/gameplay_core/*.py. The tree is
           # read straight from the fetched commit, then those commits are fetched
@@ -140,10 +154,18 @@ jobs:
           # a checksum-pinned pack. This imports evidence without changing refs.
           python tools/source_provenance.py
           BASELINES=$(git grep -h -o -E "BASE[[:space:]]*=[[:space:]]*'[0-9a-f]{40}'" "$EXPECTED_SHA" -- development/gameplay_core | cut -d"'" -f2 | sort -u)
+          # Batch exact missing source pins so only one fetch updates .git/shallow.
+          missing=()
           for baseline in $BASELINES; do
             if ! git cat-file -e "$baseline^{commit}" 2>/dev/null; then
-              git fetch --depth=1 origin "$baseline"
+              missing+=("$baseline")
             fi
+          done
+          if ((${#missing[@]})); then
+            git fetch --no-auto-maintenance --depth=1 origin "${missing[@]}"
+          fi
+          for baseline in $BASELINES; do
+            git cat-file -e "$baseline^{commit}"
           done
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
