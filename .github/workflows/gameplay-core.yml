@@ -80,7 +80,10 @@ jobs:
       - name: Install pinned asset-verifier dependency
         shell: pwsh
         run: |
-          python -m pip install Pillow==11.3.0
+          # Match the PNG encoder used by the frozen G66 source assets.
+          python -m pip install Pillow==12.3.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "import PIL; from PIL import features; print('Pillow', PIL.__version__, 'PNG zlib', features.version('zlib'))"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify source receipt and compiled comparison regression guards
