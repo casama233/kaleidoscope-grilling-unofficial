@@ -78,8 +78,15 @@ def eating_gate():
     skewers = 0
     for file in (RP / 'attachables').glob('*_skewer.attachable.json'):
         d = json.loads(file.read_text())['minecraft:attachable']['description']
+        if version >= (2,8,68) and d['identifier']=='kaleidoscope_grilling:unfinished_skewer':
+            assert d['identifier'] not in required, file
+            assert d['render_controllers']==['controller.render.kg_secret_held.stick']+[f'controller.render.kg_partial_held.{i}' for i in range(2)],file
+            assert not any(key.startswith(('eat_','fp_eat_')) for key in d['animations']),file
+            continue
         if d['identifier'] == 'kaleidoscope_grilling:secret_skewer':
-            assert d['render_controllers'] == ['controller.render.kg_secret_held.stick'] + [f'controller.render.kg_secret_held.{i}' for i in range(3)], file
+            expected=['controller.render.kg_secret_held.stick']+[f'controller.render.kg_secret_held.{i}' for i in range(3)]
+            if version>=(2,8,68):expected+=['controller.render.kg_secret_held.piece']
+            assert d['render_controllers']==expected,file
         else:
             assert 'controller.render.kg_a22.bite' in d['render_controllers'], file
         assert 'q.is_using_item' in ' '.join(d['scripts']['pre_animation']), file

@@ -476,8 +476,11 @@ def check_current_display_contracts(findings, geometry_index, animations):
     from held_pose_frames import expected_animations
     sys.path.insert(0,str(ROOT/'tools'))
     from build_java_dual_eating_projection import REPRESENTATIVES,PIECE_BINDING
-    from build_java_eating_projection import held_profile_condition, projection_items
+    from build_java_eating_projection import held_profile_condition, projection_items, SECRET_PROFILES, secret_item_animation_id
+    version=tuple(load_json(BP/"manifest.json")["header"]["version"])
+    from secret_idle_calibration import OWNED as CALIBRATED_ITEMS,animation_document,clip_id,owning_hand_using
     expected = expected_animations()
+    if version>=(2,8,68):expected.update(animation_document()["animations"])
     for ident, body in expected.items():
         if animations.get(ident, {}).get("body") != body:
             add(findings, "error", "held_pose_frame_drift", ident,
@@ -491,16 +494,18 @@ def check_current_display_contracts(findings, geometry_index, animations):
         ids = desc.get("animations", {})
         canonical_id = desc["identifier"].removesuffix("_java_three_alt")
         family = "skewer" if canonical_id.endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
-        if canonical_id == desc["identifier"]: counts[family] += 1
+        partial=version>=(2,8,68) and desc["identifier"]=="kaleidoscope_grilling:unfinished_skewer"
+        calibrated=version>=(2,8,68) and desc["identifier"] in CALIBRATED_ITEMS
+        if canonical_id == desc["identifier"]: counts["partial" if partial else family] += 1
         expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
-        if family == "skewer":
+        if family == "skewer" and not partial:
             table = json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)', (BP / 'scripts/data.js').read_text()).group(1))
             requested=table.get(canonical_id,'THREE_RANDOM' if canonical_id=='kaleidoscope_grilling:secret_skewer' else 'THREE')
             profile = requested.replace('THREE_RANDOM', 'THREE').lower()
             expected_ids.update({f'eat_{hand}': f'animation.kg_eating.item.{profile}.{hand}' for hand in ['right','left']})
             if requested=='THREE_RANDOM':expected_ids.update({f'eat_alt_{hand}':f'animation.kg_eating.item.three_alt.{hand}' for hand in ['right','left']})
         projected = None
-        if family == 'skewer' and tuple(load_json(BP/'manifest.json')['header']['version']) >= (2,8,58):
+        if family == 'skewer' and not partial and version >= (2,8,58):
             candidate = ('THREE_ALT' if desc['identifier'].endswith('_java_three_alt') else 'THREE') if requested == 'THREE_RANDOM' else requested
             if candidate in ('TWO','THREE_ALT','FOUR') and desc['identifier'] in admitted[candidate]:
                 projected = candidate
@@ -508,12 +513,16 @@ def check_current_display_contracts(findings, geometry_index, animations):
             if desc['identifier'] in REPRESENTATIVES:
                 projected=REPRESENTATIVES[desc['identifier']]
                 expected_ids.update({f'fp_eat_{hand}':f'animation.kg_java_eating.item.{projected.lower()}.{hand}' for hand in ('right','left')})
+            if desc['identifier'] in SECRET_PROFILES and desc['identifier'] in admitted[SECRET_PROFILES[desc['identifier']]]:
+                projected=SECRET_PROFILES[desc['identifier']]
+                expected_ids.update({f'fp_eat_{hand}':secret_item_animation_id(projected,hand) for hand in ('right','left')})
         seasoning_expected = None
         if family == 'bottle' and 'season_right' in ids:
             from build_seasoning_held import dispatch
             seasoning_expected = deepcopy(desc)
             dispatch(seasoning_expected)
             expected_ids = seasoning_expected['animations']
+        if calibrated:expected_ids.update({"fp_idle_calibrated_"+hand:clip_id(hand) for hand in ("right","left")})
         if ids != expected_ids:
             add(findings, "error", "held_pose_selectors", desc["identifier"], "missing or unexpected hand/view animation aliases")
         selectors = desc.get("scripts", {}).get("animate", [])
@@ -521,7 +530,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
             alias: f"c.is_first_person == {1 if alias.startswith('fp') else 0} && c.item_slot == '{'main_hand' if alias.endswith('right') else 'off_hand'}'"
             for alias in aliases
         }
-        if family == "skewer":
+        if family == "skewer" and not partial:
             required_selectors.update({f'eat_{hand}': "c.is_first_person == 1 && q.is_using_item && q.property('kaleidoscope_grilling:eat_hand') == " + str(1 if hand == 'right' else 2) + " && c.item_slot == '" + ('main_hand' if hand == 'right' else 'off_hand') + "'" for hand in ['right','left']})
             if requested=='THREE_RANDOM':
                 for hand in ['right','left']:
@@ -542,6 +551,17 @@ def check_current_display_contracts(findings, geometry_index, animations):
                 required_selectors['fp_eat_'+hand] = active
         if seasoning_expected is not None:
             required_selectors = {k:v for row in seasoning_expected['scripts']['animate'] for k,v in row.items()}
+        if calibrated:
+            for hand,slot in (("right","main_hand"),("left","off_hand")):
+                using=owning_hand_using(hand)
+                required_selectors["fp_"+hand]+=" && ("+using+")"
+                required_selectors["fp_idle_calibrated_"+hand]="c.is_first_person == 1 && c.item_slot == '"+slot+"' && ("+using+") == 0"
+        if partial:
+            from secret_skewer_assets import partial_geometries
+            expected_geometry={"stick":"geometry.kg_secret_held.stick",**{f"part_{i}_0":f"geometry.kg_secret_held.part_{i}_0" for i in range(3)},**{g["description"]["identifier"].rsplit(".",1)[1]:g["description"]["identifier"] for g in partial_geometries()}}
+            item=load_json(BP/"items/unfinished_skewer.json")["minecraft:item"]
+            if desc.get("geometry")!=expected_geometry or "minecraft:food" in item.get("components",{}):
+                add(findings,"error","held_partial_contract",desc["identifier"],"nonedible partial must retain exact partial-state references")
         actual_selectors = {}
         malformed = False
         for row in selectors:
@@ -559,7 +579,10 @@ def check_current_display_contracts(findings, geometry_index, animations):
         for alias,ref in desc.get("geometry", {}).items():
             geo = geometry_index.get(ref, {}).get("geo", {})
             bound = [b for b in geo.get("bones", []) if b.get("binding")]
-            piece=alias=='java_piece' and desc['identifier'] in REPRESENTATIVES
+            piece=(alias=='java_piece' and desc['identifier'] in REPRESENTATIVES) or (alias=='java_secret_piece' and desc['identifier'] in SECRET_PROFILES)
+            if version>=(2,8,68) and re.fullmatch(r'piece_[1-9][0-9]*',alias):
+                piece=desc['identifier'] in SECRET_PROFILES and ref=='geometry.kg_secret_held.'+alias
+                if not piece:add(findings,'error','held_binding_contract',ref,'helper variant requires exact complete secret owner and namespace')
             if len(bound) != 1 or bound[0].get("name") != "grip" or bound[0].get("pivot") != [0,24,0] or bound[0].get("binding") != (PIECE_BINDING if piece else "q.item_slot_to_bone_name(context.item_slot)"):
                 add(findings, "error", "held_binding_contract", ref, "expected one item-slot grip at the canonical pivot")
             bones = {bone.get("name"): bone for bone in geo.get("bones", [])}
@@ -576,13 +599,15 @@ def check_current_display_contracts(findings, geometry_index, animations):
                 targets = set(animations.get(anim_id, {}).get("body", {}).get("bones", {}))
                 # One attachable may render multiple geometries. The animation
                 # component addresses their union, validated above individually.
-                complementary={'skewer_pose','skewer_model'} if piece else {'dual_piece'} if desc['identifier'] in REPRESENTATIVES else set()
+                complementary={'skewer_pose','skewer_model'} if piece else {'dual_piece'} if desc['identifier'] in REPRESENTATIVES or desc['identifier'] in SECRET_PROFILES else set()
                 missing = (targets - set(bones) - complementary) | (targets-available_bones)
                 if missing:
                     add(findings, "error", "held_animation_missing_bone", ref,
                         f"{anim_id} targets absent bones: {sorted(missing)}")
-            if family == "skewer" and canonical_id!='kaleidoscope_grilling:secret_skewer' and not piece: skewer_refs.add(ref)
-    if counts != {"skewer":40,"bottle":67} or len(skewer_refs) != 150:
+            if family == "skewer" and canonical_id!='kaleidoscope_grilling:secret_skewer' and not piece and not partial: skewer_refs.add(ref)
+    expected_counts={"skewer":40,"bottle":67}
+    if version>=(2,8,68):expected_counts["partial"]=1
+    if counts != expected_counts or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 
 

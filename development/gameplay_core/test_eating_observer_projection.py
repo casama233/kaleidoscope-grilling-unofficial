@@ -16,7 +16,7 @@ import build_java_eating_projection as generator
 
 OWNER_CONTEXT_HARNESS = r"""
 function evaluatePreAnimation(rows,q,c,math,v){
- const owner=c.owning_entity??{has_property:()=>false,property:()=>0};
+ const owner={has_property:()=>false,property:()=>0,is_item_name_any:()=>false,...(c.owning_entity??{})};
  const text=rows.join('\n').replaceAll('c.owning_entity->q.','owner.');
  if(text.includes('->'))throw Error('Unsupported Molang entity context');
  const numericMath={...math,floor:Math.floor};
@@ -35,7 +35,7 @@ class EatingObserverProjection(unittest.TestCase):
         for path in (RP/'attachables').glob('*_skewer.attachable.json'):
             d=json.loads(path.read_text())['minecraft:attachable']['description']
             documents.append(d['scripts']['animate'])
-        self.assertEqual(len(documents),40)
+        self.assertEqual(len(documents),41)
         node('''
 const documents='''+json.dumps(documents)+''';
 const q={is_using_item:true,property:name=>name.endsWith('eat_hand')?1:name.endsWith('eat_profile')?5:1,
@@ -80,9 +80,10 @@ for(const rows of scripts){
 const props={'kaleidoscope_grilling:secret_main_0':174,'kaleidoscope_grilling:secret_main_1':180,'kaleidoscope_grilling:secret_main_2':184,
  'kaleidoscope_grilling:secret_off_0':-7,'kaleidoscope_grilling:secret_off_1':214,'kaleidoscope_grilling:secret_off_2':180.9};
 const owner={has_property:n=>Object.hasOwn(props,n),property:n=>props[n]},q={property:()=>99,has_property:()=>true};
-for(const [slot,expected] of [['main_hand',[174,180,184]],['off_hand',[0,213,180]]]){
+for(const [slot,expected] of [['main_hand',[174,180,184]],['off_hand',[0,214,180]]]){
  const c={item_slot:slot,owning_entity:owner},v={};evaluatePreAnimation(rows,q,c,{clamp:(n,lo,hi)=>Math.max(lo,Math.min(hi,n))},v);
  const actual=[0,1,2].map(i=>v['kg_secret_ingredient_'+i]);if(JSON.stringify(actual)!==JSON.stringify(expected))throw Error('Wrong owner/hand indices');
+ if(slot==='off_hand'&&v.kg_secret_food_1!==0)throw Error('Unsupported low byte must hide, not borrow last catalog food');
 }
 const v={};evaluatePreAnimation(rows,q,{item_slot:'main_hand'},{clamp:(n,lo,hi)=>Math.max(lo,Math.min(hi,n))},v);
 if([0,1,2].some(i=>v['kg_secret_ingredient_'+i]!==0))throw Error('Absent owner borrowed attachable properties');
@@ -131,6 +132,9 @@ for(const [profile,names] of Object.entries(items))for(const hand of ['right','l
         cases=[]
         for path in (RP/'attachables').glob('*_skewer.attachable.json'):
             d=json.loads(path.read_text())['minecraft:attachable']['description']
+            if d['identifier']=='kaleidoscope_grilling:unfinished_skewer':
+                self.assertFalse(any(k.startswith(('eat_','fp_eat_'))for k in d['animations']))
+                continue
             requested=table.get(d['identifier'],'THREE_RANDOM')
             profiles=('THREE','THREE_ALT') if requested=='THREE_RANDOM' else (requested,)
             for profile in profiles:

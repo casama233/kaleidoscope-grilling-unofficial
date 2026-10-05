@@ -14,19 +14,30 @@ from test_eating_observer_projection import node
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 import build_java_eating_projection as generator
-from build_java_dual_eating_projection import REPRESENTATIVES,PIECE_BINDING,PIECE_CONTROLLER
+from build_java_dual_eating_projection import REPRESENTATIVES,PIECE_BINDING,PIECE_CONTROLLER,one_right_vertical_alignment
 RP=generator.RP
 
 def load(path):return json.loads(path.read_text())
 
 def value(expression,pivots,slim):
     if not isinstance(expression,str):return expression
+    # This contract checks the original fixed representatives, whose exact
+    # identity never enables the owned Secret calibration in a shared clip.
+    expression=re.sub(r"\(q.is_item_name_any\('slot.weapon.(?:mainhand|offhand)','kaleidoscope_grilling:secret_skewer'\) \? 3\.41 : 0\)",'0',expression)
     expression=re.sub(r"q.get_default_bone_pivot\('([^']+)',\s*(\d)\)",lambda m:str(pivots[m[1]][int(m[2])]),expression)
     expression=re.sub(r"\(math.abs\(.*?\) < 0.01 \? ([^ ]+) : 0\)",lambda m:m[1] if slim else '0',expression)
     if not re.fullmatch(r'[\d.+\- ()]+',expression):raise ValueError(expression)
     return eval(expression,{'__builtins__':{}})
 
 class DualEatingRenderer(unittest.TestCase):
+    def test_one_right_alignment_is_pinned_view_plane_only(self):
+        fixture=load(ROOT/'development/gameplay_core/fixtures/fish-one-vertical-alignment-g66-private.json')
+        actual=one_right_vertical_alignment(generator)
+        for a,b in zip(actual,fixture['expected_alignment']):self.assertAlmostEqual(a,b,places=8)
+        self.assertEqual(actual[0],0)
+        self.assertEqual(actual[2],0)
+        self.assertTrue(fixture['retained_depth'])
+
     def test_one_serialized_helper_remains_constant_after_source_last_knot(self):
         items=load(RP/'animations/java_eating_projection.animation.json')['animations']
         players=load(RP/'animations/java_eating_player.animation.json')['animations']
@@ -46,6 +57,7 @@ class DualEatingRenderer(unittest.TestCase):
         items=load(RP/'animations/java_eating_projection.animation.json')['animations']
         players=load(RP/'animations/java_eating_player.animation.json')['animations']
         camera=chain(translate([0,24,0]),rotate('y',180))
+        alignment=load(ROOT/'development/gameplay_core/fixtures/fish-one-vertical-alignment-g66-private.json')['expected_alignment']
         cases=0
         for profile,hand,slim in itertools.product(dual.PROFILES,('right','left'),(False,True)):
             sign=1 if hand=='right' else -1
@@ -67,6 +79,8 @@ class DualEatingRenderer(unittest.TestCase):
                     actual=chain(arm_matrix,socket_matrix,child_matrix,translate([0,-24,0]))
                     expected=chain(camera,translate([0,-16*1.62,0]),REFLECT,translate([0,-24.016,0]),
                                    dual.java_arm(profile,t,side,active,slim),dual.java_item_child(profile,t,side,active),translate([0,-32,0]))
+                    if profile == 'ONE' and hand == 'right':
+                        expected=chain(translate(alignment),expected)
                     error=max(abs(actual[i][j]-expected[i][j]) for i in range(4) for j in range(4))
                     self.assertLess(error,3e-6,(profile,hand,slim,active,t))
                     cases+=1

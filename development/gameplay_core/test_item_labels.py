@@ -43,6 +43,8 @@ def current_behavior_expectation(before, kind, stem, version):
         if tag not in tags:tags.append(tag)
     if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
         expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
+    if version >= (2,8,68) and kind=='block' and stem=='pepper_leaves':
+        expected['minecraft:block']['components']['minecraft:tick']={'interval_range':[5,5],'looping':True}
     return expected
 
 

@@ -1,8 +1,7 @@
 {
   "schema": 1,
-  "scope": "Exact historical source comparisons required by canonical gates; selected original code proofs imported locally, public commits fetched without private parent history.",
+  "scope": "Exact active source-comparison pins for canonical gates: selected original source objects from the checksum-pinned pack and immutable public commits. Public PR134 supplies current repaired-source conservation; unavailable earlier private comparisons are documented as history, not active evidence.",
   "refs": {
-    "0996f05fd63ce37098d867d14b4760dad93d2501": "0996f05fd63ce37098d867d14b4760dad93d2501",
     "09d6b6d596e021326b2cb20299c23f3d3c950d0b": "09d6b6d596e021326b2cb20299c23f3d3c950d0b",
     "10de23706bed7392884d3c693423c57b87eb59e3": "10de23706bed7392884d3c693423c57b87eb59e3",
     "1517ce1b21b25701df0e1b94bf8c4657b99ad096": "1517ce1b21b25701df0e1b94bf8c4657b99ad096",
@@ -14,6 +13,7 @@
     "7ef78bb360ac6a34664a15deef2c2aff5cc3d719": "7ef78bb360ac6a34664a15deef2c2aff5cc3d719",
     "9bb6d63f10d9004b874e81794803737704a4b671": "9bb6d63f10d9004b874e81794803737704a4b671",
     "a01c8b76ff11a18bccf901e6a47482b814ddec18": "a01c8b76ff11a18bccf901e6a47482b814ddec18",
+    "a2656e08d97a6b4c31ef3667b2c957e18c80c8fd": "a2656e08d97a6b4c31ef3667b2c957e18c80c8fd",
     "cba67124": "cba67124a710f70e015ba55d306ff9f741dae9d6",
     "d795c0e": "d795c0ead96500c9afed49a83295be3272c8ec68"
   }

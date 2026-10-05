@@ -64,6 +64,13 @@
       "kaleidoscope_grilling:pepper_leaves_logic": {},
       "minecraft:connection_rule": {
         "accepts_connections_from": "none"
+      },
+      "minecraft:tick": {
+        "interval_range": [
+          5,
+          5
+        ],
+        "looping": true
       }
     },
     "permutations": [

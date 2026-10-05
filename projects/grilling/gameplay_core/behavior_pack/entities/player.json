@@ -52,7 +52,7 @@
           "type": "int",
           "range": [
             0,
-            255
+            5333
           ],
           "default": 0,
           "client_sync": true
@@ -61,12 +61,21 @@
           "type": "int",
           "range": [
             0,
-            255
+            5333
           ],
           "default": 0,
           "client_sync": true
         },
         "kaleidoscope_grilling:secret_main_2": {
+          "type": "int",
+          "range": [
+            0,
+            5333
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:secret_main_piece": {
           "type": "int",
           "range": [
             0,
@@ -79,7 +88,7 @@
           "type": "int",
           "range": [
             0,
-            255
+            5333
           ],
           "default": 0,
           "client_sync": true
@@ -88,12 +97,21 @@
           "type": "int",
           "range": [
             0,
-            255
+            5333
           ],
           "default": 0,
           "client_sync": true
         },
         "kaleidoscope_grilling:secret_off_2": {
+          "type": "int",
+          "range": [
+            0,
+            5333
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:secret_off_piece": {
           "type": "int",
           "range": [
             0,

@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.67
+## Current maintained baseline: 2.8.69
+
+**2.8.69 測試發佈候選**：整合秘製串幾何／原色、持物校準、完成後顯示所有權及食材薄片 alpha 輪廓／側面 UV 修復，保留 2.8.67 修復。限定牛肉 helper 外觀及獨立 6,500 ms 進食終點觀察見 [G69 範圍](docs/STATUS-A2.8.69.md)。先前錄影的變慢原因仍未釐清；未宣稱全部 213 食物、完整 Java／各視角或家族存檔／真人驗收通過。保持 client=false、production_ready=false、pending_client_acceptance。
 
 **2.8.67 綜合修復候選**：整合 G66 的花椒樹、秘製串顯示、原生進食、調味瓶及第四次翻面快照來源，補上實際 25-tick 原生進食開關、Cookery 熱食／調料總開關、油液回滾與重複查詢修復，以及 Heavy Metal 重複延遲結算保護。逐項修復與仍未完成的要塞生成、致死判定及客戶端能力見 [G67 狀態](docs/STATUS-A2.8.67.md)。新版本不沿用 G66 的限定真人觀察作為驗收；`client=false`、`production_ready=false`、`pending_client_acceptance`。Git、家族准入與 live 部署以各自的新收據為準。
 
