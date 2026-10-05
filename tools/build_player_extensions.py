@@ -20,7 +20,8 @@ def build():
   props[PREFIX+'eat_native_ticks']={'type':'int','range':[0,72000],'default':0,'client_sync':True}
   props[PREFIX+'eat_elapsed_ticks']={'type':'int','range':[0,72000],'default':0,'client_sync':True}
  for hand in ['main','off']:
-  for slot in range(3):props[PREFIX+'secret_'+hand+'_'+str(slot)]={'type':'int','range':[0,255],'default':0,'client_sync':True}
+  for slot in range(3):props[PREFIX+'secret_'+hand+'_'+str(slot)]={'type':'int','range':[0,5333],'default':0,'client_sync':True}
+  props[PREFIX+'secret_'+hand+'_piece']={'type':'int','range':[0,255],'default':0,'client_sync':True}
  if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,61):
   for hand in ['main','off']:
    for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,9],'default':0,'client_sync':True}

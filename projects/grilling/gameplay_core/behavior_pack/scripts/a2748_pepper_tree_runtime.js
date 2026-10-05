@@ -1,4 +1,4 @@
-import {overlappedBlockPositions} from './a285_contact_core.js';
+import {PepperContactWork} from './pepper_contact_work.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {getMainHand,getOffHand,setHand,findHandEntry,isCreative} from './a2735_player_io.js';
 import {
@@ -14,6 +14,18 @@ const STING_UNTIL='kaleidoscope_grilling:pepper_sting_until';
 const REPLACEABLE=new Set(['minecraft:air','minecraft:short_grass','minecraft:tall_grass','minecraft:snow_layer','minecraft:vine']);
 const AXES=new Set(['minecraft:wooden_axe','minecraft:stone_axe','minecraft:iron_axe','minecraft:golden_axe','minecraft:diamond_axe','minecraft:netherite_axe']);
 const DIRS=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+const pepperContacts=new PepperContactWork(),recoveredContactDimensions=new Set(),contactCensus=new Map();
+let contactWarning=-1200;
+function rememberPepperContact(block){
+ const dimension=block.dimension,d=dimension.id;
+ pepperContacts.rememberLeaf(d,block.location,system.currentTick);
+ if(recoveredContactDimensions.has(d))return;
+ // First loaded leaf heartbeat recovers existing entities after script reload.
+ // No pepper source means no dimension census; this is never a recurring scan.
+ recoveredContactDimensions.add(d);
+ contactCensus.set(d,dimension);
+}
+function contactError(error){if(system.currentTick-contactWarning>=1200){contactWarning=system.currentTick;console.warn('[Grilling pepper contact] '+error);}}
 
 function at(d,loc,dx=0,dy=0,dz=0){
  try{return d.getBlock({x:loc.x+dx,y:loc.y+dy,z:loc.z+dz})}catch{return undefined}
@@ -173,6 +185,8 @@ function breakLeaves(block,player,tool,hasPepper){
 
 system.beforeEvents.startup.subscribe(init=>{
  init.blockComponentRegistry.registerCustomComponent(LEAVES_COMPONENT_ID,{
+  // Native block ticks also recover pepper leaves already saved in old worlds.
+  onTick(event){rememberPepperContact(event.block)},
   beforeOnPlayerPlace(event){
    try{event.permutationToPlace=event.permutationToPlace.withState(PERSISTENT_STATE,true).withState(HAS_PEPPER_STATE,false)}catch{}
   },
@@ -239,15 +253,33 @@ world.beforeEvents.playerBreakBlock.subscribe(e=>{
  }catch{}
 });
 
-// Check actual living-entity bounds, including contact from the side or below.
-// Shared sting cooldown prevents damage multiplying across neighboring leaves.
+// Track loaded entities once. Sparse pepper-source buckets replace whole-world
+// voxel scans; fair continuations bound even a large body or crowded dimension.
+for(const name of ['entitySpawn','entityLoad'])world.afterEvents[name].subscribe(({entity})=>{
+ try{pepperContacts.track(entity);}catch(error){contactError(error);}
+});
+world.afterEvents.entityRemove.subscribe(({removedEntityId})=>pepperContacts.forget(removedEntityId));
+world.afterEvents.playerSpawn.subscribe(({player})=>pepperContacts.track(player));
+world.afterEvents.playerDimensionChange.subscribe(({player})=>pepperContacts.track(player));
+world.afterEvents.playerLeave.subscribe(({playerId})=>pepperContacts.forget(playerId));
 system.runInterval(()=>{
- for(const id of ['overworld','nether','the_end']){
-  const dimension=world.getDimension(id);
-  for(const entity of dimension.getEntities())try{
-   if(!entity.getComponent('minecraft:health')||entity.typeId==='minecraft:fox'||entity.typeId==='minecraft:bee')continue;
-   const bounds=entity.getAABB();
-   if(overlappedBlockPositions(bounds).some(p=>at(dimension,p)?.typeId===PEPPER_LEAVES_ID))sting(entity);
-  }catch{}
- }
-},5);
+ // Native census returns an array synchronously, once per recovered source
+ // dimension. Its API cost is separate; handle insertion is capped at16/tick.
+ const next=contactCensus.entries().next();
+ if(!next.done){const [d,dimension]=next.value;contactCensus.delete(d);try{
+  if(pepperContacts.hasLeaves(d)){
+   pepperContacts.queueRecovery(d,dimension.getEntities());
+   // Player recovery is explicit, rather than depending on query inclusion.
+   pepperContacts.queueRecovery(d+'|players',world.getAllPlayers());
+  }
+  else recoveredContactDimensions.delete(d);
+ }catch(error){recoveredContactDimensions.delete(d);contactError(error);}}
+ pepperContacts.tick(system.currentTick,{
+ valid:entity=>entity.isValid,
+ dimension:entity=>entity.dimension.id,
+ eligible:entity=>entity.typeId!=='minecraft:fox'&&entity.typeId!=='minecraft:bee'&&!!entity.getComponent('minecraft:health'),
+ bounds:entity=>entity.getAABB(),
+ leaf(d,p){const block=at(world.getDimension(d),p);return !block?'unloaded':block.typeId===PEPPER_LEAVES_ID?'leaf':'missing';},
+ sting,error:contactError
+ });
+},1);

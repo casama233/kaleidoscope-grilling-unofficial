@@ -1,6 +1,6 @@
 """Source-derived standing first-person branch; native clips are a separate gate.
 
-TWO/THREE_ALT/FOUR and two fixed ONE/THREE representatives. Native pixels,
+TWO/THREE_ALT/FOUR, two fixed ONE/THREE representatives and owned secret meshes. Native pixels,
 non-standing views and helper hands holding other items remain separate gates.
 """
 from pathlib import Path
@@ -15,6 +15,7 @@ from java_active_eating_frames import (PROFILES,ARRAYS,active_child_bone,
 from held_pose_frames import bedrock_rotation,point
 from native_eating_clock import SECONDS
 import build_java_dual_eating_projection as dual_renderer
+from secret_active_calibration import position_expression as active_position_expression
 
 P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 PROPERTY='kaleidoscope_grilling:eat_projection'
@@ -53,10 +54,15 @@ def sample_times():
 
 def item_animation_id(profile,hand):return 'animation.kg_java_eating.item.'+profile.lower()+'.'+hand
 def player_animation_id(profile,hand):return 'animation.kg_java_eating.player.'+profile.lower()+'.'+hand
+def secret_item_animation_id(profile,hand):
+    return item_animation_id(profile,hand)
 
 ALT_SUFFIX='_java_three_alt'
+SECRET='kaleidoscope_grilling:secret_skewer'
+SECRET_PROFILES={SECRET:'THREE',SECRET+ALT_SUFFIX:'THREE_ALT'}
 
 def actual_profile(identifier,table):
+    if identifier in SECRET_PROFILES:return SECRET_PROFILES[identifier]
     if identifier.endswith(ALT_SUFFIX):
         base=identifier[:-len(ALT_SUFFIX)]
         return 'THREE_ALT' if table.get(base)=='THREE_RANDOM' else None
@@ -82,6 +88,28 @@ def fixed_geometry(description):
     expected={f'stage{i}':f'geometry.kg_a287.kg_a22.{name}.stage{min(i,max(stages))}' for i in range(5)}
     return {key:value for key,value in description['geometry'].items() if key!='java_piece'}==expected
 
+def secret_geometry(description,overrides=None):
+    """Admit exact pinned cells/shaft and verified raw-last sprite outlines."""
+    from secret_skewer_assets import held_geometries,partial_geometries
+    if description['identifier'] not in SECRET_PROFILES:return False
+    expected=held_geometries()
+    refs={g['description']['identifier'].rsplit('.',1)[1]:g['description']['identifier']for g in expected}
+    refs['java_secret_piece']=refs.pop('piece')
+    if description.get('geometry')!=refs:return False
+    controllers=['controller.render.kg_secret_held.stick']+[f'controller.render.kg_secret_held.{slot}'for slot in range(3)]+['controller.render.kg_secret_held.piece']
+    if description.get('render_controllers')!=controllers:return False
+    path=RP/'models/entity/secret_held.geo.json';overrides={}if overrides is None else overrides
+    if path not in overrides and not path.is_file():return False
+    actual=overrides.get(path)or json.loads(path.read_text())
+    variants=[g for g in expected if g['description']['identifier'].startswith('geometry.kg_secret_held.piece_')]
+    main=[g for g in expected if g not in variants]
+    if actual!={'format_version':'1.21.0','minecraft:geometry':main+partial_geometries()}:return False
+    helper_path=RP/'models/entity/secret_helper_sprites.geo.json'
+    if helper_path not in overrides and not helper_path.is_file():return False
+    helper=overrides.get(helper_path)or json.loads(helper_path.read_text())
+    if isinstance(helper,str):helper=json.loads(helper)
+    return helper=={'format_version':'1.21.0','minecraft:geometry':variants}
+
 def projection_items(overrides=None):
     table=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
     items={profile:[] for profile in ALL_PROFILES}
@@ -91,7 +119,8 @@ def projection_items(overrides=None):
         d=overrides.get(path) or json.loads(path.read_text())
         d=d['minecraft:attachable']['description'];identifier=d['identifier']
         profile=actual_profile(identifier,table)
-        if profile not in ALL_PROFILES or not fixed_geometry(d):continue
+        owned_geometry=secret_geometry(d,overrides) if identifier in SECRET_PROFILES else fixed_geometry(d)
+        if profile not in ALL_PROFILES or not owned_geometry:continue
         item_path=BP/'items'/(identifier.split(':')[1]+'.json')
         item=overrides.get(item_path) or (json.loads(item_path.read_text()) if item_path.is_file() else {})
         duration=item.get('minecraft:item',{}).get('components',{}).get('minecraft:use_modifiers',{}).get('use_duration')
@@ -110,7 +139,12 @@ def held_profile_condition(profile,hand,items=None):
     condition=("q.property('kaleidoscope_grilling:eat_profile') == "+str(CODES[profile])+
             " && q.property('kaleidoscope_grilling:eat_hand') == "+str(code)+
             " && q.is_item_name_any('"+slot+"',"+names+")")
-    return condition+(' && '+dual_renderer.empty_helper(hand) if profile in ('ONE','THREE') else '')
+    if profile in ('ONE','THREE'):condition+=' && '+dual_renderer.empty_helper(hand)
+    elif SECRET+ALT_SUFFIX in items[profile]:
+        # Secret ALT shares the authored active-arm clip, but never suppresses
+        # an equipped helper item. Other fixed ALT foods retain their guards.
+        condition+=" && (q.is_item_name_any('"+slot+"','"+SECRET+ALT_SUFFIX+"') == 0 || "+dual_renderer.empty_helper(hand)+')'
+    return condition
 
 def projection_condition(items=None):
     items=projection_items() if items is None else items
@@ -143,7 +177,7 @@ def animations(items=None):
                 rotations[key]=[rounded_channel(v)for v in rotation]
                 target=native_arm_target(profile,t,sign)
                 at=point(target,[0,0,0]);at[0]*=-1
-                arm_positions[key]=[number(at[i])+" - q.get_default_bone_pivot('"+arm+"', "+str(i)+")"for i in range(3)]
+                arm_positions[key]=[active_position_expression(profile,hand,target,i,number(at[i])+" - q.get_default_bone_pivot('"+arm+"', "+str(i)+")",number)for i in range(3)]
                 rotation=unwrap(bedrock_rotation(target),last_arm);last_arm=rotation
                 arm_rotations[key]=[rounded_channel(v)for v in rotation]
             common={'loop':'hold_on_last_frame','animation_length':4.5,'anim_time_update':SECONDS}
@@ -185,13 +219,22 @@ def augment(output,profile_table):
                     row['fp_'+hand]="c.is_first_person == 1 && c.item_slot == '"+slot+"' && ("+active+") == 0"
                 for key in ('eat_'+hand,'eat_alt_'+hand):
                     if key in row:row[key]='('+row[key]+') && ('+active+') == 0'
-            alias='fp_eat_'+hand;d['animations'][alias]=item_animation_id(profile,hand)
+            alias='fp_eat_'+hand
+            d['animations'][alias]=secret_item_animation_id(profile,hand) if d['identifier'] in SECRET_PROFILES else item_animation_id(profile,hand)
             d['scripts']['animate'].append({alias:active})
-        if profile in ('ONE','THREE'):
+        if profile in ('ONE','THREE') and d['identifier'] in dual_renderer.REPRESENTATIVES:
             # Rebuilding an already generated document is idempotent.
             d['render_controllers']=[ref for ref in d['render_controllers'] if ref!=dual_renderer.PIECE_CONTROLLER]
             d['scripts']['pre_animation']=[row for row in d['scripts']['pre_animation'] if not row.startswith('v.kg_java_piece_visible = ')]
             dual_renderer.attach_piece(output,SimpleNamespace(**globals()),d,profile,conditions)
+        if d['identifier'] in SECRET_PROFILES:
+            from build_secret_held import owner_occupancy
+            rows=d['scripts']['pre_animation']
+            rows=[row for row in rows if not row.startswith(('v.kg_secret_piece_visible = ','v.kg_secret_owner_occupied = '))]
+            rows.append(owner_occupancy(d['identifier']))
+            visible='v.kg_secret_owner_occupied == 1 && v.kg_secret_piece_index > 0 && ('+' || '.join('('+c+')' for c in conditions)+')' if profile=='THREE' else '0'
+            rows.append('v.kg_secret_piece_visible = '+visible+';')
+            d['scripts']['pre_animation']=rows
     output[RP/'render_controllers/java_eating_piece.render_controllers.json']=dual_renderer.controller()
     native=json.loads((ROOT/'development/gameplay_core/fixtures/native-first-person-controller-1.26.50.4.json').read_text())['controller']
     controller=json.loads(json.dumps(native))
@@ -202,10 +245,10 @@ def augment(output,profile_table):
                 hand=1 if bone.startswith('right')else 2
                 row[bone]='('+owned+") ? (q.property('kaleidoscope_grilling:eat_profile') == 1 || q.property('kaleidoscope_grilling:eat_profile') == 3 || q.property('kaleidoscope_grilling:eat_hand') == "+str(hand)+') : ('+expression+')'
     output[RP/'render_controllers/java_eating_player.render_controllers.json']={'format_version':'1.8.0','render_controllers':{'controller.render.player.first_person':controller}}
-    # Data-only eligibility: missing/failed/secret geometries never enable a
-    # different player arm while their item remains on a legacy transform.
+    # Data-only eligibility: exact owned secret meshes use the same main-item
+    # frame without borrowing fixed food/helper geometry. Failed meshes stay legacy.
     output[BP/'scripts/java_eating_projection_items.js']=(
-        '// Fixed-geometry eligibility for the scoped Java first-person projection.\n'
+        '// Exact owned geometry eligibility for the scoped Java first-person projection.\n'
         'export const JAVA_FP_EATING_ITEMS=Object.freeze('+json.dumps(sorted(ids))+');\n'
         'export const JAVA_FP_EATING_ITEMS_BY_PROFILE=Object.freeze(Object.fromEntries(Object.entries('
         +json.dumps(items)+').map(([profile,items])=>[profile,Object.freeze(items)])));\n'

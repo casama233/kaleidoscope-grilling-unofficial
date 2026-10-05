@@ -266,6 +266,8 @@
   },
   "fixed_skewers": 19,
   "cooking_stages": 6,
-  "secret_personalized_mesh": false,
+  "secret_personalized_mesh": true,
+  "secret_mesh_pin": "9a1acdab27698457bec16c9362678e574895a28c",
+  "secret_palette_sources": "../secret-food-palettes.json",
   "client_acceptance": false
 }

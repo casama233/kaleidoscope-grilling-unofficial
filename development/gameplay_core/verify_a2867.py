@@ -15,6 +15,6 @@ def main():
         subprocess.run([sys.executable,str(ROOT/'development/gameplay_core'/name)],cwd=ROOT,check=True)
     for name in ('build_seasoning_held.py','build_player_extensions.py','build_secret_held.py','build_eating_motion.py','build_plain_eating_variants.py','build_grilling_guide.py'):
         subprocess.run([sys.executable,str(ROOT/'tools'/name),'--check'],cwd=ROOT,check=True)
-    subprocess.run(['node','--test',*[str(ROOT/'development/gameplay_core'/name) for name in ('test_seasoning_motion_runtime.mjs','test_oil_registry_rollback.mjs','test_oil_flow_native_reads.mjs','test_grill_tick_native_reads.mjs','test_oil_ambient.mjs','test_heavy_metal_deferred.mjs','test_family_oil_food_api.mjs','test_integration_interfaces.mjs')]],cwd=ROOT,check=True)
+    subprocess.run(['node','--test',*[str(ROOT/'development/gameplay_core'/name) for name in ('test_seasoning_motion_runtime.mjs','test_oil_registry_rollback.mjs','test_oil_flow_native_reads.mjs','test_grill_tick_native_reads.mjs','test_oil_ambient.mjs','test_heavy_metal_deferred.mjs','test_family_oil_food_api.mjs','test_integration_interfaces.mjs','test_pepper_contact_budget.mjs')]],cwd=ROOT,check=True)
     print('A2.8.67 source repairs PASS; native, full-family migration and human acceptance remain separate')
 if __name__=='__main__':main()

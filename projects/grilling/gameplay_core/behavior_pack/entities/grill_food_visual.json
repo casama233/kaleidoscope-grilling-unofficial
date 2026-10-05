@@ -38,6 +38,33 @@
           ],
           "default": 280,
           "client_sync": true
+        },
+        "kaleidoscope_grilling:secret_0": {
+          "type": "int",
+          "range": [
+            0,
+            5333
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:secret_1": {
+          "type": "int",
+          "range": [
+            0,
+            5333
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:secret_2": {
+          "type": "int",
+          "range": [
+            0,
+            5333
+          ],
+          "default": 0,
+          "client_sync": true
         }
       }
     },

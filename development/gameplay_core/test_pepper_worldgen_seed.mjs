@@ -4,6 +4,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import * as core from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_core.js';
+import {PepperContactWork} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/pepper_contact_work.js';
 
 const bp=new URL('../../projects/grilling/gameplay_core/behavior_pack/',import.meta.url);
 const source=readFileSync(new URL('scripts/a2748_pepper_tree_runtime.js',bp),'utf8');
@@ -28,7 +29,7 @@ function fixture({height=2,unloaded,failWrite=0,obstruction,soil='minecraft:dirt
  dimension.getBlock({x:0,y:-1,z:0}).permutation=permutation(soil);
  if(obstruction)dimension.getBlock(obstruction).permutation=permutation('minecraft:stone');
  const math=Object.create(Math);math.random=()=>draw++===0?(height===2?0:0.75):0.99;
- const context=vm.createContext({...core,Math:math,BlockPermutation:{resolve:permutation}});
+ const context=vm.createContext({...core,PepperContactWork,Math:math,BlockPermutation:{resolve:permutation}});
  vm.runInContext(functions+';globalThis.api={placePepperTree,growPepperWorldgenSeed};',context);
  const count=id=>[...blocks.values()].filter(b=>b.typeId===id);
  return {api:context.api,origin,blocks,dimension,events,count,loadNeighbor(){unloadedKey=undefined;}};

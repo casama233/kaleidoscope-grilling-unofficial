@@ -10,8 +10,6 @@ import {grillingConfig} from './server_config_runtime.js';
 import {world,system} from '@minecraft/server';
 import {STORAGE_PREFIX,peekStationContainer} from './family_station_storage.js';
 import {a25ReadPlateBlock,a25RestoreStack} from './a25_plate_recipe_runtime.js';
-import {readGrillState} from './a2740_grill_state_adapter.js';
-import {grillVisualStage} from './grill_visual_core.js';
 const TYPE='kaleidoscope_grilling:equipment_visual',work=new VisualTargetQueue(),targets=work.targets;
 let reader,restore,helpers=0,lastWarning=-1200,indexing=false,lastCapacityWarning=-1200,lastAudience=-10;
 export function configureSecretVisuals(read,build){reader=read;restore=build;}
@@ -66,8 +64,7 @@ export function syncStationContentsVisual(block,observers){
    else{seen.add(k);render(row,block,k,stack,pose(block,dx,.15,0),1);}
   }
  }else if(block.typeId==='kaleidoscope_grilling:grill'){
-  const c=peekStationContainer(block),state=readGrillState(block);
-  for(let i=0;i<3;i++){const stack=c?.getItem(i);if(canonicalFoodId(stack?.typeId)==='kaleidoscope_grilling:secret_skewer')composed(row,block,'grill/'+i,stack,{dx:(i-1)*5/16,y:5/16+.025,dz:0},grillVisualStage(state)>=4,seen);}
+  // Personalized grill meshes belong to grill_visual_runtime; clear old icon parts.
  }else{clear(row);if(!row.parts.size)work.remove(key(block));return;}
  for(const k of [...row.parts.keys()])if(!seen.has(k))discard(row,k);
 }

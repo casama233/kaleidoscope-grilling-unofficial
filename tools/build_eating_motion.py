@@ -119,7 +119,9 @@ def build(attachable_overrides=None):
   sys.path.insert(0,str(ROOT/'tools'))
   from build_java_eating_projection import augment
   output=augment(output,table)
- return output
+ from secret_idle_calibration import augment as augment_idle
+ from secret_terminal_visibility import augment as augment_terminal
+ return augment_terminal(augment_idle(output))
 def mismatch_details(expected, actual, limit=20):
  """Bounded diagnostics only; the full byte-for-byte check remains authoritative."""
  def walk(a,b,pointer=''):

@@ -4,12 +4,16 @@ The owned attachable renders a second mesh bound to the helper socket. No
 entity, ItemStack replacement, metadata conversion or offhand write is used.
 """
 import importlib.util
+import json
+import hashlib
 import tempfile
 from pathlib import Path
 import java_dual_eating_frames as dual
 from java_eating_piece_resolver import available_fixed_piece
-from held_pose_frames import point, bedrock_rotation
+from held_pose_frames import (point, bedrock_rotation, chain, translate,
+                              bone_matrix, native_skewer_calibration)
 from native_eating_clock import SECONDS
+from secret_active_calibration import position_expression as active_position_expression
 
 REPRESENTATIVES = {'kaleidoscope_grilling:grilled_fish_skewer': 'ONE',
                    'kaleidoscope_grilling:grilled_ender_pearl_skewer': 'THREE'}
@@ -19,8 +23,31 @@ PIECE_BINDING = "q.item_slot_to_bone_name(context.item_slot == 'main_hand' ? 'of
 def empty_helper(hand):
     return "q.is_item_equipped('"+('off_hand' if hand == 'right' else 'main_hand')+"') == 0"
 
+
+def one_right_vertical_alignment(g):
+    """Data-derived view-plane placement adaptation; never source camera parity.
+
+    The native-visible6503 frame supplies the prior vertical repair. Restore
+    authored X, retain source depth and all curves/rotations/gestures. The
+    original constant X alignment becomes magnified at authored mouth entry.
+    """
+    fixture = json.loads((g.ROOT/'development/gameplay_core/fixtures/fish-one-vertical-alignment-g66-private.json').read_text())
+    source = g.ROOT/fixture['held_source']
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == fixture['held_source_sha256'], 'Idle anchor requires fresh native evidence'
+    held = json.loads(source.read_text())['animations']['animation.kg_a287.skewer_fp_right']['bones']['skewer_pose']
+    assert held == fixture['held_bone']
+    base, camera = native_skewer_calibration('right')
+    idle = chain(base,translate([0,24,0]),bone_matrix(held),translate([0,-24,0]))
+    initial = chain(dual.native_arm_target('ONE',0,1,True),dual.REFLECT,
+                    dual.java_item_child('ONE',0,1,True),translate([0,-32,0]))
+    pivot = fixture['geometry_root_pivot']
+    actual, authored = point(idle,pivot), point(initial,pivot)
+    # Do not pull the source toward the near plane to match idle display depth.
+    return [0.0,actual[1]-authored[1],0.0]
+
 def animations(g, items):
     item = {}; player = {}
+    one_right_alignment = one_right_vertical_alignment(g)
     times = sorted(set(g.sample_times()) | {round(i/60,6) for i in range(301)} |
                    {float(v) for k, rows in dual.ARRAYS.items() if k.endswith('_TIMES')
                     for v in rows if 0 <= v <= 5})
@@ -53,8 +80,11 @@ def animations(g, items):
                     bones[socket]['position'][key] = [b+' + ('+slim+' ? '+g.number(n-w)+' : 0)'
                                                        for b,w,n in zip(base,wide['position'],narrow['position'])]
                     target = dual.native_arm_target(profile,t,side,active)
-                    location = point(target,[0,0,0]); location[0] *= -1
-                    bones[arm]['position'][key] = [g.number(location[i])+" - q.get_default_bone_pivot('"+arm+"', "+str(i)+")" for i in range(3)]
+                    location = point(target,[0,0,0])
+                    if profile == 'ONE' and hand == 'right':
+                        location = [value+delta for value,delta in zip(location,one_right_alignment)]
+                    location[0] *= -1
+                    bones[arm]['position'][key] = [active_position_expression(profile,hand,target,i,g.number(location[i])+" - q.get_default_bone_pivot('"+arm+"', "+str(i)+")",g.number)for i in range(3)]
                     rotation = g.unwrap(bedrock_rotation(target),previous.get(name+'arm'))
                     previous[name+'arm'] = rotation
                     bones[arm]['rotation'][key] = [g.rounded_channel(x) for x in rotation]

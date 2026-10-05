@@ -476,7 +476,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
     from held_pose_frames import expected_animations
     sys.path.insert(0,str(ROOT/'tools'))
     from build_java_dual_eating_projection import REPRESENTATIVES,PIECE_BINDING
-    from build_java_eating_projection import held_profile_condition, projection_items
+    from build_java_eating_projection import held_profile_condition, projection_items, SECRET_PROFILES, secret_item_animation_id
     expected = expected_animations()
     for ident, body in expected.items():
         if animations.get(ident, {}).get("body") != body:
@@ -508,6 +508,9 @@ def check_current_display_contracts(findings, geometry_index, animations):
             if desc['identifier'] in REPRESENTATIVES:
                 projected=REPRESENTATIVES[desc['identifier']]
                 expected_ids.update({f'fp_eat_{hand}':f'animation.kg_java_eating.item.{projected.lower()}.{hand}' for hand in ('right','left')})
+            if desc['identifier'] in SECRET_PROFILES and desc['identifier'] in admitted[SECRET_PROFILES[desc['identifier']]]:
+                projected=SECRET_PROFILES[desc['identifier']]
+                expected_ids.update({f'fp_eat_{hand}':secret_item_animation_id(projected,hand) for hand in ('right','left')})
         seasoning_expected = None
         if family == 'bottle' and 'season_right' in ids:
             from build_seasoning_held import dispatch
@@ -559,7 +562,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
         for alias,ref in desc.get("geometry", {}).items():
             geo = geometry_index.get(ref, {}).get("geo", {})
             bound = [b for b in geo.get("bones", []) if b.get("binding")]
-            piece=alias=='java_piece' and desc['identifier'] in REPRESENTATIVES
+            piece=(alias=='java_piece' and desc['identifier'] in REPRESENTATIVES) or (alias=='java_secret_piece' and desc['identifier'] in SECRET_PROFILES)
             if len(bound) != 1 or bound[0].get("name") != "grip" or bound[0].get("pivot") != [0,24,0] or bound[0].get("binding") != (PIECE_BINDING if piece else "q.item_slot_to_bone_name(context.item_slot)"):
                 add(findings, "error", "held_binding_contract", ref, "expected one item-slot grip at the canonical pivot")
             bones = {bone.get("name"): bone for bone in geo.get("bones", [])}
@@ -576,7 +579,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
                 targets = set(animations.get(anim_id, {}).get("body", {}).get("bones", {}))
                 # One attachable may render multiple geometries. The animation
                 # component addresses their union, validated above individually.
-                complementary={'skewer_pose','skewer_model'} if piece else {'dual_piece'} if desc['identifier'] in REPRESENTATIVES else set()
+                complementary={'skewer_pose','skewer_model'} if piece else {'dual_piece'} if desc['identifier'] in REPRESENTATIVES or desc['identifier'] in SECRET_PROFILES else set()
                 missing = (targets - set(bones) - complementary) | (targets-available_bones)
                 if missing:
                     add(findings, "error", "held_animation_missing_bone", ref,
