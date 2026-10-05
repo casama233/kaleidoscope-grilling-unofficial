@@ -34,6 +34,19 @@ def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,proj
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
  return bool(eval(compile(tree,'<pose-condition>','eval'),{'__builtins__':{}},{}))
+def idle_pose_alias(version,identifier,first,hand):
+ calibrated=version>=(2,8,68) and first and identifier in ('kaleidoscope_grilling:secret_skewer','kaleidoscope_grilling:unfinished_skewer')
+ return 'fp_idle_calibrated_'+hand if calibrated else ('fp_' if first else 'tp_')+hand
+
+def secret_helper_binding_gate(path,description,reference,geometry):
+ from build_java_dual_eating_projection import PIECE_BINDING
+ assert description['identifier'] in ('kaleidoscope_grilling:secret_skewer','kaleidoscope_grilling:secret_skewer_java_three_alt'),(path,reference)
+ grip=geometry['bones'][0]
+ assert grip['binding']==PIECE_BINDING and 'parent' not in grip,(path,reference)
+ assert len(geometry['bones'])==2 and not grip.get('cubes'),(path,reference)
+ piece=geometry['bones'][1]
+ assert piece['name']=='dual_piece' and piece['parent']=='grip' and piece['pivot']==[0,24,0] and piece['cubes'],(path,reference)
+
 def binding_assets():
  idx={};animations={};controllers={};rows=[];refs=set();cases=0
  version=tuple(load(BP/'manifest.json')['header']['version'])
@@ -52,7 +65,8 @@ def binding_assets():
     for bone in (hand+'item',hand+'Item','custom_'+hand+'_grip'):
      matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
-     assert matches==[expected],(p,first,slot,bone,matches)
+     idle_expected=idle_pose_alias(version,d['identifier'],first,hand)
+     assert matches==[idle_expected],(p,first,slot,bone,matches)
      for profile in (1,2,3,4,5):
       using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
@@ -71,7 +85,7 @@ def binding_assets():
        assert fallback==[expected]+local_eating,(p,profile,projection,posture,fallback)
       for inactive in (0,2 if slot=='main_hand' else 1):
        inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
-       assert inactive_matches==[expected],(p,profile,inactive,inactive_matches)
+       assert inactive_matches==[idle_expected],(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
   if d['animations'].get('fp_right')=='animation.kg_a286.bottle_fp_right' and version>=(2,8,61):
@@ -91,7 +105,10 @@ def binding_assets():
     assert len(g['bones'])==2 and not b.get('cubes')
     assert g['bones'][1]['name']=='dual_piece' and g['bones'][1]['parent']=='grip' and g['bones'][1]['pivot']==[0,24,0] and g['bones'][1]['cubes']
     continue
-   assert b['binding']=='q.item_slot_to_bone_name(context.item_slot)' and 'parent' not in b
+   if ref.startswith('geometry.kg_secret_held.piece') and version>=(2,8,68):
+    secret_helper_binding_gate(p,d,ref,g)
+    continue
+   assert b['binding']=='q.item_slot_to_bone_name(context.item_slot)' and 'parent' not in b,(p,ref,b)
    if ref.startswith('geometry.kg_a287.'):
     # A2.8.14 splits binding, display pose and handle-origin correction.
     assert len(g['bones'])==3 and not b.get('cubes'),ref
@@ -131,7 +148,7 @@ def binding_assets():
    else:
     assert len(g['bones'])==1 and b.get('cubes'),ref
     for anim in d['animations'].values():assert set(animations[anim]['bones'])=={'grip'},anim
-  if p.name.endswith('_skewer.attachable.json') and d['identifier']!='kaleidoscope_grilling:secret_skewer':
+  if p.name.endswith('_skewer.attachable.json') and d['identifier']!='kaleidoscope_grilling:secret_skewer' and not (version>=(2,8,68) and d['identifier']=='kaleidoscope_grilling:unfinished_skewer'):
    old=repair.source(p);old=old['minecraft:attachable']['description']
    profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
    from native_eating_clock import VARIABLE,ASSIGNMENT
@@ -154,7 +171,7 @@ def binding_assets():
     assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
     assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
- expected_count=107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,32) else 107
+ expected_count=108 if version>=(2,8,68) else 107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if version >= (2,8,32) else 107
  assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)
  # Regression reproduction: old dispatch can select zero poses for a normalized bone name.
  old=repair.source(RP/'attachables/empty_seasoning_bottle.attachable.json')['minecraft:attachable']['description']

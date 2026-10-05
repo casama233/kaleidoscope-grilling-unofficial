@@ -12,11 +12,14 @@ def main():
     assert 'minecraft:transient' in entity['components'] and 'minecraft:inventory' not in entity['components']
     assert all(v['client_sync'] for v in entity['description']['properties'].values())
     client=json.loads((p/'resource_pack/entity/grill_food_visual.entity.json').read_text())['minecraft:client_entity']['description']
-    assert len(client['textures'])==len(client['geometry'])==115
+    version=tuple(json.loads((p/'behavior_pack/manifest.json').read_text())['header']['version'])
+    if version>=(2,8,68):assert (len(client['textures']),len(client['geometry']))==(1613,199)
+    else:assert len(client['textures'])==len(client['geometry'])==115
     geo=json.loads((p/'resource_pack/models/entity/grill_display.geo.json').read_text())['minecraft:geometry']
-    assert len(geo)==20
+    expected_geometries=104 if version>=(2,8,68) else 20
+    assert len(geo)==expected_geometries
     assert not any('binding' in b for g in geo for b in g['bones'])
-    assert len({g['description']['identifier'] for g in geo})==20
+    assert len({g['description']['identifier'] for g in geo})==expected_geometries
     runtime=(p/'behavior_pack/scripts/grill_visual_runtime.js').read_text()
     assert 'peekStationContainer(block)' in runtime and 'stationContainer(block)' not in runtime
     assert 'setItem(' not in runtime and 'setDynamicProperty(' not in runtime

@@ -3,7 +3,6 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
-import subprocess
 import sys
 import unittest
 from bedrock_sprite_alignment import inspect_alignment
@@ -17,7 +16,6 @@ from generated_food_sprite import helper_assets, main_faces, span_cubes, spans_f
 BEEF_ROWS = ['0000', '0000', '0000', '0078', '00fc', '01fe', '03fe', '0ffe',
              '1ffe', '1ffe', '3ffc', '3ff8', '3ff0', '1fe0', '0f80', '0000']
 BEEF_ALPHA_SHA256 = '869908ee834f182e6cfa87cffec0d68e8563d24f53748a5b115323002fbf2759'
-FAILED_6717 = 'fb33b70bf9762c91224144e63d8a15b925761db5'
 
 
 def beef_alpha():
@@ -42,19 +40,18 @@ class SpriteSilhouetteAlignment(unittest.TestCase):
         self.assertEqual(result['opaque_side_texel_samples'], 94)
         self.assertEqual(result['sampled_vertex_depth_checks'], 1410)
 
-    def test_frozen_native_failed_6717_is_rejected_without_changing_main_faces(self):
-        path = 'projects/grilling/gameplay_core/resource_pack/models/entity/secret_helper_sprites.geo.json'
-        prior = json.loads(subprocess.check_output(['git', 'show', FAILED_6717 + ':' + path], cwd=ROOT))
-        current = current_beef_cubes()
-        geos, selected = helper_assets()
-        proof = json.loads((ROOT / 'development/gameplay_core/fixtures/secret-helper-sprite-spans.json').read_text())
-        index = next(row['index'] for row in proof['items'] if row['id'] == 'minecraft:beef')
-        old = next(geo for geo in prior['minecraft:geometry'] if geo['description']['identifier'] == selected[index])['bones'][1]['cubes']
-        self.assertEqual(old[0], current[0])
-        result = inspect_alignment(old, beef_alpha())
-        reasons = {issue['reason'] for issue in result['issues']}
-        self.assertIn('detached or reversed sampled texel', reasons)
-        self.assertIn('actual alpha contour missing attached side', reasons)
+    def test_reconstructed_wrong_side_convention_is_rejected_without_changing_main_faces(self):
+        # Negative mutation fixture, not recovered historical commit bytes.
+        current=current_beef_cubes();broken=deepcopy(current)
+        for side in broken[1:]:
+            side['origin'][0]=-(side['origin'][0]+side['size'][0])
+            for face,uv in side['uv'].items():
+                if face in ('east','west'):
+                    uv['uv'][1]+=uv['uv_size'][1];uv['uv_size'][1]*=-1
+        self.assertEqual(broken[0],current[0])
+        reasons={issue['reason']for issue in inspect_alignment(broken,beef_alpha())['issues']}
+        self.assertIn('detached or reversed sampled texel',reasons)
+        self.assertIn('actual alpha contour missing attached side',reasons)
 
     def test_independent_oracle_rejects_reintroduced_x_reflection(self):
         broken = deepcopy(current_beef_cubes())

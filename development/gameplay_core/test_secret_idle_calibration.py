@@ -1,58 +1,120 @@
-"""Bounded idle alias admission; native mouth/transition acceptance is separate."""
-from pathlib import Path
+"""Public repaired-source conservation; native mouth/transition acceptance is separate."""
 from copy import deepcopy
-import json,subprocess,sys,unittest
-ROOT=Path(__file__).resolve().parents[2];RP=ROOT/'projects/grilling/gameplay_core/resource_pack';sys.path.insert(0,str(ROOT/'tools'))
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
+BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
+sys.path.insert(0, str(ROOT / 'tools'))
 import secret_idle_calibration as calibration
-from build_secret_held import owner_occupancy
-from secret_terminal_visibility import apply as apply_terminal_visibility
+from public_source_witness import assert_public_bytes, public_json
 from test_eating_observer_projection import node
-BASE='f64bcbd0a1f9e350c17aa7db1b05aa5d5430c236'
-def load(p):return json.loads(p.read_text())
-def old(p):return json.loads(subprocess.check_output(['git','show',BASE+':'+str(p.relative_to(ROOT))],cwd=ROOT))
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
 class SecretIdleCalibration(unittest.TestCase):
- def test_exact6710_displacement_preserves_source_rotation_scale_and_shared_files(self):
-  current=load(calibration.TARGET);self.assertEqual(current,calibration.animation_document())
-  shared_path=RP/'animations/a287_skewer_held.animation.json';self.assertEqual(load(shared_path),old(shared_path));source=load(shared_path)['animations']
-  for hand in ('right','left'):
-   clip=deepcopy(current['animations'][calibration.clip_id(hand)]);clip['bones']['skewer_pose']['position']=source['animation.kg_a287.skewer_fp_'+hand]['bones']['skewer_pose']['position']
-   self.assertEqual(clip,source['animation.kg_a287.skewer_fp_'+hand])
- def test_exact_three_owned_attachables_get_idempotent_idle_aliases_only(self):
-  for identifier in calibration.OWNED:
-   path=RP/'attachables'/(identifier.split(':')[1]+'.attachable.json');before=old(path)['minecraft:attachable']['description'];expected=calibration.apply_idle_calibration(deepcopy(before));actual=load(path)['minecraft:attachable']['description']
-   expected['scripts']['pre_animation']=[owner_occupancy(identifier)if row.startswith('v.kg_secret_owner_occupied = ')else row for row in expected['scripts']['pre_animation']]
-   apply_terminal_visibility(expected)
-   self.assertEqual(actual,expected);self.assertEqual(calibration.apply_idle_calibration(deepcopy(actual)),actual)
-   for key,value in before['animations'].items():self.assertEqual(actual['animations'][key],value)
-   self.assertEqual(len(actual['animations']),len(before['animations'])+2)
-  for path in (RP/'attachables').glob('*.json'):
-   d=load(path)['minecraft:attachable']['description']
-   if d['identifier']not in calibration.OWNED:self.assertNotIn('fp_idle_calibrated_',json.dumps(d))
- def test_idle_active_and_completion_repairs_are_only_reviewed_owned_runtime_deltas(self):
-  changes=subprocess.check_output(['git','diff','--name-only',BASE,'--','projects/grilling/gameplay_core'],cwd=ROOT,text=True).splitlines()
-  expected=[str((RP/'attachables'/(identifier.split(':')[1]+'.attachable.json')).relative_to(ROOT))for identifier in calibration.OWNED]
-  # Private 6712 subsequently aligns the active origin; its strict channel
-  # conservation and exact item guards are checked by SecretActiveCalibration.
-  expected.append(str((RP/'animations/java_eating_player.animation.json').relative_to(ROOT)))
-  expected.extend('projects/grilling/gameplay_core/behavior_pack/scripts/'+name for name in ('main.js','secret_held_runtime.js'))
-  # The new calibrated animation is untracked before commit, tracked after it.
-  self.assertEqual(set(changes)-{str(calibration.TARGET.relative_to(ROOT))},set(expected))
- def test_idle_and_active_base_are_exclusive_without_changing_eating_helper_admission(self):
-  rows=[{'before':old(RP/'attachables'/(id.split(':')[1]+'.attachable.json'))['minecraft:attachable']['description'],'after':load(RP/'attachables'/(id.split(':')[1]+'.attachable.json'))['minecraft:attachable']['description']}for id in calibration.OWNED]
-  node('const rows='+json.dumps(rows)+r''';
-for(const {before,after}of rows)for(const hand of ['right','left'])for(const projection of [0,1])for(const using of [false,true]){
- const slot=hand==='right'?'main_hand':'off_hand',weapon=hand==='right'?'slot.weapon.mainhand':'slot.weapon.offhand',handCode=hand==='right'?1:2;
- const profile=after.identifier.endsWith('_java_three_alt')?4:3;
- const q={is_using_item:using,is_sneaking:0,is_swimming:0,is_gliding:0,is_riding:0,is_item_equipped:()=>0,
- property:n=>({eat_hand:handCode,eat_profile:profile,eat_projection:projection})[n.split(':')[1]],is_item_name_any:(s,...ids)=>s===weapon&&ids.includes(after.identifier)};
- const c={is_first_person:1,item_slot:slot},v={kg_secret_owner_occupied:1,kg_secret_piece_index:176};
- const active=(d,alias)=>{const r=d.scripts.animate.find(r=>alias in r);return r?Boolean(new Function('q','c','return '+r[alias])(q,c)):false};
- const idle=active(after,'fp_idle_calibrated_'+hand),base=active(after,'fp_'+hand);
- if(idle===using)throw Error('Idle calibration entered active own-hand use');
- if(using&&base!==active(before,'fp_'+hand))throw Error('Active legacy base admission changed');
- if(!using&&base)throw Error('Idle drew old and new base together');
- for(const alias of ['eat_'+hand,'eat_alt_'+hand,'fp_eat_'+hand,'tp_'+hand])if(active(before,alias)!==active(after,alias))throw Error('Eating/TP alias changed '+alias);
- c.is_first_person=0;if(active(after,'fp_idle_calibrated_'+hand))throw Error('Idle calibration leaked to third person');
+    def test_exact_calibration_preserves_source_rotation_scale_and_shared_files(self):
+        current = load(calibration.TARGET)
+        self.assertEqual(current, calibration.animation_document())
+        assert_public_bytes(self, calibration.TARGET)
+        shared_path = RP / 'animations/a287_skewer_held.animation.json'
+        assert_public_bytes(self, shared_path)
+        source = public_json(shared_path)['animations']
+        expected_positions = {
+            'right': [-8.44353417, .51001839, -8.65064748],
+            'left': [-11.88255811, 10.91077069, 10.76686643],
+        }
+        for hand in ('right', 'left'):
+            clip = deepcopy(current['animations'][calibration.clip_id(hand)])
+            self.assertEqual(clip['bones']['skewer_pose']['position'], expected_positions[hand])
+            clip['bones']['skewer_pose']['position'] = source['animation.kg_a287.skewer_fp_' + hand]['bones']['skewer_pose']['position']
+            self.assertEqual(clip, source['animation.kg_a287.skewer_fp_' + hand])
+
+    def test_exact_three_owned_attachables_keep_idempotent_idle_aliases(self):
+        self.assertEqual(set(calibration.OWNED), {
+            'kaleidoscope_grilling:secret_skewer',
+            'kaleidoscope_grilling:secret_skewer_java_three_alt',
+            'kaleidoscope_grilling:unfinished_skewer',
+        })
+        for identifier in calibration.OWNED:
+            path = RP / 'attachables' / (identifier.split(':')[1] + '.attachable.json')
+            assert_public_bytes(self, path)
+            actual = load(path)['minecraft:attachable']['description']
+            # The public witness already contains the repair. Re-running the
+            # current generator must conserve it, not apply a historical delta.
+            once = calibration.apply_idle_calibration(deepcopy(actual))
+            self.assertEqual(once, actual)
+            self.assertEqual(calibration.apply_idle_calibration(deepcopy(once)), actual)
+            self.assertEqual({key for key in actual['animations'] if key.startswith('fp_idle_calibrated_')},
+                             {'fp_idle_calibrated_right', 'fp_idle_calibrated_left'})
+            for hand in ('right', 'left'):
+                alias = 'fp_idle_calibrated_' + hand
+                self.assertEqual(actual['animations'][alias], calibration.clip_id(hand))
+                self.assertEqual(sum(alias in row for row in actual['scripts']['animate']), 1)
+        for path in (RP / 'attachables').glob('*.json'):
+            description = load(path)['minecraft:attachable']['description']
+            if description['identifier'] not in calibration.OWNED:
+                self.assertNotIn('fp_idle_calibrated_', json.dumps(description))
+                self.assertEqual(calibration.apply_idle_calibration(deepcopy(description)), description)
+
+    def test_reviewed_owned_runtime_and_active_helper_source_bytes_are_conserved(self):
+        # Check relevant immutable runtime bytes directly. Release metadata and
+        # guide updates are outside this repaired-source conservation guard.
+        for path in (
+            BP / 'scripts/main.js',
+            BP / 'scripts/secret_held_runtime.js',
+            RP / 'animations/java_eating_player.animation.json',
+            RP / 'animations/java_eating_projection.animation.json',
+        ):
+            assert_public_bytes(self, path)
+
+    def test_idle_active_helper_and_third_person_have_independent_admission_guards(self):
+        descriptions = [load(RP / 'attachables' / (identifier.split(':')[1] + '.attachable.json'))['minecraft:attachable']['description']
+                        for identifier in calibration.OWNED]
+        node('const descriptions = ' + json.dumps(descriptions) + r''';
+for (const d of descriptions) {
+ const complete = !d.identifier.endsWith(':unfinished_skewer');
+ const ownProfile = d.identifier.endsWith('_java_three_alt') ? 4 : 3;
+ const routes = Object.fromEntries(d.scripts.animate.flatMap(row => Object.entries(row)).map(([alias, expression]) =>
+  [alias, new Function('q', 'c', 'return ' + expression)]));
+ for (const hand of ['right', 'left']) for (const itemSlot of ['main_hand', 'off_hand'])
+ for (const first of [0, 1]) for (const using of [false, true]) for (const eatHand of [0, 1, 2])
+ for (const projection of [0, 1]) for (const profile of [3, 4]) for (const held of [d.identifier, 'minecraft:apple'])
+ for (const oppositeEquipped of [0, 1]) for (const posture of ['', 'sneaking', 'swimming', 'gliding', 'riding']) {
+  const slot = hand === 'right' ? 'main_hand' : 'off_hand';
+  const weapon = hand === 'right' ? 'slot.weapon.mainhand' : 'slot.weapon.offhand';
+  const handCode = hand === 'right' ? 1 : 2;
+  const q = {is_using_item: using, is_sneaking: posture === 'sneaking', is_swimming: posture === 'swimming',
+   is_gliding: posture === 'gliding', is_riding: posture === 'riding', is_item_equipped: () => oppositeEquipped,
+   property: name => ({eat_hand: eatHand, eat_profile: profile, eat_projection: projection})[name.split(':')[1]],
+   is_item_name_any: (selected, ...ids) => selected === weapon && ids.includes(held)};
+  const c = {is_first_person: first, item_slot: itemSlot};
+  const active = alias => routes[alias] ? Boolean(routes[alias](q, c)) : false;
+  const fpSlot = Boolean(first && itemSlot === slot);
+  const ownUsing = using && eatHand === handCode;
+  const projected = Boolean(complete && fpSlot && ownUsing && projection === 1 && profile === ownProfile &&
+   held === d.identifier && oppositeEquipped === 0 && posture === '');
+  const expected = {
+   ['fp_idle_calibrated_' + hand]: fpSlot && !ownUsing,
+   ['fp_' + hand]: fpSlot && ownUsing && !projected,
+   ['fp_eat_' + hand]: projected,
+   ['eat_' + hand]: complete && fpSlot && ownUsing && profile !== 4 && !projected,
+   ['eat_alt_' + hand]: complete && fpSlot && ownUsing && profile === 4 && !projected,
+   ['tp_' + hand]: !first && itemSlot === slot,
+  };
+  for (const [alias, admitted] of Object.entries(expected))
+   if (active(alias) !== admitted) throw Error('Wrong independent admission: ' + d.identifier + ' ' + alias);
+  if (active('fp_idle_calibrated_' + hand) && active('fp_' + hand)) throw Error('Idle drew both bases');
+ }
 }
 ''')
-if __name__=='__main__':unittest.main()
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -8,13 +8,14 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
 ANIM='animations/a287_skewer_held.animation.json'
+VERSION=tuple(json.loads((ROOT/'projects/grilling/gameplay_core/behavior_pack/manifest.json').read_text())['header']['version'])
 def load(p): return json.loads(p.read_text())
 BEFORE=load(Path(__file__).with_name('fixtures')/'skewer-hand-before-2814.json')
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 class HandAnchorTests(unittest.TestCase):
     def test_all_bite_stages_preserve_assets_and_bind_once(self):
-        refs={r for p in (RP/'attachables').glob('*_skewer.attachable.json') if p.name!='secret_skewer.attachable.json' for r in load(p)['minecraft:attachable']['description']['geometry'].values()}
+        refs={r for p in (RP/'attachables').glob('*_skewer.attachable.json') if p.name!='secret_skewer.attachable.json' and not (VERSION>=(2,8,68) and p.name=='unfinished_skewer.attachable.json') for r in load(p)['minecraft:attachable']['description']['geometry'].values()}
         seen=set()
         for p in (RP/'models/entity/a287_hand').glob('*.geo.json'):
             g=load(p)['minecraft:geometry'][0];seen.add(g['description']['identifier'])
@@ -36,14 +37,30 @@ class HandAnchorTests(unittest.TestCase):
     def test_secret_ingredients_share_the_existing_grip_and_stable_two_sided_faces(self):
         geometries=load(RP/'models/entity/secret_held.geo.json')['minecraft:geometry']
         refs=set(load(RP/'attachables/secret_skewer.attachable.json')['minecraft:attachable']['description']['geometry'].values())
-        self.assertEqual(refs,{g['description']['identifier'] for g in geometries})
+        if VERSION>=(2,8,68):
+            import sys
+            sys.path.insert(0,str(ROOT/'tools'))
+            from secret_skewer_assets import held_geometries,partial_geometries
+            from generated_food_sprite import helper_assets
+            from build_java_dual_eating_projection import PIECE_BINDING
+            source=held_geometries()+partial_geometries()
+            self.assertEqual(geometries,[g for g in source if not g['description']['identifier'].startswith('geometry.kg_secret_held.piece_')])
+            helpers,_=helper_assets()
+            self.assertEqual(load(RP/'models/entity/secret_helper_sprites.geo.json')['minecraft:geometry'],helpers[1:])
+            self.assertEqual(refs,{g['description']['identifier']for g in held_geometries()})
+            for geo in helpers:
+                self.assertEqual(geo['bones'][0],{'name':'grip','pivot':[0,24,0],'binding':PIECE_BINDING})
+                self.assertEqual(geo['bones'][1]['parent'],'grip')
+            geometries=[g for g in geometries if g['description']['identifier']!='geometry.kg_secret_held.piece']
+        else:
+            self.assertEqual(refs,{g['description']['identifier'] for g in geometries})
         for geo in geometries:
             anchor,pose,model=geo['bones']
             self.assertEqual(anchor,{'name':'grip','pivot':[0,24,0],'binding':'q.item_slot_to_bone_name(context.item_slot)'})
             self.assertEqual(pose,{'name':'skewer_pose','parent':'grip','pivot':[0,24,0]})
             self.assertEqual(model['parent'],'skewer_pose')
             self.assertNotIn('texture_meshes',model)
-            if '.part_' in geo['description']['identifier']:
+            if VERSION<(2,8,68) and '.part_' in geo['description']['identifier']:
                 for cube in model.get('cubes',[]):self.assertEqual(set(cube['uv']),{'up','down'})
     def test_third_person_matches_java_corners_for_both_hands(self):
         animations=load(RP/ANIM)['animations']

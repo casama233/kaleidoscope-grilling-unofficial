@@ -76,8 +76,20 @@ class SprinkleAnchor(unittest.TestCase):
         paths = [held.BP / 'entities/player.json', held.RP / 'animations/a286_held.animation.json',
                  held.RP / 'animations/a21_shake.animation.json', held.RP / 'animations/player_binding.animation.json']
         paths += list((held.RP / 'attachables').glob('*seasoning*.json'))
+        version=tuple(json.loads((held.BP/'manifest.json').read_text())['header']['version'])
         for path in paths:
-            self.assertEqual(path.read_bytes(), subprocess.check_output(['git', 'show', 'cba67124:' + path.relative_to(ROOT).as_posix()], cwd=ROOT), path)
+            prior=subprocess.check_output(['git','show','cba67124:'+path.relative_to(ROOT).as_posix()],cwd=ROOT)
+            if version>=(2,8,68) and path==held.BP/'entities/player.json':
+                before=json.loads(prior)
+                props=before['minecraft:entity']['description']['properties']
+                for hand in ('main','off'):
+                    for index in range(3):
+                        row=props['kaleidoscope_grilling:secret_'+hand+'_'+str(index)]
+                        self.assertEqual(row,{'type':'int','range':[0,255],'default':0,'client_sync':True})
+                        row['range']=[0,5333]
+                    props['kaleidoscope_grilling:secret_'+hand+'_piece']={'type':'int','range':[0,255],'default':0,'client_sync':True}
+                self.assertEqual(json.loads(path.read_bytes()),before,path)
+            else:self.assertEqual(path.read_bytes(),prior,path)
 
 
 if __name__ == '__main__':

@@ -3,14 +3,13 @@ from pathlib import Path
 from copy import deepcopy
 import json
 import re
-import subprocess
 import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = '35492f863ef192ecd43ee6be68036afaf4e47903'
 RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
 sys.path.insert(0, str(ROOT / 'tools'))
+from public_source_witness import public_json, assert_public_bytes
 import secret_terminal_visibility as terminal
 from test_eating_observer_projection import node
 
@@ -39,22 +38,18 @@ for(const d of descriptions)for(const hand of ['main_hand','off_hand']){
 }
 ''')
 
-    def test_only_owned_terminal_scripts_change_and_the_generator_is_idempotent(self):
-        changed = subprocess.check_output(['git', 'diff', '--name-only', BASE, '--', 'projects/grilling/gameplay_core'], cwd=ROOT).decode().splitlines()
-        expected = ['projects/grilling/gameplay_core/resource_pack/attachables/' + item.split(':')[1] + '.attachable.json' for item in terminal.OWNED]
-        # Later helper extrusion adds only catalog geometry references. Its
-        # geometry/controller files do not expand terminal script ownership.
-        self.assertEqual([path for path in changed if '/attachables/' in path], expected)
-        for path in map(lambda x: ROOT / x, expected):
-            before = json.loads(subprocess.check_output(['git', 'show', BASE + ':' + str(path.relative_to(ROOT))], cwd=ROOT))
+    def test_public_repaired_terminal_scripts_are_conserved_and_generator_is_idempotent(self):
+        # PR134 already contains the repair. This freezes those public source
+        # bytes and checks current generator behavior, not a private-before delta.
+        for item in terminal.OWNED:
+            path = RP / 'attachables' / (item.split(':')[1] + '.attachable.json')
+            assert_public_bytes(self, path)
+            source = public_json(path)
             after = json.loads(path.read_text())
-            terminal.apply(before['minecraft:attachable']['description'])
-            baseline_geometry=before['minecraft:attachable']['description']['geometry']
-            extra={key:value for key,value in after['minecraft:attachable']['description']['geometry'].items()if key not in baseline_geometry}
-            self.assertTrue(all(key.startswith('piece_') and value=='geometry.kg_secret_held.'+key for key,value in extra.items()))
-            baseline_geometry.update(extra)
-            self.assertEqual(after, before)
+            terminal.apply(source['minecraft:attachable']['description'])
+            self.assertEqual(after, source)
             self.assertEqual(terminal.apply(deepcopy(after['minecraft:attachable']['description'])), after['minecraft:attachable']['description'])
+        assert_public_bytes(self, RP / 'render_controllers/secret_held.render_controllers.json')
 
     def test_terminal_use_gate_gap_and_all_authoritative_or_fresh_serving_exits(self):
         descriptions = [json.loads((RP / 'attachables' / (item.split(':')[1] + '.attachable.json')).read_text())['minecraft:attachable']['description'] for item in terminal.OWNED]

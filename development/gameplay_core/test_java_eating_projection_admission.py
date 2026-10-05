@@ -3,12 +3,12 @@ import copy
 import json
 from pathlib import Path
 import sys
-import subprocess
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 import build_java_eating_projection as generator
+from public_source_witness import public_json,assert_public_bytes
 from test_eating_observer_projection import node
 
 
@@ -100,10 +100,13 @@ for(const id of ['kaleidoscope_grilling:grilled_gluten_skewer','kaleidoscope_gri
             self.assertNotIn(generator.SECRET,generator.projection_items({geometry_path:wrong})['THREE'])
 
     def test_secret_main_and_helper_reuse_source_channels_with_only_owned_origin_calibration(self):
-        animations=json.loads((generator.RP/'animations/java_eating_projection.animation.json').read_text())['animations']
+        animation_path=generator.RP/'animations/java_eating_projection.animation.json'
+        animations=json.loads(animation_path.read_text())['animations']
         player_path=generator.RP/'animations/java_eating_player.animation.json'
         players=json.loads(player_path.read_text())['animations']
-        before=json.loads(subprocess.check_output(['git','show','507cf91db42729d429dc915d19e6addfc6dd70d4:'+str(player_path.relative_to(ROOT))],cwd=ROOT))['animations']
+        repaired_source=public_json(player_path.relative_to(ROOT))['animations']
+        assert_public_bytes(self,animation_path)
+        assert_public_bytes(self,player_path)
         for identifier,profile in generator.SECRET_PROFILES.items():
             desc=json.loads((generator.RP/'attachables'/(identifier.split(':')[1]+'.attachable.json')).read_text())['minecraft:attachable']['description']
             self.assertNotIn('java_piece',desc['geometry']);self.assertNotIn('java_piece',desc['textures'])
@@ -116,10 +119,20 @@ for(const id of ['kaleidoscope_grilling:grilled_gluten_skewer','kaleidoscope_gri
                 self.assertEqual(animations[key],expected)
                 self.assertEqual(desc['animations']['fp_eat_'+hand],key)
                 player=generator.player_animation_id(profile,hand)
-                expected_bones=copy.deepcopy(before[player]['bones'])
+                expected_bones=copy.deepcopy(repaired_source[player]['bones'])
                 slot='slot.weapon.mainhand' if hand=='right' else 'slot.weapon.offhand'
                 suffix=" + (q.is_item_name_any('"+slot+"','"+identifier+"') ? 3.41 : 0)"
                 arms=('rightarm','leftarm') if profile=='THREE' else (hand+'arm',)
+                # The immutable public witness already carries the calibration.
+                # Verify and strip only its exact owned suffix, then reapply it
+                # to the reconstructed uncalibrated channels. No older private
+                # source is available for a historical-delta assertion.
+                for arm in arms:
+                    for position in expected_bones[arm]['position'].values():
+                        self.assertTrue(position[1].endswith(suffix),(player,arm))
+                        self.assertEqual(position[1].count(suffix),1)
+                        position[1]=position[1][:-len(suffix)]
+                self.assertNotIn('? 3.41 : 0',json.dumps(expected_bones))
                 for arm in arms:
                     for position in expected_bones[arm]['position'].values():position[1]+=suffix
                 self.assertEqual(players[player]['bones'],expected_bones)
