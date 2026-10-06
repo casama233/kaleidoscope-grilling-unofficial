@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    73
+  ],
+  "before_sha256": "9070dc08eade5351114c23a576dcd426b885889af4b6398e0b03ce6d9cf2d295",
+  "after_sha256": "2a742d2634fdf28d49ba7dc627b2210d44d6a169cf8cc56963801ad507fb9c9d",
+  "scope": "Exact G73 one-line plate completion repair: canonicalize dispatch ID for native secret-skewer aliases. Preserve original captured stack, transaction order, ingredient finish order and all other main.js bytes.",
+  "edits": [
+    {
+      "start": 892,
+      "end": 893,
+      "before": " const id=eaten.typeId;dangerousPreservation(player,id);\n",
+      "after": " const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);\n"
+    }
+  ]
+}

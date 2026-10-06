@@ -1,0 +1,83 @@
+{
+  "scope": "Exact combined direct-rack, bottle display and Java heat-write notes; other names/text immutable",
+  "locales": {
+    "en_US": {
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.1": {
+        "before": "The Advanced Kitchen Rack has 9 slots: the first 5 are for oil pots/seasoning bottles, and the last 4 are for kitchen knives, the kitchen shovel, Flint and Steel, and similar tools.",
+        "after": "The Advanced Kitchen Rack has 9 slots in two fixed rows: 5 upper slots for oil pots/seasoning bottles, and 4 lower hooks for kitchen knives, the kitchen shovel, Flint and Steel, and similar tools."
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.3": {
+        "before": "Open the rack to swap with the selected hotbar slot, deposit, withdraw, or clear an empty-slot filter. Deposit All follows existing filters.",
+        "after": "Aim at a specific slot and use: hold an accepted item to insert it, or use an empty hand to withdraw it. Sneak-use an occupied slot to swap with the held item."
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.6": {
+        "before": "Quick pick: sneak-use a position on the upper row (five seasoning slots) or lower row (four tools) to switch it directly into your hand. Normal use opens storage management.",
+        "after": "Sneak-use an empty slot with an empty hand to clear its filter. /kaleidoscope_grilling:rack returns matching inventory stacks to the nearest rack within 8 blocks, following existing filters without opening a form."
+      },
+      "guide.kg.body.kaleidoscope_grilling:special_seasoning.3": {
+        "before": "Take the pending bottle with an empty hand and hold use for 4 seconds. Sound and particles mark completion; the finished bottle has 16 uses. Releasing early does not finish it.",
+        "after": "Take the pending bottle with an empty hand and hold use for 4 seconds. Sound and particles mark completion; the finished bottle has 16 uses. Releasing early does not finish it. Inventory bottle icons show the remaining amount. Check the held or placed layers for the actual ingredient order and colors."
+      },
+      "guide.kg.body.kg_a1:guide_hot_food.1": {
+        "before": "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore.",
+        "after": "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore. New heating and hot-food merges round the expiry down to five-second boundaries, as in Java. Previously saved deadlines remain exact on reads; reheating, merging or refrigerator sorting re-buckets them as in Java."
+      },
+      "ui.kaleidoscope_grilling.advanced_rack.hint": {
+        "before": "Select a slot to swap immediately; sneak-click a physical slot for quick access. Filters are managed separately.",
+        "after": "Use the exact shelf slot directly: held item inserts, empty hand picks up. Sneak-click an occupied slot to swap; sneak-click an empty slot empty-handed to clear its filter. /kaleidoscope_grilling:rack returns matching items."
+      }
+    },
+    "zh_CN": {
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.1": {
+        "before": "高级厨具架有 9 个槽位：前 5 格放油壶/调料瓶，后 4 格放厨房刀、厨房铲、打火石等工具。",
+        "after": "高级厨具架的 9 个槽位分为固定的上下两排：上排 5 格放油壶/调料瓶，下排 4 格挂厨房刀、厨房铲、打火石等工具。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.3": {
+        "before": "右键打开界面，可交换当前快捷栏、存入、取回或在空槽位清除筛选；“批量存入”会按既有筛选整理背包。",
+        "after": "瞄准具体槽位右键：手持符合筛选的物品可存入，空手可取回；潜行右键已占用槽位可与手中物品交换。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.6": {
+        "before": "快速取用：潜行并点选架子的上排五格调味槽或下排四格工具槽，可直接切换到手中；普通互动仍可管理全部槽位。",
+        "after": "空手潜行右键空槽位可清除筛选。/kaleidoscope_grilling:rack 会将背包中符合既有筛选的物品归还到 8 格内最近的厨具架，不打开界面。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:special_seasoning.3": {
+        "before": "空手取回待摇晃的瓶子并持续使用 4 秒；完成时有声音与粒子，成品可使用 16 次。提前放开不会完成。",
+        "after": "空手取回待摇晃的瓶子并持续使用 4 秒；完成时有声音与粒子，成品可使用 16 次。提前放开不会完成。 背包瓶图标显示剩余份数；食材的实际顺序与颜色请看手持或放置的瓶层。"
+      },
+      "guide.kg.body.kg_a1:guide_hot_food.1": {
+        "before": "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。",
+        "after": "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。 热期限按原作每 5 秒一格向下取整；新加热与热食合并都遵守同一规则。已保存的旧热期限读取时保持原值；再次加热、合并或冰箱整理时会按原作重新取整。"
+      },
+      "ui.kaleidoscope_grilling.advanced_rack.hint": {
+        "before": "点击槽位即可交换；潜行点击架子上的槽位可快速操作。筛选另设管理。",
+        "after": "直接点击架上的对应槽位：手持物品存入，空手取出。潜行点击已占用槽位交换；空手潜行点击空槽清除筛选。/kaleidoscope_grilling:rack 归还符合筛选的物品。"
+      }
+    },
+    "zh_TW": {
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.1": {
+        "before": "高級廚具架有 9 個槽位：前 5 格放油壺/調料瓶，後 4 格放廚房刀、廚房鏟、打火石等工具。",
+        "after": "高級廚具架的 9 個槽位分為固定的上下兩排：上排 5 格放油壺/調料瓶，下排 4 格掛廚房刀、廚房鏟、打火石等工具。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.3": {
+        "before": "右鍵開啟介面，可交換目前快捷欄、存入、取回或在空槽位清除篩選；「批量存入」會按既有篩選整理背包。",
+        "after": "瞄準具體槽位右鍵：手持符合篩選的物品可存入，空手可取回；潛行右鍵已佔用槽位可與手中物品交換。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:advanced_rack.6": {
+        "before": "快速取用：潛行並點選架子的上排五格調味槽或下排四格工具槽，可直接切換到手中；普通互動仍可管理全部槽位。",
+        "after": "空手潛行右鍵空槽位可清除篩選。/kaleidoscope_grilling:rack 會將背包中符合既有篩選的物品歸還到 8 格內最近的廚具架，不開啟介面。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:special_seasoning.3": {
+        "before": "空手取回待搖晃的瓶子並持續使用 4 秒；完成時有聲音與粒子，成品可使用 16 次。提前放開不會完成。",
+        "after": "空手取回待搖晃的瓶子並持續使用 4 秒；完成時有聲音與粒子，成品可使用 16 次。提前放開不會完成。 背包瓶圖示顯示剩餘份數；食材的實際順序與颜色請看手持或放置的瓶層。"
+      },
+      "guide.kg.body.kg_a1:guide_hot_food.1": {
+        "before": "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。",
+        "after": "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。 熱期限按原作每 5 秒一格向下取整；新加熱與熱食合併都遵守同一規則。已保存的舊熱期限讀取時保持原值；再次加熱、合併或冰箱整理時會按原作重新取整。"
+      },
+      "ui.kaleidoscope_grilling.advanced_rack.hint": {
+        "before": "點選槽位即可交換；潛行點架子上的槽位可快速操作。篩選另設管理。",
+        "after": "直接點選架上的對應槽位：手持物品存入，空手取出。潛行點已佔用槽位交換；空手潛行點空槽清除篩選。/kaleidoscope_grilling:rack 歸還符合篩選的物品。"
+      }
+    }
+  }
+}

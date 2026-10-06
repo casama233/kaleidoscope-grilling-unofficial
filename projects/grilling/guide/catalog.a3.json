@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "version": "0.3.32",
-  "revision": "kg-guide-a3-2867",
+  "version": "0.3.33",
+  "revision": "kg-guide-a3-2875",
   "module_id": "kg_a1:grilling",
   "order": 300,
   "icon": "textures/ui/kg_grilling/grill_legged_lit",
@@ -193,28 +193,28 @@
       },
       "body": {
         "zh_CN": [
-          "高级厨具架有 9 个槽位：前 5 格放油壶/调料瓶，后 4 格放厨房刀、厨房铲、打火石等工具。",
+          "高级厨具架的 9 个槽位分为固定的上下两排：上排 5 格放油壶/调料瓶，下排 4 格挂厨房刀、厨房铲、打火石等工具。",
           "槽位第一次存入物品时会建立筛选；油壶各状态视为同一家族，调料瓶的空/待摇/完成状态也视为同一家族。",
-          "右键打开界面，可交换当前快捷栏、存入、取回或在空槽位清除筛选；“批量存入”会按既有筛选整理背包。",
+          "瞄准具体槽位右键：手持符合筛选的物品可存入，空手可取回；潜行右键已占用槽位可与手中物品交换。",
           "操作距离为 8 格；打掉厨具架时，内容和筛选会写入掉落物，重新放置后恢复。",
           "工作台图样（空位为 ·）：\nIII\n·R·\nSSS\nI = 铁锭；R = 厨具架；S = 任意木台阶",
-          "快速取用：潜行并点选架子的上排五格调味槽或下排四格工具槽，可直接切换到手中；普通互动仍可管理全部槽位。"
+          "空手潜行右键空槽位可清除筛选。/kaleidoscope_grilling:rack 会将背包中符合既有筛选的物品归还到 8 格内最近的厨具架，不打开界面。"
         ],
         "zh_TW": [
-          "高級廚具架有 9 個槽位：前 5 格放油壺/調料瓶，後 4 格放廚房刀、廚房鏟、打火石等工具。",
+          "高級廚具架的 9 個槽位分為固定的上下兩排：上排 5 格放油壺/調料瓶，下排 4 格掛廚房刀、廚房鏟、打火石等工具。",
           "槽位第一次存入物品時會建立篩選；油壺各狀態視為同一家族，調料瓶的空/待搖/完成狀態也視為同一家族。",
-          "右鍵開啟介面，可交換目前快捷欄、存入、取回或在空槽位清除篩選；「批量存入」會按既有篩選整理背包。",
+          "瞄準具體槽位右鍵：手持符合篩選的物品可存入，空手可取回；潛行右鍵已佔用槽位可與手中物品交換。",
           "操作距離為 8 格；打掉廚具架時，內容和篩選會寫入掉落物，重新放置後恢復。",
           "工作台圖樣（空位為 ·）：\nIII\n·R·\nSSS\nI = 鐵錠；R = 廚具架；S = 任意木半磚",
-          "快速取用：潛行並點選架子的上排五格調味槽或下排四格工具槽，可直接切換到手中；普通互動仍可管理全部槽位。"
+          "空手潛行右鍵空槽位可清除篩選。/kaleidoscope_grilling:rack 會將背包中符合既有篩選的物品歸還到 8 格內最近的廚具架，不開啟介面。"
         ],
         "en_US": [
-          "The Advanced Kitchen Rack has 9 slots: the first 5 are for oil pots/seasoning bottles, and the last 4 are for kitchen knives, the kitchen shovel, Flint and Steel, and similar tools.",
+          "The Advanced Kitchen Rack has 9 slots in two fixed rows: 5 upper slots for oil pots/seasoning bottles, and 4 lower hooks for kitchen knives, the kitchen shovel, Flint and Steel, and similar tools.",
           "The first inserted item establishes a slot filter. Oil-pot states share one family, and empty/pending/special seasoning bottles share one family.",
-          "Open the rack to swap with the selected hotbar slot, deposit, withdraw, or clear an empty-slot filter. Deposit All follows existing filters.",
+          "Aim at a specific slot and use: hold an accepted item to insert it, or use an empty hand to withdraw it. Sneak-use an occupied slot to swap with the held item.",
           "Use range is 8 blocks. Breaking the rack stores its contents and filters on the dropped item, which are restored when placed again.",
           "Crafting-table pattern (· = empty):\nIII\n·R·\nSSS\nI = Iron Ingot；R = Kitchenware Racks；S = Any wooden slab",
-          "Quick pick: sneak-use a position on the upper row (five seasoning slots) or lower row (four tools) to switch it directly into your hand. Normal use opens storage management."
+          "Sneak-use an empty slot with an empty hand to clear its filter. /kaleidoscope_grilling:rack returns matching inventory stacks to the nearest rack within 8 blocks, following existing filters without opening a form."
         ]
       },
       "kinds": [
@@ -3193,7 +3193,7 @@
       },
       "body": {
         "zh_CN": [
-          "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。 热期限按原作每 5 秒一格向下取整；新加热与热食合并都遵守同一规则。已保存的旧热期限在到期或再次加热前保留。",
+          "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。 热期限按原作每 5 秒一格向下取整；新加热与热食合并都遵守同一规则。已保存的旧热期限读取时保持原值；再次加热、合并或冰箱整理时会按原作重新取整。",
           "趁热吃时，新获得的固定烤串效果持续时间会翻倍，新增的饱和度提高 25%。",
           "特制调料的附加效果只会在食物仍有烟火气时触发；它们不会再被烟火气二次翻倍。冷掉后仍能吃，但不会触发这些调料效果。",
           "秘制辣椒油桶可用 1 桶菜籽油 + 3 份红辣椒粉无序合成；三种油都可通过桶、大缸与 Cookery 油壶进行已支持的转移。",
@@ -3203,7 +3203,7 @@
           "副手留空，潜行并使用手中的热食，可合并背包内相同种类与数据的热食，按数量平均剩余热度；不限烤串，也不受箱内整理的 5 分钟窗口限制。普通进食请松开潜行。"
         ],
         "zh_TW": [
-          "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。 熱期限按原作每 5 秒一格向下取整；新加熱與熱食合併都遵守同一規則。已保存的舊熱期限在到期或再次加熱前保留。",
+          "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。 熱期限按原作每 5 秒一格向下取整；新加熱與熱食合併都遵守同一規則。已保存的舊熱期限讀取時保持原值；再次加熱、合併或冰箱整理時會按原作重新取整。",
           "趁熱吃時，新獲得的固定烤串效果持續時間會翻倍，新增的飽和度提高 25%。",
           "特製調料的附加效果只會在食物仍有煙火氣時觸發；它們不會再被煙火氣二次翻倍。冷掉後仍能吃，但不會觸發這些調料效果。",
           "秘製辣椒油桶可用 1 桶菜籽油 + 3 份紅辣椒粉無序合成；三種油都可透過桶、大缸與 Cookery 油壺進行已支援的轉移。",
@@ -3213,7 +3213,7 @@
           "副手留空，潛行並使用手中的熱食，可合併背包內相同種類與資料的熱食，按數量平均剩餘熱度；不限烤串，亦不受箱內整理的 5 分鐘窗口限制。普通進食請鬆開潛行。"
         ],
         "en_US": [
-          "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore. New heating and hot-food merges round the expiry down to five-second boundaries, as in Java. Previously saved deadlines remain intact until expiry or reheating.",
+          "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore. New heating and hot-food merges round the expiry down to five-second boundaries, as in Java. Previously saved deadlines remain exact on reads; reheating, merging or refrigerator sorting re-buckets them as in Java.",
           "When eaten hot, newly gained fixed skewer effects have double duration and newly gained saturation is increased by 25%.",
           "Special Seasoning effects only trigger while the food is still hot; Hot Food does not double those seasoning durations a second time. Cold food remains edible, but those seasoning effects do not activate.",
           "A Secret Chili Oil Bucket is shapelessly crafted from 1 Canola Oil Bucket + 3 Red Chili Powder. All three oils can use the supported bucket, Big Vat, and Cookery Oil Pot transfer paths.",

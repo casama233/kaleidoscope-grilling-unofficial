@@ -893,7 +893,7 @@ function completePlateUse(player,eventStack){
  const oldH=h.currentValue,oldS=sat.currentValue;
  if(!commitEating({debit:()=>writeUseHand(player,a.use,next),reward:()=>addNestedNutrition(player,eaten,meta),
   restoreFood:()=>writeUseHand(player,a.use,a.plate),restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}}))return;
- const id=eaten.typeId;dangerousPreservation(player,id);
+ const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);
 
  if(RAW_NAUSEA[id])try{player.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{player.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{player.addEffect('blindness',200,{showParticles:true})}catch{}
  if(id===SECRET_ID)secretRemainders(player,eaten);

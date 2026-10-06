@@ -19,6 +19,13 @@ EVIDENCE = (
     'docs/BDS-G66-T98-L63-20261004.json',
     '.github/local-test-release-2.8.66.json',
 )
+# Reviewed public BP/RP identities: legacy compat/family/cookery-host.json and
+# the Cookery 1.6.0 adapter baseline. A new author pair requires review here;
+# the release label itself always comes from the canonical dependencies.
+REVIEWED_COOKERY_HOSTS = {
+    ('d322809c-a51e-4742-bfc4-16d3c1491c9d', '8e2c6318-2f5f-4907-aad0-31d10610e405'): (1, 0, 8),
+    ('5df753c9-3436-4fba-87f1-a2da3651cfcf', 'f1d333ca-2d6b-4566-8005-e6c309816324'): (1, 6, 0),
+}
 
 
 def require(condition, message):
@@ -258,15 +265,52 @@ def publish_g66(sha, report, assets, source_validation):
     print('Published exact non-latest prerelease', tag, 'from tested GitHub main', sha)
 
 
+def reviewed_cookery_requirement(version, root=ROOT):
+    """Read the current host lock; never infer host identities from Grilling's version."""
+    baseline = json.loads((root / 'baseline.json').read_text(encoding='utf-8-sig'))
+    require(type(baseline.get('schema')) is int and baseline['schema'] == 1,
+            'Unsupported release baseline schema')
+    require(baseline.get('repository') == REPO and baseline.get('repository_id') == REPO_ID,
+            'Release baseline repository mismatch')
+    own_version = baseline['version']
+    require(isinstance(own_version, list) and len(own_version) == 3
+            and all(type(part) is int and part >= 0 for part in own_version),
+            'Invalid release baseline version')
+    require(version == 'A' + '.'.join(map(str, own_version)), 'Release version/baseline mismatch')
+    packs = baseline['packs']
+    owned_ids = {packs[side]['uuid'] for side in ('BP', 'RP')}
+    hosts = {}
+    for side in ('BP', 'RP'):
+        manifest = json.loads((root / baseline['runtime'][side] / 'manifest.json').read_text(encoding='utf-8-sig'))
+        require(manifest['header']['uuid'] == packs[side]['uuid']
+                and manifest['header']['version'] == own_version
+                and manifest.get('dependencies') == packs[side].get('dependencies'),
+                f'{side} release manifest/baseline mismatch')
+        external = [dep for dep in packs[side]['dependencies']
+                    if 'uuid' in dep and dep['uuid'] not in owned_ids]
+        require(len(external) == 1, f'Expected exactly one reviewed Cookery {side} dependency')
+        hosts[side] = external[0]
+        host_version = hosts[side].get('version')
+        require(isinstance(host_version, list) and len(host_version) == 3
+                and all(type(part) is int and part >= 0 for part in host_version),
+                f'Invalid Cookery {side} dependency version')
+    pair = (hosts['BP']['uuid'], hosts['RP']['uuid'])
+    require(pair in REVIEWED_COOKERY_HOSTS, 'Unreviewed Cookery BP/RP dependency pair')
+    require(tuple(hosts['BP']['version']) == tuple(hosts['RP']['version']) == REVIEWED_COOKERY_HOSTS[pair],
+            'Cookery dependency version does not match the reviewed BP/RP pair')
+    return 'Cookery ' + '.'.join(map(str, hosts['BP']['version']))
+
+
 def publish_legacy(version, sha, assets):
-    """Keep the pre-G66 unique-per-attempt publication workflow unchanged."""
+    """Keep unique-per-attempt publication, with the current reviewed host requirement."""
+    host_requirement = reviewed_cookery_requirement(version, ROOT)
     tag = f"{version}-test.{os.environ['GITHUB_RUN_NUMBER']}.{os.environ['GITHUB_RUN_ATTEMPT']}"
     out = assets[0].parent
     notes = out / 'release-notes.md'
     status = ROOT / 'docs' / f'STATUS-{version}.md'
     notes.write_text(f'# {version} 整合測試版\n\n此包直接由合併後 main 的 `{sha}` 建置並校驗。\n\n'
         'Minecraft 客戶端操作／畫面及正式存檔遷移：**尚未驗收**。隔離 BDS 測試範圍以本版狀態文件與證據為準。請先備份測試世界。\n\n'
-        '安裝 `.mcaddon`；需要公開版 Cookery 1.0.8（私人版 UUID 不可直接替換），煙火指南已在本體內，不需另外安裝指南包。\n\n'
+        f'安裝 `.mcaddon`；需要公開版 {host_requirement}（私人版 UUID 不可直接替換），煙火指南已在本體內，不需另外安裝指南包。\n\n'
         + (status.read_text(encoding='utf-8') if status.exists() else '') + '\n', encoding='utf-8')
     run('gh', 'release', 'create', tag, *map(str, assets), '--repo', REPO, '--target', sha,
         '--title', f'Kaleidoscope Grilling {version} Integrated Test', '--notes-file', str(notes), '--prerelease')

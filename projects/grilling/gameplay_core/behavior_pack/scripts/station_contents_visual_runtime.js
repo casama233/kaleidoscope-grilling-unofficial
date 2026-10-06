@@ -1,4 +1,7 @@
 import {advancedRackToolVisuals} from './advanced_rack_visual_core.js';
+import {RACK_TOOL_VISUAL_TYPE,rackToolVisualModel} from './rack_tool_visual_data.js';
+import {rackDisplayPose,RACK_TOOL_VISUAL_Y} from './advanced_rack_layout.js';
+import {syncRackDisplay} from './a2746_rack_state_adapter.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {stationProjection,registerStationProjection} from './station_projection_core.js';
 import {readPublicFood} from './host_api/food_api_core.js';
@@ -31,10 +34,11 @@ export function renderItemType(entity,stack){
 function pose(block,dx,y,dz){const angle={north:0,east:90,south:180,west:270}[block.permutation.getState('minecraft:cardinal_direction')]??0,r=angle*Math.PI/180;return {location:{x:block.x+.5+dx*Math.cos(r)-dz*Math.sin(r),y:block.y+y,z:block.z+.5+dx*Math.sin(r)+dz*Math.cos(r)},angle};}
 function render(row,b,k,stack,at,mode){
  let old=row.parts.get(k);if(!stack){discard(row,k);return;}
- if(old&&!old.entity.isValid){discard(row,k);old=undefined;}
- const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,mode});if(old?.signature===signature)return;
- if(!old){if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn("[Grilling contents capacity] render budget="+grillingConfig().contentsHelpers+"; storage unaffected; configure contentsHelpers after workload validation")}return;}old={entity:b.dimension.spawnEntity(TYPE,at.location)};row.parts.set(k,old);helpers++;}
- try{old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});old.entity.setProperty('kaleidoscope_grilling:pose',mode);renderItemType(old.entity,stack);old.signature=signature;}catch(e){discard(row,k);throw e;}
+ const model=mode===0?rackToolVisualModel(stack.typeId):undefined,type=model===undefined?TYPE:RACK_TOOL_VISUAL_TYPE;
+ if(old&&(!old.entity.isValid||old.entity.typeId!==type)){discard(row,k);old=undefined;}
+ const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,mode,type,model});if(old?.signature===signature)return;
+ if(!old){if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn("[Grilling contents capacity] render budget="+grillingConfig().contentsHelpers+"; storage unaffected; configure contentsHelpers after workload validation")}return;}old={entity:b.dimension.spawnEntity(type,at.location)};row.parts.set(k,old);helpers++;}
+ try{old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});if(model===undefined){old.entity.setProperty('kaleidoscope_grilling:pose',mode);renderItemType(old.entity,stack);}else{old.entity.setProperty('kaleidoscope_grilling:model',model);old.entity.setProperty('kaleidoscope_grilling:ready',true);}old.signature=signature;}catch(e){discard(row,k);throw e;}
 }
 function composed(row,b,k,stack,at,cooked,seen){
  const ingredients=reader?.(stack,cooked)??[];
@@ -50,12 +54,16 @@ export function syncStationContentsVisual(block,observers){
  const seen=new Set();
  if(block.typeId==='kaleidoscope_grilling:advanced_rack_block'){
   const c=peekStationContainer(block);
-  // Java's spice_level block mesh already supplies the upper containers.
-  // Four lower slots remain storage, but only three non-empty tools have hooks.
-  // Keep the current native equipped-item Y/Z/pose until FIXED projection is
-  // separately calibrated; the source hook selection/X spacing is independent.
+  // Rebuild only derived display state for old saved racks when discovered.
+  // Native contents, filters and ownership remain authoritative and unchanged.
+  if(c)syncRackDisplay(block,Array.from({length:9},(_,i)=>c.getItem(i)));
+  // Five occupied shelf jars are block bones; all four tools have fixed hooks.
+  // Known tools use source-derived FIXED sprites; tagged extensions keep native equipment.
+  // Four fixed X cells remain; known sprite bounds are centered in the clicked lower row.
+  // Native tagged-item fallback keeps its previous Y anchor; client calibration is separate.
   for(const {slot,stack,x} of advancedRackToolVisuals(i=>c?.getItem(i))){
-   const k='rack/'+slot;seen.add(k);render(row,block,k,stack,pose(block,x,.35,-.27),0);
+   const k='rack/'+slot;seen.add(k);const y=rackToolVisualModel(stack.typeId)===undefined?.35:RACK_TOOL_VISUAL_Y;
+   render(row,block,k,stack,rackDisplayPose(block,x,y,-.27),0);
   }
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);
@@ -85,5 +93,5 @@ function pump(){
 for(const name of ['playerPlaceBlock','playerInteractWithBlock','playerBreakBlock'])world.afterEvents[name].subscribe(e=>markStationContentsDirty(e.block));
 // Script transactions cancel native interaction events, so enqueue their post-commit state too.
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{if(['kaleidoscope_grilling:grill','kaleidoscope_grilling:advanced_rack_block','kaleidoscope_grilling:skewer_plate_block'].includes(e.block.typeId)){const d=e.block.dimension,l={...e.block.location};system.run(()=>{try{markStationContentsDirty(d.getBlock(l))}catch{}})}});
-system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const e of world.getDimension(dim).getEntities({type:TYPE}))e.remove()}catch{};index();system.runInterval(pump,1);system.runInterval(index,400);});
+system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE])for(const e of world.getDimension(dim).getEntities({type}))e.remove()}catch{};index();system.runInterval(pump,1);system.runInterval(index,400);});
 export const contentsVisualHelperCount=()=>helpers;

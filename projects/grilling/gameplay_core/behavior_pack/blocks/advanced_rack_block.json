@@ -10,6 +10,28 @@
           2,
           3,
           4
+        ],
+        "kaleidoscope_grilling:seasoning_occupancy": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "kaleidoscope_grilling:seasoning_occupancy_high": [
+          0,
+          1
         ]
       },
       "traits": {
@@ -23,7 +45,16 @@
     },
     "components": {
       "minecraft:display_name": "kaleidoscope_grilling.display.block.advanced_rack",
-      "minecraft:geometry": "geometry.kg_a1.advanced_rack_0",
+      "minecraft:geometry": {
+        "identifier": "geometry.kg_a1.advanced_rack_0",
+        "bone_visibility": {
+          "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+          "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+          "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+          "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+          "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+        }
+      },
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a2746_advanced_rack",
@@ -70,31 +101,76 @@
       {
         "condition": "q.block_state('kaleidoscope_grilling:spice_level') == 0",
         "components": {
-          "minecraft:geometry": "geometry.kg_a1.advanced_rack_0"
+          "minecraft:geometry": {
+            "identifier": "geometry.kg_a1.advanced_rack_0",
+            "bone_visibility": {
+              "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+              "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+              "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+              "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+            }
+          }
         }
       },
       {
         "condition": "q.block_state('kaleidoscope_grilling:spice_level') == 1",
         "components": {
-          "minecraft:geometry": "geometry.kg_a1.advanced_rack_1"
+          "minecraft:geometry": {
+            "identifier": "geometry.kg_a1.advanced_rack_1",
+            "bone_visibility": {
+              "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+              "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+              "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+              "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+            }
+          }
         }
       },
       {
         "condition": "q.block_state('kaleidoscope_grilling:spice_level') == 2",
         "components": {
-          "minecraft:geometry": "geometry.kg_a1.advanced_rack_2"
+          "minecraft:geometry": {
+            "identifier": "geometry.kg_a1.advanced_rack_2",
+            "bone_visibility": {
+              "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+              "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+              "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+              "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+            }
+          }
         }
       },
       {
         "condition": "q.block_state('kaleidoscope_grilling:spice_level') == 3",
         "components": {
-          "minecraft:geometry": "geometry.kg_a1.advanced_rack_3"
+          "minecraft:geometry": {
+            "identifier": "geometry.kg_a1.advanced_rack_3",
+            "bone_visibility": {
+              "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+              "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+              "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+              "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+            }
+          }
         }
       },
       {
         "condition": "q.block_state('kaleidoscope_grilling:spice_level') == 4",
         "components": {
-          "minecraft:geometry": "geometry.kg_a1.advanced_rack_4"
+          "minecraft:geometry": {
+            "identifier": "geometry.kg_a1.advanced_rack_4",
+            "bone_visibility": {
+              "rack_seasoning_0": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 1) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) == 1",
+              "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
+              "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
+              "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+            }
+          }
         }
       },
       {
