@@ -48,7 +48,9 @@ def main():
         hook = [deepcopy(b) for b in old_bones if b.get('parent') == 'rack_tool_hook_0']
         hook_center = layout['tools'][0] * 16
         jar = deepcopy(next(b['cubes'] for b in old_bones if b['name'] == 'rack_seasoning_0'))
-        jar_center = layout['seasonings'][0] * 16
+        # Read the model-space anchor from the actual source group so a second
+        # run accepts both the earlier mirrored layout and corrected output.
+        jar_center = jar[0]['origin'][0] + jar[0]['size'][0] / 2
     else:
         # Existing source-conversion part groups: board/shelves, first complete
         # hook (including UV-corrected faces), first source seasoning jar.
@@ -70,8 +72,11 @@ def main():
             bones.append(bone)
     for index, x in enumerate(layout['seasonings']):
         cubes = deepcopy(jar)
+        # Rack hits and entity anchors use world-local X. Bedrock geometry X
+        # is reflected (also used by bedrock_sprite_alignment.py). Preserve
+        # each saved slot/bone/UV and translate its jar to the opposite model X.
         for cube in cubes:
-            cube['origin'][0] = round(cube['origin'][0] + x * 16 - jar_center, 9)
+            cube['origin'][0] = round(cube['origin'][0] - x * 16 - jar_center, 9)
         bones.append({'name': f'rack_seasoning_{index}', 'parent': 'root', 'pivot': [0, 0, 0], 'cubes': cubes})
     # Preserve the five established geometry identifiers and spice state values
     # for saved permutations, but every variant now has the same fixed layout.

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {RACK_SEASONING_X,RACK_TOOL_X,RACK_OCCUPANCY_STATE,RACK_OCCUPANCY_HIGH_STATE} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/advanced_rack_layout.js';
+import {rackSlotAtHit} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_rack_quick_pick.js';
 const root=new URL('../../projects/grilling/gameplay_core/',import.meta.url);
 const read=path=>JSON.parse(fs.readFileSync(new URL(path,root),'utf8'));
 test('all established rack geometries have matching four fixed hooks and five shelf cells',()=>{
@@ -20,10 +21,35 @@ test('all established rack geometries have matching four fixed hooks and five sh
   assert.equal([...bones.keys()].filter(x=>/^rack_tool_hook_/.test(x)).length,4);
   for(let slot=0;slot<5;slot++){
    const jar=bones.get(`rack_seasoning_${slot}`),body=jar.cubes[0];assert.equal(jar.cubes.length,4);
-   assert.ok(Math.abs((body.origin[0]+body.size[0]/2)/16-RACK_SEASONING_X[slot])<1e-9);
+   assert.ok(Math.abs(-(body.origin[0]+body.size[0]/2)/16-RACK_SEASONING_X[slot])<1e-9);
   }
   // Prevent old compacted hook/jar groups from being layered under new cells.
   assert.equal([...bones.keys()].filter(x=>/^instance_0_(source_[567]_mixed|element_(7|2[6-9]|3\d|4\d)_)/.test(x)).length,0);
+ }
+});
+test('actual reflected jar geometry projects into its saved hit cell for every facing and spice variant',()=>{
+ const block=read('behavior_pack/blocks/advanced_rack_block.json')['minecraft:block'];
+ const transforms=block.permutations.filter(p=>p.components['minecraft:transformation']);
+ assert.equal(transforms.length,4);
+ const expected={north:0,south:180,west:90,east:270};
+ for(const permutation of transforms){
+  const facing=permutation.condition.match(/== '([^']+)'/)[1];
+  const rotation=permutation.components['minecraft:transformation'].rotation;
+  assert.deepEqual(rotation,[0,expected[facing],0]);
+  const angle=rotation[1]*Math.PI/180,c=Math.round(Math.cos(angle)),s=Math.round(Math.sin(angle));
+  for(let level=0;level<5;level++){
+   const bones=read(`resource_pack/models/blocks/advanced_rack_${level}.geo.json`)['minecraft:geometry'][0].bones;
+   for(let slot=0;slot<5;slot++){
+    const jar=bones.find(b=>b.name===`rack_seasoning_${slot}`);
+    assert.equal(jar.parent,'root');assert.deepEqual(jar.pivot,[0,0,0]);assert.equal(jar.rotation,undefined);
+    // Independent geometry-to-world oracle: reflect JSON model X first, then
+    // apply the actual block transformation, not rackDisplayPose's inverse.
+    const body=jar.cubes[0],x=-(body.origin[0]+body.size[0]/2)/16,z=(body.origin[2]+body.size[2]/2)/16;
+    const hit={x:.5+c*x+s*z,y:12/16,z:.5-s*x+c*z};
+    assert.equal(rackSlotAtHit(facing,hit),slot,`${facing}/level${level}/saved slot${slot}`);
+    if(slot===2)assert.ok(x===0);
+   }
+  }
  }
 });
 test('every rack custom block state domain stays within the native 16-value limit in both definitions',()=>{

@@ -209,7 +209,8 @@ for(const row of [
  const f=fixture({...row,hand,realEffects:true}),before=f.state.stack.clone(),other=f.state.other.clone();
  assert.deepEqual(FOOD_DATA[row.mealId],{nutrition:row.nutrition,saturation:row.saturation});
  f.startUse();f.stop({tick:row.stop,remaining:row.remaining});f.stop({tick:row.stop,remaining:row.remaining});
- assert.deepEqual(f.state.stack,before,'Settlement is deferred to the safe phase');
+ const stopped=before.amount>1?before.clone():undefined;if(stopped)stopped.amount--;
+ assert.deepEqual(f.state.stack,stopped,'Proven nonterminal release settles in its writable after-event');
  f.flush(row.flush);
  const expected=before.amount>1?before.clone():undefined;if(expected)expected.amount--;
  assert.deepEqual(f.state.stack,expected);assert.deepEqual(f.state.other,other);
@@ -305,7 +306,7 @@ for(const [base,effect] of Object.entries(COOKED_EFFECTS))for(const mealId of ne
  const f=fixture({mealId,duration,hand,realEffects:true}),before=f.state.stack.clone(),other=f.state.other.clone();
  const a=f.startUse();assert.equal(a.id,base);assert.equal(JSON.parse(a.use.identity).id,mealId);
  if(RANDOM_EATING_IDS.has(base))assert.equal(a.profile,isAlternateEatingId(mealId)?'THREE_ALT':'THREE');
- if(finish==='release'){f.stop({tick:124,remaining:duration-24});f.stop({tick:124,remaining:duration-24});assert.deepEqual(f.state.stack,before);f.flush();}
+ if(finish==='release'){f.stop({tick:124,remaining:duration-24});f.stop({tick:124,remaining:duration-24});const stopped=before.clone();stopped.amount--;assert.deepEqual(f.state.stack,stopped);f.flush();}
  else{f.complete({nativeDebit:true});f.stop();f.flush();}
  before.amount--;assert.deepEqual(f.state.stack,before);assert.deepEqual(f.state.other,other);
  const facts=FOOD_DATA[mealId],hunger=Math.min(20,10+facts.nutrition);
@@ -342,7 +343,7 @@ for(const hand of ['main','off'])for(const finish of ['release','native'])test(`
  assert.equal(f.nativeEffects.get('strength').duration,400);assert.equal(f.nativeEffects.get('speed').duration,14400);assert.equal(f.nativeEffects.get('speed').amplifier,1);
 });
 for(const hand of ['main','off'])for(const finish of ['release','native'])test(`heat expiring at finish removes doubling and seasoning ${hand} ${finish}`,()=>{
- const finishTick=finish==='release'?126:189,f=fixture({hand,realEffects:true,hot:true,hotUntil:finishTick,seasonings:['minecraft:redstone'],saturationMultiplier:2});
+ const finishTick=finish==='release'?125:189,f=fixture({hand,realEffects:true,hot:true,hotUntil:finishTick,seasonings:['minecraft:redstone'],saturationMultiplier:2});
  f.startUse();if(finish==='release'){f.stop({tick:125,remaining:65});f.flush(126);}else{f.complete({nativeDebit:true});f.stop();f.flush();}
  assert.equal(f.nativeEffects.get('strength').duration,200);assert.equal(f.nativeEffects.has('speed'),false);assert.equal(f.nutrition.saturation,8);
 });
@@ -355,4 +356,55 @@ for(const order of ['complete-first','stop-first'])for(const hand of ['main','of
 for(const elapsed of [1,23,24,25,26])test(`animation-off release ${elapsed} never adds a timer-based debit without native completion`,()=>{
  const f=fixture({duration:25,mealId:eatingItemId(id,false,false)});f.startUse();f.stop({tick:100+elapsed});f.flush();
  assert.equal(f.counts.manualWrites,0);assert.equal(f.counts.nativeRewards,0);assert.equal(f.counts.manualRewards,0);assert.equal(f.state.stack.amount,2);
+});
+
+// Actual production stop/leave subscribers with deterministic API/scheduler
+// adapters. These tests create no Minecraft or simulated Player entities.
+function productionLeave(f){
+ const handlers=[];f.ctx.world.afterEvents.playerLeave={subscribe:fn=>handlers.push(fn)};
+ Object.assign(f.ctx,{PENDING_METAL_RESCUES:new Map(),VIGOR_LAST:new Map(),SNEAK_LAST:new Map(),THREAD_LAST:new Map(),NUMB_VISUAL:new Set(),forgetDragonHealth(){}});
+ const first=source.indexOf('world.afterEvents.playerLeave.subscribe(e=>{'),firstEnd=source.indexOf('const PENDING_METAL_RESCUES=',first);
+ const last=source.indexOf('world.afterEvents.playerLeave.subscribe(({playerId})=>{'),lastEnd=source.indexOf('configureSecretVisuals(',last);
+ assert.ok(first>=0&&firstEnd>first&&last>=0&&lastEnd>last);
+ vm.runInNewContext(source.slice(first,firstEnd)+'\n'+source.slice(last,lastEnd),f.ctx);
+ return ()=>{for(const fn of handlers)fn({playerId:f.player.id});};
+}
+for(const duration of [90,100])for(const hand of ['main','off'])for(const creative of [false,true])for(const elapsed of [24,25])test(`D02 nonterminal stop settles before leave duration=${duration} hand=${hand} creative=${creative} elapsed=${elapsed}`,()=>{
+ const f=fixture({duration,hand,creative});const leave=productionLeave(f);f.startUse();
+ const opposite=f.state.other.clone();f.stop({tick:100+elapsed,remaining:duration-elapsed});
+ assert.equal(f.counts.manualRewards,1,'eligible nonterminal release owns its settlement in this writable after-event');
+ assert.equal(f.counts.manualWrites,creative?0:1);assert.equal(f.state.stack.amount,creative?2:1);assert.equal(f.nutrition.hunger,duration===100?14:15); // source catalog: ender=4, beef=5
+ leave();f.flush(500);assert.equal(f.counts.manualRewards,1);assert.equal(f.counts.nativeRewards,0);assert.deepEqual(f.state.other,opposite);
+});
+test('D02 ineligible stop plus leave preserves the serving and nutrition',()=>{
+ const f=fixture();const leave=productionLeave(f);f.startUse();f.stop({tick:123,remaining:67});leave();f.flush();
+ assert.equal(f.state.stack.amount,2);assert.equal(f.nutrition.hunger,10);assert.equal(f.counts.manualRewards,0);
+});
+test('D02 terminal or unknown native counters still let actual completion win',()=>{
+ for(const remaining of [0,undefined,NaN,-1,1000]){const f=fixture();f.startUse();f.stop({tick:189,remaining});assert.equal(f.counts.manualRewards,0);f.complete({tick:189,nativeDebit:true});f.flush();assert.deepEqual(f.counts,{nativeDebits:1,manualWrites:0,nativeRewards:1,manualRewards:0});}
+});
+test('D02 immediately settled use cannot consume again through repeated stop or stale completion',()=>{
+ const f=fixture();f.startUse();const old=f.event.itemStack.clone();f.stop({tick:125,remaining:65});f.stop({tick:125,remaining:65,stack:old});f.complete({tick:190,stack:old});f.flush();
+ assert.equal(f.counts.manualRewards,1);assert.equal(f.counts.manualWrites,1);assert.equal(f.counts.nativeRewards,0);assert.equal(f.state.stack.amount,1);
+});
+test('D02 identity mismatch rejects immediate settlement without taking a replacement serving',()=>{
+ const f=fixture();f.startUse();f.state.stack.nameTag='replacement before stop';f.stop({tick:125,remaining:65});f.flush();
+ assert.equal(f.counts.manualRewards,0);assert.equal(f.state.stack.amount,2);assert.equal(f.state.stack.nameTag,'replacement before stop');assert.equal(f.nutrition.hunger,10);
+});
+
+test('D02 immediate debit write fault restores food/nutrition and cannot grant effects on retry',()=>{
+ const f=fixture({realEffects:true});f.startUse();const before=f.state.stack.clone(),bag=f.ctx.mainContainer(f.player),write=bag.setItem.bind(bag);let once=true;
+ bag.setItem=(...args)=>{write(...args);if(once){once=false;throw Error('after write fault');}};
+ f.stop({tick:125,remaining:65});f.flush();f.stop({tick:125,remaining:65});f.flush();
+ assert.deepEqual(f.state.stack,before);assert.equal(f.nutrition.hunger,10);assert.equal(f.nutrition.saturation,2);assert.equal(f.counts.manualRewards,0);assert.deepEqual(f.effects,[]);
+});
+test('D02 immediate nutrition fault restores the already debited serving before leave',()=>{
+ const f=fixture({realEffects:true});const leave=productionLeave(f);f.startUse();const before=f.state.stack.clone(),h=f.player.getComponent('minecraft:player.hunger'),write=h.setCurrentValue.bind(h);let once=true;
+ h.setCurrentValue=n=>{write(n);if(once){once=false;throw Error('after nutrition write fault');}};
+ f.stop({tick:125,remaining:65});leave();f.flush();
+ assert.deepEqual(f.state.stack,before);assert.equal(f.nutrition.hunger,10);assert.equal(f.nutrition.saturation,2);assert.equal(f.counts.manualRewards,0);assert.deepEqual(f.effects,[]);
+});
+for(const hand of ['main','off'])test(`D02 heat at stop is authoritative, not the removed extra scheduling tick ${hand}`,()=>{
+ const f=fixture({hand,realEffects:true,hot:true,hotUntil:126,seasonings:['minecraft:redstone'],saturationMultiplier:2});f.startUse();f.stop({tick:125,remaining:65});
+ assert.equal(f.ctx.effectFinishTick,125);assert.equal(f.nativeEffects.get('strength').duration,400);assert.ok(f.nativeEffects.has('speed'));f.flush(500);assert.equal(f.counts.manualRewards,1);
 });

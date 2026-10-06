@@ -1,6 +1,7 @@
 """G75 combines two distinct G73 identities without relaxing byte conservation."""
 import copy
 import hashlib
+import json
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -23,9 +24,10 @@ class G75SourceConservationTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(source).hexdigest(), digest)
 
     def test_both_conservation_entrypoints_expect_the_same_combined_g75(self):
-        expected = public.expected_main_bytes((2, 8, 78))
-        self.assertEqual(expected, public.expected_main_bytes((2, 8, 78), local_bottles=True))
-        self.assertEqual(hashlib.sha256(expected).hexdigest(), 'c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727')
+        self.assertEqual(hashlib.sha256(public.expected_main_bytes((2,8,78))).hexdigest(), 'c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727')
+        current=json.loads((public.ROOT/'baseline.json').read_text())['version']
+        expected=public.expected_main_bytes(current)
+        self.assertEqual(expected,public.expected_main_bytes(current,local_bottles=True))
         path = public.ROOT / public.MAIN_PATH
         self.assertEqual(path.read_bytes(), expected)
         public.assert_public_bytes(self, path)
@@ -40,6 +42,8 @@ class G75SourceConservationTests(unittest.TestCase):
             (b' ordinaryFatalFeedback(player);\n', b''),
             (b' const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);', b' const id=eaten.typeId;dangerousPreservation(player,id);'),
             (b'MINIMUM_EAT_TICKS=25', b'MINIMUM_EAT_TICKS=1'),
+            (b'used+1<a.nativeDuration',b'used<a.nativeDuration'),
+            (b'e.useDuration>0',b'e.useDuration>=0'),
         )
         changed_sources = [source + b'\n']
         for before, after in mutations:
@@ -60,6 +64,16 @@ class G75SourceConservationTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(seasoning).hexdigest(),'7788ca0e01d497e22e96a11991c6f33a96cfce6b08f1d0c93778d17d87850838')
         self.assertEqual(hashlib.sha256(plate).hexdigest(),'c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727')
         self.assertNotEqual(seasoning,plate)
+
+    def test_conflicting_g80_proposals_keep_distinct_main_source(self):
+        with self.assertRaises(AssertionError):public.expected_main_bytes((2,8,80))
+        jar=public.expected_main_bytes((2,8,80),proposal='jar_projection')
+        stop=public.expected_main_bytes((2,8,80),proposal='checkpoint_stop')
+        self.assertEqual(jar,public.expected_main_bytes((2,8,79)))
+        self.assertEqual(stop,public.expected_main_bytes((2,8,81)))
+        self.assertNotEqual(jar,stop)
+        delta=public._main_delta('g80-main-reviewed-delta.json')
+        self.assertEqual(public._apply_main_operations(jar,delta),stop)
 
     def test_g75_bridge_is_only_the_reviewed_plate_alias_line(self):
         published = public._main_delta('g74-main-reviewed-delta.json')
