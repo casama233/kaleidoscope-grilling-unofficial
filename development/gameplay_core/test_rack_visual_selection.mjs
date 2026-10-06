@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {advancedRackToolVisuals,ADVANCED_RACK_HOOK_X} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/advanced_rack_visual_core.js';
 import {RACK_SEASONING_X,RACK_TOOL_X,rackDisplayPose,rackSeasoningOccupancy} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/advanced_rack_layout.js';
+import {RACK_TOOL_VISUAL_Y} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/advanced_rack_layout.js';
+import {rackToolVisualModel} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_tool_visual_data.js';
 import {rackSlotAtHit} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_rack_quick_pick.js';
 const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js',import.meta.url),'utf8');
 function sync(rows,oldKeys=[]){
@@ -11,7 +13,7 @@ function sync(rows,oldKeys=[]){
  const row={dimensionId:'test',parts};
  const block={typeId:'kaleidoscope_grilling:advanced_rack_block',x:0,y:0,z:0};
  const read=[];
- const ctx={rememberStationVisual(){},syncRackDisplay(){},targets:new Map([['rack',row]]),key:()=> 'rack',peekStationContainer:()=>({getItem(i){read.push(i);return rows[i]}}),advancedRackToolVisuals,rackDisplayPose:(_b,x,y,z)=>({x,y,z}),render:(_r,_b,key,stack,at,mode)=>{if(stack)out.push({key,stack,at,mode})},discard:(_r,k)=>{discarded.push(k);parts.delete(k)},clear(){},work:{remove(){}}};
+ const ctx={rackToolVisualModel,RACK_TOOL_VISUAL_Y,rememberStationVisual(){},syncRackDisplay(){},targets:new Map([['rack',row]]),key:()=> 'rack',peekStationContainer:()=>({getItem(i){read.push(i);return rows[i]}}),advancedRackToolVisuals,rackDisplayPose:(_b,x,y,z)=>({x,y,z}),render:(_r,_b,key,stack,at,mode)=>{if(stack)out.push({key,stack,at,mode})},discard:(_r,k)=>{discarded.push(k);parts.delete(k)},clear(){},work:{remove(){}}};
  const start=source.indexOf('export function syncStationContentsVisual('),end=source.indexOf('\nfunction index()',start);
  assert.ok(start>=0&&end>start);vm.runInNewContext(source.slice(start,end).replace('export ',''),ctx);
  ctx.syncStationContentsVisual(block,[{dimensionId:'test',x:0,y:0,z:0}]);return {out,discarded,read};
@@ -70,4 +72,9 @@ test('all32 shelf occupancy masks identify exact saved slots without compaction'
   const f=sync(rows);assert.deepEqual(f.out.map(x=>x.key),['rack/5','rack/6','rack/7','rack/8']);
   assert.deepEqual(f.out.map(x=>x.at.x),ADVANCED_RACK_HOOK_X);assert.deepEqual(rows,before);
  }
+});
+
+test('known sprite centers match clicked tool row while extensions retain native anchor',()=>{
+ const rows=Array(9);rows[5]={typeId:'kaleidoscope_cookery:iron_kitchen_knife'};rows[8]={typeId:'custom:knife'};const f=sync(rows);
+ assert.equal(f.out[0].at.y,7/16);assert.equal(f.out[1].at.y,.35);assert.equal(f.out[0].at.z,-.27);assert.equal(f.out[1].at.z,-.27);
 });
