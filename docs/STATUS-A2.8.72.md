@@ -9,3 +9,5 @@ This removes the known five-tick pump dependency for successful immediate reconc
 Focused source verification: 203 native-storage/native-hand/held API-double tests, including 15 post-commit visual cases; 17 placed-core cases; 9 parity cases; source-conservation checks; runtime syntax and both bottle visual generator checks. Geometry and texture files have no differences from the G71 source pin.
 
 Bounded preceding G71 native and Blockbench evidence: `NATIVE-BOTTLE-G71-20261006.json`. It does not certify the G72 cleanup or expand the recorded native coverage. Original screenshots and world data are not published.
+
+Subsequent bounded G72 native check: `NATIVE-BOTTLE-G72-20261006.json` records two pickups with no residue in the first returned screenshots, retained ingredients through re-placement, and successful shaking. It does not establish zero-frame latency, all-view/skin coverage or complete client acceptance. This evidence update changes no runtime bytes.
