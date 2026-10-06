@@ -1,0 +1,5 @@
+"""Coherent checkpoint release and actual-asset rack jar projection repair."""
+from verify_a2879 import main as previous
+def main():
+ previous(expected_version=(2,8,81))
+if __name__=="__main__":main()

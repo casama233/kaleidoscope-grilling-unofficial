@@ -94,6 +94,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
         assert proposal in ['plate_alias','seasoning'], 'Conflicting unpublished proposals require an explicit source lineage'
         if proposal=='seasoning':
             return _apply_main_operations(original, _main_delta('g74-main-reviewed-delta.json'))
+    if version == (2,8,80):
+        assert proposal in ["checkpoint_stop","jar_projection"], "Conflicting G80 proposals require explicit source lineage"
     if version >= (2, 8, 74):
         expected = _apply_main_operations(original, _main_delta('g74-main-reviewed-delta.json'))
         if version >= (2, 8, 77) or proposal=='plate_alias':
@@ -103,7 +105,7 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             assert len(delta['operations']) == len(local) == 1
             assert [(op['before'], op['after']) for op in delta['operations']] == [(op['before'], op['after']) for op in local]
             expected = _apply_main_operations(expected, delta)
-        if version >= (2, 8, 80):
+        if version >= (2, 8, 81) or (version==(2,8,80) and proposal=="checkpoint_stop"):
             delta = _main_delta('g80-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 80]
             expected = _apply_main_operations(expected, delta)

@@ -65,6 +65,16 @@ class G75SourceConservationTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(plate).hexdigest(),'c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727')
         self.assertNotEqual(seasoning,plate)
 
+    def test_conflicting_g80_proposals_keep_distinct_main_source(self):
+        with self.assertRaises(AssertionError):public.expected_main_bytes((2,8,80))
+        jar=public.expected_main_bytes((2,8,80),proposal='jar_projection')
+        stop=public.expected_main_bytes((2,8,80),proposal='checkpoint_stop')
+        self.assertEqual(jar,public.expected_main_bytes((2,8,79)))
+        self.assertEqual(stop,public.expected_main_bytes((2,8,81)))
+        self.assertNotEqual(jar,stop)
+        delta=public._main_delta('g80-main-reviewed-delta.json')
+        self.assertEqual(public._apply_main_operations(jar,delta),stop)
+
     def test_g75_bridge_is_only_the_reviewed_plate_alias_line(self):
         published = public._main_delta('g74-main-reviewed-delta.json')
         bridge = public._main_delta('g75-main-reviewed-delta.json')
