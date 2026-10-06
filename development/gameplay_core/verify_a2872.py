@@ -5,5 +5,7 @@ import json,subprocess,sys
 ROOT=Path(__file__).resolve().parents[2]
 def main():
  previous(expected_version=(2,8,72))
- subprocess.run([sys.executable,'tools/check_cookery160_host.py'],cwd=ROOT,check=True)
+ sys.path.insert(0,str(ROOT/'tools'))
+ from check_cookery160_host import check
+ check()
 if __name__=='__main__':main()
