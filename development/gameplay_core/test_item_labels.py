@@ -129,7 +129,11 @@ def main():
         path = PROJECT / 'resource_pack/texts' / (locale + '.lang')
         old = language(prior(path))
         current = language(path.read_bytes())
-        assert all(current.get(k) == v for k, v in old.items()), 'Plain names/guide text changed'
+        reviewed = json.loads((ROOT/'tools/fixtures/g74-guide-reviewed-delta.json').read_text())['locales'][locale] if version >= (2,8,74) else {}
+        assert len(reviewed)==(2 if version >= (2,8,74) else 0)
+        for key, change in reviewed.items():
+            assert key.startswith('guide.kg.body.') and old[key]==change['before'] and current[key]==change['after'], 'Reviewed guide note drift'
+        assert all(current.get(k) == (reviewed[k]['after'] if k in reviewed else v) for k, v in old.items()), 'Plain names/guide text changed outside exact reviewed notes'
         config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
         assert set(current) - set(old) == set(aliases) | public_keys | config_keys, 'Unexpected localization override'
         assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'
