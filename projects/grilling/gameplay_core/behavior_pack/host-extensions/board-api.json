@@ -1,32 +1,32 @@
 {
   "schema": 1,
-  "id": "kaleidoscope_grilling:family-api-0.2.4",
+  "id": "kaleidoscope_grilling:family-api-0.2.5",
   "version": [
     0,
     2,
-    4
+    5
   ],
-  "host_uuid": "d322809c-a51e-4742-bfc4-16d3c1491c9d",
-  "archive_sha256": "9e5b617cc4c7a08ecd429fb9e42ec10e8d40a1ed5fc1f6f6687c3aff8a45a5d5",
+  "host_uuid": "5df753c9-3436-4fba-87f1-a2da3651cfcf",
+  "archive_sha256": "da12fe6d39d7514aff1de3c963d69899324d771be5ca0fc3da1ccb759c7ad458",
   "original_files": {
-    "scripts/api/extensionRegistry.js": "9fd1c604a69825e684d8d0b0e68f584fba947073d70b3e22084f451c94351646",
-    "scripts/custom_components/blocks/directStation.js": "be855cfe437b036f8a6b706f58607385f4b1ca6e53cfdad5a2c3a28bbc5cff06",
-    "scripts/custom_components/blocks/oilPot.js": "80edf892e8c6c3733d036b526b54fdbb41fd19f1997f7ce3f2a4219dac717f92",
+    "scripts/api/extensionRegistry.js": "4f02f0705fe6cd1578485490a404bff7887ceb8ace9fec9c9f61863e3cdd1723",
+    "scripts/custom_components/blocks/directStation.js": "19207a023a04da532ff9e34cd95413f09cf000fc672255c03633a7bcb2744ad4",
+    "scripts/custom_components/blocks/oilPot.js": "f12afcd4c0eeb733f405fd778754a80513e4a3832da7c870b9f14045cce61828",
     "items/kitchen/oil_pot.json": "f881cc3144f2b46fe075339a0713af8f627dbdb80c31a33a32cea3e7a4010b17",
     "items/kitchen/oil_pot_filled.json": "12eacddb8ad48c8f8d3510f78f0e6489244e7bc1d4ff7ca4aa0d73c44776f1f2",
-    "scripts/events/guidebook.js": "49ea47f9dc7511af210562118c7d2164ab5e185296a5a8c8d678e7d7ff8dc959",
-    "scripts/events/foodItemReturns.js": "d7e6bc713cb99450fd37d259a55f98195336693f68d608ee8011cbd0dca26701",
-    "scripts/data/foodEffects.js": "7d9747b585921518869074828f5daaa6c63944b7f8f35070b065f307b75164d0"
+    "scripts/events/guidebook.js": "f9bb643b340cd6106213bcef9c181a8a69f8c94d7202abf12566b0972d6b59dd",
+    "scripts/events/foodItemReturns.js": "44de93fd2f0058256e2d2ef44b7a03185a1ef61e0dd1c46f8d10010ed7f1b441",
+    "scripts/data/foodEffects.js": "e124ce6fb9dfc62a1bb42e8e674262628909bf3196a4a0d6a792c9ee9db7c590"
   },
   "patched_files": {
-    "scripts/api/extensionRegistry.js": "35ac02f29fe7b08d52b17403d24ebd6bb832334857582b9f3de7fcabd5659d4c",
-    "scripts/custom_components/blocks/directStation.js": "12aa9231d37067472b5e917ff27e1aabb2525efaae5b01e1fd9b3a65a7ab4816",
-    "scripts/custom_components/blocks/oilPot.js": "ac19f3832a92af89ace8a853566a9b1628e384c58758a733ae104349fd01f49b",
+    "scripts/api/extensionRegistry.js": "22fe74e62afe471515cb0196ba33dd43c07750edb5dd0522ed4a898837d63947",
+    "scripts/custom_components/blocks/directStation.js": "8909fdd6d65a5f2eee40ef0cc9bf92d79582b71945195e7385aa94e00f892ed3",
+    "scripts/custom_components/blocks/oilPot.js": "862c3b196283e315c5862a66584acf7b0c2620fc494515d0aad196f7e2470f86",
     "items/kitchen/oil_pot.json": "fba383920613d0e153bfd1438eaf2825b97bbce2c26486995448b14d35b83f0f",
     "items/kitchen/oil_pot_filled.json": "0296061e7db00b0979303f6800f829daf628cab4929e7e0825125a3a470ff7f3",
-    "scripts/events/guidebook.js": "5046e8eb99cdfe0ef3bc9912dea197425e5f4278855eeba6ac6a908fd0201adc",
-    "scripts/events/foodItemReturns.js": "1ed97499c10e78d0f94b15fa71be7f2fee3df2f5cc0fe3cbfb8e364b02ada0f1",
-    "scripts/data/foodEffects.js": "534162cc4e200bfa88e21b406ea753df71ae43c711f1a2e445c635c09955d0bd"
+    "scripts/events/guidebook.js": "b2db327bddc9cca6844205a8ca4c66c29324f9211521c0b3e6fd6f1a70e606ae",
+    "scripts/events/foodItemReturns.js": "ad96f8eef52d0177f75fbdd67bb1d3ca274ce1b7850e848e5c4a4a99421cdc1b",
+    "scripts/data/foodEffects.js": "4aed9ce799da391410c7d12a7cd22677c5b2a8ad2d7cf5ddbf4b4f70f78c4694"
   },
   "imports": {
     "scripts/api/extensionRegistry.js": "import {BOARD_CAPABILITIES,registerBoardV2Recipe} from \"./board_api_runtime.js\";\nimport {OIL_CAPABILITIES} from \"./oil_api_core.js\";\nimport {CUISINE_CAPABILITIES} from \"./cuisine_api_host.js\";\nimport {GUIDE_CAPABILITIES} from \"./guide_labels_core.js\";\nimport {INGREDIENT_CAPABILITIES} from \"./ingredient_api_host.js\";\n",
@@ -99,9 +99,9 @@
     },
     {
       "path": "scripts/custom_components/blocks/oilPot.js",
-      "anchor": "export function consumeOilFromHeldPot(player){",
+      "anchor": "export function consumeOilFromHeldContainer(player){",
       "position": "after",
-      "text": "\n return consumeSharedOilFromHeldPot(player);\n"
+      "text": "\n const sharedHand=slot(player),sharedItem=sharedHand?.hasItem()?sharedHand.getItem():undefined;\n if(sharedItem?.typeId===FILLED_POT)return consumeSharedOilFromHeldPot(player);\n"
     },
     {
       "path": "scripts/custom_components/blocks/oilPot.js",
@@ -249,9 +249,9 @@
     },
     {
       "path": "scripts/custom_components/blocks/directStation.js",
-      "anchor": "if(!consumeOilFromHeldPot(p))return true;d.oil=true;d.oilTicks=1200;",
+      "anchor": "if(!consumeOilFromHeldContainer(p))return true;d.oil=true;d.oilTicks=1200;",
       "position": "before",
-      "text": "return handleSharedStationOil(b,p,d,{save,load,sync:syncPotStates});\n  "
+      "text": "if(id===\"kaleidoscope_cookery:oil_pot_filled\")return handleSharedStationOil(b,p,d,{save,load,sync:syncPotStates});\n  "
     }
   ],
   "copies": {
@@ -267,7 +267,7 @@
   "expires": "2026-11-02",
   "removal_condition": "Remove each reviewed hook when the pinned author release provides tested portable oil item/placed-state, output receipts and board contracts. Re-review every author update; preserve author identities.",
   "feedback": "docs/COOKERY-FAMILY-API-PROPOSAL.md",
-  "authorization": "User requested all defects in the 2026-10-02 oil/parity re-audit fixed, author API expansion, and live deployment.",
+  "authorization": "User 2026-10-06 explicitly requires Cookery 1.6.0 adaptation, canonical Git repairs and full-family live deployment.",
   "json_updates": [
     {
       "path": "items/kitchen/oil_pot.json",
