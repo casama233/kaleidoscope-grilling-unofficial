@@ -217,6 +217,103 @@
           "stream": true
         }
       ]
+    },
+    "kg_java21.shield": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/item/shield/block1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block3",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block4",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block5",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.chime": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/block/amethyst/shimmer",
+          "volume": 0.2,
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.golden": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/block/beacon/power1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/block/beacon/power2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/block/beacon/power3",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.ordinary_break": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/random/break",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.ordinary_impact": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/random/explode1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode3",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode4",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.heavy_metal": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/item/totem/use_totem",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
     }
   }
 }

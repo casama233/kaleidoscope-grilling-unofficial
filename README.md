@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.72
+## Current maintained baseline: 2.8.73
+
+**2.8.73 原作聲效與致死邏輯修復**：普通串補齊原作致死聲效／粒子，改走傷害路徑；修正 Heavy Metal 誤讀原生暫存生命值的致死／非致死判定。選定效果改用 Java 原始音源與 sprite。這不是 100% 還原或真人驗收；依使用者本輪要求，完整還原完成前不以中間候選更新 live。見 [本版範圍](docs/STATUS-A2.8.73.md) 與 [完整目標及缺口](docs/JAVA-FIDELITY-GOAL-20261007.md)。
 
 **2.8.69 測試發佈候選**：整合秘製串幾何／原色、持物校準、完成後顯示所有權及食材薄片 alpha 輪廓／側面 UV 修復，保留 2.8.67 修復。限定牛肉 helper 外觀及獨立 6,500 ms 進食終點觀察見 [G69 範圍](docs/STATUS-A2.8.69.md)。先前錄影的變慢原因仍未釐清；未宣稱全部 213 食物、完整 Java／各視角或家族存檔／真人驗收通過。保持 client=false、production_ready=false、pending_client_acceptance。
 

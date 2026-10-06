@@ -12,7 +12,7 @@ export function invincibleDamageFeedback(entity){
  if(!shieldCooldown.claim(entity.id,system.currentTick))return;
  system.run(()=>{
   const state=context(entity);if(!state)return;const {dimension,location}=state;
-  feedbackSound(dimension,location,'item.shield.block',.7,1.25);
+  feedbackSound(dimension,location,'kg_java21.shield',.7,1.25);
   let height;try{height=entity.getAABB().extent.y*2}catch{return}
   const center={...location,y:location.y+height*.55};
   interactionParticleBurst(dimension,center,'invincibleSpark');
@@ -22,12 +22,20 @@ export function invincibleDamageFeedback(entity){
 export function invincibleAmbientFeedback(entity){const state=context(entity);if(state)emitParticles(state.dimension,state.location,invincibleAmbientParticle())}
 export function goldenSkewerFeedback(entity){
  const state=context(entity);if(!state)return;const {dimension,location}=state;
- feedbackSound(dimension,location,'beacon.power',.8,1.15);
+ feedbackSound(dimension,location,'kg_java21.golden',.8,1.15);
  emitParticles(dimension,location,goldenSkewerParticles());
 }
 export function ordinaryShieldFeedback(entity){
  const state=context(entity);if(!state)return;const {dimension,location}=state;
- feedbackSound(dimension,location,'item.shield.block',1,.8);
- feedbackSound(dimension,location,'chime.amethyst_block',.8,1.35);
+ feedbackSound(dimension,location,'kg_java21.shield',1,.8);
+ feedbackSound(dimension,location,'kg_java21.chime',.8,1.35);
  interactionParticleBurst(dimension,location,'ordinaryShield');
+}
+
+export function ordinaryFatalFeedback(entity){
+ const state=context(entity);if(!state)return;const {dimension,location}=state;
+ feedbackSound(dimension,location,'kg_java21.ordinary_break',1,.65);
+ feedbackSound(dimension,location,'kg_java21.ordinary_impact',.7,.55);
+ interactionParticleBurst(dimension,location,'ordinaryDamage');
+ interactionParticleBurst(dimension,location,'ordinarySmoke');
 }

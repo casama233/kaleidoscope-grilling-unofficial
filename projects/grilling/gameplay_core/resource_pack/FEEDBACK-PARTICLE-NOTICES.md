@@ -15,3 +15,17 @@ The source snapshots and checksums are recorded in this port's
 `development/gameplay_core/fixtures/feedback-mojang-1.26.50.4.json`. Java gameplay
 event positions, burst counts and velocity parameters come from Kaleidoscope
 Grilling 1.1.1, pinned source `9a1acdab27698457bec16c9362678e574895a28c`.
+
+The two ordinary-skewer feedback adapters additionally use selected original
+Minecraft Java 1.21.1 particle sprites (damage and eight generic smoke frames).
+Only those selected sprites are included; smoke frames are placed in one atlas
+without pixel edits. Six selected Java feedback sound events use their original
+OGG samples, weights, gain and pitch from the publisher asset index. No complete
+Minecraft client archive is included. These selected game assets remain subject
+to the Minecraft EULA; (c) Mojang AB. All rights reserved.
+
+References: `java-ordinary-particles-1.21.1.json` and
+`java-feedback-audio-1.21.1.json` in `development/gameplay_core/fixtures`.
+Bedrock particle integration/collision, lighting and audio attenuation remain
+platform adaptations requiring client comparison; these assets do not certify
+100% Java presentation parity.
