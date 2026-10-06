@@ -1,5 +1,5 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemRawLore,setItemLore} from './itemData.js';
-import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
+import {SEASONING_LIST_KEY} from './a2743_seasoning_contract_core.js';
 import {heatLore,isHeatLore} from './localized_lore_core.js';
 import {world} from '@minecraft/server';
 import {readPublicFood,writePublicFood,isFoodPayloadLine,bucketHotUntil} from './host_api/food_api_core.js';
@@ -36,10 +36,21 @@ export function isFoodStack(stack){
  try{if(stack.hasTag?.('minecraft:is_food'))return true}catch{}
  return isSkewer(stack);
 }
+function legacySeasoningSignature(stack){
+ const raw=getItemProperty(stack,SEASONING_LIST_KEY);
+ if(raw===undefined)return [];
+ // setFoodSeasonings writes JSON, not a native array. Preserve order and repeats;
+ // malformed/foreign bytes must not become the same signature as plain food.
+ if(typeof raw==='string')try{
+  const list=JSON.parse(raw);
+  if(Array.isArray(list)&&list.every(value=>typeof value==='string'))return list;
+ }catch{}
+ return {legacyUnparsed:norm(raw)};
+}
 export function mergeSignature(stack){
  const publicFood=readPublicFood(stack);
  // A damaged public record must never merge into another stack. Preserve its raw bytes.
- const seasoning=publicFood.present?(publicFood.valid?publicFood.state.seasoning:{invalid:stack.getRawLore()}):normalizeSeasoningList(getItemProperty(stack,SEASONING_LIST_KEY));
+ const seasoning=publicFood.present?(publicFood.valid?publicFood.state.seasoning:{invalid:stack.getRawLore()}):legacySeasoningSignature(stack);
  return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),seasoning,nativeVariant:publicFood.valid?publicFood.state.nativeVariant:undefined,props:props(stack,false)});
 }
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
@@ -78,14 +89,26 @@ export function canManualMerge(a,b,t=now()){
 }
 export function mergeIntoContainer(container,incoming,t=now(),strict=false){
  if(!incoming)return undefined;
- let remaining=incoming.clone();
- for(let i=0;i<container.size;i++){
-  const target=container.getItem(i);if(!target||!canManualMerge(target,remaining,t))continue;
-  const capacity=Math.max(0,target.maxAmount-target.amount);if(capacity<=0)continue;
-  const moved=Math.min(capacity,remaining.amount);remaining=moveCount(target,remaining,moved,t);container.setItem(i,target);
-  if(!remaining)return undefined;
+ let before;
+ try{
+  before=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone());
+  let remaining=incoming.clone();
+  for(let i=0;i<container.size;i++){
+   const target=container.getItem(i);if(!target||!canManualMerge(target,remaining,t))continue;
+   const capacity=Math.max(0,target.maxAmount-target.amount);if(capacity<=0)continue;
+   const moved=Math.min(capacity,remaining.amount);remaining=moveCount(target,remaining,moved,t);container.setItem(i,target);
+   if(!remaining)return undefined;
+  }
+  return container.addItem(remaining);
+ }catch(error){
+  // Native writes may fail after crediting part of the output. Restore every
+  // affected slot before returning the original remainder or propagating failure.
+  let rollbackErrors=0;
+  if(before)for(let i=0;i<before.length;i++)try{container.setItem(i,before[i])}catch{rollbackErrors++}
+  if(rollbackErrors)throw new Error('Grilling output delivery unresolved; rollback failed for '+rollbackErrors+' writes: '+error);
+  if(strict)throw error;
+  return incoming.clone();
  }
- try{return container.addItem(remaining)}catch(error){if(strict)throw error;return remaining}
 }
 export function compactMatchingHotFood(container,sample,t=now()){
  if(!container||!sample||!isFoodStack(sample)||!isHot(sample,t))return {changed:false,count:0,stacks:0};

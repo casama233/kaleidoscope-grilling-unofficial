@@ -1,4 +1,4 @@
-"""No network or mutations: fail-closed G66 publication/retry regressions."""
+"""No network or remote mutations: host notes and G66 publication/retry regressions."""
 from contextlib import redirect_stdout
 import copy
 import hashlib
@@ -18,6 +18,124 @@ import verify_current
 
 # Final public G66 tree; later runtime versions must never be repackaged as G66.
 SOURCE_BASE = '1517ce1b21b25701df0e1b94bf8c4657b99ad096'
+
+
+def host_baseline(host='1.6.0', version=(2, 8, 73)):
+    # Independent fixtures from the reviewed public host dependency metadata.
+    pair = {
+        '1.0.8': ('d322809c-a51e-4742-bfc4-16d3c1491c9d', '8e2c6318-2f5f-4907-aad0-31d10610e405'),
+        '1.6.0': ('5df753c9-3436-4fba-87f1-a2da3651cfcf', 'f1d333ca-2d6b-4566-8005-e6c309816324'),
+    }[host]
+    return {
+        'schema': 1, 'repository': publish.REPO, 'repository_id': publish.REPO_ID,
+        'version': list(version),
+        'runtime': {'BP': 'projects/grilling/gameplay_core/behavior_pack',
+                    'RP': 'projects/grilling/gameplay_core/resource_pack'},
+        'packs': {
+            'BP': {'uuid': 'c68005c5-23ff-54e8-a3ff-da6349ad43c2', 'dependencies': [
+                {'uuid': 'bbbd2d60-52e5-53a6-8b9a-c09b0f516389', 'version': list(version)},
+                {'uuid': pair[0], 'version': list(map(int, host.split('.')))},
+                {'module_name': '@minecraft/server', 'version': '2.9.0'}]},
+            'RP': {'uuid': 'bbbd2d60-52e5-53a6-8b9a-c09b0f516389', 'dependencies': [
+                {'uuid': pair[1], 'version': list(map(int, host.split('.')))}]},
+        },
+    }
+
+
+def write_host_baseline(root, baseline):
+    (root / 'baseline.json').write_text(json.dumps(baseline))
+    for side in ('BP', 'RP'):
+        path = root / baseline['runtime'][side] / 'manifest.json'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({'header': {'uuid': baseline['packs'][side]['uuid'],
+            'version': baseline['version']}, 'dependencies': baseline['packs'][side]['dependencies']}))
+
+
+class HostRequirementTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.asset = self.root / 'review.mcaddon'
+        self.asset.write_bytes(b'fixture')
+        self.enterContext(patch.object(publish, 'ROOT', self.root))
+        self.enterContext(patch.dict(publish.os.environ, {'GITHUB_RUN_NUMBER': '73', 'GITHUB_RUN_ATTEMPT': '1'}))
+        self.command = self.enterContext(patch.object(publish, 'run'))
+        self.enterContext(redirect_stdout(io.StringIO()))
+
+    def generate(self, baseline):
+        write_host_baseline(self.root, baseline)
+        publish.publish_legacy('A2.8.73', 'a' * 40, [self.asset])
+        return (self.root / 'release-notes.md').read_text()
+
+    def test_notes_follow_reviewed_host_not_grilling_version_or_dependency_order(self):
+        for host in ('1.6.0', '1.0.8'):
+            with self.subTest(host=host):
+                baseline = host_baseline(host)
+                baseline['packs']['BP']['dependencies'].reverse()
+                notes = self.generate(baseline)
+                self.assertIn(f'需要公開版 Cookery {host}（私人版 UUID 不可直接替換）', notes)
+                other = '1.0.8' if host == '1.6.0' else '1.6.0'
+                self.assertNotIn('Cookery ' + other, notes)
+                self.assertIn('尚未驗收', notes)
+                self.assertIn('A2.8.73-test.73.1', self.command.call_args.args)
+
+    def test_mixed_unknown_and_duplicate_host_pairs_fail_before_publication(self):
+        for side, dependencies in (
+            ('RP', host_baseline('1.0.8')['packs']['RP']['dependencies']),
+            ('RP', [{'uuid': '00000000-0000-0000-0000-000000000001', 'version': [1, 6, 0]}]),
+            ('RP', []),
+            ('RP', host_baseline()['packs']['RP']['dependencies'] * 2),
+        ):
+            with self.subTest(dependencies=dependencies):
+                baseline = host_baseline()
+                baseline['packs'][side]['dependencies'] = dependencies
+                with self.assertRaisesRegex(ValueError, 'dependency pair|exactly one'):
+                    self.generate(baseline)
+                self.command.assert_not_called()
+                self.assertFalse((self.root / 'release-notes.md').exists())
+
+    def test_host_versions_must_match_each_other_and_reviewed_pair(self):
+        for bp, rp in (([1, 6, 0], [1, 0, 8]), ([1, 0, 8], [1, 6, 0]),
+                       ([1, 0, 8], [1, 0, 8]), ([1, 6, 1], [1, 6, 1]),
+                       ('1.6.0', [1, 6, 0]), ([True, 6, 0], [1, 6, 0])):
+            with self.subTest(bp=bp, rp=rp):
+                baseline = host_baseline()
+                baseline['packs']['BP']['dependencies'][1]['version'] = bp
+                baseline['packs']['RP']['dependencies'][0]['version'] = rp
+                with self.assertRaisesRegex(ValueError, 'Cookery.*version'):
+                    self.generate(baseline)
+                self.command.assert_not_called()
+
+    def test_manifest_drift_fails_before_publication(self):
+        for side in ('BP', 'RP'):
+            with self.subTest(side=side):
+                baseline = host_baseline()
+                write_host_baseline(self.root, baseline)
+                path = self.root / baseline['runtime'][side] / 'manifest.json'
+                manifest = json.loads(path.read_text())
+                manifest['dependencies'] = host_baseline('1.0.8')['packs'][side]['dependencies']
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, f'{side} release manifest/baseline mismatch'):
+                    publish.publish_legacy('A2.8.73', 'a' * 40, [self.asset])
+                self.command.assert_not_called()
+
+    def test_missing_or_wrong_baseline_never_falls_back_to_legacy_requirement(self):
+        with self.assertRaises(FileNotFoundError):
+            publish.publish_legacy('A2.8.73', 'a' * 40, [self.asset])
+        for key, value in (('schema', 2), ('repository_id', 1), ('version', [2, 8, 65])):
+            with self.subTest(key=key):
+                baseline = host_baseline()
+                baseline[key] = value
+                with self.assertRaises(ValueError):
+                    self.generate(baseline)
+        self.command.assert_not_called()
+
+    def test_frozen_g66_notes_retain_historical_host(self):
+        write_host_baseline(self.root, host_baseline())
+        notes = publish.g66_notes('a' * 40, 'historical snapshot')
+        self.assertIn('public Cookery 1.0.8', notes)
+        self.assertNotIn('Cookery 1.6.0', notes)
 
 
 class RequestTests(unittest.TestCase):
@@ -458,6 +576,7 @@ class ApiTests(unittest.TestCase):
     def test_older_version_keeps_historical_unique_attempt_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
+            write_host_baseline(root, host_baseline('1.0.8', (2, 8, 65)))
             asset = root / 'review.mcaddon'
             asset.write_bytes(b'fixture')
             with patch.object(publish, 'ROOT', root), patch.dict(publish.os.environ, {'GITHUB_RUN_NUMBER': '72', 'GITHUB_RUN_ATTEMPT': '3'}), patch.object(publish, 'run') as command, redirect_stdout(io.StringIO()):

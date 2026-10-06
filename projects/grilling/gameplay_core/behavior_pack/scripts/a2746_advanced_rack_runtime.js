@@ -4,21 +4,21 @@ import {slotWrite,remainderOf,planInventoryInsert} from './rack_transfer_plan.js
 import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
 import {rackSlotAtHit} from './a285_rack_quick_pick.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
+import {captureStackIntentSnapshot,stackIntentSnapshotMatches} from './a2762_interaction_intent_core.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
 import {
  world,system,ItemStack,CommandPermissionLevel
 } from '@minecraft/server';
-import {ActionFormData} from '@minecraft/server-ui';
 import {
- playerInventory,getMainHand,setMainHand,isCreative as creative
+ playerInventory,getMainHand,isCreative as creative
 } from './a2735_player_io.js';
 import {
  ADVANCED_RACK_ITEM_ID,ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,RACK_RANGE,
- rackPlacementCandidates,rackCanPlace,rackCanonicalFilter,rackFilterMatches,
+ rackPlacementCandidates,rackCanPlace,
  bindingInRange,RACK_PAYLOAD_KEY
 } from './a2746_advanced_rack_core.js';
 import {
- rackContainer,readRackFilters,writeRackFilters,clearRackFilters,
+ rackContainer,readRackFilters,writeRackFilters,clearRackFilters,captureRackFilters,
  readRackItems,writeRackItems,clearRackItems,syncRackDisplay
 } from './a2746_rack_state_adapter.js';
 import {readRackPayloadItem,writeRackPayloadItem,encodeRackPayload} from './a2746_rack_item_codec.js';
@@ -151,69 +151,35 @@ function depositMatching(player,block){
 }
 
 const ui=(key,withArgs=[])=>({translate:'ui.kaleidoscope_grilling.advanced_rack.'+key,with:withArgs});
-function filterLabel(filter){
- if(!filter)return ui('no_filter');
- if(filter.category==='oil_pot')return ui('oil_pot');
- if(filter.category==='seasoning_bottle')return ui('seasoning_bottle');
- return {text:filter.typeId};
-}
-function slotButton(slot,stored,filter){
- const parts=[ui(slot<5?'seasoning':'tool'),{text:' '+(slot+1)+' §8| §f'}];
- if(stored){let key;try{key=stored.localizationKey}catch{};parts.push(key?{translate:key}:{text:stored.typeId},{text:' ×'+stored.amount});}
- else parts.push(ui('empty'),{text:' §7['},filterLabel(filter),{text:']'});
- return {rawtext:parts};
+function playRackSound(block,placing){
+ try{block.dimension.playSound(placing?'item.item_frame.add_item':'item.item_frame.remove_item',
+  {x:block.x+.5,y:block.y+.5,z:block.z+.5},{volume:1,pitch:1})}catch{}
 }
 
-async function openSlotForm(player,dimension,location,slot){
- const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
- const c=rackContainer(block),filters=readRackFilters(block),stored=c?.getItem(slot);
- const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
- form.body({rawtext:[ui('slot',[String(slot+1)]),{text:' · '},ui(slot<5?'seasoning':'tool'),{text:'\n'},filterLabel(filters[slot])]});
- form.button(ui('swap'));
- form.button(ui('insert'));
- form.button(ui('withdraw'));
- form.button(ui('clear_filter'));
- form.button(ui('back'));
- let r;try{r=await form.show(player)}catch{return}
- if(r.canceled)return;
- const live=resolveRack(dimension,location);if(!live||!rackInUseRange(player,live)){message(player,ui('too_far'));return;}
- if(r.selection===0){if(!swapWithHotbar(player,live,slot))message(player,ui('swap_failed'))}
- else if(r.selection===1){if(!depositSelected(player,live,slot))message(player,ui('insert_failed'))}
- else if(r.selection===2){if(!withdrawToInventory(player,live,slot))message(player,ui('inventory_full'))}
- else if(r.selection===3){
-  const lc=rackContainer(live),lf=readRackFilters(live);
-  if(lc?.getItem(slot))message(player,ui('filter_occupied'));
-  else{lf[slot]=null;writeRackFilters(live,lf);}
- }else if(r.selection===4){system.run(()=>openRackForm(player,dimension,location))}
+function clearEmptySlotFilter(block,slot){
+ const c=rackContainer(block);if(!c||c.getItem(slot))return false;
+ const state=captureRackFilters(block);if(!state.filters[slot])return false;
+ const next=state.filters.slice();next[slot]=null;
+ return commitRackTransfer([block],[state.step(next)]);
 }
 
-export async function openRackForm(player,dimension,location){
- const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
- const c=rackContainer(block),filters=readRackFilters(block);if(!c)return;
- const form=new ActionFormData().title({translate:'container.kaleidoscope_grilling.advanced_rack'});
- form.body({translate:'ui.kaleidoscope_grilling.advanced_rack.hint'});
- for(let i=0;i<RACK_COMPARTMENTS;i++)form.button(slotButton(i,c.getItem(i),filters[i]));
- form.button({translate:'ui.kaleidoscope_grilling.advanced_rack.deposit'});
- form.button(ui('manage'));
- let r;try{r=await form.show(player)}catch{return}
- if(r.canceled)return;
- if(r.selection>=0&&r.selection<RACK_COMPARTMENTS){
-  const live=resolveRack(dimension,location);if(live&&!rackInUseRange(player,live)){message(player,ui('too_far'));return;}if(live){if(!swapWithHotbar(player,live,r.selection))message(player,ui('swap_failed'));markStationContentsDirty(live);}
- }else if(r.selection===RACK_COMPARTMENTS+1)system.run(()=>openRackManagement(player,dimension,location));
- else if(r.selection===RACK_COMPARTMENTS){
-  const live=resolveRack(dimension,location);
-  if(live&&!rackInUseRange(player,live)){message(player,ui('too_far'));return}
-  if(!live||!depositMatching(player,live))message(player,ui('no_match'));
- }
-}
-
-async function openRackManagement(player,dimension,location){
- const block=resolveRack(dimension,location);if(!block||!rackInUseRange(player,block))return;
- const c=rackContainer(block),filters=readRackFilters(block);if(!c)return;
- const form=new ActionFormData().title(ui('manage'));
- for(let i=0;i<RACK_COMPARTMENTS;i++)form.button(slotButton(i,c.getItem(i),filters[i]));
- let r;try{r=await form.show(player)}catch{return}
- if(!r.canceled&&r.selection>=0&&r.selection<RACK_COMPARTMENTS)system.run(()=>openSlotForm(player,dimension,location,r.selection));
+/** Ordinary Cookery-style placement/pickup, retaining advanced stacks/filters.
+ * Sneak keeps advanced bound swaps and clears an empty slot's filter empty-handed.
+ * Re-read live native contents here; deferred events never own an item snapshot.
+ */
+function interactRackSlot(player,block,slot,sneaking=false){
+ if(!Number.isInteger(slot)||slot<0||slot>=RACK_COMPARTMENTS||!rackInUseRange(player,block))return false;
+ const c=rackContainer(block),inv=playerInventory(player),hot=player.selectedSlotIndex;
+ if(!c||!inv||!Number.isInteger(hot)||hot<0||hot>=inv.size)return false;
+ const stored=c.getItem(slot),held=inv.getItem(hot);
+ let changed=false,action;
+ if(sneaking&&!stored&&!held){changed=clearEmptySlotFilter(block,slot);action='clear_filter';}
+ else if(stored&&(!held||sneaking)){
+  changed=swapWithHotbar(player,block,slot);action=held?'swap':'pickup';
+  if(changed&&c.getItem(slot)?.amount!==stored.amount)playRackSound(block,false);
+ }else if(held){changed=depositSelected(player,block,slot);action='insert';if(changed)playRackSound(block,true);}
+ if(changed)markStationContentsDirty(block);
+ return changed?action:false;
 }
 
 function restorePlacedRack(block,item){
@@ -290,14 +256,18 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
  if(event.block.typeId===ADVANCED_RACK_BLOCK_ID){
   event.cancel=true;
   if(event.isFirstEvent!==false){
-   const p=event.player,d=event.block.dimension,l=loc(event.block);
-   if(p.isSneaking){
-    const slot=rackSlotAtHit(event.block.permutation.getState('minecraft:cardinal_direction'),event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
-    system.run(()=>{
-     const live=resolveRack(d,l);if(slot<0||!live||!rackInUseRange(p,live)||!interactionIntentStillCurrent(p,intent))return;
-     if(!swapWithHotbar(p,live,slot))message(p,ui('slot_unavailable'));
-    });
-   }else system.run(()=>openRackForm(p,d,l));
+   const p=event.player,d=event.block.dimension,l=loc(event.block),sneaking=p.isSneaking,
+    facing=event.block.permutation.getState('minecraft:cardinal_direction'),
+    slot=rackSlotAtHit(facing,event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
+   if(slot<0||intent.hand!=='main')return;
+   system.run(()=>{
+    try{
+     const live=resolveRack(d,l);
+     if(p.isValid===false||!live||!rackInUseRange(p,live)||p.isSneaking!==sneaking||
+      live.permutation.getState('minecraft:cardinal_direction')!==facing||!interactionIntentStillCurrent(p,intent))return;
+     interactRackSlot(p,live,slot,sneaking);
+    }catch(error){console.warn('[Grilling rack interaction] '+error)}
+   });
   }
   return;
  }
@@ -320,16 +290,21 @@ world.beforeEvents.explosion.subscribe(event=>{
 system.beforeEvents.startup.subscribe(event=>{
  event.customCommandRegistry.registerCommand({
   name:'kaleidoscope_grilling:rack',
-  description:'Open the nearest Advanced Rack within 8 blocks',
+  description:'Return matching items to the nearest Advanced Rack within 8 blocks',
   permissionLevel:CommandPermissionLevel.Any,
   cheatsRequired:false
  },origin=>{
   const player=origin.sourceEntity;
   if(!player||player.typeId!=='minecraft:player')return;
+  // Commands have no originating hand. Physical event ambiguity checks would
+  // incorrectly reject unchanged identical items in both hands.
+  const hand=captureStackIntentSnapshot(getMainHand(player)),hot=player.selectedSlotIndex,dimension=player.dimension.id;
   system.run(()=>{
+   if(player.isValid===false||player.dimension.id!==dimension||player.selectedSlotIndex!==hot||
+    !stackIntentSnapshotMatches(hand,getMainHand(player)))return;
    const rack=nearestRack(player);
    if(!rack)message(player,ui('not_found'));
-   else openRackForm(player,rack.dimension,loc(rack));
+   else if(depositMatching(player,rack)){playRackSound(rack,true);markStationContentsDirty(rack);}
   });
  });
 });

@@ -45,7 +45,7 @@ assert.deepEqual(overlappedBlockPositions({center:{x:.5,y:.5,z:.5},extent:{x:.5,
 assert.equal(rackSlotAtHit('north',{x:.1,y:.8,z:.8}),0);
 assert.equal(rackSlotAtHit('north',{x:.9,y:.8,z:.8}),4);
 assert.equal(rackSlotAtHit('south',{x:.9,y:.8,z:.2}),0);
-assert.equal(rackSlotAtHit('west',{x:.2,y:.8,z:.1}),0);
-assert.equal(rackSlotAtHit('east',{x:.8,y:.8,z:.9}),0);
+assert.equal(rackSlotAtHit('west',{x:.2,y:.8,z:.9}),0);
+assert.equal(rackSlotAtHit('east',{x:.8,y:.8,z:.1}),0);
 assert.equal(rackSlotAtHit('north',{x:.9,y:.4,z:.8}),8);
 console.log('A285 transaction failures, eating identity, ingredient effects and leaf contact: PASS (pure logic; no client/player simulation)');

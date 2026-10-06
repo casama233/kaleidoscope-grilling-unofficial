@@ -1,5 +1,6 @@
 import {world} from '@minecraft/server';
 import {stationContainer} from './family_station_storage.js';
+import {RACK_OCCUPANCY_STATE,RACK_OCCUPANCY_HIGH_STATE,rackSeasoningOccupancy} from './advanced_rack_layout.js';
 import {
  ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,normalizeRackFilters,rackDisplayLevel
 } from './a2746_advanced_rack_core.js';
@@ -62,13 +63,14 @@ export function writeRackItems(block,items){
  syncRackDisplay(block);return true;
 }
 export function clearRackItems(block){return writeRackItems(block,[]);}
-export function syncRackDisplay(block){
+export function syncRackDisplay(block,knownItems){
  if(!block||block.typeId!==ADVANCED_RACK_BLOCK_ID)return 0;
- const items=readRackItems(block),level=rackDisplayLevel(items.map(Boolean));
+ const items=knownItems??readRackItems(block),level=rackDisplayLevel(items.map(Boolean)),mask=rackSeasoningOccupancy(i=>items[i]);
+ const low=mask&15,high=mask>>4;
  try{
   const p=block.permutation;
-  if(p.getState('kaleidoscope_grilling:spice_level')!==level)
-   block.setPermutation(p.withState('kaleidoscope_grilling:spice_level',level));
+  if(p.getState('kaleidoscope_grilling:spice_level')!==level||p.getState(RACK_OCCUPANCY_STATE)!==low||p.getState(RACK_OCCUPANCY_HIGH_STATE)!==high)
+   block.setPermutation(p.withState('kaleidoscope_grilling:spice_level',level).withState(RACK_OCCUPANCY_STATE,low).withState(RACK_OCCUPANCY_HIGH_STATE,high));
  }catch{}
  return level;
 }
