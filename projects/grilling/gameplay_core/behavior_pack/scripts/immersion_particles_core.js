@@ -5,6 +5,8 @@ const BURSTS=Object.freeze({
  oilPressImpact:{id:'kaleidoscope_grilling:feedback_basic_crit',count:14,center:[.5,.9,.5],spread:[.32,.18,.32],speed:.08},
  invincibleSpark:{id:'kaleidoscope_grilling:feedback_electric_spark',count:8,center:[0,0,0],spread:[.35,.45,.35],speed:.08},
  invincibleRod:{id:'kaleidoscope_grilling:feedback_endrod',count:4,center:[0,0,0],spread:[.25,.35,.25],speed:.03},
+ ordinaryDamage:{id:'kaleidoscope_grilling:feedback_damage_indicator',count:24,center:[0,1,0],spread:[.45,.65,.45],speed:.12},
+ ordinarySmoke:{id:'kaleidoscope_grilling:feedback_large_smoke',count:18,center:[0,.8,0],spread:[.4,.6,.4],speed:.04},
  ordinaryShield:{id:'kaleidoscope_grilling:feedback_electric_spark',count:28,center:[0,1,0],spread:[.55,.7,.55],speed:.12}
 });
 // ServerLevel.sendParticles samples a Gaussian independently for each axis.

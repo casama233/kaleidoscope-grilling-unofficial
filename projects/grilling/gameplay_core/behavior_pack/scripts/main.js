@@ -1,9 +1,10 @@
+import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';
 import {isPlainEatingId,SKEWER_EATING_IDS} from './eating_profile_ids.js';
 import {beginSeasoningMotion,syncSeasoningMotion} from './seasoning_motion_runtime.js';
 import {supportsJavaEatingProjection} from './java_eating_projection_items.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {prepareEatingItems,forgetEatingItem,selectedEatingProfile} from './eating_item_runtime.js';
-import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';
+import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback,ordinaryFatalFeedback} from './immersion_effect_feedback.js';
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
 import './bottle_held_visual_runtime.js';
@@ -820,7 +821,9 @@ function applyOrdinary(player){
  const outcome=ordinaryChallengeOutcome(challenged,Math.random());
  if(outcome==='shield'){awardOrdinaryChallenge(player,outcome);ordinaryShieldFeedback(player);return}
  if(outcome==='spear')awardOrdinaryChallenge(player,outcome);
- system.run(()=>{try{player.kill()}catch{try{player.applyDamage(100000,{cause:'override'})}catch{}}});
+ ordinaryFatalFeedback(player);
+ // Java uses damage, not generic kill: Heavy Metal and native totems retain their damage/death route.
+ system.run(()=>{try{player.applyDamage(3.4028234663852886e38,{cause:'override'})}catch(error){console.warn('[Grilling ordinary damage] '+error)}});
 }
 function afterCommitted(player,id,meta,active,fullNative){
  id=canonicalFoodId(id);
@@ -995,9 +998,13 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
  if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');
- if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&hp.currentValue>0&&e.damage>=hp.currentValue){
+ if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){
   // Reserve synchronously: deferred writes must not enqueue duplicate rescues.
-  // This remains a before-damage approximation, not a Java death-event hook.
+  // BDS exposes provisional post-hit health here; compare that value to zero,
+  // not incoming damage to already-reduced health. Cancellation restores it.
+  // Native remaining absorption is unavailable: skip ambiguous hits rather
+  // than consuming rescue for a shield-blocked nonfatal hit.
+  // Later addon cancellation/rewrite and exact Java death ordering remain separate.
   const token={until:hm.until,amp:hm.amp};PENDING_METAL_RESCUES.set(target.id,token);e.cancel=true;
   system.run(()=>{try{
    if(PENDING_METAL_RESCUES.get(target.id)!==token)return;
@@ -1005,7 +1012,7 @@ world.beforeEvents.entityHurt.subscribe(e=>{
    // Milk, death, logout or effect replacement may invalidate a queued rescue.
    if(!current||current.until!==token.until||current.amp!==token.amp||fxGet(target,'heavy_metal_poisoning')||!health||health.currentValue<=0)return;
    fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);health.setCurrentValue(1);
-   target.dimension.playSound('random.totem',target.location);
+   target.dimension.playSound('kg_java21.heavy_metal',target.location);
   }catch(error){console.warn('[Grilling heavy metal] '+error)}finally{if(PENDING_METAL_RESCUES.get(target.id)===token)PENDING_METAL_RESCUES.delete(target.id)}});
  }
 });
