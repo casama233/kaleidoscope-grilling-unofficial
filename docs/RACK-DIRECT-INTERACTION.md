@@ -54,8 +54,9 @@ into another slot, and the fourth tool is always represented.
 
 `build_direct_rack_geometry.py` reflows the existing source-textured rack parts;
 it does not change textures. All five established geometry identifiers are kept.
-Four hooks and five jars use the shared cell centers. Shelf bone visibility uses
-the derived32-value `seasoning_occupancy` state, so sparse occupancy identifies
+Four hooks and five jars use the shared cell centers. G76 shelf bone visibility splits the logical 32 occupancy masks into legal
+`seasoning_occupancy` values 0–15 and `seasoning_occupancy_high` values 0/1,
+so sparse occupancy identifies
 the correct shelf cells instead of only a count. Existing spice-level values are
 kept for saved permutations. Visual discovery rebuilds occupancy from existing
 native contents without creating an inventory helper for inspection.

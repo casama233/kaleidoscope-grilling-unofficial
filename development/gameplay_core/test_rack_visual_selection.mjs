@@ -63,5 +63,11 @@ test('all nine fixed cells invert the display transform for all four facings',()
 });
 
 test('all32 shelf occupancy masks identify exact saved slots without compaction',()=>{
- for(let mask=0;mask<32;mask++)assert.equal(rackSeasoningOccupancy(i=>(mask&(1<<i))?{}:undefined),mask);
+ for(let mask=0;mask<32;mask++){
+  const rows=Array.from({length:9},(_,i)=>i>=5||(mask&(1<<i))?{typeId:'fixture:'+i}:undefined),before=rows.slice(),read=[];
+  assert.equal(rackSeasoningOccupancy(i=>{read.push(i);return rows[i];}),mask);
+  assert.deepEqual(read,[0,1,2,3,4]);
+  const f=sync(rows);assert.deepEqual(f.out.map(x=>x.key),['rack/5','rack/6','rack/7','rack/8']);
+  assert.deepEqual(f.out.map(x=>x.at.x),ADVANCED_RACK_HOOK_X);assert.deepEqual(rows,before);
+ }
 });

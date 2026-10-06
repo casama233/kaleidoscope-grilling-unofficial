@@ -10,6 +10,7 @@ import * as layout from '../../projects/grilling/gameplay_core/behavior_pack/scr
 import {rackSlotAtHit} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_rack_quick_pick.js';
 import {captureInteractionIntentFromStacks,interactionIntentMatchesStacks,captureStackIntentSnapshot,stackIntentSnapshotMatches} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2762_interaction_intent_core.js';
 const base=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
+const rackStateDomains=JSON.parse(fs.readFileSync(new URL('../blocks/advanced_rack_block.json',base),'utf8'))['minecraft:block'].description.states;
 const source=name=>fs.readFileSync(new URL(name,base),'utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(async|function|const))/g,'');
 class Stack{
  constructor(typeId,amount=1,tags=[]){Object.assign(this,{typeId,amount,maxAmount:64,tags,nameTag:'named',keepOnDeath:false,lockMode:'none',metadata:{lore:['original'],public:{value:7}}});}
@@ -27,8 +28,11 @@ function fixture(){
  const write=(key,fn)=>{fn();if(fail(key))throw Error('Injected '+key);};
  const container=(key,size)=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone();},setItem(i,s){write(key+':'+i,()=>this.rows[i]=s?.clone());}});
  const inv=container('inv',36),dimension={id:'minecraft:overworld',getBlock:p=>blocks.find(b=>b.x===p.x&&b.y===p.y&&b.z===p.z),playSound:(...args)=>sounds.push(args)};
- const permutation=states=>({getState:name=>states[name],withState:(name,value)=>permutation({...states,[name]:value})});
- const block=(x=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y:64,z:0,dimension,location:{x,y:64,z:0},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0}),setPermutation(p){this.permutation=p;}};b.c=container('rack'+x,9);blocks.push(b);return b;};
+ const permutation=states=>({getState:name=>states[name],withState(name,value){
+  const domain=name==='minecraft:cardinal_direction'?['north','east','south','west']:rackStateDomains[name];
+  assert.ok(domain?.includes(value),`${name} cannot store ${value}`);return permutation({...states,[name]:value});
+ }});
+ const block=(x=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y:64,z:0,dimension,location:{x,y:64,z:0},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0,[layout.RACK_OCCUPANCY_HIGH_STATE]:0}),permutationWrites:0,setPermutation(p){this.permutationWrites++;write('permutation'+x,()=>this.permutation=p);}};b.c=container('rack'+x,9);blocks.push(b);return b;};
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){write(k,()=>v===undefined?dp.delete(k):dp.set(k,v));},beforeEvents:Object.fromEntries(['playerInteractWithBlock','playerBreakBlock','explosion'].map(name=>[name,{subscribe(fn){callbacks[name]=fn;}}]))};
  const playerInventory=p=>p.inv??inv;
  const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn(){}},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
@@ -179,8 +183,52 @@ test('saved rack display occupancy rebuild changes only derived permutation stat
  const f=fixture(),b=f.block();for(const slot of [0,2,4,5,6,7,8])b.c.rows[slot]=slot<5?seasoning(slot+2):tool();
  f.world.setDynamicProperty(f.tx.rackFiltersKey(b),JSON.stringify([core.rackCanonicalFilter(seasoning(1).typeId)]));
  const contents=JSON.stringify(b.c.rows),before=snapshot(f);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),0);f.tx.syncRackDisplay(b);
- assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),21);assert.equal(b.permutation.getState('kaleidoscope_grilling:spice_level'),3);
+ assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),5);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),1);assert.equal(b.permutation.getState('kaleidoscope_grilling:spice_level'),3);
  assert.equal(JSON.stringify(b.c.rows),contents);assert.equal(snapshot(f),before);
+});
+test('production display sync projects all32 masks to legal low/high states and unchanged repeats are no-ops',()=>{
+ for(let mask=0;mask<32;mask++){
+  const f=fixture(),b=f.block();for(let slot=0;slot<9;slot++)if(slot>=5||(mask&(1<<slot)))b.c.rows[slot]=slot<5?seasoning(slot+2):tool();
+  f.world.setDynamicProperty(f.tx.rackFiltersKey(b),JSON.stringify([core.rackCanonicalFilter(seasoning(1).typeId)]));
+  const contents=JSON.stringify(b.c.rows),before=snapshot(f),level=Math.min(4,[0,1,2,3,4].filter(slot=>mask&(1<<slot)).length);
+  assert.equal(f.tx.syncRackDisplay(b),level);
+  assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),mask&15,`mask${mask} low`);
+  assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),mask>>4,`mask${mask} high`);
+  assert.equal(b.permutation.getState('kaleidoscope_grilling:spice_level'),level);
+  assert.equal(b.permutation.getState('minecraft:cardinal_direction'),'north');
+  const permutation=b.permutation,writes=b.permutationWrites;assert.equal(writes,mask===0?0:1);
+  assert.equal(f.tx.syncRackDisplay(b),level);assert.equal(b.permutation,permutation);assert.equal(b.permutationWrites,writes);
+  assert.equal(JSON.stringify(b.c.rows),contents);assert.equal(snapshot(f),before);
+ }
+});
+test('known display snapshots synchronize masks16 and31 without reading native storage',()=>{
+ const f=fixture(),b=f.block();b.c.getItem=()=>{throw Error('Known snapshot must avoid an inventory reread');};
+ for(const mask of [16,31,0]){
+  const items=Array.from({length:9},(_,slot)=>slot>=5||(mask&(1<<slot))?slot<5?seasoning(slot+2):tool():undefined),before=JSON.stringify(items);
+  f.tx.syncRackDisplay(b,items);
+  assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),mask&15);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),mask>>4);
+  assert.equal(JSON.stringify(items),before);
+ }
+});
+test('display sync detects a changed high bit even when low bits and spice level are unchanged',()=>{
+ const f=fixture(),b=f.block();b.c.rows=Array.from({length:9},(_,slot)=>slot<4?seasoning(slot+2):slot>=5?tool():undefined);
+ f.tx.syncRackDisplay(b);const writes=b.permutationWrites;b.c.rows[4]=seasoning(6);f.tx.syncRackDisplay(b);
+ assert.equal(b.permutationWrites,writes+1);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),15);
+ assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),1);assert.equal(b.permutation.getState('kaleidoscope_grilling:spice_level'),4);
+ b.c.rows[4]=undefined;f.tx.syncRackDisplay(b);assert.equal(b.permutationWrites,writes+2);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),0);
+});
+test('failed display writes keep native stacks and filters intact and the derived states can be retried',()=>{
+ for(const failure of ['before','after']){
+  const f=fixture(),b=f.block();b.c.rows[4]=seasoning(6);for(let slot=5;slot<9;slot++)b.c.rows[slot]=tool();
+  f.world.setDynamicProperty(f.tx.rackFiltersKey(b),JSON.stringify([core.rackCanonicalFilter(seasoning(1).typeId)]));
+  const contents=JSON.stringify(b.c.rows),before=snapshot(f),setPermutation=b.setPermutation;
+  if(failure==='before')b.setPermutation=()=>{throw Error('Injected display rejection');};else f.failOnce('permutation0');
+  assert.equal(f.tx.syncRackDisplay(b),1);assert.equal(JSON.stringify(b.c.rows),contents);assert.equal(snapshot(f),before);
+  assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),failure==='before'?0:1);
+  b.setPermutation=setPermutation;f.tx.syncRackDisplay(b);
+  assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_STATE),0);assert.equal(b.permutation.getState(layout.RACK_OCCUPANCY_HIGH_STATE),1);
+  assert.equal(JSON.stringify(b.c.rows),contents);assert.equal(snapshot(f),before);
+ }
 });
 test('rack runtime has no form API or opener; shortcut command directly returns matching stacks',()=>{
  const runtimeSource=fs.readFileSync(new URL('a2746_advanced_rack_runtime.js',base),'utf8');assert.doesNotMatch(runtimeSource,/ActionFormData|server-ui|openRackForm|openSlotForm|openRackManagement/);

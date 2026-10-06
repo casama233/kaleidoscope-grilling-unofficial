@@ -5,6 +5,7 @@ Idempotent: accepts either the prior source-converted models or its own output.
 No textures, UUIDs, inventory indices, author packages or worlds are modified.
 """
 from copy import deepcopy
+import argparse
 import json
 from pathlib import Path
 import subprocess
@@ -18,16 +19,24 @@ def load(path):
     return json.loads(path.read_text())
 
 
-def save(path, value):
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+def save(path, value, check=False):
+    expected = (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
+    if path.is_file() and path.read_bytes() == expected:
+        return
+    if check:
+        raise SystemExit(f'Generated rack file differs: {path.relative_to(ROOT)}')
+    path.write_bytes(expected)
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--check', action='store_true', help='Verify generated files without writing')
+    check = parser.parse_args().check
     module = (BP / 'scripts/advanced_rack_layout.js').as_uri()
     layout = json.loads(subprocess.check_output([
         'node', '--input-type=module', '-e',
-        f"import {{RACK_SEASONING_X,RACK_TOOL_X,RACK_OCCUPANCY_STATE}} from '{module}';"
-        "process.stdout.write(JSON.stringify({seasonings:RACK_SEASONING_X,tools:RACK_TOOL_X,state:RACK_OCCUPANCY_STATE}));"
+        f"import {{RACK_SEASONING_X,RACK_TOOL_X,RACK_OCCUPANCY_STATE,RACK_OCCUPANCY_HIGH_STATE}} from '{module}';"
+        "process.stdout.write(JSON.stringify({seasonings:RACK_SEASONING_X,tools:RACK_TOOL_X,state:RACK_OCCUPANCY_STATE,highState:RACK_OCCUPANCY_HIGH_STATE}));"
     ], text=True))
     models = RP / 'models/blocks'
     base = load(models / 'advanced_rack_0.geo.json')
@@ -71,25 +80,29 @@ def main():
         geometry = model['minecraft:geometry'][0]
         geometry['description']['identifier'] = f'geometry.kg_a1.advanced_rack_{level}'
         geometry['bones'] = deepcopy(bones)
-        save(models / f'advanced_rack_{level}.geo.json', model)
+        save(models / f'advanced_rack_{level}.geo.json', model, check)
     block_path = BP / 'blocks/advanced_rack_block.json'
     block = load(block_path)
     data = block['minecraft:block']
-    data['description']['states'][layout['state']] = list(range(32))
+    data['description']['states'][layout['state']] = list(range(16))
+    data['description']['states'][layout['highState']] = [0, 1]
 
     def geometry(level):
-        return {'identifier': f'geometry.kg_a1.advanced_rack_{level}', 'bone_visibility': {
+        visible = {
             f'rack_seasoning_{slot}':
                 f"math.floor(q.block_state('{layout['state']}') / {2**slot}) - 2 * math.floor(q.block_state('{layout['state']}') / {2**(slot+1)}) == 1"
-            for slot in range(5)
-        }}
+            for slot in range(4)
+        }
+        visible['rack_seasoning_4'] = f"q.block_state('{layout['highState']}') == 1"
+        return {'identifier': f'geometry.kg_a1.advanced_rack_{level}', 'bone_visibility': visible}
 
     data['components']['minecraft:geometry'] = geometry(0)
     for level, permutation in enumerate(data['permutations'][:5]):
         permutation['components']['minecraft:geometry'] = geometry(level)
-    save(block_path, block)
-    save(ROOT / 'development/gameplay_core/a2746_advanced_rack_block.json', block)
-    print('Fixed five seasoning cells and four source-textured hooks generated; not client acceptance')
+    save(block_path, block, check)
+    save(ROOT / 'development/gameplay_core/a2746_advanced_rack_block.json', block, check)
+    action = 'verified' if check else 'generated'
+    print(f'Fixed five seasoning cells and four source-textured hooks {action}; not client acceptance')
 
 
 if __name__ == '__main__':

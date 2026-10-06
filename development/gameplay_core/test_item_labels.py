@@ -59,6 +59,14 @@ def current_behavior_expectation(before, kind, stem, version):
             if geometry is not None:
                 assert isinstance(geometry, str) and geometry.startswith('geometry.kg_a1.advanced_rack_')
                 components['minecraft:geometry'] = {'identifier': geometry, 'bone_visibility': deepcopy(visible)}
+    if version >= (2,8,76) and kind == 'block' and stem == 'advanced_rack_block':
+        block = expected['minecraft:block']
+        block['description']['states']['kaleidoscope_grilling:seasoning_occupancy'] = list(range(16))
+        block['description']['states']['kaleidoscope_grilling:seasoning_occupancy_high'] = [0, 1]
+        for components in [block['components'], *[row['components'] for row in block['permutations']]]:
+            geometry = components.get('minecraft:geometry')
+            if geometry is not None:
+                geometry['bone_visibility']['rack_seasoning_4'] = "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
     return expected
 
 

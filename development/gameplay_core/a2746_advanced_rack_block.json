@@ -27,23 +27,11 @@
           12,
           13,
           14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31
+          15
+        ],
+        "kaleidoscope_grilling:seasoning_occupancy_high": [
+          0,
+          1
         ]
       },
       "traits": {
@@ -64,7 +52,7 @@
           "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
           "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
           "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-          "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+          "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
         }
       },
       "minecraft:material_instances": {
@@ -120,7 +108,7 @@
               "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
               "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
               "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-              "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
             }
           }
         }
@@ -135,7 +123,7 @@
               "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
               "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
               "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-              "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
             }
           }
         }
@@ -150,7 +138,7 @@
               "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
               "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
               "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-              "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
             }
           }
         }
@@ -165,7 +153,7 @@
               "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
               "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
               "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-              "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
             }
           }
         }
@@ -180,7 +168,7 @@
               "rack_seasoning_1": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 2) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) == 1",
               "rack_seasoning_2": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 4) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) == 1",
               "rack_seasoning_3": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 8) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) == 1",
-              "rack_seasoning_4": "math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 16) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / 32) == 1"
+              "rack_seasoning_4": "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
             }
           }
         }

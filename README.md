@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.75
+## Current maintained baseline: 2.8.76
 
 **2.8.73 原作聲效與致死邏輯修復**：普通串補齊原作致死聲效／粒子，改走傷害路徑；修正 Heavy Metal 誤讀原生暫存生命值的致死／非致死判定。選定效果改用 Java 原始音源與 sprite。這不是 100% 還原或真人驗收；依使用者本輪要求，完整還原完成前不以中間候選更新 live。見 [本版範圍](docs/STATUS-A2.8.73.md) 與 [完整目標及缺口](docs/JAVA-FIDELITY-GOAL-20261007.md)。
 
@@ -247,3 +247,5 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 Open the repository-root `config.json`, which points to the current locked BP and RP. See [the bridge. workflow](docs/BRIDGE-WORKFLOW.md) for editor settings, portable `.brproject` export, schema limitations and exact runtime comparison.
 
 G75 draft reconciles published G73 with the separately preserved bottle, plate-alias and direct-rack repairs; see [scope](docs/STATUS-A2.8.75.md). Native acceptance and BSM pre-merge/release/deployment gates remain open.
+
+G76 fixes the native rack registration failure caused by G75's illegal 32-value block state; see [scope](docs/STATUS-A2.8.76.md). Native retest remains required.

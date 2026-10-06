@@ -4,7 +4,9 @@
  */
 export const RACK_HALF_WIDTH=7/16;
 export const RACK_ROW_BOUNDARY=9/16;
+// Each Bedrock custom state has at most 16 values: low four bits plus slot 4.
 export const RACK_OCCUPANCY_STATE='kaleidoscope_grilling:seasoning_occupancy';
+export const RACK_OCCUPANCY_HIGH_STATE='kaleidoscope_grilling:seasoning_occupancy_high';
 const centers=count=>Object.freeze(Array.from({length:count},(_,i)=>-RACK_HALF_WIDTH+(i+.5)*2*RACK_HALF_WIDTH/count));
 export const RACK_SEASONING_X=centers(5);
 export const RACK_TOOL_X=centers(4);

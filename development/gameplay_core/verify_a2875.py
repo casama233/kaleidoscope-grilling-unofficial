@@ -3,8 +3,8 @@ from pathlib import Path
 import subprocess,sys
 from verify_a2871 import main as bottle_checks
 ROOT=Path(__file__).resolve().parents[2]
-def main():
- bottle_checks(expected_version=(2,8,75))
+def main(expected_version=(2,8,75)):
+ bottle_checks(expected_version=expected_version)
  sys.path.insert(0,str(ROOT/'tools'))
  from check_cookery160_host import check
  check()
