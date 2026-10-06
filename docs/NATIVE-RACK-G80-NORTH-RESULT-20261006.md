@@ -28,3 +28,22 @@ All four local screenshots were inspected and their byte counts/SHA256 verified 
 East, south and west client-facing behavior and touch controls were not tested in this checkpoint. Full Java visual parity and individual contained-ingredient rendering are not accepted; jars currently share an appearance. This bounded north-facing pass does not set global client acceptance or production readiness.
 
 This evidence-only change leaves runtime bytes, version, baseline/release history and the exact tested archive unchanged. BSM verification remains required before merge, Release publication or live deployment. No such action is included.
+
+## Cardinal addendum: outer left/right cells
+
+Additional actual client session: 2026-10-06 20:29:03–20:38:26 UTC, using the same G80 runtime source, archive and Cookery 1.6.0 listed above.
+
+East, west and south racks were physically placed on corresponding stone faces. On each facing, ordinary empty-bottle insertion into the outer left and outer right slot displayed the jar on the clicked side. Empty-hand pickup removed that same visible jar and returned the bottle. No form UI appeared. All six tested outer slots were recovered empty afterward; the client and launcher were closed at the end.
+
+Together with the earlier north session, outer left/right insertion, display and pickup have bounded actual-client coverage in all four cardinal facings. The north-only five-jar simultaneous occupancy, inner slot1 gap/reinsertion and save/reload observations are not extended to east/west/south. Inner slots on those three facings were not separately tested. Touch, full Java visual parity and individual contained-ingredient appearance remain unaccepted. Private world paths, absolute positions, player identity and unrelated observations are omitted.
+
+Six additional screenshots were inspected and their bytes/SHA256 verified:
+
+- `g80_east_left.jpg` — 105304 bytes; SHA256 `7fce3381432a48d752f12b1ef85284474fb260755e4bd9557d0458443a1b50f3`
+- `g80_east_right.jpg` — 105559 bytes; SHA256 `9e1a72ee15f0f0407896990c153a5ea60213cb8f86a1e46b86f78d1b16ef9dba`
+- `g80_west_left.jpg` — 102546 bytes; SHA256 `076d46f0e7513d296efd50f15b5a7d06f03c2e81bde51822c1e19f28656f046d`
+- `g80_west_right.jpg` — 103395 bytes; SHA256 `25ae7237790d7ada0446e8ceb40ebeb804c5fb2d206c3efbe9e47af2c0e0415c`
+- `g80_south_left.jpg` — 107204 bytes; SHA256 `7c9f91d4e7339916603e9d1f5786611abe1abc5c5bb09bbf133c487a22d07ea2`
+- `g80_south_right.jpg` — 107716 bytes; SHA256 `457df80a71794159a41692c5f01512ebc6a1f765a72bf5a7706378e5c3234f48`
+
+This addendum is documentation only: runtime identity, all exported bytes, version and tested archive remain unchanged. BSM/merge/Release/live gates remain pending; no such action is included.
