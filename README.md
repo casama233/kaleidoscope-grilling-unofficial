@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.74
+## Current maintained baseline: 2.8.75
 
 **2.8.73 原作聲效與致死邏輯修復**：普通串補齊原作致死聲效／粒子，改走傷害路徑；修正 Heavy Metal 誤讀原生暫存生命值的致死／非致死判定。選定效果改用 Java 原始音源與 sprite。這不是 100% 還原或真人驗收；依使用者本輪要求，完整還原完成前不以中間候選更新 live。見 [本版範圍](docs/STATUS-A2.8.73.md) 與 [完整目標及缺口](docs/JAVA-FIDELITY-GOAL-20261007.md)。
 
@@ -43,7 +43,7 @@ Canonical runtime and dependencies: [baseline.json](baseline.json). Build from t
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**當前 runtime 身份以 baseline.json 與頁首狀態為準，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
+**當前 runtime 身份以 baseline.json 與頁首狀態為準，依賴作者原版 Cookery 1.6.0。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 
@@ -245,3 +245,5 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 ## bridge. canonical authoring
 
 Open the repository-root `config.json`, which points to the current locked BP and RP. See [the bridge. workflow](docs/BRIDGE-WORKFLOW.md) for editor settings, portable `.brproject` export, schema limitations and exact runtime comparison.
+
+G75 draft reconciles published G73 with the separately preserved bottle, plate-alias and direct-rack repairs; see [scope](docs/STATUS-A2.8.75.md). Native acceptance and BSM pre-merge/release/deployment gates remain open.

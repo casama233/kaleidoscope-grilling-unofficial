@@ -4,7 +4,7 @@ import * as stackAPI from '../../projects/grilling/gameplay_core/behavior_pack/s
 import * as registry from '../../projects/grilling/gameplay_core/behavior_pack/scripts/integration_registry_core.js';
 import * as fortress from '../../projects/grilling/gameplay_core/behavior_pack/scripts/fortress_generation_core.js';
 import {stationProjection} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/station_projection_core.js';
-import {readPublicFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
+import {readPublicFood,writePublicFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
 import {normalizeConfig,configValue} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/server_config_core.js';
 class Stack{constructor(id='minecraft:cooked_beef',amount=1){this.typeId=id;this.amount=amount;this.lore=[];this.extra={foreign:'preserve'};}getRawLore(){return structuredClone(this.lore)}setLore(lore){this.lore=structuredClone(lore)}getComponent(k){return k==='minecraft:food'&&this.typeId==='test:data_driven'?{}:undefined}clone(){const n=new Stack(this.typeId,this.amount);Object.assign(n,structuredClone(this));return n;}}
 const runtime='projects/grilling/gameplay_core/behavior_pack/scripts/integration_api_runtime.js';
@@ -36,6 +36,17 @@ test('native vanilla foods without a scripting food component use pinned Mojang 
  for(const id of ['minecraft:suspicious_stew','minecraft:cooked_beef','minecraft:bread']){const input=new Stack(id);assert.equal(input.getComponent('minecraft:food'),undefined);assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{hotTicks:600},1000)).state.hotUntil,1600);}
  assert.equal(readPublicFood(stackAPI.prepareProducedFood(new Stack('test:data_driven'),{},1000)).valid,true);
  assert.throws(()=>stackAPI.prepareProducedFood(new Stack('minecraft:stone'),{},1000),/not edible/);
+});
+test('producer deadlines bucket absolute boundaries while no-heat updates keep exact legacy reads',()=>{
+ for(const now of [1000,1099,1150])for(const hotTicks of [1,49,50,99,100,101,601]){
+  const input=new Stack(),user=Array.from({length:19},(_,i)=>({text:'producer lore '+i}));input.lore=user;
+  writePublicFood(input,{v:1,hotUntil:2277,seasoning:['minecraft:redstone'],nativeVariant:7});const before=input.getRawLore();
+  const output=stackAPI.prepareProducedFood(input,{hotTicks,seasoning:['minecraft:redstone']},now);
+  assert.deepEqual(readPublicFood(output).state,{v:1,hotUntil:Math.floor((now+hotTicks)/100)*100,seasoning:['minecraft:redstone'],nativeVariant:7});
+  assert.equal(output.getRawLore().length,20);assert.deepEqual(output.getRawLore().slice(0,19),user);assert.deepEqual(input.getRawLore(),before);
+  assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{hotTicks:0},now)).state.hotUntil,2277);
+  assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{hotTicks},now,{enableCookeryFoodHeatAndSeasoning:false})).state.hotUntil,2277);
+ }
 });
 test('public projection supports two variants of one item and explicit catalog aliases after registry restore',()=>{
  registry.resetIntegrationRegistry();registry.registerProjectionDescriptor({itemId:'minecraft:cooked_beef',provider:'test:model'});

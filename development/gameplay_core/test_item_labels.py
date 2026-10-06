@@ -48,6 +48,17 @@ def current_behavior_expectation(before, kind, stem, version):
         expected['minecraft:item']['components']['minecraft:icon'] = {'textures': {'default': stem}}
     if version >= (2,8,68) and kind=='block' and stem=='pepper_leaves':
         expected['minecraft:block']['components']['minecraft:tick']={'interval_range':[5,5],'looping':True}
+    if version >= (2,8,75) and kind == 'block' and stem == 'advanced_rack_block':
+        block = expected['minecraft:block']
+        block['description']['states']['kaleidoscope_grilling:seasoning_occupancy'] = list(range(32))
+        visible = {f'rack_seasoning_{i}':
+            f"math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / {1 << i}) - 2 * math.floor(q.block_state('kaleidoscope_grilling:seasoning_occupancy') / {2 << i}) == 1"
+            for i in range(5)}
+        for components in [block['components'], *[row['components'] for row in block['permutations']]]:
+            geometry = components.get('minecraft:geometry')
+            if geometry is not None:
+                assert isinstance(geometry, str) and geometry.startswith('geometry.kg_a1.advanced_rack_')
+                components['minecraft:geometry'] = {'identifier': geometry, 'bone_visibility': deepcopy(visible)}
     return expected
 
 
@@ -129,11 +140,17 @@ def main():
         path = PROJECT / 'resource_pack/texts' / (locale + '.lang')
         old = language(prior(path))
         current = language(path.read_bytes())
-        reviewed = json.loads((ROOT/'tools/fixtures/g74-guide-reviewed-delta.json').read_text())['locales'][locale] if version >= (2,8,74) else {}
-        assert len(reviewed)==(2 if version >= (2,8,74) else 0)
-        for key, change in reviewed.items():
-            assert key.startswith('guide.kg.body.') and old[key]==change['before'] and current[key]==change['after'], 'Reviewed guide note drift'
-        assert all(current.get(k) == (reviewed[k]['after'] if k in reviewed else v) for k, v in old.items()), 'Plain names/guide text changed outside exact reviewed notes'
+        approved = {}
+        if version >= (2,8,74):
+            name = 'g75-guide-reviewed-delta.json' if version >= (2,8,75) else 'g74-guide-reviewed-delta.json'
+            approved = json.loads((ROOT / 'tools/fixtures' / name).read_text())['locales'][locale]
+            expected_keys = {'guide.kg.body.kaleidoscope_grilling:special_seasoning.3', 'guide.kg.body.kg_a1:guide_hot_food.1'}
+            if version >= (2,8,75):
+                expected_keys |= {'ui.kaleidoscope_grilling.advanced_rack.hint', *{f'guide.kg.body.kaleidoscope_grilling:advanced_rack.{n}' for n in (1,3,6)}}
+            assert set(approved) == expected_keys
+            for key, change in approved.items():
+                assert old[key] == change['before'] and current[key] == change['after'], 'Reviewed guide delta drift'
+        assert all(current.get(k) == v for k, v in old.items() if k not in approved), 'Plain names/guide text changed'
         config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
         assert set(current) - set(old) == set(aliases) | public_keys | config_keys, 'Unexpected localization override'
         assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'

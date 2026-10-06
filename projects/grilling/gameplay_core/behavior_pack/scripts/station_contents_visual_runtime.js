@@ -1,4 +1,6 @@
 import {advancedRackToolVisuals} from './advanced_rack_visual_core.js';
+import {rackDisplayPose} from './advanced_rack_layout.js';
+import {syncRackDisplay} from './a2746_rack_state_adapter.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {stationProjection,registerStationProjection} from './station_projection_core.js';
 import {readPublicFood} from './host_api/food_api_core.js';
@@ -50,12 +52,13 @@ export function syncStationContentsVisual(block,observers){
  const seen=new Set();
  if(block.typeId==='kaleidoscope_grilling:advanced_rack_block'){
   const c=peekStationContainer(block);
-  // Java's spice_level block mesh already supplies the upper containers.
-  // Four lower slots remain storage, but only three non-empty tools have hooks.
-  // Keep the current native equipped-item Y/Z/pose until FIXED projection is
-  // separately calibrated; the source hook selection/X spacing is independent.
+  // Rebuild only derived display state for old saved racks when discovered.
+  // Native contents, filters and ownership remain authoritative and unchanged.
+  if(c)syncRackDisplay(block,Array.from({length:9},(_,i)=>c.getItem(i)));
+  // Five occupied shelf jars are block bones; all four tools have fixed hooks.
+  // Keep native equipped-item Y/Z/pose pending rendered-client calibration.
   for(const {slot,stack,x} of advancedRackToolVisuals(i=>c?.getItem(i))){
-   const k='rack/'+slot;seen.add(k);render(row,block,k,stack,pose(block,x,.35,-.27),0);
+   const k='rack/'+slot;seen.add(k);render(row,block,k,stack,rackDisplayPose(block,x,.35,-.27),0);
   }
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);

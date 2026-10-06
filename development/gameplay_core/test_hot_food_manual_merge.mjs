@@ -12,7 +12,7 @@ class ItemStack{
  getDynamicProperty(k){return this.dp.get(k)}
  setDynamicProperty(k,v){v===undefined?this.dp.delete(k):this.dp.set(k,v)}
  getRawLore(){return [...this.lore]}
- getLore(){return [...this.lore]}setLore(v){this.lore=[...v]}
+ getLore(){return [...this.lore]}setLore(v){if(v.length>20)throw Error('native lore capacity');this.lore=[...v]}
  clone(){const s=new ItemStack(this.typeId,this.amount,this.food);s.dp=new Map(this.dp);s.lore=[...this.lore];s.nameTag=this.nameTag;return s}
 }
 class Container{
@@ -63,3 +63,29 @@ const variants=new Container(2),v1=writePublicFood(new ItemStack('example:meal')
 variants.setItem(0,v1);variants.setItem(1,v2);assert.equal(hot.compactMatchingHotFood(variants,v1.clone(),1000).changed,false);
 const precise=new Container(2),pa=heat(new ItemStack('minecraft:cooked_beef'),1277),pb=heat(new ItemStack('minecraft:cooked_beef'),1299);assert.equal(data.getItemProperty(pa,'kaleidoscope_grilling:hot_until'),2277);assert.equal(data.getItemProperty(pb,'kaleidoscope_grilling:hot_until'),2299);precise.setItem(0,pa);precise.setItem(1,pb);assert.equal(hot.compactMatchingHotFood(precise,pa.clone(),1000).changed,true);assert.equal(data.getItemProperty(precise.getItem(0),'kaleidoscope_grilling:hot_until'),2200);
 console.log('Java bucketed heat merge, preserved legacy inputs and native variant boundaries: PASS');
+
+for(const now of [1000,1099,1150])for(const portable of [false,true]){
+ const target=heat(new ItemStack('minecraft:cooked_beef',62),1277),source=heat(new ItemStack('minecraft:cooked_beef',5),1499),partial=new Container(1);
+ if(portable)for(const stack of [target,source])writePublicFood(stack,{v:1,hotUntil:data.getItemProperty(stack,'kaleidoscope_grilling:hot_until'),seasoning:['minecraft:redstone'],nativeVariant:7});
+ const originalLore=source.getRawLore(),originalHeat=hot.hotUntil(source);partial.setItem(0,target);
+ partial.addItem=remaining=>remaining;
+ const remainder=hot.mergeIntoContainer(partial,source,now);
+ const weighted=Math.floor(((2277-now)*62+(2499-now)*2)/64),expected=Math.floor((now+weighted)/100)*100;
+ assert.equal(partial.getItem(0).amount,64);assert.equal(hot.hotUntil(partial.getItem(0)),expected);
+ assert.equal(remainder.amount,3);assert.equal(hot.hotUntil(remainder),originalHeat);assert.deepEqual(remainder.getRawLore(),originalLore);
+ assert.equal(source.amount,5);assert.equal(hot.hotUntil(source),2499);assert.deepEqual(source.getRawLore(),originalLore);
+}
+console.log('Partial heat merges bucket only the weighted target and preserve exact source remainder metadata/count: PASS');
+
+for(const portable of [false,true]){
+ const cap=portable?18:19,target=new ItemStack('minecraft:cooked_beef',62),source=new ItemStack('minecraft:cooked_beef',5),user=Array.from({length:cap},(_,i)=>({text:'keepsake '+i})),partial=new Container(1);
+ for(const [stack,until] of [[target,2277],[source,2499]]){
+  stack.setLore(user);data.setItemProperty(stack,'kaleidoscope_grilling:hot_until',until);
+  if(portable)writePublicFood(stack,{v:1,hotUntil:until,seasoning:['minecraft:redstone'],nativeVariant:7});
+ }
+ const before=source.getRawLore();partial.setItem(0,target);partial.addItem=remaining=>remaining;
+ const remainder=hot.mergeIntoContainer(partial,source,1150);
+ assert.equal(target.amount,64);assert.equal(hot.hotUntil(target),2200);assert.equal(target.getRawLore().length,20);assert.deepEqual(target.getRawLore().slice(0,cap),user);
+ assert.equal(remainder.amount,3);assert.equal(hot.hotUntil(remainder),2499);assert.deepEqual(remainder.getRawLore(),before);
+}
+console.log('Partial merges retain full private/public carriers without a cosmetic lore overflow: PASS');

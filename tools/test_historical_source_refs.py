@@ -35,6 +35,21 @@ class HistoricalSourceRefsTests(unittest.TestCase):
    path=ROOT/'docs/archive/private-builders'/(name+'.txt')
    source=subprocess.check_output(['git','show',public.PUBLIC_SOURCE_BASE+':tools/'+name],cwd=ROOT)
    self.assertEqual(path.read_bytes(),source);self.assertFalse((ROOT/'tools'/name).exists())
+ def test_g73_plate_alias_delta_is_single_line_and_rejects_unrelated_mutations(self):
+  path=ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
+  delta=json.loads((ROOT/'tools/fixtures/g73-plate-alias-main-delta.json').read_text())
+  before=' const id=eaten.typeId;dangerousPreservation(player,id);\n'
+  after=' const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);\n'
+  self.assertEqual(delta['release'],[2,8,73]);self.assertEqual(len(delta['edits']),1)
+  edit=delta['edits'][0];self.assertEqual(edit['end']-edit['start'],1)
+  self.assertEqual(edit['before'],before);self.assertEqual(edit['after'],after)
+  public.assert_public_bytes_with_g71_bottles(self,path)
+  source=path.read_bytes()
+  for changed in (source.replace(after.encode(),before.encode()),source.replace(b'MINIMUM_EAT_TICKS=25',b'MINIMUM_EAT_TICKS=1'),source+b'\n'):
+   self.assertNotEqual(changed,source)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
