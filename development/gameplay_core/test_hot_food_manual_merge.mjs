@@ -61,5 +61,5 @@ console.log('Public seasonings prevent an incompatible heat merge: PASS');
 
 const variants=new Container(2),v1=writePublicFood(new ItemStack('example:meal'),{v:1,hotUntil:2237,seasoning:[],nativeVariant:1}),v2=writePublicFood(new ItemStack('example:meal'),{v:1,hotUntil:2237,seasoning:[],nativeVariant:2});
 variants.setItem(0,v1);variants.setItem(1,v2);assert.equal(hot.compactMatchingHotFood(variants,v1.clone(),1000).changed,false);
-const precise=new Container(2),pa=heat(new ItemStack('minecraft:cooked_beef'),1277),pb=heat(new ItemStack('minecraft:cooked_beef'),1299);precise.setItem(0,pa);precise.setItem(1,pb);assert.equal(hot.compactMatchingHotFood(precise,pa.clone(),1000).changed,true);assert.equal(data.getItemProperty(precise.getItem(0),'kaleidoscope_grilling:hot_until'),2288);
-console.log('Tick-precise heat merge and native variant boundaries: PASS');
+const precise=new Container(2),pa=heat(new ItemStack('minecraft:cooked_beef'),1277),pb=heat(new ItemStack('minecraft:cooked_beef'),1299);assert.equal(data.getItemProperty(pa,'kaleidoscope_grilling:hot_until'),2277);assert.equal(data.getItemProperty(pb,'kaleidoscope_grilling:hot_until'),2299);precise.setItem(0,pa);precise.setItem(1,pb);assert.equal(hot.compactMatchingHotFood(precise,pa.clone(),1000).changed,true);assert.equal(data.getItemProperty(precise.getItem(0),'kaleidoscope_grilling:hot_until'),2200);
+console.log('Java bucketed heat merge, preserved legacy inputs and native variant boundaries: PASS');

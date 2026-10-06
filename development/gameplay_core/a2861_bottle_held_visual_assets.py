@@ -136,8 +136,11 @@ def build():
     palette_png = BytesIO()
     atlas.save(palette_png, format='PNG', compress_level=9)
     result = {RP / (ATLAS + '.png'): palette_png.getvalue()}
-    placed_index = {g['description']['identifier']: g for g in
-                    load(RP / 'models/entity/a2770_placed/seasoning.geo.json')['minecraft:geometry']}
+    # Consume this build's reflected pending halves, not a potentially stale
+    # generated file left by a different invocation order.
+    placed_path = RP / 'models/entity/a2770_placed/seasoning.geo.json'
+    placed_geometry = json.loads(placed.OUT[placed_path.relative_to(ROOT).as_posix()])
+    placed_index = {g['description']['identifier']: g for g in placed_geometry['minecraft:geometry']}
     shell = load(RP / 'models/entity/a286_hand/kg_a2733.seasoning_bottle_hand.geo.json')['minecraft:geometry'][0]
     combined = combined_shell(shell, 'geometry.kg_bottle_held.combined')
     visibility = [{'*': False}, {'grip': True}, {'shell': True}]
@@ -161,11 +164,12 @@ def build():
         'controller.render.kg_bottle_held.fixed': {
             'geometry': 'Geometry.default', 'materials': materials,
             'textures': ['Texture.default']}}
-    for item in ['empty_seasoning_bottle', 'pending_seasoning']:
+    for item in ['empty_seasoning_bottle', 'pending_seasoning', *[f'{kind}_seasoning_f{fill}' for kind in ['partial', 'pending'] for fill in range(1, 9)]]:
         path = RP / 'attachables' / (item + '.attachable.json')
-        doc = load(path)
+        base = 'empty_seasoning_bottle' if item.startswith('partial_') else 'pending_seasoning'
+        doc = load(path) if path.exists() else load(RP / 'attachables' / (base + '.attachable.json'))
         desc = doc['minecraft:attachable']['description']
-        assert desc['identifier'] == NS + item
+        desc['identifier'] = NS + item
         update_numeric_scripts(desc)
         route(desc, 'geometry.kg_bottle_held.combined', 'controller.render.kg_bottle_held.dynamic')
         result[path] = doc
@@ -242,7 +246,7 @@ def main():
                 path.write_bytes(doc)
             else:
                 path.write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8', newline='\n')
-    print('67 bottle attachables: one RC each; 8 dynamic layers and 64 fixed variants; native expansion acceptance pending')
+    print('83 bottle attachables: one RC each; 8 dynamic layers and 64 fixed variants; native expansion acceptance pending')
 
 
 if __name__ == '__main__':

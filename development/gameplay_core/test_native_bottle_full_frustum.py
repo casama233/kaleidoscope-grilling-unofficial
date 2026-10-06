@@ -114,7 +114,7 @@ class NativeBottleFullFrustum(unittest.TestCase):
                 self.assertTrue(bone.get('cubes'), ref)
         self.assertEqual(refs, {f'geometry.kg_bottle_held.fixed.r{r}.v{v}' for r in range(1, 9) for v in range(8)})
         self.assertEqual(len(files), 65)  #64 fixed variants plus default special.
-        self.assertEqual(len(self.routes), 134)  #67 items, one geometry in both hands.
+        self.assertEqual(len(self.routes), 166)  #83 items including 16 fill proxies, one geometry in both hands.
 
     def test_only_two_fp_positions_change_rotation_scale_and_other_tracks_stay_pinned(self):
         fp = {'animation.kg_a286.bottle_fp_right', 'animation.kg_a286.bottle_fp_left'}

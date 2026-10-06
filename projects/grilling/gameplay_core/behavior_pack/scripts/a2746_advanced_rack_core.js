@@ -1,3 +1,4 @@
+import {canonicalSeasoningBottleId} from './a2743_seasoning_contract_core.js';
 import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
 export const ADVANCED_RACK_ITEM_ID='kaleidoscope_grilling:advanced_rack';
 export const ADVANCED_RACK_BLOCK_ID='kaleidoscope_grilling:advanced_rack_block';
@@ -36,7 +37,7 @@ export function rackSlotKind(slot){
 }
 
 function rackItemKinds(typeId,tags=[]){
- const id=String(typeId??''),set=new Set(Array.isArray(tags)?tags:[]);
+ const id=canonicalSeasoningBottleId(String(typeId??'')),set=new Set(Array.isArray(tags)?tags:[]);
  return {
   seasoning:SEASONING_ITEM_IDS.has(id)||isSpecialSeasoningId(id)||set.has('kaleidoscope_grilling:advanced_rack_seasonings'),
   tool:TOOL_ITEM_IDS.has(id)||set.has('kaleidoscope_grilling:advanced_rack_tools')||set.has('kaleidoscope_cookery:kitchen_knife')||set.has('kaleidoscope_cookery:kitchen_shovel')
@@ -47,7 +48,7 @@ export function rackItemKind(typeId,tags=[]){
 }
 
 export function rackCanonicalFilter(typeId,tags=[],slot=undefined){
- const id=String(typeId??''),expected=slot===undefined?undefined:rackSlotKind(slot);
+ const id=canonicalSeasoningBottleId(String(typeId??'')),expected=slot===undefined?undefined:rackSlotKind(slot);
  const kind=expected?(rackItemKinds(id,tags)[expected]?expected:''):rackItemKind(id,tags);
  if(!kind)return undefined;
  if(id==='kaleidoscope_cookery:oil_pot'||id==='kaleidoscope_cookery:oil_pot_filled')

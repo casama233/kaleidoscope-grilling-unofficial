@@ -46,7 +46,8 @@ test('Secret skewer remains on the newer metadata-aware executor',()=>{
 });
 test('Guide and display runtime are each imported once',()=>{
  const main=fs.readFileSync(new URL('scripts/main.js',BP),'utf8');
- for(const name of ['guide/main.js','a2770_placed_visual_runtime.js'])assert.equal(main.split("import './"+name+"';").length-1,1);
+ assert.equal(main.split("import './guide/main.js';").length-1,1);
+ assert.equal(main.split("import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';").length-1,1);
 });
 test('Typed oil-pot event writes retain the A2769 compensation path',()=>{
  const runtime=fs.readFileSync(new URL('scripts/a2736_typed_oil_pot_block_runtime.js',BP),'utf8');

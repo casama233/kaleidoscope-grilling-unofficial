@@ -1,5 +1,6 @@
 """Narrow source/math gate after native G64 clipping; candidate is unaccepted."""
 import json
+import re
 import math
 import subprocess
 import sys
@@ -78,6 +79,15 @@ class SprinkleAnchor(unittest.TestCase):
         paths += list((held.RP / 'attachables').glob('*seasoning*.json'))
         version=tuple(json.loads((held.BP/'manifest.json').read_text())['header']['version'])
         for path in paths:
+            proxy=re.fullmatch(r'(partial|pending)_seasoning_f[1-8]\.attachable',path.stem) if path.parent==held.RP/'attachables' else None
+            if proxy:
+                self.assertGreaterEqual(version,(2,8,71))
+                base='empty_seasoning_bottle' if proxy.group(1)=='partial' else 'pending_seasoning'
+                original=path.with_name(base+'.attachable.json')
+                before=json.loads(subprocess.check_output(['git','show','cba67124:'+original.relative_to(ROOT).as_posix()],cwd=ROOT))
+                before['minecraft:attachable']['description']['identifier']='kaleidoscope_grilling:'+path.name.removesuffix('.attachable.json')
+                self.assertEqual(json.loads(path.read_bytes()),before,path)
+                continue
             prior=subprocess.check_output(['git','show','cba67124:'+path.relative_to(ROOT).as_posix()],cwd=ROOT)
             if version>=(2,8,68) and path==held.BP/'entities/player.json':
                 before=json.loads(prior)

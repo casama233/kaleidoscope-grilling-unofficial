@@ -81,15 +81,21 @@ class SeasoningAnimationTests(unittest.TestCase):
 
     def test_pending_release_and_swap_stop_expression(self):
         script = (BP / 'scripts/main.js').read_text()
-        branch = script.split('if(id===PENDING_SEASONING){const hand=', 1)[1].split('if(id===PLATE_ID)', 1)[0]
+        branch = script.split('if(isPendingSeasoningId(id)){const hand=', 1)[1].split('if(id===PLATE_ID)', 1)[0]
         self.assertIn("controller:'kg_seasoning_shake'", branch)
         self.assertIn('!q.is_using_item || !q.is_item_name_any(', branch)
         self.assertIn("'slot.weapon.offhand':'slot.weapon.mainhand'", branch)
 
     def test_combined_bottle_assets_and_item_definitions_are_preserved(self):
+        proxy_pattern = re.compile(r'(partial|pending)_seasoning_f[1-8]')
         for path in sorted((RP / 'attachables').glob('*seasoning*.json')):
-            relative = path.relative_to(ROOT).as_posix()
+            name = path.name.removesuffix('.attachable.json')
+            proxy = proxy_pattern.fullmatch(name)
+            prior_path = path.with_name(('empty_seasoning_bottle' if proxy.group(1) == 'partial' else 'pending_seasoning')+'.attachable.json') if proxy else path
+            relative = prior_path.relative_to(ROOT).as_posix()
             before = json.loads(subprocess.check_output(['git', 'show', '604a91b0:' + relative], cwd=ROOT))['minecraft:attachable']['description']
+            if proxy:
+                before['identifier'] = 'kaleidoscope_grilling:'+name
             after = load(path)['minecraft:attachable']['description']
             for field in ['identifier', 'geometry', 'textures', 'materials', 'render_controllers']:
                 self.assertEqual(after[field], before[field], (path.name, field))
@@ -97,8 +103,27 @@ class SeasoningAnimationTests(unittest.TestCase):
         paths += list((RP / 'models/entity/a286_hand').glob('*seasoning*.json'))
         paths += list((BP / 'items').glob('*seasoning*.json'))
         for path in paths:
-            before = subprocess.check_output(['git', 'show', '604a91b0:' + path.relative_to(ROOT).as_posix()], cwd=ROOT)
-            self.assertEqual(path.read_bytes(), before, path)
+            proxy = proxy_pattern.fullmatch(path.stem) if path.parent == BP / 'items' else None
+            prior_path = path.with_name(('empty_seasoning_bottle' if proxy.group(1) == 'partial' else 'pending_seasoning')+'.json') if proxy else path
+            before = subprocess.check_output(['git', 'show', '604a91b0:' + prior_path.relative_to(ROOT).as_posix()], cwd=ROOT)
+            state = re.fullmatch(r'special_seasoning_r[1-8]_v[0-7]', path.stem)
+            if path.name == 'bottle_held_contents.geo.json':
+                # G71 reflects only the pending halves through Java-to-Bedrock X.
+                expected = json.loads(before)
+                for geometry in expected['minecraft:geometry']:
+                    for bone in geometry['bones']:
+                        if bone['name'].startswith('pending_'):
+                            for cube in bone['cubes']:
+                                cube['origin'][0] = -cube['origin'][0]-cube['size'][0]
+                self.assertEqual(load(path), expected, path)
+            elif proxy or state:
+                expected = json.loads(before)
+                if proxy:
+                    expected['minecraft:item']['description'].update(identifier='kaleidoscope_grilling:'+path.stem,menu_category={'category':'none'})
+                expected['minecraft:item']['components']['minecraft:icon']['textures']['default'] = path.stem
+                self.assertEqual(load(path), expected, path)
+            else:
+                self.assertEqual(path.read_bytes(), before, path)
 
     def test_motion_dispatch_is_exclusive_and_owning_entity_safe(self):
         import build_seasoning_held as held

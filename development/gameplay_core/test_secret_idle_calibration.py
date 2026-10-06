@@ -10,7 +10,7 @@ RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
 BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
 sys.path.insert(0, str(ROOT / 'tools'))
 import secret_idle_calibration as calibration
-from public_source_witness import assert_public_bytes, public_json
+from public_source_witness import assert_public_bytes_with_g71_bottles as assert_public_bytes, public_json
 from test_eating_observer_projection import node
 
 

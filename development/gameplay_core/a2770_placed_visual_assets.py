@@ -140,6 +140,11 @@ def pending_assets(controllers,description,geometries):
   g['description']['texture_width']=g['description']['texture_height']=16
   for bone in g['bones']:
    for cube in bone.get('cubes',[]):
+    # The bottle shell already uses Java-to-Bedrock X reflection. Match it
+    # without reversing tint order: [from.x, to.x] -> [8-to.x, 8-from.x].
+    # These faces all use the checked solid-white mask, so face orientation
+    # cannot alter their palette color. Keep other placed converters unchanged.
+    cube['origin'][0]=-cube['origin'][0]-cube['size'][0]
     for face in cube['uv']:
      cube['uv'][face]={'uv':[16,16],'uv_size':[-16,-16]} if face in ('up','down') else {'uv':[0,0],'uv_size':[16,16]}
   geometries.append(g)
@@ -225,6 +230,11 @@ def oil_assets(controllers):
 
 def ingredient_palette():
  atlas=load(RP/'textures/item_texture.json')['texture_data'];result={}
+ # Bottle GUI renders are presentation assets, never particle-color sources.
+ # Match item identity rather than mutable icon keys, including fill proxies.
+ bottles={NS+name for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning')}
+ bottles|={NS+f'special_seasoning_r{r}_v{v}' for r in range(1,9) for v in range(8)}
+ bottles|={NS+f'{state}_seasoning_f{fill}' for state in ('partial','pending') for fill in range(1,9)}
  profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
  # PR124's owned duration aliases reuse the canonical Java item texture.
  # They are not additional seasoning ingredients or Java palette identities.
@@ -235,10 +245,12 @@ def ingredient_palette():
   if item['description']['identifier'] in aliases:continue
   icon=item.get('components',{}).get('minecraft:icon')
   key=icon if isinstance(icon,str) else (icon or {}).get('texture',(icon or {}).get('textures',{}).get('default'))
-  paths=atlas.get(key,{}).get('textures');path=paths[0] if isinstance(paths,list) else paths
-  if not isinstance(path,str):continue
-  candidate=RP/(path if path.endswith('.png') else path+'.png')
-  if key in ('empty_seasoning_bottle','pending_seasoning','special_seasoning'):candidate=RP/'textures/blocks/seasoning_bottle.png'
+  if item['description']['identifier'] in bottles:
+   candidate=RP/'textures/blocks/seasoning_bottle.png'
+  else:
+   paths=atlas.get(key,{}).get('textures');path=paths[0] if isinstance(paths,list) else paths
+   if not isinstance(path,str):continue
+   candidate=RP/(path if path.endswith('.png') else path+'.png')
   if not candidate.is_file():continue
   image=Image.open(candidate).convert('RGBA');w,h=image.size
   colors=Counter((r<<16)|(g<<8)|b for r,g,b,a in image.crop((w//4,h//4,3*w//4,3*h//4)).getdata() if a>=48)

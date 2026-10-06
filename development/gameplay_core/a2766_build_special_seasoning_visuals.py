@@ -67,7 +67,7 @@ def item_doc(variant: int, remaining: int) -> dict:
             },
             "components": {
                 "minecraft:display_name": {"value": DISPLAY},
-                "minecraft:icon": {"textures": {"default": "special_seasoning"}},
+                "minecraft:icon": {"textures": {"default": f"special_seasoning_r{remaining}_v{variant}"}},
                 "minecraft:max_stack_size": 1,
                 "minecraft:hand_equipped": True,
                 "minecraft:allow_off_hand": True,

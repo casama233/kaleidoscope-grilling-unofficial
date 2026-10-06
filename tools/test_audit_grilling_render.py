@@ -10,11 +10,12 @@ class ThreadedAuditContracts(unittest.TestCase):
  @classmethod
  def setUpClass(cls):
   cls.geometries=audit.collect_geometries([]);cls.animations=audit.collect_animations()
- def check(self,change=None,geometry=None,animation=None,version=None,food=False):
+ def check(self,change=None,geometry=None,animation=None,version=None,food=False,bottle=None):
   loader=audit.load_json
   def modified(path):
    d=loader(path)
    if path.name=='secret_skewer.attachable.json' and change:change(d['minecraft:attachable']['description'])
+   if path.name=='pending_seasoning_f8.attachable.json' and bottle:bottle(d['minecraft:attachable']['description'])
    if path.name=='manifest.json' and path.parent==audit.BP and version:d['header']['version']=version
    if path.name=='unfinished_skewer.json' and food:d['minecraft:item']['components']['minecraft:food']={'nutrition':1,'saturation_modifier':.1}
    return d
@@ -25,6 +26,8 @@ class ThreadedAuditContracts(unittest.TestCase):
   with patch.object(audit,'load_json',modified):audit.check_current_display_contracts(findings,geos,anims)
   return {r['code']for r in findings if r['severity']=='error'}
  def test_current(self):self.assertEqual(self.check(),set())
+ def test_unknown_fill_id_cannot_replace_an_expected_proxy_at_same_count(self):
+  self.assertIn('held_inventory_contract',self.check(bottle=lambda d:d.update(identifier='kaleidoscope_grilling:pending_seasoning_f9')))
  def test_wrong_helper_hand(self):
   def mutate(geos):geos['geometry.kg_secret_held.piece_1']['geo']['bones'][0]['binding']='q.item_slot_to_bone_name(context.item_slot)'
   self.assertIn('held_binding_contract',self.check(geometry=mutate))

@@ -1,6 +1,6 @@
 /** Author-owned output transactions; native food state travels with the actual output. */
 import {world,system,ItemStack,EquipmentSlot} from '@minecraft/server';
-import {writePublicFood,readPublicFood,normalizePublicFood} from './food_api_core.js';
+import {writePublicFood,readPublicFood,normalizePublicFood,bucketHotUntil} from './food_api_core.js';
 export const CUISINE_CAPABILITIES=Object.freeze(['cuisine_output_receipt_v2','secret_ingredient_consume_v1','cuisine_configuration_v1']);
 const CONFIG_KEY='senluo:cuisine_heat_and_seasoning_v1';
 const cuisineEnabled=()=>world.getDynamicProperty(CONFIG_KEY)!==false;
@@ -18,7 +18,7 @@ export function readCuisineMetadata(b,data={},kind='pot'){
  const raw=world.getDynamicProperty(META_PREFIX+key(b));if(raw!==undefined)state={...state,...JSON.parse(String(raw))};
  const oilType=data.grillingOilType||state.oilType;
  const heat=kind==='stockpot'?1200:oilType==='premium_chili'?24000:oilType==='secret_chili'?12000:1200;
- const result=normalizePublicFood({v:1,hotUntil:Number(world.getAbsoluteTime())+heat,seasoning:[...(state.seasoning??[])]});if(!result)throw Error('cuisine metadata invalid');return result;
+ const result=normalizePublicFood({v:1,hotUntil:bucketHotUntil(Number(world.getAbsoluteTime())+heat),seasoning:[...(state.seasoning??[])]});if(!result)throw Error('cuisine metadata invalid');return result;
 }
 export function createNativeSuspiciousStew(b,variant=Math.floor(Math.random()*11)){
  if(!Number.isInteger(variant)||variant<0||variant>10)throw Error('stew variant');
@@ -49,7 +49,7 @@ export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,ta
  const meta=readCuisineMetadata(b,data,kind),base=nativeStack?.clone()??new ItemStack(id,count);if(base.typeId!==id||base.amount!==count)throw Error('native output identity');
  const outputMeta=readPublicFood(base);if(outputMeta.present&&!outputMeta.valid)throw Error('native output metadata unreadable');
  if(outputMeta.valid&&outputMeta.state.nativeVariant!==undefined)meta.nativeVariant=outputMeta.state.nativeVariant;
- const stack=writePublicFood(base,meta);if(meta.hotUntil>Number(world.getAbsoluteTime()))stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
+ const stack=writePublicFood(base,meta);if(meta.hotUntil>Number(world.getAbsoluteTime())&&stack.getRawLore().length<20)stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
  let slot=-1,target,entity;
  if(container)for(let i=0;i<container.size;i++)if(!container.getItem(i)){slot=i;break;}
  if(slot>=0){if(!playerId&&!targetBlock)throw Error('output block target missing');target=playerId?{kind:'player_slot',playerId,slot,expectedId:id,expectedAmount:count}:{kind:'block_slot',...station(targetBlock),slot,expectedId:id,expectedAmount:count};}

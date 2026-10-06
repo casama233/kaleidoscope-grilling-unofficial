@@ -1,3 +1,4 @@
+import {isPendingSeasoningId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
 /** Real motion-only runtime with API doubles; no native client claim. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +13,7 @@ function fixture(){
  const identity=stack=>stack?JSON.stringify(stack):null;
  const world={afterEvents:Object.fromEntries(['playerLeave','playerSpawn'].map(k=>[k,{subscribe(cb){events[k]=cb}}]))};
  const player={id:'holder',selectedSlotIndex:2,playAnimation(name,options){animations.push({name,options})},setProperty(k,v){if(reject?.(k))throw Error('Injected property failure');properties.set(k,v)}};
- const context=vm.createContext({world,system,isSpecialSeasoningId,getMainHand:()=>main,getOffHand:()=>off,eatingIdentity:identity});
+ const context=vm.createContext({world,system,isSpecialSeasoningId,isPendingSeasoningId,getMainHand:()=>main,getOffHand:()=>off,eatingIdentity:identity});
  vm.runInContext(source,context);const api=vm.runInContext('({beginSeasoningMotion,syncSeasoningMotion})',context);
  return {api,player,system,events,animations,properties,identity,get main(){return main},set main(x){main=x},get off(){return off},set off(x){off=x},setFailure(cb){reject=cb},read:k=>properties.get(N+k),pending(hand){return {hand,use:{identity:identity(hand==='off'?off:main),slot:player.selectedSlotIndex}}}};
 }
@@ -63,3 +64,5 @@ test('only main-hand completed seasoning starts the finite anchor and pins no ot
   if(f.animations.length){const a=f.animations[0];assert.equal(a.name,'animation.kg_seasoning.player.sprinkle_anchor.right');assert.equal(a.options.blendOutTime,0);assert.equal(a.options.controller,'kg_seasoning_sprinkle_anchor');assert.ok(a.options.stopExpression.includes(typeId));assert.ok(a.options.stopExpression.includes("q.property('kaleidoscope_grilling:season_hand') == 2"));assert.ok(!a.options.stopExpression.includes('season_phase'));}
  }
 });
+
+for(const fill of [1,8])test('pending fill '+fill+' participates in native motion',()=>{const f=fixture();f.off={typeId:PENDING+'_f'+fill,amount:1};f.api.syncSeasoningMotion(f.player,f.pending('off'));assert.equal(f.read('pending_hand'),2);});

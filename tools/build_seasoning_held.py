@@ -44,9 +44,9 @@ def motion(hand,t,shaking):
 
 def dispatch(desc):
  identifier=desc['identifier']
- if identifier==NS+'empty_seasoning_bottle':return
- if identifier!=NS+'pending_seasoning' and not identifier.startswith(NS+'special_seasoning'):return
- pending=identifier==NS+'pending_seasoning'
+ if identifier==NS+'empty_seasoning_bottle' or identifier.startswith(NS+'partial_seasoning_f'):return
+ if identifier!=NS+'pending_seasoning' and not identifier.startswith(NS+'pending_seasoning_f') and not identifier.startswith(NS+'special_seasoning'):return
+ pending=identifier==NS+'pending_seasoning' or identifier.startswith(NS+'pending_seasoning_f')
  scripts=desc.setdefault('scripts',{})
  for phase in ['initialize','pre_animation']:
   scripts[phase]=[s for s in scripts.get(phase,[]) if not s.startswith('v.kg_season_')]

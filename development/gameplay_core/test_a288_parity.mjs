@@ -59,7 +59,7 @@ check('manual hot merge supports non-skewer food and ignores five-minute window'
  data.setItemLore(a,['§c🔥 7:30']);data.setItemLore(b,['§c🔥 0:50']);c.setItem(0,a);c.setItem(2,b);
  const result=hot.compactHotFoodContainer(c,1000,'minecraft:cooked_beef');
  assert.equal(result.changed,true);assert.equal(c.getItem(0).amount,3);
- assert.equal(data.getItemProperty(c.getItem(0),'kaleidoscope_grilling:hot_until')-1000,Math.floor((9000*2+1000)/3));
+ assert.equal(data.getItemProperty(c.getItem(0),'kaleidoscope_grilling:hot_until')-1000,6300); // Java weighted 7333 deadline floors to 7300 at now=1000
 });
 check('manual hot merge preserves component boundaries',()=>{
  const c=new Container(4),a=new Stack('minecraft:cooked_beef',1),b=new Stack('minecraft:cooked_beef',1);

@@ -14,6 +14,19 @@ def require(ok,message):
 def pure(module,fn):
     code=f"import {{pathToFileURL}} from 'node:url';const m=await import(pathToFileURL(process.argv[1]));console.log(JSON.stringify(m.{fn}()));"
     return json.loads(subprocess.check_output(['node','--input-type=module','-e',code,str(GAME/'scripts'/module)],text=True,encoding='utf-8'))
+def check_hidden_bottle_fill(item,owner):
+    iid=item['description']['identifier']
+    match=re.fullmatch(NS+r'(partial|pending)_seasoning_f([1-8])',iid)
+    if not match:return False
+    base=NS+('empty_seasoning_bottle' if match[1]=='partial' else 'pending_seasoning')
+    require(item['description'].get('menu_category')=={'category':'none'} and base in owner,'Private fill entry leaked '+iid)
+    original=load(GAME/'items'/(base.split(':')[-1]+'.json'))['minecraft:item']
+    components=json.loads(json.dumps(item['components']))
+    require(components['minecraft:icon']=={'textures':{'default':iid.split(':')[-1]}},'Fill icon identity drift '+iid)
+    components['minecraft:icon']=original['components']['minecraft:icon']
+    require(components==original['components'],'Fill proxy mechanic drift '+iid)
+    return True
+
 def check_facts(s):
     owner={}
     for e in s['entries']:
@@ -33,6 +46,7 @@ def check_facts(s):
             continue
         if re.fullmatch(NS+r'special_seasoning_r[1-8]_v[0-7]',iid):
             require(item['description']['menu_category']['category']=='none' and NS+'special_seasoning' in owner,'Private seasoning entry leaked');continue
+        if check_hidden_bottle_fill(item,owner):continue
         require(iid in owner,'Item absent '+iid);covered+=1
     for e in s['entries']:
         pairs=dict(e.get('nutrition_variants',{}))

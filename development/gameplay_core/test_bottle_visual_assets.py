@@ -3,6 +3,8 @@ import json
 import re
 import unittest
 import subprocess
+import tempfile
+from unittest.mock import patch
 from pathlib import Path
 from PIL import Image
 import a2861_bottle_held_visual_assets as held
@@ -49,7 +51,7 @@ class BottleVisualAssets(unittest.TestCase):
             self.assertNotIn('binding',bone)
             element=next(e for e in source['elements'] if any(f.get('tintindex')==tint for f in e['faces'].values()))
             cube=bone['cubes'][0]
-            self.assertEqual(cube['origin'],[element['from'][0]-8,element['from'][1],element['from'][2]-8])
+            self.assertEqual(cube['origin'],[8-element['to'][0],element['from'][1],element['from'][2]-8])
             self.assertEqual(cube['size'],[element['to'][i]-element['from'][i] for i in range(3)])
             self.assertEqual(set(cube['uv']),set(element['faces']))
             self.assertEqual(visible[bone['name']],f"q.property('kaleidoscope_grilling:layer_{tint//2}') == {value}")
@@ -70,7 +72,7 @@ class BottleVisualAssets(unittest.TestCase):
             element=next(e for e in source['elements'] if any(f.get('tintindex')==tint for f in e['faces'].values()))
             g=geos['geometry.kg_a2770.pending_'+str(tint)]
             cube=g['bones'][0]['cubes'][0]
-            self.assertEqual(cube['origin'],[element['from'][0]-8,element['from'][1],element['from'][2]-8])
+            self.assertEqual(cube['origin'],[8-element['to'][0],element['from'][1],element['from'][2]-8])
             self.assertEqual(cube['size'],[element['to'][i]-element['from'][i] for i in range(3)])
             self.assertEqual(set(cube['uv']),set(element['faces']))
         data=(BP/'scripts/a2770_placed_visual_data.js').read_text()
@@ -190,6 +192,40 @@ for(const slot of ['main_hand','off_hand']) {
 }
 """.replace('EXPRESSIONS',source)
             subprocess.run(['node','-e',script],check=True,capture_output=True,text=True)
+
+    def test_all_bottle_gui_icons_cannot_change_particle_palette(self):
+        # Canonical bottle particle sprite, independently pinned by the source
+        # audit, must be sampled even when GUI keys, paths or pixels change.
+        names = ['empty_seasoning_bottle', 'pending_seasoning', 'special_seasoning']
+        names += [f'special_seasoning_r{r}_v{v}' for r in range(1, 9) for v in range(8)]
+        names += [f'{state}_seasoning_f{fill}' for state in ['partial', 'pending'] for fill in range(1, 9)]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            bp, rp = root / 'behavior_pack', root / 'resource_pack'
+            for path in [bp / 'items', bp / 'scripts', rp / 'textures/items', rp / 'textures/blocks']:
+                path.mkdir(parents=True)
+            (bp / 'scripts/data.js').write_text('export const PROFILE_BY_ITEM=Object.freeze({});')
+            (rp / 'textures/blocks/seasoning_bottle.png').write_bytes((RP / 'textures/blocks/seasoning_bottle.png').read_bytes())
+            atlas = {}
+            for name in [*names, 'ordinary_item']:
+                key = 'rebaked_' + name
+                atlas[key] = {'textures': 'textures/items/gui'}
+                doc = {'minecraft:item': {'description': {'identifier': 'kaleidoscope_grilling:' + name},
+                                         'components': {'minecraft:icon': key}}}
+                (bp / f'items/{name}.json').write_text(json.dumps(doc))
+            (rp / 'textures/item_texture.json').write_text(json.dumps({'texture_data': atlas}))
+            gui = rp / 'textures/items/gui.png'
+            with patch.object(held.placed, 'BP', bp), patch.object(held.placed, 'RP', rp):
+                Image.new('RGBA', (16, 16), (255, 0, 255, 255)).save(gui)
+                before = held.placed.ingredient_palette()
+                Image.new('RGBA', (16, 16), (0, 255, 0, 255)).save(gui)
+                after = held.placed.ingredient_palette()
+            for name in names:
+                with self.subTest(item=name):
+                    identifier = 'kaleidoscope_grilling:' + name
+                    self.assertEqual(before[identifier], [6756368, 8339631])
+                    self.assertEqual(after[identifier], before[identifier])
+            self.assertNotEqual(before['kaleidoscope_grilling:ordinary_item'], after['kaleidoscope_grilling:ordinary_item'])
 
     def test_generator_is_reproducible_and_player_budget_fits(self):
         for path,expected in held.build().items():

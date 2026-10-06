@@ -43,6 +43,9 @@ def current_behavior_expectation(before, kind, stem, version):
         if tag not in tags:tags.append(tag)
     if version >= (2, 8, 61) and kind == 'item' and stem in BOTTLES:
         expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
+    if version >= (2, 8, 71) and kind == 'item' and stem in {
+            f'special_seasoning_r{r}_v{v}' for r in range(1, 9) for v in range(8)}:
+        expected['minecraft:item']['components']['minecraft:icon'] = {'textures': {'default': stem}}
     if version >= (2,8,68) and kind=='block' and stem=='pepper_leaves':
         expected['minecraft:block']['components']['minecraft:tick']={'interval_range':[5,5],'looping':True}
     return expected
@@ -80,6 +83,15 @@ def main():
                 assert not (PROJECT / 'behavior_pack/items/pepper_worldgen_seed.json').exists()
                 # This later hidden worldgen carrier reuses an existing label;
                 # it is not part of the historical label-only release count.
+                continue
+            proxy = re.fullmatch(r'(partial|pending)_seasoning_f([1-8])', path.stem) if kind == 'item' else None
+            if proxy:
+                assert version >= (2,8,71)
+                base = 'empty_seasoning_bottle' if proxy.group(1) == 'partial' else 'pending_seasoning'
+                expected = json.loads(path.with_name(base+'.json').read_bytes())
+                expected['minecraft:item']['description'].update(identifier='kaleidoscope_grilling:'+path.stem,menu_category={'category':'none'})
+                expected['minecraft:item']['components']['minecraft:icon']['textures']['default']=path.stem
+                assert json.loads(path.read_bytes()) == expected, path
                 continue
             before = json.loads(prior(path))
             after = json.loads(path.read_bytes())

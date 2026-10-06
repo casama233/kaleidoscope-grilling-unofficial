@@ -1,3 +1,4 @@
+import {isPendingSeasoningId} from './a2743_seasoning_contract_core.js';
 // Motion-only port of PR125; contents remain owned by bottle_held_visual_runtime.
 import {system,world} from '@minecraft/server';
 import {getMainHand,getOffHand} from './a2735_player_io.js';
@@ -17,7 +18,7 @@ export function beginSeasoningMotion(player,hand){
 export function syncSeasoningMotion(player,pending){
  // Use the captured native hand; two pending bottles must never shake together.
  const stack=pending&&held(player,pending.hand);
- const using=stack?.typeId===NS+'pending_seasoning'&&eatingIdentity(stack)===pending.use.identity&&
+ const using=isPendingSeasoningId(stack?.typeId)&&eatingIdentity(stack)===pending.use.identity&&
   (pending.hand==='off'||pending.use.slot===player.selectedSlotIndex);
  const hand=using?(pending.hand==='off'?2:1):0;
  if(pendingHands.get(player.id)!==hand){player.setProperty(NS+'pending_hand',hand);pendingHands.set(player.id,hand)}

@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "scope": "Integrated G73 damage/feedback plus reviewed PR135 bottle-only main changes; original public completion/eating source outside exact edits conserved.",
+  "before_sha256": "42a4096faada55381ffd0af37a8c46064dfc34d4e5875a325a21e477f0caace2",
+  "after_sha256": "7788ca0e01d497e22e96a11991c6f33a96cfce6b08f1d0c93778d17d87850838",
+  "operations": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';\nimport {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';\n"
+    },
+    {
+      "start": 400,
+      "end": 543,
+      "before": "import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';\n",
+      "after": "import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback,ordinaryFatalFeedback} from './immersion_effect_feedback.js';\n"
+    },
+    {
+      "start": 3350,
+      "end": 3393,
+      "before": "import './a2770_placed_visual_runtime.js';\n",
+      "after": "import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';\n"
+    },
+    {
+      "start": 5310,
+      "end": 5367,
+      "before": " hasSeasoningBase,isSeasoningBlockId as isSeasoningBlock\n",
+      "after": " hasSeasoningBase,isPendingSeasoningId,seasoningFillVisualId,isSeasoningBlockId as isSeasoningBlock\n"
+    },
+    {
+      "start": 40672,
+      "end": 40783,
+      "before": " const kind=isSpecialSeasoningId(stack?.typeId)?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';\n",
+      "after": " const kind=isSpecialSeasoningId(stack?.typeId)?'special':isPendingSeasoningId(stack?.typeId)?'pending':'empty';\n"
+    },
+    {
+      "start": 40959,
+      "end": 41174,
+      "before": " const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);\n",
+      "after": " const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):seasoningFillVisualId(data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,data.ingredients??[]),stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);\n"
+    },
+    {
+      "start": 44601,
+      "end": 44723,
+      "before": " if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||isSpecialSeasoningId(id)){pushBottle(block,player,held,hand);return}\n",
+      "after": " if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}\n"
+    },
+    {
+      "start": 45155,
+      "end": 45241,
+      "before": "  // Java mutates the existing stack, except the explicit EMPTY -> PENDING promotion.\n",
+      "after": "  // Java's explicit EMPTY -> PENDING promotion creates a fresh semantic item.\n  // Same-kind fill changes preserve all stable-API metadata through readback.\n"
+    },
+    {
+      "start": 45359,
+      "end": 45540,
+      "before": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');}\n",
+      "after": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}\n"
+    },
+    {
+      "start": 46150,
+      "end": 46150,
+      "before": "",
+      "after": "  else item=retargetBottleFillStack(item);\n"
+    },
+    {
+      "start": 46255,
+      "end": 46308,
+      "before": "  else blockSound(block,'seasoning_bottle_place',1);\n",
+      "after": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}\n"
+    },
+    {
+      "start": 49215,
+      "end": 49350,
+      "before": "  const isBottle=held=>!!held&&(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId));\n",
+      "after": "  const isBottle=isNativeBottleItem;\n"
+    },
+    {
+      "start": 59315,
+      "end": 59418,
+      "before": " system.run(()=>{try{player.kill()}catch{try{player.applyDamage(100000,{cause:'override'})}catch{}}});\n",
+      "after": " ordinaryFatalFeedback(player);\n // Java uses damage, not generic kill: Heavy Metal and native totems retain their damage/death route.\n system.run(()=>{try{player.applyDamage(3.4028234663852886e38,{cause:'override'})}catch(error){console.warn('[Grilling ordinary damage] '+error)}});\n"
+    },
+    {
+      "start": 65980,
+      "end": 66072,
+      "before": " if(id===PENDING_SEASONING){const hand=captureInteractionIntent(e.source,e.itemStack).hand;\n",
+      "after": " if(isPendingSeasoningId(id)){const hand=captureInteractionIntent(e.source,e.itemStack).hand;\n"
+    },
+    {
+      "start": 66443,
+      "end": 66723,
+      "before": "  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:\"!q.is_using_item || !q.is_item_name_any('\"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+\"','\"+PENDING_SEASONING+\"')\"})}catch{}return}\n",
+      "after": "  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:\"!q.is_using_item || !q.is_item_name_any('\"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+\"','\"+e.itemStack.typeId+\"')\"})}catch{}return}\n"
+    },
+    {
+      "start": 70742,
+      "end": 70937,
+      "before": " const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}\n",
+      "after": " const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(isPendingSeasoningId(id)){completePending(e.source,e.itemStack);return}\n"
+    },
+    {
+      "start": 75719,
+      "end": 75857,
+      "before": " if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&hp.currentValue>0&&e.damage>=hp.currentValue){\n",
+      "after": " if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){\n"
+    },
+    {
+      "start": 75937,
+      "end": 76015,
+      "before": "  // This remains a before-damage approximation, not a Java death-event hook.\n",
+      "after": "  // BDS exposes provisional post-hit health here; compare that value to zero,\n  // not incoming damage to already-reduced health. Cancellation restores it.\n  // Native remaining absorption is unavailable: skip ambiguous hits rather\n  // than consuming rescue for a shield-blocked nonfatal hit.\n  // Later addon cancellation/rewrite and exact Java death ordering remain separate.\n"
+    },
+    {
+      "start": 76625,
+      "end": 76688,
+      "before": "   target.dimension.playSound('random.totem',target.location);\n",
+      "after": "   target.dimension.playSound('kg_java21.heavy_metal',target.location);\n"
+    },
+    {
+      "start": 86158,
+      "end": 86331,
+      "before": "  try{prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}\n",
+      "after": "  try{prepareBottleFillItems(p,!!active||PENDING_USES.has(p.id));prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}\n"
+    }
+  ]
+}

@@ -75,6 +75,9 @@ def cases(legacy=False):
   desc=json.loads(p.read_text())['minecraft:attachable']['description']
   refs=set(desc['geometry'].values())
   if legacy:
+   # G71-only proxy routes did not exist in the historical missing-fill frame.
+   # Keep that 67-route witness exact; current-frame coverage above includes all.
+   if desc['identifier'].startswith(('kaleidoscope_grilling:partial_seasoning_f','kaleidoscope_grilling:pending_seasoning_f')):continue
    if desc['identifier']=='kaleidoscope_grilling:empty_seasoning_bottle':
     refs={'geometry.kg_a286.kg_a2733.seasoning_bottle_hand'}
    elif desc['identifier']=='kaleidoscope_grilling:pending_seasoning':
