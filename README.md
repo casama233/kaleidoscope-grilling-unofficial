@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.69
+## Current maintained baseline: 2.8.72
 
 **2.8.69 測試發佈候選**：整合秘製串幾何／原色、持物校準、完成後顯示所有權及食材薄片 alpha 輪廓／側面 UV 修復，保留 2.8.67 修復。限定牛肉 helper 外觀及獨立 6,500 ms 進食終點觀察見 [G69 範圍](docs/STATUS-A2.8.69.md)。先前錄影的變慢原因仍未釐清；未宣稱全部 213 食物、完整 Java／各視角或家族存檔／真人驗收通過。保持 client=false、production_ready=false、pending_client_acceptance。
 

@@ -100,6 +100,7 @@ VERIFIERS = {
     (2, 8, 67): "verify_a2867.py",
     (2, 8, 68): "verify_a2868.py",
     (2, 8, 69): "verify_a2869.py",
+    (2, 8, 72): "verify_a2872.py",
     (2, 8, 8): "verify_a288_local.py",
 }
 
@@ -159,10 +160,12 @@ def generic_gate() -> tuple[int, int, int, int]:
 
     rp_dep = dependency_by_uuid(bp, EXPECTED["rp_header_uuid"])
     assert tuple(rp_dep["version"]) == rp_version
-    cookery_bp = dependency_by_uuid(bp, EXPECTED["cookery_bp_uuid"])
-    cookery_rp = dependency_by_uuid(rp, EXPECTED["cookery_rp_uuid"])
-    assert tuple(cookery_bp["version"]) == (1, 0, 8)
-    assert tuple(cookery_rp["version"]) == (1, 0, 8)
+    host_ids=("5df753c9-3436-4fba-87f1-a2da3651cfcf","f1d333ca-2d6b-4566-8005-e6c309816324") if bp_version >= (2,8,72) else (EXPECTED["cookery_bp_uuid"],EXPECTED["cookery_rp_uuid"])
+    host_version=(1,6,0) if bp_version >= (2,8,72) else (1,0,8)
+    cookery_bp = dependency_by_uuid(bp, host_ids[0])
+    cookery_rp = dependency_by_uuid(rp, host_ids[1])
+    assert tuple(cookery_bp["version"]) == host_version
+    assert tuple(cookery_rp["version"]) == host_version
 
     entry = BP / script_module["entry"]
     assert entry.is_file(), entry
