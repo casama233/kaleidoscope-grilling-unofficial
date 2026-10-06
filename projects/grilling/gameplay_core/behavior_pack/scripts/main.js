@@ -42,7 +42,7 @@ import {captureEatingIdentity,eatingStillCurrent,eatingEventMatches,commitEating
 import {completedUseStillCurrent} from './a2810_use_transaction.js';
 import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {showJavaEatingHud} from './java_eating_hud_runtime.js';
-import './a2770_placed_visual_runtime.js';
+import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';
 import './guide/main.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './eating_data_lookup.js';
@@ -641,7 +641,7 @@ function handleSeasoningBlock(block,player,hand='main'){
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
   else item=retargetBottleFillStack(item);
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
-  else blockSound(block,'seasoning_bottle_place',1);
+  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}
   return;
  }
  javaInteractionFeedback(player,'invalid_seasoning');

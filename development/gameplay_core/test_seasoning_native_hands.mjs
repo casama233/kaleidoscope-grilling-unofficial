@@ -86,7 +86,7 @@ function fixture(){
   hostWorld:world,world,system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},
   EquipmentSlot:{Offhand:'offhand'},GameMode:{Survival:'survival',Creative:'creative'},
   BlockPermutation:{resolve:permutation},SEASONING_BLOCK:core.SEASONING_PLACE_BLOCK_ID,
-  console:{warn(){},error(){}},markPlacedVisualDirty(){},blockSound(){},message(){},
+  console:{warn(){},error(){}},markPlacedVisualDirty(){},refreshPlacedBottleAfterPickup(){},blockSound(){},message(){},
   javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},interactionParticleBurst(){},transactionStatus:r=>r.ok,
   EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
   seasoningLore:()=>[],

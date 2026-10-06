@@ -48,9 +48,9 @@ function render(row,dimension,slot,type,location,rotation,plan){
   entity.setProperty(PREFIX+'ready',true);entry.signature=signature;
  }catch(error){dispose(row,slot);warn(error)}
 }
-function sync(row,players){
+function sync(row,players,afterPickup=false){
  const l=row.location;
- if(!players.some(p=>p.dimensionId===row.dimensionId&&(p.x-l.x)**2+(p.y-l.y)**2+(p.z-l.z)**2<=RANGE_SQ)){clear(row);return}
+ if(!afterPickup&&!players.some(p=>p.dimensionId===row.dimensionId&&(p.x-l.x)**2+(p.y-l.y)**2+(p.z-l.z)**2<=RANGE_SQ)){clear(row);return}
  let dimension,block;
  try{dimension=world.getDimension(row.dimensionId);block=dimension.getBlock(l)}catch{clear(row);return}
  if(!block){clear(row);return}
@@ -66,6 +66,16 @@ function sync(row,players){
  }else{
   clear(row);if(!row.helpers.size)tracked.delete(visualLocationKey(row.dimensionId,l));
  }
+}
+// Called only after the native bottle/hand transaction commits. Reconcile this
+// renderer's existing target now; the normal queue retains retry/rebuild work.
+// Visual failures must never roll back an already committed inventory transfer.
+export function refreshPlacedBottleAfterPickup(block){
+ try{
+  markPlacedVisualDirty(block);
+  const row=tracked.get(visualLocationKey(block.dimension.id,block.location));
+  if(row)sync(row,[],true);
+ }catch(error){warn(error)}
 }
 function pump(){
  const players=[];
