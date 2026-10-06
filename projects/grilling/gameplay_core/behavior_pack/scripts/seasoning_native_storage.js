@@ -3,11 +3,11 @@
  */
 import {stationContainer,inspectStationStorage,quarantineStation} from './family_station_storage.js';
 import {readPlacedSeasoningStack} from './a2743_seasoning_block_adapter.js';
-import {SEASONING_MAX_BOTTLES,PENDING_SEASONING_ID} from './a2743_seasoning_contract_core.js';
+import {SEASONING_MAX_BOTTLES,isEmptySeasoningId,isPendingSeasoningId} from './a2743_seasoning_contract_core.js';
 import {isSpecialSeasoningId} from './a2766_special_seasoning_visual_core.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {slotWrite} from './rack_transfer_plan.js';
-export const isNativeBottleItem=stack=>!!stack&&(stack.typeId==='kaleidoscope_grilling:empty_seasoning_bottle'||stack.typeId===PENDING_SEASONING_ID||isSpecialSeasoningId(stack.typeId));
+export const isNativeBottleItem=stack=>!!stack&&(isEmptySeasoningId(stack.typeId)||isPendingSeasoningId(stack.typeId)||isSpecialSeasoningId(stack.typeId));
 
 export function readNativeBottles(block,describe,restoreLegacy,{fresh=false}={}){
  const rows=readPlacedSeasoningStack(block,true),presence=inspectStationStorage(block);

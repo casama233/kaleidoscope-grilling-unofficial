@@ -41,3 +41,32 @@ def assert_public_bytes(testcase, path):
     if not path.is_absolute():
         path = ROOT / path
     testcase.assertEqual(path.read_bytes(), public_bytes(path), 'Repaired public-source bytes changed: ' + str(path.relative_to(ROOT)))
+
+
+def assert_public_bytes_with_g71_bottles(testcase, path):
+    """Allow only the exact reviewed bottle delta; conserve every other byte."""
+    path = Path(path)
+    if not path.is_absolute():
+        path = ROOT / path
+    relative = path.relative_to(ROOT).as_posix()
+    if relative != 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js':
+        return assert_public_bytes(testcase, path)
+    version = json.loads((ROOT / 'baseline.json').read_text())['version']
+    if tuple(version) < (2, 8, 71):
+        return assert_public_bytes(testcase, path)
+    delta = json.loads((ROOT / 'tools/fixtures/g71-bottle-main-delta.json').read_text())
+    testcase.assertEqual(delta['path'], relative)
+    testcase.assertEqual(delta['release'], [2, 8, 71])
+    source = public_bytes(path)
+    testcase.assertEqual(hashlib.sha256(source).hexdigest(), delta['before_sha256'])
+    lines = source.decode('utf-8').splitlines(keepends=True)
+    cursor, result = 0, []
+    for edit in delta['edits']:
+        start, end = edit['start'], edit['end']
+        testcase.assertTrue(cursor <= start <= end <= len(lines))
+        testcase.assertEqual(''.join(lines[start:end]), edit['before'])
+        result.extend(lines[cursor:start]); result.append(edit['after']); cursor = end
+    result.extend(lines[cursor:])
+    expected = ''.join(result).encode('utf-8')
+    testcase.assertEqual(hashlib.sha256(expected).hexdigest(), delta['after_sha256'])
+    testcase.assertEqual(path.read_bytes(), expected, 'Source differs outside exact G71 bottle delta')

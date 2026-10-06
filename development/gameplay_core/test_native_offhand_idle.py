@@ -24,7 +24,7 @@ class NativeOffhandIdle(unittest.TestCase):
    if hand!='left':continue
    self.assertFalse(visible(projected(g,OLD['animation.kg_a286.bottle_fp_left'],hand)),(name,ref));checked+=1
   version=tuple(json.loads((RP.parent/'behavior_pack/manifest.json').read_text())['header']['version'])
-  self.assertEqual(checked,67 if version>=(2,8,61) else 133)
+  self.assertEqual(checked,83 if version>=(2,8,71) else 67 if version>=(2,8,61) else 133)
  def test_historical_bottle_routes_and_new_layer_delta_are_explicit(self):
   original={(name,ref):g for name,hand,ref,g in cases(legacy=True) if hand=='left'}
   self.assertEqual(len(original),133)
@@ -37,10 +37,11 @@ class NativeOffhandIdle(unittest.TestCase):
   # Old133-per-hand shell/content refs stay pinned in the legacy fixture;
   # current67 item routes use64 fixed variants plus one shared dynamic rig.
   combined={key:g for key,g in current.items() if key[1]=='geometry.kg_bottle_held.combined'}
-  self.assertEqual({name for name,ref in combined},{'empty_seasoning_bottle.attachable.json','pending_seasoning.attachable.json'})
-  self.assertEqual(len(current),67)
-  self.assertEqual(len(current)-len(original),-66)
-  self.assertEqual(len(set(current)-set(original)),67)
+  proxy_names={f'{kind}_seasoning_f{fill}.attachable.json' for kind in ['partial','pending'] for fill in range(1,9)} if version>=(2,8,71) else set()
+  self.assertEqual({name for name,ref in combined},{'empty_seasoning_bottle.attachable.json','pending_seasoning.attachable.json'}|proxy_names)
+  self.assertEqual(len(current),67+len(proxy_names))
+  self.assertEqual(len(current)-len(original),-66+len(proxy_names))
+  self.assertEqual(len(set(current)-set(original)),67+len(proxy_names))
   self.assertEqual(len(set(original)-set(current)),133)
   for (name,ref),g in combined.items():
    bound=[b for b in g['bones'] if b.get('binding')]

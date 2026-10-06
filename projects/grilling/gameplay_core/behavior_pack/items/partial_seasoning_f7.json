@@ -1,0 +1,28 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:partial_seasoning_f7",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "kaleidoscope_grilling.display.item.empty_seasoning_bottle"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "partial_seasoning_f7"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:allow_off_hand": true,
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:seasoning_bottle_1",
+        "replace_block_item": false
+      }
+    }
+  }
+}

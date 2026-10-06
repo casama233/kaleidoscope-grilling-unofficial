@@ -1,3 +1,4 @@
+import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
 /**
  * Canonical function-body integration with API doubles, not an engine certificate.
  * Run from repository root: node --test development/gameplay_core/test_seasoning_native_hands.mjs
@@ -82,7 +83,7 @@ function fixture(){
  let context,api;
  const load=()=>{
  context=vm.createContext({...core,...visuals,...tx,...plans,...support,...intent,
-  hostWorld:world,world,system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,
+  hostWorld:world,world,system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},
   EquipmentSlot:{Offhand:'offhand'},GameMode:{Survival:'survival',Creative:'creative'},
   BlockPermutation:{resolve:permutation},SEASONING_BLOCK:core.SEASONING_PLACE_BLOCK_ID,
   console:{warn(){},error(){}},markPlacedVisualDirty(){},blockSound(){},message(){},
@@ -91,6 +92,7 @@ function fixture(){
   seasoningLore:()=>[],
  });
  const run=s=>vm.runInContext(s,context);
+ run(body(read('eating_item_runtime.js'),'copyEatingVariant')+'\n'+['bottleFillIngredients','retargetBottleFillStack'].map(n=>body(read('bottle_fill_item_runtime.js'),n)).join('\n'));
  // Load the actual canonical implementations. Only unrelated visual/HUD effects are stubs.
  run(strip(read('itemDataCore.js')));run('configureItemDataWorld(hostWorld)');
  for(const name of ['host_api/food_api_core.js','a2735_player_io.js','a2762_interaction_intent_core.js'])run(strip(read(name)));
@@ -108,7 +110,7 @@ function fixture(){
  const source=read('main.js');
  run(source.slice(source.indexOf('const bottleInteractionSupports='),source.indexOf('function tryScheduleOffhandBottleInteraction(')));
  run(functions.map(n=>body(read('main.js'),n)).join('\n'));
- api=run('({nativeBottles,pushBottle,handleSeasoningBlock,scheduleNativeBottlePlacement,tryScheduleOffhandBottleInteraction,bottleDataFromItem,captureWritableHand,captureInteractionIntent,interactionIntentStillCurrent,getItemProperty,setItemProperty,setItemLore,readFoodSeasonings,setFoodSeasonings,seasoningBlockKey})');
+ api=run('({nativeBottles,pushBottle,handleSeasoningBlock,scheduleNativeBottlePlacement,tryScheduleOffhandBottleInteraction,bottleDataFromItem,captureWritableHand,captureInteractionIntent,interactionIntentStillCurrent,getItemProperty,setItemProperty,setItemLore,readFoodSeasonings,setFoodSeasonings,seasoningBlockKey,retargetBottleFillStack})');
  // Exercise the actual subscribed callback; unrelated branches remain observable stubs.
  const subscription='world.beforeEvents.playerInteractWithBlock.subscribe(';
  const start=source.indexOf(subscription),end=source.indexOf('\nworld.afterEvents.playerPlaceBlock',start);
@@ -145,6 +147,7 @@ function decorated(f,kind,{uses=0,variant=0,partial=1,marker=kind,typeId}={}){
  for(const [k,v] of Object.entries({'other:boolean':true,'other:number':7,'other:string':marker,'other:vector':{x:1,y:2,z:3}}))f.api.setItemProperty(s,k,v);
  f.api.setFoodSeasonings(s,kind==='empty'?core.BASE_SEASONINGS.slice(0,partial):[...core.BASE_SEASONINGS,'minecraft:redstone']);
  if(kind==='special'){f.api.setItemProperty(s,core.SEASONING_USES_KEY,uses);f.api.setItemProperty(s,core.SEASONING_VARIANT_KEY,variant);}
+ if(!typeId&&kind!=='special')s.typeId=core.seasoningFillVisualId(s.typeId,f.api.readFoodSeasonings(s));
  return s;
 }
 function seedForOff(f){
@@ -163,7 +166,7 @@ for(const hand of ['main','off'])for(const kind of ['empty','pending','special']
   assert.equal(f.get(hand),undefined);equal(f.get(hand==='main'?'off':'main'),sentinel);
   equal(f.api.nativeBottles(f.block).items.at(-1),original);
   f.api.handleSeasoningBlock(f.block,f.player,hand);equal(f.get(hand),original);equal(f.get(hand==='main'?'off':'main'),sentinel);
-  if(kind==='empty'){assert.equal(f.get(hand).typeId,EMPTY);equal(f.api.readFoodSeasonings(f.get(hand)),core.BASE_SEASONINGS.slice(0,state.partial));}
+  if(kind==='empty'){assert.equal(f.get(hand).typeId,core.seasoningFillVisualId(EMPTY,core.BASE_SEASONINGS.slice(0,state.partial)));equal(f.api.readFoodSeasonings(f.get(hand)),core.BASE_SEASONINGS.slice(0,state.partial));}
   if(hand==='main')f.placeMain();else assert.equal(f.api.pushBottle(f.block,f.player,f.get('off'),'off'),true);
   equal(f.api.nativeBottles(f.block).items.at(-1),original);equal(f.get(hand==='main'?'off':'main'),sentinel);
   if(seed)equal(f.api.nativeBottles(f.block).items[0],seed,'Lower bottle stays unchanged');
@@ -176,7 +179,7 @@ for(const hand of ['main','off'])test(`${hand} EMPTY ingredient addition uses ca
  const opposite=hand==='main'?'off':'main',sentinel=decorated(f,'pending',{marker:'other'});f.set(opposite,sentinel);
  f.set(hand,new Stack(core.BASE_SEASONINGS[1]));f.api.handleSeasoningBlock(f.block,f.player,hand);
  const expected=original.clone();f.api.setFoodSeasonings(expected,core.BASE_SEASONINGS.slice(0,2));
- equal(f.api.nativeBottles(f.block).items.at(-1),expected);equal(f.get(opposite),sentinel);assert.equal(f.get(hand),undefined);
+ equal(f.api.nativeBottles(f.block).items.at(-1),f.api.retargetBottleFillStack(expected));equal(f.get(opposite),sentinel);assert.equal(f.get(hand),undefined);
 });
 
 test('canonical writable main hand pins captured slot for write and rollback',()=>{
@@ -216,7 +219,7 @@ for(const kind of ['false','throw'])for(const after of [false,true])for(const ac
 
 for(const kind of ['empty','pending','special'])for(const occupiedMain of [false,true])test(`unique off ${kind} first-place/pickup/replace preserves metadata; main occupied=${occupiedMain}`,()=>{
  const f=fixture(),s=decorated(f,kind,{partial:2,uses:15,variant:7}),other=occupiedMain?decorated(f,'pending',{marker:'main sentinel',typeId:'minecraft:totem_of_undying'}):undefined;
- if(kind==='pending')f.api.setFoodSeasonings(s,Object.keys(core.SEASONING_KINDS).slice(0,8));
+ if(kind==='pending'){f.api.setFoodSeasonings(s,Object.keys(core.SEASONING_KINDS).slice(0,8));s.typeId=PENDING+'_f8';}
  f.set('main',other);f.set('off',s);f.phase.before=true;
  assert.equal(f.queuePlace().cancel,true);assert.equal(f.queued,1);assert.equal(f.phase.destroy+f.phase.place,0);
  f.phase.before=false;f.flush();assert.equal(f.get('off'),undefined);equal(f.get('main'),other);equal(f.api.nativeBottles(f.block).items[0],s);
@@ -259,7 +262,7 @@ for(const kind of ['false','throw'])for(const after of [false,true])test(`off fi
 // event item. These tests run that real subscription, never fabricate placement.
 for(const [kind,state] of [['empty',{partial:2}],['pending',{}],['special',{uses:0,variant:0}],['special',{uses:15,variant:7}]])test(`script off ${kind} ${json(state)} interaction/save-reload/main pickup/replace retains exact stack`,()=>{
  const f=fixture(),original=decorated(f,kind,state);
- if(kind==='pending')f.api.setFoodSeasonings(original,Object.keys(core.SEASONING_KINDS).slice(0,8));
+ if(kind==='pending'){f.api.setFoodSeasonings(original,Object.keys(core.SEASONING_KINDS).slice(0,8));original.typeId=PENDING+'_f8';}
  f.set('off',original);f.phase.before=true;
  assert.equal(f.interact().cancel,true);assert.equal(f.queued,1);assert.equal(f.phase.destroy+f.phase.place,0);
  f.phase.before=false;f.flush();assert.equal(f.get('main'),undefined);assert.equal(f.get('off'),undefined);

@@ -1,3 +1,4 @@
+import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
 import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 /** Actual function bodies and native-storage API doubles; no simulated players. */
 import test from 'node:test';
@@ -15,8 +16,11 @@ const strip=s=>s.replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(cla
 function fn(source,name){const start=source.indexOf('function '+name+'(');assert.ok(start>=0,name);let i=source.indexOf('{',start),depth=1,end=i+1;for(;depth&&end<source.length;end++){if(source[end]==='{')depth++;if(source[end]==='}')depth--;}return source.slice(start,end);}
 const N='kaleidoscope_grilling:',EMPTY=N+'empty_seasoning_bottle',PENDING=N+'pending_seasoning';
 class Stack{
- constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.maxAmount=16;this.props={};this.lore=[];}
+ constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.maxAmount=1;this.props={};this.lore=[];this.canDestroy=[];this.canPlaceOn=[];}
  clone(){return Object.assign(new Stack(this.typeId,this.amount),structuredClone({...this}));}
+ getRawLore(){return structuredClone(this.lore)} getLore(){return this.lore} setLore(v){this.lore=structuredClone(v)}
+ getDynamicPropertyIds(){return Object.keys(this.props)} getDynamicProperty(k){return structuredClone(this.props[k])} setDynamicProperty(k,v){if(v===undefined)delete this.props[k];else this.props[k]=structuredClone(v)}
+ getCanDestroy(){return [...this.canDestroy]} setCanDestroy(v){this.canDestroy=[...v]} getCanPlaceOn(){return [...this.canPlaceOn]} setCanPlaceOn(v){this.canPlaceOn=[...v]} getComponent(){return undefined}
 }
 function decorated(kind='special',uses=15){
  const s=new Stack(kind==='special'?visuals.specialSeasoningVisualId(uses,5):kind==='pending'?PENDING:EMPTY);
@@ -37,18 +41,19 @@ function fixture(){
  const holder={id:'test-player',dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
  let context,api;
  const load=()=>{
-  context=vm.createContext({canonicalFoodId,forgetEatingItem(){},...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
+  context=vm.createContext({canonicalFoodId,forgetEatingItem(){},...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
    EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
    readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
    markPlacedVisualDirty(){},blockSound(){},message(){},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
    heldMain:()=>hand?.clone(),heldByHand:()=>hand?.clone(),creative:()=>mode==='creative',
    captureWritableHand(_,which='main'){if(which==='off')return {before:undefined,write(){throw Error('Empty offhand fixture')}};const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
    captureInteractionIntent:()=>({hand:'main',signature:JSON.stringify(hand)}),interactionIntentStillCurrent:(_,intent)=>JSON.stringify(hand)===intent.signature});
+  vm.runInContext(fn(read('eating_item_runtime.js'),'copyEatingVariant')+'\n'+['bottleFillIngredients','retargetBottleFillStack'].map(n=>fn(read('bottle_fill_item_runtime.js'),n)).join('\n'),context);
   for(const name of ['family_station_storage.js','a2743_seasoning_block_adapter.js','seasoning_native_storage.js'])vm.runInContext(strip(read(name)),context);
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);
   const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
   const main=read('main.js');vm.runInContext('const pendingBottlePlacements=new Set();\n'+fn(main,'queueBottlePlacement')+'\n'+names.map(n=>fn(main,n)).join('\n'),context);
-  api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage})',context);
+  api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage,retargetBottleFillStack})',context);
  };
  load();const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
  return {world,dimension,block,holder,dp,entities,queue,drops,permutation,get api(){return api},get hand(){return hand},set hand(s){hand=s?.clone()},setMode(v){mode=v},reload(){load()},failOnce(target){let once=true;fail=k=>once&&k===target?(once=false,true):false},setFault(fn){fail=fn},place(){const e={block,player:holder,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;}};
@@ -66,11 +71,11 @@ test('four differently named stacks survive independent runtime reload and varia
 });
 test('pending remains pending and retains unrelated metadata when incomplete ingredients are added',()=>{
  const f=fixture(),s=decorated('pending');s.props[core.SEASONING_LIST_KEY]='[]';f.hand=s;f.place();f.hand=new Stack('minecraft:redstone');f.api.handleSeasoningBlock(f.block,f.holder);const stored=f.api.nativeBottles(f.block).items[0];
- assert.equal(stored.typeId,PENDING);assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);equal(stored.opaqueNative,s.opaqueNative);equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone']);
+ assert.equal(stored.typeId,PENDING+'_f1');assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone']);
 });
 test('empty with incomplete ingredients preserves metadata, explicit empty-to-pending promotion recreates it',()=>{
  const f=fixture(),s=decorated('empty');f.hand=s;f.place();
- for(let i=0;i<3;i++){f.hand=new Stack(core.BASE_SEASONINGS[i]);f.api.handleSeasoningBlock(f.block,f.holder);const stored=f.api.nativeBottles(f.block).items[0];assert.equal(stored.typeId,i<2?EMPTY:PENDING);assert.equal(stored.nameTag,i<2?s.nameTag:undefined);}
+ for(let i=0;i<3;i++){f.hand=new Stack(core.BASE_SEASONINGS[i]);f.api.handleSeasoningBlock(f.block,f.holder);const stored=f.api.nativeBottles(f.block).items[0];assert.equal(stored.typeId,core.seasoningFillVisualId(i<2?EMPTY:PENDING,core.BASE_SEASONINGS.slice(0,i+1)));assert.equal(stored.nameTag,i<2?s.nameTag:undefined);}
 });
 for(const kind of ['empty','pending'])test('partial '+kind+' add/pickup/replacement roundtrip preserves exact native ingredients and metadata',()=>{
  const f=fixture(),s=decorated(kind);s.props[core.SEASONING_LIST_KEY]='[]';f.hand=s;f.place();
@@ -78,8 +83,8 @@ for(const kind of ['empty','pending'])test('partial '+kind+' add/pickup/replacem
   f.hand=new Stack(id);f.api.handleSeasoningBlock(f.block,f.holder);
  }
  const stored=f.api.nativeBottles(f.block).items[0];
- assert.equal(stored.typeId,kind==='empty'?EMPTY:PENDING);equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone',core.BASE_SEASONINGS[0]]);
- assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);equal(stored.opaqueNative,s.opaqueNative);
+ assert.equal(stored.typeId,N+(kind==='empty'?'partial':'pending')+'_seasoning_f2');equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone',core.BASE_SEASONINGS[0]]);
+ assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');
  f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
  f.place();equal(f.api.nativeBottles(f.block).items[0],stored);
  f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);
@@ -88,7 +93,7 @@ test('creative player break returns every native bottle without normalizing it',
  const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(core.BASE_SEASONINGS);f.hand=s;f.place();f.setMode('creative');assert.equal(f.api.breakNativeBottles(f.block),true);equal(f.drops[0].item,s);assert.equal(f.entities.size,0);assert.equal(f.block.typeId,'minecraft:air');
 });
 test('only empty-with-base pickup promotes to fresh pending',()=>{
- const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(core.BASE_SEASONINGS);f.hand=s;f.place();f.api.handleSeasoningBlock(f.block,f.holder);assert.equal(f.hand.typeId,PENDING);assert.equal(f.hand.nameTag,undefined);
+ const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(core.BASE_SEASONINGS);f.hand=s;f.place();f.api.handleSeasoningBlock(f.block,f.holder);assert.equal(f.hand.typeId,PENDING+'_f3');assert.equal(f.hand.nameTag,undefined);
 });
 for(const target of ['block:64','entity1:slot0','hand'])test('first placement failure '+target+' retains original input and restores target',()=>{
  const f=fixture(),s=decorated();f.hand=s;f.failOnce(target);f.place();equal(f.hand,s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);assert.equal(f.dp.size,0);
@@ -184,4 +189,10 @@ test('retirement with unexpected nonempty inventory fails closed and preserves i
  const f=fixture(),s=decorated();f.hand=s;f.place();const c=f.api.stationContainer(f.block),entity=[...f.entities.values()][0];
  entity.remove=()=>{throw Error('remove rejected')};f.api.handleSeasoningBlock(f.block,f.holder);
  c.setItem(0,new Stack('minecraft:diamond'));f.hand=s;f.place();assert.equal(f.hand.typeId,s.typeId);assert.equal(c.getItem(0).typeId,'minecraft:diamond');assert.equal(f.block.typeId,'minecraft:air');
+});
+
+for(const kind of ['partial','pending'])for(let fill=1;fill<=8;fill++)test(`${kind} fill ${fill} native place/reload/pickup retains the exact proxy stack`,()=>{
+ const f=fixture(),s=decorated(kind==='partial'?'empty':'pending');s.typeId=N+kind+'_seasoning_f'+fill;s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(fill).fill('minecraft:redstone'));
+ f.hand=s;f.place();equal(f.api.nativeBottles(f.block).items[0],s);f.reload();equal(f.api.nativeBottles(f.block).items[0],s);
+ f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
 });

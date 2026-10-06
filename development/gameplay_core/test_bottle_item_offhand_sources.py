@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 DEV = Path(__file__).resolve().parent
 BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
 SOURCE_BASE = '9bb6d63f10d9004b874e81794803737704a4b671'
-BOTTLES = {'empty_seasoning_bottle', 'pending_seasoning', 'special_seasoning'} | {
-    f'special_seasoning_r{r}_v{v}' for r in range(1, 9) for v in range(8)}
+STATE_BOTTLES = {f'special_seasoning_r{r}_v{v}' for r in range(1, 9) for v in range(8)}
+BOTTLES = {'empty_seasoning_bottle', 'pending_seasoning', 'special_seasoning'} | STATE_BOTTLES
 
 
 def source(name, old=False):
@@ -52,23 +52,52 @@ def authored_items(old=False):
     return definitions
 
 
+def authoring_expectation(baseline, name):
+    expected = deepcopy(baseline)
+    if name in BOTTLES:
+        expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
+    if name in STATE_BOTTLES:
+        # G71 corrects the inventory icon for each exact finished state. Keep
+        # every other field in this historical authoring comparison intact.
+        expected['minecraft:item']['components']['minecraft:icon'] = {'textures': {'default': name}}
+    return expected
+
+
 def check_authoring():
     current, old = authored_items(), authored_items(old=True)
     assert set(current) == BOTTLES | {'canola_oil_brush', 'secret_chili_oil_brush', 'premium_chili_oil_brush'}
     for name, definition in current.items():
-        expected = deepcopy(old[name])
+        expected = authoring_expectation(old[name], name)
         if name in BOTTLES:
-            expected['minecraft:item']['components']['minecraft:allow_off_hand'] = True
             actual = json.loads((BP / f'items/{name}.json').read_bytes())
             assert actual['minecraft:item']['description']['identifier'] == 'kaleidoscope_grilling:' + name
             assert actual['minecraft:item']['components']['minecraft:allow_off_hand'] is True, name
-        assert definition == expected, 'Authoring changed more than the exact bottle eligibility flag: ' + name
+        assert definition == expected, 'Authoring changed more than exact bottle eligibility and state icon bindings: ' + name
     return len(BOTTLES)
 
 
 class BottleItemOffhandSources(unittest.TestCase):
     def test_all_67_authored_items_retain_flag_and_other_authoring_fields(self):
         self.assertEqual(check_authoring(), 67)
+
+    def test_state_icon_expectation_is_exact_and_preserves_every_other_field(self):
+        baseline = {'minecraft:item': {'components': {
+            'minecraft:max_stack_size': 1,
+            'minecraft:icon': {'textures': {'default': 'special_seasoning'}},
+        }}}
+        for name in STATE_BOTTLES:
+            expected = authoring_expectation(baseline, name)
+            self.assertEqual(expected['minecraft:item']['components']['minecraft:icon'], {'textures': {'default': name}})
+            for wrong in ('special_seasoning', 'special_seasoning_r0_v0', name + '_wrong'):
+                altered = deepcopy(expected)
+                altered['minecraft:item']['components']['minecraft:icon']['textures']['default'] = wrong
+                self.assertNotEqual(altered, expected)
+            altered = deepcopy(expected)
+            altered['minecraft:item']['components']['minecraft:max_stack_size'] = 64
+            self.assertNotEqual(altered, expected)
+        for name in ('empty_seasoning_bottle', 'pending_seasoning', 'special_seasoning', 'special_seasoning_r9_v0', 'other'):
+            expected = authoring_expectation(baseline, name)
+            self.assertEqual(expected['minecraft:item']['components']['minecraft:icon'], baseline['minecraft:item']['components']['minecraft:icon'])
 
     def test_label_gate_rejects_missing_false_and_unrelated_non_display_changes(self):
         # The same full-dict expectation used by the label gate permits exactly

@@ -246,7 +246,7 @@ class SinglePassAudit(unittest.TestCase):
         pinned = {}
         for tint in range(16):
             element = next(e for e in mask['elements'] if any(face.get('tintindex') == tint for face in e['faces'].values()))
-            pinned[tint] = ([element['from'][0] - 8, element['from'][1] + 18, element['from'][2] - 8], [element['to'][i] - element['from'][i] for i in range(3)], set(element['faces']))
+            pinned[tint] = ([8 - element['to'][0], element['from'][1] + 18, element['from'][2] - 8], [element['to'][i] - element['from'][i] for i in range(3)], set(element['faces']))
         texture_path = next(iter(d['textures'].values()))
         with Image.open(RP / (texture_path + '.png')) as image:
             atlas = image.convert('RGBA')
@@ -279,6 +279,32 @@ class SinglePassAudit(unittest.TestCase):
                     colors = atlas.crop((x - 4, y - 4, x + 12, y + 12)).getcolors()
                     self.assertEqual(colors, [(256, expected_color)])
         self.assertEqual(set(self.lookup), {(tint, index) for tint in range(16) for index in range(1, 10)})
+
+    def test_pending_half_reflection_preserves_java_order_in_held_and_placed(self):
+        # Independent numeric regression: Java ingredient_0_a X [5.5, 8]
+        # becomes Bedrock X [0, 2.5], retaining the first palette color.
+        mask = load(FIXTURES / 'a2770/grilling/kaleidoscope_grilling/models/item/seasoning_states/pending_8.json')
+        source_a = next(e for e in mask['elements'] if e['name'] == 'ingredient_0_a')
+        self.assertEqual((source_a['from'][0], source_a['to'][0]), (5.5, 8))
+        self.assertEqual({f['tintindex'] for f in source_a['faces'].values()}, {0})
+        _, held, _ = self.dynamic_assets()
+        placed = self.geos['geometry.kg_a2770.pending_combined']
+        self.assertEqual(len(next(b for b in held['bones'] if b['name'] == 'shell')['cubes']), 9)
+        for layer in range(8):
+            for half in range(2):
+                tint = layer * 2 + half
+                expected_x = (0, 2.5) if half == 0 else (-2.5, 0)
+                original = self.geos[f'geometry.kg_a2770.pending_{tint}']['bones'][0]['cubes'][0]
+                self.assertEqual((original['origin'][0], original['origin'][0] + original['size'][0]), expected_x)
+                for geometry, y_offset in [(held, 18), (placed, 0)]:
+                    bones = {b['name']: b for b in geometry['bones']}
+                    for value in range(1, 10):
+                        with self.subTest(layer=layer, half=half, value=value, geometry=geometry['description']['identifier']):
+                            cube = bones[f'pending_{tint}_color_{value}']['cubes'][0]
+                            self.assertEqual((cube['origin'][0], cube['origin'][0] + cube['size'][0]), expected_x)
+                            self.assertEqual(cube['origin'][1], 0.5 + layer * 0.625 + y_offset)
+                            self.assertEqual(cube['origin'][2], -2.5)
+                            self.assertEqual(cube['size'], [2.5, 0.625, 5])
 
     def test_each_tint_is_one_hot_for_every_ingredient_and_unknown_fallback_in_all_eight_layers(self):
         # Reuse the independently built tint/UV lookup, not the generator's names.

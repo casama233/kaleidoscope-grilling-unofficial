@@ -63,7 +63,14 @@ def feedback():
  main=(BP/'scripts/main.js').read_text()
  assert 'world.beforeEvents.playerPlaceBlock' not in main
  assert "registerCustomComponent('senluo:grilling_bottle_place'" in main
- assert 'isSpecialSeasoningId(held.typeId)' in main
+ if tuple(load(BP/'manifest.json')['header']['version']) >= (2,8,71):
+  assert "import {readNativeBottles,isNativeBottleItem} from './seasoning_native_storage.js';" in main
+  assert 'if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}' in main
+  assert 'const isBottle=isNativeBottleItem;' in main
+  native=(BP/'scripts/seasoning_native_storage.js').read_text()
+  assert 'export const isNativeBottleItem=stack=>!!stack&&(isEmptySeasoningId(stack.typeId)||isPendingSeasoningId(stack.typeId)||isSpecialSeasoningId(stack.typeId));' in native
+ else:
+  assert 'isSpecialSeasoningId(held.typeId)' in main
  for p in (BP/'blocks').glob('seasoning_bottle*.json'):
   assert 'senluo:grilling_bottle_place' in load(p)['minecraft:block']['components']
 
