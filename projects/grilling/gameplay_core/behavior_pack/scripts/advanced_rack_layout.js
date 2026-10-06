@@ -4,6 +4,10 @@
  */
 export const RACK_HALF_WIDTH=7/16;
 export const RACK_ROW_BOUNDARY=9/16;
+export const RACK_TOOL_ROW_MIN=5/16;
+export const RACK_TOOL_VISUAL_Y=(RACK_TOOL_ROW_MIN+RACK_ROW_BOUNDARY)/2;
+// Half a source pixel of total clearance inside each fitted tool cell.
+export const RACK_TOOL_VISUAL_GAP=.5/16;
 // Each Bedrock custom state has at most 16 values: low four bits plus slot 4.
 export const RACK_OCCUPANCY_STATE='kaleidoscope_grilling:seasoning_occupancy';
 export const RACK_OCCUPANCY_HIGH_STATE='kaleidoscope_grilling:seasoning_occupancy_high';
@@ -22,7 +26,7 @@ export function rackLocalHit(direction,hit){
 }
 
 export function rackSlotAtLocalHit(hit){
- if(!hit||!Number.isFinite(hit.x)||!Number.isFinite(hit.y)||Math.abs(hit.x)>RACK_HALF_WIDTH||hit.y<5/16||hit.y>14/16)return -1;
+ if(!hit||!Number.isFinite(hit.x)||!Number.isFinite(hit.y)||Math.abs(hit.x)>RACK_HALF_WIDTH||hit.y<RACK_TOOL_ROW_MIN||hit.y>14/16)return -1;
  const top=hit.y>=RACK_ROW_BOUNDARY,count=top?5:4;
  const index=Math.min(count-1,Math.floor((hit.x+RACK_HALF_WIDTH)/(2*RACK_HALF_WIDTH)*count));
  return (top?0:5)+index;

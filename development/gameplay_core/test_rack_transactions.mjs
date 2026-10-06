@@ -24,7 +24,7 @@ class Stack{
 }
 const seasoning=amount=>new Stack('kaleidoscope_grilling:empty_seasoning_bottle',amount);
 function fixture(){
- const dp=new Map(),faults=[],blocks=[],queue=[],callbacks={},commands=new Map(),dirty=[],sounds=[];let fail=()=>false,startup;
+ const dp=new Map(),faults=[],blocks=[],queue=[],callbacks={},commands=new Map(),dirty=[],sounds=[],logs=[];let fail=()=>false,startup;
  const write=(key,fn)=>{fn();if(fail(key))throw Error('Injected '+key);};
  const container=(key,size)=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone();},setItem(i,s){write(key+':'+i,()=>this.rows[i]=s?.clone());}});
  const inv=container('inv',36),dimension={id:'minecraft:overworld',getBlock:p=>blocks.find(b=>b.x===p.x&&b.y===p.y&&b.z===p.z),playSound:(...args)=>sounds.push(args)};
@@ -35,7 +35,7 @@ function fixture(){
  const block=(x=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y:64,z:0,dimension,location:{x,y:64,z:0},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0,[layout.RACK_OCCUPANCY_HIGH_STATE]:0}),permutationWrites:0,setPermutation(p){this.permutationWrites++;write('permutation'+x,()=>this.permutation=p);}};b.c=container('rack'+x,9);blocks.push(b);return b;};
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){write(k,()=>v===undefined?dp.delete(k):dp.set(k,v));},beforeEvents:Object.fromEntries(['playerInteractWithBlock','playerBreakBlock','explosion'].map(name=>[name,{subscribe(fn){callbacks[name]=fn;}}]))};
  const playerInventory=p=>p.inv??inv;
- const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn(){}},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
+ const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn:(...args)=>logs.push(args.join(' '))},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
  vm.runInContext(source('a2746_rack_state_adapter.js'),context);
  vm.runInContext(source('rack_transactions.js'),context);
  // Isolated module scope keeps actual runtime helper names separate from adapter declarations.
@@ -44,7 +44,7 @@ function fixture(){
  const automation=load('a2746_rack_automation_api.js','borrowAdvancedRackItem,returnAdvancedRackItem');
  const tx=vm.runInContext('({depositInventorySlot,planRackInsert,commitRackTransfer,rackContainer,rackFiltersKey,readRackFilters,syncRackDisplay})',context);
  const holder={typeId:'minecraft:player',isValid:true,isSneaking:false,selectedSlotIndex:0,dimension,location:{x:0,y:64,z:0},getDynamicProperty:k=>dp.get('holder:'+k),setDynamicProperty:(k,v)=>v===undefined?dp.delete('holder:'+k):dp.set('holder:'+k,v)};
- return {inv,block,world,dp,tx,runtime,automation,holder,dimension,dirty,sounds,callbacks,commands,makeInventory:name=>container(name,36),flush(){while(queue.length)queue.shift()();},start(){startup({customCommandRegistry:{registerCommand(spec,run){commands.set(spec.name,{spec,run});}}});},setFault(fn){fail=fn;},failOnce(target){let once=true;fail=key=>once&&key===target?(once=false,true):false;}};
+ return {logs,inv,block,world,dp,tx,runtime,automation,holder,dimension,dirty,sounds,callbacks,commands,makeInventory:name=>container(name,36),flush(){while(queue.length)queue.shift()();},start(){startup({customCommandRegistry:{registerCommand(spec,run){commands.set(spec.name,{spec,run});}}});},setFault(fn){fail=fn;},failOnce(target){let once=true;fail=key=>once&&key===target?(once=false,true):false;}};
 }
 const snapshot=f=>JSON.stringify({inv:f.inv.rows,dp:[...f.dp]});
 test('Java public rack tags are independent per slot, including dual-tag items',()=>{
@@ -242,4 +242,27 @@ test('bulk command accepts identical main/offhand items but still rejects stale 
  assert.equal(b.c.rows[0].amount,8);assert.equal(f.inv.rows[1],undefined);assert.equal(f.inv.rows[0].typeId,'minecraft:totem_of_undying');
  f.inv.rows[1]=seasoning(9);command({sourceEntity:f.holder});f.inv.rows[0].metadata.canDestroy=['minecraft:obsidian'];f.flush();
  assert.equal(b.c.rows[0].amount,8);assert.equal(f.inv.rows[1].amount,9);
+});
+
+test('rack QA is opt-in and records sanitized hit, admission and result without changing transfer',()=>{
+ for(const enabled of [false,true]){
+  const f=fixture(),b=f.block();f.holder.hasTag=tag=>enabled&&tag==='kg_rack_qa';
+  f.holder.name='PRIVATE_PLAYER';f.holder.id='PRIVATE_ID';f.inv.rows[0]=seasoning(1);
+  const event={player:f.holder,block:b,isFirstEvent:true,blockFace:'North',faceLocation:{x:.5,y:.72,z:.0625},itemStack:f.inv.getItem(0)};
+  f.callbacks.playerInteractWithBlock(event);f.flush();assert.equal(b.c.rows[2]?.amount,1);
+  const lines=f.logs.filter(x=>x.startsWith('[Grilling rack QA] '));
+  if(!enabled){assert.equal(lines.length,0);continue;}
+  const rows=lines.map(x=>JSON.parse(x.slice('[Grilling rack QA] '.length)));
+  assert.deepEqual(rows.map(x=>x.stage),['target','resolved','admission','result']);
+  assert.equal(rows[1].slot,2);assert.equal(rows[1].row,'seasoning');assert.equal(rows[2].canPlace,true);assert.equal(rows[3].action,'insert');
+  assert.ok(!lines.join('').match(/PRIVATE_|original|metadata|location|dimension/));
+ }
+});
+test('rack QA distinguishes invalid hit and stale intent without weakening rejection',()=>{
+ for(const kind of ['hit','intent']){
+  const f=fixture(),b=f.block();f.holder.hasTag=()=>true;f.inv.rows[0]=seasoning(1);
+  const event={player:f.holder,block:b,isFirstEvent:true,blockFace:'North',faceLocation:{x:.5,y:kind==='hit'?.95:.72,z:.0625},itemStack:f.inv.getItem(0)};
+  f.callbacks.playerInteractWithBlock(event);if(kind==='intent')f.inv.rows[0].amount=2;f.flush();
+  assert.ok(f.logs.some(x=>x.includes(kind==='hit'?'outside_hit_cells':'intent_changed')));assert.equal(b.c.rows.filter(Boolean).length,0);
+ }
 });

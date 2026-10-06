@@ -14,7 +14,7 @@ import {
 } from './a2735_player_io.js';
 import {
  ADVANCED_RACK_ITEM_ID,ADVANCED_RACK_BLOCK_ID,RACK_COMPARTMENTS,RACK_RANGE,
- rackPlacementCandidates,rackCanPlace,
+ rackPlacementCandidates,rackCanPlace,rackItemKind,
  bindingInRange,RACK_PAYLOAD_KEY
 } from './a2746_advanced_rack_core.js';
 import {
@@ -251,28 +251,50 @@ function nearestRack(player){
  return best;
 }
 
+// Opt-in QA only. No identities, absolute coordinates, stack lore or metadata.
+// Remove kg_rack_qa from the isolated tester to disable these content-log records.
+function rackQa(player,stage,details={}){
+ try{if(player.hasTag('kg_rack_qa'))console.warn('[Grilling rack QA] '+JSON.stringify({stage,...details}));}catch{}
+}
 world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
- if(event.cancel)return;
+ const p=event.player;
+ if(event.isFirstEvent!==false){
+  const hit=event.faceLocation;
+  rackQa(p,'target',{block:event.block.typeId,face:event.blockFace,
+   hit:hit?{x:hit.x,y:hit.y,z:hit.z}:null,cancelled:!!event.cancel});
+ }
+ if(event.cancel){rackQa(p,'reject',{reason:'already_cancelled'});return;}
  if(event.block.typeId===ADVANCED_RACK_BLOCK_ID){
   event.cancel=true;
   if(event.isFirstEvent!==false){
-   const p=event.player,d=event.block.dimension,l=loc(event.block),sneaking=p.isSneaking,
+   const d=event.block.dimension,l=loc(event.block),sneaking=p.isSneaking,
     facing=event.block.permutation.getState('minecraft:cardinal_direction'),
     slot=rackSlotAtHit(facing,event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
-   if(slot<0||intent.hand!=='main')return;
+   rackQa(p,'resolved',{facing,slot,row:slot<0?'outside':slot<5?'seasoning':'tool',hand:intent.hand});
+   if(slot<0||intent.hand!=='main'){rackQa(p,'reject',{reason:slot<0?'outside_hit_cells':'non_main_hand'});return;}
    system.run(()=>{
     try{
      const live=resolveRack(d,l);
-     if(p.isValid===false||!live||!rackInUseRange(p,live)||p.isSneaking!==sneaking||
-      live.permutation.getState('minecraft:cardinal_direction')!==facing||!interactionIntentStillCurrent(p,intent))return;
-     interactRackSlot(p,live,slot,sneaking);
-    }catch(error){console.warn('[Grilling rack interaction] '+error)}
+     const reason=p.isValid===false?'player_invalid':!live?'rack_missing':!rackInUseRange(p,live)?'out_of_range':
+      p.isSneaking!==sneaking?'sneak_changed':live.permutation.getState('minecraft:cardinal_direction')!==facing?'facing_changed':
+      !interactionIntentStillCurrent(p,intent)?'intent_changed':null;
+     if(reason){rackQa(p,'reject',{reason});return;}
+     // Read-only admission detail. Actual ownership still uses the transaction below.
+     try{if(p.hasTag('kg_rack_qa')){
+      const c=rackContainer(live),held=getMainHand(p),stored=c?.getItem(slot),filter=readRackFilters(live)[slot];
+      rackQa(p,'admission',{slot,heldKind:held?rackItemKind(held.typeId,tags(held)):'empty',
+       occupied:!!stored,filter:filter?.category??null,canPlace:held?rackCanPlace(slot,held.typeId,tags(held),filter):null});
+     }}catch{rackQa(p,'admission',{reason:'diagnostic_read_failed'});}
+     const action=interactRackSlot(p,live,slot,sneaking);
+     rackQa(p,'result',{action:action||'no_transfer'});
+    }catch(error){rackQa(p,'reject',{reason:'runtime_exception'});console.warn('[Grilling rack interaction] '+error)}
    });
   }
   return;
  }
  try{scheduleRackPlacement(event)}catch{}
 });
+
 world.beforeEvents.playerBreakBlock.subscribe(event=>{
  if(event.block.typeId!==ADVANCED_RACK_BLOCK_ID)return;
  event.cancel=true;const block=event.block,drop=!creative(event.player);

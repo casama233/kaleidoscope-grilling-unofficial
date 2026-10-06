@@ -23,8 +23,8 @@ class G75SourceConservationTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(source).hexdigest(), digest)
 
     def test_both_conservation_entrypoints_expect_the_same_combined_g75(self):
-        expected = public.expected_main_bytes((2, 8, 77))
-        self.assertEqual(expected, public.expected_main_bytes((2, 8, 77), local_bottles=True))
+        expected = public.expected_main_bytes((2, 8, 78))
+        self.assertEqual(expected, public.expected_main_bytes((2, 8, 78), local_bottles=True))
         self.assertEqual(hashlib.sha256(expected).hexdigest(), 'c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727')
         path = public.ROOT / public.MAIN_PATH
         self.assertEqual(path.read_bytes(), expected)
@@ -85,7 +85,7 @@ class G75SourceConservationTests(unittest.TestCase):
             with self.subTest(delta=changed):
                 with patch.object(public, '_main_delta', side_effect=lambda name: changed if name == 'g75-main-reviewed-delta.json' else load(name)):
                     with self.assertRaises(AssertionError):
-                        public.expected_main_bytes((2, 8, 77))
+                        public.expected_main_bytes((2, 8, 78))
 
 
 if __name__ == '__main__':
