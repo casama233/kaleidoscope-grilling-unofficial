@@ -1,5 +1,5 @@
 /** Public, portable metadata. Producers call this on the actual output before handing it over. */
-import {normalizePublicFood,readPublicFood,writePublicFood} from './host_api/food_api_core.js';
+import {normalizePublicFood,readPublicFood,writePublicFood,bucketHotUntil} from './host_api/food_api_core.js';
 import {VANILLA_FOOD_NUTRITION} from './vanilla_food_nutrition.js';
 export const PROJECTION_KEY='senluo.public.projection.v1';
 export const ITEM_ID=/^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
@@ -38,7 +38,7 @@ export function prepareProducedFood(stack,{kind='cuisine',hotTicks=0,seasoning=[
  const old=readPublicFood(stack);if(old.present&&!old.valid)throw Error('food metadata unreadable');
  const cuisineDisabled=kind==='cuisine'&&config.enableCookeryFoodHeatAndSeasoning===false;
  const duration=kind==='cuisine'?(cuisineDisabled?0:hotTicks):config.enableSmeltedFoodHeat===true?(config.smeltedFoodSeconds??30)*20:0;
- const meta=normalizePublicFood({v:1,hotUntil:duration?now+duration:old.state?.hotUntil??0,seasoning:cuisineDisabled?(old.state?.seasoning??[]):seasoning,nativeVariant:nativeVariant??old.state?.nativeVariant});
+ const meta=normalizePublicFood({v:1,hotUntil:duration?bucketHotUntil(now+duration):old.state?.hotUntil??0,seasoning:cuisineDisabled?(old.state?.seasoning??[]):seasoning,nativeVariant:nativeVariant??old.state?.nativeVariant});
  if(!meta)throw Error('production metadata');
  const output=stack.clone();writePublicFood(output,meta);if(projection)writePublicProjection(output,projection);return output;
 }

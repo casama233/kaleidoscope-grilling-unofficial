@@ -1,4 +1,9 @@
 /** Explicit cross-pack output metadata; the empty translated carrier is not display lore. */
+// Java FoodState.bucket: quantize new absolute deadlines, never stored reads.
+export function bucketHotUntil(until){
+ if(!Number.isSafeInteger(until)||until<0)throw Error('invalid heat deadline');
+ return Math.floor(until/100)*100;
+}
 export const FOOD_PAYLOAD_KEY='senluo.public.food.v1';
 const ID=/^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
 export function normalizePublicFood(raw){

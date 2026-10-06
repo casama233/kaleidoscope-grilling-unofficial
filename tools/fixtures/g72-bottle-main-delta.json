@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    72
+  ],
+  "before_sha256": "74d1e8b16018d6a9b495a84134ff05c7c025186d5f6fc13ffbba0c1a598dea60",
+  "after_sha256": "9070dc08eade5351114c23a576dcd426b885889af4b6398e0b03ce6d9cf2d295",
+  "scope": "Exact G72 delta after frozen G71: import the shared visual refresh and invoke it only in successful bottle pickup branch. No transaction or eating semantics changes.",
+  "edits": [
+    {
+      "start": 44,
+      "end": 45,
+      "before": "import './a2770_placed_visual_runtime.js';\n",
+      "after": "import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';\n"
+    },
+    {
+      "start": 643,
+      "end": 644,
+      "before": "  else blockSound(block,'seasoning_bottle_place',1);\n",
+      "after": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}\n"
+    }
+  ]
+}

@@ -13,7 +13,7 @@
       },
       "minecraft:icon": {
         "textures": {
-          "default": "special_seasoning"
+          "default": "special_seasoning_r6_v4"
         }
       },
       "minecraft:max_stack_size": 1,

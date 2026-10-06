@@ -4,6 +4,20 @@ export const SEASONING_MAX_USES=16;
 export const SEASONING_VARIANT_MAX=7;
 
 export const PENDING_SEASONING_ID='kaleidoscope_grilling:pending_seasoning';
+export const EMPTY_BOTTLE_ID='kaleidoscope_grilling:empty_seasoning_bottle';
+const PARTIAL_FILL=/^kaleidoscope_grilling:partial_seasoning_f[1-8]$/;
+const PENDING_FILL=/^kaleidoscope_grilling:pending_seasoning_f[1-8]$/;
+export function isEmptySeasoningId(id){return id===EMPTY_BOTTLE_ID||(typeof id==='string'&&PARTIAL_FILL.test(id))}
+export function isPendingSeasoningId(id){return id===PENDING_SEASONING_ID||(typeof id==='string'&&PENDING_FILL.test(id))}
+export function canonicalSeasoningBottleId(id){return isEmptySeasoningId(id)?EMPTY_BOTTLE_ID:isPendingSeasoningId(id)?PENDING_SEASONING_ID:id}
+// A fill proxy records presentation only. Existing PENDING never becomes EMPTY
+// because its ingredient list happens to lack a base ingredient.
+export function seasoningFillVisualId(id,ingredients=[]){
+ const base=canonicalSeasoningBottleId(id),fill=normalizeSeasoningList(ingredients).length;
+ if(base!==EMPTY_BOTTLE_ID&&base!==PENDING_SEASONING_ID)return id;
+ return fill?'kaleidoscope_grilling:'+(base===PENDING_SEASONING_ID?'pending':'partial')+'_seasoning_f'+fill:base;
+}
+
 export const SEASONING_PLACE_BLOCK_ID='kaleidoscope_grilling:seasoning_bottle_1';
 export const SEASONING_BLOCK_IDS=Object.freeze([
  'kaleidoscope_grilling:seasoning_bottle',

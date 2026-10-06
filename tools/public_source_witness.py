@@ -43,7 +43,8 @@ def assert_public_bytes(testcase, path):
     expected = public_bytes(path)
     version = tuple(json.loads((ROOT / 'baseline.json').read_text())['version'])
     if version >= (2, 8, 73) and path.relative_to(ROOT).as_posix() == 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js':
-        delta = json.loads((ROOT / 'tools/fixtures/g73-main-reviewed-delta.json').read_text())
+        filename = 'g74-main-reviewed-delta.json' if version >= (2, 8, 74) else 'g73-main-reviewed-delta.json'
+        delta = json.loads((ROOT / 'tools/fixtures' / filename).read_text())
         assert delta['schema'] == 1
         assert hashlib.sha256(expected).hexdigest() == delta['before_sha256'], 'Reviewed main delta has wrong public preimage'
         text = expected.decode('utf-8')
@@ -56,3 +57,7 @@ def assert_public_bytes(testcase, path):
         expected = text.encode('utf-8')
         assert hashlib.sha256(expected).hexdigest() == delta['after_sha256'], 'Reviewed main delta is incomplete'
     testcase.assertEqual(path.read_bytes(), expected, 'Repaired public-source bytes changed outside reviewed scope: ' + str(path.relative_to(ROOT)))
+
+# Historical G71 tests use this name. The current combined admission still
+# conserves every byte outside the exact registered G74/G73 edits.
+assert_public_bytes_with_g71_bottles = assert_public_bytes

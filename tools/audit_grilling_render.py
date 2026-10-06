@@ -486,6 +486,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
             add(findings, "error", "held_pose_frame_drift", ident,
                 "runtime differs from reviewed Java-to-Bedrock frame conversion")
     counts = Counter()
+    bottle_ids = set()
     skewer_refs = set()
     aliases = {"fp_right", "fp_left", "tp_right", "tp_left"}
     admitted = projection_items()
@@ -497,6 +498,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
         partial=version>=(2,8,68) and desc["identifier"]=="kaleidoscope_grilling:unfinished_skewer"
         calibrated=version>=(2,8,68) and desc["identifier"] in CALIBRATED_ITEMS
         if canonical_id == desc["identifier"]: counts["partial" if partial else family] += 1
+        if family == "bottle": bottle_ids.add(desc["identifier"])
         expected_ids = {alias: f"animation.{'kg_a287' if family == 'skewer' else 'kg_a286'}.{family}_{alias}" for alias in aliases}
         if family == "skewer" and not partial:
             table = json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)', (BP / 'scripts/data.js').read_text()).group(1))
@@ -605,9 +607,13 @@ def check_current_display_contracts(findings, geometry_index, animations):
                     add(findings, "error", "held_animation_missing_bone", ref,
                         f"{anim_id} targets absent bones: {sorted(missing)}")
             if family == "skewer" and canonical_id!='kaleidoscope_grilling:secret_skewer' and not piece and not partial: skewer_refs.add(ref)
-    expected_counts={"skewer":40,"bottle":67}
+    expected_bottles={'kaleidoscope_grilling:'+name for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning')}
+    expected_bottles|={f'kaleidoscope_grilling:special_seasoning_r{remaining}_v{variant}' for remaining in range(1,9) for variant in range(8)}
+    if version>=(2,8,71):
+        expected_bottles|={f'kaleidoscope_grilling:{kind}_seasoning_f{fill}' for kind in ('partial','pending') for fill in range(1,9)}
+    expected_counts={"skewer":40,"bottle":len(expected_bottles)}
     if version>=(2,8,68):expected_counts["partial"]=1
-    if counts != expected_counts or len(skewer_refs) != 150:
+    if counts != expected_counts or bottle_ids != expected_bottles or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.31",
+  "version": "0.3.32",
   "revision": "kg-guide-a3-2867",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -2284,7 +2284,7 @@
         "zh_CN": [
           "放置空调料瓶后，对最上层瓶子加入材料；每瓶最多记录 8 份材料，世界中最多可叠放 4 瓶。",
           "完成调料必须至少有青/绿辣椒粉、花椒、洋葱粉各 1 份；三种基础料齐全后，瓶子会变成“待摇晃的调料”。",
-          "空手取回待摇晃的瓶子并持续使用 4 秒；完成时有声音与粒子，成品可使用 16 次。提前放开不会完成。",
+          "空手取回待摇晃的瓶子并持续使用 4 秒；完成时有声音与粒子，成品可使用 16 次。提前放开不会完成。 背包瓶图标显示剩余份数；食材的实际顺序与颜色请看手持或放置的瓶层。",
           "对烧烤架撒料时，每根架上烤串消耗 1 次；剩余次数不足时不会部分提交。",
           "搭配：红石提供速度，火药提供力量，折耳根粉延时；不死图腾粉与龙蛋粉提供特殊效果。各材料的数量门槛见其同名条目。",
           "把一瓶调料单独放入合成格，可清空内容并取回空瓶；包含待摇瓶与已用过的完成调料。",
@@ -2294,7 +2294,7 @@
         "zh_TW": [
           "放置空調料瓶後，對最上層瓶子加入材料；每瓶最多記錄 8 份材料，世界中最多可疊放 4 瓶。",
           "完成調料必須至少有青辣椒粉、花椒、洋蔥粉各 1 份；三種基礎料齊全後，瓶子會變成「待搖晃的調料」。",
-          "空手取回待搖晃的瓶子並持續使用 4 秒；完成時有聲音與粒子，成品可使用 16 次。提前放開不會完成。",
+          "空手取回待搖晃的瓶子並持續使用 4 秒；完成時有聲音與粒子，成品可使用 16 次。提前放開不會完成。 背包瓶圖示顯示剩餘份數；食材的實際順序與颜色請看手持或放置的瓶層。",
           "對燒烤架撒料時，每根架上烤串消耗 1 次；剩餘次數不足時不會部分提交。",
           "搭配：紅石提供速度，火藥提供力量，折耳根粉延時；不死圖騰粉與龍蛋粉提供特殊效果。各材料的數量門檻見其同名條目。",
           "把一瓶調料單獨放入合成格，可清空內容並取回空瓶；包含待搖瓶與已用過的完成調料。",
@@ -2304,7 +2304,7 @@
         "en_US": [
           "Place an Empty Seasoning Bottle and add ingredients to the top bottle. Each bottle stores up to 8 ingredients, and up to 4 bottles can be stacked in the world.",
           "A finished seasoning requires at least one Green Chili Powder, one Sichuan Pepper, and one Onion Powder. Once all three bases are present, it becomes Seasoning to Be Shaken.",
-          "Take the pending bottle with an empty hand and hold use for 4 seconds. Sound and particles mark completion; the finished bottle has 16 uses. Releasing early does not finish it.",
+          "Take the pending bottle with an empty hand and hold use for 4 seconds. Sound and particles mark completion; the finished bottle has 16 uses. Releasing early does not finish it. Inventory bottle icons show the remaining amount. Check the held or placed layers for the actual ingredient order and colors.",
           "Seasoning a grill costs 1 use per skewer currently on the grill; insufficient remaining uses do not partially commit.",
           "Mixing: Redstone grants Speed, Gunpowder grants Strength, and Houttuynia Powder extends effects. Totem and Dragon Egg Powders add special effects; see their material entries for thresholds.",
           "Place one seasoning bottle alone in a crafting grid to discard its contents and recover an empty bottle. Pending and partially used bottles are supported.",
@@ -3193,7 +3193,7 @@
       },
       "body": {
         "zh_CN": [
-          "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。",
+          "菜籽油提供约 60 秒烟火气；秘制辣椒油约 10 分钟；高级辣椒油约 20 分钟。烟火气剩余时间会显示在食物描述上。 热期限按原作每 5 秒一格向下取整；新加热与热食合并都遵守同一规则。已保存的旧热期限在到期或再次加热前保留。",
           "趁热吃时，新获得的固定烤串效果持续时间会翻倍，新增的饱和度提高 25%。",
           "特制调料的附加效果只会在食物仍有烟火气时触发；它们不会再被烟火气二次翻倍。冷掉后仍能吃，但不会触发这些调料效果。",
           "秘制辣椒油桶可用 1 桶菜籽油 + 3 份红辣椒粉无序合成；三种油都可通过桶、大缸与 Cookery 油壶进行已支持的转移。",
@@ -3203,7 +3203,7 @@
           "副手留空，潜行并使用手中的热食，可合并背包内相同种类与数据的热食，按数量平均剩余热度；不限烤串，也不受箱内整理的 5 分钟窗口限制。普通进食请松开潜行。"
         ],
         "zh_TW": [
-          "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。",
+          "菜籽油提供約 60 秒煙火氣；秘製辣椒油約 10 分鐘；高級辣椒油約 20 分鐘。煙火氣剩餘時間會顯示在食物描述上。 熱期限按原作每 5 秒一格向下取整；新加熱與熱食合併都遵守同一規則。已保存的舊熱期限在到期或再次加熱前保留。",
           "趁熱吃時，新獲得的固定烤串效果持續時間會翻倍，新增的飽和度提高 25%。",
           "特製調料的附加效果只會在食物仍有煙火氣時觸發；它們不會再被煙火氣二次翻倍。冷掉後仍能吃，但不會觸發這些調料效果。",
           "秘製辣椒油桶可用 1 桶菜籽油 + 3 份紅辣椒粉無序合成；三種油都可透過桶、大缸與 Cookery 油壺進行已支援的轉移。",
@@ -3213,7 +3213,7 @@
           "副手留空，潛行並使用手中的熱食，可合併背包內相同種類與資料的熱食，按數量平均剩餘熱度；不限烤串，亦不受箱內整理的 5 分鐘窗口限制。普通進食請鬆開潛行。"
         ],
         "en_US": [
-          "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore.",
+          "Canola Oil gives about 60 seconds of Hot Food time, Secret Chili Oil about 10 minutes, and Premium Chili Oil about 20 minutes. Remaining heat is shown on the food lore. New heating and hot-food merges round the expiry down to five-second boundaries, as in Java. Previously saved deadlines remain intact until expiry or reheating.",
           "When eaten hot, newly gained fixed skewer effects have double duration and newly gained saturation is increased by 25%.",
           "Special Seasoning effects only trigger while the food is still hot; Hot Food does not double those seasoning durations a second time. Cold food remains edible, but those seasoning effects do not activate.",
           "A Secret Chili Oil Bucket is shapelessly crafted from 1 Canola Oil Bucket + 3 Red Chili Powder. All three oils can use the supported bucket, Big Vat, and Cookery Oil Pot transfer paths.",

@@ -1,4 +1,5 @@
 import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';
+import {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';
 import {isPlainEatingId,SKEWER_EATING_IDS} from './eating_profile_ids.js';
 import {beginSeasoningMotion,syncSeasoningMotion} from './seasoning_motion_runtime.js';
 import {supportsJavaEatingProjection} from './java_eating_projection_items.js';
@@ -42,7 +43,7 @@ import {captureEatingIdentity,eatingStillCurrent,eatingEventMatches,commitEating
 import {completedUseStillCurrent} from './a2810_use_transaction.js';
 import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {showJavaEatingHud} from './java_eating_hud_runtime.js';
-import './a2770_placed_visual_runtime.js';
+import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';
 import './guide/main.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
 import {RAW_TO_COOKED,FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,OIL_TOOLS,GRILL_ID,SEASONING_ID,EMPTY_SEASONING_ID,MYSTERIOUS_ID,DARK_ID} from './eating_data_lookup.js';
@@ -63,7 +64,7 @@ import {
  PENDING_SEASONING_ID as PENDING_SEASONING,SEASONING_PLACE_BLOCK_ID as SEASONING_BLOCK,
  SEASONING_USES_KEY as SEASON_USES_KEY,
  SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,SEASONING_KINDS,
- hasSeasoningBase,isSeasoningBlockId as isSeasoningBlock
+ hasSeasoningBase,isPendingSeasoningId,seasoningFillVisualId,isSeasoningBlockId as isSeasoningBlock
 } from './a2743_seasoning_contract_core.js';
 import {
  readPlacedSeasoningStack as readBottleStack,writePlacedSeasoningStack as writeBottleStack
@@ -565,11 +566,11 @@ function handleGrill(block,player,hand='main'){
 }
 function bottleDataFromItem(stack){
  if(!isNativeBottleItem(stack))throw new Error('Unknown item cannot become a seasoning bottle');
- const kind=isSpecialSeasoningId(stack?.typeId)?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';
+ const kind=isSpecialSeasoningId(stack?.typeId)?'special':isPendingSeasoningId(stack?.typeId)?'pending':'empty';
  return {kind,ingredients:readSeasonings(stack),uses:kind==='special'?getUses(stack):0,variant:kind==='special'?specialSeasoningVariant(stack):0};
 }
 function bottleItem(data){
- const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
+ const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):seasoningFillVisualId(data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,data.ingredients??[]),stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);
  if(data.kind==='special'){setUses(stack,data.uses??0);try{setItemProperty(stack,SEASON_VARIANT_KEY,data.variant??0);setItemLore(stack,seasoningLore(SEASONING_MAX_USES-(data.uses??0),data.ingredients?.length??0))}catch{}}
  else try{if(data.ingredients?.length)setItemLore(stack,seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind!=='pending'}))}catch{}
  if(JSON.stringify(bottleDataFromItem(stack))!==JSON.stringify({kind:data.kind,ingredients:data.ingredients??[],uses:data.uses??0,variant:data.variant??0}))throw new Error('Bottle reconstruction did not preserve its mechanic fields');
@@ -618,16 +619,17 @@ function pushBottle(block,player,held,hand='main'){
 function handleSeasoningBlock(block,player,hand='main'){
  const current=nativeBottles(block),items=current.items.map(x=>x.clone());
  const held=heldByHand(player,hand),id=held?.typeId;
- if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||isSpecialSeasoningId(id)){pushBottle(block,player,held,hand);return}
+ if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}
  const topItem=items.at(-1),top=bottleDataFromItem(topItem);
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
   if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
   if(top.ingredients.length>=SEASONING_CAPACITY){javaInteractionFeedback(player,'bottle_full');return}
   const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
   top.ingredients.push(id);
-  // Java mutates the existing stack, except the explicit EMPTY -> PENDING promotion.
+  // Java's explicit EMPTY -> PENDING promotion creates a fresh semantic item.
+  // Same-kind fill changes preserve all stable-API metadata through readback.
   if(top.kind==='empty'&&hasSeasoningBase(top.ingredients))items[items.length-1]=bottleItem({...top,kind:'pending'});
-  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');}
+  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}
   if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
   awardSeasoningMilestones(player,top.ingredients);
   blockSound(block,'action_success',.65);
@@ -638,8 +640,9 @@ function handleSeasoningBlock(block,player,hand='main'){
   const storage=captureWritableHand(player,hand);let item=items.pop();const data=bottleDataFromItem(item);
   if(storage.before)throw new Error('Grilling: take-bottle hand is no longer empty');
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
+  else item=retargetBottleFillStack(item);
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
-  else blockSound(block,'seasoning_bottle_place',1);
+  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}
   return;
  }
  javaInteractionFeedback(player,'invalid_seasoning');
@@ -684,7 +687,7 @@ function scheduleNativeBottlePlacement(e){
  let intent;
  try{
   const main=captureWritableHand(player,'main').before,off=captureWritableHand(player,'off').before;
-  const isBottle=held=>!!held&&(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId));
+  const isBottle=isNativeBottleItem;
   const mainBottle=isBottle(main),offBottle=isBottle(off);
   if(mainBottle===offBottle)return;
   const hand=offBottle?'off':'main',held=offBottle?off:main;
@@ -909,11 +912,11 @@ function completePending(player,stack){
 world.afterEvents.itemStartUse.subscribe(e=>{
  try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{}
  const id=canonicalFoodId(e.itemStack?.typeId);
- if(id===PENDING_SEASONING){const hand=captureInteractionIntent(e.source,e.itemStack).hand;
+ if(isPendingSeasoningId(id)){const hand=captureInteractionIntent(e.source,e.itemStack).hand;
   stopSoundHandle(PENDING_USES.get(e.source.id)?.audio);
   PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:useSound(e.source,'shake_seasoning',.8)});
   try{syncSeasoningMotion(e.source,PENDING_USES.get(e.source.id))}catch(error){console.warn('[Grilling seasoning motion] '+error)}
-  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:"!q.is_using_item || !q.is_item_name_any('"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+"','"+PENDING_SEASONING+"')"})}catch{}return}
+  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:"!q.is_using_item || !q.is_item_name_any('"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+"','"+e.itemStack.typeId+"')"})}catch{}return}
  if(id===PLATE_ID){
   const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0)return;
   const selected=a25RestoreStack(rows[index]),meta=stackMeta(selected),sat=e.source.getComponent('minecraft:player.saturation'),hand=captureInteractionIntent(e.source,e.itemStack).hand;
@@ -953,7 +956,7 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  startEatingSound(e.source,a);
 });
 world.afterEvents.itemCompleteUse.subscribe(e=>{
- const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}
+ const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(isPendingSeasoningId(id)){completePending(e.source,e.itemStack);return}
  if(id===PLATE_ID){completePlateUse(e.source,e.itemStack);return}
   dangerousPreservation(e.source,id);
   if(CUISINE_FOOD_SET.has(id)){
@@ -1122,7 +1125,7 @@ system.runInterval(()=>{
  for(const p of world.getAllPlayers()){try{
   try{syncSeasoningMotion(p,PENDING_USES.get(p.id))}catch(error){if(system.currentTick%20===0)console.warn('[Grilling seasoning motion] '+error)}
   const active=ACTIVE_EATS.get(p.id);
-  try{prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}
+  try{prepareBottleFillItems(p,!!active||PENDING_USES.has(p.id));prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}
   if(active&&eatingStillCurrent(active.use,heldByHand(p,active.hand),p.selectedSlotIndex,now())){
    // Do not assume a remote custom-item countdown matches the owner's clock.
    // Replicate source session time; native food debit/reward stays event-owned.

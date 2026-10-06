@@ -12,7 +12,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = 'projects/grilling/gameplay_core/'
 sys.path.insert(0, str(ROOT / 'tools'))
-from public_source_witness import assert_public_bytes, public_json
+from public_source_witness import assert_public_bytes_with_g71_bottles as assert_public_bytes, public_json
 from secret_terminal_visibility import apply as apply_terminal_visibility
 
 

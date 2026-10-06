@@ -24,9 +24,9 @@ function engine({saved=new Map(),fault}={}){
  function wart(p,age=2){const b={dimension:dim,...p,typeId:'minecraft:nether_wart',permutation:perm('minecraft:nether_wart',{age}),setPermutation(next){this.typeId=next.type.id;this.permutation=next;fault?.('block',key(p),next)}};blocks.set(key(p),b);blocks.set(key({...p,y:p.y-1}),{typeId:'minecraft:soul_sand'});return b;}
  return {props,items,responses,invoke,register,output,wart,events,setNow:v=>now=v,setConfig:v=>config=normalizeConfig(v)};
 }
-test('producer SDK preserves actual stack and exact deadlines; furnace option defaults off with original 30 seconds',()=>{
+test('producer SDK preserves actual stack and Java-bucketed new deadlines; furnace option defaults off with original 30 seconds',()=>{
  const input=new Stack();input.nameTag='Authored';input.lore=['User lore'];const next=stackAPI.prepareProducedFood(input,{hotTicks:601,seasoning:['minecraft:redstone'],nativeVariant:7},1000);
- assert.equal(readPublicFood(next).state.hotUntil,1601);assert.equal(readPublicFood(next).state.nativeVariant,7);assert.deepEqual(next.extra,input.extra);assert.deepEqual(input.lore,['User lore']);
+ assert.equal(readPublicFood(next).state.hotUntil,1600);assert.equal(readPublicFood(next).state.nativeVariant,7);assert.deepEqual(next.extra,input.extra);assert.deepEqual(input.lore,['User lore']);
  assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{kind:'furnace'},1000)).state.hotUntil,0);
  assert.equal(readPublicFood(stackAPI.prepareProducedFood(input,{kind:'smoker'},1000,{enableSmeltedFoodHeat:true,smeltedFoodSeconds:30})).state.hotUntil,1600);
  assert.equal(configValue('smeltedFoodSeconds',86400),86400);assert.throws(()=>configValue('smeltedFoodSeconds',86401));

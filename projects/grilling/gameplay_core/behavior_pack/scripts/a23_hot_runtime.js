@@ -2,7 +2,7 @@ import {getItemProperty,setItemProperty,getItemPropertyIds,getItemRawLore,setIte
 import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {heatLore,isHeatLore} from './localized_lore_core.js';
 import {world} from '@minecraft/server';
-import {readPublicFood,writePublicFood,isFoodPayloadLine} from './host_api/food_api_core.js';
+import {readPublicFood,writePublicFood,isFoodPayloadLine,bucketHotUntil} from './host_api/food_api_core.js';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 
@@ -45,19 +45,23 @@ export function mergeSignature(stack){
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
 export function hotUntil(stack){const p=readPublicFood(stack);if(p.present)return p.valid?p.state.hotUntil:0;try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}
 export function isHot(stack,t=now()){return hotUntil(stack)>t}
-function bucket(t){return Math.floor(t)}
+const bucket=bucketHotUntil; // Java setHot quantizes the absolute deadline.
 function setHot(stack,remaining,t=now()){
+ const before=stack.getRawLore(),priorHot=getItemProperty(stack,HOT);
  try{
   const portable=readPublicFood(stack);if(portable.present&&!portable.valid)throw Error('public food unreadable');
-  const lore=baseLore(stack);
-  if(remaining>0)lore.push(heatLore(remaining/20));
-  // Stable 2.9 ItemStack dynamic properties require a non-stackable/custom-data stack.
-  // Give the stack custom lore first, then persist HotUntil.
+  const lore=baseLore(stack),until=remaining>0?bucket(t+remaining):0,left=Math.max(0,until-t);
+  const limit=(stack.maxAmount>1?19:20)-(portable.valid?1:0);
+  if(lore.length>limit)throw Error('heat metadata has no lore space');
+  if(left>0&&lore.length<limit)lore.push(heatLore(Math.ceil(left/20)));
   setItemLore(stack,lore);
-  if(remaining>0)setItemProperty(stack,HOT,bucket(t+remaining));
-  else setItemProperty(stack,HOT,undefined);
-  if(portable.valid)writePublicFood(stack,{...portable.state,hotUntil:remaining>0?bucket(t+remaining):0});
- }catch{}
+  setItemProperty(stack,HOT,remaining>0?until:undefined);
+  if(portable.valid)writePublicFood(stack,{...portable.state,hotUntil:until});
+  if(hotUntil(stack)!==until)throw Error('heat metadata readback');
+ }catch(error){
+  try{if(stack.maxAmount<=1)stack.setDynamicProperty(HOT,priorHot);stack.setLore(before)}catch{}
+  throw error;
+ }
  return stack;
 }
 function moveCount(target,source,moved,t=now()){

@@ -1,14 +1,13 @@
-import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {world,system} from '@minecraft/server';
 import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {readRawFoodLore,isHeatLore,applyFoodMaxim} from './a2769_food_tooltip_core.js';
 import './a2769_food_tooltip_runtime.js';
 import {heatLore} from './localized_lore_core.js';
-import {readPublicFood,writePublicFood} from './host_api/food_api_core.js';
+import {readPublicFood,writePublicFood,bucketHotUntil} from './host_api/food_api_core.js';
 
 export const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until';
 function now(){try{return Number(world.getAbsoluteTime())||system.currentTick}catch{return system.currentTick}}
-function bucketHot(until){return Math.floor(until)}
 export function readFoodSeasonings(stack){
  const portable=readPublicFood(stack);if(portable.present)return portable.valid?normalizeSeasoningList(portable.state.seasoning):[];
  try{
@@ -31,29 +30,37 @@ export function refreshHotLore(stack){
  if(!stack)return stack;
  const until=hotUntil(stack);
  try{
-  const base=readRawFoodLore(stack).filter(line=>!isHeatLore(line));
+  const base=getItemRawLore(stack).filter(line=>!isHeatLore(line));
   if(until<=0)return stack;
   const left=Math.max(0,until-now());
   if(left<=0){const p=readPublicFood(stack);setItemProperty(stack,HOT_UNTIL_KEY,undefined);setItemLore(stack,base.filter(x=>!x||typeof x!=='object'||x.translate!=='senluo.public.food.v1'));if(p.present&&p.valid)writePublicFood(stack,{...p.state,hotUntil:0});return stack}
   const sec=Math.max(1,Math.ceil(left/20));
   // A full custom lore is not permission to discard a user's line.
-  if(base.length>=20)return stack;
+  if(base.length>=(stack.maxAmount>1?19:20))return stack;
   base.push(heatLore(sec));setItemLore(stack,base);
  }catch{}
  return stack;
 }
 export function setHotFood(stack,ticks){
- if(!stack||ticks<=0)return stack;
+ if(!stack||!Number.isFinite(ticks)||ticks<=0)return stack;
+ let before,priorHot;
  try{
-  const until=bucketHot(now()+Math.max(1,Math.floor(Number(ticks)||0)));
-  const left=Math.max(1,until-now()),sec=Math.max(1,Math.ceil(left/20));
-  const lore=readRawFoodLore(stack).filter(line=>!isHeatLore(line));
-  if(lore.length>=20)return stack;
-  lore.push(heatLore(sec));
+  const portable=readPublicFood(stack);if(portable.present&&!portable.valid)return stack;
+  before=stack.getRawLore();priorHot=getItemProperty(stack,HOT_UNTIL_KEY);
+  const time=now(),until=bucketHotUntil(time+Math.max(1,Math.floor(ticks)));
+  const left=Math.max(0,until-time),sec=Math.ceil(left/20);
+  const lore=getItemRawLore(stack).filter(line=>!isHeatLore(line));
+  // Stackable metadata needs a carrier. A cosmetic badge must not consume its line.
+  const limit=stack.maxAmount>1?19:20;
+  if(lore.length>limit)return stack;
+  if(left>0&&lore.length<limit)lore.push(heatLore(sec));
   setItemLore(stack,lore);
   setItemProperty(stack,HOT_UNTIL_KEY,until);
-  const p=readPublicFood(stack);if(p.present){if(!p.valid)throw Error('public food unreadable');writePublicFood(stack,{...p.state,hotUntil:until});}
- }catch{}
+  if(portable.valid)writePublicFood(stack,{...portable.state,hotUntil:until});
+ }catch{
+  // Restore the original carrier or native property after any partial write.
+  if(before)try{if(stack.maxAmount<=1)stack.setDynamicProperty(HOT_UNTIL_KEY,priorHot);stack.setLore(before)}catch{}
+ }
  return stack;
 }
 export function applyFoodMetadata(stack,{seasoning=[],hotTicks=0}={}){
