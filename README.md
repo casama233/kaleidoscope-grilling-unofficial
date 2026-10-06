@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.78
+## Current maintained baseline: 2.8.79
 
 **2.8.78 一致來源整合候選**：保留已發布 G74，整合原生合法的五罐四鉤廚具架／串盤別名、熱度到期資料回復，以及調料 JSON 比較與出料守恆修正。兩套不同的 G75 提案各保留原來源／收據，不合併或重用其版號；目前以全新候選進入 Git／家族准入。見 [本版範圍](docs/STATUS-A2.8.78.md)。平台差異明列，dot 客戶端驗收仍待完成。
 
@@ -247,3 +247,5 @@ python development/immersion/build.py --upstream /path/to/KaleidoscopeGrilling-9
 ## bridge. canonical authoring
 
 Open the repository-root `config.json`, which points to the current locked BP and RP. See [the bridge. workflow](docs/BRIDGE-WORKFLOW.md) for editor settings, portable `.brproject` export, schema limitations and exact runtime comparison.
+
+Current rack hit correction: [G79 scope](docs/STATUS-A2.8.79.md).

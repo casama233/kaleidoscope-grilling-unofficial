@@ -8,6 +8,7 @@ import * as plan from '../../projects/grilling/gameplay_core/behavior_pack/scrip
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
 import * as layout from '../../projects/grilling/gameplay_core/behavior_pack/scripts/advanced_rack_layout.js';
 import {rackSlotAtHit} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_rack_quick_pick.js';
+import {captureRackHit} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_aim_hit.js';
 import {captureInteractionIntentFromStacks,interactionIntentMatchesStacks,captureStackIntentSnapshot,stackIntentSnapshotMatches} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2762_interaction_intent_core.js';
 const base=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const rackStateDomains=JSON.parse(fs.readFileSync(new URL('../blocks/advanced_rack_block.json',base),'utf8'))['minecraft:block'].description.states;
@@ -32,10 +33,10 @@ function fixture(){
   const domain=name==='minecraft:cardinal_direction'?['north','east','south','west']:rackStateDomains[name];
   assert.ok(domain?.includes(value),`${name} cannot store ${value}`);return permutation({...states,[name]:value});
  }});
- const block=(x=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y:64,z:0,dimension,location:{x,y:64,z:0},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0,[layout.RACK_OCCUPANCY_HIGH_STATE]:0}),permutationWrites:0,setPermutation(p){this.permutationWrites++;write('permutation'+x,()=>this.permutation=p);}};b.c=container('rack'+x,9);blocks.push(b);return b;};
+ const block=(x=0,y=64,z=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y,z,dimension,location:{x,y,z},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0,[layout.RACK_OCCUPANCY_HIGH_STATE]:0}),permutationWrites:0,setPermutation(p){this.permutationWrites++;write('permutation'+x,()=>this.permutation=p);}};b.c=container('rack'+x,9);blocks.push(b);return b;};
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){write(k,()=>v===undefined?dp.delete(k):dp.set(k,v));},beforeEvents:Object.fromEntries(['playerInteractWithBlock','playerBreakBlock','explosion'].map(name=>[name,{subscribe(fn){callbacks[name]=fn;}}]))};
  const playerInventory=p=>p.inv??inv;
- const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn:(...args)=>logs.push(args.join(' '))},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
+ const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,captureRackHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn:(...args)=>logs.push(args.join(' '))},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
  vm.runInContext(source('a2746_rack_state_adapter.js'),context);
  vm.runInContext(source('rack_transactions.js'),context);
  // Isolated module scope keeps actual runtime helper names separate from adapter declarations.
@@ -43,7 +44,7 @@ function fixture(){
  const runtime=load('a2746_advanced_rack_runtime.js','swapWithHotbar,depositSelected,withdrawToInventory,depositMatching,interactRackSlot,clearEmptySlotFilter');
  const automation=load('a2746_rack_automation_api.js','borrowAdvancedRackItem,returnAdvancedRackItem');
  const tx=vm.runInContext('({depositInventorySlot,planRackInsert,commitRackTransfer,rackContainer,rackFiltersKey,readRackFilters,syncRackDisplay})',context);
- const holder={typeId:'minecraft:player',isValid:true,isSneaking:false,selectedSlotIndex:0,dimension,location:{x:0,y:64,z:0},getDynamicProperty:k=>dp.get('holder:'+k),setDynamicProperty:(k,v)=>v===undefined?dp.delete('holder:'+k):dp.set('holder:'+k,v)};
+ const holder={inputInfo:{lastInputModeUsed:'KeyboardAndMouse'},eye:{x:.5,y:64.72,z:-2},view:{x:0,y:0,z:1},getHeadLocation(){return {...this.eye};},getViewDirection(){return {...this.view};},typeId:'minecraft:player',isValid:true,isSneaking:false,selectedSlotIndex:0,dimension,location:{x:0,y:64,z:0},getDynamicProperty:k=>dp.get('holder:'+k),setDynamicProperty:(k,v)=>v===undefined?dp.delete('holder:'+k):dp.set('holder:'+k,v)};
  return {logs,inv,block,world,dp,tx,runtime,automation,holder,dimension,dirty,sounds,callbacks,commands,makeInventory:name=>container(name,36),flush(){while(queue.length)queue.shift()();},start(){startup({customCommandRegistry:{registerCommand(spec,run){commands.set(spec.name,{spec,run});}}});},setFault(fn){fail=fn;},failOnce(target){let once=true;fail=key=>once&&key===target?(once=false,true):false;}};
 }
 const snapshot=f=>JSON.stringify({inv:f.inv.rows,dp:[...f.dp]});
@@ -130,6 +131,8 @@ const tool=()=>{const s=new Stack('kaleidoscope_cookery:iron_kitchen_knife');s.m
 function click(f,b,slot,options={}){
  const p=options.player??f.holder,direction=b.permutation.getState('minecraft:cardinal_direction'),x=slot<5?layout.RACK_SEASONING_X[slot]:layout.RACK_TOOL_X[slot-5];
  const at=layout.rackDisplayPose(b,x,slot<5?12/16:6/16,.35).location;
+ const outward={north:{x:0,z:-1},south:{x:0,z:1},east:{x:1,z:0},west:{x:-1,z:0}}[direction];
+ p.eye={x:at.x+outward.x*2,y:at.y,z:at.z+outward.z*2};p.view={x:-outward.x,y:0,z:-outward.z};
  const e={cancel:false,isFirstEvent:true,block:b,player:p,itemStack:(p.inv??f.inv).getItem(p.selectedSlotIndex),faceLocation:{x:at.x-b.x,y:at.y-b.y,z:at.z-b.z},...options};
  f.callbacks.playerInteractWithBlock(e);return e;
 }
@@ -262,7 +265,42 @@ test('rack QA distinguishes invalid hit and stale intent without weakening rejec
  for(const kind of ['hit','intent']){
   const f=fixture(),b=f.block();f.holder.hasTag=()=>true;f.inv.rows[0]=seasoning(1);
   const event={player:f.holder,block:b,isFirstEvent:true,blockFace:'North',faceLocation:{x:.5,y:kind==='hit'?.95:.72,z:.0625},itemStack:f.inv.getItem(0)};
+  if(kind==='hit')f.holder.eye.y=64.95;
   f.callbacks.playerInteractWithBlock(event);if(kind==='intent')f.inv.rows[0].amount=2;f.flush();
-  assert.ok(f.logs.some(x=>x.includes(kind==='hit'?'outside_hit_cells':'intent_changed')));assert.equal(b.c.rows.filter(Boolean).length,0);
+  assert.ok(f.logs.some(x=>x.includes(kind==='hit'?'missing_or_missed_ray':'intent_changed')));assert.equal(b.c.rows.filter(Boolean).length,0);
  }
+});
+
+test('negative-Y native event row is ignored for crosshair insert and lower tool control stays lower',()=>{
+ for(const slot of [2,7]){
+  const f=fixture(),b=f.block(320,-59,319);f.holder.location={x:320.5,y:-60,z:317};f.inv.rows[0]=slot<5?seasoning(1):tool();
+  const item=f.inv.rows[0].clone(),native={x:.5001525879,y:slot<5?.3255882263:.6744117737,z:.0625};
+  click(f,b,slot,{faceLocation:native,blockFace:'North'});f.flush();assert.deepEqual(b.c.rows[slot],item);assert.equal(f.inv.rows[0],undefined);
+  assert.equal(b.c.rows.filter(Boolean).length,1);
+ }
+});
+test('same-event ray snapshot survives changed aim before deferred commit without changing selected slot',()=>{
+ const f=fixture(),b=f.block();f.inv.rows[0]=seasoning(1);click(f,b,1);f.holder.eye={x:99,y:99,z:99};f.holder.view={x:0,y:-1,z:0};f.flush();
+ assert.equal(b.c.rows[1]?.amount,1);assert.equal(f.inv.rows[0],undefined);
+});
+test('missing crosshair ray rejects before storage access despite an apparently valid native hit',()=>{
+ const f=fixture(),b=f.block();f.inv.rows[0]=seasoning(1);delete f.holder.getHeadLocation;b.c.getItem=()=>{throw Error('Storage must not be read');};
+ const before=snapshot(f);click(f,b,2);f.flush();assert.equal(snapshot(f),before);assert.equal(b.c.rows.filter(Boolean).length,0);
+});
+test('known direct-touch transfer follows the negative-Y tapped row while crosshair aims elsewhere',()=>{
+ const f=fixture(),b=f.block(320,-59,319);f.holder.location={x:320.5,y:-60,z:317};f.holder.inputInfo={lastInputModeUsed:'Touch',touchOnlyAffectsHotbar:false};f.inv.rows[0]=tool();
+ click(f,b,2,{blockFace:'North',faceLocation:{x:.5,y:.6,z:.0625}});f.flush();assert.equal(b.c.rows[7]?.typeId,'kaleidoscope_cookery:iron_kitchen_knife');assert.equal(f.inv.rows[0],undefined);assert.equal(b.c.rows[2],undefined);
+});
+test('opt-in QA includes raw event hit and independent relative eye/view/used point',()=>{
+ const f=fixture(),b=f.block(320,-59,319);f.holder.location={x:320.5,y:-60,z:317};f.holder.hasTag=()=>true;f.inv.rows[0]=seasoning(1);
+ click(f,b,2,{blockFace:'North',faceLocation:{x:.5001525879,y:.3255882263,z:.0625}});f.flush();
+ const rows=f.logs.map(line=>JSON.parse(line.slice('[Grilling rack QA] '.length))),resolved=rows.find(row=>row.stage==='resolved');
+ assert.equal(rows[0].hit.y,.3255882263);assert.equal(resolved.source,'eye_ray');assert.equal(resolved.mode,'KeyboardAndMouse');assert.equal(resolved.headRelative.y,.75);assert.deepEqual(resolved.view,{x:0,y:0,z:1});assert.equal(resolved.used.y,.75);assert.equal(resolved.slot,2);
+ assert.ok(!f.logs.join('').match(/320|319|"y":-59|PRIVATE_|original|metadata|location|dimension/));
+});
+test('actual backing-block event never redirects an otherwise valid eye ray into a nearby rack',()=>{
+ const f=fixture(),b=f.block();f.inv.rows[0]=seasoning(1);let rays=0;f.holder.getHeadLocation=()=>{rays++;return {x:.5,y:64.72,z:-2};};
+ const stone={...b,typeId:'minecraft:stone',location:{x:0,y:64,z:1},z:1};const before=snapshot(f);
+ f.callbacks.playerInteractWithBlock({player:f.holder,block:stone,isFirstEvent:true,blockFace:'North',faceLocation:{x:.5,y:.72,z:0},itemStack:f.inv.getItem(0)});f.flush();
+ assert.equal(rays,0);assert.equal(snapshot(f),before);assert.equal(b.c.rows.filter(Boolean).length,0);
 });
