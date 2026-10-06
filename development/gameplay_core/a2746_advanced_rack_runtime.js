@@ -3,6 +3,7 @@ import {planRackInsert,commitRackTransfer,depositInventorySlot} from './rack_tra
 import {slotWrite,remainderOf,planInventoryInsert} from './rack_transfer_plan.js';
 import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
 import {rackSlotAtHit} from './a285_rack_quick_pick.js';
+import {captureRackHit} from './rack_aim_hit.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
 import {captureStackIntentSnapshot,stackIntentSnapshotMatches} from './a2762_interaction_intent_core.js';
 import {interactionFeedback} from './a283_interaction_feedback.js';
@@ -269,9 +270,11 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
   if(event.isFirstEvent!==false){
    const d=event.block.dimension,l=loc(event.block),sneaking=p.isSneaking,
     facing=event.block.permutation.getState('minecraft:cardinal_direction'),
-    slot=rackSlotAtHit(facing,event.faceLocation),intent=captureInteractionIntent(p,event.itemStack);
-   rackQa(p,'resolved',{facing,slot,row:slot<0?'outside':slot<5?'seasoning':'tool',hand:intent.hand});
-   if(slot<0||intent.hand!=='main'){rackQa(p,'reject',{reason:slot<0?'outside_hit_cells':'non_main_hand'});return;}
+    hit=captureRackHit(p,event.block,event.blockFace,event.faceLocation),
+    slot=rackSlotAtHit(facing,hit.point),intent=captureInteractionIntent(p,event.itemStack);
+   rackQa(p,'resolved',{facing,slot,row:slot<0?'outside':slot<5?'seasoning':'tool',hand:intent.hand,
+    mode:hit.mode,source:hit.source,headRelative:hit.origin,view:hit.direction,aimed:hit.aimed,used:hit.point??null});
+   if(slot<0||intent.hand!=='main'){rackQa(p,'reject',{reason:slot<0?(hit.reason??'outside_hit_cells'):'non_main_hand'});return;}
    system.run(()=>{
     try{
      const live=resolveRack(d,l);
