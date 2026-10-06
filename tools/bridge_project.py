@@ -54,7 +54,8 @@ def check(root=ROOT):
         assert manifest['header']['uuid'] == baseline['packs'][pack]['uuid']
         assert manifest['header']['version'] == baseline['version'], 'bridge. export changed the locked version'
         assert manifest['header']['name'] == 'Kaleidoscope Grilling ' + pack, 'stale version-labelled pack name'
-        assert 'Cookery 1.0.8' in manifest['header']['description'], 'stale displayed Cookery requirement'
+        cookery='1.6.0' if tuple(baseline['version']) >= (2,8,72) else '1.0.8'
+        assert 'Cookery '+cookery in manifest['header']['description'], 'stale displayed Cookery requirement'
         assert all(m['version'] == baseline['version'] for m in manifest['modules'])
         assert tuple(map(int, config['targetVersion'].split('.'))) >= tuple(manifest['header']['min_engine_version'])
         json_count = 0
