@@ -1,5 +1,7 @@
 # G89 placed facing and full ordinary-skewer candidate
 
+The exact G89 candidate now has a [bounded native placed-rendering result](NATIVE-PLATE-G89-BOUNDED-20261007.md): the restored ordinary mesh is visible with a fresh empty content log, and the observed five-beef samples face the placer correctly in all four directions. Canonical source/Dash/export CI passed for the same runtime. This does not certify every variant or held-plate input, audio, Java pixel/animation or family/live parity.
+
 G89 is a fresh 2.8.89 candidate based on frozen G88 documentation head `39e6dd145a84abdf921382aef9c90833061aa955`. It retains the original Cookery palette correction and all prior plate visibility, nutrition, native-use cancellation, yaw-change rebuild and removal-fault guards. The [G88 bounded native report](NATIVE-PLATE-G88-BOUNDED-20261007.md) and its successful [documentation-head canonical CI](https://github.com/casama233/kaleidoscope-grilling-unofficial/actions/runs/37577098848) remain evidence for those exact bytes, not G89 acceptance.
 
 ## Two additional native observations
@@ -30,7 +32,7 @@ Occupied-plate handheld contents are being handled separately. Dynamic GUI icons
 
 ## Gates and evidence integrity
 
-Focused source, matrix, asset conservation, production display, ownership/rollback and nutrition checks are distinct from engine acceptance. G89 still requires exact public Git/package identity, full canonical/compiled CI and its own native direction/ordinary checks. No all-facing, full-Java, audio, family/live, BSM freshness or production acceptance is claimed. Keep `client=false`, `production_ready=false`, `pending_client_acceptance`. No merge, release or live deployment is authorized here.
+Focused source, matrix, asset conservation, production display, ownership/rollback and nutrition checks are distinct from engine acceptance. G89 has verified exact public Git/package identity, full canonical/compiled CI and the linked bounded native direction/ordinary checks. No all-facing, full-Java, audio, family/live, BSM freshness or production acceptance is claimed. Keep `client=false`, `production_ready=false`, `pending_client_acceptance`. No merge, release or live deployment is authorized here.
 
 Private worlds, player records, machine paths and logs are not published. Native observation screenshot SHA256:
 
