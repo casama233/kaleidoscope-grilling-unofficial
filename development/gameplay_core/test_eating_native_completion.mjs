@@ -362,8 +362,10 @@ for(const elapsed of [1,23,24,25,26])test(`animation-off release ${elapsed} neve
 // adapters. These tests create no Minecraft or simulated Player entities.
 function productionLeave(f){
  const handlers=[];f.ctx.world.afterEvents.playerLeave={subscribe:fn=>handlers.push(fn)};
- Object.assign(f.ctx,{PENDING_METAL_RESCUES:new Map(),VIGOR_LAST:new Map(),SNEAK_LAST:new Map(),THREAD_LAST:new Map(),NUMB_VISUAL:new Set(),forgetDragonHealth(){}});
- const first=source.indexOf('world.afterEvents.playerLeave.subscribe(e=>{'),firstEnd=source.indexOf('const PENDING_METAL_RESCUES=',first);
+ Object.assign(f.ctx,{PENDING_METAL_RESCUES:new Map(),VIGOR_LAST:new Map(),SNEAK_LAST:new Map(),THREAD_LAST:new Map(),NUMB_VISUAL:new Set(),forgetDragonHealth(){},forgetProjectileDodge(playerId){assert.equal(playerId,f.player.id)}});
+ // Select the actual one-line leave subscriber, without importing unrelated
+ // adjacent death/removal subscribers into this eating-only API adapter.
+ const first=source.indexOf('world.afterEvents.playerLeave.subscribe(e=>{'),firstEnd=source.indexOf('\n',first);
  const last=source.indexOf('world.afterEvents.playerLeave.subscribe(({playerId})=>{'),lastEnd=source.indexOf('configureSecretVisuals(',last);
  assert.ok(first>=0&&firstEnd>first&&last>=0&&lastEnd>last);
  vm.runInNewContext(source.slice(first,firstEnd)+'\n'+source.slice(last,lastEnd),f.ctx);
