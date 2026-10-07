@@ -34,6 +34,35 @@ def expression(expr,first,slot,bone,using=False,eat_profile=3,eat_hand=None,proj
  tree=ast.parse(expr,mode='eval')
  assert all(isinstance(n,(ast.Expression,ast.BoolOp,ast.And,ast.Or,ast.Compare,ast.Eq,ast.NotEq,ast.Constant,ast.Load)) for n in ast.walk(tree)),expr
  return bool(eval(compile(tree,'<pose-condition>','eval'),{'__builtins__':{}},{}))
+def animation_entries(rows):
+ # Bedrock accepts unconditional alias strings as well as condition maps.
+ assert isinstance(rows,list) and rows
+ for row in rows:
+  if isinstance(row,str):
+   assert row;yield row,'1'
+  else:
+   assert isinstance(row,dict) and row and all(isinstance(k,str) and k and isinstance(v,str) for k,v in row.items())
+   yield from row.items()
+
+def plate_binding_gate(path,description,reference,geometry,animations):
+ assert description['identifier']=='kaleidoscope_grilling:skewer_plate',(path,reference)
+ bones=geometry['bones'];grip,pose=bones[:2]
+ assert grip=={'name':'grip','pivot':[0,24,0],'binding':'q.item_slot_to_bone_name(context.item_slot)'},(path,reference)
+ assert pose=={'name':'plate_pose','parent':'grip','pivot':[0,24,0]},(path,reference)
+ assert not any('binding' in b for b in bones[1:]),(path,reference)
+ if reference=='geometry.kg_plate_held.body':
+  assert len(bones)==3 and bones[-1]['name']=='plate_body' and bones[-1]['parent']=='plate_pose' and bones[-1]['cubes'],reference
+ else:
+  assert len(bones)==5 and re.fullmatch(r'plate_slot_[0-4]',bones[2]['name']),reference
+  row=bones[2]['name'][-1]
+  assert bones[2]=={'name':'plate_slot_'+row,'parent':'plate_pose','pivot':[0,24,0]},reference
+  assert bones[3]=={'name':'plate_fixed_'+row,'parent':'plate_slot_'+row,'pivot':[0,24,0]},reference
+  assert bones[4]['name']=='plate_row_'+row and bones[4]['parent']=='plate_fixed_'+row,reference
+ assert bones[-1]['pivot']==[0,24,0],reference
+ for alias,anim in description['animations'].items():
+  expected={f'plate_{part}_{row}' for part in ('slot','fixed') for row in range(5)} if alias=='layout' else {'plate_pose'}
+  assert set(animations[anim]['bones'])==expected,anim
+
 def idle_pose_alias(version,identifier,first,hand):
  calibrated=version>=(2,8,68) and first and identifier in ('kaleidoscope_grilling:secret_skewer','kaleidoscope_grilling:unfinished_skewer')
  return 'fp_idle_calibrated_'+hand if calibrated else ('fp_' if first else 'tp_')+hand
@@ -60,15 +89,19 @@ def binding_assets():
  for p in sorted((RP/'attachables').glob('*.json')):
   if p.stem.endswith('_java_three_alt.attachable'):continue
   d=load(p)['minecraft:attachable']['description'];selected=[]
+  entries=list(animation_entries(d['scripts']['animate']))
+  shared=[row for row in d['scripts']['animate'] if isinstance(row,str)]
+  assert all(key in d['animations'] and not key.startswith(('fp_','tp_','eat_')) for key in shared),p
+  if d['identifier']=='kaleidoscope_grilling:skewer_plate':assert shared==['layout'],p
   for first in (0,1):
    for slot,hand in [('main_hand','right'),('off_hand','left')]:
     for bone in (hand+'item',hand+'Item','custom_'+hand+'_grip'):
-     matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
+     matches=[key for key,expr in entries if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
      idle_expected=idle_pose_alias(version,d['identifier'],first,hand)
-     assert matches==[idle_expected],(p,first,slot,bone,matches)
+     assert matches==[idle_expected]+shared,(p,first,slot,bone,matches)
      for profile in (1,2,3,4,5):
-      using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
+      using_matches=[key for key,expr in entries if expression(expr,first,slot,bone,True,profile)]
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
       projected='fp_eat_'+hand
       projected_code={'one':1,'two':2,'three':3,'three_alt':4,'four':5}.get(d['animations'].get(projected,'').split('.')[-2] if projected in d['animations'] else '')
@@ -76,16 +109,16 @@ def binding_assets():
       # first-person-only. Older immutable candidates retain their old guard.
       local_eating=[eating] if eating in d['animations'] and (first or version<(2,8,61)) else []
       expected_using=([projected] if first and profile==projected_code else [expected]+local_eating) if version>=(2,8,58) else [expected]+local_eating
-      assert using_matches==expected_using,(p,profile,using_matches,expected_using)
+      assert using_matches==expected_using+shared,(p,profile,using_matches,expected_using)
       # Projection is independently synchronized, and every excluded posture
       # falls back to the native display. Local authored motion is FP-only in
       # .61; third-person never inherits a camera-space item displacement.
       for projection,posture in [(False,None)]+[(True,s) for s in ('is_sneaking','is_swimming','is_gliding','is_riding')]:
-       fallback=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
-       assert fallback==[expected]+local_eating,(p,profile,projection,posture,fallback)
+       fallback=[key for key,expr in entries if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
+       assert fallback==[expected]+local_eating+shared,(p,profile,projection,posture,fallback)
       for inactive in (0,2 if slot=='main_hand' else 1):
-       inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
-       assert inactive_matches==[idle_expected],(p,profile,inactive,inactive_matches)
+       inactive_matches=[key for key,expr in entries if expression(expr,first,slot,bone,True,profile,inactive)]
+       assert inactive_matches==[idle_expected]+shared,(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
   if d['animations'].get('fp_right')=='animation.kg_a286.bottle_fp_right' and version>=(2,8,61):
@@ -126,6 +159,8 @@ def binding_assets():
     pose,model=g['bones'][1:]
     assert pose=={'name':'skewer_pose','parent':'grip','pivot':[0,24,0]},ref
     assert model['name']=='skewer_model' and model['parent']=='skewer_pose',ref
+   elif ref.startswith('geometry.kg_plate_held.'):
+    plate_binding_gate(p,d,ref,g,animations)
    elif ref=='geometry.kg_bottle_held.combined':
     assert len(g['bones'])==146 and not b.get('cubes'),ref
     assert {child['name'] for child in g['bones'][1:]}=={'shell'}|{f'pending_{tint}_color_{value}' for tint in range(16) for value in range(1,10)},ref
@@ -172,10 +207,11 @@ def binding_assets():
     assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
  expected_count=124 if version>=(2,8,71) else 108 if version>=(2,8,68) else 107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if version >= (2,8,32) else 107
+ if (RP/'attachables/skewer_plate.attachable.json').exists():expected_count+=1
  assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)
  # Regression reproduction: old dispatch can select zero poses for a normalized bone name.
  old=repair.source(RP/'attachables/empty_seasoning_bottle.attachable.json')['minecraft:attachable']['description']
- assert not any(expression(expr,0,'main_hand','rightitem') for row in old['scripts']['animate'] for expr in row.values())
+ assert not any(expression(expr,0,'main_hand','rightitem') for _,expr in animation_entries(old['scripts']['animate']))
  # World entities and native block items must never inherit a player hand binding.
  entities=0;native=0
  for p in (RP/'entity').glob('*.json'):

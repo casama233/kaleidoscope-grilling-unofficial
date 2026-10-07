@@ -16,4 +16,4 @@ Two independently published 2.8.83/84 lines have different bytes. Current-main e
 
 Required source/export CI, new native held views/counts/hand coexistence and recovery checks must be recorded for this exact candidate. The required BSM upstream-status evidence remains unavailable; family/BDS/saved-world/production gates are separate. Keep `client=false`, `production_ready=false`, `pending_client_acceptance`; no merge, release or live deployment is authorized for this review candidate.
 
-Expanded G89 evidence is on the [owner-access personal Space Page](https://chatgpt.com/space/page_ed507605a220819186f21060f874f5ae). Public readers may not have access. Essential source identities/results are retained in Git; no new large screenshots or redundant full reports are added.
+Expanded captures remain in the owner's private evidence archive. Essential source identities/results are retained in Git; no new large screenshots or redundant full reports are added.
