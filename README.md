@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.108
+## Current maintained baseline: 2.8.109
+
+**G109 調料瓶候選**：保留 G108 全部修復，整合第一人稱握持位移與食材數提示修正。原生驗收仍待完成；見 [本版範圍](docs/STATUS-A2.8.109.md)。
 
 **G104 烤串背包與指南圖示修補**：空籤改用原作 GUI 竹籤，完成籤用原作三份遮罩及 fallback 色合成固定圖示；修正把三維 UV 圖集當成背包 sprite 的来源错误。[本版範圍](docs/STATUS-A2.8.104.md)明列固定平台替代、未完成的每物品動態顏色／數量／variants 與待真人驗收。
 

@@ -490,7 +490,7 @@ function planSeasoningBottle(player,hand,needed){
  if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
  const nextUses=uses+needed;
  if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
- const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses))}catch{}
+ const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses,ingredients.length))}catch{}
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 // The fourth successful flip freezes secret ingredient conversions in storage.
