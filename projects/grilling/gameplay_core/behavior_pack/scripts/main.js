@@ -15,6 +15,7 @@ import {seasoningLore,creatorLore} from './localized_lore_core.js';
 import {readEffects,writeEffects,clearEffects} from './effect_state_runtime.js';
 import {nativeDragonHealth,forgetDragonHealth} from './dragon_native_health.js';
 import {finishedFoodMeta} from './food_finish_core.js';
+import {plateQaTrace} from './plate_qa_runtime.js';
 import {eatingProfile,eatingNativeTicks,eatingElapsedTicks,nativeEatingCompleted,EAT_ELAPSED_TICKS_PROPERTY,EAT_NATIVE_TICKS_PROPERTY,EAT_PROFILE_PROPERTY,EAT_HAND_PROPERTY,EAT_PROJECTION_PROPERTY} from './player_presentation_core.js';
 import {SECRET_MODEL_VARIANTS_KEY,appendedModelVariants} from './secret_visual_state_core.js';
 import {configureSecretGrillReader} from './grill_visual_runtime.js';
@@ -402,12 +403,33 @@ function secretRemainders(player,stack){
   emitSecretIngredientConsumed(player,row);
  }
 }
-function addSecretNutrition(player,stack,meta){
- const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
- const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
- const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
+function addSecretNutrition(player,stack,meta,diagnostics=false){
+ const trace=(stage,detail=()=>({}))=>{if(diagnostics)plateQaTrace(player,'reward_detail',stack,()=>({stage,...detail()}));};
+ let operation='facts';
+ try{
+  trace('reward_facts_begin');
+  const d=dynamicFood(stack);
+  trace('reward_facts_ok',()=>({nutrition:d?.nutrition,saturationModifier:d?.saturation}));
+  operation='components';
+  const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
+  trace('reward_components',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax}));
+  operation='hunger_target';
+  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);
+  trace('reward_hunger_before',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,hungerTarget:hunger}));
+  operation='hunger_write';h.setCurrentValue(hunger);
+  trace('reward_hunger_after',()=>({hungerAfter:h.currentValue}));
+  operation='saturation_target';
+  // Native saturation bounds can lag the hunger write. Read the current view,
+  // retain its authoritative cap, and never invent or modify an attribute maximum.
+  const currentSat=player.getComponent('minecraft:player.saturation');
+  if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');
+  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,currentSat.effectiveMax,currentSat.currentValue+gain);
+  trace('reward_saturation_before',()=>({saturationCurrent:currentSat.currentValue,saturationMax:currentSat.effectiveMax,saturationTarget:saturation,gain}));
+  operation='saturation_write';currentSat.setCurrentValue(saturation);
+  trace('reward_saturation_after',()=>({saturationAfter:currentSat.currentValue}));
+ }catch(error){trace('reward_failed',()=>({operation,errorName:error?.name}));throw error;}
 }
-function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}
+function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta,true)}
 function clearContainer(block){const c=inv(block);if(c)for(let i=0;i<3;i++)c.setItem(i,undefined)}
 function resetBlock(block,lit=false){const s=initialState();s.lit=lit;writeState(block,s)}
 function getUses(stack){try{return Math.max(0,Math.min(SEASONING_MAX_USES,Number(getItemProperty(stack,SEASON_USES_KEY)??0)|0))}catch{return 0}}
@@ -877,10 +899,15 @@ function writeUseHand(player,use,stack){
 }
 function completePlateUse(player,eventStack){
  const a=PLATE_EATS.get(player.id);PLATE_EATS.delete(player.id);
- if(!a||!completedUseStillCurrent(a.use,eventStack,heldByHand(player,a.hand),player.selectedSlotIndex,!creative(player)))return;
+ plateQaTrace(player,'complete_received',eventStack,{session:!!a,stage:'received'});
+ if(!a){plateQaTrace(player,'complete_gate',eventStack,{session:false,identityMatch:false,stage:'missing_session'});return;}
+ const identityMatch=completedUseStillCurrent(a.use,eventStack,heldByHand(player,a.hand),player.selectedSlotIndex,!creative(player));
+ plateQaTrace(player,'complete_gate',eventStack,{session:true,identityMatch,stage:identityMatch?'accepted':'identity_rejected'});
+ if(!identityMatch)return;
  let eaten,meta,next;
  const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');
  try{
+  plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_begin'});
   if(!h||!sat)throw new Error('Nutrition unavailable');
   const rows=a25PlateRows(a.plate),index=plateHighestNutritionIndex(rows);
   if(index<0)throw new Error('Empty plate');
@@ -889,15 +916,22 @@ function completePlateUse(player,eventStack){
   for(const key of Object.keys(row.props??{}))if(JSON.stringify(restored[key])!==JSON.stringify(row.props[key]))throw new Error('Plate food metadata unavailable');
   meta=stackMeta(eaten);next=rows.length?a25PlateItem(rows,a.plate):undefined;
   if(rows.length&&(!next||JSON.stringify(a25PlateRows(next))!==JSON.stringify(rows)))throw new Error('Plate data write failed');
- }catch(error){writeUseHand(player,a.use,a.plate);console.warn('[Grilling plate] '+error);return}
+  plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_ok'});
+ }catch(error){plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_failed'});writeUseHand(player,a.use,a.plate);console.warn('[Grilling plate] '+error);return}
  const oldH=h.currentValue,oldS=sat.currentValue;
- if(!commitEating({debit:()=>writeUseHand(player,a.use,next),reward:()=>addNestedNutrition(player,eaten,meta),
-  restoreFood:()=>writeUseHand(player,a.use,a.plate),restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}}))return;
+ plateQaTrace(player,'settlement',eventStack,{stage:'commit_begin'});
+ let committed;try{committed=commitEating({debit:()=>{plateQaTrace(player,'settlement',eventStack,{stage:'debit_begin'});writeUseHand(player,a.use,next);plateQaTrace(player,'settlement',eventStack,{stage:'debit_ok'});},
+  reward:()=>{plateQaTrace(player,'settlement',eventStack,{stage:'reward_begin'});addNestedNutrition(player,eaten,meta);plateQaTrace(player,'settlement',eventStack,{stage:'reward_ok'});},
+  restoreFood:()=>writeUseHand(player,a.use,a.plate),restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}});
+ }catch(error){plateQaTrace(player,'settlement',eventStack,{stage:'commit_threw'});throw error;}
+ if(!committed){plateQaTrace(player,'settlement',eventStack,{stage:'commit_failed'});return;}
+ plateQaTrace(player,'settlement',eventStack,{stage:'commit_ok'});
  const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);
 
  if(RAW_NAUSEA[id])try{player.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{player.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{player.addEffect('blindness',200,{showParticles:true})}catch{}
  if(id===SECRET_ID)secretRemainders(player,eaten);
  afterCommitted(player,id,meta,{...a,meta},false);
+ plateQaTrace(player,'settlement',eventStack,{stage:'finish_ok'});
 }
 function completePending(player,stack){
  const a=PENDING_USES.get(player.id);
@@ -918,9 +952,12 @@ world.afterEvents.itemStartUse.subscribe(e=>{
   try{syncSeasoningMotion(e.source,PENDING_USES.get(e.source.id))}catch(error){console.warn('[Grilling seasoning motion] '+error)}
   try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:"!q.is_using_item || !q.is_item_name_any('"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+"','"+e.itemStack.typeId+"')"})}catch{}return}
  if(id===PLATE_ID){
-  const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0)return;
+  plateQaTrace(e.source,'start_received',e.itemStack,{stage:'received'});
+  const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0){plateQaTrace(e.source,'start_empty',e.itemStack,{session:false,stage:'empty_event_rows'});return;}
+  plateQaTrace(e.source,'start_selected',e.itemStack,{stage:'selected'});
   const selected=a25RestoreStack(rows[index]),meta=stackMeta(selected),sat=e.source.getComponent('minecraft:player.saturation'),hand=captureInteractionIntent(e.source,e.itemStack).hand;
-  PLATE_EATS.set(e.source.id,{id,plate:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});return;
+  PLATE_EATS.set(e.source.id,{id,plate:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
+  plateQaTrace(e.source,'start_registered',e.itemStack,{session:true,stage:'registered'});return;
  }
   if(CUISINE_FOOD_SET.has(id)){
    const meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
@@ -980,8 +1017,9 @@ world.afterEvents.itemStopUse.subscribe(e=>{
  // Completion and stop can share a tick. Clear only the stopped session, after
  // completion has had a chance to commit; never delete a new use session.
  const id=e.source.id,plate=PLATE_EATS.get(id),pending=PENDING_USES.get(id);
+ if(e.itemStack?.typeId===PLATE_ID||plate)plateQaTrace(e.source,'stop_received',e.itemStack,{session:!!plate,stage:'stop_scheduled'});
  const pendingMatches=!e.itemStack||!pending||eatingEventMatches(pending.use,e.itemStack,now());
- system.run(()=>{if(PLATE_EATS.get(id)===plate)PLATE_EATS.delete(id);if(pendingMatches&&PENDING_USES.get(id)===pending){stopSoundHandle(pending?.audio);PENDING_USES.delete(id)}});
+ system.run(()=>{if(PLATE_EATS.get(id)===plate){if(plate)plateQaTrace(e.source,'stop_cleared',e.itemStack,{session:true,stage:'stop_cleared'});PLATE_EATS.delete(id);}if(pendingMatches&&PENDING_USES.get(id)===pending){stopSoundHandle(pending?.audio);PENDING_USES.delete(id)}});
  CUISINE_EATS.delete(id);const a=ACTIVE_EATS.get(id);if(!a)return;
  if(e.itemStack&&!eatingEventMatches(a.use,e.itemStack,now()))return;
  if(a.start===system.currentTick&&SETTLED.get(id)===system.currentTick)return;
@@ -1033,6 +1071,7 @@ function canUseSecretSkewer(stack){
  try{return validSecretIngredientRows(readSkewerRows(stack))&&(!isSecretCooked(stack)||validSecretIngredientRows(readEffectiveSkewerRows(stack)))}catch{return false}
 }
 world.beforeEvents.itemUse.subscribe(e=>{
+ if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_before',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'already_cancelled':'received'});
  if(e.cancel)return;
  if(canonicalFoodId(e.itemStack?.typeId)===SECRET_ID&&!canUseSecretSkewer(e.itemStack)){e.cancel=true;return}
  try{
@@ -1047,7 +1086,7 @@ world.beforeEvents.itemUse.subscribe(e=>{
  // Java non-eating interactions above retain priority, even at full hunger.
  const edibleSkewer=!!FOOD_DATA[e.itemStack?.typeId]||canonicalFoodId(e.itemStack?.typeId)===SECRET_ID||e.itemStack?.typeId===PLATE_ID;
  if(!edibleSkewer)return;
- if(e.source.isSneaking){e.cancel=true;return;}
+ if(e.source.isSneaking){e.cancel=true;if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_result',e.itemStack,{cancelled:true,stage:'cancelled'});return;}
  const animations=grillingConfig().enableEatingAnimations;
  if(SKEWER_EATING_IDS.has(canonicalFoodId(e.itemStack.typeId))&&isPlainEatingId(e.itemStack.typeId)===animations){
   // A setting/item change can race the per-tick preparation. Refuse the wrong
@@ -1056,6 +1095,7 @@ world.beforeEvents.itemUse.subscribe(e=>{
   system.run(()=>{if(interactionIntentStillCurrent(player,intent))prepareEatingItems(player,ACTIVE_EATS.has(player.id),grillingConfig().enableEatingAnimations)});return;
  }
  if(!grillingConfig().fullHungerEating){const h=e.source.getComponent('minecraft:player.hunger');if(h&&h.currentValue>=h.effectiveMax)e.cancel=true;}
+ if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_result',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'cancelled':'allowed'});
 });
 world.beforeEvents.playerInteractWithEntity.subscribe(e=>{
  try{const action=skewerAction(e.player,e.itemStack??heldMain(e.player));if(!action)return;e.cancel=true;scheduleSkewerAction(e.player,action)}catch{}

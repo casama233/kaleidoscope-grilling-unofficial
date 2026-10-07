@@ -60,6 +60,6 @@ test('new helpers preserve all four facing rotations and independent slot identi
  }
 });
 test('startup clears both transient render types and does not add a second visual loop',()=>{
- assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE])'));
+ assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE])'));
  assert.equal((source.match(/system\.runInterval\(pump,1\)/g)??[]).length,1);
 });
