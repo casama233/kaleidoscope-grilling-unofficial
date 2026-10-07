@@ -53,7 +53,7 @@ test('budget exhaustion and rendering failure do not consume stored stacks',()=>
 });
 test('plate bindings remain transient with existing audience/budget/queue and startup cleanup',()=>{
  const p=new URL('../../projects/grilling/gameplay_core/',import.meta.url),bp=JSON.parse(fs.readFileSync(new URL('behavior_pack/entities/plate_food_visual.json',p))),rp=JSON.parse(fs.readFileSync(new URL('resource_pack/entity/plate_food_visual.entity.json',p)));
- assert.ok(Object.hasOwn(bp['minecraft:entity'].components,'minecraft:transient'));assert.equal(bp['minecraft:entity'].components['minecraft:inventory'],undefined);assert.equal(bp['minecraft:entity'].description.runtime_identifier,undefined);
+ assert.ok(Object.hasOwn(bp['minecraft:entity'].components,'minecraft:transient'));assert.deepEqual(bp['minecraft:entity'].components['minecraft:body_rotation_always_follows_head'],{});assert.equal(bp['minecraft:entity'].components['minecraft:body_rotation_blocked'],undefined);assert.equal(bp['minecraft:entity'].components['minecraft:body_rotation_axis_aligned'],undefined);assert.equal(bp['minecraft:entity'].components['minecraft:inventory'],undefined);assert.equal(bp['minecraft:entity'].description.runtime_identifier,undefined);
  assert.equal(rp['minecraft:client_entity'].description.enable_attachables,undefined);assert.equal(rp['minecraft:client_entity'].description.scripts.initialize,undefined);
  assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE])'));assert.ok(source.includes('configurePlateVisualDirty(markStationContentsDirty)'));
  assert.ok(source.includes('plateVisualPose(block,i,rows.length)'));assert.equal((source.match(/system\.runInterval\(pump,1\)/g)??[]).length,1);

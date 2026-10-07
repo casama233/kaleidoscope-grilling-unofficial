@@ -77,7 +77,8 @@
           }
         ]
       },
-      "minecraft:fire_immune": {}
+      "minecraft:fire_immune": {},
+      "minecraft:body_rotation_always_follows_head": {}
     }
   }
 }

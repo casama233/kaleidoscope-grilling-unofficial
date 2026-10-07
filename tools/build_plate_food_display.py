@@ -22,6 +22,10 @@ def build():
  server=deepcopy(json.loads((BP/'entities/grill_food_visual.json').read_text()))
  d=server['minecraft:entity']['description'];d['identifier']=NS+'plate_food_visual'
  for name in ('flips','hop'):d['properties'].pop(NS+name)
+ # A visual helper must preserve arbitrary authored slot yaw from its facing.
+ # Keep body/head aligned without cardinal quantization or a polling loop.
+ # Official component minimum is1.21.90; this entity format is1.26.0.
+ server['minecraft:entity']['components']['minecraft:body_rotation_always_follows_head']={}
  return {
  RP/'entity/plate_food_visual.entity.json':dump(client),
  BP/'entities/plate_food_visual.json':dump(server),

@@ -403,12 +403,29 @@ function secretRemainders(player,stack){
   emitSecretIngredientConsumed(player,row);
  }
 }
-function addSecretNutrition(player,stack,meta){
- const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
- const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
- const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
+function addSecretNutrition(player,stack,meta,diagnostics=false){
+ const trace=(stage,detail=()=>({}))=>{if(diagnostics)plateQaTrace(player,'reward_detail',stack,()=>({stage,...detail()}));};
+ let operation='facts';
+ try{
+  trace('reward_facts_begin');
+  const d=dynamicFood(stack);
+  trace('reward_facts_ok',()=>({nutrition:d?.nutrition,saturationModifier:d?.saturation}));
+  operation='components';
+  const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
+  trace('reward_components',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax}));
+  operation='hunger_target';
+  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);
+  trace('reward_hunger_before',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,hungerTarget:hunger}));
+  operation='hunger_write';h.setCurrentValue(hunger);
+  trace('reward_hunger_after',()=>({hungerAfter:h.currentValue}));
+  operation='saturation_target';
+  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,sat.currentValue+gain);
+  trace('reward_saturation_before',()=>({saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax,saturationTarget:saturation,gain}));
+  operation='saturation_write';sat.setCurrentValue(saturation);
+  trace('reward_saturation_after',()=>({saturationAfter:sat.currentValue}));
+ }catch(error){trace('reward_failed',()=>({operation,errorName:error?.name}));throw error;}
 }
-function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}
+function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta,true)}
 function clearContainer(block){const c=inv(block);if(c)for(let i=0;i<3;i++)c.setItem(i,undefined)}
 function resetBlock(block,lit=false){const s=initialState();s.lit=lit;writeState(block,s)}
 function getUses(stack){try{return Math.max(0,Math.min(SEASONING_MAX_USES,Number(getItemProperty(stack,SEASON_USES_KEY)??0)|0))}catch{return 0}}

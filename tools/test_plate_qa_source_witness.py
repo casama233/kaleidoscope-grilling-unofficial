@@ -1,5 +1,6 @@
 """The opt-in diagnostic delta does not weaken earlier source conservation."""
 import hashlib
+import json
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -12,7 +13,8 @@ class PlateQaSourceWitnessTests(unittest.TestCase):
         after=public.expected_main_bytes((2,8,83))
         self.assertEqual(hashlib.sha256(before).hexdigest(),delta['before_sha256'])
         self.assertEqual(hashlib.sha256(after).hexdigest(),delta['after_sha256'])
-        self.assertEqual(after,(public.ROOT/public.MAIN_PATH).read_bytes())
+        current=json.loads((public.ROOT/'baseline.json').read_text())['version']
+        self.assertEqual(public.expected_main_bytes(current),(public.ROOT/public.MAIN_PATH).read_bytes())
         self.assertNotEqual(before,after)
         self.assertIn(b"import {plateQaTrace} from './plate_qa_runtime.js';",after)
 
