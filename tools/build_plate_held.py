@@ -401,7 +401,7 @@ def decoder_scripts():
         # Read the raw word before validation. Clamping a748 transaction marker
         # to747 would incorrectly reveal a complete plate during partial writes.
         pre.append(var + " = math.floor(c.item_slot == 'off_hand' ? " + property_read('off', word) + ' : ' + property_read('main', word) + ');')
-    pre += ['v.kg_plate_count = math.floor((v.kg_plate_word_7 - 10)/123);',
+    pre += ['v.kg_plate_count = math.floor((v.kg_plate_word_7 - 10 + 0.5)/123);',
         'v.kg_plate_count = math.clamp(v.kg_plate_count, 0, 5);']
     valid = 'v.kg_plate_word_7 >= 10 && v.kg_plate_word_7 <= 747'
     valid += ' && ' + ' && '.join(f'v.kg_plate_word_{i} >= 0 && v.kg_plate_word_{i} <= {PALETTE_MAX if i < 5 else PAIR_MAX}' for i in range(7))

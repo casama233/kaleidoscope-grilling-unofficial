@@ -13,6 +13,8 @@ PROJECT = previous.PROJECT
 HISTORICAL = previous.HISTORICAL
 FROZEN_SOURCE_BASE = '4014645d132ec676791b2aa39752db37d84abb2e'
 FROZEN_TREE = 'd641b145893e802265751229df9f415a3a6e2d27'
+REVIEWED_SOURCE_BASE = 'ca6a2d0777066b4bcdce278d1d0f501a39fbc2c5'
+REVIEWED_SOURCE_TREE = '25e5d0aee047092302f9973c5420bd789a090c3d'
 MANIFESTS = previous.MANIFESTS
 QA_GEOMETRY_PATH = previous.QA_GEOMETRY_PATH
 REVIEWED_PATCH_SHA256 = '0804e8cb0a6619246a17ba0c6f93b7b795ba2af4504e53c6c8ff1a927ed1f94b'
@@ -49,7 +51,7 @@ def verify_frozen_foundation():
     return result
 
 
-def metadata():
+def metadata(*, frozen=False):
     assert REVIEWED_PATCH_SHA256 and REVIEWED_AFTER, 'Final reviewed G95 patch is not yet admitted'
     data = json.loads((ROOT / 'tools/fixtures/g95-runtime-reviewed-delta.json').read_text())
     assert data['schema'] == 1 and data['release'] == [2, 8, 95]
@@ -61,8 +63,12 @@ def metadata():
                                    'source_after_sha256': REVIEWED_SOURCE_AFTER}, 'Unreviewed QA-render diagnostic'
     for path, identity in REVIEWED_AFTER.items():
         assert data['files'][path]['after_sha256'] == identity, 'QA-render diagnostic differs from reviewed bytes: ' + path
+    frozen_sources = frozen or tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 96)
+    if frozen_sources:
+        assert HISTORICAL.git('rev-parse', REVIEWED_SOURCE_BASE + '^{tree}').decode().strip() == REVIEWED_SOURCE_TREE, 'Reviewed diagnostic G95 source tree drift'
     for path, identity in REVIEWED_SOURCE_AFTER.items():
-        assert sha((ROOT / path).read_bytes()) == identity, 'Reviewed QA-render source drift: ' + path
+        data_source = HISTORICAL.source(REVIEWED_SOURCE_BASE, path) if frozen_sources else (ROOT / path).read_bytes()
+        assert sha(data_source) == identity, 'Reviewed QA-render source drift: ' + path
     return data
 
 
@@ -108,8 +114,8 @@ def bump_manifest(value):
     return value
 
 
-def apply_delta(path):
-    row = metadata()['files'][path]
+def apply_delta(path, *, frozen=False):
+    row = metadata(frozen=frozen)['files'][path]
     assert (path in ADDED_PATHS) == (path not in files()), 'Unreviewed runtime addition/deletion'
     before = b'' if path in ADDED_PATHS else source(path)
     assert row['before_sha256'] == sha(before), 'Reviewed G95 preimage hash changed'
@@ -130,13 +136,42 @@ def apply_delta(path):
     return after
 
 
-def expected_runtime_bytes(path):
+def expected_frozen_runtime_bytes(path):
     assert path in set(files()) | ADDED_PATHS, 'Runtime path outside frozen diagnostic G94 and exact G95 additions'
-    metadata()
-    return apply_delta(path) if path in DELTA_PATHS else source(path)
+    metadata(frozen=True)
+    return apply_delta(path, frozen=True) if path in DELTA_PATHS else source(path)
+
+
+def expected_runtime_bytes(path):
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 96):
+        from g96_source_conservation import expected_runtime_bytes as expected_next
+        return expected_next(path)
+    return expected_frozen_runtime_bytes(path)
+
+
+def verify_snapshot(ref):
+    """Validate diagnostic G95 without consulting later current expectations."""
+    result = verify_frozen_foundation()
+    metadata(frozen=True)
+    frozen = HISTORICAL.files(ref)
+    assert set(frozen) == set(files()) | ADDED_PATHS, 'Frozen G95 missing/extra runtime file'
+    for path, identity in frozen.items():
+        expected_identity = (HISTORICAL.blob(expected_frozen_runtime_bytes(path))
+                             if path in DELTA_PATHS else files()[path])
+        assert identity == expected_identity, 'Frozen G95 source drift: ' + path
+    path = 'tools/fixtures/g95-runtime-reviewed-delta.json'
+    assert (ROOT / path).read_bytes() == HISTORICAL.source(ref, path), 'Frozen reviewed fixture drift: ' + path
+    history = json.loads(HISTORICAL.source(ref, 'release-history.json'))
+    for version, row in json.loads(source('release-history.json')).items():
+        assert history[version] == row, 'Frozen diagnostic G94 history drift: ' + version
+    return {**result, 'runtime_files': len(frozen), 'reviewed_release': [2, 8, 95],
+            'reviewed_paths': len(DELTA_PATHS)}
 
 
 def verify_current():
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 96):
+        from g96_source_conservation import verify_current as verify_next
+        return verify_next()
     result = verify_frozen_foundation()
     metadata()
     assert json.loads((ROOT / 'baseline.json').read_text())['version'] == [2, 8, 95], 'Current identity is not G95'

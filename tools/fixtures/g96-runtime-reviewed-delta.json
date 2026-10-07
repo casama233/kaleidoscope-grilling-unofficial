@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    96
+  ],
+  "base_commit": "ca6a2d0777066b4bcdce278d1d0f501a39fbc2c5",
+  "base_tree": "25e5d0aee047092302f9973c5420bd789a090c3d",
+  "held_review": {
+    "patch_sha256": "158d7046d64e11e536cddb49181507f5e03328f100b3710a002f1ab5345ef3ec",
+    "after_sha256": {
+      "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": "0f9203656d395bd6c969b63b1429c485e45fdddb0ea8b47f683593fa1d74f608"
+    },
+    "source_after_sha256": {
+      "tools/build_plate_held.py": "dbcf25054a28bb0e3d868257058595f3349ad173b5071a34fe3b17cf299d7f1a",
+      "tools/test_plate_client_probe.py": "77ac579a8b8580074fb550b1428cfd334b3c75231e20a05b002a8f3aed6e74ab"
+    }
+  },
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json": {
+      "before_sha256": "25a6c174d83d564fbf2fd3af4f7ba5de0fc65c95b736afdce44aab0e881f611d",
+      "after_sha256": "a8054ff9274e75040cee398e629d2b38031acb4c74b6516461897e437ab7def9",
+      "operations": [
+        {
+          "start": 230,
+          "end": 231,
+          "before": "5",
+          "after": "6"
+        },
+        {
+          "start": 453,
+          "end": 454,
+          "before": "5",
+          "after": "6"
+        },
+        {
+          "start": 670,
+          "end": 671,
+          "before": "5",
+          "after": "6"
+        },
+        {
+          "start": 821,
+          "end": 822,
+          "before": "5",
+          "after": "6"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/manifest.json": {
+      "before_sha256": "1ccdc9a70c26e93065f20413ad0b386d8586fbe4b15c740cc65105460c72b222",
+      "after_sha256": "189f51c2f74c3d21eb10e6487599380bae5ab74bde02ea84964d6b529a135c4b",
+      "operations": [
+        {
+          "start": 230,
+          "end": 231,
+          "before": "5",
+          "after": "6"
+        },
+        {
+          "start": 458,
+          "end": 459,
+          "before": "5",
+          "after": "6"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": {
+      "before_sha256": "4e443d04eddd276d55bac04d98e6b78c68c6eb59d4fa77ee3a97a2c5fcbc102d",
+      "after_sha256": "0f9203656d395bd6c969b63b1429c485e45fdddb0ea8b47f683593fa1d74f608",
+      "operations": [
+        {
+          "start": 87309,
+          "end": 87309,
+          "before": "",
+          "after": " + 0.5"
+        }
+      ]
+    }
+  }
+}

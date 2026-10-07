@@ -306,23 +306,33 @@ for(const hand of ['main_hand','off_hand','inventory']){
 }
 ''')
 
-    def test_raw_marker133_logs_when_modeled_float32_reciprocal_count_is_zero(self):
-        # A source/harness discriminator, not proof of native arithmetic:
-        # inject only the hypothesized decoder result before running the real
-        # unchanged QA gate/log statements. Production division is untouched.
+    def test_midpoint_count_matches_all_legal_markers_and_float32_models(self):
+        # Check an integer-boundary repair under two float32 arithmetic models.
+        # Neither model establishes the native compiler's actual mechanism.
         self.harness(r'''
-const qaStart=d.scripts.pre_animation.findIndex(row=>row.startsWith('v.kg_plate_qa_enabled = '));
-assert(d.scripts.pre_animation.includes('v.kg_plate_count = math.floor((v.kg_plate_word_7 - 10)/123);'),'Production division changed');
-for(const hand of ['main_hand','off_hand'])for(const [marker,expectedCount] of [[133,0]]){
- const word=[...fixture];word[7]=marker;const i=instance(hand,word);
- evaluatePreAnimation(d.scripts.pre_animation.slice(0,qaStart),i.q,i.c,math,i.v);
- i.v.kg_plate_count=Math.floor(Math.fround(Math.fround(marker-10)*Math.fround(1/123)));
- assert(i.v.kg_plate_count===expectedCount,'Float32 reciprocal hypothesis result changed');
- evaluatePreAnimation(d.scripts.pre_animation.slice(qaStart),i.q,i.c,math,i.v);
- assert(i.v.kg_plate_qa_enabled&&i.logs.length===26,'Modeled count failure suppressed probe');
- assert(i.logs[hand==='main_hand'?9:17]===marker&&i.logs[18]===expectedCount,'Raw marker/decoded count not distinguished');
- assert(i.visible('qa_probe').qa_a_flag&&!i.visible('qa_probe').qa_d_decoded,'Count-failure post legend wrong');
- assert(i.visible('qa_forced_food').plate_row_0,'Modeled count failure suppressed constant control');
+const countLines=d.scripts.pre_animation.filter(row=>row.startsWith('v.kg_plate_count = math.floor('));
+assert(countLines.length===1&&countLines[0]==='v.kg_plate_count = math.floor((v.kg_plate_word_7 - 10 + 0.5)/123);','Exact generated midpoint expression missing');
+assert(d.scripts.pre_animation.includes('v.kg_plate_count = math.clamp(v.kg_plate_count, 0, 5);'),'Count clamp changed');
+const f32=Math.fround,divisor=f32(123),reciprocal=f32(1/divisor);
+let markers=0;
+for(let count=0;count<=5;count++)for(let row4=0;row4<=122;row4++){
+ const marker=10+count*123+row4;
+ const centered=f32(f32(f32(marker)-f32(10))+f32(.5));
+ const direct=Math.floor(f32(centered/divisor));
+ const lowered=Math.floor(f32(centered*reciprocal));
+ assert(direct===count&&lowered===count,'Float32 midpoint count mismatch '+marker+'/'+count+'/'+row4);
+ for(const hand of ['main_hand','off_hand']){
+  const word=[...fixture];word[7]=marker;const i=instance(hand,word);i.update(0);
+  assert(i.v.kg_plate_count===count,'Generated count mismatch '+hand+'/'+marker);
+ }
+ markers++;
+}
+assert(markers===738,'Legal marker coverage incomplete');
+const main=[...fixture],off=[...other];off[7]=502;
+for(const [hand,marker,count] of [['main_hand',133,1],['off_hand',502,4]]){
+ const i=instance(hand,fixture,{main,off});i.update(0);
+ assert(i.v.kg_plate_qa_raw_word_7===marker&&i.v.kg_plate_count===count,'Raw133/502 target count mismatch');
+ assert(i.logs.length===26&&i.logs[18]===count,'Existing QA logger did not observe repaired count');
 }
 ''')
 

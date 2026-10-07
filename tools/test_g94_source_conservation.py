@@ -62,7 +62,7 @@ class BinaryBoardSourceConservation(unittest.TestCase):
         self.assertEqual(result['reviewed_paths'], 5)
         latest = witness.verify_current()
         self.assertEqual(latest['runtime_files'], 4157)
-        self.assertEqual(latest['reviewed_release'], [2, 8, 95])
+        self.assertEqual(latest['reviewed_release'], [2, 8, 96])
         self.assertEqual(latest['reviewed_paths'], 3)
         self.assertEqual(set(witness.metadata()['files']), witness.MANIFESTS | set(witness.REVIEWED_AFTER))
         self.assertEqual(witness.ADDED_PATHS, {witness.QA_GEOMETRY_PATH})
@@ -135,7 +135,7 @@ class BinaryBoardSourceConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:94|95) runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:94|95|96) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_base_tree_patch_hash_scope_and_reviewed_bytes(self):
@@ -215,7 +215,7 @@ class BinaryBoardSourceConservation(unittest.TestCase):
         history['2.8.93']['BP']['sha256'] = '0' * 64
         with patch.object(Path, 'read_text', lambda path, *args, **kwargs:
             json.dumps(history) if path == witness.ROOT / 'release-history.json' else original_text(path, *args, **kwargs)):
-            with self.assertRaisesRegex(AssertionError, '(?:G93|Diagnostic G94) history drift'): witness.verify_current()
+            with self.assertRaisesRegex(AssertionError, '(?:G93|Diagnostic G94|Diagnostic G95) history drift'): witness.verify_current()
 
 
 if __name__ == '__main__': unittest.main()
