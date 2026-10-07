@@ -78,7 +78,9 @@ function fixture(){
   entities.set(id,e);return e;
  }};
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){if(v===undefined)dp.delete(k);else dp.set(k,v);},getEntity:id=>entities.get(id)};
- const player={id:'test-player',isValid:true,dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,getGameMode:()=> 'survival',
+ // Positive pending-placement cases use Java's explicit sneak gesture.
+ // Standing-use regressions override this input, not bottle data.
+ const player={id:'test-player',isValid:true,dimension,location:{x:0,y:65,z:0},isSneaking:true,selectedSlotIndex:0,getGameMode:()=> 'survival',
   getComponent:id=>id==='minecraft:inventory'?{container:inventory}:id==='minecraft:equippable'?equipment:undefined};
  let context,api;
  const load=()=>{
@@ -328,4 +330,26 @@ test('main native first placement remains available after supplement declines th
 test('duplicate event wrappers with the same player ID share a pending claim',()=>{
  const f=fixture(),s=decorated(f,'pending');f.set('off',s);assert.equal(f.interact().cancel,true);
  assert.equal(f.interact({player:{...f.player}}).cancel,false);assert.equal(f.queued,1);f.flush();equal(f.api.nativeBottles(f.block).items[0],s);
+});
+
+for(const hand of ['main','off'])for(const fill of [0,3,8])test(`standing pending bottle ${hand} fill=${fill} stays held instead of being placed`,()=>{
+ const f=fixture(),original=decorated(f,'pending',{typeId:fill?PENDING+'_f'+fill:PENDING});
+ f.player.isSneaking=false;f.set(hand,original);
+ assert.equal(f.queuePlace().cancel,true);assert.equal(f.queued,0);
+ if(hand==='off')assert.equal(f.interact().cancel,false);
+ f.flush();equal(f.get(hand),original);assert.equal(f.block.typeId,'minecraft:air');
+ assert.equal(f.entities.size,0);assert.equal(f.dp.size,0);
+});
+
+for(const hand of ['main','off'])test(`pending bottle ${hand} placement is cancelled if sneak is released before the deferred write`,()=>{
+ const f=fixture(),original=decorated(f,'pending');f.player.isSneaking=true;f.set(hand,original);
+ f.queuePlace();assert.equal(f.queued,1);f.player.isSneaking=false;f.flush();
+ equal(f.get(hand),original);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);assert.equal(f.dp.size,0);
+ f.player.isSneaking=true;f.queuePlace();f.flush();equal(f.api.nativeBottles(f.block).items[0],original);
+});
+
+for(const hand of ['main','off'])for(const kind of ['empty','special'])test(`standing ${kind} bottle ${hand} retains ordinary placement`,()=>{
+ const f=fixture(),original=decorated(f,kind);f.player.isSneaking=false;f.set(hand,original);
+ f.queuePlace();assert.equal(f.queued,1);f.flush();equal(f.api.nativeBottles(f.block).items[0],original);
+ assert.equal(f.get(hand),undefined);
 });

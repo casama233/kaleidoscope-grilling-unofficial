@@ -674,6 +674,9 @@ function tryScheduleOffhandBottleInteraction(e){
   const mode=player.getGameMode();if(mode!==GameMode.Survival&&mode!==GameMode.Creative)return false;
   const main=captureWritableHand(player,'main').before,off=captureWritableHand(player,'off').before;
   if(main!==undefined||!isNativeBottleItem(off))return false;
+  // Java PendingSeasoningItem.useOn only places while sneaking. Ordinary use
+  // must leave the pending bottle in its hand for the 80-tick shake.
+  if(isPendingSeasoningId(off.typeId)&&!player.isSneaking)return false;
   const support=e.block;
   if(!bottleInteractionSupports.has(support.typeId)||!hasSolidTop(support))return false;
   const block=support.above();if(!block||block.typeId!=='minecraft:air')return false;
@@ -696,6 +699,7 @@ function scheduleNativeBottlePlacement(e){
   const mainBottle=isBottle(main),offBottle=isBottle(off);
   if(mainBottle===offBottle)return;
   const hand=offBottle?'off':'main',held=offBottle?off:main;
+  if(isPendingSeasoningId(held.typeId)&&!player.isSneaking)return;
   intent=captureInteractionIntent(player,held);
   if(intent?.hand!==hand)return;
  }catch{return} // An unreadable hand cannot establish a unique source.
@@ -712,6 +716,8 @@ function queueBottlePlacement(player,targetBlock,intent,proposed){
   let block,current,freshPreflight=false;
   try{
    if(player.isValid===false||player.dimension.id!==dimension.id||player.selectedSlotIndex!==slot||!interactionIntentStillCurrent(player,intent))return;
+   // A released sneak must not turn a later ordinary use into a queued place.
+   if(isPendingSeasoningId(heldByHand(player,intent.hand)?.typeId)&&!player.isSneaking)return;
    const mode=player.getGameMode();if(mode!==GameMode.Survival&&mode!==GameMode.Creative)return;
    if(Math.hypot(player.location.x-location.x-.5,player.location.y-location.y-.5,player.location.z-location.z-.5)>8)return;
    block=dimension.getBlock(location);if(!sameBottleTarget(block,target)||!sameBottleTarget(block.below(),below)||!hasSolidTop(block.below()))return;
