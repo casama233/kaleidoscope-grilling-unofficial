@@ -92,8 +92,8 @@ def patch_items_and_assets():
     })
 
     tex=load(RP/'textures/item_texture.json')
-    tex['texture_data']['unfinished_skewer']={'textures':'textures/items/unfinished_skewer'}
-    tex['texture_data']['secret_skewer']={'textures':'textures/items/secret_skewer'}
+    tex['texture_data']['unfinished_skewer']={'textures':'textures/items/unfinished_skewer_gui'}
+    tex['texture_data']['secret_skewer']={'textures':'textures/items/secret_skewer_gui'}
     write(RP/'textures/item_texture.json',tex)
     # The 3D shaft UV atlas is not an inventory sprite. Use original GUI
     # templates and the explicit static fallback, preserving the held atlas.

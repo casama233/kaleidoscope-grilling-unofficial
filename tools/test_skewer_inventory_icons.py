@@ -25,7 +25,7 @@ class NativeInventoryIconTests(unittest.TestCase):
         sys.path.insert(0, str(ROOT / 'development/gameplay_core'))
         import a2770_placed_visual_assets as placed
         original_open = Image.open
-        gui_paths = {RP / 'textures/items/unfinished_skewer.png', RP / 'textures/items/secret_skewer.png'}
+        gui_paths = {RP / 'textures/items/unfinished_skewer_gui.png', RP / 'textures/items/secret_skewer_gui.png'}
 
         def particle_open(path, *args, **kwargs):
             if isinstance(path, (str, Path)):
@@ -39,18 +39,21 @@ class NativeInventoryIconTests(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_empty_gui_stick_is_not_held_uv_atlas(self):
-        target = RP / 'textures/items/unfinished_skewer.png'
+        target = RP / 'textures/items/unfinished_skewer_gui.png'
         source = TEMPLATES / 'stick.png'
         self.assertEqual(target.read_bytes(), source.read_bytes())
         self.assertEqual(rgba(target).size, (16, 16))
         self.assertNotEqual(rgba(target).tobytes(), rgba(RP / 'textures/secret_skewer_stick.png').tobytes())
+        for legacy in ('secret_skewer', 'unfinished_skewer'):
+            self.assertEqual((RP / f'textures/items/{legacy}.png').read_bytes(),
+                             (RP / 'textures/secret_skewer_stick.png').read_bytes())
         item = json.loads((PROJECT / 'behavior_pack/items/unfinished_skewer.json').read_text())['minecraft:item']
         self.assertEqual(item['components']['minecraft:icon']['textures']['default'], 'unfinished_skewer')
         atlas = json.loads((RP / 'textures/item_texture.json').read_text())['texture_data']
-        self.assertEqual(atlas['unfinished_skewer']['textures'], 'textures/items/unfinished_skewer')
+        self.assertEqual(atlas['unfinished_skewer']['textures'], 'textures/items/unfinished_skewer_gui')
 
     def test_completed_three_masks_front_overlap_and_native_routes(self):
-        result = rgba(RP / 'textures/items/secret_skewer.png')
+        result = rgba(RP / 'textures/items/secret_skewer_gui.png')
         stick = rgba(TEMPLATES / 'stick.png')
         masks = [rgba(TEMPLATES / f'food_{i}_1.png') for i in (1, 2, 3)]
         # Independent literals from author fallback B8/6B/45 and Java tones.
@@ -74,7 +77,7 @@ class NativeInventoryIconTests(unittest.TestCase):
             item = json.loads((PROJECT / f'behavior_pack/items/{name}.json').read_text())['minecraft:item']
             icon = item['components']['minecraft:icon']['textures']['default']
             self.assertEqual(icon, 'secret_skewer')
-            self.assertEqual(atlas[icon]['textures'], 'textures/items/secret_skewer')
+            self.assertEqual(atlas[icon]['textures'], 'textures/items/secret_skewer_gui')
             self.assertTrue((RP / (atlas[icon]['textures'] + '.png')).is_file())
 
 

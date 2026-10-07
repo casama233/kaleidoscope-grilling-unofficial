@@ -1,10 +1,10 @@
 # Custom-skewer inventory rendering: evidence and limits
 
-G103 corrects a separate asset error: the two native inventory icons previously
+G104 corrects a separate asset error: the two native inventory icons previously
 contained the held shaft's UV atlas. They now use the diagonal Java GUI stick
 and a completed three-mask sprite in the author's fallback color. This static
 fallback fixes the UV-layout icon; ordered per-stack colors, count and variants
-remain unresolved. See [G103 scope](STATUS-A2.8.103.md).
+remain unresolved. See [G104 scope](STATUS-A2.8.104.md).
 
 Research checked 2026-10-06. **Exact per-stack Java GUI parity remains unresolved.**
 The documented stable Bedrock icon/API surfaces below do not provide a verified

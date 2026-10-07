@@ -14,6 +14,8 @@ from java_custom_skewer_gui import TEMPLATES, mask_tone
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'projects/grilling/gameplay_core/resource_pack/textures/items'
+HELD_UV = (ROOT / 'development/gameplay_core/fixtures/java-secret-skewer-9a1acdab'
+           / 'common/src/main/resources/assets/kaleidoscope_grilling/textures/item/secret_skewer_stick.png')
 # Both maintained Java branches: SkewerColorProvider.FALLBACK.
 FALLBACK_RGB = (0xB8, 0x6B, 0x45)
 
@@ -53,8 +55,11 @@ def png_bytes(image):
 
 def expected_icons():
     return {
-        'unfinished_skewer.png': (TEMPLATES / 'stick.png').read_bytes(),
-        'secret_skewer.png': png_bytes(completed_icon()),
+        # Existing raw-last helper references retain the original UV sprite.
+        'unfinished_skewer.png': HELD_UV.read_bytes(),
+        'secret_skewer.png': HELD_UV.read_bytes(),
+        'unfinished_skewer_gui.png': (TEMPLATES / 'stick.png').read_bytes(),
+        'secret_skewer_gui.png': png_bytes(completed_icon()),
     }
 
 
