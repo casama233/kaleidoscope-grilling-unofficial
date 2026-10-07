@@ -1028,7 +1028,17 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  }
 });
 world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
-world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});
+world.afterEvents.entityHurt.subscribe(e=>{
+ // Cookery HinderEvent follows damage from a living attacker, including its
+ // projectile; a melee contact event cannot represent that source contract.
+ // Java has no positive-amount gate. Do not invent one for after-hurt events.
+ try{
+  const source=e.damageSource;
+  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;
+  if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;
+  e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});
+ }catch{} // A removed actor/projectile must not abort other damage subscribers.
+});
 function canUseSecretSkewer(stack){
  try{return validSecretIngredientRows(readSkewerRows(stack))&&(!isSecretCooked(stack)||validSecretIngredientRows(readEffectiveSkewerRows(stack)))}catch{return false}
 }
@@ -1146,7 +1156,7 @@ system.runInterval(()=>{
   if(system.currentTick%10===0&&fxGet(p,'invincible'))invincibleAmbientFeedback(p);
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
-  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);
+  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);
   if(system.currentTick%5===0){if(fxGet(p,'mustard'))fleeCreepers(p);if(fxGet(p,'sulfur'))repelPhantoms(p)}
   if(fxGet(p,'tundra_strider')){try{const b=p.getBlockStandingOn();if(b&&TUNDRA_BLOCKS.has(b.typeId)){const v=p.getVelocity(),factor=tundraFactor(b.typeId);p.applyImpulse({x:v.x*(factor-1),y:0,z:v.z*(factor-1)});if(b.typeId==='minecraft:powder_snow'&&v.y<.02)p.applyImpulse({x:0,y:Math.min(.16,Math.max(.04,-v.y+.04)),z:0})}}catch{}}
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}
