@@ -1,4 +1,5 @@
 import {grillingConfig} from './server_config_runtime.js';
+import {plateQaTrace} from './plate_qa_runtime.js';
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {useSound} from './immersion_audio_runtime.js';
 import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
@@ -27,6 +28,8 @@ const COOKERY_RECIPE_ITEMS=new Set([
  'kaleidoscope_cookery:recipe',
  'kaleidoscope_cookery:recipe_item'
 ]);
+let plateVisualDirty;
+export function configurePlateVisualDirty(notify){plateVisualDirty=notify;}
 const COOKERY_TABLE='kaleidoscope_cookery:table';
 const PLATE_PREFIX='kaleidoscope_grilling:a25_plate_';
 const RECIPE_PREFIX='kaleidoscope_grilling:a25_recipe_';
@@ -211,6 +214,8 @@ function placePlateOn(support,face,player,source,hand='main'){
  const remainder=next.amount===1?undefined:next;if(remainder)remainder.amount--;
  const place={apply(){target.setType(PLATE_BLOCK_ID);target.setPermutation(target.permutation.withState('minecraft:cardinal_direction',facing));if(target.typeId!==PLATE_BLOCK_ID||target.permutation.getState('minecraft:cardinal_direction')!==facing)throw Error('Grilling: plate placement rejected')},rollback(){target.setPermutation(before);if(target.typeId!==before.type.id||metadataSignature(target.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: plate placement rollback rejected')}};
  if(!plateTransaction(target,[place,plateStorageStep(target,rows),...(creative(player)?[]:[plateHandStep(captured,remainder)])]))return false;
+ // Display notification runs once only after all placement/storage/hand steps commit.
+ try{plateVisualDirty?.(target)}catch{}
  try{target.dimension.playSound('dig.wood',target.location,{volume:.8,pitch:1})}catch{}
  return true;
 }
@@ -362,8 +367,10 @@ function breakRecipe(block,player){
 
 world.beforeEvents.itemUse.subscribe(e=>{
  try{
+  if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'plate_before',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'already_cancelled':'received'});
   if(e.cancel)return;const id=e.itemStack?.typeId,p=e.source;
-  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(p,'§7空烤串盤不能食用');return}
+  if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;plateQaTrace(p,'plate_before_empty',e.itemStack,{cancelled:true,stage:'empty_event_rows'});message(p,'§7空烤串盤不能食用');return;}
+  if(id===PLATE_ID)plateQaTrace(p,'plate_before_allowed',e.itemStack,{cancelled:false,stage:'allowed'});
   const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;
   if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(p))){
    e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
@@ -371,7 +378,7 @@ world.beforeEvents.itemUse.subscribe(e=>{
   }
   if(id!==BOOK_ID)return;e.cancel=true;const offSignature=interactionStackSignature(heldOff(p));
   system.run(()=>{if(!interactionIntentStillCurrent(p,intent)||interactionStackSignature(heldOff(p))!==offSignature){message(p,'§7操作已取消：食譜書或副手材料已變更');return}handleBookAir(p)});
- }catch{}
+ }catch{if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'plate_before_error',e.itemStack,{cancelled:!!e.cancel,stage:'unreadable'});}
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
