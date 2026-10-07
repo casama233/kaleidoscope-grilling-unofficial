@@ -41,10 +41,27 @@ test('composed plain secret creates one full-skewer helper with all3 packed food
  assert.equal(f.writes[0][1],false);assert.deepEqual(stack,before);f.draw(stack);assert.equal(f.spawned.length,1);assert.equal(f.writes.length,6);
  stack.secret[0]++;f.draw(stack);assert.equal(f.spawned.length,1);assert.equal(e.props['kaleidoscope_grilling:secret_0'],2054);
 });
-test('five skewer identities and count changes reuse helpers; removal retires only missing derived display',()=>{
+test('unchanged-yaw count changes reuse helpers; removal retires only missing derived display',()=>{
  const f=fixture(),stack={typeId:Object.values(RAW_TO_COOKED)[0],secret:[]};for(let i=0;i<5;i++)f.draw(stack,'plate/'+i,5);
  assert.equal(f.spawned.length,5);assert.equal(f.row.parts.size,5);const first=f.spawned[0].location;
  f.draw(stack,'plate/0',3);assert.notDeepEqual(f.spawned[0].location,first);f.draw(undefined,'plate/4',4);assert.equal(f.row.parts.size,4);assert.equal(f.removed.length,1);
+});
+test('count transitions replace only helpers whose authored yaw changed, including3→4→5 and reversals',()=>{
+ const stack={typeId:Object.values(RAW_TO_COOKED)[0],amount:1,secret:[],props:{saved:'unchanged'}},before=structuredClone(stack);
+ for(const direction of ['south','west','north','east']){
+  const f=fixture(5);f.block.permutation.getState=()=>direction;
+  for(const count of [1,2,3,4,5,4,3,2,1]){
+   const old=new Map([...f.row.parts].map(([key,value])=>[key,{entity:value.entity,yaw:value.spawnYaw}]));
+   for(let slot=0;slot<5;slot++)f.draw(slot<count?stack:undefined,'plate/'+slot,count);
+   assert.equal(f.row.parts.size,count);assert.deepEqual(stack,before);
+   for(let slot=0;slot<count;slot++){
+    const key='plate/'+slot,part=f.row.parts.get(key),pose=plateVisualPose(f.block,slot,count),previous=old.get(key);
+    assert.equal(part.spawnYaw,-pose.angle);assert.equal(part.entity.spawnOptions.initialRotation,-pose.angle);
+    assert.equal(part.entity.options.rotation.y,-pose.angle);assert.deepEqual(part.entity.location,pose.location);
+    if(previous){if(previous.yaw===-pose.angle)assert.equal(part.entity,previous.entity);else{assert.notEqual(part.entity,previous.entity);assert.equal(previous.entity.isValid,false);}}
+   }
+  }
+ }
 });
 test('budget exhaustion and rendering failure do not consume stored stacks',()=>{
  const stack={typeId:Object.keys(RAW_TO_COOKED)[0],amount:1},before=structuredClone(stack),f=fixture(0);f.draw(stack);assert.equal(f.spawned.length,0);assert.deepEqual(stack,before);

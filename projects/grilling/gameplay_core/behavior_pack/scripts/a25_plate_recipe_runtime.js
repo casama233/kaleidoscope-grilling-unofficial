@@ -103,6 +103,12 @@ function isSkewer(stack){
  if(FIXED_IDS.has(canonicalFoodId(stack.typeId))||canonicalFoodId(stack.typeId)===SECRET_ID)return true;
  try{return !!(stack.hasTag?.(RAW_SKEWER_TAG)||stack.hasTag?.(GRILLED_SKEWER_TAG))}catch{return false}
 }
+// The block and item-use callbacks are independent. A nearby plate owns this
+// skewer gesture; cancel native eating too, regardless of which callback arrives first.
+function skewerUseTargetsPlate(player,stack){
+ if(!isSkewer(stack))return false;
+ try{return player.getBlockFromViewDirection?.({maxDistance:6})?.block?.typeId===PLATE_BLOCK_ID;}catch{return false;}
+}
 function skewerIngredientIds(stack){return parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3).map(x=>x.id)}
 function isRecordableStack(stack){
  if(!stack)return false;const ingredients=skewerIngredientIds(stack);
@@ -369,6 +375,7 @@ world.beforeEvents.itemUse.subscribe(e=>{
  try{
   if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'plate_before',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'already_cancelled':'received'});
   if(e.cancel)return;const id=e.itemStack?.typeId,p=e.source;
+  if(skewerUseTargetsPlate(p,e.itemStack)){e.cancel=true;return;}
   if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;plateQaTrace(p,'plate_before_empty',e.itemStack,{cancelled:true,stage:'empty_event_rows'});message(p,'§7空烤串盤不能食用');return;}
   if(id===PLATE_ID)plateQaTrace(p,'plate_before_allowed',e.itemStack,{cancelled:false,stage:'allowed'});
   const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;

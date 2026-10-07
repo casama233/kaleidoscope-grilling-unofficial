@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    87
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_runtime.js",
+  "scope": "Only source-backed plate ownership guard for the separate item-use callback. Nearby placed plate + skewer cancels native eating; item/block callback order independent, air/other/far targets unchanged. No timer, inventory rewrite or storage changes. Native client acceptance remains separate.",
+  "base_commit": "6e714853d029f93f0186efa2e96e192e87735a74",
+  "before_sha256": "1be59e0891683c267deea677124279f7faeac4269ac122a80857844658ab3066",
+  "after_sha256": "50345043ffee1212882f0cdb37bbfa05e1165c6d85c5c9b691c14e79238a8b95",
+  "operations": [
+    {
+      "start": 6716,
+      "end": 6716,
+      "before": "",
+      "after": "}\n// The block and item-use callbacks are independent. A nearby plate owns this\n// skewer gesture; cancel native eating too, regardless of which callback arrives first.\nfunction skewerUseTargetsPlate(player,stack){\n if(!isSkewer(stack))return false;\n try{return player.getBlockFromViewDirection?.({maxDistance:6})?.block?.typeId===PLATE_BLOCK_ID;}catch{return false;}\n"
+    },
+    {
+      "start": 24925,
+      "end": 24925,
+      "before": "",
+      "after": "  if(skewerUseTargetsPlate(p,e.itemStack)){e.cancel=true;return;}\n"
+    }
+  ]
+}

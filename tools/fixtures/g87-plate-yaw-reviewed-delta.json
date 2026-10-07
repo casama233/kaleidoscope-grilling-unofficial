@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    87
+  ],
+  "base_commit": "6e714853d029f93f0186efa2e96e192e87735a74",
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js",
+  "scope": "Only record plate helper authored spawn yaw and rebuild that transient helper when its effective authored yaw changes. Preserve unchanged-yaw reuse, source layouts, metadata, audience/budget/cleanup, storage and other stations. Native verification remains separate.",
+  "before_sha256": "7c5dc53681c6ba337968fff1f93a725037a3e2926155d65c0875cecbc8e253a4",
+  "after_sha256": "e1d303dcc8bf8855d001b6b0a13800ad5d04efed8db7060f2a2b6dafb36059f4",
+  "operations": [
+    {
+      "start": 4870,
+      "end": 4977,
+      "before": " if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE)){discard(row,k);old=undefined;}\n",
+      "after": " // A count transition can change a slot's authored yaw. Teleport does not reseed\n // the native head/body basis; rebuild only that derived helper with the new yaw.\n if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);old=undefined;}\n"
+    },
+    {
+      "start": 5543,
+      "end": 5679,
+      "before": "  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle})};row.parts.set(k,old);helpers++;}\n",
+      "after": "  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle}),spawnYaw:-at.angle};row.parts.set(k,old);helpers++;}\n"
+    }
+  ]
+}

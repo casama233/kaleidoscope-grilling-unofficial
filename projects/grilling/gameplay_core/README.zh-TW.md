@@ -1,5 +1,7 @@
 # Kaleidoscope Grilling Gameplay Core
 
+**G87 餐盤互動／姿態候選**：保留既有餐盤、色盤及營養修復；指向餐盤的原生進食與槽位 yaw 更新採限定修復。新候選仍須原生驗收。見根目錄 docs/STATUS-A2.8.87.md。
+
 本分支 canonical runtime：**A2.8.10 Use Repair**。見 [本批修復與驗證邊界](../../../docs/STATUS-A2.8.10.md)；歷史版本紀錄保留供追溯。
 
 這個目錄下的 `behavior_pack/` 與 `resource_pack/` 是目前真正要編譯、驗證與打包的來源。歷史 `development/gameplay_core/aXX*`、`verify_aXX*` 與已封存的版本 workflow 保留作追溯；**不要再從舊 augment/workflow 生成回來覆寫 canonical runtime**。

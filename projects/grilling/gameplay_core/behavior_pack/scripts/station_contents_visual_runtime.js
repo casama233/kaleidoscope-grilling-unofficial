@@ -52,13 +52,15 @@ function composed(row,b,k,stack,at,cooked,seen){
 }
 function renderPlate(row,b,k,stack,at,plan){
  let old=row.parts.get(k);if(!stack||!plan||!at){discard(row,k);return;}
- if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE)){discard(row,k);old=undefined;}
+ // A count transition can change a slot's authored yaw. Teleport does not reseed
+ // the native head/body basis; rebuild only that derived helper with the new yaw.
+ if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);old=undefined;}
  const secret=plan.secret?secretVisualState(stack,reader):[0,0,0];
  const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,model:plan.model,secret});
  if(old?.signature===signature)return;
  if(!old){if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn('[Grilling contents capacity] plate render budget exceeded; storage unaffected')}return;}
   // Seed the same authored yaw at creation; teleport alone can leave a default head/body basis.
-  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle})};row.parts.set(k,old);helpers++;}
+  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle}),spawnYaw:-at.angle};row.parts.set(k,old);helpers++;}
  try{old.entity.setProperty('kaleidoscope_grilling:ready',false);
   old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});
   old.entity.setProperty('kaleidoscope_grilling:model',plan.model);
