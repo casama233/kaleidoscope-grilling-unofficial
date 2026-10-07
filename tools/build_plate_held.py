@@ -64,14 +64,17 @@ BINDING = 'q.item_slot_to_bone_name(context.item_slot)'
 # translation inside those bounds; source display rotations/scales stay intact.
 # This settled native-frame projection is not rendered-client acceptance.
 PLATE_FP_CAMERA_OFFSET = [-4, 3.1, -9]
-# G92 is an opt-in client diagnostic, not a rendering/runtime repair. The BP
-# fixture writer alone uses dormant word4=1 while its QA tag is enabled.
-QA_LOG_CANARY, QA_LOG_SAMPLES = 914000, 3
-QA_LOG_FIELDS = ('v.kg_plate_qa_hand', 'v.kg_plate_qa_raw_word_0',
-    'v.kg_plate_word_0', 'v.kg_plate_qa_raw_word_5', 'v.kg_plate_qa_raw_word_7',
+# This opt-in client diagnostic is not a rendering/runtime repair. The BP
+# exact count1 fixture alone uses dormant word4=1 while its QA tag is enabled.
+# Either raw hand flag with exact fixture marker133 enables the probe without
+# decoded count, equipment-slot context or item occupancy. Normal bottles and
+# count5 row4 paletteword1 cannot enable it through their natural word4=1.
+QA_LOG_CANARY, QA_LOG_SAMPLES = 914100, 3
+QA_LOG_FIELDS = ('v.kg_plate_qa_hand',
+    *(f'v.kg_plate_qa_raw_{hand}_word_{word}' for hand in ('main', 'off') for word in range(8)),
     'v.kg_plate_count', 'v.kg_plate_desc_0', 'v.kg_plate_shape_0',
     'v.kg_plate_style_0', 'v.kg_plate_food_0_0', 'v.kg_plate_food_0_1',
-    'v.kg_plate_food_0_2')
+    'v.kg_plate_food_0_2', 'v.kg_plate_owner_occupied == 1 ? 1 : 0')
 QA_POST_TESTS = {
     'qa_a_flag': '1',
     'qa_b_large_word': 'v.kg_plate_qa_raw_word_0 == 8285209',
@@ -231,12 +234,18 @@ def owner_occupancy():
 def decoder_scripts():
     initialize = ['v.kg_plate_owner_occupied = 0;', 'v.kg_plate_count = 0;']
     pre = []
+    for hand in ('main', 'off'):
+        for word in range(8):
+            var = f'v.kg_plate_qa_raw_{hand}_word_{word}'
+            initialize.append(var + ' = 0;')
+            # Read both owner banks directly, before any hand selection,
+            # flooring or decoding, to expose the previously gated-out path.
+            pre.append(var + ' = ' + property_read(hand, word) + ';')
     for word in (0, 5, 7):
         var = f'v.kg_plate_qa_raw_word_{word}'
         initialize.append(var + ' = 0;')
-        # Separate owner-query scalar, deliberately independent of the
-        # production integer floor, so large-word/query loss is observable.
-        pre.append(var + " = c.item_slot == 'off_hand' ? " + property_read('off', word) + ' : ' + property_read('main', word) + ';')
+        # Preserve existing post B/C observations in the selected raw bank.
+        pre.append(var + f" = c.item_slot == 'off_hand' ? v.kg_plate_qa_raw_off_word_{word} : v.kg_plate_qa_raw_main_word_{word};")
     for word in range(8):
         var = f'v.kg_plate_word_{word}'; initialize.append(var + ' = 0;')
         # Read the raw word before validation. Clamping a748 transaction marker
@@ -270,17 +279,20 @@ def decoder_scripts():
             pre.append(var + ' = math.clamp(' + food + ', 0, 213);')
     initialize += [f'v.kg_plate_qa_{name} = 0;' for name in
         ('enabled', 'hand', 'samples', 'next_log', 'elapsed', 'life_origin', 'clock', 'sample_due')]
-    # QA visibility must survive a rejected large payload: use raw item
-    # occupancy here, not the production all-word validity/owner gate.
-    pre += ['v.kg_plate_qa_enabled = v.kg_plate_word_4 == 1 && v.kg_plate_count == 1 && (' + owner_occupancy() + ');',
+    # The BP writer is still the exact tagged fixture's sole flag producer.
+    # Match only the raw count1 fixture marker, excluding normal bottles and
+    # count5 row4 palettes without borrowing decoded count, item-slot context,
+    # item occupancy, or large-word/descriptor payload validation.
+    raw_flag = lambda hand: f'(v.kg_plate_qa_raw_{hand}_word_4 == 1 && v.kg_plate_qa_raw_{hand}_word_7 == 133)'
+    pre += ['v.kg_plate_qa_enabled = ' + raw_flag('main') + ' || ' + raw_flag('off') + ';',
         "v.kg_plate_qa_hand = c.item_slot == 'main_hand' ? 1 : c.item_slot == 'off_hand' ? 2 : 0;",
         'v.kg_plate_qa_life_origin = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples == 0 ? q.life_time : v.kg_plate_qa_life_origin;',
         'v.kg_plate_qa_elapsed = v.kg_plate_qa_enabled == 1 ? v.kg_plate_qa_elapsed + math.max(q.delta_time, 0) : v.kg_plate_qa_elapsed;',
         'v.kg_plate_qa_clock = v.kg_plate_qa_enabled == 1 ? math.max(q.life_time - v.kg_plate_qa_life_origin, v.kg_plate_qa_elapsed) : 0;',
         f'v.kg_plate_qa_sample_due = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples < {QA_LOG_SAMPLES} && v.kg_plate_qa_clock >= v.kg_plate_qa_next_log;']
-    # query.log accepts a value. Each numeric-only sample is thirteen
-    # consecutive values: canary, hand, raw0, floor0, raw5, raw7, count,
-    # desc0, shape0, style0, food0/1/2. At most three samples per attachable
+    # query.log accepts a value. Each numeric-only sample is 26 values:
+    # canary, hand, main raw0..7, off raw0..7, selected count/desc0/shape0/
+    # style0/food0/1/2/owner occupied. At most three samples per attachable
     # lifetime; disabling/re-enabling QA never resets this cap. life_time is
     # preferred when it advances; delta_time supplies the zero-clock fallback.
     pre += [f'v.kg_plate_qa_sample_due ? q.log({value}) : 0;'

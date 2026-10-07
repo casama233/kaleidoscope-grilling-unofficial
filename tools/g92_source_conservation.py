@@ -112,12 +112,40 @@ def apply_delta(path):
 
 
 @lru_cache(maxsize=None)
-def expected_runtime_bytes(path):
+def expected_frozen_runtime_bytes(path):
     assert path in set(files()) | ADDED_PATHS, 'Runtime path outside frozen G91 and exact G92 additions'
     return apply_delta(path) if path in DELTA_PATHS else source(path)
 
 
+def expected_runtime_bytes(path):
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 93):
+        from g93_source_conservation import expected_runtime_bytes as expected_next
+        return expected_next(path)
+    return expected_frozen_runtime_bytes(path)
+
+
+def verify_snapshot(ref):
+    """Validate immutable G92 independently of any later current release."""
+    result = previous.verify_snapshot(FROZEN_SOURCE_BASE)
+    metadata()
+    expected = set(files()) | ADDED_PATHS
+    frozen = previous.previous.files(ref)
+    assert set(frozen) == expected, 'Frozen G92 missing/extra runtime file'
+    for path, identity in frozen.items():
+        expected_identity = (previous.previous.blob(expected_frozen_runtime_bytes(path))
+                             if path in DELTA_PATHS else files()[path])
+        assert identity == expected_identity, 'Frozen G92 source drift: ' + path
+    history = json.loads(previous.previous.source(ref, 'release-history.json'))
+    for version, row in json.loads(source('release-history.json')).items():
+        assert history[version] == row, 'Frozen G91 history drift: ' + version
+    return {**result, 'runtime_files': len(frozen), 'reviewed_release': [2, 8, 92],
+            'reviewed_paths': len(DELTA_PATHS)}
+
+
 def verify_current():
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 93):
+        from g93_source_conservation import verify_current as verify_next
+        return verify_next()
     # Immutable G91 (and its G90 source union) must pass before current admission.
     result = previous.verify_snapshot(FROZEN_SOURCE_BASE)
     metadata()
@@ -128,7 +156,7 @@ def verify_current():
     assert set(current) == expected, 'Missing/extra G92 runtime file'
     for path, local in current.items():
         if path in DELTA_PATHS:
-            assert local.read_bytes() == expected_runtime_bytes(path), 'Runtime source drift: ' + path
+            assert local.read_bytes() == expected_frozen_runtime_bytes(path), 'Runtime source drift: ' + path
         else:
             assert previous.previous.blob(local.read_bytes()) == files()[path], 'Runtime source drift: ' + path
     history = json.loads((ROOT / 'release-history.json').read_text())

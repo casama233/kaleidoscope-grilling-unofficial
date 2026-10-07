@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 import g92_source_conservation as witness
+import g93_source_conservation as current
 
 
 class HeldClientProbeConservation(unittest.TestCase):
@@ -19,10 +20,14 @@ class HeldClientProbeConservation(unittest.TestCase):
         self.assertEqual(frozen['runtime_files'], 4155)
         self.assertEqual(frozen['reviewed_release'], [2, 8, 91])
         self.assertEqual(frozen['reviewed_paths'], 5)
-        current = witness.verify_current()
-        self.assertEqual(current['runtime_files'], 4156)
-        self.assertEqual(current['reviewed_release'], [2, 8, 92])
-        self.assertEqual(current['reviewed_paths'], 6)
+        frozen_g92 = witness.verify_snapshot(current.FROZEN_SOURCE_BASE)
+        self.assertEqual(frozen_g92['runtime_files'], 4156)
+        self.assertEqual(frozen_g92['reviewed_release'], [2, 8, 92])
+        self.assertEqual(frozen_g92['reviewed_paths'], 6)
+        latest = witness.verify_current()
+        self.assertEqual(latest['runtime_files'], 4156)
+        self.assertEqual(latest['reviewed_release'], [2, 8, 93])
+        self.assertEqual(latest['reviewed_paths'], 3)
         self.assertEqual(set(witness.metadata()['files']), witness.DELTA_PATHS)
         self.assertEqual(witness.ADDED_PATHS, {witness.QA_GEOMETRY_PATH})
 
@@ -50,7 +55,7 @@ class HeldClientProbeConservation(unittest.TestCase):
         for path, identity in witness.REVIEWED_AFTER.items():
             after = witness.apply_delta(path)
             self.assertEqual(witness.sha(after), identity)
-            self.assertEqual((witness.ROOT / path).read_bytes(), after)
+            self.assertEqual(current.source(path), after)
         for relative in ('resource_pack/models/entity/plate_held.geo.json',
                          'resource_pack/animations/plate_held.animation.json',
                          'behavior_pack/entities/player.json',
@@ -96,7 +101,7 @@ class HeldClientProbeConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G92 runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:92|93) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_wrong_base_tree_patch_hash_scope_or_probe_bytes(self):
@@ -190,7 +195,7 @@ class HeldClientProbeConservation(unittest.TestCase):
         with patch.object(Path, 'read_text', lambda path, *args, **kwargs:
             json.dumps(history) if path == witness.ROOT / 'release-history.json'
             else original(path, *args, **kwargs)):
-            with self.assertRaisesRegex(AssertionError, 'G91 history drift'):
+            with self.assertRaisesRegex(AssertionError, 'G(?:91|92) history drift'):
                 witness.verify_current()
 
 

@@ -1,9 +1,9 @@
-"""G92 default-off source probe and real generated-expression harness.
+"""Default-off raw-owner source probe and generated-expression harness.
 
 This is not Bedrock Molang/native-client acceptance. The fixture-only QA pass
 isolates client property/decode observations from constant mesh/palette routing.
-Numeric log sample order is canary, hand, raw0, floor0, raw5, raw7, count,
-desc0, shape0, style0, food0/1/2. No player identity is queried or emitted.
+Numeric sample order is canary, hand, main raw0..7, off raw0..7, selected
+count/desc0/shape0/style0/food0/1/2/owner occupied: 26 values, no identity.
 """
 from pathlib import Path
 import json
@@ -33,7 +33,7 @@ const fixture=[8285209,0,0,0,1,57,0,133];
 const other=[9+4*214+7*45796,0,0,0,0,57,0,133];
 const math={clamp:(n,a,b)=>Math.max(a,Math.min(b,n)),max:Math.max};
 function instance(hand='main_hand',word=fixture,options={}){
- const state={main:[...(hand==='main_hand'?word:other)],off:[...(hand==='off_hand'?word:other)],
+ const state={main:[...(hand!=='off_hand'?word:other)],off:[...(hand==='off_hand'?word:other)],
   mainItem:d.identifier,offItem:d.identifier,...options};
  const owner={has_property:n=>/^kaleidoscope_grilling:bottle_(main|off)_[0-7]$/.test(n),
   property:n=>state[n.includes(':bottle_off_')?'off':'main'][Number(n.slice(-1))],
@@ -69,6 +69,15 @@ function assert(condition,message){if(!condition)throw Error(message);}
 
     def test_raw_reads_are_independent_owner_scalars_without_floor(self):
         scripts = self.attach['scripts']
+        for hand in ('main', 'off'):
+            for word in range(8):
+                raw = f'v.kg_plate_qa_raw_{hand}_word_{word}'
+                self.assertIn(raw + ' = 0;', scripts['initialize'])
+                read, = [row for row in scripts['pre_animation'] if row.startswith(raw + ' = ')]
+                self.assertEqual(read, raw + ' = ' + held.property_read(hand, word) + ';')
+                self.assertNotIn('math.floor', read)
+                self.assertNotIn('c.item_slot', read)
+                self.assertNotIn('v.kg_plate_word_', read)
         for word in (0, 5, 7):
             raw = f'v.kg_plate_qa_raw_word_{word}'
             self.assertIn(raw + ' = 0;', scripts['initialize'])
@@ -76,13 +85,13 @@ function assert(condition,message){if(!condition)throw Error(message);}
             self.assertNotIn('math.floor', read)
             self.assertNotIn(f'v.kg_plate_word_{word}', read)
             for hand in ('main', 'off'):
-                self.assertIn(held.property_read(hand, word), read)
+                self.assertIn(f'v.kg_plate_qa_raw_{hand}_word_{word}', read)
         text = '\n'.join(scripts['pre_animation'])
         self.assertNotIn('q.get_name', text)
         self.assertNotIn('q.get_id', text)
         self.assertNotIn('q.position', text)
-        self.assertNotIn('kg_plate_owner_occupied', next(row for row in scripts['pre_animation']
-            if row.startswith('v.kg_plate_qa_enabled = ')))
+        enabled, = [row for row in scripts['pre_animation'] if row.startswith('v.kg_plate_qa_enabled = ')]
+        self.assertEqual(enabled, 'v.kg_plate_qa_enabled = (v.kg_plate_qa_raw_main_word_4 == 1 && v.kg_plate_qa_raw_main_word_7 == 133) || (v.kg_plate_qa_raw_off_word_4 == 1 && v.kg_plate_qa_raw_off_word_7 == 133);')
 
     def test_four_posts_reuse_body_material_texture_and_original_socket(self):
         self.assertEqual(self.qa['description']['texture_width'], 16)
@@ -118,26 +127,84 @@ function assert(condition,message){if(!condition)throw Error(message);}
         self.assertNotIn('arrays', controller)
         self.assertNotIn('Array.', json.dumps(controller))
 
-    def test_qa_is_default_off_and_requires_flag_count_and_raw_plate_occupancy(self):
+    def test_qa_is_default_off_without_either_raw_flag(self):
         self.harness(r'''
-for(const hand of ['main_hand','off_hand']){
+for(const hand of ['main_hand','off_hand','inventory']){
  const fresh=instance(hand);assert(fresh.v.kg_plate_qa_enabled===0,'QA not initialized off');
- for(const flag of [0,2]){
-  const w=[...fixture];w[4]=flag;const i=instance(hand,w);i.update(0);
+ for(const mainFlag of [0,2,1.5])for(const offFlag of [0,2,1.5]){
+  const main=[...fixture],off=[...fixture];main[4]=mainFlag;off[4]=offFlag;
+  const i=instance(hand,fixture,{main,off});i.update(0);
   assert(!i.v.kg_plate_qa_enabled&&i.logs.length===0,'Dormant flag logged');
   assert(!Object.values(i.visible('qa_probe')).some(Boolean)&&!i.visible('qa_forced_food').plate_row_0,'Dormant flag drew QA');
  }
- for(const count of [0,2,5]){
-  const w=[...fixture];w[7]=10+count*123;const i=instance(hand,w);i.update(0);
-  assert(!i.v.kg_plate_qa_enabled&&i.logs.length===0,'Other count admitted');
- }
- const key=hand==='main_hand'?'mainItem':'offItem';
- const stale=instance(hand,fixture,{[key]:'minecraft:stick'});stale.update(0);
- assert(!stale.v.kg_plate_qa_enabled&&stale.logs.length===0,'Stale hand owner admitted');
  const absent=instance(hand);delete absent.c.owning_entity;absent.update(0);
  assert(!absent.v.kg_plate_qa_enabled&&absent.logs.length===0,'Absent owner admitted');
- const unknown=instance(hand);unknown.c.item_slot='inventory';unknown.update(0);
- assert(!unknown.v.kg_plate_qa_enabled&&unknown.logs.length===0,'Unknown hand admitted');
+}
+''')
+
+    def test_raw_flag_bypasses_count_occupancy_and_unknown_hand_gates(self):
+        self.harness(r'''
+for(const hand of ['main_hand','off_hand','inventory'])for(const flagBank of ['main','off']){
+ for(const marker of [133]){
+  const main=[...fixture],off=[...fixture];main[4]=0;off[4]=0;main[7]=marker;off[7]=marker;
+  const i=instance(hand,fixture,{main,off,mainItem:'minecraft:stick',offItem:'minecraft:air'});
+  i.state[flagBank][4]=1;i.update(0);
+  assert(i.v.kg_plate_qa_enabled&&i.logs.length===26,'Raw flag still depends on count/hand/item occupancy');
+  assert(!i.v.kg_plate_owner_occupied,'Production occupancy gate changed');
+  assert(i.visible('qa_probe').qa_a_flag&&i.visible('qa_forced_food').plate_row_0,'Existing constant passes not activated');
+  assert(i.logs[1]===(hand==='main_hand'?1:hand==='off_hand'?2:0),'Unknown hand code wrong');
+ }
+}
+''')
+
+    def test_bottle_and_count5_word4_one_cannot_enable_plate_probe(self):
+        self.harness(r'''
+for(const hand of ['main_hand','off_hand','inventory'])for(const bank of ['main','off']){
+ for(const marker of [0,1,4,9,10,256,625,626,664,747,748,1000]){
+  // A held plate without the tag may share a flagged bottle or a legitimate
+  // count5 plate whose fifth row has paletteword1 (secret descriptor39=664).
+  const main=[...fixture],off=[...fixture];main[4]=0;off[4]=0;
+  const i=instance(hand,fixture,{main,off});i.state[bank][4]=1;i.state[bank][7]=marker;i.update(0);
+  assert(!i.v.kg_plate_qa_enabled&&i.logs.length===0,'Nonfixture marker enabled probe '+bank+'/'+marker);
+  assert(!Object.values(i.visible('qa_probe')).some(Boolean)&&!i.visible('qa_forced_food').plate_row_0,'Bottle/count5 word4 drew QA');
+ }
+ // A valid raw plate flag remains visible beside a normal flagged bottle.
+ const i=instance(hand,fixture,{main:[...fixture],off:[...fixture]});
+ i.state[bank][7]=9;i.update(0);assert(i.v.kg_plate_qa_enabled,'Bottle marker masked other valid plate flag');
+}
+''')
+
+    def test_both_raw_banks_are_read_without_floor_or_selected_hand_borrow(self):
+        self.harness(r'''
+const main=[101.25,102.25,103.25,104.25,1,106.25,107.25,133];
+const off=[201.75,202.75,203.75,204.75,0,206.75,207.75,208.75];
+for(const hand of ['main_hand','off_hand','inventory']){
+ const i=instance(hand,fixture,{main:[...main],off:[...off]});i.update(0);
+ assert(i.v.kg_plate_qa_enabled,'Opposite-hand raw flag omitted');
+ for(const [bank,expected] of [['main',main],['off',off]])for(let word=0;word<8;word++)
+  assert(i.v['kg_plate_qa_raw_'+bank+'_word_'+word]===expected[word],'Raw bank floored/borrowed '+bank+'/'+word);
+ assert(JSON.stringify(i.logs.slice(2,10))===JSON.stringify(main),'Main raw log order wrong');
+ assert(JSON.stringify(i.logs.slice(10,18))===JSON.stringify(off),'Off raw log order wrong');
+}
+''')
+
+    def test_raw_marker133_logs_when_modeled_float32_reciprocal_count_is_zero(self):
+        # A source/harness discriminator, not proof of native arithmetic:
+        # inject only the hypothesized decoder result before running the real
+        # unchanged QA gate/log statements. Production division is untouched.
+        self.harness(r'''
+const qaStart=d.scripts.pre_animation.findIndex(row=>row.startsWith('v.kg_plate_qa_enabled = '));
+assert(d.scripts.pre_animation.includes('v.kg_plate_count = math.floor((v.kg_plate_word_7 - 10)/123);'),'Production division changed');
+for(const hand of ['main_hand','off_hand'])for(const [marker,expectedCount] of [[133,0]]){
+ const word=[...fixture];word[7]=marker;const i=instance(hand,word);
+ evaluatePreAnimation(d.scripts.pre_animation.slice(0,qaStart),i.q,i.c,math,i.v);
+ i.v.kg_plate_count=Math.floor(Math.fround(Math.fround(marker-10)*Math.fround(1/123)));
+ assert(i.v.kg_plate_count===expectedCount,'Float32 reciprocal hypothesis result changed');
+ evaluatePreAnimation(d.scripts.pre_animation.slice(qaStart),i.q,i.c,math,i.v);
+ assert(i.v.kg_plate_qa_enabled&&i.logs.length===26,'Modeled count failure suppressed probe');
+ assert(i.logs[hand==='main_hand'?9:17]===marker&&i.logs[18]===expectedCount,'Raw marker/decoded count not distinguished');
+ assert(i.visible('qa_probe').qa_a_flag&&!i.visible('qa_probe').qa_d_decoded,'Count-failure post legend wrong');
+ assert(i.visible('qa_forced_food').plate_row_0,'Modeled count failure suppressed constant control');
 }
 ''')
 
@@ -165,28 +232,28 @@ for(const hand of ['main_hand','off_hand']){
             for value in (str(held.QA_LOG_CANARY), *held.QA_LOG_FIELDS)])
         self.assertEqual(held.QA_LOG_SAMPLES, 3)
         self.harness(r'''
-for(const hand of ['main_hand','off_hand'])for(const lifeSupported of [true,false]){
+for(const hand of ['main_hand','off_hand','inventory'])for(const lifeSupported of [true,false]){
  const i=instance(hand),sampleTimes=[],update=i.update;
  let before=0;
  for(const time of [0,.25,.5,.75,1,1.25,1.5,1.75,2,2.25,3,10,100]){
   update(lifeSupported?time:0,time-before);before=time;
-  const count=i.logs.length/13;
+  const count=i.logs.length/26;
   if(count>sampleTimes.length)sampleTimes.push(time);
  }
  assert(JSON.stringify(sampleTimes)==='[0,1,2]','One-second sample spacing/cap wrong '+sampleTimes);
- const expected=[914000,hand==='main_hand'?1:2,8285209,8285209,57,133,1,57,18,0,199,195,180];
- assert(i.logs.length===39&&i.v.kg_plate_qa_samples===3,'More than three numeric groups');
- for(let sample=0;sample<3;sample++)assert(JSON.stringify(i.logs.slice(sample*13,(sample+1)*13))===JSON.stringify(expected),'Numeric group/hand order wrong');
+ const expected=[914100,hand==='main_hand'?1:hand==='off_hand'?2:0,...i.state.main,...i.state.off,1,57,18,0,199,195,180,hand==='inventory'?0:1];
+ assert(i.logs.length===78&&i.v.kg_plate_qa_samples===3,'More than three numeric groups');
+ for(let sample=0;sample<3;sample++)assert(JSON.stringify(i.logs.slice(sample*26,(sample+1)*26))===JSON.stringify(expected),'Numeric group/hand order wrong');
  // Disable/re-enable, re-entrant frames and a reset life clock cannot reset
  // the per-attachable cap. A new attachable initialization gets its own cap.
- i.state[hand==='main_hand'?'main':'off'][4]=0;i.update(200,100);
- i.state[hand==='main_hand'?'main':'off'][4]=1;i.update(201,1);i.update(0,0);i.update(1000,999);
- assert(i.logs.length===39&&i.v.kg_plate_qa_samples===3,'Flag toggle reset lifetime cap');
- const fresh=instance(hand);fresh.update(0);assert(fresh.logs.length===13&&fresh.v.kg_plate_qa_samples===1,'New attachable did not initialize');
+ i.state[hand==='off_hand'?'off':'main'][4]=0;i.update(200,100);
+ i.state[hand==='off_hand'?'off':'main'][4]=1;i.update(201,1);i.update(0,0);i.update(1000,999);
+ assert(i.logs.length===78&&i.v.kg_plate_qa_samples===3,'Flag toggle reset lifetime cap');
+ const fresh=instance(hand);fresh.update(0);assert(fresh.logs.length===26&&fresh.v.kg_plate_qa_samples===1,'New attachable did not initialize');
 }
 // An already old entity starts with a new attachable-local sampling clock.
 const old=instance();for(const time of [500,500.5,501,501.5,502,503])old.update(time,0);
-assert(old.logs.length===39&&old.v.kg_plate_qa_samples===3,'Owner lifetime origin/cap wrong');
+assert(old.logs.length===78&&old.v.kg_plate_qa_samples===3,'Owner lifetime origin/cap wrong');
 ''')
 
 

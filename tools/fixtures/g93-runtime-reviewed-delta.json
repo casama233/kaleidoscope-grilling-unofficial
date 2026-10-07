@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    93
+  ],
+  "base_commit": "9d7185abc8ec98a53aa315cc18b13ea51c074786",
+  "base_tree": "21e89288ec74cb233aa24185eea7f93d6f6fb6a5",
+  "scope": "Only the independently reviewed raw client QA statements in the plate RP attachable and paired version identity. All G92 BP runtime, production decoder statements, geometry, animations and controllers remain byte-exact; no runtime file additions or deletions. This diagnostic source proves neither native rendering nor the float32 reciprocal hypothesis.",
+  "held_review": {
+    "patch_sha256": "3d1453f1048c39303c2171588e3b11c6b95553fd23356c2b58ec235c215f1231",
+    "after_sha256": {
+      "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": "a02bac07b403fcd4a2f126b60d23f10ca807b75dcfe846f7f67fd8e3f34b1727"
+    }
+  },
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json": {
+      "before_sha256": "b46f43f120ebcddf7dd430ab6c807ff500cbb0e46dc121229fbdfeb8daec7589",
+      "after_sha256": "36c701966afae8570024f6301e1d6e64846c2bb400830e2376007de1b2ec7474",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      92\n",
+          "after": "      93\n"
+        },
+        {
+          "start": 444,
+          "end": 455,
+          "before": "        92\n",
+          "after": "        93\n"
+        },
+        {
+          "start": 661,
+          "end": 672,
+          "before": "        92\n",
+          "after": "        93\n"
+        },
+        {
+          "start": 812,
+          "end": 823,
+          "before": "        92\n",
+          "after": "        93\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": {
+      "before_sha256": "ff52e39282ec837cd9321dd95cdb020d780270dcb89b388be7f4c9ca515aa453",
+      "after_sha256": "a02bac07b403fcd4a2f126b60d23f10ca807b75dcfe846f7f67fd8e3f34b1727",
+      "operations": [
+        {
+          "start": 78106,
+          "end": 78106,
+          "before": "",
+          "after": "          \"v.kg_plate_qa_raw_main_word_0 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_1 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_2 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_3 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_4 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_5 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_6 = 0;\",\n          \"v.kg_plate_qa_raw_main_word_7 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_0 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_1 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_2 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_3 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_4 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_5 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_6 = 0;\",\n          \"v.kg_plate_qa_raw_off_word_7 = 0;\",\n"
+        },
+        {
+          "start": 80003,
+          "end": 81086,
+          "before": "          \"v.kg_plate_qa_raw_word_0 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_0') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_0') : 0);\",\n          \"v.kg_plate_qa_raw_word_5 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_5') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_5') : 0);\",\n          \"v.kg_plate_qa_raw_word_7 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_7') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_7') : 0);\",\n",
+          "after": "          \"v.kg_plate_qa_raw_main_word_0 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_0') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_1 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_1') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_1') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_2 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_2') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_2') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_3 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_3') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_3') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_4 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_4') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_4') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_5 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_5') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_6 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_6') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_6') : 0);\",\n          \"v.kg_plate_qa_raw_main_word_7 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_7') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_0 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_0') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_1 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_1') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_1') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_2 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_2') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_2') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_3 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_3') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_3') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_4 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_4') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_4') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_5 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_5') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_6 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_6') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_6') : 0);\",\n          \"v.kg_plate_qa_raw_off_word_7 = (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_7') : 0);\",\n          \"v.kg_plate_qa_raw_word_0 = c.item_slot == 'off_hand' ? v.kg_plate_qa_raw_off_word_0 : v.kg_plate_qa_raw_main_word_0;\",\n          \"v.kg_plate_qa_raw_word_5 = c.item_slot == 'off_hand' ? v.kg_plate_qa_raw_off_word_5 : v.kg_plate_qa_raw_main_word_5;\",\n          \"v.kg_plate_qa_raw_word_7 = c.item_slot == 'off_hand' ? v.kg_plate_qa_raw_off_word_7 : v.kg_plate_qa_raw_main_word_7;\",\n"
+        },
+        {
+          "start": 88099,
+          "end": 88449,
+          "before": "          \"v.kg_plate_qa_enabled = v.kg_plate_word_4 == 1 && v.kg_plate_count == 1 && ((c.item_slot == 'main_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:skewer_plate')) || (c.item_slot == 'off_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:skewer_plate')));\",\n",
+          "after": "          \"v.kg_plate_qa_enabled = (v.kg_plate_qa_raw_main_word_4 == 1 && v.kg_plate_qa_raw_main_word_7 == 133) || (v.kg_plate_qa_raw_off_word_4 == 1 && v.kg_plate_qa_raw_off_word_7 == 133);\",\n"
+        },
+        {
+          "start": 89121,
+          "end": 89180,
+          "before": "          \"v.kg_plate_qa_sample_due ? q.log(914000) : 0;\",\n",
+          "after": "          \"v.kg_plate_qa_sample_due ? q.log(914100) : 0;\",\n"
+        },
+        {
+          "start": 89251,
+          "end": 89552,
+          "before": "          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_5) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_7) : 0;\",\n",
+          "after": "          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_1) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_2) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_3) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_4) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_5) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_6) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_main_word_7) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_1) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_2) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_3) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_4) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_5) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_6) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_off_word_7) : 0;\",\n"
+        },
+        {
+          "start": 90049,
+          "end": 90049,
+          "before": "",
+          "after": "          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_owner_occupied == 1 ? 1 : 0) : 0;\",\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/manifest.json": {
+      "before_sha256": "99f083ba8e04b88b9685983b5e87f230dbe95bd162fbb90e68867b213bab9d03",
+      "after_sha256": "ec65a11dd3ad117104bdbf394eab86dc30e8c2940e51607fb8c3d9ccb660c1ee",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      92\n",
+          "after": "      93\n"
+        },
+        {
+          "start": 449,
+          "end": 460,
+          "before": "        92\n",
+          "after": "        93\n"
+        }
+      ]
+    }
+  }
+}
