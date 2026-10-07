@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib,json,shutil,urllib.request
+import hashlib,json,shutil,subprocess,sys,urllib.request
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -10,7 +10,6 @@ RP=P/'resource_pack'
 DEV=Path(__file__).parent
 VERSION=[2,4,0]
 UP='https://raw.githubusercontent.com/breezeth-CN/KaleidoscopeGrilling/9a1acdab27698457bec16c9362678e574895a28c/'
-SECRET_TEXTURE=('common/src/main/resources/assets/kaleidoscope_grilling/textures/item/secret_skewer_stick.png','77321e269c440f5844cc48fe6456f92e0544d8ab')
 
 def blob(v):return hashlib.sha1(b'blob '+str(len(v)).encode()+bytes([0])+v).hexdigest()
 def fetch(path,sha):
@@ -96,9 +95,9 @@ def patch_items_and_assets():
     tex['texture_data']['unfinished_skewer']={'textures':'textures/items/unfinished_skewer'}
     tex['texture_data']['secret_skewer']={'textures':'textures/items/secret_skewer'}
     write(RP/'textures/item_texture.json',tex)
-    texture_path,texture_sha=SECRET_TEXTURE;raw=fetch(texture_path,texture_sha)
-    for name in ('unfinished_skewer','secret_skewer'):
-        (RP/f'textures/items/{name}.png').write_bytes(raw)
+    # The 3D shaft UV atlas is not an inventory sprite. Use original GUI
+    # templates and the explicit static fallback, preserving the held atlas.
+    subprocess.run([sys.executable,str(ROOT/'tools/build_skewer_inventory_icons.py')],check=True)
 
     labels={
         'zh_TW':('未完成烤串','秘制串'),

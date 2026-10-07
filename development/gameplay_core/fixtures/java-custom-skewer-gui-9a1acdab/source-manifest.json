@@ -50,5 +50,5 @@
   "asset_attribution": "breezeth (2026); adapted/reused Cookery resources: Kaleidoscope Official Production Team (2025)",
   "assets_license": "CC-BY-NC-SA-4.0",
   "code_license": "BSD-3-Clause",
-  "changes": "Source and template bytes unchanged. QA compositions are adaptations under CC-BY-NC-SA-4.0; not wired to native inventory."
+  "changes": "Source and template bytes unchanged. G102 native static fallbacks reuse the exact GUI stick and adapt three GUI masks with the original SkewerColorProvider fallback color. CC-BY-NC-SA-4.0; per-stack ingredient/count/cooking/variant GUI routing remains unimplemented."
 }
