@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.100
+## Current maintained baseline: 2.8.101
+
+**G101 Cloud Molang 修補**：修復客戶端確認的向量成員 `??` 解析錯誤，三個速度改用直接 scalar 變數並保留零值回退；服務端同步傳參，其他粒子仍保留原 vector 契約。Java 公式、速度單位與 RNG 保持。[本版範圍](docs/STATUS-A2.8.101.md)保留真人／渲染驗收界線。
 
 **G100 原作音效世界參照修補**：在送出Cloud前保存世界，並用相同參照播放音效；保留G94的方塊中心與浮點音高、連續粒子座標及既有邏輯。[本版範圍](docs/STATUS-A2.8.100.md)分列來源操作案例與待真人驗收項目。地面搜尋稿尚未加入本版。
 
@@ -53,7 +55,7 @@ Canonical runtime and dependencies: [baseline.json](baseline.json). Build from t
 
 煙火（Grilling）的非官方 Minecraft 基岩版移植工程。
 
-**當前 runtime 身份以 baseline.json 與頁首狀態為準，依賴作者原版 Cookery 1.0.8。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
+**當前 runtime 身份以 baseline.json 與頁首狀態為準，依賴作者原版 Cookery 1.6.0。正式打包直接輸出此來源，不使用 server-edition 玩法注入。爐／串架使用原生容器實體儲存，不要求 upcoming_creator_features；隔離 BDS 探針已通過，A2.8.40 補齊餐盤放置／插串／取串的寫入確認與回滾；A2.8.31 的牛肉塊與切雞副產物仍需整套家族的砧板 API。驗收證據以部署收據為準。**
 
 唯一寫入目的地：`casama233/kaleidoscope-grilling-unofficial`，repository ID **1377218440**。
 

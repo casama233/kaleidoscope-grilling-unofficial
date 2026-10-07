@@ -68,10 +68,22 @@ test('owned particle definitions emit exactly once at zero offset without implic
 test('native particle adapter supplies all three velocity axes in blocks per second',()=>{
  const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particles_runtime.js',import.meta.url),'utf8').replace(/^import .*;$/gm,'').replace(/export function/g,'function');
  let received;
- class Variables{setVector3(key,value){this.key=key;this.value=value}}
+ class Variables{constructor(){this.scalars={}}setVector3(key,value){this.key=key;this.value=value}setFloat(key,value){this.scalars[key]=value}}
  const context=vm.createContext({recordParticleDelivery(){},MolangVariableMap:Variables,emitParticleCommands:(dimension,origin,particles,factory)=>{received=factory(particles[0].velocity)}});
  vm.runInContext(source+';this.run=emitParticles;',context);context.run({}, {},[{velocity:[.1,.02,-.05]}]);
  assert.equal(received.key,'variable.kg_velocity');assert.deepEqual({...received.value},{x:2,y:.4,z:-1});
+ assert.deepEqual(received.scalars,{'variable.kg_velocity_x':2,'variable.kg_velocity_y':.4,'variable.kg_velocity_z':-1});
+});
+test('Cloud delivery without event velocity supplies scalar zeros and keeps ordinary vector compatibility',()=>{
+ const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particles_runtime.js',import.meta.url),'utf8').replace(/^import .*;$/gm,'').replace(/export function/g,'function');
+ const received=[];
+ class Variables{constructor(){this.scalars={}}setVector3(key,value){this.key=key;this.value=value}setFloat(key,value){this.scalars[key]=value}}
+ const context=vm.createContext({recordParticleDelivery(){},MolangVariableMap:Variables,emitParticleCommands:emitParticles});
+ vm.runInContext(source+';this.run=emitParticles;',context);
+ context.run({spawnParticle:(id,position,variables)=>received.push({id,position,variables})},{x:1,y:2,z:3},[{id:'kaleidoscope_grilling:feedback_cloud',offset:[0,0,0]}]);
+ assert.equal(received.length,1);assert.deepEqual(received[0].position,{x:1,y:2,z:3});
+ assert.equal(received[0].variables.key,'variable.kg_velocity');assert.deepEqual({...received[0].variables.value},{x:0,y:0,z:0});
+ assert.deepEqual(received[0].variables.scalars,{'variable.kg_velocity_x':0,'variable.kg_velocity_y':0,'variable.kg_velocity_z':0});
 });
 test('native effect adapter keeps particles after rejected sounds and coalesces damage feedback',()=>{
  const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_effect_feedback.js',import.meta.url),'utf8').replace(/^import .*;$/gm,'').replace(/export function/g,'function');
