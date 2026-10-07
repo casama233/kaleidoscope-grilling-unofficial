@@ -50,6 +50,22 @@ class HistoricalSourceRefsTests(unittest.TestCase):
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
      public.assert_public_bytes_with_g71_bottles(self,path)
+ def test_g109_lore_delta_is_exact_and_rejects_unrelated_mutations(self):
+  path=ROOT/public.MAIN_PATH;source=path.read_bytes()
+  delta=public._main_delta('g109-main-reviewed-delta.json')
+  before=b'seasoningLore(16-nextUses)';after=b'seasoningLore(16-nextUses,ingredients.length)'
+  self.assertEqual(delta['release'],[2,8,109]);self.assertEqual(len(delta['operations']),1)
+  op=delta['operations'][0];self.assertEqual(op['before'].encode(),before);self.assertEqual(op['after'].encode(),after)
+  previous=public.expected_main_bytes((2,8,108));self.assertEqual(previous.count(before),1)
+  self.assertEqual(public._apply_main_operations(previous,delta),previous.replace(before,after))
+  self.assertEqual(public.expected_main_bytes((2,8,109)),source)
+  for changed in (source.replace(after,before),source.replace(after,b'seasoningLore(16-nextUses,8)'),source+b'\n'):
+   self.assertNotEqual(changed,source)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
+  for bad in (dict(delta,before_sha256='0'*64),dict(delta,after_sha256='0'*64)):
+   with self.assertRaises(AssertionError):public._apply_main_operations(previous,bad)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)

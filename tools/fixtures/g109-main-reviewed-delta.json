@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    109
+  ],
+  "scope": "Exactly one ingredient-count argument passed to seasoningLore after successful non-exhausting consumption; all other runtime bytes retained.",
+  "before_sha256": "37ad481af615f875259d1898dcb7571288126e43ac0d91f89d531d80a8f38b4a",
+  "after_sha256": "1e70be8b225b777bdfbf612519fda9c1ee7db731b2dfe9d80307f01dbaf90add",
+  "operations": [
+    {
+      "start": 35600,
+      "end": 35626,
+      "before": "seasoningLore(16-nextUses)",
+      "after": "seasoningLore(16-nextUses,ingredients.length)"
+    }
+  ]
+}
