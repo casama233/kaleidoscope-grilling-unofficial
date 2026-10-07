@@ -71,13 +71,16 @@ test('native equipment commands include and verify the declared aux data',()=>{
 test('minimum visual budget alternates departed cleanup and active refresh',()=>{
  const q=new VisualTargetQueue();q.add('departed',{dimensionId:'overworld',location:{x:100,y:0,z:0}});q.add('active',{dimensionId:'overworld',location:{x:0,y:0,z:0}});q.observe([{dimensionId:'overworld',x:100,y:0,z:0}]);q.observe([{dimensionId:'overworld',x:0,y:0,z:0}]);const visited=[...q.take(1),...q.take(1)];assert(visited.includes('departed'));assert(visited.includes('active'));q.observe([]);assert.deepEqual(q.take(1),['active']);assert.deepEqual(q.take(1),[]);
 });
-test('same actor wrappers share committed effects, caller edits and failed writes do not poison snapshots',()=>{
+test('same actor wrappers share acknowledged effects; unapplied faults cannot poison snapshots',()=>{
  const dp=new Map();let tick=1,reads=0,fail=false;
- const wrapper=()=>({id:'same-native-actor',getDynamicProperty(k){reads++;return dp.get(k)},setDynamicProperty(k,v){if(fail){dp.set(k,v);throw Error('after write')}if(v===undefined)dp.delete(k);else dp.set(k,v)}});
+ const wrapper=()=>({id:'same-native-actor',getDynamicProperty(k){reads++;return dp.get(k)},setDynamicProperty(k,v){if(fail==='before')throw Error('before write');if(fail==='after'){dp.set(k,v);throw Error('after write')}if(v===undefined)dp.delete(k);else dp.set(k,v)}});
  const a=wrapper(),b=wrapper(),context={world:{getAbsoluteTime:()=>100},system:{get currentTick(){return tick}},activeEffects,effectPayload,milkEffects,FX_KEY};
  vm.runInNewContext(strip(fs.readFileSync(scriptRoot+'effect_state_runtime.js','utf8'))+';this.api={readEffects,writeEffects}',context);
  const api=context.api;api.readEffects(a);api.readEffects(b);assert.equal(reads,1);
  api.writeEffects(a,{vigor:{until:400,amp:0}});assert.equal(api.readEffects(b).vigor.until,400);
  const draft=api.readEffects(b);draft.vigor.until=600;assert.equal(api.readEffects(a).vigor.until,400);api.writeEffects(b,draft);assert.equal(api.readEffects(a).vigor.until,600);
- fail=true;assert.throws(()=>api.writeEffects(a,{warmth:{until:500,amp:0}}));assert.equal(api.readEffects(b).warmth.until,500);assert.equal(api.readEffects(b).vigor,undefined);tick++;assert.equal(api.readEffects(a).warmth.until,500);
+ // An applied mutation is acknowledged by storage readback, even if its setter
+ // reports a later error. It must neither refund nor invent an unapplied write.
+ fail='after';assert.doesNotThrow(()=>api.writeEffects(a,{warmth:{until:500,amp:0}}));assert.equal(api.readEffects(b).warmth.until,500);assert.equal(api.readEffects(b).vigor,undefined);
+ fail='before';assert.throws(()=>api.writeEffects(a,{vigor:{until:800,amp:0}}));assert.equal(api.readEffects(b).warmth.until,500);assert.equal(api.readEffects(b).vigor,undefined);tick++;assert.equal(api.readEffects(a).warmth.until,500);
 });
