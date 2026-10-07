@@ -20,13 +20,13 @@ function fixture({hand='main',consumed=true,creative=false,failure,selected=3,sc
  const plate=new Stack(plateId);plate.rows=[{id:foodId,props:{ingredients:'apple'}},{id:'test:second',props:{}}];plate.props.rows=JSON.stringify(plate.rows);
  const pending=new Stack(pendingId);pending.list=['pepper','onion','chili'];pending.props.ingredients=JSON.stringify(pending.list);
  const slots=new Map([[3,consumed?undefined:plate.clone()]]);let off=hand==='off'?(consumed?undefined:plate.clone()):undefined,awards=0,effects=0;
- const secretFinishes=[],finishOrder=[];
+ const secretFinishes=[],finishOrder=[],qa=[];
  const hunger={currentValue:10,setCurrentValue(v){this.currentValue=v;}},sat={currentValue:2,setCurrentValue(v){this.currentValue=v;}};
  const write=(h,v,slot=player.selectedSlotIndex)=>{if(failure==='debit'&&v?.typeId===plateId&&v.rows.length===1)throw Error('write rejected');if(failure==='pendingWrite'&&v?.typeId==='test:filled')throw Error('write rejected');if(h==='off')off=v;else slots.set(slot,v);};
  const player={id:'p',selectedSlotIndex:selected,creative,getComponent(id){return id.endsWith('hunger')?hunger:id.endsWith('saturation')?sat:id.endsWith('equippable')?{setEquipment(_,v){write('off',v);return true;}}:null;}};
  const active={plate:plate.clone(),stack:pending.clone(),hand,use:captureEatingIdentity(plate,hand,3)};
  const plateMap=new Map([['p',active]]),pendingMap=new Map();
- const context={canonicalFoodId,seasoningLore,setItemProperty,setItemLore,PLATE_EATS:plateMap,PENDING_USES:pendingMap,completedUseStillCurrent,commitEating,stopSoundHandle(){},seasoningFinished(){},
+ const context={plateQaTrace(_player,phase,_stack,detail={}){qa.push({phase,...detail});},canonicalFoodId,seasoningLore,setItemProperty,setItemLore,PLATE_EATS:plateMap,PENDING_USES:pendingMap,completedUseStillCurrent,commitEating,stopSoundHandle(){},seasoningFinished(){},
  heldByHand:(_,h)=>h==='off'?off:slots.get(player.selectedSlotIndex),creative:p=>p.creative,mainContainer:()=>({setItem(slot,v){write('main',v,slot);}}),EquipmentSlot:{Offhand:'off'},
  a25PlateRows:s=>structuredClone(s.rows),plateHighestNutritionIndex:r=>r.length?0:-1,
  a25RestoreStack:r=>{if(failure==='restore')return undefined;const s=new Stack(r.id);s.props=failure==='metadata'?{}:{...r.props};return s;},
@@ -37,7 +37,7 @@ function fixture({hand='main',consumed=true,creative=false,failure,selected=3,sc
  ItemStack:Stack,readSeasonings:s=>s.list,setSeasonings:(s,v)=>{if(failure!=='seasonData')s.list=v;},setUses(){},getUses:()=>0,hasSeasoningBase:()=>true,message(){},specialSeasoningVisualId:()=> 'test:filled',SEASONING_VARIANT_MAX:7,SEASON_VARIANT_KEY:'variant',SEASONING_MAX_USES:16,SEASONING_CAPACITY:8,PENDING_SEASONING:pendingId,handFor:()=>({name:'main'}),awardSeasoningFinishedChallenges(){awards++;}};
  const text=script.slice(script.indexOf('function '+(script.includes('function writeUseHand')?'writeUseHand':'completePlateUse')+'('),script.indexOf('world.afterEvents.itemStartUse.subscribe'));
  vm.createContext(context);vm.runInContext(text,context);
- return {player,plate,pending,active,plateMap,pendingMap,context,hunger,sat,slots,secretFinishes,finishOrder,get off(){return off;},get effects(){return effects;},get awards(){return awards;},usePlate(){context.completePlateUse(player,plate.clone());},
+ return {player,plate,pending,active,plateMap,pendingMap,context,hunger,sat,slots,secretFinishes,finishOrder,qa,get off(){return off;},get effects(){return effects;},get awards(){return awards;},usePlate(){context.completePlateUse(player,plate.clone());},
  usePending(){context.completePending(player,pending.clone());},setPending(){if(hand==='off')off=pending.clone();else slots.set(3,pending.clone());pendingMap.set('p',{stack:pending.clone(),hand,use:captureEatingIdentity(pending,hand,3)});}};
 }
 // Reproduce the two defects in the actual previous completion handlers.
@@ -48,11 +48,12 @@ let cases=2;
 for(const hand of ['main','off'])for(const creative of [false,true]){
  const f=fixture({hand,creative,consumed:!creative});f.usePlate();const out=hand==='off'?f.off:f.slots.get(3);
  assert.equal(out.rows.length,1);assert.equal(f.hunger.currentValue,14);assert.equal(f.effects,2);
+ assert(f.qa.some(x=>x.phase==='complete_gate'&&x.identityMatch===true));assert(f.qa.some(x=>x.stage==='finish_ok'));
  f.usePlate();assert.equal(f.hunger.currentValue,14);assert.equal(out.rows.length,1);cases++;
 }
 for(const failure of ['debit','reward','restore','metadata','plateData'])for(const hand of ['main','off']){
  const f=fixture({hand,failure});f.usePlate();assert.equal(f.hunger.currentValue,10);assert.equal(f.sat.currentValue,2);assert.equal(f.effects,0);
- assert.equal((hand==='off'?f.off:f.slots.get(3)).rows.length,2);cases++;
+ assert.equal((hand==='off'?f.off:f.slots.get(3)).rows.length,2);assert(f.qa.some(x=>x.stage===(['debit','reward'].includes(failure)?'commit_failed':'reconstruct_failed')));cases++;
 }
 for(const selected of [3,4]){
  const f=fixture({consumed:false,selected});const replacement=new Stack('test:unrelated');f.slots.set(selected,replacement);f.usePlate();assert.equal(f.slots.get(selected),replacement);assert.equal(f.effects,0);assert.equal(f.hunger.currentValue,10);cases++;

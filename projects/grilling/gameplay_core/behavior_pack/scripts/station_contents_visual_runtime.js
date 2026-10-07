@@ -1,3 +1,5 @@
+import {PLATE_FOOD_VISUAL_TYPE,plateVisualPlan,plateVisualPose} from './plate_visual_core.js';
+import {secretVisualState} from './secret_visual_state.js';
 import {advancedRackToolVisuals} from './advanced_rack_visual_core.js';
 import {RACK_TOOL_VISUAL_TYPE,rackToolVisualModel} from './rack_tool_visual_data.js';
 import {rackDisplayPose,RACK_TOOL_VISUAL_Y} from './advanced_rack_layout.js';
@@ -12,7 +14,7 @@ import {grillingConfig} from './server_config_runtime.js';
 /** Transient native equipped-item renderers. Helpers never own or deliver station contents. */
 import {world,system} from '@minecraft/server';
 import {STORAGE_PREFIX,peekStationContainer} from './family_station_storage.js';
-import {a25ReadPlateBlock,a25RestoreStack} from './a25_plate_recipe_runtime.js';
+import {a25ReadPlateBlock,a25RestoreStack,configurePlateVisualDirty} from './a25_plate_recipe_runtime.js';
 const TYPE='kaleidoscope_grilling:equipment_visual',work=new VisualTargetQueue(),targets=work.targets;
 let reader,restore,helpers=0,lastWarning=-1200,indexing=false,lastCapacityWarning=-1200,lastAudience=-10;
 export function configureSecretVisuals(read,build){reader=read;restore=build;}
@@ -48,6 +50,24 @@ function composed(row,b,k,stack,at,cooked,seen){
   const offset=pose(b,at.dx,at.y,at.dz+(i-1)*.15);render(row,b,name,food,offset,2);
  }
 }
+function renderPlate(row,b,k,stack,at,plan){
+ let old=row.parts.get(k);if(!stack||!plan||!at){discard(row,k);return;}
+ // A count transition can change a slot's authored yaw. Teleport does not reseed
+ // the native head/body basis; rebuild only that derived helper with the new yaw.
+ if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);if(row.parts.has(k))return;old=undefined;}
+ const secret=plan.secret?secretVisualState(stack,reader):[0,0,0];
+ const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,model:plan.model,secret});
+ if(old?.signature===signature)return;
+ if(!old){if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn('[Grilling contents capacity] plate render budget exceeded; storage unaffected')}return;}
+  // Seed the same authored yaw at creation; teleport alone can leave a default head/body basis.
+  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle}),spawnYaw:-at.angle};row.parts.set(k,old);helpers++;}
+ try{old.entity.setProperty('kaleidoscope_grilling:ready',false);
+  old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});
+  old.entity.setProperty('kaleidoscope_grilling:model',plan.model);
+  for(let i=0;i<3;i++)old.entity.setProperty('kaleidoscope_grilling:secret_'+i,secret[i]);
+  old.entity.setProperty('kaleidoscope_grilling:ready',true);old.signature=signature;
+ }catch(e){discard(row,k);throw e;}
+}
 export function syncStationContentsVisual(block,observers){
  rememberStationVisual(block);const row=targets.get(key(block));
  if(!observers.some(p=>p.dimensionId===row.dimensionId&&Math.hypot(p.x-block.x,p.y-block.y,p.z-block.z)<=48)){clear(row);return;}
@@ -68,7 +88,8 @@ export function syncStationContentsVisual(block,observers){
  }else if(block.typeId==='kaleidoscope_grilling:skewer_plate_block'){
   const rows=a25ReadPlateBlock(block);
   for(let i=0;i<5;i++){const stack=rows[i]?a25RestoreStack(rows[i]):undefined,k='plate/'+i,dx=(i-2)*.14;
-   if(canonicalFoodId(stack?.typeId)==='kaleidoscope_grilling:secret_skewer')composed(row,block,k,stack,{dx,y:.15,dz:0},undefined,seen);
+   const plan=plateVisualPlan(stack);
+   if(plan){seen.add(k);renderPlate(row,block,k,stack,plateVisualPose(block,i,rows.length),plan);}
    else{seen.add(k);render(row,block,k,stack,pose(block,dx,.15,0),1);}
   }
  }else if(block.typeId==='kaleidoscope_grilling:grill'){
@@ -90,8 +111,9 @@ function pump(){
   try{if(!work.visible.has(k)){clear(row);continue;}const b=world.getDimension(row.dimensionId).getBlock(row.location);if(b)syncStationContentsVisual(b,viewers);else clear(row);}catch(e){clear(row);warn(e)}
  }
 }
+configurePlateVisualDirty(markStationContentsDirty);
 for(const name of ['playerPlaceBlock','playerInteractWithBlock','playerBreakBlock'])world.afterEvents[name].subscribe(e=>markStationContentsDirty(e.block));
 // Script transactions cancel native interaction events, so enqueue their post-commit state too.
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{if(['kaleidoscope_grilling:grill','kaleidoscope_grilling:advanced_rack_block','kaleidoscope_grilling:skewer_plate_block'].includes(e.block.typeId)){const d=e.block.dimension,l={...e.block.location};system.run(()=>{try{markStationContentsDirty(d.getBlock(l))}catch{}})}});
-system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE])for(const e of world.getDimension(dim).getEntities({type}))e.remove()}catch{};index();system.runInterval(pump,1);system.runInterval(index,400);});
+system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE])for(const e of world.getDimension(dim).getEntities({type}))e.remove()}catch{};index();system.runInterval(pump,1);system.runInterval(index,400);});
 export const contentsVisualHelperCount=()=>helpers;

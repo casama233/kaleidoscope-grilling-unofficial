@@ -59,6 +59,8 @@ class BottleFillProxyAssets(unittest.TestCase):
             name=build.name_for(kind,fill);base='empty_seasoning_bottle' if kind=='partial' else 'pending_seasoning'
             expected=build.load(build.RP/'attachables'/f'{base}.attachable.json')
             expected['minecraft:attachable']['description']['identifier']=build.NS+name
+            scripts=expected['minecraft:attachable']['description']['scripts']
+            scripts['pre_animation']=[row.replace("'"+build.NS+base+"'","'"+build.NS+name+"'") for row in scripts['pre_animation']]
             actual=build.load(build.RP/'attachables'/f'{name}.attachable.json')
             self.assertEqual(actual,expected,name)
             d=actual['minecraft:attachable']['description']

@@ -86,9 +86,16 @@ def _local_bottle_main_bytes(expected, version):
     return expected
 
 
-def expected_main_bytes(version, *, local_bottles=False, proposal=None):
+def expected_main_bytes(version, *, local_bottles=False, proposal=None, lineage=None):
     """Published G73/G74 and local G71-G73 remain distinct; G75 adds one plate fix."""
     version = tuple(version)
+    if version >= (2,8,90):
+        from g90_source_conservation import expected_runtime_bytes
+        return expected_runtime_bytes(MAIN_PATH)
+    if version in [(2,8,83),(2,8,84)]:
+        assert lineage in ["plate","cookery_damage"], "Colliding G83/G84 identities require explicit source lineage"
+    elif lineage is not None:
+        assert lineage == "plate", "Cookery damage lineage ends at its own G84"
     original = public_bytes(MAIN_PATH)
     if version in [(2,8,75),(2,8,76)]:
         assert proposal in ['plate_alias','seasoning'], 'Conflicting unpublished proposals require an explicit source lineage'
@@ -109,6 +116,15 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             delta = _main_delta('g80-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 80]
             expected = _apply_main_operations(expected, delta)
+        if version in [(2,8,83),(2,8,84)] and lineage == 'cookery_damage':
+            from g90_source_conservation import verify_lineages
+            verify_lineages()
+            for patch_version in range(83,version[2]+1):
+                filename = ROOT/'tools/fixtures/lineages/merged-main-g84/tools/fixtures'/('g'+str(patch_version)+'-main-reviewed-delta.json')
+                delta = json.loads(filename.read_text())
+                assert delta['path'] == MAIN_PATH and delta['release'] == [2,8,patch_version]
+                expected = _apply_main_operations(expected,delta)
+            return expected
         if version >= (2, 8, 83):
             delta = _main_delta('g83-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 83]
@@ -116,6 +132,10 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
         if version >= (2, 8, 84):
             delta = _main_delta('g84-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 84]
+            expected = _apply_main_operations(expected, delta)
+        if version >= (2, 8, 85):
+            delta = _main_delta('g85-main-reviewed-delta.json')
+            assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 85]
             expected = _apply_main_operations(expected, delta)
         return expected
     if local_bottles:
@@ -129,10 +149,15 @@ def assert_public_bytes(testcase, path):
     path = Path(path)
     if not path.is_absolute():
         path = ROOT / path
-    expected = public_bytes(path)
-    if path.relative_to(ROOT).as_posix() == MAIN_PATH:
-        version = json.loads((ROOT / 'baseline.json').read_text())['version']
-        expected = expected_main_bytes(version)
+    relative = path.relative_to(ROOT).as_posix()
+    version = tuple(json.loads((ROOT / 'baseline.json').read_text())['version'])
+    if version >= (2,8,90) and relative in [MAIN_PATH,'projects/grilling/gameplay_core/behavior_pack/entities/player.json']:
+        from g90_source_conservation import expected_runtime_bytes
+        expected = expected_runtime_bytes(relative)
+    else:
+        expected = public_bytes(path)
+        if relative == MAIN_PATH:
+            expected = expected_main_bytes(version)
     testcase.assertEqual(path.read_bytes(), expected, 'Repaired public-source bytes changed outside reviewed scope: ' + str(path.relative_to(ROOT)))
 
 

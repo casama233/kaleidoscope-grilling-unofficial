@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    85
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only proven native saturation bounds repair after G84 native cap10 rejected target12.353846. Reacquire the saturation view after hunger update; cap by both resulting hunger and authoritative effectiveMax; preserve plate transaction rollback, metadata and finish ordering. No maximum-setting API or invented cap.",
+  "base_commit": "7eef713cbc2cf1089c7bac6f99c29674e10525b4",
+  "before_sha256": "6ee1a2e9c030903ac39e7f2ba99a6fac6f95c1ff9f023c9921ccd00375496926",
+  "after_sha256": "42b362c2c5bba7c9704f19d480b416f046d38bd42ccd3511e821a8cdf65b4159",
+  "operations": [
+    {
+      "start": 30242,
+      "end": 30670,
+      "before": "  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,sat.currentValue+gain);\n  trace('reward_saturation_before',()=>({saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax,saturationTarget:saturation,gain}));\n  operation='saturation_write';sat.setCurrentValue(saturation);\n  trace('reward_saturation_after',()=>({saturationAfter:sat.currentValue}));\n",
+      "after": "  // Native saturation bounds can lag the hunger write. Read the current view,\n  // retain its authoritative cap, and never invent or modify an attribute maximum.\n  const currentSat=player.getComponent('minecraft:player.saturation');\n  if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');\n  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,currentSat.effectiveMax,currentSat.currentValue+gain);\n  trace('reward_saturation_before',()=>({saturationCurrent:currentSat.currentValue,saturationMax:currentSat.effectiveMax,saturationTarget:saturation,gain}));\n  operation='saturation_write';currentSat.setCurrentValue(saturation);\n  trace('reward_saturation_after',()=>({saturationAfter:currentSat.currentValue}));\n"
+    }
+  ]
+}

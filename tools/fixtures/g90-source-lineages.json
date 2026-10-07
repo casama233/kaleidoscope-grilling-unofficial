@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "main_commit": "fe99c0ca3d25ffe5140ed699e89a470ee6abbc63",
+  "main_tree": "136f8f02e401887da2427d2bec1b23497123c3a9",
+  "plate_commit": "fdc9892edcb714c22e1b014943b4ce86c4a2570d",
+  "plate_tree": "7cab2afcc8d5c9d159bf76d794cff467dd7cfadd",
+  "canonical_history": "release-history.json",
+  "collision_policy": "Current main entries remain canonical; both exact published histories are preserved below and verified against their immutable commits. A fresh version consolidates the runtime; overlapping labels never identify equal bytes.",
+  "collisions": {
+    "2.8.83": {
+      "main": {
+        "BP": {
+          "sha256": "abf8b16d52e88100238495a614cdd1cb4cc2d09c1a10f1ae0414191d929d0e58",
+          "files": 644
+        },
+        "RP": {
+          "sha256": "4ebf6f84619737cf7852b8a385a03f9391eb31fda68e7e2c6b4d8721a2a7f919",
+          "files": 3498
+        }
+      },
+      "plate": {
+        "BP": {
+          "sha256": "eb2f94443b42098a593af11ac101db6a8773b6c7e119716784a9fef50ec33261",
+          "files": 648
+        },
+        "RP": {
+          "sha256": "b32e94f9a685b2f3def6e8688e177f0a62b618117d1d2ea3760141f6e93d17a8",
+          "files": 3499
+        }
+      }
+    },
+    "2.8.84": {
+      "main": {
+        "BP": {
+          "sha256": "711f5a7409330cde8d80be51dfff9be2c9fd272a0fb46c75ff579be2581463cb",
+          "files": 644
+        },
+        "RP": {
+          "sha256": "308932645945426b4ab1356b04f6d5e38dd5e6e414d8a1c59387e8ffbdb1f34f",
+          "files": 3498
+        }
+      },
+      "plate": {
+        "BP": {
+          "sha256": "da1a70a552266f1fbbfebf42375e368f2a64490720ac20bae9cfae479e1feeb7",
+          "files": 648
+        },
+        "RP": {
+          "sha256": "cfc2d3683ffede8fdf5e97eee4f21910d9c82d5a9408d514dfd6cdea2ab1766d",
+          "files": 3499
+        }
+      }
+    }
+  },
+  "main_snapshots": {
+    "development/gameplay_core/verify_a2883.py": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/development/gameplay_core/verify_a2883.py",
+      "sha256": "ace96df2576cc7310ae767cfbabd29a511413625fdcc61709354c53a7893feb7"
+    },
+    "development/gameplay_core/verify_a2884.py": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/development/gameplay_core/verify_a2884.py",
+      "sha256": "c2c036caa7712e355fba544c8b394930bb75c0cd70b61d9498c3d5fc28478f6c"
+    },
+    "docs/STATUS-A2.8.83.md": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/docs/STATUS-A2.8.83.md",
+      "sha256": "7c0d7ae2c0fe3f23e195aac7f55dce6e0799d9436eab8278157558baaf98cbc1"
+    },
+    "docs/STATUS-A2.8.84.md": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/docs/STATUS-A2.8.84.md",
+      "sha256": "5a986fbaefb0d96d08d6c0b8603a82e74d63719f501685b1e73f9b0261a63978"
+    },
+    "tools/fixtures/g83-main-reviewed-delta.json": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/tools/fixtures/g83-main-reviewed-delta.json",
+      "sha256": "2ebc7f81b1e922bcbabe803de1ef7fc26c599bb3832b032557158c78a0b68023"
+    },
+    "tools/fixtures/g84-main-reviewed-delta.json": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/tools/fixtures/g84-main-reviewed-delta.json",
+      "sha256": "cce7423e1b90adce2227f0d14e8c80c4d5234dd64108d2c1eb4fc74c2bf79c50"
+    },
+    "tools/public_source_witness.py": {
+      "snapshot": "tools/fixtures/lineages/merged-main-g84/tools/public_source_witness.py",
+      "sha256": "ebaf6a5a1484bac81cb04199940ce11ad62902de2d3baf527297245a59e533a2"
+    }
+  }
+}

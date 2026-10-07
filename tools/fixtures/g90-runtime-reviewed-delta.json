@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    90
+  ],
+  "scope": "Only exact current-main, plate G89 and reviewed held-source integration; paired manifests change release identity only. Every other runtime byte is selected from immutable source blobs. No native or production acceptance is inferred.",
+  "sources": {
+    "common": "c85cb34f591079c0b06878b8e565e7f262833e49",
+    "main": "fe99c0ca3d25ffe5140ed699e89a470ee6abbc63",
+    "plate": "fdc9892edcb714c22e1b014943b4ce86c4a2570d",
+    "held": "05c7ad49e8aa43f813e826905106020c8e803a46"
+  },
+  "trees": {
+    "common": "171efe0e86bc16ad3f96180a926fe7b9f76f4d14",
+    "main": "136f8f02e401887da2427d2bec1b23497123c3a9",
+    "plate": "7cab2afcc8d5c9d159bf76d794cff467dd7cfadd",
+    "held": "ba0adff939ebd767fa3d0d7b62140887fe1f5c4b"
+  },
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json": {
+      "base_commit": "fdc9892edcb714c22e1b014943b4ce86c4a2570d",
+      "before_sha256": "e46bb4b86bfb5403f2a4a21970e9d96168b8d40cd5835746a5eda9d08c9ba6cf",
+      "after_sha256": "48b37b8c82841504dde3066e5da7bb7285e0119a6ed66aee5053ad96a8a5523b",
+      "operations": [
+        {
+          "start": 79,
+          "end": 231,
+          "before": "    \"description\": \"\\u68ee\\u7f85\\u7269\\u8a9e\\uff1a\\u7159\\u706b \\u975e\\u5b98\\u65b9\\u57fa\\u5ca9\\u7248\\uff1b\\u9700\\u8981\\u516c\\u958b\\u7248 Cookery 1.6.0\",\n",
+          "after": "    \"description\": \"森羅物語：煙火 非官方基岩版；需要公開版 Cookery 1.6.0\",\n"
+        },
+        {
+          "start": 318,
+          "end": 327,
+          "before": "      89\n",
+          "after": "      90\n"
+        },
+        {
+          "start": 539,
+          "end": 550,
+          "before": "        89\n",
+          "after": "        90\n"
+        },
+        {
+          "start": 756,
+          "end": 767,
+          "before": "        89\n",
+          "after": "        90\n"
+        },
+        {
+          "start": 907,
+          "end": 918,
+          "before": "        89\n",
+          "after": "        90\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/behavior_pack/scripts/main.js": {
+      "base_commit": "fdc9892edcb714c22e1b014943b4ce86c4a2570d",
+      "before_sha256": "42b362c2c5bba7c9704f19d480b416f046d38bd42ccd3511e821a8cdf65b4159",
+      "after_sha256": "79fc0e8352042561dab579d45fd735057977b2e37bece1e2926dca01d10ce814",
+      "operations": [
+        {
+          "start": 868,
+          "end": 910,
+          "before": "import './bottle_held_visual_runtime.js';\n",
+          "after": "import {configurePlateHeldReader} from './bottle_held_visual_runtime.js';\n"
+        },
+        {
+          "start": 82711,
+          "end": 82881,
+          "before": "world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});\n",
+          "after": "world.afterEvents.entityHurt.subscribe(e=>{\n // Cookery HinderEvent follows damage from a living attacker, including its\n // projectile; a melee contact event cannot represent that source contract.\n // Java has no positive-amount gate. Do not invent one for after-hurt events.\n try{\n  const source=e.damageSource;\n  let attacker=source?.damagingEntity;\n  if(!attacker?.getComponent('minecraft:health')){\n   const projectile=source?.damagingProjectile;\n   // Native hurt may report the arrow itself as damagingEntity. Resolve its\n   // living owner, while preserving an independently reported actor's priority.\n   if(attacker&&projectile&&attacker.id!==projectile.id)return;\n   attacker=(projectile??attacker)?.getComponent('minecraft:projectile')?.owner;\n  }\n  if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;\n  e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});\n }catch{} // A removed actor/projectile must not abort other damage subscribers.\n});\n"
+        },
+        {
+          "start": 93429,
+          "end": 93760,
+          "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
+          "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+        },
+        {
+          "start": 95325,
+          "end": 95325,
+          "before": "",
+          "after": "configurePlateHeldReader(readEffectiveSkewerRows);\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/manifest.json": {
+      "base_commit": "fdc9892edcb714c22e1b014943b4ce86c4a2570d",
+      "before_sha256": "552ed3decb3b333fd9fa7885e568cff8bfccaba086ee2629296c56284953b714",
+      "after_sha256": "bc8a68f1eef623ed275d692d41d5eca1f0a202ee2ea72c83c00aa7c8ff8d1d6e",
+      "operations": [
+        {
+          "start": 79,
+          "end": 231,
+          "before": "    \"description\": \"\\u68ee\\u7f85\\u7269\\u8a9e\\uff1a\\u7159\\u706b \\u975e\\u5b98\\u65b9\\u57fa\\u5ca9\\u7248\\uff1b\\u9700\\u8981\\u516c\\u958b\\u7248 Cookery 1.6.0\",\n",
+          "after": "    \"description\": \"森羅物語：煙火 非官方基岩版；需要公開版 Cookery 1.6.0\",\n"
+        },
+        {
+          "start": 318,
+          "end": 327,
+          "before": "      89\n",
+          "after": "      90\n"
+        },
+        {
+          "start": 544,
+          "end": 555,
+          "before": "        89\n",
+          "after": "        90\n"
+        }
+      ]
+    }
+  }
+}

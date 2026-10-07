@@ -22,7 +22,7 @@ class Stack{
 }
 const N='kaleidoscope_grilling:',PLATE=N+'skewer_plate_block',food=()=>{const s=new Stack(N+'grilled_beef_skewer');s.nameTag='named food';s.lore=[{translate:'item.foreign.food',with:['保留']}];s.props['foreign:value']='preserve';return s;};
 function fixture(savedDp){
- const dp=new Map(savedDp),slots=new Map(),entities=[],events={},scheduled=[];let fault;
+ const dp=new Map(savedDp),slots=new Map(),entities=[],events={},scheduled=[],visuals=[];let fault;
  function write(k,v){if(v===undefined)dp.delete(k);else dp.set(k,v);if(fault?.(k,v))throw Error('post-write failure')}
  const permutation=(typeId,states={})=>({type:{id:typeId},getState:k=>states[k],getAllStates:()=>({...states}),withState(k,v){return permutation(typeId,{...states,[k]:v})}});
  const dimension={id:'minecraft:overworld',getBlock:()=>block,playSound(){},spawnItem(stack){
@@ -36,14 +36,15 @@ function fixture(savedDp){
  const held=(p,h)=>slots.get(h==='off'?'off':p.selectedSlotIndex);
  const setHand=(p,h,s)=>{const key=h==='off'?'off':p.selectedSlotIndex;slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')};
  const captureWritableHand=(p,h)=>{const key=h==='off'?'off':p.selectedSlotIndex;return {before:slots.get(key)?.clone(),read:()=>slots.get(key),write(s){slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')}}};
- const c=vm.createContext({canonicalFoodId,...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
+ const c=vm.createContext({plateQaTrace(){},canonicalFoodId,...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
   world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{blockExplode:{subscribe(){}},playerBreakBlock:{subscribe(){}}}},
   system:{run(fn){scheduled.push(fn)}},console:{warn(){}},SECRET_ID:N+'secret_skewer',captureWritableHand,
   heldByHand:held,setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,
   interactionStackSignature:s=>s?JSON.stringify(s):'',interactionFeedback(){},UNFINISHED_ID:N+'unfinished_skewer'});
- vm.runInContext(source+'\nglobalThis.api={readPlateBlock,placePlateOn,handlePlateBlock,plateStorageStep,plateTransaction,posKey,plateFaultKey,breakPlate};',c);
+ vm.runInContext(source+'\nglobalThis.api={configurePlateVisualDirty,readPlateBlock,placePlateOn,handlePlateBlock,plateStorageStep,plateTransaction,posKey,plateFaultKey,breakPlate};',c);
+ vm.runInContext('configurePlateVisualDirty(globalThis.notice)',Object.assign(c,{notice:b=>visuals.push({typeId:b.typeId,rows:c.api.readPlateBlock(b).length,hand:slots.get(0)})}));
  const api=c.api,key=api.posKey(N+'a25_plate_',block);
- return {dp,slots,entities,events,scheduled,flush(){while(scheduled.length)scheduled.shift()()},block,holder,api,key,set fault(f){fault=f},oneFailure(target){let once=true;fault=k=>k===target&&once?(once=false,true):false},rows(n=1){const rows=Array.from({length:n},(_,i)=>{const s=food();s.nameTag='named food '+i;s.props['qa:slot']=i;return {id:s.typeId,native:snapshot.captureSkewerMetadata(s),nutrition:4,saturation:.4}});dp.set(key,JSON.stringify(rows));block.permutation=block.permutation.withState(N+'plate_count',n);return rows;}};
+ return {dp,slots,entities,events,scheduled,visuals,flush(){while(scheduled.length)scheduled.shift()()},block,holder,api,key,set fault(f){fault=f},oneFailure(target){let once=true;fault=k=>k===target&&once?(once=false,true):false},rows(n=1){const rows=Array.from({length:n},(_,i)=>{const s=food();s.nameTag='named food '+i;s.props['qa:slot']=i;return {id:s.typeId,native:snapshot.captureSkewerMetadata(s),nutrition:4,saturation:.4}});dp.set(key,JSON.stringify(rows));block.permutation=block.permutation.withState(N+'plate_count',n);return rows;}};
 }
 test('invalid saved rows are rejected, never filtered or truncated',()=>{
  for(const raw of [null,1,'{',JSON.stringify({}),JSON.stringify([null]),JSON.stringify([{id:'bad'}]),JSON.stringify([{id:'x:food',native:{version:2,id:'x:food'}}]),JSON.stringify([{id:'x:food',native:{version:1,id:'x:other'}}]),JSON.stringify(Array(6).fill({id:'x:food'}))])assert.throws(()=>tx.decodePlateStorage(raw));
@@ -71,13 +72,13 @@ for(const hand of ['main','off']){
  for(const target of ['hand','property','block'])test('placement '+hand+' '+target+' rejection restores replaceable block, saved absence and source',()=>{
   const f=fixture();f.block.setType('minecraft:short_grass');const s=food();f.slots.set(hand==='off'?'off':0,s);f.oneFailure(target==='property'?f.key:target);
   assert.equal(f.api.placePlateOn({typeId:'minecraft:stone',x:0,y:79,z:0,dimension:f.block.dimension},'up',f.holder,s,hand),false);
-  assert.equal(f.block.typeId,'minecraft:short_grass');assert.equal(f.dp.has(f.key),false);assert.deepEqual(snapshot.captureSkewerMetadata(f.slots.get(hand==='off'?'off':0)),snapshot.captureSkewerMetadata(s));
+  assert.equal(f.visuals.length,0);assert.equal(f.block.typeId,'minecraft:short_grass');assert.equal(f.dp.has(f.key),false);assert.deepEqual(snapshot.captureSkewerMetadata(f.slots.get(hand==='off'?'off':0)),snapshot.captureSkewerMetadata(s));
  });
 }
 test('successful placement faces west and creative placement retains source',()=>{
  for(const creative of [false,true]){const f=fixture();f.block.setType('minecraft:air');const s=food();f.slots.set(0,s);f.holder.creative=creative;
   assert.equal(f.api.placePlateOn({typeId:'minecraft:stone',x:0,y:79,z:0,dimension:f.block.dimension},'up',f.holder,s),true);
-  assert.equal(f.block.permutation.getState('minecraft:cardinal_direction'),'west');assert.equal(f.api.readPlateBlock(f.block).length,1);assert.equal(!!f.slots.get(0),creative);
+  assert.equal(f.visuals.length,1);assert.equal(f.visuals[0].typeId,PLATE);assert.equal(f.visuals[0].rows,1);assert.equal(!!f.visuals[0].hand,creative);assert.equal(f.block.permutation.getState('minecraft:cardinal_direction'),'west');assert.equal(f.api.readPlateBlock(f.block).length,1);assert.equal(!!f.slots.get(0),creative);
  }
 });
 test('orphaned data prevents overwriting a removed plate location',()=>{
@@ -90,7 +91,7 @@ test('incomplete rollback persists quarantine and blocks later reads/transfers',
 });
 test('native hand adapter pins original slot for read, apply and rollback',()=>{
  const ioSource=fs.readFileSync(new URL('a2735_player_io.js',base),'utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(function|const))/g,'');
- const rows=new Map([[3,food()],[4,new Stack('minecraft:stone')]]),io=vm.createContext({canonicalFoodId,EquipmentSlot:{Offhand:'off'}});
+ const rows=new Map([[3,food()],[4,new Stack('minecraft:stone')]]),io=vm.createContext({plateQaTrace(){},canonicalFoodId,EquipmentSlot:{Offhand:'off'}});
  vm.runInContext(ioSource+'\nglobalThis.capture=captureWritableHand;',io);
  const holder={selectedSlotIndex:3,getComponent:()=>({container:{size:36,getItem:k=>rows.get(k),setItem:(k,v)=>rows.set(k,v)}})};
  const bound=io.capture(holder,'main'),after=food();after.amount=2;
@@ -156,3 +157,6 @@ test('persisted quarantine blocks transfers after production module reload',()=>
 });
 
 test('prepared plate delivery survives module reload and prevents a second credit',()=>{const f=fixture();f.rows(2);f.dp.set(f.key+'_delivery',JSON.stringify({phase:'prepared',saved:f.dp.get(f.key)}));const restored=fixture(f.dp);assert.throws(()=>restored.api.breakPlate(restored.block),/delivery requires recovery/);assert.equal(restored.entities.length,0);});
+
+test('a failed transient placement notification cannot undo committed contents or debit',()=>{const f=fixture();f.block.setType('minecraft:air');const s=food();f.slots.set(0,s);
+ f.api.configurePlateVisualDirty(()=>{throw Error('display unavailable')});assert.equal(f.api.placePlateOn({typeId:'minecraft:stone',x:0,y:79,z:0,dimension:f.block.dimension},'up',f.holder,s),true);assert.equal(f.api.readPlateBlock(f.block).length,1);assert.equal(f.slots.get(0),undefined);});

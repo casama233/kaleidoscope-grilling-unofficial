@@ -488,10 +488,35 @@ def check_current_display_contracts(findings, geometry_index, animations):
     counts = Counter()
     bottle_ids = set()
     skewer_refs = set()
+    plate_expected = None
+    if (RP / 'attachables/skewer_plate.attachable.json').is_file():
+        from build_plate_held import build as build_plate_held
+        plate_expected = {path: json.loads(data) for path, data in build_plate_held().items()}
     aliases = {"fp_right", "fp_left", "tp_right", "tp_left"}
     admitted = projection_items()
     for path in sorted((RP / "attachables").glob("*.json")):
         desc = load_json(path)["minecraft:attachable"]["description"]
+        if path.name == 'skewer_plate.attachable.json' and plate_expected is not None:
+            counts['plate'] += 1
+            expected_desc = plate_expected[path]['minecraft:attachable']['description']
+            if desc != expected_desc:
+                add(findings, 'error', 'held_plate_contract', desc['identifier'],
+                    'held plate must retain the reviewed owner decoding and hand/layout routes')
+            expected_geometries = plate_expected[RP / 'models/entity/plate_held.geo.json']['minecraft:geometry']
+            for geo in expected_geometries:
+                ref = geo['description']['identifier']
+                if geometry_index.get(ref, {}).get('geo') != geo:
+                    add(findings, 'error', 'held_plate_geometry_contract', ref,
+                        'held plate source cubes and single bound hierarchy must remain exact')
+            for ref, body in plate_expected[RP / 'animations/plate_held.animation.json']['animations'].items():
+                if animations.get(ref, {}).get('body') != body:
+                    add(findings, 'error', 'held_plate_animation_contract', ref,
+                        'held plate item frame/count layout differs from the source conversion')
+            controller_path = RP / 'render_controllers/plate_held.render_controllers.json'
+            if load_json(controller_path) != plate_expected[controller_path]:
+                add(findings, 'error', 'held_plate_controller_contract', desc['identifier'],
+                    'held plate passes must retain owner/count/descriptor gates')
+            continue
         ids = desc.get("animations", {})
         canonical_id = desc["identifier"].removesuffix("_java_three_alt")
         family = "skewer" if canonical_id.endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
@@ -612,6 +637,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
     if version>=(2,8,71):
         expected_bottles|={f'kaleidoscope_grilling:{kind}_seasoning_f{fill}' for kind in ('partial','pending') for fill in range(1,9)}
     expected_counts={"skewer":40,"bottle":len(expected_bottles)}
+    if plate_expected is not None:expected_counts['plate']=1
     if version>=(2,8,68):expected_counts["partial"]=1
     if counts != expected_counts or bottle_ids != expected_bottles or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))

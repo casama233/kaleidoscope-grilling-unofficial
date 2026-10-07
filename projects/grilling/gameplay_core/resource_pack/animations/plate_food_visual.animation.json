@@ -1,0 +1,18 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_station.plate_food": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "scale": 1.2,
+          "position": [
+            0,
+            "q.property('kaleidoscope_grilling:model') == 114 ? -1.8 : -0.6",
+            1.8
+          ]
+        }
+      }
+    }
+  }
+}

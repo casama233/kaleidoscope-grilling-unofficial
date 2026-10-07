@@ -6,16 +6,22 @@
     84
   ],
   "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
-  "scope": "Only native projectile-reported damagingEntity to living-owner resolution. Responsible living actor retains priority, unrelated nonliving actor cannot inherit a different projectile owner. All other G83/G82/G81 main bytes conserved.",
-  "base_commit": "0a3f55be6dad72ad50b9a9c485dc195b9c7b1930",
-  "before_sha256": "5d09325573be741ba585c80a2daec1ff71f057f25d2e284f18b6dc2f7be61320",
-  "after_sha256": "ba4cfe77374258c2a43a73b4d9a0d1215b4bc015125b0d75b6a210691baf4b2d",
+  "scope": "Only additional opt-in kg_plate_qa nested reward numeric substage/readback and whitelisted exception-category diagnostics. Original calculation order, component APIs, writes and identical exception propagation remain unchanged. No nutrition repair is inferred.",
+  "base_commit": "69bfc1b97531679e10ed7d225992a1c5985e0a14",
+  "before_sha256": "e22e15e8e47e0a1a22d435ac7826273e5f4f12e4811d3e3f89871a5041a26577",
+  "after_sha256": "6ee1a2e9c030903ac39e7f2ba99a6fac6f95c1ff9f023c9921ccd00375496926",
   "operations": [
     {
-      "start": 79597,
-      "end": 79711,
-      "before": "  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;\n",
-      "after": "  let attacker=source?.damagingEntity;\n  if(!attacker?.getComponent('minecraft:health')){\n   const projectile=source?.damagingProjectile;\n   // Native hurt may report the arrow itself as damagingEntity. Resolve its\n   // living owner, while preserving an independently reported actor's priority.\n   if(attacker&&projectile&&attacker.id!==projectile.id)return;\n   attacker=(projectile??attacker)?.getComponent('minecraft:projectile')?.owner;\n  }\n"
+      "start": 29181,
+      "end": 29630,
+      "before": "function addSecretNutrition(player,stack,meta){\n const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;\n const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);\n const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));\n",
+      "after": "function addSecretNutrition(player,stack,meta,diagnostics=false){\n const trace=(stage,detail=()=>({}))=>{if(diagnostics)plateQaTrace(player,'reward_detail',stack,()=>({stage,...detail()}));};\n let operation='facts';\n try{\n  trace('reward_facts_begin');\n  const d=dynamicFood(stack);\n  trace('reward_facts_ok',()=>({nutrition:d?.nutrition,saturationModifier:d?.saturation}));\n  operation='components';\n  const h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;\n  trace('reward_components',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax}));\n  operation='hunger_target';\n  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);\n  trace('reward_hunger_before',()=>({hungerCurrent:h.currentValue,hungerMax:h.effectiveMax,hungerTarget:hunger}));\n  operation='hunger_write';h.setCurrentValue(hunger);\n  trace('reward_hunger_after',()=>({hungerAfter:h.currentValue}));\n  operation='saturation_target';\n  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,sat.currentValue+gain);\n  trace('reward_saturation_before',()=>({saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax,saturationTarget:saturation,gain}));\n  operation='saturation_write';sat.setCurrentValue(saturation);\n  trace('reward_saturation_after',()=>({saturationAfter:sat.currentValue}));\n }catch(error){trace('reward_failed',()=>({operation,errorName:error?.name}));throw error;}\n"
+    },
+    {
+      "start": 29632,
+      "end": 29718,
+      "before": "function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}\n",
+      "after": "function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta,true)}\n"
     }
   ]
 }

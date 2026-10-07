@@ -6,22 +6,88 @@
     83
   ],
   "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
-  "scope": "Only Cookery living-source Hinder damage dispatch and original flatulence sound/10-Cloud event. All eating, stop/completion ownership, rack, machine and other source bytes remain conserved. Native phase/render differences remain explicit.",
-  "base_commit": "c85cb34f591079c0b06878b8e565e7f262833e49",
+  "scope": "Only default-off kg_plate_qa tagged, bounded sanitized plate event/gate/settlement diagnostics. Gameplay predicates, storage/reward/effect order and exception propagation are preserved. No plate consumption repair is inferred.",
+  "base_commit": "21b995bb1b1fdffd1e8300dc17a2b968272384a4",
   "before_sha256": "159a67ea0efc2d5252e5525bf313b5beccdf478e2cc000345201af07d507736b",
-  "after_sha256": "5d09325573be741ba585c80a2daec1ff71f057f25d2e284f18b6dc2f7be61320",
+  "after_sha256": "e22e15e8e47e0a1a22d435ac7826273e5f4f12e4811d3e3f89871a5041a26577",
   "operations": [
     {
-      "start": 79283,
-      "end": 79453,
-      "before": "world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});\n",
-      "after": "world.afterEvents.entityHurt.subscribe(e=>{\n // Cookery HinderEvent follows damage from a living attacker, including its\n // projectile; a melee contact event cannot represent that source contract.\n // Java has no positive-amount gate. Do not invent one for after-hurt events.\n try{\n  const source=e.damageSource;\n  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;\n  if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;\n  e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});\n }catch{} // A removed actor/projectile must not abort other damage subscribers.\n});\n"
+      "start": 1294,
+      "end": 1294,
+      "before": "",
+      "after": "import {plateQaTrace} from './plate_qa_runtime.js';\n"
     },
     {
-      "start": 89581,
-      "end": 89912,
-      "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
-      "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+      "start": 63411,
+      "end": 63540,
+      "before": " if(!a||!completedUseStillCurrent(a.use,eventStack,heldByHand(player,a.hand),player.selectedSlotIndex,!creative(player)))return;\n",
+      "after": " plateQaTrace(player,'complete_received',eventStack,{session:!!a,stage:'received'});\n if(!a){plateQaTrace(player,'complete_gate',eventStack,{session:false,identityMatch:false,stage:'missing_session'});return;}\n const identityMatch=completedUseStillCurrent(a.use,eventStack,heldByHand(player,a.hand),player.selectedSlotIndex,!creative(player));\n plateQaTrace(player,'complete_gate',eventStack,{session:true,identityMatch,stage:identityMatch?'accepted':'identity_rejected'});\n if(!identityMatch)return;\n"
+    },
+    {
+      "start": 63680,
+      "end": 63680,
+      "before": "",
+      "after": "  plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_begin'});\n"
+    },
+    {
+      "start": 64389,
+      "end": 64487,
+      "before": " }catch(error){writeUseHand(player,a.use,a.plate);console.warn('[Grilling plate] '+error);return}\n",
+      "after": "  plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_ok'});\n }catch(error){plateQaTrace(player,'settlement',eventStack,{stage:'reconstruct_failed'});writeUseHand(player,a.use,a.plate);console.warn('[Grilling plate] '+error);return}\n"
+    },
+    {
+      "start": 64537,
+      "end": 64784,
+      "before": " if(!commitEating({debit:()=>writeUseHand(player,a.use,next),reward:()=>addNestedNutrition(player,eaten,meta),\n  restoreFood:()=>writeUseHand(player,a.use,a.plate),restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}}))return;\n",
+      "after": " plateQaTrace(player,'settlement',eventStack,{stage:'commit_begin'});\n let committed;try{committed=commitEating({debit:()=>{plateQaTrace(player,'settlement',eventStack,{stage:'debit_begin'});writeUseHand(player,a.use,next);plateQaTrace(player,'settlement',eventStack,{stage:'debit_ok'});},\n  reward:()=>{plateQaTrace(player,'settlement',eventStack,{stage:'reward_begin'});addNestedNutrition(player,eaten,meta);plateQaTrace(player,'settlement',eventStack,{stage:'reward_ok'});},\n  restoreFood:()=>writeUseHand(player,a.use,a.plate),restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}});\n }catch(error){plateQaTrace(player,'settlement',eventStack,{stage:'commit_threw'});throw error;}\n if(!committed){plateQaTrace(player,'settlement',eventStack,{stage:'commit_failed'});return;}\n plateQaTrace(player,'settlement',eventStack,{stage:'commit_ok'});\n"
+    },
+    {
+      "start": 65212,
+      "end": 65212,
+      "before": "",
+      "after": " plateQaTrace(player,'settlement',eventStack,{stage:'finish_ok'});\n"
+    },
+    {
+      "start": 67328,
+      "end": 67425,
+      "before": "  const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0)return;\n",
+      "after": "  plateQaTrace(e.source,'start_received',e.itemStack,{stage:'received'});\n  const rows=a25PlateRows(e.itemStack),index=plateHighestNutritionIndex(rows);if(index<0){plateQaTrace(e.source,'start_empty',e.itemStack,{session:false,stage:'empty_event_rows'});return;}\n  plateQaTrace(e.source,'start_selected',e.itemStack,{stage:'selected'});\n"
+    },
+    {
+      "start": 67611,
+      "end": 67907,
+      "before": "  PLATE_EATS.set(e.source.id,{id,plate:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});return;\n",
+      "after": "  PLATE_EATS.set(e.source.id,{id,plate:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});\n  plateQaTrace(e.source,'start_registered',e.itemStack,{session:true,stage:'registered'});return;\n"
+    },
+    {
+      "start": 73590,
+      "end": 73590,
+      "before": "",
+      "after": " if(e.itemStack?.typeId===PLATE_ID||plate)plateQaTrace(e.source,'stop_received',e.itemStack,{session:!!plate,stage:'stop_scheduled'});\n"
+    },
+    {
+      "start": 73687,
+      "end": 73867,
+      "before": " system.run(()=>{if(PLATE_EATS.get(id)===plate)PLATE_EATS.delete(id);if(pendingMatches&&PENDING_USES.get(id)===pending){stopSoundHandle(pending?.audio);PENDING_USES.delete(id)}});\n",
+      "after": " system.run(()=>{if(PLATE_EATS.get(id)===plate){if(plate)plateQaTrace(e.source,'stop_cleared',e.itemStack,{session:true,stage:'stop_cleared'});PLATE_EATS.delete(id);}if(pendingMatches&&PENDING_USES.get(id)===pending){stopSoundHandle(pending?.audio);PENDING_USES.delete(id)}});\n"
+    },
+    {
+      "start": 79699,
+      "end": 79699,
+      "before": "",
+      "after": " if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_before',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'already_cancelled':'received'});\n"
+    },
+    {
+      "start": 80556,
+      "end": 80604,
+      "before": " if(e.source.isSneaking){e.cancel=true;return;}\n",
+      "after": " if(e.source.isSneaking){e.cancel=true;if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_result',e.itemStack,{cancelled:true,stage:'cancelled'});return;}\n"
+    },
+    {
+      "start": 81351,
+      "end": 81351,
+      "before": "",
+      "after": " if(e.itemStack?.typeId===PLATE_ID)plateQaTrace(e.source,'guard_result',e.itemStack,{cancelled:!!e.cancel,stage:e.cancel?'cancelled':'allowed'});\n"
     }
   ]
 }

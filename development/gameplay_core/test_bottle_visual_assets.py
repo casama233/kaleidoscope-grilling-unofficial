@@ -143,10 +143,10 @@ class BottleVisualAssets(unittest.TestCase):
             self.assertEqual(rc['textures'],['Texture.default'])
             self.assertEqual(rc['materials'],[{'*':'Material.contents'},{'shell':'Material.default'}])
         visible={k:v for row in controllers['controller.render.kg_bottle_held.dynamic']['part_visibility'] for k,v in row.items()}
-        self.assertEqual({k:v for k,v in visible.items() if not k.startswith('pending_')},{'*':False,'grip':True,'shell':True})
+        self.assertEqual({k:v for k,v in visible.items() if not k.startswith('pending_')},{'*':False,'grip':True,'shell':'v.kg_bottle_owner_occupied == 1'})
         for tint in range(16):
             for value in range(1,10):
-                self.assertEqual(visible[f'pending_{tint}_color_{value}'],f'v.kg_bottle_layer_{tint//2} == {value}')
+                self.assertEqual(visible[f'pending_{tint}_color_{value}'],f'v.kg_bottle_owner_occupied == 1 && v.kg_bottle_layer_{tint//2} == {value}')
 
     def test_render_context_uses_initialized_numeric_animation_variables(self):
         controllers=load(RP/'render_controllers/bottle_held_contents.render_controllers.json')['render_controllers']
@@ -159,10 +159,11 @@ class BottleVisualAssets(unittest.TestCase):
             d=load(RP/f'attachables/{item}.attachable.json')['minecraft:attachable']['description']
             self.assertNotRegex(json.dumps(d['render_controllers']),r'\b(?:c|context|q|query)\.')
             initial=[v for v in d['scripts']['initialize'] if v.startswith('v.kg_bottle_')];pre=[v for v in d['scripts']['pre_animation'] if v.startswith('v.kg_bottle_')]
-            self.assertEqual(initial,['v.kg_bottle_off_hand = 0;']+
+            self.assertEqual(initial,['v.kg_bottle_off_hand = 0;','v.kg_bottle_owner_word = 748;','v.kg_bottle_owner_occupied = 0;','v.kg_bottle_owner_pair_5 = 0;','v.kg_bottle_owner_pair_6 = 0;']+
                 [f'v.kg_bottle_layer_{i} = 0;' for i in range(8)])
             self.assertEqual(pre[0],"v.kg_bottle_off_hand = c.item_slot == 'off_hand';")
-            for i,expression in enumerate(pre[1:]):
+            self.assertIn('v.kg_bottle_owner_word <= 9',pre[4])
+            for i,expression in enumerate(row for row in pre if row.startswith('v.kg_bottle_layer_')):
                 for hand in ['main','off']:
                     self.assertIn(f"c.owning_entity->q.property('kaleidoscope_grilling:bottle_{hand}_{i}')",expression)
                     self.assertIn(f"c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_{hand}_{i}')",expression)
@@ -176,7 +177,7 @@ const expressions=EXPRESSIONS.map(s=>s.replaceAll('c.owning_entity->q.','owner_q
 for(const slot of ['main_hand','off_hand']) {
  const c={item_slot:slot},v={},main=[0,1,2,3,4,5,6,9],off=[8,7,6,5,4,3,2,1];
  const q={property:()=>{throw Error('Property read from attachable instead of owning entity')}};
- const owner_q={has_property:()=>true,property:name=>name.includes(':bottle_off_')?off[Number(name.split('_').at(-1))]:main[Number(name.split('_').at(-1))]};
+ const owner_q={is_item_name_any:()=>true,has_property:()=>true,property:name=>name.includes(':bottle_off_')?off[Number(name.split('_').at(-1))]:main[Number(name.split('_').at(-1))]};
  const math={floor:Math.floor,clamp:(x,a,b)=>Math.max(a,Math.min(b,x))};
  const evaluate=()=>{for(const expression of expressions)new Function('c','v','q','owner_q','math',expression)(c,v,q,owner_q,math)};
  evaluate();
@@ -227,6 +228,29 @@ for(const slot of ['main_hand','off_hand']) {
                     self.assertEqual(after[identifier], before[identifier])
             self.assertNotEqual(before['kaleidoscope_grilling:ordinary_item'], after['kaleidoscope_grilling:ordinary_item'])
 
+    def test_dynamic_bottle_owner_blocks_plate_words_transaction_sentinel_and_wrong_hand_item(self):
+        names=['empty_seasoning_bottle','pending_seasoning']+[f'{kind}_seasoning_f{fill}' for kind in ['partial','pending'] for fill in range(1,9)]
+        descriptions=[load(RP/f'attachables/{name}.attachable.json')['minecraft:attachable']['description'] for name in names]
+        script=r'''
+const descriptions=DESCRIPTIONS;
+for(const d of descriptions)for(const hand of ['main','off'])for(const marker of [0,9,10,133,747,748,9800343])for(const exact of [true,false])for(const pair of ['valid','pair5','pair6']){
+ const c={item_slot:hand+'_hand'},v={},math={floor:Math.floor,clamp:(n,a,b)=>Math.max(a,Math.min(b,n))};
+ const q={property:()=>{throw Error('Attachable-local property query')}};
+ const owner_q={has_property:()=>true,property:key=>{
+  const own=key.includes(':bottle_'+hand+'_');
+  if(key.endsWith('_7'))return own?marker:747;
+  if(key.endsWith('_5')||key.endsWith('_6'))return own?(pair==='pair'+key.slice(-1)?15129:3):1;
+  return own?9800343:1;
+ },is_item_name_any:(slot,id)=>exact&&id===d.identifier&&slot==='slot.weapon.'+(hand==='main'?'mainhand':'offhand')};
+ for(const row of d.scripts.pre_animation.filter(row=>row.startsWith('v.kg_bottle_'))){
+  new Function('c','v','q','owner_q','math',row.replaceAll('c.owning_entity->q.','owner_q.'))(c,v,q,owner_q,math);
+ }
+ if(Boolean(v.kg_bottle_owner_occupied)!==(exact&&marker>=0&&marker<=9&&pair==='valid'))throw Error('Wrong shared-word owner gate');
+ if(v.kg_bottle_owner_word!==marker)throw Error('Marker was clamped or borrowed from opposite hand');
+}
+'''.replace('DESCRIPTIONS',json.dumps(descriptions))
+        subprocess.run(['node','-e',script],check=True,capture_output=True,text=True)
+
     def test_generator_is_reproducible_and_player_budget_fits(self):
         for path,expected in held.build().items():
             self.assertEqual(path.read_bytes() if isinstance(expected,bytes) else load(path),expected,path)
@@ -234,7 +258,7 @@ for(const slot of ['main_hand','off_hand']) {
         self.assertLessEqual(len(props),32)
         for hand in ['main','off']:
             for i in range(8):
-                self.assertEqual(props[f'kaleidoscope_grilling:bottle_{hand}_{i}'],{'type':'int','range':[0,9],'default':0,'client_sync':True})
+                self.assertEqual(props[f'kaleidoscope_grilling:bottle_{hand}_{i}'],{'type':'int','range':[0,9800343],'default':0,'client_sync':True})
 
 if __name__=='__main__':
     unittest.main()

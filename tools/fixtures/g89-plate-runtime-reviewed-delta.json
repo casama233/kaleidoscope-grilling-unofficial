@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    89
+  ],
+  "base_commit": "39e6dd145a84abdf921382aef9c90833061aa955",
+  "scope": "Only plate mesh-facing native yaw, ordinary canonical/alias selection, model115 plate-only range/bindings and source-derived ordinary geometry/controller. Original arrays/anchors, ownership, food rewards, all other stations/held assets/palettes and prior fixes remain unchanged. Native acceptance separate.",
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/scripts/plate_visual_core.js": {
+      "new": false,
+      "after_sha256": "92a9cf95195354b3cc874664b743c3ddab1726c351e24a3ff01a909cdfad5505",
+      "before_sha256": "31bc473be8476045302f2f42d1b70828245eccadbe8bae6921f7da2418a8f5ae",
+      "operations": [
+        {
+          "start": 906,
+          "end": 906,
+          "before": "",
+          "after": " if(id==='kaleidoscope_grilling:ordinary_skewer')return {model:115,secret:false};\n"
+        },
+        {
+          "start": 1693,
+          "end": 1842,
+          "before": " return {location:{x:block.x+.5+dx*Math.cos(r)-dz*Math.sin(r),y:block.y+cell[1]/16,z:block.z+.5+dx*Math.sin(r)+dz*Math.cos(r)},angle:angle-cell[3]};\n",
+          "after": " // The native mesh basis flips Z after source-to-mesh X conversion. Matching\n // Java Ry(slotYaw-facing) needs native yaw180+facing-slotYaw, normalized here.\n const nativeYaw=(angle-cell[3]+360)%360-180;\n return {location:{x:block.x+.5+dx*Math.cos(r)-dz*Math.sin(r),y:block.y+cell[1]/16,z:block.z+.5+dx*Math.sin(r)+dz*Math.cos(r)},angle:nativeYaw?-nativeYaw:0};\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/behavior_pack/entities/plate_food_visual.json": {
+      "new": false,
+      "after_sha256": "3c45b6f24bb61011fc0d4f501ed7e6ea1156bfd8b65f82bf8004d9ce632c19a4",
+      "before_sha256": "7f9aa53718f5a0ab411a9c83b28093b5b0cc82a14a45835150c33909c1ee5f33",
+      "operations": [
+        {
+          "start": 490,
+          "end": 506,
+          "before": "            114\n",
+          "after": "            115\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/entity/plate_food_visual.entity.json": {
+      "new": false,
+      "after_sha256": "cc275495604a7498055eed5cf60a24c058d558b649e1677a58d43847b3a04c3a",
+      "before_sha256": "fa03f79e283f474711583b5d8254df6b9ea7e4b2cff884c8b6574061ce4ee173",
+      "operations": [
+        {
+          "start": 104798,
+          "end": 104863,
+          "before": "        \"food_213_s6\": \"textures/secret_food_palette/food_213_6\"\n",
+          "after": "        \"food_213_s6\": \"textures/secret_food_palette/food_213_6\",\n        \"s115\": \"textures/a22_bites/ordinary_skewer_stage0\"\n"
+        },
+        {
+          "start": 117516,
+          "end": 117577,
+          "before": "        \"state_63_2\": \"geometry.kg_station.grill.state_63_2\"\n",
+          "after": "        \"state_63_2\": \"geometry.kg_station.grill.state_63_2\",\n        \"s115\": \"geometry.kg_station.plate.ordinary_skewer\"\n"
+        },
+        {
+          "start": 119369,
+          "end": 119461,
+          "before": "          \"controller.render.kg_station.grill\": \"q.property('kaleidoscope_grilling:ready')\"\n",
+          "after": "          \"controller.render.kg_station.plate_food\": \"q.property('kaleidoscope_grilling:ready')\"\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/models/entity/plate_food_display.geo.json": {
+      "new": true,
+      "after_sha256": "888f81fbdcb6d418449e7dcc0b3fe18e2e7508db2ff84c0f84ebd2064c91acac"
+    },
+    "projects/grilling/gameplay_core/resource_pack/render_controllers/plate_food_visual.render_controllers.json": {
+      "new": true,
+      "after_sha256": "2c08a064c3122131fec75e90f23dd240be0c00c3a15bd4f7f6ae0ab64da87f9a"
+    }
+  }
+}

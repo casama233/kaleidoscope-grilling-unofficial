@@ -24,7 +24,9 @@ def build():
   props[PREFIX+'secret_'+hand+'_piece']={'type':'int','range':[0,255],'default':0,'client_sync':True}
  if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,61):
   for hand in ['main','off']:
-   for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,9],'default':0,'client_sync':True}
+   # Shared held plate/bottle words remain below the exact float32 integer
+   # boundary. Names/types/defaults are retained, with no 33rd property.
+   for slot in range(8):props[PREFIX+'bottle_'+hand+'_'+str(slot)]={'type':'int','range':[0,9800343],'default':0,'client_sync':True}
  if (ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/seasoning_motion_runtime.js').is_file():
   for name,maximum in [('season_hand',2),('season_phase',10),('pending_hand',2)]:
    props[PREFIX+name]={'type':'int','range':[0,maximum],'default':0,'client_sync':True}

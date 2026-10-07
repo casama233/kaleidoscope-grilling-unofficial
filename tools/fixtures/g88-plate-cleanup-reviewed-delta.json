@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    88
+  ],
+  "base_commit": "81d08da044c52ba5e06bb2de1bd803ea6977b041",
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js",
+  "scope": "Only stop plate helper replacement if existing discard did not remove its tracked part. Native remove failure must retain the existing actor and counter, never create an untracked replacement. No storage or other-station changes.",
+  "before_sha256": "e1d303dcc8bf8855d001b6b0a13800ad5d04efed8db7060f2a2b6dafb36059f4",
+  "after_sha256": "350faa75b708355eae843232028916e102df7922160ca1b6e9863da7ffbc718f",
+  "operations": [
+    {
+      "start": 5035,
+      "end": 5168,
+      "before": " if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);old=undefined;}\n",
+      "after": " if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);if(row.parts.has(k))return;old=undefined;}\n"
+    }
+  ]
+}

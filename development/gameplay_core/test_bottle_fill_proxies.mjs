@@ -25,7 +25,7 @@ function decorated(id,fill){const s=new Stack(id);Object.assign(s,{nameTag:'Exac
 function fixture(){
  const events={},system={currentTick:10},inventory={size:3,rows:[],getItem(i){return this.rows[i]?.clone()},setItem(i,s){this.rows[i]=s?.clone()}},player={id:'holder',selectedSlotIndex:0};let off;
  const world={afterEvents:Object.fromEntries(['playerSpawn','playerLeave'].map(k=>[k,{subscribe(f){events[k]=f}}]))};
- const context=vm.createContext({...core,...metadata,...itemData,world,system,ItemStack:Stack,EnchantmentType:class {constructor(id){this.id=id}},playerInventory:()=>inventory,getOffHand:()=>off?.clone(),setOffHand:(_,s)=>off=s?.clone()});
+ const context=vm.createContext({plateQaTrace(){},...core,...metadata,...itemData,world,system,ItemStack:Stack,EnchantmentType:class {constructor(id){this.id=id}},playerInventory:()=>inventory,getOffHand:()=>off?.clone(),setOffHand:(_,s)=>off=s?.clone()});
  vm.runInContext(body(read('eating_item_runtime.js'),'copyEatingVariant'),context);vm.runInContext(strip(read('bottle_fill_item_runtime.js')),context);
  const api=vm.runInContext('({retargetBottleFillStack,bottleFillIngredients,refreshBottleFillSlot,prepareBottleFillItems})',context);
  return {api,events,system,inventory,player,get off(){return off},set off(s){off=s}};
@@ -77,7 +77,7 @@ test('inventory/offhand refresh skips active use and clears scan history on leav
 test('all pending proxies start and complete native use; partial proxies do not shake',()=>{
  const events={},uses=new Map(),animations=[];let completed=0;
  const world={afterEvents:Object.fromEntries(['itemStartUse','itemCompleteUse'].map(k=>[k,{subscribe(f){events[k]=f}}]))};
- const context=vm.createContext({...core,world,canonicalFoodId,PENDING_USES:uses,stopSoundHandle(){},captureInteractionIntent:()=>({hand:'off'}),captureEatingIdentity:s=>({identity:s.typeId}),useSound(){},syncSeasoningMotion(){},completePending(){completed++},PLATE_ID:N+'skewer_plate',CUISINE_FOOD_SET:new Set(),FOOD_DATA:{},SECRET_ID:N+'secret_skewer',dangerousPreservation(){}});
+ const context=vm.createContext({plateQaTrace(){},...core,world,canonicalFoodId,PENDING_USES:uses,stopSoundHandle(){},captureInteractionIntent:()=>({hand:'off'}),captureEatingIdentity:s=>({identity:s.typeId}),useSound(){},syncSeasoningMotion(){},completePending(){completed++},PLATE_ID:N+'skewer_plate',CUISINE_FOOD_SET:new Set(),FOOD_DATA:{},SECRET_ID:N+'secret_skewer',dangerousPreservation(){}});
  const source=read('main.js'),start=source.indexOf('world.afterEvents.itemStartUse.subscribe('),end=source.indexOf('world.afterEvents.itemStopUse.subscribe(',start);
  // Only register the two relevant listeners, using their original complete bodies.
  for(const [event,next] of [['itemStartUse','itemCompleteUse'],['itemCompleteUse','itemStopUse']]){const a=source.indexOf('world.afterEvents.'+event+'.subscribe('),b=source.indexOf('world.afterEvents.'+next+'.subscribe(',a);vm.runInContext(source.slice(a,b),context);}
