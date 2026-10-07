@@ -63,5 +63,19 @@ for(const row of cases)for(const held of [row.id,'minecraft:apple','kaleidoscope
    old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+relative],cwd=ROOT,capture_output=True)
    self.assertNotEqual(old.returncode,0,'station exception must only admit a new file')
    self.assertEqual(set(json.loads(path.read_text())['animations']),{clip})
+  version=tuple(json.loads((ROOT/'baseline.json').read_text())['version'])
+  if version >= (2,8,90):
+   # This additional held-only clip must be new and exactly source-admitted;
+   # all existing eating/helper byte guards above remain unchanged.
+   path=RP/'animations/plate_held.animation.json';relative=path.relative_to(ROOT).as_posix()
+   old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+relative],cwd=ROOT,capture_output=True)
+   self.assertNotEqual(old.returncode,0)
+   if version >= (2,8,91):
+    from g91_source_conservation import expected_runtime_bytes
+   else:
+    from g90_source_conservation import expected_runtime_bytes
+   self.assertEqual(path.read_bytes(),expected_runtime_bytes(relative))
+   self.assertEqual(set(json.loads(path.read_text())['animations']),{f'animation.kg_plate_held.{key}' for key in ('fp_right','fp_left','tp_right','tp_left','layout')})
+   allowed.add(relative)
   self.assertEqual(set(changed)-allowed,set())
 if __name__=='__main__':unittest.main()

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 sys.path.insert(0, str(ROOT / 'development/gameplay_core'))
 import build_seasoning_held as held
+FROZEN_PLATE_SOURCE_BASE='fdc9892edcb714c22e1b014943b4ce86c4a2570d'
 from test_native_bottle_fp import projected
 
 
@@ -78,7 +79,16 @@ class SprinkleAnchor(unittest.TestCase):
                  held.RP / 'animations/a21_shake.animation.json', held.RP / 'animations/player_binding.animation.json']
         paths += list((held.RP / 'attachables').glob('*seasoning*.json'))
         version=tuple(json.loads((held.BP/'manifest.json').read_text())['header']['version'])
+        if version >= (2,8,90):
+            from g90_source_conservation import verify_current,expected_runtime_bytes
+            verify_current()
         for path in paths:
+            actual=path.read_bytes()
+            if version >= (2,8,90):
+                # Preserve the old physical/idle assertions on frozen G89;
+                # current ranges/owner guards require exact reviewed source bytes.
+                self.assertEqual(actual,expected_runtime_bytes(path.relative_to(ROOT).as_posix()),path)
+                actual=subprocess.check_output(['git','show',FROZEN_PLATE_SOURCE_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT)
             proxy=re.fullmatch(r'(partial|pending)_seasoning_f[1-8]\.attachable',path.stem) if path.parent==held.RP/'attachables' else None
             if proxy:
                 self.assertGreaterEqual(version,(2,8,71))
@@ -86,7 +96,7 @@ class SprinkleAnchor(unittest.TestCase):
                 original=path.with_name(base+'.attachable.json')
                 before=json.loads(subprocess.check_output(['git','show','cba67124:'+original.relative_to(ROOT).as_posix()],cwd=ROOT))
                 before['minecraft:attachable']['description']['identifier']='kaleidoscope_grilling:'+path.name.removesuffix('.attachable.json')
-                self.assertEqual(json.loads(path.read_bytes()),before,path)
+                self.assertEqual(json.loads(actual),before,path)
                 continue
             prior=subprocess.check_output(['git','show','cba67124:'+path.relative_to(ROOT).as_posix()],cwd=ROOT)
             if version>=(2,8,68) and path==held.BP/'entities/player.json':
@@ -98,8 +108,8 @@ class SprinkleAnchor(unittest.TestCase):
                         self.assertEqual(row,{'type':'int','range':[0,255],'default':0,'client_sync':True})
                         row['range']=[0,5333]
                     props['kaleidoscope_grilling:secret_'+hand+'_piece']={'type':'int','range':[0,255],'default':0,'client_sync':True}
-                self.assertEqual(json.loads(path.read_bytes()),before,path)
-            else:self.assertEqual(path.read_bytes(),prior,path)
+                self.assertEqual(json.loads(actual),before,path)
+            else:self.assertEqual(actual,prior,path)
 
 
 if __name__ == '__main__':

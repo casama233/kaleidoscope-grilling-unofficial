@@ -20,7 +20,12 @@ def build(check=False):
     # particle delivery contract, so no Tavern runtime dependency is introduced.
     text = json.dumps(data)
     for axis in 'xyz':
-        text = text.replace('variable.kt_v' + axis, 'variable.kg_velocity.' + axis)
+        # The production MolangVariableMap always supplies all three axes,
+        # including zero when delivery defaults an absent velocity. Native
+        # the G90 native loader rejects these vector-component coalescers.
+        scalar = '((variable.kt_v' + axis + ' ?? 0)/20)'
+        assert text.count(scalar) == 1, 'Unreviewed Cloud velocity input: ' + axis
+        text = text.replace(scalar, '(variable.kg_velocity.' + axis + '/20)')
     text = text.replace('variable.kt_', 'variable.kg_cloud_').replace('kt_init', 'kg_cloud_init')
     data = json.loads(text)
     effect = data['particle_effect']

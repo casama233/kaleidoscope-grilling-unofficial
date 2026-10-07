@@ -85,7 +85,7 @@ class SourceUnionTests(unittest.TestCase):
                     rows=[row for row in rows if row!=missing] if fault=='missing' else rows+[extra]
                 return iter(rows)
             with patch.object(Path,'rglob',glob),patch.object(Path,'is_file',lambda p:True if p==extra else original_is_file(p)):
-                with self.assertRaisesRegex(AssertionError,'Missing/extra G90 runtime file'):witness.verify_current()
+                with self.assertRaisesRegex(AssertionError,'Missing/extra G(?:90|91) runtime file'):witness.verify_current()
 
     def test_manifest_delta_cannot_change_fields_outside_version_identity(self):
         original=Path.read_text;meta=copy.deepcopy(witness.metadata())
@@ -96,11 +96,11 @@ class SourceUnionTests(unittest.TestCase):
         meta['files'][path]['after_sha256']=witness.sha(after)
         def read(p,*args,**kwargs):
             return json.dumps(meta) if p.name=='g90-runtime-reviewed-delta.json' else original(p,*args,**kwargs)
-        witness.expected_runtime_bytes.cache_clear()
+        witness.expected_frozen_runtime_bytes.cache_clear()
         try:
             with patch.object(Path,'read_text',read):
-                with self.assertRaisesRegex(AssertionError,'fresh paired release identity'):witness.expected_runtime_bytes(path)
-        finally:witness.expected_runtime_bytes.cache_clear()
+                with self.assertRaisesRegex(AssertionError,'fresh paired release identity'):witness.expected_frozen_runtime_bytes(path)
+        finally:witness.expected_frozen_runtime_bytes.cache_clear()
 
     def test_current_main_and_player_entrypoints_have_exact_union_expectations(self):
         for path in [witness.MAIN_PATH,witness.PROJECT+'behavior_pack/entities/player.json']:

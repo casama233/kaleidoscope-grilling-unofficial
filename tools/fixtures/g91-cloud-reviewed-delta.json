@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    91
+  ],
+  "base_commit": "6fbc56f9b49d033f5df106123311096ee39f8702",
+  "base_tree": "b262b2c3095b9ef2c106740c22239f8f24eb71d1",
+  "scope": "Only the three Cloud vector-component read corrections, the exact reviewed default-off held QA/two FP translation patch, and paired version identity. The custom secret native render issue remains unresolved; this is an isolated diagnostic candidate, with newer-main conflict admission separate.",
+  "held_review": {
+    "patch_sha256": "eb4a1d985e6ea47556ef61a10fe580450abd8ec8e8394852a85349a9c3d308ce",
+    "after_sha256": {
+      "projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_runtime.js": "72b0e69d561ae2a12ca9c2d7f27c335837bdb7d11c6749a40ab6679e8168a224",
+      "projects/grilling/gameplay_core/resource_pack/animations/plate_held.animation.json": "802a8391a37bde12f6846b83429c37afb43ae09e6d74c1d662e1d8b3da642d89"
+    }
+  },
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json": {
+      "before_sha256": "48b37b8c82841504dde3066e5da7bb7285e0119a6ed66aee5053ad96a8a5523b",
+      "after_sha256": "21366cb5c567aa282a489981b2e088318683b954468974fc9e0bce7bdae4216e",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      90\n",
+          "after": "      91\n"
+        },
+        {
+          "start": 444,
+          "end": 455,
+          "before": "        90\n",
+          "after": "        91\n"
+        },
+        {
+          "start": 661,
+          "end": 672,
+          "before": "        90\n",
+          "after": "        91\n"
+        },
+        {
+          "start": 812,
+          "end": 823,
+          "before": "        90\n",
+          "after": "        91\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_runtime.js": {
+      "before_sha256": "bbddb03544cc76a0bde5307c9fd5b46451a0103439e2fc73705c301e0bfd0e9c",
+      "after_sha256": "72b0e69d561ae2a12ca9c2d7f27c335837bdb7d11c6749a40ab6679e8168a224",
+      "operations": [
+        {
+          "start": 864,
+          "end": 864,
+          "before": "",
+          "after": "const heldQa=new Map();\n"
+        },
+        {
+          "start": 978,
+          "end": 978,
+          "before": "",
+          "after": "\nfunction heldQaItem(player,hand,stack,projected){\n const itemId=typeof stack?.typeId==='string'&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(stack.typeId)?stack.typeId:null;\n const out={itemId,projected:Array.from({length:8},(_,i)=>projected?.['kaleidoscope_grilling:bottle_'+hand+'_'+i]??null),serverLive:Array.from({length:8},(_,i)=>{try{return player.getProperty('kaleidoscope_grilling:bottle_'+hand+'_'+i)??null}catch{return 'unreadable';}})};\n if(itemId===PLATE_ID)try{\n  const raw=getItemProperty(stack,PLATE_SKEWERS_KEY),rows=raw===undefined?[]:JSON.parse(raw);\n  if(!Array.isArray(rows)||rows.length>5)throw Error('plate rows');\n  out.rows=rows.map(row=>{\n   const id=typeof row?.id==='string'&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)?row.id:'invalid';\n   const raw=(row?.native?.props??row?.props??{})[SECRET_MODEL_VARIANTS_KEY];let variants=null;\n   if(raw!==undefined)try{variants=typeof raw==='string'?JSON.parse(raw):raw;if(!Array.isArray(variants)||variants.length>3||variants.some(v=>!Number.isInteger(v)||v<1||v>9))variants='invalid';}catch{variants='invalid';}\n   return {id,modelVariants:variants};\n  });\n }catch{out.rows='unreadable';}\n return out;\n}\n\n// Existing opt-in only; no item/player metadata writes, names, lore, creator\n// fields or player identifiers in output. Internal rate-limit keys are never emitted.\n// At most one changed record/second and24 records per opt-in activation.\nexport function traceHeldProjection(player,projected,phase='ready'){\n try{\n  if(player?.hasTag?.('kg_plate_qa')!==true){heldQa.delete(player.id);return;}\n  const tick=system.currentTick,state=heldQa.get(player.id)??{next:-1,count:0,last:''};\n  if(state.count>=24||tick<state.next)return;\n  state.next=tick+20;heldQa.set(player.id,state);\n  const record={phase,main:heldQaItem(player,'main',getMainHand(player),projected),off:heldQaItem(player,'off',getOffHand(player),projected)},signature=JSON.stringify(record);\n  if(state.last===signature)return;\n  state.last=signature;state.count++;console.warn('[Grilling held QA] '+signature);\n }catch{} // Optional diagnostics cannot interrupt the presentation transaction.\n}\n"
+        },
+        {
+          "start": 4567,
+          "end": 4625,
+          "before": " }}catch(error){throw invalidateHeldInput(player,error);}\n",
+          "after": " }}catch(error){const failure=invalidateHeldInput(player,error);traceHeldProjection(player,undefined,'input_failed');throw failure;}\n"
+        },
+        {
+          "start": 4664,
+          "end": 4714,
+          "before": " if(signatures.get(player.id)===signature)return;\n",
+          "after": " if(signatures.get(player.id)===signature){traceHeldProjection(player,rows);return;}\n"
+        },
+        {
+          "start": 5130,
+          "end": 5515,
+          "before": " for(const hand of ['main','off'])player.setProperty('kaleidoscope_grilling:bottle_'+hand+'_7',HELD_VISUAL_INVALID_OWNER);\n for(const [key,value] of Object.entries(rows))if(!key.endsWith('_7'))player.setProperty(key,value);\n for(const hand of ['main','off']){const key='kaleidoscope_grilling:bottle_'+hand+'_7';player.setProperty(key,rows[key]);}\n signatures.set(player.id,signature);\n",
+          "after": " try{\n  for(const hand of ['main','off'])player.setProperty('kaleidoscope_grilling:bottle_'+hand+'_7',HELD_VISUAL_INVALID_OWNER);\n  for(const [key,value] of Object.entries(rows))if(!key.endsWith('_7'))player.setProperty(key,value);\n  for(const hand of ['main','off']){const key='kaleidoscope_grilling:bottle_'+hand+'_7';player.setProperty(key,rows[key]);}\n  signatures.set(player.id,signature);\n }catch(error){traceHeldProjection(player,rows,'publish_failed');throw error;}\n traceHeldProjection(player,rows);\n"
+        },
+        {
+          "start": 5954,
+          "end": 6062,
+          "before": "world.afterEvents.playerLeave.subscribe(e=>{signatures.delete(e.playerId);platePlans.delete(e.playerId);});\n",
+          "after": "world.afterEvents.playerLeave.subscribe(e=>{signatures.delete(e.playerId);platePlans.delete(e.playerId);heldQa.delete(e.playerId);});\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/animations/plate_held.animation.json": {
+      "before_sha256": "11e345ff9cc0892dc2f4fa9a67bfb8d18b7fec717fa89f05ec0c9b29c71e5197",
+      "after_sha256": "802a8391a37bde12f6846b83429c37afb43ae09e6d74c1d662e1d8b3da642d89",
+      "operations": [
+        {
+          "start": 176,
+          "end": 249,
+          "before": "            -2.15601965,\n            4.53282703,\n            -1.52083612\n",
+          "after": "            3.41663155,\n            -2.16507196,\n            -7.06102634\n"
+        },
+        {
+          "start": 608,
+          "end": 665,
+          "before": "            -15.039,\n            1.232,\n            11.6\n",
+          "after": "            -11.039,\n            4.332,\n            20.6\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/manifest.json": {
+      "before_sha256": "bc8a68f1eef623ed275d692d41d5eca1f0a202ee2ea72c83c00aa7c8ff8d1d6e",
+      "after_sha256": "d36407995af02678c5552bf1d8f437be0a78dc706e7c92a330d8e0fb29deb2de",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      90\n",
+          "after": "      91\n"
+        },
+        {
+          "start": 449,
+          "end": 460,
+          "before": "        90\n",
+          "after": "        91\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/particles/feedback_cloud.json": {
+      "before_sha256": "0c92365e3b4d9c959417d239e5d772a11a5a8b052c8fa2a177ed00f170553e59",
+      "after_sha256": "68da7631496b32dff52b38d5632d5a01b5179f5fb3c87563d278c08eff5a3131",
+      "operations": [
+        {
+          "start": 3355,
+          "end": 4533,
+          "before": "        \"expression\": \"variable.kg_cloud_tick=0;variable.kg_cloud_age=0;variable.kg_cloud_x=0;variable.kg_cloud_oldx=variable.kg_cloud_x;variable.kg_cloud_y=0;variable.kg_cloud_oldy=variable.kg_cloud_y;variable.kg_cloud_z=0;variable.kg_cloud_oldz=variable.kg_cloud_z;variable.kg_cloud_dx=(0)+math.random(-0.4,0.4);variable.kg_cloud_dy=(0)+math.random(-0.4,0.4);variable.kg_cloud_dz=(0)+math.random(-0.4,0.4);variable.kg_cloud_scale=(math.random(0,1)+math.random(0,1)+1)*0.06/math.max(0.000000000001,math.sqrt(variable.kg_cloud_dx*variable.kg_cloud_dx+variable.kg_cloud_dy*variable.kg_cloud_dy+variable.kg_cloud_dz*variable.kg_cloud_dz));variable.kg_cloud_dx=variable.kg_cloud_dx*(variable.kg_cloud_scale);variable.kg_cloud_dy=variable.kg_cloud_dy*(variable.kg_cloud_scale);variable.kg_cloud_dz=variable.kg_cloud_dz*(variable.kg_cloud_scale);variable.kg_cloud_dy=variable.kg_cloud_dy+(0.1);variable.kg_cloud_dx=variable.kg_cloud_dx*0.1+((variable.kg_velocity.x ?? 0)/20);variable.kg_cloud_dy=variable.kg_cloud_dy*0.1+((variable.kg_velocity.y ?? 0)/20);variable.kg_cloud_dz=variable.kg_cloud_dz*0.1+((variable.kg_velocity.z ?? 0)/20);variable.kg_cloud_gray=1-math.random(0,0.3);\"\n",
+          "after": "        \"expression\": \"variable.kg_cloud_tick=0;variable.kg_cloud_age=0;variable.kg_cloud_x=0;variable.kg_cloud_oldx=variable.kg_cloud_x;variable.kg_cloud_y=0;variable.kg_cloud_oldy=variable.kg_cloud_y;variable.kg_cloud_z=0;variable.kg_cloud_oldz=variable.kg_cloud_z;variable.kg_cloud_dx=(0)+math.random(-0.4,0.4);variable.kg_cloud_dy=(0)+math.random(-0.4,0.4);variable.kg_cloud_dz=(0)+math.random(-0.4,0.4);variable.kg_cloud_scale=(math.random(0,1)+math.random(0,1)+1)*0.06/math.max(0.000000000001,math.sqrt(variable.kg_cloud_dx*variable.kg_cloud_dx+variable.kg_cloud_dy*variable.kg_cloud_dy+variable.kg_cloud_dz*variable.kg_cloud_dz));variable.kg_cloud_dx=variable.kg_cloud_dx*(variable.kg_cloud_scale);variable.kg_cloud_dy=variable.kg_cloud_dy*(variable.kg_cloud_scale);variable.kg_cloud_dz=variable.kg_cloud_dz*(variable.kg_cloud_scale);variable.kg_cloud_dy=variable.kg_cloud_dy+(0.1);variable.kg_cloud_dx=variable.kg_cloud_dx*0.1+(variable.kg_velocity.x/20);variable.kg_cloud_dy=variable.kg_cloud_dy*0.1+(variable.kg_velocity.y/20);variable.kg_cloud_dz=variable.kg_cloud_dz*0.1+(variable.kg_velocity.z/20);variable.kg_cloud_gray=1-math.random(0,0.3);\"\n"
+        }
+      ]
+    }
+  }
+}

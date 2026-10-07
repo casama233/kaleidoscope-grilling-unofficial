@@ -12,8 +12,40 @@ import {heldVisualRegistryRevision} from './integration_registry_core.js';
 
 const signatures=new Map();
 const platePlans=new Map();
+const heldQa=new Map();
 let plateSecretReader;
 export function configurePlateHeldReader(read){plateSecretReader=read;platePlans.clear();}
+
+function heldQaItem(player,hand,stack,projected){
+ const itemId=typeof stack?.typeId==='string'&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(stack.typeId)?stack.typeId:null;
+ const out={itemId,projected:Array.from({length:8},(_,i)=>projected?.['kaleidoscope_grilling:bottle_'+hand+'_'+i]??null),serverLive:Array.from({length:8},(_,i)=>{try{return player.getProperty('kaleidoscope_grilling:bottle_'+hand+'_'+i)??null}catch{return 'unreadable';}})};
+ if(itemId===PLATE_ID)try{
+  const raw=getItemProperty(stack,PLATE_SKEWERS_KEY),rows=raw===undefined?[]:JSON.parse(raw);
+  if(!Array.isArray(rows)||rows.length>5)throw Error('plate rows');
+  out.rows=rows.map(row=>{
+   const id=typeof row?.id==='string'&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(row.id)?row.id:'invalid';
+   const raw=(row?.native?.props??row?.props??{})[SECRET_MODEL_VARIANTS_KEY];let variants=null;
+   if(raw!==undefined)try{variants=typeof raw==='string'?JSON.parse(raw):raw;if(!Array.isArray(variants)||variants.length>3||variants.some(v=>!Number.isInteger(v)||v<1||v>9))variants='invalid';}catch{variants='invalid';}
+   return {id,modelVariants:variants};
+  });
+ }catch{out.rows='unreadable';}
+ return out;
+}
+
+// Existing opt-in only; no item/player metadata writes, names, lore, creator
+// fields or player identifiers in output. Internal rate-limit keys are never emitted.
+// At most one changed record/second and24 records per opt-in activation.
+export function traceHeldProjection(player,projected,phase='ready'){
+ try{
+  if(player?.hasTag?.('kg_plate_qa')!==true){heldQa.delete(player.id);return;}
+  const tick=system.currentTick,state=heldQa.get(player.id)??{next:-1,count:0,last:''};
+  if(state.count>=24||tick<state.next)return;
+  state.next=tick+20;heldQa.set(player.id,state);
+  const record={phase,main:heldQaItem(player,'main',getMainHand(player),projected),off:heldQaItem(player,'off',getOffHand(player),projected)},signature=JSON.stringify(record);
+  if(state.last===signature)return;
+  state.last=signature;state.count++;console.warn('[Grilling held QA] '+signature);
+ }catch{} // Optional diagnostics cannot interrupt the presentation transaction.
+}
 
 export function readBottleHeldSeasonings(stack){
  if(!isBottleHeldVisualItem(stack?.typeId))return [];
@@ -76,19 +108,22 @@ export function syncBottleHeld(player){
    plan=bottleHeldVisualPlan(stack?.typeId,readBottleHeldSeasonings(stack));
   }
   for(let i=0;i<plan.length;i++)rows['kaleidoscope_grilling:bottle_'+hand+'_'+i]=plan[i];
- }}catch(error){throw invalidateHeldInput(player,error);}
+ }}catch(error){const failure=invalidateHeldInput(player,error);traceHeldProjection(player,undefined,'input_failed');throw failure;}
  const signature=JSON.stringify(rows);
- if(signatures.get(player.id)===signature)return;
+ if(signatures.get(player.id)===signature){traceHeldProjection(player,rows);return;}
  // A failed write can leave some properties updated. Invalidate the old cache
  // before writing, so reverting hands also retries a complete projection.
  signatures.delete(player.id);
  // Neither renderer owns this sentinel. Publish payloads only while both hands
  // are invalid, then release each owner marker last. Failed writes leave a
  // complete retry pending even if the user reverts to the old held items.
- for(const hand of ['main','off'])player.setProperty('kaleidoscope_grilling:bottle_'+hand+'_7',HELD_VISUAL_INVALID_OWNER);
- for(const [key,value] of Object.entries(rows))if(!key.endsWith('_7'))player.setProperty(key,value);
- for(const hand of ['main','off']){const key='kaleidoscope_grilling:bottle_'+hand+'_7';player.setProperty(key,rows[key]);}
- signatures.set(player.id,signature);
+ try{
+  for(const hand of ['main','off'])player.setProperty('kaleidoscope_grilling:bottle_'+hand+'_7',HELD_VISUAL_INVALID_OWNER);
+  for(const [key,value] of Object.entries(rows))if(!key.endsWith('_7'))player.setProperty(key,value);
+  for(const hand of ['main','off']){const key='kaleidoscope_grilling:bottle_'+hand+'_7';player.setProperty(key,rows[key]);}
+  signatures.set(player.id,signature);
+ }catch(error){traceHeldProjection(player,rows,'publish_failed');throw error;}
+ traceHeldProjection(player,rows);
 }
 
 function syncSafely(player){
@@ -97,5 +132,5 @@ function syncSafely(player){
 
 world.afterEvents.playerInventoryItemChange.subscribe(e=>{platePlans.delete(e.player.id);system.run(()=>syncSafely(e.player));});
 world.afterEvents.playerHotbarSelectedSlotChange.subscribe(e=>{const hands=platePlans.get(e.player.id);if(hands)delete hands.main;system.run(()=>syncSafely(e.player));});
-world.afterEvents.playerLeave.subscribe(e=>{signatures.delete(e.playerId);platePlans.delete(e.playerId);});
+world.afterEvents.playerLeave.subscribe(e=>{signatures.delete(e.playerId);platePlans.delete(e.playerId);heldQa.delete(e.playerId);});
 system.runInterval(()=>{for(const player of world.getAllPlayers())syncSafely(player)},5);

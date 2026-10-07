@@ -146,7 +146,7 @@ def union_sources():
     return expected
 
 @lru_cache(maxsize=None)
-def expected_runtime_bytes(path):
+def expected_frozen_runtime_bytes(path):
     ref = union_sources().get(path, 'missing')
     assert ref != 'missing', 'Runtime path outside exact G90 union: '+path
     if path in DELTA_PATHS:
@@ -167,7 +167,34 @@ def expected_runtime_bytes(path):
     return source(ref,path)
 
 
+@lru_cache(maxsize=None)
+def expected_runtime_bytes(path):
+    if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,91):
+        from g91_source_conservation import expected_runtime_bytes as expected_next
+        return expected_next(path)
+    return expected_frozen_runtime_bytes(path)
+
+
+def verify_snapshot(ref):
+    """Retain every exact G90 assertion on its immutable public pack snapshot."""
+    verify_lineages();metadata()
+    expected=union_sources();frozen=files(ref)
+    assert set(frozen)==set(expected),'Frozen G90 missing/extra runtime file'
+    for path,origin in expected.items():
+        identity=blob(expected_frozen_runtime_bytes(path)) if origin is None else files(origin)[path]
+        assert frozen[path]==identity,'Frozen G90 source drift: '+path
+    history=json.loads(source(ref,'release-history.json'))
+    for version,row in json.loads(source(MERGED_MAIN_SOURCE_BASE,'release-history.json')).items():
+        assert history[version]==row,'Frozen canonical main history drift: '+version
+    for version,row in json.loads(source(PLATE_SOURCE_BASE,'release-history.json')).items():
+        if version not in COLLISIONS:assert history[version]==row,'Frozen plate history drift: '+version
+    return {'runtime_files':len(frozen),'sources':3,'collision_labels':len(COLLISIONS)}
+
+
 def verify_current():
+    if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,91):
+        from g91_source_conservation import verify_current as verify_next
+        return verify_next()
     verify_lineages(); metadata()
     expected = union_sources()
     current = {p.relative_to(ROOT).as_posix():p for side in ('behavior_pack','resource_pack')

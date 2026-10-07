@@ -109,3 +109,22 @@ test('owned Cloud uses the existing G atlas/velocity contract and retains its de
  const text=JSON.stringify(cloud);assert.ok(text.includes('variable.kg_velocity.x'));assert.ok(!text.includes('variable.kt_'));assert.ok(!text.includes('kaleidoscope_tavern:'));
  const proof=JSON.parse(read('development/gameplay_core/fixtures/java-cookery-effect-feedback-160.json'));assert.equal(proof.client,false);assert.ok(proof.boundaries.some(x=>x.includes('Nearest-player')));
 });
+
+test('Cloud input reads retain the native vector map, zero delivery default and authored per-tick divisor/order',()=>{
+ const cloud=JSON.parse(read('projects/grilling/gameplay_core/resource_pack/particles/feedback_cloud.json')).particle_effect;
+ const expression=cloud.events.kg_cloud_init.expression;assert.ok(!expression.includes('??'));
+ const positions=[];
+ for(const axis of ['x','y','z']){const term=`variable.kg_cloud_d${axis}=variable.kg_cloud_d${axis}*0.1+(variable.kg_velocity.${axis}/20);`;assert.equal(expression.split(term).length,2);positions.push(expression.indexOf(term));}
+ assert.ok(positions[0]<positions[1]&&positions[1]<positions[2]);
+ const source=read('projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particles_runtime.js').replace(/^import .*;$/gm,'').replace(/export function/g,'function'),received=[];
+ class Variables{setVector3(key,value){this.key=key;this.value=value;}}
+ const ctx=vm.createContext({MolangVariableMap:Variables,emitParticleCommands,recordParticleDelivery(){}});
+ vm.runInContext(source+';this.emit=emitParticles;',ctx);
+ ctx.emit({spawnParticle(_id,_position,map){received.push(map);}}, {x:0,y:0,z:0},[
+  {id:cloud.description.identifier,offset:[0,0,0],velocity:[.1,.02,-.05]},
+  {id:cloud.description.identifier,offset:[0,0,0]}
+ ]);
+ assert.equal(received.length,2);assert.ok(received.every(map=>map.key==='variable.kg_velocity'));
+ assert.deepEqual({...received[0].value},{x:2,y:.4,z:-1});assert.deepEqual({...received[1].value},{x:0,y:0,z:0});
+ assert.deepEqual(Object.values(received[0].value).map(v=>v/20),[.1,.02,-.05]);
+});

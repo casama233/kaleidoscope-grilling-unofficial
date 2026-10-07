@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.90
+## Current maintained baseline: 2.8.91
+
+**G91 Cloud 表達式候選**：修正 G90 原生載入確認的 Cloud 粒子 Molang 語法錯誤，保留相同速度向量、單位及既有餐盤功能。G90 觀察與新候選驗證分開記錄。見 [G91 範圍](docs/STATUS-A2.8.91.md)。
 
 **G90 手持餐盤候選**：整合 current main 的油液所有權／原作傷害回饋與 G89 放置餐盤修復，加入只讀的雙手盤中內容顯示、快取失效及讀寫錯誤恢復保護。相同編號的兩條 G83／G84 來源明列保留；原生手持驗證及家族准入仍待完成。見 [G90 範圍](docs/STATUS-A2.8.90.md)。
 

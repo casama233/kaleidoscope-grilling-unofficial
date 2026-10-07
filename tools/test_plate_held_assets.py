@@ -13,9 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'development/gameplay_core')]
 import build_plate_held as held
 from held_pose_frames import (chain, translate, rotate, xyz, scale, point,
-    bone_matrix, rigid_inverse, native_skewer_calibration)
+    bone_matrix, rigid_inverse, native_skewer_calibration, zyx)
 from secret_skewer_assets import state_slot_cubes, shaft_cubes, COMPLETE_STATES
 from test_eating_observer_projection import node
+from test_native_skewer_fp import reference_frame
 
 
 def load(relative):
@@ -93,10 +94,10 @@ class PlateHeldAssets(unittest.TestCase):
         for count in range(6):
             for row in range(count, 5): self.assertEqual(held.slot_pose(row, count), {'position': [0, 0, 0], 'rotation': [0, 0, 0]})
 
-    def test_authored_first_person_frames_reconstruct_both_native_socket_projections(self):
+    def test_first_person_frames_preserve_authored_projection_plus_camera_translation(self):
         # Check the generated bone frame against the separately assembled Java
-        # model transform, not copied Euler channels. Body visibility remains
-        # partial at the default native camera edge; native acceptance is open.
+        # model transform plus the explicit Bedrock camera translation. The
+        # source rotation/scale remain authored; native acceptance is still open.
         for hand in ('right', 'left'):
             sign = 1 if hand == 'right' else -1
             base, camera = native_skewer_calibration(hand)
@@ -104,13 +105,12 @@ class PlateHeldAssets(unittest.TestCase):
                 bone_matrix(held.plate_pose('fp', hand)), translate([0, -24, 0]))
             expected = chain(translate([0, -24, -32.4]), translate([9.039*sign, 15.682, 20.8]),
                 translate([0, 3.75, 0]), xyz([0, -135*sign, 0]), scale([.4]*3), translate([-8]*3))
-            visible = 0
+            offset = [-4*sign, 3.1, -9]
             for source in itertools.product((1, 8, 15), (0, 2), (1, 8, 15)):
                 result = point(actual, [source[0]-8, source[1]+24, source[2]-8])
-                for a, b in zip(result, point(expected, source)): self.assertAlmostEqual(a, b, places=7)
-                visible += result[2] < -.1 and abs(result[0]/result[2]) < 1.3 and abs(result[1]/result[2]) < .75
+                for a, b, delta in zip(result, point(expected, source), offset):
+                    self.assertAlmostEqual(a, b+delta, places=7)
                 self.assertTrue(all(math.isfinite(v) for v in result))
-            self.assertGreater(visible, 0)
 
     def test_real_decoder_owner_and_visibility_expressions_in_both_hands(self):
         # Evaluate the actual generated scripts/controllers under the existing
@@ -199,6 +199,136 @@ for(const hand of ['main_hand','off_hand'])for(const firstPerson of [0,1]){
         self.assertLess(held.PALETTE_MAX, 2**24)
         for marker in (0, 9, 748, 9800343): self.assertFalse(held.decode_projection([0]*7+[marker])['owner'])
         self.assertEqual(held.decode_projection([0]*7+[10]), {'owner': True, 'count': 0, 'rows': []})
+
+
+def cube_corners(cube):
+    """Every reflected source corner, including cube-local rotation/inflation."""
+    pivot = cube.get('pivot', [0, 0, 0]); pivot = [-pivot[0], pivot[1], pivot[2]]
+    rotation = cube.get('rotation', [0, 0, 0])
+    matrix = chain(translate(pivot), zyx([-rotation[0], -rotation[1], rotation[2]]),
+        translate([-v for v in pivot]))
+    origin, size, inflate = cube['origin'], cube['size'], cube.get('inflate', 0)
+    return [point(matrix, [(-1 if axis == 0 else 1) *
+        (origin[axis]-inflate+corner[axis]*(size[axis]+2*inflate)) for axis in range(3)])
+        for corner in itertools.product((0, 1), repeat=3)]
+
+
+class PlateFirstPersonFraming(unittest.TestCase):
+    """Complete rigid-model framing; no Bedrock pixel/controller certification.
+
+    The independent pinned native socket is settled, wide skin, zero bob,
+    non-VR. Every possible active row mesh is included, so its union bounds all
+    mixed combinations, palettes and styles without enumerating their product.
+    Equip lowering and actual FOV/eye/blending remain native-client gates.
+    """
+    X_VIEW = (.025, .535)
+    Y_VIEW = (-.285, -.015)
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geometries = {g['description']['identifier'].rsplit('.', 1)[1]: g
+            for g in load('models/entity/plate_held.geo.json')['minecraft:geometry']}
+        cls.aliases = {}
+        cls.source_corners = {}
+        for alias, geometry in cls.geometries.items():
+            cls.source_corners[alias] = [p for bone in geometry['bones']
+                for cube in bone.get('cubes', []) for p in cube_corners(cube)]
+        for row in range(5):
+            cls.aliases[row] = {f'fixed_{row}_{i}' for i in range(19)} | {f'stick_{row}'} | \
+                {f'secret_{row}_{shape}_{slot}' for shape in range(27) for slot in range(3)} | \
+                {f'special_{row}_{i}' for i in range(3)}
+        cls.cases = {}
+        fixed = {'position': [0, 1.8, 1.8], 'rotation': [0, 0, -180], 'scale': 1.2}
+        for hand in ('right', 'left'):
+            # reference_frame independently assembles the native player/socket
+            # fixture; do not use the generator's native_skewer_calibration.
+            root = chain(reference_frame(hand), bone_matrix(held.plate_pose('fp', hand)),
+                translate([0, -24, 0]))
+            for count in range(6):
+                cls.cases[hand, count, 'body'] = [point(root, p) for p in cls.source_corners['body']]
+                for row in range(count):
+                    matrix = chain(root, translate([0, 24, 0]),
+                        bone_matrix(held.slot_pose(row, count)), bone_matrix(fixed), translate([0, -24, 0]))
+                    for alias in sorted(cls.aliases[row]):
+                        cls.cases[hand, count, alias] = [point(matrix, p) for p in cls.source_corners[alias]]
+        cls.points = [([p[0] if hand == 'right' else -p[0], p[1], p[2]])
+            for (hand, _, _), points in cls.cases.items() for p in points]
+
+    def test_full_body_and_every_selectable_row_family_count_zero_through_five(self):
+        self.assertEqual(len(self.cases), 3132)
+        self.assertEqual(len(self.points), 384336)
+        for row in range(5):
+            actual = {alias for alias, geometry in self.geometries.items()
+                if geometry['bones'][-1]['name'] == f'plate_row_{row}' and has_cubes(geometry)}
+            self.assertEqual(actual, self.aliases[row])
+        for (hand, count, alias), points in self.cases.items():
+            self.assertTrue(points, (hand, count, alias))
+            sign = 1 if hand == 'right' else -1
+            self.assertTrue(all(all(math.isfinite(v) for v in p) and p[2] < -.1 and
+                self.X_VIEW[0] < sign*p[0]/-p[2] < self.X_VIEW[1] and
+                self.Y_VIEW[0] < p[1]/-p[2] < self.Y_VIEW[1] for p in points),
+                f'Complete model leaves narrower hand viewport: {hand}/{count}/{alias}')
+
+    def test_projection_covers_the_actual_identity_geometry_hierarchy(self):
+        for alias, geometry in self.geometries.items():
+            if alias == 'body':
+                names = ['grip', 'plate_pose', 'plate_body']
+            else:
+                row = alias.split('_')[1]
+                names = ['grip', 'plate_pose', f'plate_slot_{row}', f'plate_fixed_{row}', f'plate_row_{row}']
+            self.assertEqual([b['name'] for b in geometry['bones']], names, alias)
+            for index, bone in enumerate(geometry['bones']):
+                self.assertEqual(bone['pivot'], [0, 24, 0], (alias, bone['name']))
+                self.assertFalse(set(bone) & {'position', 'rotation', 'scale'}, (alias, bone['name']))
+                if index:
+                    self.assertEqual(bone['parent'], names[index-1], (alias, bone['name']))
+                else:
+                    self.assertNotIn('parent', bone)
+                    self.assertEqual(bone['binding'], held.BINDING)
+
+    def test_complete_model_also_fits_horizontal_and_vertical_sixty_degree_cameras(self):
+        tangent = math.tan(math.radians(30))
+        for aspect in (1.49, 16/9):
+            for axis in ('horizontal', 'vertical'):
+                hx, hy = (tangent, tangent/aspect) if axis == 'horizontal' else (tangent*aspect, tangent)
+                self.assertTrue(all(p[2] < -.1 and abs(p[0]) < -p[2]*hx and
+                    abs(p[1]) < -p[2]*hy for p in self.points), (axis, aspect))
+
+    def test_source_corner_constraints_derive_a_bounded_mirrored_translation(self):
+        self.assertEqual(held.PLATE_FP_CAMERA_OFFSET, [-4, 3.1, -9])
+        # Undo only the tested common camera translation to measure the intact
+        # authored frame. These are model-frame measurements, not pixel data.
+        source = [[p[0]+4, p[1]-3.1, p[2]+9] for p in self.points]
+        intervals = []
+        minimum_depths = []
+        for axis, (low, high) in enumerate((self.X_VIEW, self.Y_VIEW)):
+            lower = max(-low*p[2]-p[axis] for p in source)
+            upper = min(-high*p[2]-p[axis] for p in source)
+            minimum_depths.append((lower-upper)/(high-low))
+            intervals.append((low*9+lower, high*9+upper))
+        self.assertAlmostEqual(max(minimum_depths), 8.46439919, places=6)
+        self.assertLess(intervals[0][0], -4); self.assertGreater(intervals[0][1], -4)
+        self.assertLess(intervals[1][0], 3.1); self.assertGreater(intervals[1][1], 3.1)
+        # Eight units cannot satisfy the whole-model vertical bounds with any
+        # common Y translation; nine creates the documented safe interval.
+        self.assertGreater(max(minimum_depths), 8)
+        self.assertLess(max(minimum_depths), 9)
+
+    def test_unadapted_source_frame_witness_rejects_prior_partial_body_gate(self):
+        for hand, sign in (('right', 1), ('left', -1)):
+            current = self.cases[hand, 0, 'body']
+            source = [[p[0]+4*sign, p[1]-3.1, p[2]+9] for p in current]
+            # The former any-corner envelope passes while whole-tray coverage
+            # fails. Preserve this reproducer rather than relaxing the gate.
+            self.assertTrue(any(p[2] < -.1 and abs(p[0]/p[2]) < 1.3 and
+                abs(p[1]/p[2]) < .75 for p in source))
+            self.assertFalse(all(p[2] < -.1 and
+                self.X_VIEW[0] < sign*p[0]/-p[2] < self.X_VIEW[1] and
+                self.Y_VIEW[0] < p[1]/-p[2] < self.Y_VIEW[1] for p in source))
+
+
+def has_cubes(geometry):
+    return any(bone.get('cubes') for bone in geometry['bones'])
 
 
 if __name__ == '__main__': unittest.main()

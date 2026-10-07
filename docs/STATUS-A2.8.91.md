@@ -1,0 +1,15 @@
+# G91 held diagnostics, framing and Cloud candidate
+
+G90 source `06b92eea0c3a5973b5cfb59b41f0a8cc9b59841b` / archive SHA256 `c48fb397b1a13d025f351e6554db11e9eb272d6cfe5865d6c843b8172cc0fcd6` produced an actual Bedrock 1.26.52.3 first-load Content Log error. The Cloud initializer used null-coalescing on `variable.kg_velocity.x/y/z`, which this native parser rejects because those operands are not direct scalar-variable references. The private capture SHA256 is `31dbd811d67414e096084f3ea85d5eeff3d9b2ebf6a68281d07f585cdb686ee8`; screenshots remain in the owner's private evidence archive.
+
+The generator had substituted three scalar template variables with vector components while retaining `??0`. Production already supplies every velocity axis through the existing MolangMap vector contract, including zero velocity. G91 removes only those three coalescers. Component names, vector API, axis values, `/20` conversion, random motion and statement order remain unchanged. The original author template remains intact; no host pack replacement or broader particle rewrite is introduced.
+
+G90 runtime/archive stay frozen. G91 uses a fresh paired identity and exact Cloud/manifests delta over frozen G90, preserving the current-main oil/damage feedback, all placed repairs, held renderer and both historical 83/84 lineages. Native first-load and actual Cloud rendering still need this exact candidate's checks; no source/static test certifies those results. Dynamic GUI, failed variants/provenance, complete Java audio/visual parity and BSM/family/live gates remain open. Keep draft, `client=false`, `production_ready=false`, `pending_client_acceptance`; no merge, release or deployment.
+
+## Bounded held follow-up
+
+The same G90 native sample showed an empty custom plate in both hands, while four-beef plate was visible in third person; both first-person plates were cropped at pitch 0°. G91 does not invent a custom-render repair. Existing opt-in tag `kg_plate_qa` can report raw row identifiers/model variants plus projected and server-live eight-word values, at most 24 changed records per activation/one per second. It is off by default and does not write ItemStack, lore, creator or plate metadata. Server readings do not certify client Molang state. The preserved custom row's expected words are `[8285209,0,0,0,0,57,0,133]`.
+
+The framing candidate changes only the two first-person plate translations by mirrored native-camera offset `[-4sign,3.1,-9]`, calibrated against selected exported model corners. Java rotations/scales, third-person poses, layout, geometry and arms stay unchanged. The new framing must be checked natively.
+
+Latest main advanced separately to `93056ea40dd598761a200fa22e91de02c8eadb0a` through PR154, with a different published 2.8.85 identity from historical plate PR148. This isolated diagnostic candidate stays on frozen G90; latest-main source/history consolidation is required before eventual merge/release. A conflicted draft or local focused checks are not canonical PR CI readiness.
