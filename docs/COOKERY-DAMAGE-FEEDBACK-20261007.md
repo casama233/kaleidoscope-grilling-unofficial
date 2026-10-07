@@ -6,10 +6,19 @@ branches instead apply 100 ticks of Slowness II when the damage source's
 responsible entity is a living actor with Hinder. Projectile damage therefore
 missed the Bedrock handler.
 
-The repair subscribes once to `entityHurt`, prefers the reported responsible
-`damagingEntity`, and reads the native projectile's `owner` only when that field
-is absent. A health component is the Bedrock mapping for a living attacker and
-victim. The existing `kaleidoscope_grilling:a21_fx` state and `hinder` key remain
+The repair subscribes once to `entityHurt` and prefers a reported living
+`damagingEntity`. Native candidate checks exposed another representation:
+Bedrock can report the same arrow in both `damagingEntity` and
+`damagingProjectile`, even though that arrow's owner is living. Selecting the
+first field merely because it exists would still miss Hinder. The correction
+uses the recognized native projectile's owner when the responsible field is
+absent, when both fields identify that projectile, or when the only reported
+entity itself has a native projectile component. A reported living attacker
+retains priority. An unrelated nonliving damager alongside a different
+projectile does not inherit that projectile's owner.
+
+A health component is the Bedrock mapping for a living attacker and victim.
+The existing `kaleidoscope_grilling:a21_fx` state and `hinder` key remain
 unchanged, including expiry and food/secret-ingredient producers. The Java
 handlers have no positive damage amount condition; the port adds none.
 
@@ -47,8 +56,10 @@ timing, mixing and nearby-player attraction remain unverified client behavior.
 `test_cookery_damage_feedback.mjs` exercises the actual production subscribers
 and flatulence statement with API-operation adapters. Its old-handler
 counterexample misses an attributed projectile hurt event; the corrected
-handler applies Slowness II once. The focused checks cover expiry, responsible
-source priority, missing sources, nonliving mappings, reported zero damage,
+handler applies Slowness II once. The focused checks also cover an arrow in
+both native source fields, separate wrappers with the same native ID, a lone
+recognized projectile, and conflicting nonliving source identities. They cover
+expiry, responsible source priority, missing sources, nonliving mappings, reported zero damage,
 removed entities, repeated sneak state, ten particle commands, sound pitch and
 feedback failures. These source tests do not certify native Minecraft event
 ordering or human audio/render acceptance. The owned Cloud producer has a

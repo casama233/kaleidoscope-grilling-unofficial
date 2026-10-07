@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    84
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only native projectile-reported damagingEntity to living-owner resolution. Responsible living actor retains priority, unrelated nonliving actor cannot inherit a different projectile owner. All other G83/G82/G81 main bytes conserved.",
+  "base_commit": "0a3f55be6dad72ad50b9a9c485dc195b9c7b1930",
+  "before_sha256": "5d09325573be741ba585c80a2daec1ff71f057f25d2e284f18b6dc2f7be61320",
+  "after_sha256": "ba4cfe77374258c2a43a73b4d9a0d1215b4bc015125b0d75b6a210691baf4b2d",
+  "operations": [
+    {
+      "start": 79597,
+      "end": 79711,
+      "before": "  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;\n",
+      "after": "  let attacker=source?.damagingEntity;\n  if(!attacker?.getComponent('minecraft:health')){\n   const projectile=source?.damagingProjectile;\n   // Native hurt may report the arrow itself as damagingEntity. Resolve its\n   // living owner, while preserving an independently reported actor's priority.\n   if(attacker&&projectile&&attacker.id!==projectile.id)return;\n   attacker=(projectile??attacker)?.getComponent('minecraft:projectile')?.owner;\n  }\n"
+    }
+  ]
+}

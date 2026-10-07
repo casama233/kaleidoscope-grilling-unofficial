@@ -1034,7 +1034,14 @@ world.afterEvents.entityHurt.subscribe(e=>{
  // Java has no positive-amount gate. Do not invent one for after-hurt events.
  try{
   const source=e.damageSource;
-  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;
+  let attacker=source?.damagingEntity;
+  if(!attacker?.getComponent('minecraft:health')){
+   const projectile=source?.damagingProjectile;
+   // Native hurt may report the arrow itself as damagingEntity. Resolve its
+   // living owner, while preserving an independently reported actor's priority.
+   if(attacker&&projectile&&attacker.id!==projectile.id)return;
+   attacker=(projectile??attacker)?.getComponent('minecraft:projectile')?.owner;
+  }
   if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;
   e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});
  }catch{} // A removed actor/projectile must not abort other damage subscribers.

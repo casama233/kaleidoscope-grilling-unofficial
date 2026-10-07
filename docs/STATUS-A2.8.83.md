@@ -13,3 +13,5 @@ The exact `main.js` delta permits only the two reviewed damage/feedback edits. E
 The async movement guard deliberately cancels even ordinary movement while waiting for legacy publication. The published pot remains usable on the next synchronous interaction. Same-coordinate target replacement is not a new block-instance identity guarantee. ProjectileDodge impact-stage equivalence and its missing old-location teleport sound remain follow-up work. Full survival, multiplayer, persistence and same-candidate hand/player/audio/render comparisons are still open with dot. Keep `client=false`, `production_ready=false`, `pending_client_acceptance`; do not claim the full goal complete.
 
 See [Cookery damage and feedback source](COOKERY-DAMAGE-FEEDBACK-20261007.md) and [complete goal](JAVA-FIDELITY-GOAL-20261007.md).
+
+G83 was frozen as a development candidate and superseded by G84 after a real native projectile source mismatch. Its identity/history and failed evidence are preserved; G83 was not deployed or claimed accepted. See [G84](STATUS-A2.8.84.md).

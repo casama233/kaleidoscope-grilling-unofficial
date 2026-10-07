@@ -48,6 +48,24 @@ test('missing responsible entity uses a native projectile owner, never the proje
  const owner=actor(),target=actor(),projectile={getComponent:id=>id==='minecraft:projectile'?{owner}:undefined};
  harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingProjectile:projectile}});expectSlow(target);
 });
+test('a native arrow reported in both source fields resolves to its living owner, including separate wrappers for the same ID',()=>{
+ for(const separateWrapper of [false,true]){
+  const owner=actor(),target=actor(),projectile={id:'native-arrow',getComponent:id=>id==='minecraft:projectile'?{owner}:undefined};
+  const damagingEntity=separateWrapper?{id:projectile.id,getComponent:projectile.getComponent}:projectile;
+  harness().hurt({hurtEntity:target,damage:2,damageSource:{cause:'projectile',damagingEntity,damagingProjectile:projectile}});expectSlow(target);
+ }
+});
+test('a reported arrow alone resolves its owner only through a recognized native projectile component',()=>{
+ const target=actor(),owner=actor(),projectile={id:'native-arrow-only',getComponent:id=>id==='minecraft:projectile'?{owner}:undefined};
+ harness().hurt({hurtEntity:target,damage:2,damageSource:{cause:'projectile',damagingEntity:projectile}});expectSlow(target);
+ const unrelated=actor({living:false});harness().hurt({hurtEntity:target,damage:2,damageSource:{cause:'projectile',damagingEntity:unrelated}});assert.equal(target.applied.length,1);
+});
+test('an unrelated nonliving damager cannot inherit an owner from a different reported projectile',()=>{
+ for(const damager of [actor({living:false}),{id:'another-native-arrow',getComponent:id=>id==='minecraft:projectile'?{owner:actor()}:undefined}]){
+  const target=actor(),projectile={id:'damage-native-arrow',getComponent:id=>id==='minecraft:projectile'?{owner:actor()}:undefined};
+  harness().hurt({hurtEntity:target,damage:2,damageSource:{cause:'projectile',damagingEntity:damager,damagingProjectile:projectile}});assert.equal(target.applied.length,0);
+ }
+});
 test('reported responsible attacker takes precedence over a projectile owner',()=>{
  const target=actor(),attacker=actor({effect:'vigor'}),projectile={getComponent:()=>({owner:actor()})};
  harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:attacker,damagingProjectile:projectile}});assert.equal(target.applied.length,0);
