@@ -7,22 +7,23 @@ import {activeEffects,FX_KEY} from '../../projects/grilling/gameplay_core/behavi
 import {interactionParticles} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particles_core.js';
 import {emitParticleCommands} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particle_delivery.js';
 import {FLATULENCE_SOUND_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_audio_core.js';
+import {isCookeryLivingEntity} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/cookery_living_class.js';
 
 const root=new URL('../../',import.meta.url),read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const main=read('projects/grilling/gameplay_core/behavior_pack/scripts/main.js');
 const fxGet=main.slice(main.indexOf('function fxGet('),main.indexOf('function fxSet('));
-function actor({living=true,effect='hinder',until=2000}={}){
+function actor({living=true,typeId='minecraft:cow',families=['mob'],health=10,effect='hinder',until=2000}={}){
  const applied=[],sound=[],particles=[],impulses=[];
- return {id:'native-actor-'+Math.random(),isSneaking:false,applied,sound,particles,impulses,
+ return {id:'native-actor-'+Math.random(),typeId,isSneaking:false,applied,sound,particles,impulses,
   location:{x:2,y:80,z:3},
   dimension:{playSound:(...v)=>sound.push(v),spawnParticle:(...v)=>particles.push(v)},
-  getComponent:id=>id==='minecraft:health'&&living?{}:undefined,
+  getComponent:id=>id==='minecraft:health'&&living?{currentValue:health}:id==='minecraft:type_family'&&families?{hasTypeFamily:family=>families.includes(family)}:undefined,
   getDynamicProperty:key=>key===FX_KEY?JSON.stringify({[effect]:{until,amp:0}}):undefined,
   addEffect:(...v)=>applied.push(v),applyImpulse:v=>impulses.push(v)};
 }
 function harness({legacy=false,draw=.5}={}){
  const callbacks={},context=vm.createContext({console,
-  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,
+  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,isCookeryLivingEntity,
   now:()=>1000,readFx:entity=>activeEffects(JSON.parse(entity.getDynamicProperty(FX_KEY)??'{}'),1000),
   interactionParticleBurst:(dimension,origin,event)=>emitParticleCommands(dimension,origin,interactionParticles(event,()=>.25)),
   world:{afterEvents:Object.fromEntries(['entityHurt','entityHitEntity'].map(k=>[k,{subscribe:callback=>{callbacks[k]=callback}}]))}});
@@ -81,6 +82,53 @@ test('a removed source/projectile or rejected effect remains local to that callb
  const h=harness(),target=actor(),broken={getComponent(){throw Error('Removed entity')}};
  assert.doesNotThrow(()=>h.hurt({hurtEntity:target,damageSource:{damagingProjectile:broken}}));assert.equal(target.applied.length,0);
  target.addEffect=()=>{throw Error('Removed target')};assert.doesNotThrow(()=>h.hurt({hurtEntity:target,damageSource:{damagingEntity:actor()}}));
+});
+test('Hinder class guard rejects health-bearing boat, chest boat and minecart victims',()=>{
+ for(const [typeId,families] of [['minecraft:boat',['boat','inanimate']],['minecraft:chest_boat',['boat','inanimate']],['minecraft:minecart',['minecart','inanimate']]]){
+  const target=actor({typeId,families});harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:actor()}});assert.equal(target.applied.length,0);
+ }
+});
+test('Hinder class permission retains cow, armor stand and player class controls without a mob-only assumption',()=>{
+ for(const [typeId,families] of [['minecraft:cow',['mob']],['minecraft:armor_stand',['inanimate']],['minecraft:player',['player']]]){
+  const target=actor({typeId,families});harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:actor({typeId,families})}});expectSlow(target);
+ }
+});
+test('Hinder class permission does not introduce a positive-health or amount gate for health-zero living controls',()=>{
+ for(const damage of [0,2]){
+  const target=actor({health:0}),attacker=actor({health:0});harness().hurt({hurtEntity:target,damage,damageSource:{damagingEntity:attacker}});expectSlow(target);
+ }
+ const target=actor(),attacker=actor(),getComponent=attacker.getComponent;
+ attacker.getComponent=id=>id==='minecraft:health'?{get currentValue(){throw Error('Class must not read life value')}}:getComponent(id);
+ harness().hurt({hurtEntity:target,damage:0,damageSource:{damagingEntity:attacker}});expectSlow(target);
+});
+test('Hinder rejects health-bearing nonliving attackers even with active Hinder effect state',()=>{
+ for(const [typeId,families] of [['minecraft:boat',['boat','inanimate']],['minecraft:chest_boat',['boat','inanimate']],['minecraft:minecart',['minecart','inanimate']]]){
+  const target=actor();harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:actor({typeId,families})}});assert.equal(target.applied.length,0);
+ }
+});
+test('Hinder reported health-vehicle damagers cannot inherit a living owner from a different arrow',()=>{
+ const target=actor(),owner=actor(),vehicle=actor({typeId:'minecraft:boat',families:['boat','inanimate']}),projectile={id:'other-native-arrow',getComponent:id=>id==='minecraft:projectile'?{owner}:undefined};
+ harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:vehicle,damagingProjectile:projectile}});assert.equal(target.applied.length,0);
+});
+test('Hinder projectile owner resolution rejects a vehicle owner while reported living attacker priority is retained',()=>{
+ const owner=actor({typeId:'minecraft:minecart',families:['minecart','inanimate']}),arrow={id:'owner-vehicle-arrow',getComponent:id=>id==='minecraft:projectile'?{owner}:undefined};
+ const denied=actor();harness().hurt({hurtEntity:denied,damage:2,damageSource:{damagingEntity:arrow,damagingProjectile:arrow}});assert.equal(denied.applied.length,0);
+ const target=actor();harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:actor(),damagingProjectile:arrow}});expectSlow(target);
+});
+test('Hinder unknown custom classes, missing family membership and family faults cannot be inferred living',()=>{
+ for(const mode of ['missing-family','nonmob-family','missing-method','throws'])for(const role of ['attacker','victim']){
+  const unknown=actor({typeId:'addon:unknown_living_class',families:mode==='missing-family'?undefined:['unreviewed']});
+  const getComponent=unknown.getComponent;
+  unknown.getComponent=id=>id==='minecraft:type_family'?mode==='missing-family'?undefined:mode==='missing-method'?{}:mode==='throws'?{hasTypeFamily(){throw Error('Unloaded family')}}:getComponent(id):getComponent(id);
+  const target=role==='victim'?unknown:actor(),attacker=role==='attacker'?unknown:actor();
+  assert.doesNotThrow(()=>harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:attacker}}));assert.equal(target.applied.length,0);
+ }
+});
+test('Hinder known player or armor stand still requires health presence and damaged component reads fail closed',()=>{
+ for(const typeId of ['minecraft:player','minecraft:armor_stand']){
+  const target=actor({typeId,families:undefined,living:false});harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:actor()}});assert.equal(target.applied.length,0);
+ }
+ const target=actor(),attacker=actor();attacker.getComponent=()=>{throw Error('Removed health component')};assert.doesNotThrow(()=>harness().hurt({hurtEntity:target,damage:2,damageSource:{damagingEntity:attacker}}));assert.equal(target.applied.length,0);
 });
 test('flatulence press sends ten Cloud commands and the existing original host audio exactly once',()=>{
  const h=harness(),subject=actor({effect:'flatulence'});h.tick(subject);subject.isSneaking=true;h.tick(subject);h.tick(subject);

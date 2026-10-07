@@ -1,4 +1,5 @@
 import {PROJECTILE_DODGE_ATTEMPTS,projectileDodgePositionValid,projectileDodgeBounds,sampleProjectileDodgeAttempt} from './projectile_dodge_movement_core.js';
+import {projectileDodgeLiquidPrecheck} from './projectile_dodge_liquid_runtime.js';
 const copyPosition=point=>({x:point.x,y:point.y,z:point.z});
 
 function dismountOne(entity){
@@ -15,8 +16,9 @@ function dismountOne(entity){
 }
 
 // Mutable caller owns fee/lifecycle/collision protection; this helper moves only.
-// Java ground scan, no-liquid AABB, navigation and TELEPORT game events remain
-// separate platform gaps. checkForBlocks is not a claim that those are present.
+// The sampled candidate must have a readable, dry translated native body box.
+// Java ground adjustment, collision shape, navigation and TELEPORT game events
+// remain separate boundaries; checkForBlocks does not establish their parity.
 export function tryProjectileDodgeMovement(entity,{random=Math.random}={}){
  const result={success:false,attempts:0,origin:undefined,destination:undefined,dimensionId:undefined,reason:''};
  let bounds;
@@ -34,9 +36,14 @@ export function tryProjectileDodgeMovement(entity,{random=Math.random}={}){
   if(!to){result.reason='random_source_unavailable';return result}
   try{if(entity.dimension.id!==result.dimensionId){result.reason='dimension_changed';return result}}catch{result.reason='movement_context_unavailable';return result}
   const dismount=dismountOne(entity);if(!dismount.ok){result.reason=dismount.reason;return result}
+  try{if(entity.dimension.id!==result.dimensionId){result.reason='dimension_changed';return result}}catch{result.reason='movement_context_unavailable';return result}
+  const liquid=projectileDodgeLiquidPrecheck(entity,to);
+  if(!liquid.allow){result.reason=liquid.reason;continue}
+  try{if(entity.dimension.id!==result.dimensionId){result.reason='dimension_changed';return result}}catch{result.reason='movement_context_unavailable';return result}
+  try{if(entity.getComponent('minecraft:riding')){result.reason='riding_context_changed';return result}}catch{result.reason='riding_context_unavailable';return result}
   try{
    if(!entity.tryTeleport(to,{checkForBlocks:true}))continue;
-   result.success=true;
+   result.success=true;result.reason='';
    // Preserve observed native success even if the actor vanishes before the
    // destination can be read; a caller must not repeat the already moved use.
    try{const destination=copyPosition(entity.location);if(projectileDodgePositionValid(destination))result.destination=destination;else result.reason='destination_unavailable'}catch{result.reason='destination_unavailable'}
