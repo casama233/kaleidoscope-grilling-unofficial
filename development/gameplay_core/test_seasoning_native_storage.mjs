@@ -46,7 +46,9 @@ function fixture({withPlacedVisuals=false}={}){
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){mutate(k,()=>v===undefined?dp.delete(k):dp.set(k,v))},getEntity:id=>entities.get(id),
   getDynamicPropertyIds:()=>[...dp.keys()],getAllPlayers:()=>[holder],getDimension(id){if(id===dimension.id||id==='overworld')return dimension;throw Error('Unloaded test dimension')},
   afterEvents:Object.fromEntries(['playerPlaceBlock','playerInteractWithBlock','playerBreakBlock'].map(name=>[name,{subscribe(){}}]))};
- const holder={id:'test-player',dimension,location:{x:0,y:65,z:0},selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
+ // These storage roundtrips explicitly place pending bottles with Java's sneak
+ // gesture; standing use is covered by test_seasoning_native_hands.mjs.
+ const holder={id:'test-player',dimension,location:{x:0,y:65,z:0},isSneaking:true,selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
  let context,api,placed;
  const load=()=>{
   const system={currentTick:10,run:f=>queue.push(f),runInterval(){},runJob(job){for(const step of job){}}};
