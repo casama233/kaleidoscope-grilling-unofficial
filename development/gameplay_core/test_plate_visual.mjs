@@ -58,3 +58,9 @@ test('plate bindings remain transient with existing audience/budget/queue and st
  assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE])'));assert.ok(source.includes('configurePlateVisualDirty(markStationContentsDirty)'));
  assert.ok(source.includes('plateVisualPose(block,i,rows.length)'));assert.equal((source.match(/system\.runInterval\(pump,1\)/g)??[]).length,1);
 });
+
+test('plate-only animation owns one static horizontal root and exact reviewed post-scale offset',()=>{
+ const p=new URL('../../projects/grilling/gameplay_core/resource_pack/animations/plate_food_visual.animation.json',import.meta.url),clips=JSON.parse(fs.readFileSync(p)).animations;
+ assert.deepEqual(Object.keys(clips),['animation.kg_station.plate_food']);
+ assert.deepEqual(clips['animation.kg_station.plate_food'],{loop:true,bones:{root:{scale:1.2,position:[0,"q.property('kaleidoscope_grilling:model') == 114 ? -1.8 : -0.6",1.8]}}});
+});

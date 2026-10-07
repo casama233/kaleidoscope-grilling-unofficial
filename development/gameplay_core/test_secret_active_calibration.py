@@ -48,14 +48,20 @@ for(const row of cases)for(const held of [row.id,'minecraft:apple','kaleidoscope
  def test_item_child_helper_timing_scale_and_calibrated_active_animation_are_preserved(self):
   p=RP/'animations/java_eating_projection.animation.json';assert_public_bytes(self,p)
   changed=subprocess.check_output(['git','diff','--name-only',PUBLIC_SOURCE_BASE,'--',str((RP/'animations').relative_to(ROOT))],cwd=ROOT,text=True).splitlines()
-  # G77 adds a separate rack-only animation; every pre-existing eating/helper
-  # file must remain byte-identical to the public calibration baseline.
-  rack=RP/'animations/rack_tool_visual.animation.json'
-  allowed={str(rack.relative_to(ROOT))} if rack.exists() else set()
+  # New station-only files do not replace or loosen the byte equality of any
+  # pre-existing eating/helper clip. Each exception must be absent at the
+  # public calibration baseline and own exactly its one station clip key.
+  station_clips={
+   'rack_tool_visual.animation.json':'animation.kg_station.rack_tool',
+   'plate_food_visual.animation.json':'animation.kg_station.plate_food',
+  }
+  allowed=set()
+  for filename,clip in station_clips.items():
+   path=RP/'animations'/filename
+   if not path.exists():continue
+   relative=str(path.relative_to(ROOT));allowed.add(relative)
+   old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+relative],cwd=ROOT,capture_output=True)
+   self.assertNotEqual(old.returncode,0,'station exception must only admit a new file')
+   self.assertEqual(set(json.loads(path.read_text())['animations']),{clip})
   self.assertEqual(set(changed)-allowed,set())
-  if rack.exists():
-   old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+str(rack.relative_to(ROOT))],cwd=ROOT,capture_output=True)
-   self.assertNotEqual(old.returncode,0,'rack exception must only admit a new file')
-   animations=json.loads(rack.read_text())['animations']
-   self.assertEqual(set(animations),{'animation.kg_station.rack_tool'})
 if __name__=='__main__':unittest.main()
