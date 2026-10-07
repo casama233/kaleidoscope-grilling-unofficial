@@ -10,7 +10,7 @@ class CloudSourceConservation(unittest.TestCase):
  def test_frozen_g90_is_validated_before_the_exact_current_delta(self):
   self.assertEqual(witness.previous.verify_snapshot(witness.FROZEN_SOURCE_BASE)['runtime_files'],4155)
   result=witness.verify_snapshot(current.FROZEN_SOURCE_BASE);self.assertEqual(result['reviewed_paths'],5)
-  self.assertEqual(witness.verify_current()['reviewed_paths'],3)
+  self.assertEqual(witness.verify_current()['reviewed_paths'],5)
   self.assertEqual(set(witness.metadata()['files']),witness.DELTA_PATHS)
 
  def test_cloud_changes_only_the_three_inherited_coalescers(self):

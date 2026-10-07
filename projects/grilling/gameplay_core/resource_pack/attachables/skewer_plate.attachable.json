@@ -691,7 +691,8 @@
         "fixed_18_1": "textures/grill_display/raw_sweet_potato_sheet_skewer_4",
         "special_0": "textures/a22_bites/ordinary_skewer_stage0",
         "special_1": "textures/secret_skewer_stick",
-        "special_2": "textures/secret_skewer_stick"
+        "special_2": "textures/secret_skewer_stick",
+        "qa_binary": "textures/held/bottle_shell_palette"
       },
       "geometry": {
         "body": "geometry.kg_plate_held.body",
@@ -1220,7 +1221,8 @@
         "special_4_0": "geometry.kg_plate_held.special_4_0",
         "special_4_1": "geometry.kg_plate_held.special_4_1",
         "special_4_2": "geometry.kg_plate_held.special_4_2",
-        "qa_probe": "geometry.kg_plate_held.qa_probe"
+        "qa_probe": "geometry.kg_plate_held.qa_probe",
+        "qa_binary": "geometry.kg_plate_held.qa_binary"
       },
       "scripts": {
         "initialize": [
@@ -1444,7 +1446,8 @@
         "controller.render.kg_plate_held.secret_4_2",
         "controller.render.kg_plate_held.special_4",
         "controller.render.kg_plate_held.qa_probe",
-        "controller.render.kg_plate_held.qa_forced_food"
+        "controller.render.kg_plate_held.qa_forced_food",
+        "controller.render.kg_plate_held.qa_binary"
       ]
     }
   }

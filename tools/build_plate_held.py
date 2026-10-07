@@ -81,6 +81,24 @@ QA_POST_TESTS = {
     'qa_c_small_words': 'v.kg_plate_qa_raw_word_5 == 57 && v.kg_plate_qa_raw_word_7 == 133',
     'qa_d_decoded': 'v.kg_plate_count == 1 && v.kg_plate_desc_0 == 57 && v.kg_plate_shape_0 == 18 && v.kg_plate_style_0 == 0 && v.kg_plate_food_0_0 == 199 && v.kg_plate_food_0_1 == 195 && v.kg_plate_food_0_2 == 180',
 }
+QA_BINARY_TEXTURE = 'textures/held/bottle_shell_palette'
+QA_BINARY_DARK_UV, QA_BINARY_LIGHT_UV = [0, 32], [119, 8]
+QA_BINARY_OFFSET = [0, .3, -2]
+QA_BINARY_FONT = {
+    '0': ('111', '101', '101', '101', '111'),
+    '1': ('010', '110', '010', '010', '111'),
+    '2': ('111', '001', '111', '100', '111'),
+    '3': ('111', '001', '111', '001', '111'),
+    '4': ('101', '101', '111', '001', '001'),
+    '5': ('111', '100', '111', '001', '111'),
+    '6': ('111', '100', '111', '101', '111'),
+    '7': ('111', '001', '010', '010', '010'),
+    'H': ('101', '101', '111', '101', '101'),
+    'M': ('101', '111', '111', '101', '101'),
+    'L': ('100', '100', '100', '100', '111'),
+    'C': ('111', '100', '100', '100', '111'),
+    'D': ('110', '101', '101', '101', '110'),
+}
 
 
 def dump(value):
@@ -219,6 +237,102 @@ def qa_geometry():
             'pivot': [0, 24, 0], 'cubes': [{'origin': [-5.5 + index*3, 26, 4.5],
                 'size': [1, index+1, 1], 'uv': uv}]})
     return {'format_version': '1.21.0', 'minecraft:geometry': [result]}
+
+
+def binary_bit(value, bit):
+    """Exact power-of-two extraction; no nonbinary radix or large equality."""
+    high = f'math.floor({value}/{2**(bit+1)})'
+    return f'math.floor({value}/{2**bit}) - {high} - {high}'
+
+
+def qa_binary_rows():
+    raw = 'v.kg_plate_qa_raw_word_0'
+    rows = [(label, [binary_bit(raw, bit) for bit in range(top, top-8, -1)])
+        for label, top in (('H', 23), ('M', 15), ('L', 7))]
+    rows.append(('C', [binary_bit('v.kg_plate_count', bit) for bit in (2, 1, 0)] +
+        [f'{raw} != math.floor({raw})', f'{raw} - math.floor({raw}) == 0.5', '0', '1', '1']))
+    rows.append(('D', [f'{raw} < 0'] + [binary_bit('v.kg_plate_desc_0', bit) for bit in range(6, -1, -1)]))
+    rows += [(str(slot), [binary_bit(f'v.kg_plate_food_0_{slot}', bit) for bit in range(7, -1, -1)])
+        for slot in range(3)]
+    return rows
+
+
+def qa_binary_cube(origin, size, light=False):
+    # Every large face samples one reviewed opaque atlas texel. Small dark
+    # glyph boxes use ordinary box UV inside its uniform near-black region.
+    uv = ({face: {'uv': QA_BINARY_LIGHT_UV, 'uv_size': [1, 1]}
+        for face in ('north', 'east', 'south', 'west', 'up', 'down')} if light
+        else QA_BINARY_DARK_UV)
+    return {'origin': [round(v, 5) for v in origin], 'size': [round(v, 5) for v in size], 'uv': uv}
+
+
+def qa_binary_glyph(label, x, y, pixel=.12, z=-8.17, depth=.04, x_scale=1):
+    """Merge a 3x5 glyph's horizontal pixel runs into compact upright bars."""
+    active, rectangles = {}, []
+    for row, line in enumerate(QA_BINARY_FONT[label]):
+        runs = [(match.start(), len(match.group())) for match in re.finditer('1+', line)]
+        next_active = {}
+        for run in runs:
+            start, height = active.pop(run, (row, 0))
+            next_active[run] = (start, height+1)
+        rectangles += [(col, start, width, height) for (col, width), (start, height) in active.items()]
+        active = next_active
+    rectangles += [(col, start, width, height) for (col, width), (start, height) in active.items()]
+    return [qa_binary_cube([x+col*pixel*x_scale, y+(5-start-height)*pixel, z],
+        [width*pixel*x_scale, height*pixel, depth]) for col, start, width, height in rectangles]
+
+
+def qa_binary_geometry():
+    """Upright labeled 8x8 board in front of foods; original hand rig intact.
+
+    Authored X increases from MSB to LSB; rows descend Y. H/M/L are raw
+    bits23..16/15..8/7..0. C is count2/1/0, fraction, half, fixed0/1/QA1.
+    D is raw-negative flag plus descriptor6..0; 0/1/2 are foods7..0.
+    Opaque ivory tiles always exist; each displays an explicit black 0 or1.
+    Reference0/1 and the corner tab disambiguate orientation in either hand.
+    """
+    result = geometry('qa_binary', [], 128, 128)
+    result['bones'].pop()
+    # Start in the reviewed upright XY layout, then move only this new board
+    # by Y+.3/Z-2 below. Its final envelope is X[-7.2,5.95], Y[24.55,34.45],
+    # Z[-10.25,-9.84], with opaque tile fronts atZ-10.12 ahead of shafts.
+    # Board placement is QA-local authored geometry, not a plate pose fix.
+    frame = [qa_binary_cube([-7.2, 24.25, -7.96], [13.15, 9.9, .12], True)]
+    # The ivory board under dark glyphs/grid remains a visible zero backdrop.
+    for col in range(8):
+        frame += qa_binary_glyph(str(7-col), -5.45+col*1.4-.45, 33.6, .10, x_scale=3)
+    frame.append(qa_binary_cube([-7.15, 33.95, -8.25], [.3, .2, .3]))
+    for row, (label, expressions) in enumerate(qa_binary_rows()):
+        cy = 32.95-row*1.1
+        frame += qa_binary_glyph(label, -7.05, cy-.325, .13, x_scale=2.3)
+        for col, _ in enumerate(expressions):
+            cx = -5.45+col*1.4
+            # A dark socket permanently outlines every ivory cell, so a
+            # true zero cannot look like a missing/unrendered ingredient.
+            frame.append(qa_binary_cube([cx-.58, cy-.48, -8.09], [1.16, .96, .14]))
+            frame.append(qa_binary_cube([cx-.55, cy-.45, -8.12], [1.1, .9, .03], True))
+            for value in (0, 1):
+                name = f'qa_binary_{row}_{col}_{value}'
+                result['bones'].append({'name': name, 'parent': 'plate_pose',
+                    'pivot': [0, 24, 0], 'cubes': qa_binary_glyph(str(value),
+                        cx-.45, cy-.30, z=-8.17, depth=.02, x_scale=2.5)})
+    result['bones'].insert(2, {'name': 'qa_binary_frame', 'parent': 'plate_pose',
+        'pivot': [0, 24, 0], 'cubes': frame})
+    for bone in result['bones']:
+        for cube in bone.get('cubes', []):
+            cube['origin'] = [round(value+offset, 5)
+                for value, offset in zip(cube['origin'], QA_BINARY_OFFSET)]
+    return {'format_version': '1.21.0', 'minecraft:geometry': [result]}
+
+
+def qa_binary_controller():
+    visibility = [{'*': 0}, {'qa_binary_frame': 'v.kg_plate_qa_enabled == 1'}]
+    for row, (_, expressions) in enumerate(qa_binary_rows()):
+        for col, expression in enumerate(expressions):
+            visibility += [{f'qa_binary_{row}_{col}_{value}':
+                f'v.kg_plate_qa_enabled == 1 && ({expression}) == {value}'} for value in (0, 1)]
+    return {'geometry': 'Geometry.qa_binary', 'materials': [{'*': 'Material.default'}],
+        'textures': ['Texture.qa_binary'], 'part_visibility': visibility}
 
 
 def property_read(hand, word):
@@ -392,6 +506,8 @@ def build():
             {'geometries': {'Array.specials': special_models}, 'textures': {'Array.special_textures': ['Texture.special_' + str(i) for i in range(3)]}})
     references = {g['description']['identifier'].rsplit('.', 1)[1]: g['description']['identifier'] for g in geometries}
     references['qa_probe'] = 'geometry.kg_plate_held.qa_probe'
+    references['qa_binary'] = 'geometry.kg_plate_held.qa_binary'
+    textures['qa_binary'] = QA_BINARY_TEXTURE
     controllers['controller.render.kg_plate_held.qa_probe'] = {
         'geometry': 'Geometry.qa_probe', 'materials': [{'*': 'Material.default'}],
         'textures': ['Texture.body'], 'part_visibility': [{'*': 0}] +
@@ -404,6 +520,7 @@ def build():
         'geometry': 'Geometry.secret_0_18_1', 'materials': [{'*': 'Material.default'}],
         'textures': ['Texture.food_195_s0'],
         'part_visibility': [{'*': 0}, {'plate_row_0': 'v.kg_plate_qa_enabled == 1'}]}
+    controllers['controller.render.kg_plate_held.qa_binary'] = qa_binary_controller()
     attach = {'format_version': '1.26.0', 'minecraft:attachable': {'description': {
         'identifier': NS + 'skewer_plate', 'materials': {'default': 'entity_alphatest_one_sided'},
         'textures': textures, 'geometry': references, 'scripts': decoder_scripts(),
@@ -413,6 +530,7 @@ def build():
         ',\n'.join(json.dumps(g, separators=(',', ':')) for g in geometries) + '\n]}\n').encode()
     return {RP / 'models/entity/plate_held.geo.json': compact,
         RP / 'models/entity/plate_held_qa.geo.json': dump(qa_geometry()),
+        RP / 'models/entity/plate_held_binary_qa.geo.json': (json.dumps(qa_binary_geometry(), separators=(',', ':')) + '\n').encode(),
         RP / 'attachables/skewer_plate.attachable.json': dump(attach),
         RP / 'animations/plate_held.animation.json': dump(animations()),
         RP / 'render_controllers/plate_held.render_controllers.json': dump({'format_version': '1.8.0', 'render_controllers': controllers})}

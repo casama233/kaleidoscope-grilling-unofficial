@@ -7,6 +7,7 @@ count/desc0/shape0/style0/food0/1/2/owner occupied: 26 values, no identity.
 """
 from pathlib import Path
 import json
+import re
 import sys
 import unittest
 
@@ -26,12 +27,13 @@ class PlateClientProbe(unittest.TestCase):
         cls.attach = load('attachables/skewer_plate.attachable.json')['minecraft:attachable']['description']
         cls.controllers = load('render_controllers/plate_held.render_controllers.json')['render_controllers']
         cls.qa = load('models/entity/plate_held_qa.geo.json')['minecraft:geometry'][0]
+        cls.binary = load('models/entity/plate_held_binary_qa.geo.json')['minecraft:geometry'][0]
 
     def harness(self, source):
         node('const d=' + json.dumps(self.attach) + '; const rc=' + json.dumps(self.controllers) + r''';
 const fixture=[8285209,0,0,0,1,57,0,133];
 const other=[9+4*214+7*45796,0,0,0,0,57,0,133];
-const math={clamp:(n,a,b)=>Math.max(a,Math.min(b,n)),max:Math.max};
+const math={clamp:(n,a,b)=>Math.max(a,Math.min(b,n)),max:Math.max,floor:Math.floor};
 function instance(hand='main_hand',word=fixture,options={}){
  const state={main:[...(hand!=='off_hand'?word:other)],off:[...(hand==='off_hand'?word:other)],
   mainItem:d.identifier,offItem:d.identifier,...options};
@@ -44,7 +46,7 @@ function instance(hand='main_hand',word=fixture,options={}){
  evaluatePreAnimation(d.scripts.initialize,q,c,math,v);
  const update=(time,delta=0)=>{q.life_time=time;q.delta_time=delta;evaluatePreAnimation(d.scripts.pre_animation,q,c,math,v);};
  const visible=name=>Object.fromEntries(rc['controller.render.kg_plate_held.'+name].part_visibility
-  .flatMap(row=>Object.entries(row)).map(([bone,expr])=>[bone,Boolean(new Function('v','return '+expr)(v))]));
+  .flatMap(row=>Object.entries(row)).map(([bone,expr])=>[bone,Boolean(new Function('v','math','return '+expr)(v,math))]));
  return {state,logs,v,c,q,update,visible};
 }
 function assert(condition,message){if(!condition)throw Error(message);}
@@ -52,7 +54,7 @@ function assert(condition,message){if(!condition)throw Error(message);}
 
     def test_source_outputs_keep_probe_geometry_separate_and_primary_unchanged(self):
         output = held.build()
-        self.assertEqual(len(output), 5)
+        self.assertEqual(len(output), 6)
         for path, data in output.items():
             self.assertTrue(path.is_relative_to(held.RP))
             self.assertEqual(path.read_bytes(), data, str(path))
@@ -61,11 +63,82 @@ function assert(condition,message){if(!condition)throw Error(message);}
         self.assertFalse(any(g['description']['identifier'].endswith('.qa_probe') for g in primary))
         self.assertEqual(self.attach['geometry']['qa_probe'], 'geometry.kg_plate_held.qa_probe')
         self.assertEqual(load('animations/plate_held.animation.json'), held.animations())
-        self.assertEqual(len(self.controllers), 33)
+        self.assertEqual(len(self.controllers), 34)
         production = {key: value for key, value in self.controllers.items()
             if not key.startswith('controller.render.kg_plate_held.qa_')}
         self.assertEqual(len(production), 31)
         self.assertNotIn('kg_plate_qa_', json.dumps(production))
+
+    def test_binary_board_uses_power_of_two_bits_and_explicit_zero_one_glyphs(self):
+        rows = held.qa_binary_rows()
+        self.assertEqual([label for label, _ in rows], ['H', 'M', 'L', 'C', 'D', '0', '1', '2'])
+        self.assertTrue(all(len(expressions) == 8 for _, expressions in rows))
+        for row in (0, 1, 2, 4, 5, 6, 7):
+            for expression in rows[row][1]:
+                for divisor in re.findall(r'/([0-9]+)', expression):
+                    value = int(divisor)
+                    self.assertGreater(value, 0)
+                    self.assertEqual(value & (value-1), 0)
+                self.assertNotIn('/123', expression)
+                self.assertNotIn('8285209', expression)
+        self.assertEqual(rows[3][1][-3:], ['0', '1', '1'])
+        self.assertEqual(rows[4][1][0], 'v.kg_plate_qa_raw_word_0 < 0')
+        bones = {bone['name']: bone for bone in self.binary['bones']}
+        self.assertEqual(len(bones), 131)
+        self.assertEqual(bones['grip'], {'name': 'grip', 'pivot': [0, 24, 0], 'binding': held.BINDING})
+        self.assertEqual(bones['plate_pose'], {'name': 'plate_pose', 'parent': 'grip', 'pivot': [0, 24, 0]})
+        self.assertTrue(bones['qa_binary_frame']['cubes'])
+        for row in range(8):
+            for col in range(8):
+                zero, one = [bones[f'qa_binary_{row}_{col}_{value}'] for value in (0, 1)]
+                self.assertTrue(zero['cubes'])
+                self.assertTrue(one['cubes'])
+                self.assertNotEqual(zero['cubes'], one['cubes'])
+                self.assertEqual(zero['parent'], 'plate_pose')
+                self.assertEqual(one['parent'], 'plate_pose')
+                for glyph in (zero, one):
+                    self.assertTrue(all(cube['size'][2] == .02 for cube in glyph['cubes']))
+                    self.assertTrue(all(cube['origin'][2] == -10.17 for cube in glyph['cubes']))
+                    width = max(cube['origin'][0]+cube['size'][0] for cube in glyph['cubes']) - min(cube['origin'][0] for cube in glyph['cubes'])
+                    self.assertAlmostEqual(width, .9)
+        controller = self.controllers['controller.render.kg_plate_held.qa_binary']
+        self.assertEqual(controller['geometry'], 'Geometry.qa_binary')
+        self.assertEqual(controller['textures'], ['Texture.qa_binary'])
+        self.assertNotIn('arrays', controller)
+        self.assertNotIn('q.', json.dumps(controller))
+        self.assertEqual(self.attach['textures']['qa_binary'], held.QA_BINARY_TEXTURE)
+        self.assertEqual(self.attach['geometry']['qa_binary'], 'geometry.kg_plate_held.qa_binary')
+
+    def test_binary_board_expected_fixture_grid_both_hands_and_fractional_raw(self):
+        self.harness(r'''
+function grid(i){
+ const p=i.visible('qa_binary');assert(p.qa_binary_frame,'Binary reference frame missing');
+ return Array.from({length:8},(_,row)=>Array.from({length:8},(_,col)=>{
+  const zero=p['qa_binary_'+row+'_'+col+'_0'],one=p['qa_binary_'+row+'_'+col+'_1'];
+  assert(zero!==one,'Missing or ambiguous zero/one cell '+row+'/'+col);return one?'1':'0';
+ }).join(''));
+}
+const expected=['01111110','01101100','00011001','00100011','00111001','11000111','11000011','10110100'];
+for(const hand of ['main_hand','off_hand']){
+ const i=instance(hand);i.update(0);assert(JSON.stringify(grid(i))===JSON.stringify(expected),'Expected full binary grid wrong');
+ // Shared raw QA gate activates both plate boards, but each reads its own
+ // selected raw bank. The opposite bank is not replaced with fixture values.
+ const cross=instance(hand,fixture,{main:[...fixture],off:[...other]});cross.update(0);
+ const word=hand==='main_hand'?8285209:other[0],raw=word.toString(2).padStart(24,'0');
+ assert(grid(cross).slice(0,3).join('')===raw,'Binary bank crossed hands');
+ const half=[...fixture];half[0]=8285208.5;const h=instance(hand,half);h.update(0);
+ assert(grid(h).slice(0,3).join('')==='011111100110110000011000','Fractional raw silently rounded upward');
+ assert(grid(h)[3].slice(3,5)==='11','Fraction/half controls absent');
+ const quarter=[...fixture];quarter[0]=8285208.25;const q=instance(hand,quarter);q.update(0);
+ assert(grid(q)[3].slice(3,5)==='10','Fraction/half controls conflated');
+ const signed=[...fixture];signed[0]=8285209-2**24;const n=instance(hand,signed);n.update(0);
+ assert(grid(n).slice(0,3).join('')==='011111100110110000011001'&&grid(n)[4][0]==='1','Signed raw pattern/negative control ambiguous');
+ i.v.kg_plate_count=0;assert(grid(i)[3]==='00000011','Decoded count zero suppressed binary board');
+ i.v.kg_plate_owner_occupied=0;assert(grid(i)[0]===expected[0],'Production owner validity suppressed board');
+}
+const off=instance();off.state.main[4]=0;off.update(0);
+assert(!Object.values(off.visible('qa_binary')).some(Boolean),'Default-off binary board leaked');
+''')
 
     def test_raw_reads_are_independent_owner_scalars_without_floor(self):
         scripts = self.attach['scripts']

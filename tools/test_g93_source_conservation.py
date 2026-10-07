@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 import g93_source_conservation as witness
+import g94_source_conservation as current
 
 
 class RawClientSourceConservation(unittest.TestCase):
@@ -14,15 +15,19 @@ class RawClientSourceConservation(unittest.TestCase):
             json.dumps(data) if path.name == 'g93-runtime-reviewed-delta.json'
             else original(path, *args, **kwargs))
 
-    def test_frozen_g92_precedes_exact_three_path_current_admission(self):
+    def test_frozen_g92_g93_precede_exact_five_path_current_admission(self):
         frozen = witness.previous.verify_snapshot(witness.FROZEN_SOURCE_BASE)
         self.assertEqual(frozen['runtime_files'], 4156)
         self.assertEqual(frozen['reviewed_release'], [2, 8, 92])
         self.assertEqual(frozen['reviewed_paths'], 6)
-        current = witness.verify_current()
-        self.assertEqual(current['runtime_files'], 4156)
-        self.assertEqual(current['reviewed_release'], [2, 8, 93])
-        self.assertEqual(current['reviewed_paths'], 3)
+        frozen_g93 = witness.verify_snapshot(current.FROZEN_SOURCE_BASE)
+        self.assertEqual(frozen_g93['runtime_files'], 4156)
+        self.assertEqual(frozen_g93['reviewed_release'], [2, 8, 93])
+        self.assertEqual(frozen_g93['reviewed_paths'], 3)
+        latest = witness.verify_current()
+        self.assertEqual(latest['runtime_files'], 4157)
+        self.assertEqual(latest['reviewed_release'], [2, 8, 94])
+        self.assertEqual(latest['reviewed_paths'], 5)
         self.assertEqual(set(witness.metadata()['files']), witness.MANIFESTS | {witness.ATTACHABLE_PATH})
         self.assertEqual(witness.ADDED_PATHS, set())
         path = 'tools/fixtures/g92-runtime-reviewed-delta.json'
@@ -50,14 +55,15 @@ class RawClientSourceConservation(unittest.TestCase):
     def test_exact_attachable_and_all_bp_controller_geometry_animation_bytes(self):
         after = witness.apply_delta(witness.ATTACHABLE_PATH)
         self.assertEqual(witness.sha(after), witness.REVIEWED_AFTER[witness.ATTACHABLE_PATH])
-        self.assertEqual((witness.ROOT / witness.ATTACHABLE_PATH).read_bytes(), after)
+        self.assertEqual(current.source(witness.ATTACHABLE_PATH), after)
         witness.assert_held_preservation(witness.source(witness.ATTACHABLE_PATH), after)
         conserved = [path for path in witness.files() if path not in witness.DELTA_PATHS and (
             '/behavior_pack/' in path or '/render_controllers/' in path or
             '/models/' in path or '/animations/' in path)]
         self.assertTrue(conserved)
         for path in conserved:
-            self.assertEqual((witness.ROOT / path).read_bytes(), witness.source(path), path)
+            actual = current.source(path) if path in current.DELTA_PATHS else (witness.ROOT / path).read_bytes()
+            self.assertEqual(actual, witness.source(path), path)
         controllers = json.loads(witness.source(witness.previous.CONTROLLERS_PATH))['render_controllers']
         self.assertEqual(len(controllers), 33)
 
@@ -88,7 +94,7 @@ class RawClientSourceConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G93 runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:93|94) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_base_tree_patch_hash_scope_and_probe_bytes(self):
@@ -158,7 +164,7 @@ class RawClientSourceConservation(unittest.TestCase):
         history['2.8.92']['BP']['sha256'] = '0' * 64
         with patch.object(Path, 'read_text', lambda path, *args, **kwargs:
             json.dumps(history) if path == witness.ROOT / 'release-history.json' else original(path, *args, **kwargs)):
-            with self.assertRaisesRegex(AssertionError, 'G92 history drift'): witness.verify_current()
+            with self.assertRaisesRegex(AssertionError, 'G(?:92|93) history drift'): witness.verify_current()
 
 
 if __name__ == '__main__': unittest.main()

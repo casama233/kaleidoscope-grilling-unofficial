@@ -85,7 +85,7 @@ class SourceUnionTests(unittest.TestCase):
                     rows=[row for row in rows if row!=missing] if fault=='missing' else rows+[extra]
                 return iter(rows)
             with patch.object(Path,'rglob',glob),patch.object(Path,'is_file',lambda p:True if p==extra else original_is_file(p)):
-                with self.assertRaisesRegex(AssertionError,'Missing/extra G(?:90|91|92|93) runtime file'):witness.verify_current()
+                with self.assertRaisesRegex(AssertionError,'Missing/extra G(?:90|91|92|93|94) runtime file'):witness.verify_current()
 
     def test_manifest_delta_cannot_change_fields_outside_version_identity(self):
         original=Path.read_text;meta=copy.deepcopy(witness.metadata())
