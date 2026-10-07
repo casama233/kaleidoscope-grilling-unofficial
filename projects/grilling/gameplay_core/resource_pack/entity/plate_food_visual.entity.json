@@ -1619,7 +1619,8 @@
         "food_210_s6": "textures/secret_food_palette/food_210_6",
         "food_211_s6": "textures/secret_food_palette/food_211_6",
         "food_212_s6": "textures/secret_food_palette/food_212_6",
-        "food_213_s6": "textures/secret_food_palette/food_213_6"
+        "food_213_s6": "textures/secret_food_palette/food_213_6",
+        "s115": "textures/a22_bites/ordinary_skewer_stage0"
       },
       "geometry": {
         "s0": "geometry.kg_station.grill.raw_beef_skewer",
@@ -1820,7 +1821,8 @@
         "state_62_2": "geometry.kg_station.grill.state_62_2",
         "state_63_0": "geometry.kg_station.grill.state_63_0",
         "state_63_1": "geometry.kg_station.grill.state_63_1",
-        "state_63_2": "geometry.kg_station.grill.state_63_2"
+        "state_63_2": "geometry.kg_station.grill.state_63_2",
+        "s115": "geometry.kg_station.plate.ordinary_skewer"
       },
       "scripts": {
         "pre_animation": [
@@ -1850,7 +1852,7 @@
       },
       "render_controllers": [
         {
-          "controller.render.kg_station.grill": "q.property('kaleidoscope_grilling:ready')"
+          "controller.render.kg_station.plate_food": "q.property('kaleidoscope_grilling:ready')"
         },
         {
           "controller.render.kg_station.secret.0": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:model') == 114"

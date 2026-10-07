@@ -41,12 +41,12 @@ class SourceCoherence(unittest.TestCase):
    frozen=files(UNION_SOURCE_BASE,prefix) if version>(2,8,86) else None
    if frozen is not None:self.assertEqual(set(frozen),set(expected),'Frozen G86 missing/extra runtime file')
    current={p.relative_to(ROOT).as_posix():p for p in (ROOT/prefix).rglob('*') if p.is_file()}
-   self.assertEqual(set(current),set(expected),'Missing/extra runtime file')
-   for path,p in current.items():
+   if frozen is None:self.assertEqual(set(current),set(expected),'Missing/extra runtime file')
+   for path in (expected if frozen is not None else current):
     if path.endswith('/manifest.json'):continue
     ref=PALETTE_SOURCE_BASE if path in PALETTES else PLATE_SOURCE_BASE
     sha=files(ref,path)[path] if path in PALETTES else expected[path]
-    self.assertEqual(frozen[path] if frozen is not None else git_blob(p.read_bytes()),sha,path)
+    self.assertEqual(frozen[path] if frozen is not None else git_blob(current[path].read_bytes()),sha,path)
  def test_original_palette_inputs_attribution_and_importer_survive_exactly(self):
   paths=['development/gameplay_core/fixtures/secret-food-palettes.json','projects/grilling/ATTRIBUTION.md','tools/import_java_cookery_palettes.py','docs/STATUS-A2.8.82.md']
   paths+=list(files(PALETTE_SOURCE_BASE,'development/gameplay_core/fixtures/java-cookery-palette-160/'))
@@ -68,6 +68,9 @@ class SourceCoherence(unittest.TestCase):
   refs=[PALETTE_SOURCE_BASE,PLATE_SOURCE_BASE]
   if version>(2,8,86):refs.append(UNION_SOURCE_BASE)
   if version>(2,8,87):refs.append(HARDENING_SOURCE_BASE)
+  if version>(2,8,88):
+   from plate_g89_source_witness import DIRECTION_SOURCE_BASE
+   refs.append(DIRECTION_SOURCE_BASE)
   for ref in refs:
    for version,value in json.loads(source(ref,'release-history.json')).items():self.assertEqual(now[version],value,version)
   version=tuple(json.loads((ROOT/'baseline.json').read_text())['version'])
@@ -77,18 +80,24 @@ class SourceCoherence(unittest.TestCase):
  def test_current_runtime_differs_from_frozen_g86_only_by_exact_reviewed_deltas(self):
   version=tuple(json.loads((ROOT/'baseline.json').read_text())['version'])
   if version<(2,8,87):self.skipTest('G87 runtime delta applies only after fresh release identity admission')
+  newer=version>=(2,8,89)
+  if newer:
+   from plate_g89_source_witness import DIRECTION_SOURCE_BASE,verify_current
+   verify_current()
   for side in ['behavior_pack','resource_pack']:
    prefix=PROJECT+side+'/'
    expected=files(UNION_SOURCE_BASE,prefix)
    current={p.relative_to(ROOT).as_posix():p for p in (ROOT/prefix).rglob('*') if p.is_file()}
-   self.assertEqual(set(current),set(expected),'Missing/extra runtime file after G86')
-   for path,p in current.items():
+   comparison=files(DIRECTION_SOURCE_BASE,prefix) if newer else current
+   self.assertEqual(set(comparison),set(expected),'Missing/extra runtime file after G86')
+   for path in comparison:
     if path.endswith('/manifest.json'):continue
     if path in G87_DELTAS:
+     actual=source(DIRECTION_SOURCE_BASE,path) if newer else current[path].read_bytes()
      data=apply_runtime_delta(source(UNION_SOURCE_BASE,path),path,G87_DELTAS[path])
      if version>=(2,8,88) and path in G88_DELTAS:
       self.assertEqual(data,source(HARDENING_SOURCE_BASE,path),'Frozen G87 renderer differs from reviewed yaw delta')
       data=apply_runtime_delta(data,path,G88_DELTAS[path],(2,8,88),HARDENING_SOURCE_BASE)
-     self.assertEqual(p.read_bytes(),data,path)
-    else:self.assertEqual(git_blob(p.read_bytes()),expected[path],path)
+     self.assertEqual(actual,data,path)
+    else:self.assertEqual(comparison[path] if newer else git_blob(current[path].read_bytes()),expected[path],path)
 if __name__=='__main__':unittest.main()

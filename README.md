@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.88
+## Current maintained baseline: 2.8.89
+
+**G89 餐盤朝向／普通串候選**：依 G88 四向觀察與原作矩陣修正 native mesh yaw，並讓普通串使用既有完整原作網格及餐盤專用顯示，避免持物查詢缺失造成空盤。保留已驗證的 G88 進食、插入及數量更新修復；本候選仍須原生驗證。見 [G89 範圍](docs/STATUS-A2.8.89.md)。
 
 **G88 餐盤互動／姿態候選**：保留已凍結的 G87 修復，補上顯示 helper 移除失敗時的封閉保護與真實 discard 路徑測試；使用全新身份，不覆寫 G87。原生互動與姿態仍須本候選驗證。見 [G88 範圍](docs/STATUS-A2.8.88.md)。
 

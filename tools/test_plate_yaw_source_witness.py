@@ -39,5 +39,9 @@ class PlateYawWitness(unittest.TestCase):
    self.assertNotEqual(after,changed)
  def test_layouts_and_eating_code_are_identical_to_frozen_g86(self):
   for path in ('projects/grilling/gameplay_core/behavior_pack/scripts/plate_visual_core.js','projects/grilling/gameplay_core/behavior_pack/scripts/main.js'):
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',PLATE_YAW_SOURCE_BASE+':'+path],cwd=ROOT),path)
+   original=subprocess.check_output(['git','show',PLATE_YAW_SOURCE_BASE+':'+path],cwd=ROOT)
+   if path.endswith('/plate_visual_core.js') and tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,89):
+    from plate_g89_source_witness import expected_current,source as frozen_source
+    self.assertEqual(frozen_source(path),original);self.assertEqual((ROOT/path).read_bytes(),expected_current(path),path)
+   else:self.assertEqual((ROOT/path).read_bytes(),original,path)
 if __name__=='__main__':unittest.main()

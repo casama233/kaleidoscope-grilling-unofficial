@@ -1,5 +1,7 @@
 # Kaleidoscope Grilling Gameplay Core
 
+**G89 餐盤朝向／普通串候選**：修正餐盤 native yaw，並用既有完整網格顯示普通串；保留 G88 修復。本候選仍須原生驗證。見根目錄 docs/STATUS-A2.8.89.md。
+
 **G88 餐盤互動／姿態候選**：保留 G87 的互動及 yaw 更新修復，補上 helper 移除失敗保護；使用全新身份。見根目錄 docs/STATUS-A2.8.88.md。
 
 **G87 餐盤互動／姿態候選**：保留既有餐盤、色盤及營養修復；指向餐盤的原生進食與槽位 yaw 更新採限定修復。新候選仍須原生驗收。見根目錄 docs/STATUS-A2.8.87.md。

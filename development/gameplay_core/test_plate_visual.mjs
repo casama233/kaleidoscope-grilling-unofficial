@@ -34,11 +34,16 @@ test('original1..5 count layouts are bounded; all4 facings rotate positions with
   const cell=PLATE_VISUAL_LAYOUTS[count][slot],positions=[];
   for(const [direction,angle]of Object.entries({south:0,west:90,north:180,east:270})){
    f.block.permutation.getState=()=>direction;const pose=plateVisualPose(f.block,slot,count);positions.push(pose.location);
-   assert.equal(pose.location.y,64+cell[1]/16);assert.equal(pose.angle,angle-cell[3]);if(direction==='south'){assert.equal(pose.location.x,2+cell[0]/16);assert.equal(pose.location.z,-3+cell[2]/16)}
+  assert.equal(pose.location.y,64+cell[1]/16);assert.equal(pose.angle,180-angle+cell[3]);if(direction==='south'){assert.equal(pose.location.x,2+cell[0]/16);assert.equal(pose.location.z,-3+cell[2]/16)}
   }
   assert.ok(Math.abs(positions[0].x+positions[2].x-5)<1e-9);assert.ok(Math.abs(positions[1].z+positions[3].z+5)<1e-9);
  }
  assert.equal(plateVisualPose(f.block,0,0),undefined);assert.equal(plateVisualPose(f.block,5,5),undefined);
+});
+test('ordinary full mesh routes canonical/native/alternate variants through the plate-only helper',()=>{
+ for(const suffix of ['', '_native_plain','_java_three_alt'])assert.deepEqual(plateVisualPlan({typeId:'kaleidoscope_grilling:ordinary_skewer'+suffix}),{model:115,secret:false});
+ const f=fixture(),stack={typeId:'kaleidoscope_grilling:ordinary_skewer',amount:1,props:{saved:'native metadata unchanged'}},before=structuredClone(stack);
+ f.draw(stack);assert.equal(f.spawned.length,1);assert.equal(f.spawned[0].typeId,PLATE_FOOD_VISUAL_TYPE);assert.equal(f.spawned[0].props['kaleidoscope_grilling:model'],115);assert.deepEqual(stack,before);
 });
 test('composed plain secret creates one full-skewer helper with all3 packed foods, never native item equipment',()=>{
  const f=fixture(),stack={typeId:'kaleidoscope_grilling:secret_skewer_native_plain',amount:1,secret:[2053,2794,122],props:{saved:'all metadata stays'}},before=structuredClone(stack);
