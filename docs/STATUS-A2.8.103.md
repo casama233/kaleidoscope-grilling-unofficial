@@ -11,3 +11,5 @@
 PR／CI 與部署結果由各自收據記錄，來源圖示並非真人渲染驗收。完整家族 static／BDS／存檔預檢與 live 部署仍各有證據邊界；在取得本版真人客戶端驗收前，維持 `client=false`、`production_ready=false` 與 `pending_client_acceptance`。
 
 指南 catalog 0.3.34、傳輸 payload、兩張指南圖示及來源記錄同步至新 sprite。G102 已凍結但在遠端指南來源檢查失敗，未部署；保留其 release-history，最終候選另用 G103，沒有重用版號。
+
+調料粒子取色仍讀 Java 模型的 shaft UV，與 GUI sprite 分開。新增來源檢查確認背包圖示更新不會加入新的調料顏色或重新編號既有 tint；原有 191 個放置模型產物保持相同內容。

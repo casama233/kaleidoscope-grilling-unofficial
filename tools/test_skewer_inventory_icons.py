@@ -1,7 +1,10 @@
 """Two source/asset regressions; these do not certify client rendering."""
 import json
+import re
+import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -18,6 +21,23 @@ def rgba(path):
 
 
 class NativeInventoryIconTests(unittest.TestCase):
+    def test_gui_changes_do_not_reassign_particle_palette(self):
+        sys.path.insert(0, str(ROOT / 'development/gameplay_core'))
+        import a2770_placed_visual_assets as placed
+        original_open = Image.open
+        gui_paths = {RP / 'textures/items/unfinished_skewer.png', RP / 'textures/items/secret_skewer.png'}
+
+        def particle_open(path, *args, **kwargs):
+            if isinstance(path, (str, Path)):
+                self.assertNotIn(Path(path), gui_paths, 'GUI sprite used as a particle-color source')
+            return original_open(path, *args, **kwargs)
+
+        with patch.object(placed.Image, 'open', side_effect=particle_open):
+            actual = placed.ingredient_palette()
+        data = (PROJECT / 'behavior_pack/scripts/a2770_placed_visual_data.js').read_text()
+        expected = json.loads(re.search(r'INGREDIENT_COLORS=Object.freeze\((\{.*?\})\)', data).group(1))
+        self.assertEqual(actual, expected)
+
     def test_empty_gui_stick_is_not_held_uv_atlas(self):
         target = RP / 'textures/items/unfinished_skewer.png'
         source = TEMPLATES / 'stick.png'
