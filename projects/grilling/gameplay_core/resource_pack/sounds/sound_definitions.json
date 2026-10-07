@@ -374,6 +374,16 @@
         }
       ],
       "max_distance": 16
+    },
+    "kg_java21.seasoning_finished": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/action_success",
+          "volume": 0.85
+        }
+      ],
+      "max_distance": 16
     }
   }
 }

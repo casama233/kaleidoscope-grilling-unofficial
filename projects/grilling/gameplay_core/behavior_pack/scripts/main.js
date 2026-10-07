@@ -914,7 +914,9 @@ function completePending(player,stack){
  const a=PENDING_USES.get(player.id);
  if(!a||!completedUseStillCurrent(a.use,stack,heldByHand(player,a.hand),player.selectedSlotIndex))return;
  PENDING_USES.delete(player.id);stopSoundHandle(a.audio);
- const list=readSeasonings(stack);if(!hasSeasoningBase(list)){javaInteractionFeedback(player,'missing_base_seasoning');return}
+ // Both current Java branches finish any PENDING identity. Legacy pending
+ // bottles may lack a base ingredient; EMPTY promotion owns that requirement.
+ const list=readSeasonings(stack);
  const variant=Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)),out=new ItemStack(specialSeasoningVisualId(0,variant),1);setSeasonings(out,list);setUses(out,0);
  setItemProperty(out,SEASON_VARIANT_KEY,variant);setItemLore(out,seasoningLore(SEASONING_MAX_USES,list.length));
  if(JSON.stringify(readSeasonings(out))!==JSON.stringify(list)||getUses(out)!==0)throw new Error('Seasoning data write failed');
