@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 import g94_source_conservation as witness
+import g95_source_conservation as current
 
 
 class FrozenG93Foundation(unittest.TestCase):
@@ -55,17 +56,21 @@ class BinaryBoardSourceConservation(unittest.TestCase):
             else original(path, *args, **kwargs))
 
     def test_exact_five_paths_one_addition_and_frozen_g93_before_current(self):
-        result = witness.verify_current()
+        result = witness.verify_snapshot(current.FROZEN_SOURCE_BASE)
         self.assertEqual(result['runtime_files'], 4157)
         self.assertEqual(result['reviewed_release'], [2, 8, 94])
         self.assertEqual(result['reviewed_paths'], 5)
+        latest = witness.verify_current()
+        self.assertEqual(latest['runtime_files'], 4157)
+        self.assertEqual(latest['reviewed_release'], [2, 8, 95])
+        self.assertEqual(latest['reviewed_paths'], 3)
         self.assertEqual(set(witness.metadata()['files']), witness.MANIFESTS | set(witness.REVIEWED_AFTER))
         self.assertEqual(witness.ADDED_PATHS, {witness.QA_GEOMETRY_PATH})
         self.assertNotIn(witness.QA_GEOMETRY_PATH, witness.files())
         for path, identity in witness.REVIEWED_AFTER.items():
             after = witness.apply_delta(path)
             self.assertEqual(witness.sha(after), identity)
-            self.assertEqual((witness.ROOT / path).read_bytes(), after)
+            self.assertEqual(current.source(path), after)
 
     def test_frozen_g93_failure_blocks_current_metadata(self):
         with patch.object(witness.previous, 'verify_snapshot', side_effect=AssertionError('Frozen G93 source drift')) as frozen:
@@ -101,7 +106,8 @@ class BinaryBoardSourceConservation(unittest.TestCase):
             '/behavior_pack/' in path or '/models/' in path or '/animations/' in path)]
         self.assertTrue(conserved)
         for path in conserved:
-            self.assertEqual((witness.ROOT / path).read_bytes(), witness.source(path), path)
+            actual = current.source(path) if path in current.DELTA_PATHS else (witness.ROOT / path).read_bytes()
+            self.assertEqual(actual, witness.source(path), path)
 
     def test_reviewed_and_unchanged_runtime_mutations_fail_closed(self):
         original = Path.read_bytes
@@ -129,7 +135,7 @@ class BinaryBoardSourceConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G94 runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:94|95) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_base_tree_patch_hash_scope_and_reviewed_bytes(self):
@@ -209,7 +215,7 @@ class BinaryBoardSourceConservation(unittest.TestCase):
         history['2.8.93']['BP']['sha256'] = '0' * 64
         with patch.object(Path, 'read_text', lambda path, *args, **kwargs:
             json.dumps(history) if path == witness.ROOT / 'release-history.json' else original_text(path, *args, **kwargs)):
-            with self.assertRaisesRegex(AssertionError, 'G93 history drift'): witness.verify_current()
+            with self.assertRaisesRegex(AssertionError, '(?:G93|Diagnostic G94) history drift'): witness.verify_current()
 
 
 if __name__ == '__main__': unittest.main()

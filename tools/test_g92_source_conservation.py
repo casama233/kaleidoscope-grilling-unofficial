@@ -26,8 +26,8 @@ class HeldClientProbeConservation(unittest.TestCase):
         self.assertEqual(frozen_g92['reviewed_paths'], 6)
         latest = witness.verify_current()
         self.assertEqual(latest['runtime_files'], 4157)
-        self.assertEqual(latest['reviewed_release'], [2, 8, 94])
-        self.assertEqual(latest['reviewed_paths'], 5)
+        self.assertEqual(latest['reviewed_release'], [2, 8, 95])
+        self.assertEqual(latest['reviewed_paths'], 3)
         self.assertEqual(set(witness.metadata()['files']), witness.DELTA_PATHS)
         self.assertEqual(witness.ADDED_PATHS, {witness.QA_GEOMETRY_PATH})
 
@@ -101,7 +101,7 @@ class HeldClientProbeConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:92|93|94) runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:92|93|94|95) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_wrong_base_tree_patch_hash_scope_or_probe_bytes(self):

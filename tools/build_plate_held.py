@@ -82,8 +82,10 @@ QA_POST_TESTS = {
     'qa_d_decoded': 'v.kg_plate_count == 1 && v.kg_plate_desc_0 == 57 && v.kg_plate_shape_0 == 18 && v.kg_plate_style_0 == 0 && v.kg_plate_food_0_0 == 199 && v.kg_plate_food_0_1 == 195 && v.kg_plate_food_0_2 == 180',
 }
 QA_BINARY_TEXTURE = 'textures/held/bottle_shell_palette'
-QA_BINARY_DARK_UV, QA_BINARY_LIGHT_UV = [0, 32], [119, 8]
-QA_BINARY_OFFSET = [0, .3, -2]
+QA_BINARY_DARK_UV, QA_BINARY_LIGHT_UV = [8, 40], [123, 40]
+QA_BINARY_OFFSET = [0, .55, -2]
+QA_BINARY_FRONT_Z, QA_BINARY_BACK_Z, QA_BINARY_GLYPH_DEPTH = -9.22, -6.6, .02
+QA_BINARY_MIRROR_X_SUM = -1.25
 QA_BINARY_FONT = {
     '0': ('111', '101', '101', '101', '111'),
     '1': ('010', '110', '010', '010', '111'),
@@ -257,67 +259,101 @@ def qa_binary_rows():
     return rows
 
 
-def qa_binary_cube(origin, size, light=False):
-    # Every large face samples one reviewed opaque atlas texel. Small dark
-    # glyph boxes use ordinary box UV inside its uniform near-black region.
-    uv = ({face: {'uv': QA_BINARY_LIGHT_UV, 'uv_size': [1, 1]}
-        for face in ('north', 'east', 'south', 'west', 'up', 'down')} if light
-        else QA_BINARY_DARK_UV)
+def qa_binary_cube(origin, size, light=False, face_only=False):
+    # Explicit one-texel faces avoid fractional box-net UVs. Both swatches
+    # are interior, fully opaque, and uniform around bilinear sample edges.
+    texel = QA_BINARY_LIGHT_UV if light else QA_BINARY_DARK_UV
+    # Black front text has only its outward north face; the mirrored rear
+    # copy switches to south. Omitted faces are not drawn, so the unchanged
+    # one-sided material cannot show ghost reversed text around panel edges.
+    faces = ('north', 'east', 'south', 'west', 'up', 'down') if light and not face_only else ('north',)
+    uv = {face: {'uv': texel[:], 'uv_size': [1, 1]} for face in faces}
     return {'origin': [round(v, 5) for v in origin], 'size': [round(v, 5) for v in size], 'uv': uv}
 
 
-def qa_binary_glyph(label, x, y, pixel=.12, z=-8.17, depth=.04, x_scale=1):
-    """Merge a 3x5 glyph's horizontal pixel runs into compact upright bars."""
-    active, rectangles = {}, []
-    for row, line in enumerate(QA_BINARY_FONT[label]):
-        runs = [(match.start(), len(match.group())) for match in re.finditer('1+', line)]
-        next_active = {}
-        for run in runs:
-            start, height = active.pop(run, (row, 0))
-            next_active[run] = (start, height+1)
+def qa_binary_glyph(label, x, y, pixel=.12, z=QA_BINARY_FRONT_Z, depth=QA_BINARY_GLYPH_DEPTH, x_scale=1, padding=(.025, .025)):
+    """Disjoint black strokes, ivory empty pixels and same-plane padding.
+
+    Local opaque contrast travels with the glyph, independent of the distant
+    backing silhouette. Contrasting rectangles meet without overlapping.
+    """
+    cubes = []
+    for value in ('1', '0'):
+        active, rectangles = {}, []
+        for row, line in enumerate(QA_BINARY_FONT[label]):
+            runs = [(match.start(), len(match.group())) for match in re.finditer(value+'+', line)]
+            next_active = {}
+            for run in runs:
+                start, height = active.pop(run, (row, 0))
+                next_active[run] = (start, height+1)
+            rectangles += [(col, start, width, height) for (col, width), (start, height) in active.items()]
+            active = next_active
         rectangles += [(col, start, width, height) for (col, width), (start, height) in active.items()]
-        active = next_active
-    rectangles += [(col, start, width, height) for (col, width), (start, height) in active.items()]
-    return [qa_binary_cube([x+col*pixel*x_scale, y+(5-start-height)*pixel, z],
-        [width*pixel*x_scale, height*pixel, depth]) for col, start, width, height in rectangles]
+        cubes += [qa_binary_cube([x+col*pixel*x_scale, y+(5-start-height)*pixel, z],
+            [width*pixel*x_scale, height*pixel, depth], light=value == '0', face_only=True)
+            for col, start, width, height in rectangles]
+    width, height = 3*pixel*x_scale, 5*pixel
+    px, py = padding
+    cubes += [qa_binary_cube([cx, cy, z], [w, h, depth], light=True, face_only=True)
+        for cx, cy, w, h in ((x-px, y-py, width+2*px, py), (x-px, y+height, width+2*px, py),
+            (x-px, y, px, height), (x+width, y, px, height))]
+    return cubes
+
+
+def qa_binary_back(cubes):
+    """Duplicate readable rear text in the same existing conditional bone.
+
+    Reflect X and glyph shape about the panel center; a viewer on the other
+    side therefore sees the same upright labels, MSB-left ordering and code.
+    """
+    back = deepcopy(cubes)
+    for cube in back:
+        cube['origin'][0] = round(QA_BINARY_MIRROR_X_SUM - cube['origin'][0] - cube['size'][0], 5)
+        cube['origin'][2] = QA_BINARY_BACK_Z
+        cube['uv'] = {'south': cube['uv']['north']}
+    return back
 
 
 def qa_binary_geometry():
-    """Upright labeled 8x8 board in front of foods; original hand rig intact.
+    """Two-sided upright 8x8 code board; original hand rig intact.
 
     Authored X increases from MSB to LSB; rows descend Y. H/M/L are raw
     bits23..16/15..8/7..0. C is count2/1/0, fraction, half, fixed0/1/QA1.
     D is raw-negative flag plus descriptor6..0; 0/1/2 are foods7..0.
-    Opaque ivory tiles always exist; each displays an explicit black 0 or1.
+    One thick opaque ivory panel has explicit black 0/1 on both sides.
     Reference0/1 and the corner tab disambiguate orientation in either hand.
     """
     result = geometry('qa_binary', [], 128, 128)
     result['bones'].pop()
-    # Start in the reviewed upright XY layout, then move only this new board
-    # by Y+.3/Z-2 below. Its final envelope is X[-7.2,5.95], Y[24.55,34.45],
-    # Z[-10.25,-9.84], with opaque tile fronts atZ-10.12 ahead of shafts.
-    # Board placement is QA-local authored geometry, not a plate pose fix.
-    frame = [qa_binary_cube([-7.2, 24.25, -7.96], [13.15, 9.9, .12], True)]
-    # The ivory board under dark glyphs/grid remains a visible zero backdrop.
+    # Final QA-only envelope X[-7.2,5.95], Y[24.80,34.70], Z[-11.22,-8.58].
+    # The single panel is Z[-10.20,-9.60]. Black text/grid are one full unit
+    # clear of each panel face, with common .02 depth and no socket layers.
+    # Neither camera-side assumption nor native readability is certified here.
+    backing = qa_binary_cube([-7.2, 24.25, -8.2], [13.15, 9.9, .6], True)
+    front = []
     for col in range(8):
-        frame += qa_binary_glyph(str(7-col), -5.45+col*1.4-.45, 33.6, .10, x_scale=3)
-    frame.append(qa_binary_cube([-7.15, 33.95, -8.25], [.3, .2, .3]))
+        front += qa_binary_glyph(str(7-col), -5.45+col*1.4-.45, 33.6, .10, x_scale=3, padding=(.08, .025))
+    front.append(qa_binary_cube([-7.15, 33.95, QA_BINARY_FRONT_Z], [.3, .2, QA_BINARY_GLYPH_DEPTH]))
+    # Grid bars share the black glyph plane and meet only at boundaries.
+    # Vertical segments stop at horizontal bars; glyphs stay inside cells.
+    for boundary in range(9):
+        front.append(qa_binary_cube([-6.15, 24.7+boundary*1.1-.015, QA_BINARY_FRONT_Z],
+            [11.2, .03, QA_BINARY_GLYPH_DEPTH]))
+        for row in range(8):
+            front.append(qa_binary_cube([-6.15+boundary*1.4-.015, 24.7+row*1.1+.015, QA_BINARY_FRONT_Z],
+                [.03, 1.07, QA_BINARY_GLYPH_DEPTH]))
     for row, (label, expressions) in enumerate(qa_binary_rows()):
         cy = 32.95-row*1.1
-        frame += qa_binary_glyph(label, -7.05, cy-.325, .13, x_scale=2.3)
+        front += qa_binary_glyph(label, -7.10, cy-.325, .13, x_scale=2.3, padding=(.025, .05))
         for col, _ in enumerate(expressions):
             cx = -5.45+col*1.4
-            # A dark socket permanently outlines every ivory cell, so a
-            # true zero cannot look like a missing/unrendered ingredient.
-            frame.append(qa_binary_cube([cx-.58, cy-.48, -8.09], [1.16, .96, .14]))
-            frame.append(qa_binary_cube([cx-.55, cy-.45, -8.12], [1.1, .9, .03], True))
             for value in (0, 1):
                 name = f'qa_binary_{row}_{col}_{value}'
+                glyph = qa_binary_glyph(str(value), cx-.45, cy-.30, x_scale=2.5, padding=(.1, .08))
                 result['bones'].append({'name': name, 'parent': 'plate_pose',
-                    'pivot': [0, 24, 0], 'cubes': qa_binary_glyph(str(value),
-                        cx-.45, cy-.30, z=-8.17, depth=.02, x_scale=2.5)})
+                    'pivot': [0, 24, 0], 'cubes': glyph + qa_binary_back(glyph)})
     result['bones'].insert(2, {'name': 'qa_binary_frame', 'parent': 'plate_pose',
-        'pivot': [0, 24, 0], 'cubes': frame})
+        'pivot': [0, 24, 0], 'cubes': [backing] + front + qa_binary_back(front)})
     for bone in result['bones']:
         for cube in bone.get('cubes', []):
             cube['origin'] = [round(value+offset, 5)

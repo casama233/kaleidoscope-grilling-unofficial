@@ -26,8 +26,8 @@ class RawClientSourceConservation(unittest.TestCase):
         self.assertEqual(frozen_g93['reviewed_paths'], 3)
         latest = witness.verify_current()
         self.assertEqual(latest['runtime_files'], 4157)
-        self.assertEqual(latest['reviewed_release'], [2, 8, 94])
-        self.assertEqual(latest['reviewed_paths'], 5)
+        self.assertEqual(latest['reviewed_release'], [2, 8, 95])
+        self.assertEqual(latest['reviewed_paths'], 3)
         self.assertEqual(set(witness.metadata()['files']), witness.MANIFESTS | {witness.ATTACHABLE_PATH})
         self.assertEqual(witness.ADDED_PATHS, set())
         path = 'tools/fixtures/g92-runtime-reviewed-delta.json'
@@ -94,7 +94,7 @@ class RawClientSourceConservation(unittest.TestCase):
                 return iter(rows)
             with patch.object(Path, 'rglob', glob), patch.object(Path, 'is_file',
                 lambda path: True if path == extra else original_is_file(path)):
-                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:93|94) runtime file'):
+                with self.assertRaisesRegex(AssertionError, 'Missing/extra G(?:93|94|95) runtime file'):
                     witness.verify_current()
 
     def test_metadata_rejects_base_tree_patch_hash_scope_and_probe_bytes(self):

@@ -6,6 +6,7 @@ import g93_source_conservation as previous
 
 ROOT = previous.ROOT
 PROJECT = previous.PROJECT
+HISTORICAL = previous.previous.previous.previous
 FROZEN_SOURCE_BASE = '44c5fd8a786addf6cf1881ba5f7d665f0f492b0c'
 FROZEN_TREE = 'b555875c13464c377ac8d81adc4d01ca7b0b5a00'
 MANIFESTS = previous.MANIFESTS
@@ -28,18 +29,18 @@ def sha(data):
 
 
 def source(path):
-    return previous.previous.previous.previous.source(FROZEN_SOURCE_BASE, path)
+    return HISTORICAL.source(FROZEN_SOURCE_BASE, path)
 
 
 def files():
-    return previous.previous.previous.previous.files(FROZEN_SOURCE_BASE)
+    return HISTORICAL.files(FROZEN_SOURCE_BASE)
 
 
 def metadata():
     data = json.loads((ROOT / 'tools/fixtures/g94-runtime-reviewed-delta.json').read_text())
     assert data['schema'] == 1 and data['release'] == [2, 8, 94]
     assert data['base_commit'] == FROZEN_SOURCE_BASE and data['base_tree'] == FROZEN_TREE
-    assert previous.previous.previous.previous.git('rev-parse', FROZEN_SOURCE_BASE + '^{tree}').decode().strip() == FROZEN_TREE
+    assert HISTORICAL.git('rev-parse', FROZEN_SOURCE_BASE + '^{tree}').decode().strip() == FROZEN_TREE
     assert set(data['files']) == DELTA_PATHS, 'Unreviewed G94 runtime path'
     assert data['held_review'] == {'patch_sha256': REVIEWED_PATCH_SHA256,
                                    'after_sha256': REVIEWED_AFTER}, 'Unreviewed binary client diagnostic'
@@ -139,12 +140,44 @@ def apply_delta(path):
 
 
 @lru_cache(maxsize=None)
-def expected_runtime_bytes(path):
+def expected_frozen_runtime_bytes(path):
     assert path in set(files()) | ADDED_PATHS, 'Runtime path outside frozen G93 and exact G94 addition'
     return apply_delta(path) if path in DELTA_PATHS else source(path)
 
 
+def expected_runtime_bytes(path):
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 95):
+        from g95_source_conservation import expected_runtime_bytes as expected_next
+        return expected_next(path)
+    return expected_frozen_runtime_bytes(path)
+
+
+def verify_snapshot(ref):
+    """Validate diagnostic G94 independently of every later current release."""
+    result = previous.verify_snapshot(FROZEN_SOURCE_BASE)
+    for release in (92, 93):
+        path = f'tools/fixtures/g{release}-runtime-reviewed-delta.json'
+        assert (ROOT / path).read_bytes() == source(path), 'Frozen reviewed fixture drift: ' + path
+    metadata()
+    frozen = HISTORICAL.files(ref)
+    assert set(frozen) == set(files()) | ADDED_PATHS, 'Frozen G94 missing/extra runtime file'
+    for path, identity in frozen.items():
+        expected_identity = (HISTORICAL.blob(expected_frozen_runtime_bytes(path))
+                             if path in DELTA_PATHS else files()[path])
+        assert identity == expected_identity, 'Frozen G94 source drift: ' + path
+    path = 'tools/fixtures/g94-runtime-reviewed-delta.json'
+    assert (ROOT / path).read_bytes() == HISTORICAL.source(ref, path), 'Frozen reviewed fixture drift: ' + path
+    history = json.loads(HISTORICAL.source(ref, 'release-history.json'))
+    for version, row in json.loads(source('release-history.json')).items():
+        assert history[version] == row, 'Frozen G93 history drift: ' + version
+    return {**result, 'runtime_files': len(frozen), 'reviewed_release': [2, 8, 94],
+            'reviewed_paths': len(DELTA_PATHS)}
+
+
 def verify_current():
+    if tuple(json.loads((ROOT / 'baseline.json').read_text())['version']) >= (2, 8, 95):
+        from g95_source_conservation import verify_current as verify_next
+        return verify_next()
     # Immutable G93 passes on unchanged d93/d92 fixtures before G94 admission.
     result = previous.verify_snapshot(FROZEN_SOURCE_BASE)
     for release in (92, 93):
@@ -157,9 +190,9 @@ def verify_current():
     assert set(current) == set(files()) | ADDED_PATHS, 'Missing/extra G94 runtime file'
     for path, local in current.items():
         if path in DELTA_PATHS:
-            assert local.read_bytes() == expected_runtime_bytes(path), 'Runtime source drift: ' + path
+            assert local.read_bytes() == expected_frozen_runtime_bytes(path), 'Runtime source drift: ' + path
         else:
-            assert previous.previous.previous.previous.blob(local.read_bytes()) == files()[path], 'Runtime source drift: ' + path
+            assert HISTORICAL.blob(local.read_bytes()) == files()[path], 'Runtime source drift: ' + path
     history = json.loads((ROOT / 'release-history.json').read_text())
     for version, row in json.loads(source('release-history.json')).items():
         assert history[version] == row, 'G93 history drift: ' + version

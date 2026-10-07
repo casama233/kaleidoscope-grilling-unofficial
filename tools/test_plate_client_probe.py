@@ -10,6 +10,7 @@ import json
 import re
 import sys
 import unittest
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'tools'), str(ROOT / 'development/gameplay_core')]
@@ -88,6 +89,39 @@ function assert(condition,message){if(!condition)throw Error(message);}
         self.assertEqual(bones['grip'], {'name': 'grip', 'pivot': [0, 24, 0], 'binding': held.BINDING})
         self.assertEqual(bones['plate_pose'], {'name': 'plate_pose', 'parent': 'grip', 'pivot': [0, 24, 0]})
         self.assertTrue(bones['qa_binary_frame']['cubes'])
+        frame = bones['qa_binary_frame']['cubes']
+        faces = {'north', 'east', 'south', 'west', 'up', 'down'}
+        panels = [cube for cube in frame if set(cube['uv']) == faces]
+        self.assertEqual(len(panels), 1)
+        panel = panels[0]
+        self.assertEqual(panel['origin'], [-7.2, 24.8, -10.2])
+        self.assertEqual(panel['size'], [13.15, 9.9, .6])
+        front_z = round(held.QA_BINARY_FRONT_Z+held.QA_BINARY_OFFSET[2], 5)
+        back_z = round(held.QA_BINARY_BACK_Z+held.QA_BINARY_OFFSET[2], 5)
+        self.assertAlmostEqual(panel['origin'][2] - (front_z+.02), 1)
+        self.assertAlmostEqual(back_z - (panel['origin'][2]+panel['size'][2]), 1)
+        self.assertTrue(all(cube['size'][2] == .02 for cube in frame if cube is not panel))
+        with Image.open(held.RP / (held.QA_BINARY_TEXTURE + '.png')) as image:
+            atlas = image.convert('RGBA')
+            for texel, radius, expected in ((held.QA_BINARY_DARK_UV, 2, (4, 4, 10, 255)),
+                    (held.QA_BINARY_LIGHT_UV, 3, (249, 216, 144, 255))):
+                self.assertEqual({atlas.getpixel((x, y)) for x in range(texel[0]-radius, texel[0]+radius+1)
+                    for y in range(texel[1]-radius, texel[1]+radius+1)}, {expected})
+        for bone in bones.values():
+            for cube in bone.get('cubes', []):
+                self.assertEqual(set(cube['uv']), faces if cube is panel else
+                    {'north'} if cube['origin'][2] == front_z else {'south'})
+                for face in cube['uv'].values():
+                    self.assertEqual(face['uv_size'], [1, 1])
+                    self.assertIn(face['uv'], (held.QA_BINARY_DARK_UV, held.QA_BINARY_LIGHT_UV))
+            front = [cube for cube in bone.get('cubes', []) if cube['origin'][2] == front_z]
+            for index, a in enumerate(front):
+                for b in front[index+1:]:
+                    if a['uv']['north']['uv'] == b['uv']['north']['uv']:
+                        continue
+                    overlap = [min(a['origin'][axis]+a['size'][axis], b['origin'][axis]+b['size'][axis])
+                        - max(a['origin'][axis], b['origin'][axis]) for axis in (0, 1)]
+                    self.assertFalse(all(value > .000001 for value in overlap), 'Contrasting font/grid interiors overlap')
         for row in range(8):
             for col in range(8):
                 zero, one = [bones[f'qa_binary_{row}_{col}_{value}'] for value in (0, 1)]
@@ -98,9 +132,20 @@ function assert(condition,message){if(!condition)throw Error(message);}
                 self.assertEqual(one['parent'], 'plate_pose')
                 for glyph in (zero, one):
                     self.assertTrue(all(cube['size'][2] == .02 for cube in glyph['cubes']))
-                    self.assertTrue(all(cube['origin'][2] == -10.17 for cube in glyph['cubes']))
-                    width = max(cube['origin'][0]+cube['size'][0] for cube in glyph['cubes']) - min(cube['origin'][0] for cube in glyph['cubes'])
-                    self.assertAlmostEqual(width, .9)
+                    self.assertEqual({cube['origin'][2] for cube in glyph['cubes']}, {front_z, back_z})
+                    front = [cube for cube in glyph['cubes'] if cube['origin'][2] == front_z]
+                    back = [cube for cube in glyph['cubes'] if cube['origin'][2] == back_z]
+                    self.assertEqual(len(front), len(back))
+                    for side in (front, back):
+                        self.assertTrue(any(next(iter(cube['uv'].values()))['uv'] == held.QA_BINARY_LIGHT_UV for cube in side))
+                        black = [cube for cube in side if next(iter(cube['uv'].values()))['uv'] == held.QA_BINARY_DARK_UV]
+                        width = max(cube['origin'][0]+cube['size'][0] for cube in black) - min(cube['origin'][0] for cube in black)
+                        self.assertAlmostEqual(width, .9)
+                    for a, b in zip(front, back):
+                        self.assertAlmostEqual(b['origin'][0], held.QA_BINARY_MIRROR_X_SUM-a['origin'][0]-a['size'][0])
+                        self.assertEqual(b['origin'][1], a['origin'][1])
+                        self.assertEqual(b['size'], a['size'])
+                        self.assertEqual(b['uv'], {'south': a['uv']['north']})
         controller = self.controllers['controller.render.kg_plate_held.qa_binary']
         self.assertEqual(controller['geometry'], 'Geometry.qa_binary')
         self.assertEqual(controller['textures'], ['Texture.qa_binary'])
