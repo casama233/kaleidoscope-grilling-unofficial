@@ -4,6 +4,22 @@ import hashlib,json,subprocess,sys
 from verify_a2827 import main as baseline
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
+
+def verify_sound_registry(defs,proof,version):
+    expected_names={'kg_imm.'+name for name in proof['sound_events']}|{'kg_imm.four_skewer_eat_ch'+str(i) for i in range(8)}
+    if tuple(version)>=(2,8,73):
+        expected_names|={'kg_java21.'+name for name in ('shield','chime','golden','ordinary_break','ordinary_impact','heavy_metal')}
+    if tuple(version)>=(2,8,85):
+        sys.path.insert(0,str(ROOT/'tools'))
+        from build_projectile_dodge_audio import event_definitions
+        fixture=json.loads((ROOT/'development/gameplay_core/fixtures/java-projectile-dodge-audio-160.json').read_text())
+        aliases=event_definitions(fixture)
+        assert set(aliases)=={'kg_java21.teleport','kg_java21.teleport_neutral','kg_java21.teleport_hostile','kg_cookery.flatulence'}, 'Unreviewed G85 alias identity'
+        expected_names|=set(aliases)
+        for name,value in aliases.items():
+            assert defs.get(name)==value, 'Reviewed G85 sound definition differs: '+name
+    assert set(defs)==expected_names, 'Missing or unreviewed sound event'
+
 def main():
     baseline()
     subprocess.run(['node','--test','development/gameplay_core/test_immersion_audio.mjs','development/gameplay_core/test_localized_heat_lore.mjs','development/gameplay_core/test_pending_audio.mjs','development/gameplay_core/test_full_skewer_flow.mjs'],cwd=ROOT,check=True)
@@ -14,10 +30,7 @@ def main():
     for row in proof['assets']:
         assert hashlib.sha256((ROOT/row['target']).read_bytes()).hexdigest()==row['sha256'],row['target']
     defs=json.loads((RP/'sounds/sound_definitions.json').read_text())['sound_definitions']
-    expected_names={'kg_imm.'+name for name in proof['sound_events']}|{'kg_imm.four_skewer_eat_ch'+str(i) for i in range(8)}
-    if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,73):
-        expected_names|={'kg_java21.'+name for name in ('shield','chime','golden','ordinary_break','ordinary_impact','heavy_metal')}
-    assert set(defs)==expected_names, 'Missing or unreviewed sound event'
+    verify_sound_registry(defs,proof,json.loads((ROOT/'baseline.json').read_text())['version'])
     for i in range(8):
         assert defs['kg_imm.four_skewer_eat_ch'+str(i)]==defs['kg_imm.four_skewer_eat'], 'Historical eating channel changed'
     for event,row in proof['sound_events'].items():

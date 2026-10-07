@@ -1,3 +1,6 @@
+import {tryProjectileDodgeMovement} from './projectile_dodge_movement_runtime.js';
+import {projectileDodgeTeleportFeedback,FLATULENCE_SOUND_ID} from './projectile_dodge_audio_runtime.js';
+import {reserveProjectileDodge,settleProjectileDodge,abandonProjectileDodge,forgetProjectileDodge} from './projectile_dodge_runtime.js';
 import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';
 import {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';
 import {isPlainEatingId,SKEWER_EATING_IDS} from './eating_profile_ids.js';
@@ -783,10 +786,10 @@ function handleCustomBlockInteraction(block,player,intent){
  else handleSeasoningBlock(block,player,intent.hand);
 }
 function readFx(entity){try{return readEffects(entity)}catch{return {}}}
-function writeFx(entity,fx){try{return writeEffects(entity,fx)}catch{return {}}}
+function writeFx(entity,fx,options){try{return writeEffects(entity,fx,options)}catch{return {}}}
 function fxGet(entity,name){const v=readFx(entity)[name];return v&&Number(v.until)>now()?v:null}
-function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx)}
-function fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx)}
+function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}
+function fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}
 function fxReduce(entity,name,ticks){const fx=readFx(entity),v=fx[name];if(!v)return;v.until-=ticks;if(v.until<=now())delete fx[name];writeFx(entity,fx)}
 function fxSnapshot(entity){return JSON.parse(JSON.stringify(readFx(entity)))}
 function nativeSnapshot(entity){const out={};try{for(const e of entity.getEffects())out[e.typeId]={duration:e.duration,amplifier:e.amplifier}}catch{}return out}
@@ -1001,13 +1004,21 @@ world.afterEvents.itemStopUse.subscribe(e=>{
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
-world.afterEvents.playerLeave.subscribe(e=>{PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
+world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
+world.afterEvents.entityDie.subscribe(e=>forgetProjectileDodge(e.deadEntity));
+world.afterEvents.entityRemove.subscribe(e=>forgetProjectileDodge(e.removedEntityId));
 const PENDING_METAL_RESCUES=new Map();
 world.beforeEvents.entityHurt.subscribe(e=>{
  if(e.cancel)return;
  const target=e.hurtEntity,cause=e.damageSource?.cause;
+ if(e.damageSource?.damagingProjectile){
+  const claim=reserveProjectileDodge(target);
+  if(claim){try{
+   system.run(()=>settleProjectileDodge(target,claim,()=>{const moved=tryProjectileDodgeMovement(target);if(moved.success)projectileDodgeTeleportFeedback(target,moved.origin)}));
+   e.cancel=true;return;
+  }catch(error){abandonProjectileDodge(claim);console.warn('[Grilling projectile dodge schedule] '+error)}}
+ }
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
- if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}
  const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');
  if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){
   // Reserve synchronously: deferred writes must not enqueue duplicate rescues.
@@ -1027,7 +1038,7 @@ world.beforeEvents.entityHurt.subscribe(e=>{
   }catch(error){console.warn('[Grilling heavy metal] '+error)}finally{if(PENDING_METAL_RESCUES.get(target.id)===token)PENDING_METAL_RESCUES.delete(target.id)}});
  }
 });
-world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
+world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHurt.subscribe(e=>{
  // Cookery HinderEvent follows damage from a living attacker, including its
  // projectile; a melee contact event cannot represent that source contract.
@@ -1163,7 +1174,7 @@ system.runInterval(()=>{
   if(system.currentTick%10===0&&fxGet(p,'invincible'))invincibleAmbientFeedback(p);
   writeFx(p,readFx(p));const hunger=p.getComponent('minecraft:player.hunger'),sat=p.getComponent('minecraft:player.saturation');
   if(fxGet(p,'vigor')&&hunger&&sat){const prev=VIGOR_LAST.get(p.id);if(p.isSprinting&&prev){if(hunger.currentValue<prev.hunger)hunger.setCurrentValue(prev.hunger);if(sat.currentValue<prev.sat)sat.setCurrentValue(prev.sat)}VIGOR_LAST.set(p.id,{hunger:hunger.currentValue,sat:sat.currentValue})}else VIGOR_LAST.delete(p.id);
-  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);
+  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound(FLATULENCE_SOUND_ID,p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);
   if(system.currentTick%5===0){if(fxGet(p,'mustard'))fleeCreepers(p);if(fxGet(p,'sulfur'))repelPhantoms(p)}
   if(fxGet(p,'tundra_strider')){try{const b=p.getBlockStandingOn();if(b&&TUNDRA_BLOCKS.has(b.typeId)){const v=p.getVelocity(),factor=tundraFactor(b.typeId);p.applyImpulse({x:v.x*(factor-1),y:0,z:v.z*(factor-1)});if(b.typeId==='minecraft:powder_snow'&&v.y<.02)p.applyImpulse({x:0,y:Math.min(.16,Math.max(.04,-v.y+.04)),z:0})}}catch{}}
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}

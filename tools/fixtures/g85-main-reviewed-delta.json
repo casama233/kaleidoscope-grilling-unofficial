@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    85
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only named projectile-dodge producer/lifecycle/reservation integration and source-prioritized projectile dodge before invincible; successful movement and original audio helper call sites plus owned flatulence sound alias. All other G84 main bytes conserved.",
+  "base_commit": "fe99c0ca3d25ffe5140ed699e89a470ee6abbc63",
+  "before_sha256": "ba4cfe77374258c2a43a73b4d9a0d1215b4bc015125b0d75b6a210691baf4b2d",
+  "after_sha256": "6e56192ba6994a24d1f3135d4cde5384e93043dc6b98e1491ee944f759107f85",
+  "operations": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {tryProjectileDodgeMovement} from './projectile_dodge_movement_runtime.js';\nimport {projectileDodgeTeleportFeedback,FLATULENCE_SOUND_ID} from './projectile_dodge_audio_runtime.js';\nimport {reserveProjectileDodge,settleProjectileDodge,abandonProjectileDodge,forgetProjectileDodge} from './projectile_dodge_runtime.js';\n"
+    },
+    {
+      "start": 56149,
+      "end": 56230,
+      "before": "function writeFx(entity,fx){try{return writeEffects(entity,fx)}catch{return {}}}\n",
+      "after": "function writeFx(entity,fx,options){try{return writeEffects(entity,fx,options)}catch{return {}}}\n"
+    },
+    {
+      "start": 56327,
+      "end": 56554,
+      "before": "function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx)}\nfunction fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx)}\n",
+      "after": "function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}\nfunction fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}\n"
+    },
+    {
+      "start": 75886,
+      "end": 76207,
+      "before": "world.afterEvents.playerLeave.subscribe(e=>{PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});\n",
+      "after": "world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});\nworld.afterEvents.entityDie.subscribe(e=>forgetProjectileDodge(e.deadEntity));\nworld.afterEvents.entityRemove.subscribe(e=>forgetProjectileDodge(e.removedEntityId));\n"
+    },
+    {
+      "start": 76368,
+      "end": 76368,
+      "before": "",
+      "after": " if(e.damageSource?.damagingProjectile){\n  const claim=reserveProjectileDodge(target);\n  if(claim){try{\n   system.run(()=>settleProjectileDodge(target,claim,()=>{const moved=tryProjectileDodgeMovement(target);if(moved.success)projectileDodgeTeleportFeedback(target,moved.origin)}));\n   e.cancel=true;return;\n  }catch(error){abandonProjectileDodge(claim);console.warn('[Grilling projectile dodge schedule] '+error)}}\n }\n"
+    },
+    {
+      "start": 76499,
+      "end": 76938,
+      "before": " if(e.damageSource?.damagingProjectile&&fxGet(target,'projectile_dodge')){e.cancel=true;system.run(()=>{fxReduce(target,'projectile_dodge',200);const base=target.location;for(let i=0;i<16;i++){const to={x:base.x+(Math.random()-.5)*3,y:base.y+(Math.random()-.5)*3,z:base.z+(Math.random()-.5)*3};try{if(target.tryTeleport(to,{checkForBlocks:true})){target.dimension.playSound('mob.endermen.portal',target.location);break}}catch{}}});return}\n",
+      "after": ""
+    },
+    {
+      "start": 78522,
+      "end": 79283,
+      "before": "world.afterEvents.playerSpawn.subscribe(e=>{try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n",
+      "after": "world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n"
+    },
+    {
+      "start": 90462,
+      "end": 90795,
+      "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
+      "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound(FLATULENCE_SOUND_ID,p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+    }
+  ]
+}
