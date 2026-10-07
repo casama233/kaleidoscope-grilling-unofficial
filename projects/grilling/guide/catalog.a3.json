@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.33",
+  "version": "0.3.34",
   "revision": "kg-guide-a3-2875",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -6207,7 +6207,7 @@
     },
     "textures/ui/kg_grilling/catalog/secret_skewer": {
       "source": "projects/grilling/gameplay_core/resource_pack/textures/items/secret_skewer.png",
-      "sha256": "70e4ed0b135ac7ffe2b2fd47cbfc1c00b9998c702d95c865ca5254fc14709406",
+      "sha256": "84e74a05cb641e5b159ad1fefe94aa455909a1a11590f5d292098fdd8a5fa24a",
       "item": "kaleidoscope_grilling:secret_skewer",
       "atlas_key": "secret_skewer"
     },
@@ -6273,7 +6273,7 @@
     },
     "textures/ui/kg_grilling/catalog/unfinished_skewer": {
       "source": "projects/grilling/gameplay_core/resource_pack/textures/items/unfinished_skewer.png",
-      "sha256": "70e4ed0b135ac7ffe2b2fd47cbfc1c00b9998c702d95c865ca5254fc14709406",
+      "sha256": "7809d5de46dadb17af1220ae00ff82d9aea7008d8f05fe114a4d0868da153bcd",
       "item": "kaleidoscope_grilling:unfinished_skewer",
       "atlas_key": "unfinished_skewer"
     },
