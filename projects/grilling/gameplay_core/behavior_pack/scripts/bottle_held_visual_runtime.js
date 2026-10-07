@@ -16,6 +16,12 @@ const heldQa=new Map();
 let plateSecretReader;
 export function configurePlateHeldReader(read){plateSecretReader=read;platePlans.clear();}
 
+// Diagnostic fixture only: row4 is dormant in this one-row presentation. Keep
+// the cached production plan untouched so opt-out immediately restores word4=0.
+export function heldClientProbeFlag(player,stack,plan){
+ try{return stack?.typeId===PLATE_ID&&plan?.length===8&&plan[0]===8285209&&plan[5]===57&&plan[6]===0&&plan[7]===133&&plan.slice(1,5).every(value=>value===0)&&player?.hasTag?.('kg_plate_qa')===true;}catch{return false;}
+}
+
 function heldQaItem(player,hand,stack,projected){
  const itemId=typeof stack?.typeId==='string'&&/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(stack.typeId)?stack.typeId:null;
  const out={itemId,projected:Array.from({length:8},(_,i)=>projected?.['kaleidoscope_grilling:bottle_'+hand+'_'+i]??null),serverLive:Array.from({length:8},(_,i)=>{try{return player.getProperty('kaleidoscope_grilling:bottle_'+hand+'_'+i)??null}catch{return 'unreadable';}})};
@@ -108,6 +114,7 @@ export function syncBottleHeld(player){
    plan=bottleHeldVisualPlan(stack?.typeId,readBottleHeldSeasonings(stack));
   }
   for(let i=0;i<plan.length;i++)rows['kaleidoscope_grilling:bottle_'+hand+'_'+i]=plan[i];
+  if(heldClientProbeFlag(player,stack,plan))rows['kaleidoscope_grilling:bottle_'+hand+'_4']=1;
  }}catch(error){const failure=invalidateHeldInput(player,error);traceHeldProjection(player,undefined,'input_failed');throw failure;}
  const signature=JSON.stringify(rows);
  if(signatures.get(player.id)===signature){traceHeldProjection(player,rows);return;}

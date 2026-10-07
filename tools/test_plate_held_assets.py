@@ -33,7 +33,7 @@ class PlateHeldAssets(unittest.TestCase):
 
     def test_generated_assets_are_exact_and_only_rp(self):
         output = held.build()
-        self.assertEqual(len(output), 4)
+        self.assertEqual(len(output), 5)
         for path, data in output.items():
             self.assertTrue(path.is_relative_to(held.RP))
             self.assertEqual(path.read_bytes(), data, str(path))
@@ -43,7 +43,7 @@ class PlateHeldAssets(unittest.TestCase):
 
     def test_one_socket_per_geometry_preserves_player_arms(self):
         self.assertEqual(len(self.geometries), 526)
-        self.assertEqual(len(self.controllers), 31)
+        self.assertEqual(len(self.controllers), 33)
         self.assertFalse((held.RP / 'entity/player.entity.json').exists())
         self.assertFalse((held.RP / 'entity/player.json').exists())
         for geometry in self.geometries.values():

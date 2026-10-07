@@ -19,8 +19,8 @@ const read=name=>fs.readFileSync(new URL(name,ROOT),'utf8');
 
 function fixture({productionSecret=false}={}){
  const callbacks={},properties=new Map(),writes=[],warnings=[],states=[],restored=[],stats={rawPlateReads:0,plateDecodes:0,restores:0,secretReads:0};
- let main,off,failure,readFailure;
- const player={id:'plate-holder',selectedSlotIndex:0,getComponent(id){
+ let main,off,failure,readFailure,qaEnabled=false;
+ const player={id:'plate-holder',selectedSlotIndex:0,hasTag:tag=>qaEnabled&&tag==='kg_plate_qa',getProperty:key=>properties.get(key),getComponent(id){
   if(id==='minecraft:inventory')return {container:{size:9,getItem:()=>main,setItem(){throw Error('Inventory mutation')}}};
   if(id==='minecraft:equippable')return {getEquipment:()=>off,setEquipment(){throw Error('Equipment mutation')}};
  },setProperty(key,value){
@@ -39,12 +39,12 @@ function fixture({productionSecret=false}={}){
   secretVisualState:(stack,reader)=>{stats.secretReads++;return productionSecret?productionSecretVisualState(stack,reader):stack.visual}
  });
  vm.runInContext(strip(read('bottle_held_visual_runtime.js')),context);
- const api=vm.runInContext('({syncBottleHeld,configurePlateHeldReader,isDefaultFailedHeldVisual})',context);
+ const api=vm.runInContext('({syncBottleHeld,configurePlateHeldReader,isDefaultFailedHeldVisual,heldClientProbeFlag})',context);
  api.configurePlateHeldReader(stack=>JSON.parse(stack.props?.[N+'skewer_ingredients']??'[]'));
  const stack=(typeId,props={})=>Object.freeze({typeId,props:Object.freeze(props),amount:1,maxAmount:1,getDynamicProperty:key=>props[key],nameTag:'Keep native name',setDynamicProperty(){throw Error('Metadata mutation')},setLore(){throw Error('Lore mutation')}});
  const plateStack=rows=>Object.freeze({...stack(PLATE,{[N+'plate_skewers']:JSON.stringify(rows)}),rows:Object.freeze(rows)});
  const bottleStack=(ids,typeId=EMPTY)=>stack(typeId,{[seasoning.SEASONING_LIST_KEY]:JSON.stringify(ids)});
- return {api,player,properties,writes,warnings,states,restored,stats,stack,plateStack,bottleStack,callbacks,get main(){return main},set main(v){main=v},get off(){return off},set off(v){off=v},fail(f){failure=f},failRead(s){readFailure=s},words(hand){return Array.from({length:8},(_,i)=>properties.get(N+'bottle_'+hand+'_'+i))}};
+ return {api,player,properties,writes,warnings,states,restored,stats,stack,plateStack,bottleStack,callbacks,get main(){return main},set main(v){main=v},get off(){return off},set off(v){off=v},fail(f){failure=f},failRead(s){readFailure=s},setQa(value){qaEnabled=value},words(hand){return Array.from({length:8},(_,i)=>properties.get(N+'bottle_'+hand+'_'+i))}};
 }
 
 const raws=Object.keys(GRILL_MODEL_INDEX).sort();
@@ -281,4 +281,18 @@ for(const plateHand of ['main','off'])for(const mode of ['before','after'])for(c
  f[plateHand]=b;f[bottleHand]=bad;f.failRead(bad);const keys=new Set(blocked==='plate_marker'?[N+'bottle_'+plateHand+'_7']:blocked==='bottle_marker'?[N+'bottle_'+bottleHand+'_7']:[N+'bottle_main_7',N+'bottle_off_7',N+'bottle_main_5',N+'bottle_off_5']);f.fail(key=>keys.has(key)?mode:false);f.callbacks.interval();assert.equal(f.warnings.length,1);assert.match(f.warnings[0],/invalidation rejected/);
  assert.equal(renderedPlate(f,plateHand).owner,false);assert.equal(renderedPlate(f,plateHand).visible,0);assert.deepEqual(renderedBottle(f,bottleHand),{owner:false,contents:0});
  f.fail(()=>false);f[plateHand]=a;f[bottleHand]=originalBottle;const writes=f.writes.length;f.callbacks.interval();assert.equal(f.writes.length,writes+18);assert.equal(renderedPlate(f,plateHand).visible,3);assert.deepEqual(renderedBottle(f,bottleHand),{owner:true,contents:2});
+});
+
+test('client QA flag uses only dormant word4 for the exact opt-in one-row fixture and clears on opt-out without item or cached-plan mutation',()=>{
+ const f=fixture({productionSecret:true}),secret=f.stack(N+'secret_skewer_java_three_alt',{[N+'skewer_ingredients']:JSON.stringify([{id:'minecraft:mushroom_stew'},{id:'minecraft:golden_apple'},{id:'minecraft:carrot'}]),[N+'model_variants']:'[9,4,7]'}),native=f.plateStack([secret]);f.main=native;
+ f.api.syncBottleHeld(f.player);assert.deepEqual(f.words('main'),[8285209,0,0,0,0,57,0,133]);assert.equal(f.stats.restores,1);
+ f.setQa(true);f.api.syncBottleHeld(f.player);assert.deepEqual(f.words('main'),[8285209,0,0,0,1,57,0,133]);assert.equal(f.stats.restores,1);assert.strictEqual(f.main,native);assert.equal(f.writes.length,36);
+ f.api.syncBottleHeld(f.player);assert.equal(f.writes.length,36);
+ f.setQa(false);f.api.syncBottleHeld(f.player);assert.deepEqual(f.words('main'),[8285209,0,0,0,0,57,0,133]);assert.equal(f.stats.restores,1);assert.equal(f.writes.length,54);
+ f.setQa(true);f.api.syncBottleHeld(f.player);assert.equal(f.words('main')[4],1,'Opt-out must not alter the cached production plan');assert.strictEqual(f.main,native);assert.equal(f.stats.restores,1);
+});
+test('client QA flag rejects other items, shapes, counts, existing row4 data, disabled tags and tag-query failures',()=>{
+ const f=fixture(),target=Object.freeze([8285209,0,0,0,0,57,0,133]),plateStack=f.plateStack([]);assert.equal(f.api.heldClientProbeFlag(f.player,plateStack,target),false);f.setQa(true);assert.equal(f.api.heldClientProbeFlag(f.player,plateStack,target),true);
+ for(const [index,value] of [[0,8285208],[1,1],[4,1],[5,39],[6,1],[7,625]]){const changed=[...target];changed[index]=value;assert.equal(f.api.heldClientProbeFlag(f.player,plateStack,changed),false);}
+ assert.equal(f.api.heldClientProbeFlag(f.player,f.stack(N+'secret_skewer'),target),false);assert.equal(f.api.heldClientProbeFlag({hasTag(){throw Error('unavailable tag')}},plateStack,target),false);assert.deepEqual(target,[8285209,0,0,0,0,57,0,133]);
 });

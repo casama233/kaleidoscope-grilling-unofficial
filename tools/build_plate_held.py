@@ -64,6 +64,20 @@ BINDING = 'q.item_slot_to_bone_name(context.item_slot)'
 # translation inside those bounds; source display rotations/scales stay intact.
 # This settled native-frame projection is not rendered-client acceptance.
 PLATE_FP_CAMERA_OFFSET = [-4, 3.1, -9]
+# G92 is an opt-in client diagnostic, not a rendering/runtime repair. The BP
+# fixture writer alone uses dormant word4=1 while its QA tag is enabled.
+QA_LOG_CANARY, QA_LOG_SAMPLES = 914000, 3
+QA_LOG_FIELDS = ('v.kg_plate_qa_hand', 'v.kg_plate_qa_raw_word_0',
+    'v.kg_plate_word_0', 'v.kg_plate_qa_raw_word_5', 'v.kg_plate_qa_raw_word_7',
+    'v.kg_plate_count', 'v.kg_plate_desc_0', 'v.kg_plate_shape_0',
+    'v.kg_plate_style_0', 'v.kg_plate_food_0_0', 'v.kg_plate_food_0_1',
+    'v.kg_plate_food_0_2')
+QA_POST_TESTS = {
+    'qa_a_flag': '1',
+    'qa_b_large_word': 'v.kg_plate_qa_raw_word_0 == 8285209',
+    'qa_c_small_words': 'v.kg_plate_qa_raw_word_5 == 57 && v.kg_plate_qa_raw_word_7 == 133',
+    'qa_d_decoded': 'v.kg_plate_count == 1 && v.kg_plate_desc_0 == 57 && v.kg_plate_shape_0 == 18 && v.kg_plate_style_0 == 0 && v.kg_plate_food_0_0 == 199 && v.kg_plate_food_0_1 == 195 && v.kg_plate_food_0_2 == 180',
+}
 
 
 def dump(value):
@@ -184,6 +198,26 @@ def lift_cubes(source, amount):
     return cubes
 
 
+def qa_geometry():
+    """Four tiny wood-textured posts reuse the exact plate hand/pivot rig.
+
+    A/B/C/D have heights one/two/three/four and distinct X positions across
+    the near tray edge. This separate geometry leaves the 526 production
+    meshes byte-for-byte unchanged. Cube bases sit on the Y26 tray surface.
+    """
+    result = geometry('qa_probe', [])
+    result['bones'].pop()  # No duplicate production plate_body pass.
+    for index, name in enumerate(QA_POST_TESTS):
+        uv = {face: {'uv': [1, 0], 'uv_size': [1, 2]}
+            for face in ('north', 'east', 'south', 'west')}
+        uv.update({face: {'uv': [1, 1], 'uv_size': [1, 1]}
+            for face in ('up', 'down')})
+        result['bones'].append({'name': name, 'parent': 'plate_pose',
+            'pivot': [0, 24, 0], 'cubes': [{'origin': [-5.5 + index*3, 26, 4.5],
+                'size': [1, index+1, 1], 'uv': uv}]})
+    return {'format_version': '1.21.0', 'minecraft:geometry': [result]}
+
+
 def property_read(hand, word):
     name = NS + f'bottle_{hand}_{word}'
     return f"(c.owning_entity->q.has_property('{name}') ? c.owning_entity->q.property('{name}') : 0)"
@@ -197,6 +231,12 @@ def owner_occupancy():
 def decoder_scripts():
     initialize = ['v.kg_plate_owner_occupied = 0;', 'v.kg_plate_count = 0;']
     pre = []
+    for word in (0, 5, 7):
+        var = f'v.kg_plate_qa_raw_word_{word}'
+        initialize.append(var + ' = 0;')
+        # Separate owner-query scalar, deliberately independent of the
+        # production integer floor, so large-word/query loss is observable.
+        pre.append(var + " = c.item_slot == 'off_hand' ? " + property_read('off', word) + ' : ' + property_read('main', word) + ';')
     for word in range(8):
         var = f'v.kg_plate_word_{word}'; initialize.append(var + ' = 0;')
         # Read the raw word before validation. Clamping a748 transaction marker
@@ -228,6 +268,25 @@ def decoder_scripts():
         for slot, food in enumerate(foods):
             var = f'v.kg_plate_food_{row}_{slot}'; initialize.append(var + ' = 0;')
             pre.append(var + ' = math.clamp(' + food + ', 0, 213);')
+    initialize += [f'v.kg_plate_qa_{name} = 0;' for name in
+        ('enabled', 'hand', 'samples', 'next_log', 'elapsed', 'life_origin', 'clock', 'sample_due')]
+    # QA visibility must survive a rejected large payload: use raw item
+    # occupancy here, not the production all-word validity/owner gate.
+    pre += ['v.kg_plate_qa_enabled = v.kg_plate_word_4 == 1 && v.kg_plate_count == 1 && (' + owner_occupancy() + ');',
+        "v.kg_plate_qa_hand = c.item_slot == 'main_hand' ? 1 : c.item_slot == 'off_hand' ? 2 : 0;",
+        'v.kg_plate_qa_life_origin = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples == 0 ? q.life_time : v.kg_plate_qa_life_origin;',
+        'v.kg_plate_qa_elapsed = v.kg_plate_qa_enabled == 1 ? v.kg_plate_qa_elapsed + math.max(q.delta_time, 0) : v.kg_plate_qa_elapsed;',
+        'v.kg_plate_qa_clock = v.kg_plate_qa_enabled == 1 ? math.max(q.life_time - v.kg_plate_qa_life_origin, v.kg_plate_qa_elapsed) : 0;',
+        f'v.kg_plate_qa_sample_due = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples < {QA_LOG_SAMPLES} && v.kg_plate_qa_clock >= v.kg_plate_qa_next_log;']
+    # query.log accepts a value. Each numeric-only sample is thirteen
+    # consecutive values: canary, hand, raw0, floor0, raw5, raw7, count,
+    # desc0, shape0, style0, food0/1/2. At most three samples per attachable
+    # lifetime; disabling/re-enabling QA never resets this cap. life_time is
+    # preferred when it advances; delta_time supplies the zero-clock fallback.
+    pre += [f'v.kg_plate_qa_sample_due ? q.log({value}) : 0;'
+        for value in (str(QA_LOG_CANARY), *QA_LOG_FIELDS)]
+    pre += ['v.kg_plate_qa_next_log = v.kg_plate_qa_sample_due ? v.kg_plate_qa_clock + 1 : v.kg_plate_qa_next_log;',
+        'v.kg_plate_qa_samples = v.kg_plate_qa_sample_due ? v.kg_plate_qa_samples + 1 : v.kg_plate_qa_samples;']
     return {'initialize': initialize, 'pre_animation': pre,
         'animate': [{key: "c.is_first_person == " + str(int(key.startswith('fp'))) + " && c.item_slot == '" + ('main_hand' if key.endswith('right') else 'off_hand') + "'"}
             for key in ('fp_right', 'fp_left', 'tp_right', 'tp_left')] + ['layout']}
@@ -320,6 +379,19 @@ def build():
             'Array.special_textures[math.clamp(' + desc + '-120,0,2)]', desc + ' >= 120 && ' + desc + ' <= 122',
             {'geometries': {'Array.specials': special_models}, 'textures': {'Array.special_textures': ['Texture.special_' + str(i) for i in range(3)]}})
     references = {g['description']['identifier'].rsplit('.', 1)[1]: g['description']['identifier'] for g in geometries}
+    references['qa_probe'] = 'geometry.kg_plate_held.qa_probe'
+    controllers['controller.render.kg_plate_held.qa_probe'] = {
+        'geometry': 'Geometry.qa_probe', 'materials': [{'*': 'Material.default'}],
+        'textures': ['Texture.body'], 'part_visibility': [{'*': 0}] +
+        [{name: 'v.kg_plate_qa_enabled == 1 && (' + condition + ')'}
+            for name, condition in QA_POST_TESTS.items()]}
+    # One authored state53 golden-apple ingredient, with no dynamic array or
+    # decoded selector. Keep all production row/controller selections intact.
+    assert COMPLETE_STATES[18] == 53
+    controllers['controller.render.kg_plate_held.qa_forced_food'] = {
+        'geometry': 'Geometry.secret_0_18_1', 'materials': [{'*': 'Material.default'}],
+        'textures': ['Texture.food_195_s0'],
+        'part_visibility': [{'*': 0}, {'plate_row_0': 'v.kg_plate_qa_enabled == 1'}]}
     attach = {'format_version': '1.26.0', 'minecraft:attachable': {'description': {
         'identifier': NS + 'skewer_plate', 'materials': {'default': 'entity_alphatest_one_sided'},
         'textures': textures, 'geometry': references, 'scripts': decoder_scripts(),
@@ -328,6 +400,7 @@ def build():
     compact = ('{"format_version":"1.21.0","minecraft:geometry":[\n' +
         ',\n'.join(json.dumps(g, separators=(',', ':')) for g in geometries) + '\n]}\n').encode()
     return {RP / 'models/entity/plate_held.geo.json': compact,
+        RP / 'models/entity/plate_held_qa.geo.json': dump(qa_geometry()),
         RP / 'attachables/skewer_plate.attachable.json': dump(attach),
         RP / 'animations/plate_held.animation.json': dump(animations()),
         RP / 'render_controllers/plate_held.render_controllers.json': dump({'format_version': '1.8.0', 'render_controllers': controllers})}

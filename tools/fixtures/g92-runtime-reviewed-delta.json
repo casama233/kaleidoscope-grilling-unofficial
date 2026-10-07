@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    92
+  ],
+  "base_commit": "b29737b250544fea2e3ab712bad30c2c04498809",
+  "base_tree": "254f367835779c07963efc8ad139c13a41f048bb",
+  "scope": "Only the exact independently reviewed default-off held client probe in the existing shared writer, plate attachable and controller, its one new QA geometry, and paired version identity. Frozen G91 including Cloud, production plate geometry/animations, all 31 production controllers and decoder order are conserved. This diagnostic candidate does not establish native rendered-client acceptance.",
+  "held_review": {
+    "patch_sha256": "47725fb4d7fc39233c6fb1919f23efcca4be2b522e3e10f050f0bb76c2d3ca2e",
+    "after_sha256": {
+      "projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_runtime.js": "d956a5bd54071560ab8138e3685dbae7750b8b8f6d3d3887ae2e8785eb2173be",
+      "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": "ff52e39282ec837cd9321dd95cdb020d780270dcb89b388be7f4c9ca515aa453",
+      "projects/grilling/gameplay_core/resource_pack/render_controllers/plate_held.render_controllers.json": "71aea09c3b02bab08fca5487260cb38a6ff5bee0de64fb265179a5332d050181",
+      "projects/grilling/gameplay_core/resource_pack/models/entity/plate_held_qa.geo.json": "d30da28f8eb06bbb55ca72303dd63974060a0be9b2104712f194b9808e720f09"
+    }
+  },
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json": {
+      "before_sha256": "21366cb5c567aa282a489981b2e088318683b954468974fc9e0bce7bdae4216e",
+      "after_sha256": "b46f43f120ebcddf7dd430ab6c807ff500cbb0e46dc121229fbdfeb8daec7589",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      91\n",
+          "after": "      92\n"
+        },
+        {
+          "start": 444,
+          "end": 455,
+          "before": "        91\n",
+          "after": "        92\n"
+        },
+        {
+          "start": 661,
+          "end": 672,
+          "before": "        91\n",
+          "after": "        92\n"
+        },
+        {
+          "start": 812,
+          "end": 823,
+          "before": "        91\n",
+          "after": "        92\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_runtime.js": {
+      "before_sha256": "72b0e69d561ae2a12ca9c2d7f27c335837bdb7d11c6749a40ab6679e8168a224",
+      "after_sha256": "d956a5bd54071560ab8138e3685dbae7750b8b8f6d3d3887ae2e8785eb2173be",
+      "operations": [
+        {
+          "start": 1002,
+          "end": 1002,
+          "before": "",
+          "after": "\n// Diagnostic fixture only: row4 is dormant in this one-row presentation. Keep\n// the cached production plan untouched so opt-out immediately restores word4=0.\nexport function heldClientProbeFlag(player,stack,plan){\n try{return stack?.typeId===PLATE_ID&&plan?.length===8&&plan[0]===8285209&&plan[5]===57&&plan[6]===0&&plan[7]===133&&plan.slice(1,5).every(value=>value===0)&&player?.hasTag?.('kg_plate_qa')===true;}catch{return false;}\n}\n"
+        },
+        {
+          "start": 6715,
+          "end": 6715,
+          "before": "",
+          "after": "  if(heldClientProbeFlag(player,stack,plan))rows['kaleidoscope_grilling:bottle_'+hand+'_4']=1;\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/skewer_plate.attachable.json": {
+      "before_sha256": "712698501f72b831cc44d8990ab60d940cc2b2f7348183520a17d1849869ef58",
+      "after_sha256": "ff52e39282ec837cd9321dd95cdb020d780270dcb89b388be7f4c9ca515aa453",
+      "operations": [
+        {
+          "start": 77860,
+          "end": 77920,
+          "before": "        \"special_4_2\": \"geometry.kg_plate_held.special_4_2\"\n",
+          "after": "        \"special_4_2\": \"geometry.kg_plate_held.special_4_2\",\n        \"qa_probe\": \"geometry.kg_plate_held.qa_probe\"\n"
+        },
+        {
+          "start": 78051,
+          "end": 78051,
+          "before": "",
+          "after": "          \"v.kg_plate_qa_raw_word_0 = 0;\",\n          \"v.kg_plate_qa_raw_word_5 = 0;\",\n          \"v.kg_plate_qa_raw_word_7 = 0;\",\n"
+        },
+        {
+          "start": 79421,
+          "end": 79458,
+          "before": "          \"v.kg_plate_food_4_2 = 0;\"\n",
+          "after": "          \"v.kg_plate_food_4_2 = 0;\",\n          \"v.kg_plate_qa_enabled = 0;\",\n          \"v.kg_plate_qa_hand = 0;\",\n          \"v.kg_plate_qa_samples = 0;\",\n          \"v.kg_plate_qa_next_log = 0;\",\n          \"v.kg_plate_qa_elapsed = 0;\",\n          \"v.kg_plate_qa_life_origin = 0;\",\n          \"v.kg_plate_qa_clock = 0;\",\n          \"v.kg_plate_qa_sample_due = 0;\"\n"
+        },
+        {
+          "start": 79496,
+          "end": 79496,
+          "before": "",
+          "after": "          \"v.kg_plate_qa_raw_word_0 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_0') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_0') : 0);\",\n          \"v.kg_plate_qa_raw_word_5 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_5') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_5') : 0);\",\n          \"v.kg_plate_qa_raw_word_7 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_7') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_7') : 0);\",\n"
+        },
+        {
+          "start": 86417,
+          "end": 86508,
+          "before": "          \"v.kg_plate_food_4_2 = math.clamp(math.floor(v.kg_plate_word_4/45796), 0, 213);\"\n",
+          "after": "          \"v.kg_plate_food_4_2 = math.clamp(math.floor(v.kg_plate_word_4/45796), 0, 213);\",\n          \"v.kg_plate_qa_enabled = v.kg_plate_word_4 == 1 && v.kg_plate_count == 1 && ((c.item_slot == 'main_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:skewer_plate')) || (c.item_slot == 'off_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:skewer_plate')));\",\n          \"v.kg_plate_qa_hand = c.item_slot == 'main_hand' ? 1 : c.item_slot == 'off_hand' ? 2 : 0;\",\n          \"v.kg_plate_qa_life_origin = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples == 0 ? q.life_time : v.kg_plate_qa_life_origin;\",\n          \"v.kg_plate_qa_elapsed = v.kg_plate_qa_enabled == 1 ? v.kg_plate_qa_elapsed + math.max(q.delta_time, 0) : v.kg_plate_qa_elapsed;\",\n          \"v.kg_plate_qa_clock = v.kg_plate_qa_enabled == 1 ? math.max(q.life_time - v.kg_plate_qa_life_origin, v.kg_plate_qa_elapsed) : 0;\",\n          \"v.kg_plate_qa_sample_due = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples < 3 && v.kg_plate_qa_clock >= v.kg_plate_qa_next_log;\",\n          \"v.kg_plate_qa_sample_due ? q.log(914000) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_hand) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_word_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_5) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_7) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_count) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_desc_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_shape_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_style_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_0) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_1) : 0;\",\n          \"v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_2) : 0;\",\n          \"v.kg_plate_qa_next_log = v.kg_plate_qa_sample_due ? v.kg_plate_qa_clock + 1 : v.kg_plate_qa_next_log;\",\n          \"v.kg_plate_qa_samples = v.kg_plate_qa_sample_due ? v.kg_plate_qa_samples + 1 : v.kg_plate_qa_samples;\"\n"
+        },
+        {
+          "start": 88902,
+          "end": 88954,
+          "before": "        \"controller.render.kg_plate_held.special_4\"\n",
+          "after": "        \"controller.render.kg_plate_held.special_4\",\n        \"controller.render.kg_plate_held.qa_probe\",\n        \"controller.render.kg_plate_held.qa_forced_food\"\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/manifest.json": {
+      "before_sha256": "d36407995af02678c5552bf1d8f437be0a78dc706e7c92a330d8e0fb29deb2de",
+      "after_sha256": "99f083ba8e04b88b9685983b5e87f230dbe95bd162fbb90e68867b213bab9d03",
+      "operations": [
+        {
+          "start": 223,
+          "end": 232,
+          "before": "      91\n",
+          "after": "      92\n"
+        },
+        {
+          "start": 449,
+          "end": 460,
+          "before": "        91\n",
+          "after": "        92\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/models/entity/plate_held_qa.geo.json": {
+      "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after_sha256": "d30da28f8eb06bbb55ca72303dd63974060a0be9b2104712f194b9808e720f09",
+      "operations": [
+        {
+          "start": 0,
+          "end": 0,
+          "before": "",
+          "after": "{\n  \"format_version\": \"1.21.0\",\n  \"minecraft:geometry\": [\n    {\n      \"description\": {\n        \"identifier\": \"geometry.kg_plate_held.qa_probe\",\n        \"texture_width\": 16,\n        \"texture_height\": 16,\n        \"visible_bounds_width\": 4,\n        \"visible_bounds_height\": 4,\n        \"visible_bounds_offset\": [\n          0,\n          1.5,\n          0\n        ]\n      },\n      \"bones\": [\n        {\n          \"name\": \"grip\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ],\n          \"binding\": \"q.item_slot_to_bone_name(context.item_slot)\"\n        },\n        {\n          \"name\": \"plate_pose\",\n          \"parent\": \"grip\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ]\n        },\n        {\n          \"name\": \"qa_a_flag\",\n          \"parent\": \"plate_pose\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ],\n          \"cubes\": [\n            {\n              \"origin\": [\n                -5.5,\n                26,\n                4.5\n              ],\n              \"size\": [\n                1,\n                1,\n                1\n              ],\n              \"uv\": {\n                \"north\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"east\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"south\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"west\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"up\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                },\n                \"down\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                }\n              }\n            }\n          ]\n        },\n        {\n          \"name\": \"qa_b_large_word\",\n          \"parent\": \"plate_pose\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ],\n          \"cubes\": [\n            {\n              \"origin\": [\n                -2.5,\n                26,\n                4.5\n              ],\n              \"size\": [\n                1,\n                2,\n                1\n              ],\n              \"uv\": {\n                \"north\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"east\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"south\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"west\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"up\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                },\n                \"down\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                }\n              }\n            }\n          ]\n        },\n        {\n          \"name\": \"qa_c_small_words\",\n          \"parent\": \"plate_pose\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ],\n          \"cubes\": [\n            {\n              \"origin\": [\n                0.5,\n                26,\n                4.5\n              ],\n              \"size\": [\n                1,\n                3,\n                1\n              ],\n              \"uv\": {\n                \"north\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"east\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"south\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"west\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"up\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                },\n                \"down\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                }\n              }\n            }\n          ]\n        },\n        {\n          \"name\": \"qa_d_decoded\",\n          \"parent\": \"plate_pose\",\n          \"pivot\": [\n            0,\n            24,\n            0\n          ],\n          \"cubes\": [\n            {\n              \"origin\": [\n                3.5,\n                26,\n                4.5\n              ],\n              \"size\": [\n                1,\n                4,\n                1\n              ],\n              \"uv\": {\n                \"north\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"east\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"south\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"west\": {\n                  \"uv\": [\n                    1,\n                    0\n                  ],\n                  \"uv_size\": [\n                    1,\n                    2\n                  ]\n                },\n                \"up\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                },\n                \"down\": {\n                  \"uv\": [\n                    1,\n                    1\n                  ],\n                  \"uv_size\": [\n                    1,\n                    1\n                  ]\n                }\n              }\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n"
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/render_controllers/plate_held.render_controllers.json": {
+      "before_sha256": "c620733341cfa14be34bcf88ea59a79f470ada8ae607859c077cb97bcbdf7e10",
+      "after_sha256": "71aea09c3b02bab08fca5487260cb38a6ff5bee0de64fb265179a5332d050181",
+      "operations": [
+        {
+          "start": 382484,
+          "end": 382484,
+          "before": "",
+          "after": "    },\n    \"controller.render.kg_plate_held.qa_probe\": {\n      \"geometry\": \"Geometry.qa_probe\",\n      \"materials\": [\n        {\n          \"*\": \"Material.default\"\n        }\n      ],\n      \"textures\": [\n        \"Texture.body\"\n      ],\n      \"part_visibility\": [\n        {\n          \"*\": 0\n        },\n        {\n          \"qa_a_flag\": \"v.kg_plate_qa_enabled == 1 && (1)\"\n        },\n        {\n          \"qa_b_large_word\": \"v.kg_plate_qa_enabled == 1 && (v.kg_plate_qa_raw_word_0 == 8285209)\"\n        },\n        {\n          \"qa_c_small_words\": \"v.kg_plate_qa_enabled == 1 && (v.kg_plate_qa_raw_word_5 == 57 && v.kg_plate_qa_raw_word_7 == 133)\"\n        },\n        {\n          \"qa_d_decoded\": \"v.kg_plate_qa_enabled == 1 && (v.kg_plate_count == 1 && v.kg_plate_desc_0 == 57 && v.kg_plate_shape_0 == 18 && v.kg_plate_style_0 == 0 && v.kg_plate_food_0_0 == 199 && v.kg_plate_food_0_1 == 195 && v.kg_plate_food_0_2 == 180)\"\n        }\n      ]\n    },\n    \"controller.render.kg_plate_held.qa_forced_food\": {\n      \"geometry\": \"Geometry.secret_0_18_1\",\n      \"materials\": [\n        {\n          \"*\": \"Material.default\"\n        }\n      ],\n      \"textures\": [\n        \"Texture.food_195_s0\"\n      ],\n      \"part_visibility\": [\n        {\n          \"*\": 0\n        },\n        {\n          \"plate_row_0\": \"v.kg_plate_qa_enabled == 1\"\n        }\n      ]\n"
+        }
+      ]
+    }
+  }
+}

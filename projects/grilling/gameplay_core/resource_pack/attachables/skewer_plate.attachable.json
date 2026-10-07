@@ -1219,12 +1219,16 @@
         "secret_4_26_2": "geometry.kg_plate_held.secret_4_26_2",
         "special_4_0": "geometry.kg_plate_held.special_4_0",
         "special_4_1": "geometry.kg_plate_held.special_4_1",
-        "special_4_2": "geometry.kg_plate_held.special_4_2"
+        "special_4_2": "geometry.kg_plate_held.special_4_2",
+        "qa_probe": "geometry.kg_plate_held.qa_probe"
       },
       "scripts": {
         "initialize": [
           "v.kg_plate_owner_occupied = 0;",
           "v.kg_plate_count = 0;",
+          "v.kg_plate_qa_raw_word_0 = 0;",
+          "v.kg_plate_qa_raw_word_5 = 0;",
+          "v.kg_plate_qa_raw_word_7 = 0;",
           "v.kg_plate_word_0 = 0;",
           "v.kg_plate_word_1 = 0;",
           "v.kg_plate_word_2 = 0;",
@@ -1262,9 +1266,20 @@
           "v.kg_plate_style_4 = 0;",
           "v.kg_plate_food_4_0 = 0;",
           "v.kg_plate_food_4_1 = 0;",
-          "v.kg_plate_food_4_2 = 0;"
+          "v.kg_plate_food_4_2 = 0;",
+          "v.kg_plate_qa_enabled = 0;",
+          "v.kg_plate_qa_hand = 0;",
+          "v.kg_plate_qa_samples = 0;",
+          "v.kg_plate_qa_next_log = 0;",
+          "v.kg_plate_qa_elapsed = 0;",
+          "v.kg_plate_qa_life_origin = 0;",
+          "v.kg_plate_qa_clock = 0;",
+          "v.kg_plate_qa_sample_due = 0;"
         ],
         "pre_animation": [
+          "v.kg_plate_qa_raw_word_0 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_0') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_0') : 0);",
+          "v.kg_plate_qa_raw_word_5 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_5') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_5') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_5') : 0);",
+          "v.kg_plate_qa_raw_word_7 = c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_7') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_7') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_7') : 0);",
           "v.kg_plate_word_0 = math.floor(c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_0') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_0') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_0') : 0));",
           "v.kg_plate_word_1 = math.floor(c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_1') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_1') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_1') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_1') : 0));",
           "v.kg_plate_word_2 = math.floor(c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_off_2') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_off_2') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_main_2') ? c.owning_entity->q.property('kaleidoscope_grilling:bottle_main_2') : 0));",
@@ -1305,7 +1320,28 @@
           "v.kg_plate_shape_4 = math.clamp(v.kg_plate_desc_4 - 39, 0, 80) - v.kg_plate_style_4*27;",
           "v.kg_plate_food_4_0 = math.clamp(v.kg_plate_word_4 - math.floor(v.kg_plate_word_4/214)*214, 0, 213);",
           "v.kg_plate_food_4_1 = math.clamp(math.floor(v.kg_plate_word_4/214) - math.floor(v.kg_plate_word_4/45796)*214, 0, 213);",
-          "v.kg_plate_food_4_2 = math.clamp(math.floor(v.kg_plate_word_4/45796), 0, 213);"
+          "v.kg_plate_food_4_2 = math.clamp(math.floor(v.kg_plate_word_4/45796), 0, 213);",
+          "v.kg_plate_qa_enabled = v.kg_plate_word_4 == 1 && v.kg_plate_count == 1 && ((c.item_slot == 'main_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:skewer_plate')) || (c.item_slot == 'off_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:skewer_plate')));",
+          "v.kg_plate_qa_hand = c.item_slot == 'main_hand' ? 1 : c.item_slot == 'off_hand' ? 2 : 0;",
+          "v.kg_plate_qa_life_origin = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples == 0 ? q.life_time : v.kg_plate_qa_life_origin;",
+          "v.kg_plate_qa_elapsed = v.kg_plate_qa_enabled == 1 ? v.kg_plate_qa_elapsed + math.max(q.delta_time, 0) : v.kg_plate_qa_elapsed;",
+          "v.kg_plate_qa_clock = v.kg_plate_qa_enabled == 1 ? math.max(q.life_time - v.kg_plate_qa_life_origin, v.kg_plate_qa_elapsed) : 0;",
+          "v.kg_plate_qa_sample_due = v.kg_plate_qa_enabled == 1 && v.kg_plate_qa_samples < 3 && v.kg_plate_qa_clock >= v.kg_plate_qa_next_log;",
+          "v.kg_plate_qa_sample_due ? q.log(914000) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_hand) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_word_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_5) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_qa_raw_word_7) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_count) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_desc_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_shape_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_style_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_0) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_1) : 0;",
+          "v.kg_plate_qa_sample_due ? q.log(v.kg_plate_food_0_2) : 0;",
+          "v.kg_plate_qa_next_log = v.kg_plate_qa_sample_due ? v.kg_plate_qa_clock + 1 : v.kg_plate_qa_next_log;",
+          "v.kg_plate_qa_samples = v.kg_plate_qa_sample_due ? v.kg_plate_qa_samples + 1 : v.kg_plate_qa_samples;"
         ],
         "animate": [
           {
@@ -1361,7 +1397,9 @@
         "controller.render.kg_plate_held.secret_4_0",
         "controller.render.kg_plate_held.secret_4_1",
         "controller.render.kg_plate_held.secret_4_2",
-        "controller.render.kg_plate_held.special_4"
+        "controller.render.kg_plate_held.special_4",
+        "controller.render.kg_plate_held.qa_probe",
+        "controller.render.kg_plate_held.qa_forced_food"
       ]
     }
   }

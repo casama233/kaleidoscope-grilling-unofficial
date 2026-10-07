@@ -11294,6 +11294,53 @@
           ]
         }
       }
+    },
+    "controller.render.kg_plate_held.qa_probe": {
+      "geometry": "Geometry.qa_probe",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.body"
+      ],
+      "part_visibility": [
+        {
+          "*": 0
+        },
+        {
+          "qa_a_flag": "v.kg_plate_qa_enabled == 1 && (1)"
+        },
+        {
+          "qa_b_large_word": "v.kg_plate_qa_enabled == 1 && (v.kg_plate_qa_raw_word_0 == 8285209)"
+        },
+        {
+          "qa_c_small_words": "v.kg_plate_qa_enabled == 1 && (v.kg_plate_qa_raw_word_5 == 57 && v.kg_plate_qa_raw_word_7 == 133)"
+        },
+        {
+          "qa_d_decoded": "v.kg_plate_qa_enabled == 1 && (v.kg_plate_count == 1 && v.kg_plate_desc_0 == 57 && v.kg_plate_shape_0 == 18 && v.kg_plate_style_0 == 0 && v.kg_plate_food_0_0 == 199 && v.kg_plate_food_0_1 == 195 && v.kg_plate_food_0_2 == 180)"
+        }
+      ]
+    },
+    "controller.render.kg_plate_held.qa_forced_food": {
+      "geometry": "Geometry.secret_0_18_1",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.food_195_s0"
+      ],
+      "part_visibility": [
+        {
+          "*": 0
+        },
+        {
+          "plate_row_0": "v.kg_plate_qa_enabled == 1"
+        }
+      ]
     }
   }
 }

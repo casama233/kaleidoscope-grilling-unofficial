@@ -4,11 +4,13 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 import g91_source_conservation as witness
+import g92_source_conservation as current
 
 class CloudSourceConservation(unittest.TestCase):
  def test_frozen_g90_is_validated_before_the_exact_current_delta(self):
   self.assertEqual(witness.previous.verify_snapshot(witness.FROZEN_SOURCE_BASE)['runtime_files'],4155)
-  result=witness.verify_current();self.assertEqual(result['reviewed_paths'],5)
+  result=witness.verify_snapshot(current.FROZEN_SOURCE_BASE);self.assertEqual(result['reviewed_paths'],5)
+  self.assertEqual(witness.verify_current()['reviewed_paths'],6)
   self.assertEqual(set(witness.metadata()['files']),witness.DELTA_PATHS)
 
  def test_cloud_changes_only_the_three_inherited_coalescers(self):
@@ -45,13 +47,13 @@ class CloudSourceConservation(unittest.TestCase):
  def test_held_diagnostic_and_fp_deltas_are_exact_reviewed_patch_bytes(self):
   for path,digest in witness.HELD_REVIEWED_AFTER.items():
    after=witness.apply_delta(path);self.assertEqual(witness.sha(after),digest)
-   self.assertEqual((witness.ROOT/path).read_bytes(),after)
+   self.assertEqual(current.source(path),after)
   path=witness.PROJECT+'resource_pack/models/entity/plate_held.geo.json'
   self.assertEqual((witness.ROOT/path).read_bytes(),witness.source(path))
 
  def test_manifest_delta_cannot_change_other_fields(self):
   original=Path.read_text;changed=copy.deepcopy(witness.metadata());path=next(iter(witness.MANIFESTS));before=witness.source(path)
-  after=json.loads((witness.ROOT/path).read_text());after['header']['uuid']='00000000-0000-0000-0000-000000000000'
+  after=json.loads(witness.apply_delta(path));after['header']['uuid']='00000000-0000-0000-0000-000000000000'
   after=(json.dumps(after,ensure_ascii=False,indent=2)+'\n').encode()
   changed['files'][path]['operations']=[{'start':0,'end':len(before.decode()),'before':before.decode(),'after':after.decode()}]
   changed['files'][path]['after_sha256']=witness.sha(after)

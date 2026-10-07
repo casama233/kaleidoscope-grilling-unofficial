@@ -71,11 +71,35 @@ def apply_delta(path):
     return after
 
 @lru_cache(maxsize=None)
-def expected_runtime_bytes(path):
+def expected_frozen_runtime_bytes(path):
     assert path in previous.files(FROZEN_SOURCE_BASE),'Runtime path outside frozen G90'
     return apply_delta(path) if path in DELTA_PATHS else source(path)
 
+def expected_runtime_bytes(path):
+    if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,92):
+        from g92_source_conservation import expected_runtime_bytes as expected_next
+        return expected_next(path)
+    return expected_frozen_runtime_bytes(path)
+
+
+def verify_snapshot(ref):
+    """Retain all G91 assertions on an immutable public runtime snapshot."""
+    result=previous.verify_snapshot(FROZEN_SOURCE_BASE)
+    metadata();expected=previous.files(FROZEN_SOURCE_BASE);frozen=previous.files(ref)
+    assert set(frozen)==set(expected),'Frozen G91 missing/extra runtime file'
+    for path,identity in expected.items():
+        if path in DELTA_PATHS:identity=previous.blob(expected_frozen_runtime_bytes(path))
+        assert frozen[path]==identity,'Frozen G91 source drift: '+path
+    history=json.loads(previous.source(ref,'release-history.json'))
+    for version,row in json.loads(source('release-history.json')).items():
+        assert history[version]==row,'Frozen G90 history drift: '+version
+    return {**result,'reviewed_release':[2,8,91],'reviewed_paths':len(DELTA_PATHS)}
+
+
 def verify_current():
+    if tuple(json.loads((ROOT/'baseline.json').read_text())['version']) >= (2,8,92):
+        from g92_source_conservation import verify_current as verify_next
+        return verify_next()
     # Validate frozen G90's full original source union before inspecting G91.
     result=previous.verify_snapshot(FROZEN_SOURCE_BASE)
     metadata();expected=previous.files(FROZEN_SOURCE_BASE)
@@ -83,7 +107,7 @@ def verify_current():
              for p in (ROOT/PROJECT/side).rglob('*') if p.is_file()}
     assert set(current)==set(expected),'Missing/extra G91 runtime file'
     for path,p in current.items():
-        if path in DELTA_PATHS:assert p.read_bytes()==expected_runtime_bytes(path),'Runtime source drift: '+path
+        if path in DELTA_PATHS:assert p.read_bytes()==expected_frozen_runtime_bytes(path),'Runtime source drift: '+path
         else:assert previous.blob(p.read_bytes())==expected[path],'Runtime source drift: '+path
     current_history=json.loads((ROOT/'release-history.json').read_text())
     for version,row in json.loads(source('release-history.json')).items():

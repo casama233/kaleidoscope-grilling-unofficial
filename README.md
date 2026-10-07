@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.91
+## Current maintained baseline: 2.8.92
+
+**G92 手持餐盤客戶端診斷候選**：預設關閉；只對既有 QA 標記與指定單列餐盤加入限量 client Molang 記錄、四個判定柱及常量食材對照，保留資料與正式顯示路徑。此隔離候選未整合最新 main，也未宣稱修復秘製內容或 CI／真人驗收通過。見 [G92 範圍](docs/STATUS-A2.8.92.md)。
 
 **G91 Cloud 表達式候選**：修正 G90 原生載入確認的 Cloud 粒子 Molang 語法錯誤，保留相同速度向量、單位及既有餐盤功能。G90 觀察與新候選驗證分開記錄。見 [G91 範圍](docs/STATUS-A2.8.91.md)。
 
