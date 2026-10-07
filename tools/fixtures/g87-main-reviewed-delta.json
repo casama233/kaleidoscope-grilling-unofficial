@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    87
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only flatulence sound helper import and cue call: block-position-center origin and Java float pitch. Cloud, impulse, sneak edge and Hinder/projectile flow conserved. Ground work excluded.",
+  "base_commit": "3134539ae4b846b55db29a80aa42dd5f8563aeb2",
+  "before_sha256": "507c00a0450a28f5774a0dc1fe09a15ffafaf89e422ad1273a63c19ec49e6ffc",
+  "after_sha256": "dc5dc0b6d1ba8fd80587c714dcebc5bcb9d0bdc2de5eb74af8a6e62c324077cb",
+  "operations": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {flatulenceSoundOrigin,flatulenceSoundPitch} from './flatulence_sound_runtime.js';\n"
+    },
+    {
+      "start": 91150,
+      "end": 91475,
+      "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound(FLATULENCE_SOUND_ID,p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
+      "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{const dimension=p.dimension,origin=flatulenceSoundOrigin(p);if(origin){const pitch=flatulenceSoundPitch();if(pitch!==undefined)dimension.playSound(FLATULENCE_SOUND_ID,origin,{volume:1,pitch})}}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+    }
+  ]
+}
