@@ -142,7 +142,7 @@
     }
   },
   "boundaries": [
-    "Bedrock health component is the living-actor mapping; custom actor parity is not certified.",
+    "Hinder uses health presence AND (native player OR armor stand OR type_family mob) as its class-only living-actor mapping; health-bearing vehicles alone do not qualify, and arbitrary custom Java inheritance is not certified.",
     "Forge LivingDamageEvent / NeoForge LivingDamageEvent.Pre are different phases; Bedrock after-hurt cannot certify arbitrary addon ordering.",
     "No amount>0 gate is added. If native after-hurt reports zero damage, apply the authored effect.",
     "Nearest-player vertical attraction in PlayerCloudParticle is not implemented by the portable Cloud provider.",

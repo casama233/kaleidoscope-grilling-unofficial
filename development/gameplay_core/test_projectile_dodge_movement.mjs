@@ -5,18 +5,19 @@ import fs from 'node:fs';
 import {PROJECTILE_DODGE_ATTEMPTS,PROJECTILE_DODGE_RANGE,projectileDodgeBounds,sampleProjectileDodgeAttempt} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_movement_core.js';
 import {tryProjectileDodgeMovement} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_movement_runtime.js';
 const root=new URL('../../',import.meta.url),fixture=JSON.parse(fs.readFileSync(new URL('development/gameplay_core/fixtures/java-projectile-dodge-movement-160.json',root),'utf8'));
-function actor({dimensionId='minecraft:overworld',range={min:-64,max:320},position={x:1,y:80,z:2},succeedAt=1,mounted=false,remount=false}={}){
- const calls=[],ejected=[],order=[];let riding=mounted,location={...position},reportedDimension=dimensionId;
+function actor({dimensionId='minecraft:overworld',range={min:-64,max:320},position={x:1,y:80,z:2},succeedAt=1,mounted=false,remount=false,readBlock=()=>({typeId:'minecraft:air',isLiquid:false,isWaterlogged:false})}={}){
+ const calls=[],ejected=[],order=[],reads=[];let riding=mounted,location={...position},reportedDimension=dimensionId;
  const mount={getComponent:id=>id==='minecraft:rideable'?{
   ejectRider:rider=>{ejected.push(rider);order.push('eject');riding=false},
   ejectRiders(){throw Error('Other passengers must not be ejected')}
  }:undefined};
- const subject={typeId:'minecraft:cow',get dimension(){return {id:reportedDimension,heightRange:range}},
+ const subject={typeId:'minecraft:cow',get dimension(){return {id:reportedDimension,heightRange:range,getBlock:point=>{reads.push({...point});return readBlock(point)}}},
   get location(){return location},
+  getAABB:()=>({center:{x:location.x,y:location.y+.65,z:location.z},extent:{x:.45,y:.65,z:.45}}),
   getComponent:id=>id==='minecraft:health'?{currentValue:10}:id==='minecraft:riding'&&riding?{entityRidingOn:mount}:undefined,
   tryTeleport:(to,options)=>{order.push('teleport');calls.push({to,options});if(calls.length===succeedAt){location={...to};return true}if(remount)riding=true;return false},
   setDynamicProperty(){throw Error('Movement must not spend effects')},playSound(){throw Error('Movement must not play sounds')}};
- return {subject,mount,calls,ejected,order,setRiding:value=>{riding=value},setPosition:value=>{location=value},setDimension:value=>{reportedDimension=value}};
+ return {subject,mount,calls,ejected,order,reads,setRiding:value=>{riding=value},setPosition:value=>{location=value},setDimension:value=>{reportedDimension=value}};
 }
 test('both original loader dimension definitions yield the fixed vanilla logical bounds, including Nether127',()=>{
  assert.equal(PROJECTILE_DODGE_ATTEMPTS,fixture.attempts);assert.equal(PROJECTILE_DODGE_RANGE,fixture.sample_range);
@@ -85,4 +86,55 @@ test('dimension changes and teleport API failures stop further attempts without 
 test('observed native success is preserved if destination disappears after movement',()=>{
  let moved=false;const a=actor();Object.defineProperty(a.subject,'location',{get(){if(moved)throw Error('Removed after teleport');return {x:1,y:80,z:2}}});a.subject.tryTeleport=()=>{moved=true;return true};
  const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});assert.equal(result.success,true);assert.equal(result.attempts,1);assert.equal(result.destination,undefined);assert.equal(result.reason,'destination_unavailable');
+});
+
+test('integrated dry candidates reach native teleport while liquid and unsupported candidates consume at most16 attempts',()=>{
+ const dry=actor(),accepted=tryProjectileDodgeMovement(dry.subject,{random:()=>.5});
+ assert.equal(accepted.success,true);assert.equal(accepted.attempts,1);assert.equal(dry.calls.length,1);assert.ok(dry.reads.length>0);assert.equal(dry.calls[0].options.checkForBlocks,true);
+ for(const block of [
+  {typeId:'minecraft:water',isLiquid:true,isWaterlogged:false},
+  {typeId:'minecraft:bubble_column',isLiquid:false,isWaterlogged:false},
+  {typeId:'addon:unknown_script_fluid',isLiquid:false,isWaterlogged:false}
+ ]){
+  const a=actor({readBlock:()=>block});let draws=0;
+  const result=tryProjectileDodgeMovement(a.subject,{random:()=>{draws++;return .5}});
+  assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(draws,48);assert.equal(a.calls.length,0);assert.equal(a.reads.length,16);
+ }
+});
+test('integrated actual body rejects waterlogged head-height overlap while its feet cells are dry',()=>{
+ const a=actor({readBlock:point=>point.y===81?{typeId:'minecraft:oak_slab',isLiquid:false,isWaterlogged:true}:{typeId:'minecraft:air',isLiquid:false,isWaterlogged:false}});
+ const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
+ assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(a.calls.length,0);assert.ok(a.reads.some(point=>point.y===81));assert.ok(a.reads.some(point=>point.y===80));
+});
+test('integrated unreadable native box or block context never permits a guessed teleport',()=>{
+ for(const mode of ['missing-box','throwing-box','missing-block','throwing-block']){
+  const a=actor({readBlock:()=>{if(mode==='throwing-block')throw Error('Unloaded cell');return mode==='missing-block'?undefined:{typeId:'minecraft:air',isLiquid:false,isWaterlogged:false}}});
+  if(mode==='missing-box')a.subject.getAABB=undefined;
+  if(mode==='throwing-box')a.subject.getAABB=()=>{throw Error('Bounds unavailable')};
+  const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
+  assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(a.calls.length,0);
+  assert.equal(a.reads.length,mode.endsWith('box')?0:16);
+ }
+});
+test('a liquid first candidate can be followed by a dry success with no stale failure reason',()=>{
+ let draws=0;const a=actor({readBlock:()=>draws===3?{typeId:'minecraft:water',isLiquid:true,isWaterlogged:false}:{typeId:'minecraft:air',isLiquid:false,isWaterlogged:false}});
+ const result=tryProjectileDodgeMovement(a.subject,{random:()=>{draws++;return .5}});
+ assert.equal(result.success,true);assert.equal(result.attempts,2);assert.equal(draws,6);assert.equal(a.calls.length,1);assert.equal(result.reason,'');assert.deepEqual(result.destination,{x:1,y:80,z:2});
+});
+test('an acknowledged eject that changes dimension cannot reuse the old origin candidate in the new dimension',()=>{
+ const a=actor({mounted:true}),eject=a.mount.getComponent('minecraft:rideable').ejectRider;
+ a.mount.getComponent=()=>({ejectRider:target=>{eject(target);a.setDimension('minecraft:nether')}});
+ const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
+ assert.equal(result.success,false);assert.equal(result.attempts,1);assert.equal(result.reason,'dimension_changed');assert.equal(a.ejected.length,1);assert.equal(a.calls.length,0);assert.equal(a.reads.length,0);
+});
+test('liquid integration reads the actual post-eject body rather than an earlier smaller mounted box',()=>{
+ const a=actor({mounted:true,readBlock:point=>point.y===83?{typeId:'minecraft:water',isLiquid:true,isWaterlogged:false}:{typeId:'minecraft:air',isLiquid:false,isWaterlogged:false}}),boxStages=[];
+ a.subject.getAABB=()=>{boxStages.push(a.ejected.length);return a.ejected.length?{center:{x:1,y:82,z:2},extent:{x:.3,y:2,z:.3}}:{center:{x:1,y:80.25,z:2},extent:{x:.3,y:.25,z:.3}}};
+ const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
+ assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(a.ejected.length,1);assert.equal(a.calls.length,0);assert.ok(a.reads.some(point=>point.y===83));assert.ok(boxStages.length>0);assert.ok(boxStages.every(stage=>stage===1));
+});
+test('a dry cell operation that remounts the unchanged box cannot inherit its earlier dismount permission',()=>{
+ let a;a=actor({readBlock:()=>{a.setRiding(true);return {typeId:'minecraft:air',isLiquid:false,isWaterlogged:false}}});
+ const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
+ assert.equal(result.success,false);assert.equal(result.attempts,1);assert.equal(result.reason,'riding_context_changed');assert.equal(a.calls.length,0);assert.equal(a.ejected.length,0);assert.ok(a.reads.length>0);
 });

@@ -17,7 +17,12 @@ entity itself has a native projectile component. A reported living attacker
 retains priority. An unrelated nonliving damager alongside a different
 projectile does not inherit that projectile's owner.
 
-A health component is the Bedrock mapping for a living attacker and victim.
+Both attacker and victim must have health and be a native player, armor stand
+or member of the native mob family. Health presence alone does not classify
+boats or minecarts as Java LivingEntity. The shared class-only predicate does
+not read current health or add a positive-health gate; arbitrary custom Java
+inheritance remains outside this native mapping. The focused class correction
+and source controls are documented in `HINDER-LIVING-DAMAGE-CLASS-20261007.md`.
 The existing `kaleidoscope_grilling:a21_fx` state and `hinder` key remain
 unchanged, including expiry and food/secret-ingredient producers. The Java
 handlers have no positive damage amount condition; the port adds none.

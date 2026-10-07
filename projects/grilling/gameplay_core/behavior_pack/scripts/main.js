@@ -1,4 +1,5 @@
 import {tryProjectileDodgeMovement} from './projectile_dodge_movement_runtime.js';
+import {isCookeryLivingEntity} from './cookery_living_class.js';
 import {projectileDodgeTeleportFeedback,FLATULENCE_SOUND_ID} from './projectile_dodge_audio_runtime.js';
 import {reserveProjectileDodge,settleProjectileDodge,abandonProjectileDodge,forgetProjectileDodge} from './projectile_dodge_runtime.js';
 import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';
@@ -1046,14 +1047,14 @@ world.afterEvents.entityHurt.subscribe(e=>{
  try{
   const source=e.damageSource;
   let attacker=source?.damagingEntity;
-  if(!attacker?.getComponent('minecraft:health')){
+  if(!isCookeryLivingEntity(attacker)){
    const projectile=source?.damagingProjectile;
    // Native hurt may report the arrow itself as damagingEntity. Resolve its
    // living owner, while preserving an independently reported actor's priority.
    if(attacker&&projectile&&attacker.id!==projectile.id)return;
    attacker=(projectile??attacker)?.getComponent('minecraft:projectile')?.owner;
   }
-  if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;
+  if(!isCookeryLivingEntity(attacker)||!isCookeryLivingEntity(e.hurtEntity)||!fxGet(attacker,'hinder'))return;
   e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});
  }catch{} // A removed actor/projectile must not abort other damage subscribers.
 });
