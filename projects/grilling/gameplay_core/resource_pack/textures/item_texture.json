@@ -171,10 +171,10 @@
       "textures": "textures/items/premium_chili_oil_bucket"
     },
     "unfinished_skewer": {
-      "textures": "textures/items/unfinished_skewer"
+      "textures": "textures/items/unfinished_skewer_gui"
     },
     "secret_skewer": {
-      "textures": "textures/items/secret_skewer"
+      "textures": "textures/items/secret_skewer_gui"
     },
     "skewer_plate": {
       "textures": "textures/items/skewer_plate"

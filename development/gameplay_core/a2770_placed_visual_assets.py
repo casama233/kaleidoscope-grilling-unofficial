@@ -230,11 +230,12 @@ def oil_assets(controllers):
 
 def ingredient_palette():
  atlas=load(RP/'textures/item_texture.json')['texture_data'];result={}
- # Bottle GUI renders are presentation assets, never particle-color sources.
+ # Bottle/skewer GUI renders are presentation assets, never particle-color sources.
  # Match item identity rather than mutable icon keys, including fill proxies.
  bottles={NS+name for name in ('empty_seasoning_bottle','pending_seasoning','special_seasoning')}
  bottles|={NS+f'special_seasoning_r{r}_v{v}' for r in range(1,9) for v in range(8)}
  bottles|={NS+f'{state}_seasoning_f{fill}' for state in ('partial','pending') for fill in range(1,9)}
+ skewers={NS+'unfinished_skewer',NS+'secret_skewer'}
  profiles=json.loads(re.search(r'PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)',(BP/'scripts/data.js').read_text()).group(1))
  # PR124's owned duration aliases reuse the canonical Java item texture.
  # They are not additional seasoning ingredients or Java palette identities.
@@ -247,6 +248,10 @@ def ingredient_palette():
   key=icon if isinstance(icon,str) else (icon or {}).get('texture',(icon or {}).get('textures',{}).get('default'))
   if item['description']['identifier'] in bottles:
    candidate=RP/'textures/blocks/seasoning_bottle.png'
+  elif item['description']['identifier'] in skewers:
+   # Java's model particle texture remains the shaft UV; the separate GUI
+   # compositor must not change seasoning colors or reorder their tint slots.
+   candidate=RP/'textures/secret_skewer_stick.png'
   else:
    paths=atlas.get(key,{}).get('textures');path=paths[0] if isinstance(paths,list) else paths
    if not isinstance(path,str):continue
