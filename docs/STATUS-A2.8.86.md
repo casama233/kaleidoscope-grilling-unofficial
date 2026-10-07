@@ -8,7 +8,7 @@ G86 is a fresh source-coherent candidate based on current main `c85cb34f591079c0
 - All3499 RP files are identical to G85, except the manifest and the seven `food_100_0.png` through `food_100_6.png` atlases. Those seven files are exactly current main/G82's original Java Cookery suspicious-stir-fry palette correction
 - Original Java palette/provenance fixtures, retained changed sprite, importer, attribution and G82 status survive byte-identical to main. G85's gameplay/plate scripts, meshes, aliases and exact reviewed main deltas survive without a new gameplay delta
 - Both append-only release histories and verifier entries82–85 are retained. The G86 verifier runs the complete G85 chain once with expected_version86; existing palette generation checks cover all1491 atlases. A separate Git-source union/provenance gate protects the precise two-source relationship without weakening older byte guards
-- Two immutable owned-repository commit pins are added to the existing audited source-ref inventory so shallow Linux/Windows CI can retrieve the exact comparison objects; no new workflow or private source pack is introduced
+- Three immutable owned-repository commit pins are added to the existing audited source-ref inventory so shallow Linux/Windows CI can retrieve the exact comparison objects; no new workflow or private source pack is introduced
 
 ## Bounded native G85 evidence, not G86 acceptance
 
@@ -19,6 +19,8 @@ A separate ordinary grilled-beef-skewer sample on one west-facing tray was immed
 The source-coherence gate proves the associated BP behavior and the vanilla ingredient palettes are unchanged in G86. It does not make G85 screenshots a G86 native pass. G86 still needs its own exact-source/package identity, canonical/compiled CI and bounded native continuation; the seven corrected Cookery atlases have no new native color acceptance here.
 
 ## Gates
+
+The initial exact-head canonical source run reached the G85 native saturation counterfactual, then failed because shallow CI had not fetched its G84 comparison object. A test-only follow-up registers that exact G84 source pin in the existing audited inventory and asserts that its actual main.js bytes match the reviewed pre-fix delta. Runtime files and the installed G86 archive are unchanged. The full canonical run must pass on the follow-up head; the initial failed run is not acceptance.
 
 No merge, release or live deployment is authorized in this task. Canonical source/export checks and isolated native testing may run in parallel after exact Git/package/focused checks; both remain distinct. Required BSM freshness, full-family/saved-world/live admission and broader client acceptance remain open. Keep `client=false`, `production_ready=false`, `pending_client_acceptance`.
 
