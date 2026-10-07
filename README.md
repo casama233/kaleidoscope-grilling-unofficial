@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.84
+## Current maintained baseline: 2.8.85
+
+**G85 原生餐盤修復候選**：以 G84 真實診斷確認的 saturation setter 上限錯誤為依據，於飢餓值更新後重新取得當前飽和度元件並遵守其有效上限，避免獎勵失敗回滾整次進食。盤中 helper 使用原有計算的 yaw 初始化生成，保留原作斜列；新候選仍須原生驗收。見 [G85 範圍](docs/STATUS-A2.8.85.md)。
 
 **G84 餐盤姿態／診斷候選**：保留 G83 已限定實測的完整盤中食材、取回／插回與重新載入顯示；加入盤中 helper 的原生 body/head 對齊元件，並把已有的預設關閉診斷延伸至營養回報各子步驟與白名單錯誤分類。沒有猜測或修改營養 setter／計算；原生新候選仍待驗收。見 [G84 範圍](docs/STATUS-A2.8.84.md) 及 [G83 限定原生結果](docs/NATIVE-PLATE-G83-BOUNDED-20261007.md)。
 

@@ -57,7 +57,8 @@ function renderPlate(row,b,k,stack,at,plan){
  const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,model:plan.model,secret});
  if(old?.signature===signature)return;
  if(!old){if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn('[Grilling contents capacity] plate render budget exceeded; storage unaffected')}return;}
-  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location)};row.parts.set(k,old);helpers++;}
+  // Seed the same authored yaw at creation; teleport alone can leave a default head/body basis.
+  old={entity:b.dimension.spawnEntity(PLATE_FOOD_VISUAL_TYPE,at.location,{initialRotation:-at.angle})};row.parts.set(k,old);helpers++;}
  try{old.entity.setProperty('kaleidoscope_grilling:ready',false);
   old.entity.teleport(at.location,{dimension:b.dimension,rotation:{x:0,y:-at.angle}});
   old.entity.setProperty('kaleidoscope_grilling:model',plan.model);

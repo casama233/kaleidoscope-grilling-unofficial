@@ -7,7 +7,7 @@ import {GRILL_MODEL_INDEX} from '../../projects/grilling/gameplay_core/behavior_
 const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js',import.meta.url),'utf8');
 function fixture(limit=32){
  const row={parts:new Map()},spawned=[],removed=[],writes=[],block={x:2,y:64,z:-3,permutation:{getState:()=> 'north'}};
- block.dimension={id:'minecraft:overworld',spawnEntity(typeId,at){const e={typeId,isValid:true,props:{},teleport(location,options){this.location=location;this.options=options},setProperty(k,v){writes.push([k,v]);this.props[k]=v},remove(){this.isValid=false;removed.push(this)}};spawned.push(e);return e}};
+ block.dimension={id:'minecraft:overworld',spawnEntity(typeId,at,spawnOptions){const e={typeId,isValid:true,spawnOptions,props:{},teleport(location,options){this.location=location;this.options=options},setProperty(k,v){writes.push([k,v]);this.props[k]=v},remove(){this.isValid=false;removed.push(this)}};spawned.push(e);return e}};
  const ctx=vm.createContext({PLATE_FOOD_VISUAL_TYPE,secretVisualState:(stack,reader)=>reader(stack),reader:s=>s.secret,
  metadataSignature:JSON.stringify,captureSkewerMetadata:s=>structuredClone(s),helpers:0,grillingConfig:()=>({contentsHelpers:limit}),system:{currentTick:0},lastCapacityWarning:-1200,console,
  discard(r,k){const old=r.parts.get(k);if(old){old.entity.remove();r.parts.delete(k);ctx.helpers--;}}});
@@ -63,4 +63,13 @@ test('plate-only animation owns one static horizontal root and exact reviewed po
  const p=new URL('../../projects/grilling/gameplay_core/resource_pack/animations/plate_food_visual.animation.json',import.meta.url),clips=JSON.parse(fs.readFileSync(p)).animations;
  assert.deepEqual(Object.keys(clips),['animation.kg_station.plate_food']);
  assert.deepEqual(clips['animation.kg_station.plate_food'],{loop:true,bones:{root:{scale:1.2,position:[0,"q.property('kaleidoscope_grilling:model') == 114 ? -1.8 : -0.6",1.8]}}});
+});
+
+test('new plate helpers seed exact facing plus authored slot yaw at spawn, without altering other stations',()=>{
+ const stack={typeId:Object.keys(RAW_TO_COOKED)[0],secret:[]};
+ for(const direction of ['south','west','north','east'])for(let count=1;count<=5;count++){
+  const f=fixture();f.block.permutation.getState=()=>direction;
+  for(let slot=0;slot<count;slot++){f.draw(stack,'plate/'+slot,count);const pose=plateVisualPose(f.block,slot,count),e=f.spawned[slot];assert.deepEqual(Object.keys(e.spawnOptions),['initialRotation']);assert.equal(e.spawnOptions.initialRotation,-pose.angle);assert.equal(e.options.rotation.y,-pose.angle);}
+ }
+ assert.equal((source.match(/initialRotation:-at.angle/g)??[]).length,1);
 });

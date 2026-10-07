@@ -419,10 +419,14 @@ function addSecretNutrition(player,stack,meta,diagnostics=false){
   operation='hunger_write';h.setCurrentValue(hunger);
   trace('reward_hunger_after',()=>({hungerAfter:h.currentValue}));
   operation='saturation_target';
-  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,sat.currentValue+gain);
-  trace('reward_saturation_before',()=>({saturationCurrent:sat.currentValue,saturationMax:sat.effectiveMax,saturationTarget:saturation,gain}));
-  operation='saturation_write';sat.setCurrentValue(saturation);
-  trace('reward_saturation_after',()=>({saturationAfter:sat.currentValue}));
+  // Native saturation bounds can lag the hunger write. Read the current view,
+  // retain its authoritative cap, and never invent or modify an attribute maximum.
+  const currentSat=player.getComponent('minecraft:player.saturation');
+  if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');
+  const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1),saturation=Math.min(hunger,currentSat.effectiveMax,currentSat.currentValue+gain);
+  trace('reward_saturation_before',()=>({saturationCurrent:currentSat.currentValue,saturationMax:currentSat.effectiveMax,saturationTarget:saturation,gain}));
+  operation='saturation_write';currentSat.setCurrentValue(saturation);
+  trace('reward_saturation_after',()=>({saturationAfter:currentSat.currentValue}));
  }catch(error){trace('reward_failed',()=>({operation,errorName:error?.name}));throw error;}
 }
 function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta,true)}
