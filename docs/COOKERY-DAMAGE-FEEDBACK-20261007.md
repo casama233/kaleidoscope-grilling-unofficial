@@ -35,10 +35,13 @@ Flatulence previously played `random.fizz` and emitted one smoke particle. Both
 author branches specify ten Cloud particles, center height +0.25, Gaussian
 spread 0.25 on each axis, event speed 0.1 blocks/tick, and the original fart
 sound at volume 1 with pitch in [0.8, 1.2). The repair restores those event
-parameters through the existing Grilling delivery adapter and calls the current
-Cookery resource event `kaleidoscope_cookery.fart`. The three samples in the
-Cookery 1.6 original resource pack are byte-identical to the corresponding Java
-author samples; no host scripts or new copies of those sounds are exported.
+parameters through the existing Grilling delivery adapter. The current Cookery
+resource event `kaleidoscope_cookery.fart` uses a neutral category, while the
+author call explicitly uses PLAYERS. Grilling therefore adds the owned player
+alias `kg_cookery.flatulence`, referencing the same three existing Cookery
+resource sample paths. The three samples in the Cookery 1.6 original resource
+pack are byte-identical to the corresponding Java author samples; no host
+scripts, host resource replacement or new copies of those sounds are exported.
 
 Author sources: [Forge flatulence feedback](https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/2f4e386ce23f49a385ddf003c67fc6415c55417a/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/network/message/SimpleC2SModMessage.java#L48-L58)
 and [NeoForge flatulence feedback](https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/network/message/SimpleC2SModMessage.java#L48-L57).

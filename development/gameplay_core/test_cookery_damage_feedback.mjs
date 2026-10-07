@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import {activeEffects,FX_KEY} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/effect_lifecycle_core.js';
 import {interactionParticles} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particles_core.js';
 import {emitParticleCommands} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particle_delivery.js';
+import {FLATULENCE_SOUND_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_audio_core.js';
 
 const root=new URL('../../',import.meta.url),read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const main=read('projects/grilling/gameplay_core/behavior_pack/scripts/main.js');
@@ -21,7 +22,7 @@ function actor({living=true,effect='hinder',until=2000}={}){
 }
 function harness({legacy=false,draw=.5}={}){
  const callbacks={},context=vm.createContext({console,
-  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),
+  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,
   now:()=>1000,readFx:entity=>activeEffects(JSON.parse(entity.getDynamicProperty(FX_KEY)??'{}'),1000),
   interactionParticleBurst:(dimension,origin,event)=>emitParticleCommands(dimension,origin,interactionParticles(event,()=>.25)),
   world:{afterEvents:Object.fromEntries(['entityHurt','entityHitEntity'].map(k=>[k,{subscribe:callback=>{callbacks[k]=callback}}]))}});
@@ -85,7 +86,7 @@ test('flatulence press sends ten Cloud commands and the existing original host a
  const h=harness(),subject=actor({effect:'flatulence'});h.tick(subject);subject.isSneaking=true;h.tick(subject);h.tick(subject);
  assert.equal(subject.impulses.length,1);assert.equal(subject.impulses[0].y,.75);assert.equal(subject.particles.length,10);
  assert.ok(subject.particles.every(x=>x[0]==='kaleidoscope_grilling:feedback_cloud'));assert.equal(subject.sound.length,1);
- const [id,location,options]=subject.sound[0];assert.equal(id,'kaleidoscope_cookery.fart');assert.equal(location,subject.location);assert.equal(options.volume,1);assert.equal(options.pitch,1);
+ const [id,location,options]=subject.sound[0];assert.equal(id,'kg_cookery.flatulence');assert.equal(location,subject.location);assert.equal(options.volume,1);assert.equal(options.pitch,1);
  subject.isSneaking=false;h.tick(subject);subject.isSneaking=true;h.tick(subject);assert.equal(subject.sound.length,2);
 });
 test('flatulence uses source pitch bounds without firing for inactive effects',()=>{

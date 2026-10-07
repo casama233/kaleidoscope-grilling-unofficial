@@ -314,6 +314,66 @@
         }
       ],
       "max_distance": 16
+    },
+    "kg_java21.teleport": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.teleport_neutral": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.teleport_hostile": {
+      "category": "hostile",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_cookery.flatulence": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kc_entity_fart_fart_0",
+          "stream": false
+        },
+        {
+          "name": "sounds/kc_entity_fart_fart_1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kc_entity_fart_fart_2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
     }
   }
 }
