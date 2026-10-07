@@ -8,9 +8,12 @@ import {interactionParticles} from '../../projects/grilling/gameplay_core/behavi
 import {emitParticleCommands} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_particle_delivery.js';
 import {FLATULENCE_SOUND_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_audio_core.js';
 import {isCookeryLivingEntity} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/cookery_living_class.js';
+import {flatulenceSoundOrigin,flatulenceSoundPitch} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/flatulence_sound_runtime.js';
 
 const root=new URL('../../',import.meta.url),read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const main=read('projects/grilling/gameplay_core/behavior_pack/scripts/main.js');
+const flatulenceOracle=JSON.parse(read('development/gameplay_core/fixtures/java-flatulence-sound-160.json'));
+const floatBits=value=>{const view=new DataView(new ArrayBuffer(4));view.setFloat32(0,value);return view.getUint32(0).toString(16).padStart(8,'0')};
 const fxGet=main.slice(main.indexOf('function fxGet('),main.indexOf('function fxSet('));
 function actor({living=true,typeId='minecraft:cow',families=['mob'],health=10,effect='hinder',until=2000}={}){
  const applied=[],sound=[],particles=[],impulses=[];
@@ -22,8 +25,9 @@ function actor({living=true,typeId='minecraft:cow',families=['mob'],health=10,ef
   addEffect:(...v)=>applied.push(v),applyImpulse:v=>impulses.push(v)};
 }
 function harness({legacy=false,draw=.5}={}){
+ let pitchDraws=0;const pitchRandom=()=>{pitchDraws++;return draw};
  const callbacks={},context=vm.createContext({console,
-  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,isCookeryLivingEntity,
+  Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,isCookeryLivingEntity,flatulenceSoundOrigin,flatulenceSoundPitch:()=>flatulenceSoundPitch(pitchRandom),
   now:()=>1000,readFx:entity=>activeEffects(JSON.parse(entity.getDynamicProperty(FX_KEY)??'{}'),1000),
   interactionParticleBurst:(dimension,origin,event)=>emitParticleCommands(dimension,origin,interactionParticles(event,()=>.25)),
   world:{afterEvents:Object.fromEntries(['entityHurt','entityHitEntity'].map(k=>[k,{subscribe:callback=>{callbacks[k]=callback}}]))}});
@@ -32,7 +36,7 @@ function harness({legacy=false,draw=.5}={}){
   main.slice(main.indexOf('world.afterEvents.entityHurt.subscribe(e=>{'),main.indexOf('function canUseSecretSkewer('));
  vm.runInContext(handler,context);
  const line=main.split('\n').find(x=>x.includes('const sneak=!!p.isSneaking'));
- return {callbacks,hurt:event=>callbacks.entityHurt?.(event),tick:entity=>{context.p=entity;vm.runInContext('(()=>{'+line+'})()',context)}};
+ return {callbacks,get pitchDraws(){return pitchDraws},hurt:event=>callbacks.entityHurt?.(event),tick:entity=>{context.p=entity;vm.runInContext('(()=>{'+line+'})()',context)}};
 }
 function expectSlow(target){assert.equal(target.applied.length,1);const [name,ticks,options]=target.applied[0];assert.equal(name,'slowness');assert.equal(ticks,100);assert.equal(options.amplifier,1);assert.equal(options.showParticles,true)}
 test('a responsible living attacker applies authored Hinder on projectile damage; the old melee-only handler misses it',()=>{
@@ -134,12 +138,40 @@ test('flatulence press sends ten Cloud commands and the existing original host a
  const h=harness(),subject=actor({effect:'flatulence'});h.tick(subject);subject.isSneaking=true;h.tick(subject);h.tick(subject);
  assert.equal(subject.impulses.length,1);assert.equal(subject.impulses[0].y,.75);assert.equal(subject.particles.length,10);
  assert.ok(subject.particles.every(x=>x[0]==='kaleidoscope_grilling:feedback_cloud'));assert.equal(subject.sound.length,1);
- const [id,location,options]=subject.sound[0];assert.equal(id,'kg_cookery.flatulence');assert.equal(location,subject.location);assert.equal(options.volume,1);assert.equal(options.pitch,1);
+ const [id,location,options]=subject.sound[0];assert.equal(id,'kg_cookery.flatulence');assert.deepEqual(location,{x:2.5,y:80.5,z:3.5});assert.equal(options.volume,1);assert.equal(options.pitch,1);
  subject.isSneaking=false;h.tick(subject);subject.isSneaking=true;h.tick(subject);assert.equal(subject.sound.length,2);
 });
-test('flatulence uses source pitch bounds without firing for inactive effects',()=>{
- for(const draw of [0,.25,.999]){const h=harness({draw}),subject=actor({effect:'flatulence'});subject.isSneaking=true;h.tick(subject);assert.equal(subject.sound[0][2].pitch,.8+draw*.4)}
- for(const subject of [actor({effect:'vigor'}),actor({effect:'flatulence',until:1000})]){subject.isSneaking=true;harness().tick(subject);assert.equal(subject.sound.length,0);assert.equal(subject.particles.length,0)}
+test('flatulence producer pitch matches the independent Java scalar fixture without firing for inactive effects',()=>{
+ for(const oracle of flatulenceOracle.pitch_oracle.cases){
+  const h=harness({draw:oracle.draw}),subject=actor({effect:'flatulence'});subject.isSneaking=true;h.tick(subject);
+  assert.equal(subject.sound.length,1);const pitch=subject.sound[0][2].pitch;
+  assert.equal(pitch,oracle.pitch);assert.equal(floatBits(pitch),oracle.float_bits);assert.equal(h.pitchDraws,flatulenceOracle.sound.random_draw_count);
+ }
+ for(const subject of [actor({effect:'vigor'}),actor({effect:'flatulence',until:1000})]){const h=harness();subject.isSneaking=true;h.tick(subject);assert.equal(subject.sound.length,0);assert.equal(subject.particles.length,0);assert.equal(h.pitchDraws,0)}
+});
+test('flatulence producer keeps ten Cloud commands at continuous fractional positions while sound uses negative block centers',()=>{
+ const cases=[
+  [{x:1.2,y:80.1,z:-.2},{x:1.5,y:80.5,z:-.5}],
+  [{x:-1.01,y:-.2,z:-3.9},{x:-1.5,y:-.5,z:-3.5}]
+ ];
+ for(const [location,soundCenter] of cases){
+  const h=harness(),subject=actor({effect:'flatulence'});subject.location={...location};subject.isSneaking=true;h.tick(subject);
+  assert.equal(subject.impulses.length,1);assert.equal(subject.impulses[0].y,.75);assert.equal(subject.sound.length,1);assert.deepEqual(subject.sound[0][1],soundCenter);assert.equal(h.pitchDraws,1);
+  assert.equal(subject.particles.length,10);
+  for(const [id,point] of subject.particles){assert.equal(id,'kaleidoscope_grilling:feedback_cloud');assert.ok(Math.abs(point.x-location.x)<1e-14);assert.ok(Math.abs(point.y-(location.y+.25))<1e-14);assert.ok(Math.abs(point.z-location.z)<1e-14)}
+  assert.deepEqual(subject.location,location);
+ }
+});
+test('flatulence producer does not fabricate a cue or consume RNG when its second location read fails after Cloud',()=>{
+ const h=harness(),subject=actor({effect:'flatulence'}),location={x:-.01,y:70.99,z:5.01};let reads=0;
+ Object.defineProperty(subject,'location',{get(){reads++;if(reads===2)throw Error('Unavailable audio position after Cloud');return location}});
+ subject.isSneaking=true;assert.doesNotThrow(()=>h.tick(subject));
+ assert.equal(reads,2);assert.equal(subject.impulses.length,1);assert.equal(subject.impulses[0].y,.75);assert.equal(subject.particles.length,10);assert.equal(subject.sound.length,0);assert.equal(h.pitchDraws,0);
+ for(const [,point] of subject.particles){assert.ok(Math.abs(point.x-location.x)<1e-14);assert.ok(Math.abs(point.y-(location.y+.25))<1e-14);assert.ok(Math.abs(point.z-location.z)<1e-14)}
+ // Subsequent reads would succeed. A held press must still not retry that cue.
+ h.tick(subject);h.tick(subject);assert.equal(reads,2);assert.equal(subject.impulses.length,1);assert.equal(subject.particles.length,10);assert.equal(subject.sound.length,0);assert.equal(h.pitchDraws,0);
+ subject.isSneaking=false;h.tick(subject);subject.isSneaking=true;h.tick(subject);
+ assert.equal(reads,4);assert.equal(subject.impulses.length,2);assert.equal(subject.particles.length,20);assert.equal(subject.sound.length,1);assert.deepEqual(subject.sound[0][1],{x:-.5,y:70.5,z:5.5});assert.equal(h.pitchDraws,1);
 });
 test('unavailable particles or audio never change the authored impulse or the other feedback channel',()=>{
  const h=harness(),subject=actor({effect:'flatulence'});subject.dimension.spawnParticle=()=>{throw Error('Unloaded particle')};subject.isSneaking=true;assert.doesNotThrow(()=>h.tick(subject));assert.equal(subject.impulses.length,1);assert.equal(subject.sound.length,1);
