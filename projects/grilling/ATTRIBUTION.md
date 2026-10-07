@@ -84,3 +84,8 @@ The five advanced-rack models, their original PNG, the rack blockstate mapping a
 ## A1.12 canola and guide-only integration
 
 Canola models/textures remain under the same pinned Grilling source licence. The 25 guide thumbnails are derived from actual exported model geometry, not newly drawn replacement art. Publisher licence and detailed attribution are in integration/cookery106/. Cookery 1.0.6 host code is only inspected/tested from the user-provided archive and is not bundled into runtime packs.
+
+
+## G82 Java Cookery palette sources
+
+Default generated particle samples for 99 original foods are reviewed from KaleidoscopeMods/KaleidoscopeCookery Forge `2f4e386ce23f49a385ddf003c67fc6415c55417a` and NeoForge `4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c`. Only suspicious stir fry changes its seven derived stage atlases; 98 equal palettes remain. Original/derived resources: Copyright (c) 2025 Kaleidoscope Official Production Team, CC BY-NC-SA 4.0. Detailed source paths, identities, limited tint scope and the changed public sprite attribution are in development/gameplay_core/fixtures/java-cookery-palette-160/. No author endorsement or private Bedrock food scripts are included.
