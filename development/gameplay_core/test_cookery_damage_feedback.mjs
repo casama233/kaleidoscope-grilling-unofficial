@@ -188,8 +188,29 @@ test('owned Cloud uses the existing G atlas/velocity contract and retains its de
  const cloud=JSON.parse(read('projects/grilling/gameplay_core/resource_pack/particles/feedback_cloud.json')).particle_effect;
  assert.equal(cloud.description.identifier,'kaleidoscope_grilling:feedback_cloud');assert.equal(cloud.description.basic_render_parameters.texture,'textures/particle/kg_java_smoke');
  assert.equal(cloud.components['minecraft:emitter_rate_instant'].num_particles,1);assert.equal(cloud.components['minecraft:particle_appearance_billboard'].uv.texture_width,64);
- const text=JSON.stringify(cloud);assert.ok(text.includes('variable.kg_velocity.x'));assert.ok(!text.includes('variable.kt_'));assert.ok(!text.includes('kaleidoscope_tavern:'));
+ const text=JSON.stringify(cloud);assert.ok(text.includes('variable.kg_velocity_x'));assert.ok(!text.includes('variable.kt_'));assert.ok(!text.includes('kaleidoscope_tavern:'));
  const proof=JSON.parse(read('development/gameplay_core/fixtures/java-cookery-effect-feedback-160.json'));assert.equal(proof.client,false);assert.ok(proof.boundaries.some(x=>x.includes('Nearest-player')));
+});
+
+// Guard only the client-confirmed ?? direct-variable rule. This is not a
+// replacement for Minecraft's complete Molang parser or rendered acceptance.
+function cloudCoalescingOperands(expression){
+ const operands=[...expression.matchAll(/([a-z_][a-z0-9_.]*)\s*\?\?\s*0\b/gi)].map(match=>match[1]);
+ assert.equal(operands.length,(expression.match(/\?\?/g)??[]).length,'Cloud fallbacks must retain numeric zero');
+ for(const operand of operands)assert.match(operand,/^variable\.[a-z_][a-z0-9_]*$/i,'Cloud ?? requires a direct scalar variable');
+ return operands;
+}
+test('Cloud preserves all three scalar zero fallbacks and rejects the reported vector-member parser forms',()=>{
+ const expression=JSON.parse(read('projects/grilling/gameplay_core/resource_pack/particles/feedback_cloud.json')).particle_effect.events.kg_cloud_init.expression;
+ assert.deepEqual(cloudCoalescingOperands(expression),['variable.kg_velocity_x','variable.kg_velocity_y','variable.kg_velocity_z']);
+ for(const axis of ['x','y','z']){
+  assert.throws(()=>cloudCoalescingOperands(`variable.kg_velocity.${axis} ?? 0`),/direct scalar variable/);
+  assert.deepEqual(cloudCoalescingOperands(`variable.kg_velocity_${axis} ?? 0`),[`variable.kg_velocity_${axis}`]);
+  assert.throws(()=>cloudCoalescingOperands(`variable.kg_velocity_${axis} ?? 1`),/numeric zero/);
+ }
+ const source=JSON.parse(read('development/gameplay_core/fixtures/java-cookery-effect-feedback-160.json')).cloud_template.particle_effect.events.kt_init.expression;
+ const restored=expression.replace(/variable\.kg_velocity_([xyz])/g,'variable.kt_v$1').replace(/variable\.kg_cloud_/g,'variable.kt_');
+ assert.equal(restored,source,'Only Molang transport names may change; Java math, units and RNG remain exact');
 });
 
 

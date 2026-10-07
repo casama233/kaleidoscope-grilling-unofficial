@@ -16,11 +16,11 @@ OUT = ROOT / 'projects/grilling/gameplay_core/resource_pack/particles/feedback_c
 def build(check=False):
     fixture = json.loads(FIXTURE.read_text())
     data = copy.deepcopy(fixture['cloud_template'])
-    # Keep internal state private to this emitter; inputs use the existing G
-    # particle delivery contract, so no Tavern runtime dependency is introduced.
+    # Keep internal state private to this emitter. Cloud's ?? operands must be
+    # direct scalar variables, not the members supplied by setVector3.
     text = json.dumps(data)
     for axis in 'xyz':
-        text = text.replace('variable.kt_v' + axis, 'variable.kg_velocity.' + axis)
+        text = text.replace('variable.kt_v' + axis, 'variable.kg_velocity_' + axis)
     text = text.replace('variable.kt_', 'variable.kg_cloud_').replace('kt_init', 'kg_cloud_init')
     data = json.loads(text)
     effect = data['particle_effect']
