@@ -11,7 +11,12 @@ function actor({dimensionId='minecraft:overworld',range={min:-64,max:320},positi
   ejectRider:rider=>{ejected.push(rider);order.push('eject');riding=false},
   ejectRiders(){throw Error('Other passengers must not be ejected')}
  }:undefined};
- const subject={typeId:'minecraft:cow',get dimension(){return {id:reportedDimension,heightRange:range,getBlock:point=>{reads.push({...point});return readBlock(point)}}},
+ // Existing liquid fixtures describe body cells. Supply an independent dry
+ // stone floor below the original actor so they still exercise the liquid path.
+ const subject={typeId:'minecraft:cow',get dimension(){return {id:reportedDimension,heightRange:range,isChunkLoaded:()=>true,getBlock:point=>{
+  reads.push({...point});if(point.y<Math.floor(position.y))return {typeId:'minecraft:stone',isLiquid:false,isWaterlogged:false,permutation:{type:{id:'minecraft:stone'},getAllStates:()=>({stone_type:'stone'})}};
+  return readBlock(point);
+ }}},
   get location(){return location},
   getAABB:()=>({center:{x:location.x,y:location.y+.65,z:location.z},extent:{x:.45,y:.65,z:.45}}),
   getComponent:id=>id==='minecraft:health'?{currentValue:10}:id==='minecraft:riding'&&riding?{entityRidingOn:mount}:undefined,
@@ -39,10 +44,12 @@ test('sample order retains three independent uniform axes and clamps only Y to s
  assert.deepEqual(sampleProjectileDodgeAttempt({x:0,y:-64,z:0},{min:-64,max:319},()=>0),{x:-1.5,y:-64,z:-1.5});
  for(const bad of [NaN,-.1,1,Infinity])assert.equal(sampleProjectileDodgeAttempt(origin,{min:0,max:127},()=>bad),undefined);
 });
-test('actual runtime clamps vanilla upper and lower endpoints without a guessed native max-1',()=>{
+test('actual runtime clamps vanilla endpoints; the source minimum has no below-cell ground support',()=>{
  for(const [dimensionId,min,max,nativeMax] of [['minecraft:overworld',-64,319,320],['minecraft:nether',0,127,128],['minecraft:the_end',0,255,256]])for(const upper of [false,true]){
   const a=actor({dimensionId,range:{min,max:nativeMax},position:{x:0,y:upper?max+1:min-1,z:0}}),result=tryProjectileDodgeMovement(a.subject,{random:()=>upper?.999:0});
-  assert.equal(result.success,true);assert.equal(result.attempts,1);assert.equal(result.destination.y,upper?max:min);assert.equal(a.calls[0].options.checkForBlocks,true);
+  assert.equal(result.success,upper);assert.equal(result.attempts,upper?1:16);
+  if(upper){assert.equal(result.destination.y,max);assert.equal(a.calls[0].options.checkForBlocks,true)}
+  else{assert.equal(a.calls.length,0);assert.equal(a.reads.length,0)}
  }
 });
 test('ordinary failed attempts retry at most16 with every sample anchored to the immutable origin',()=>{
@@ -98,7 +105,7 @@ test('integrated dry candidates reach native teleport while liquid and unsupport
  ]){
   const a=actor({readBlock:()=>block});let draws=0;
   const result=tryProjectileDodgeMovement(a.subject,{random:()=>{draws++;return .5}});
-  assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(draws,48);assert.equal(a.calls.length,0);assert.equal(a.reads.length,16);
+  assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(draws,48);assert.equal(a.calls.length,0);assert.equal(a.reads.length,32);
  }
 });
 test('integrated actual body rejects waterlogged head-height overlap while its feet cells are dry',()=>{
@@ -113,7 +120,7 @@ test('integrated unreadable native box or block context never permits a guessed 
   if(mode==='throwing-box')a.subject.getAABB=()=>{throw Error('Bounds unavailable')};
   const result=tryProjectileDodgeMovement(a.subject,{random:()=>.5});
   assert.equal(result.success,false);assert.equal(result.attempts,16);assert.equal(a.calls.length,0);
-  assert.equal(a.reads.length,mode.endsWith('box')?0:16);
+  assert.equal(a.reads.length,mode.endsWith('box')?16:32);
  }
 });
 test('a liquid first candidate can be followed by a dry success with no stale failure reason',()=>{
