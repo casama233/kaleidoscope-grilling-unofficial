@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess,unittest
 ROOT=Path(__file__).resolve().parents[1]
+from test_g86_source_coherence import HARDENING_SOURCE_BASE,G88_DELTAS,source,apply_runtime_delta
 PLATE_YAW_SOURCE_BASE='6e714853d029f93f0186efa2e96e192e87735a74'
 PATH='projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js'
 def reviewed():
@@ -18,9 +19,15 @@ def reviewed():
  result.append(text[cursor:]);after=''.join(result).encode()
  assert hashlib.sha256(after).hexdigest()==d['after_sha256']
  return before,after,d
+def current_reviewed():
+ _,after,_=reviewed()
+ if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,88):
+  assert after==source(HARDENING_SOURCE_BASE,PATH)
+  after=apply_runtime_delta(after,PATH,G88_DELTAS[PATH],(2,8,88),HARDENING_SOURCE_BASE)
+ return after
 class PlateYawWitness(unittest.TestCase):
  def test_exact_renderer_delta_and_no_unrelated_runtime_edits(self):
-  before,after,d=reviewed();self.assertEqual((ROOT/PATH).read_bytes(),after)
+  before,after,d=reviewed();self.assertEqual((ROOT/PATH).read_bytes(),current_reviewed())
   self.assertEqual(d['operations'][0]['before'].count('if(old&&'),1)
   self.assertIn('old.spawnYaw!==-at.angle',d['operations'][0]['after'])
   self.assertIn('spawnYaw:-at.angle',d['operations'][1]['after'])

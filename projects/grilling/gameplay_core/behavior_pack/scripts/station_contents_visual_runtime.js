@@ -54,7 +54,7 @@ function renderPlate(row,b,k,stack,at,plan){
  let old=row.parts.get(k);if(!stack||!plan||!at){discard(row,k);return;}
  // A count transition can change a slot's authored yaw. Teleport does not reseed
  // the native head/body basis; rebuild only that derived helper with the new yaw.
- if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);old=undefined;}
+ if(old&&(!old.entity.isValid||old.entity.typeId!==PLATE_FOOD_VISUAL_TYPE||old.spawnYaw!==-at.angle)){discard(row,k);if(row.parts.has(k))return;old=undefined;}
  const secret=plan.secret?secretVisualState(stack,reader):[0,0,0];
  const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,model:plan.model,secret});
  if(old?.signature===signature)return;

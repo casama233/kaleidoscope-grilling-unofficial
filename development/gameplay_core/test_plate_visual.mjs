@@ -9,9 +9,8 @@ function fixture(limit=32){
  const row={parts:new Map()},spawned=[],removed=[],writes=[],block={x:2,y:64,z:-3,permutation:{getState:()=> 'north'}};
  block.dimension={id:'minecraft:overworld',spawnEntity(typeId,at,spawnOptions){const e={typeId,isValid:true,spawnOptions,props:{},teleport(location,options){this.location=location;this.options=options},setProperty(k,v){writes.push([k,v]);this.props[k]=v},remove(){this.isValid=false;removed.push(this)}};spawned.push(e);return e}};
  const ctx=vm.createContext({PLATE_FOOD_VISUAL_TYPE,secretVisualState:(stack,reader)=>reader(stack),reader:s=>s.secret,
- metadataSignature:JSON.stringify,captureSkewerMetadata:s=>structuredClone(s),helpers:0,grillingConfig:()=>({contentsHelpers:limit}),system:{currentTick:0},lastCapacityWarning:-1200,console,
- discard(r,k){const old=r.parts.get(k);if(old){old.entity.remove();r.parts.delete(k);ctx.helpers--;}}});
- vm.runInContext(source.slice(source.indexOf('function renderPlate('),source.indexOf('export function syncStationContentsVisual(')),ctx);
+ metadataSignature:JSON.stringify,captureSkewerMetadata:s=>structuredClone(s),helpers:0,grillingConfig:()=>({contentsHelpers:limit}),system:{currentTick:0},lastCapacityWarning:-1200,console,warn(){}});
+ vm.runInContext(source.slice(source.indexOf('function discard('),source.indexOf('function clear('))+source.slice(source.indexOf('function renderPlate('),source.indexOf('export function syncStationContentsVisual(')),ctx);
  return {row,block,spawned,removed,writes,draw(stack,key='plate/0',count=1){ctx.renderPlate(row,block,key,stack,plateVisualPose(block,Number(key.split('/')[1]),count),plateVisualPlan(stack))}};
 }
 test('all19 raw/cooked canonical pairs and native eating aliases select exact existing world meshes',()=>{
@@ -21,6 +20,13 @@ test('all19 raw/cooked canonical pairs and native eating aliases select exact ex
  }
  for(const suffix of ['', '_native_plain','_java_three_alt'])assert.deepEqual(plateVisualPlan({typeId:'kaleidoscope_grilling:secret_skewer'+suffix}),{model:114,secret:true});
  for(const id of [undefined,'minecraft:carrot','external:unknown','toString'])assert.equal(plateVisualPlan({typeId:id}),undefined);
+});
+test('a native removal failure retains the yaw-stale helper and budget until retry, without an untracked replacement',()=>{
+ const f=fixture(2),stack={typeId:Object.values(RAW_TO_COOKED)[0],amount:1,secret:[]},before=structuredClone(stack);
+ f.draw(stack,'plate/2',3);const old=f.row.parts.get('plate/2'),remove=old.entity.remove;
+ old.entity.remove=()=>{throw Error('native removal rejected')};
+ f.draw(stack,'plate/2',4);assert.equal(f.spawned.length,1);assert.equal(f.row.parts.get('plate/2'),old);assert.equal(old.entity.isValid,true);assert.equal(f.removed.length,0);assert.deepEqual(stack,before);
+ old.entity.remove=remove;f.draw(stack,'plate/2',4);assert.equal(f.spawned.length,2);assert.equal(f.removed.length,1);assert.equal(old.entity.isValid,false);assert.notEqual(f.row.parts.get('plate/2'),old);assert.equal(f.row.parts.size,1);
 });
 test('original1..5 count layouts are bounded; all4 facings rotate positions with their distinct y/yaw',()=>{
  assert.deepEqual(PLATE_VISUAL_LAYOUTS.map(r=>r.length),[0,1,2,3,4,5]);

@@ -1,4 +1,6 @@
-## Current maintained baseline: 2.8.87
+## Current maintained baseline: 2.8.88
+
+**G88 餐盤互動／姿態候選**：保留已凍結的 G87 修復，補上顯示 helper 移除失敗時的封閉保護與真實 discard 路徑測試；使用全新身份，不覆寫 G87。原生互動與姿態仍須本候選驗證。見 [G88 範圍](docs/STATUS-A2.8.88.md)。
 
 **G87 餐盤互動／姿態候選**：根據 G86 真實客戶端觀察修復指向餐盤時的原生進食漏取消，並在數量改變造成槽位 yaw 更新時重建該顯示 helper。保留 G86 色盤、資料及飽和度修復；新候選仍須原生驗收。見 [G87 範圍](docs/STATUS-A2.8.87.md)。
 

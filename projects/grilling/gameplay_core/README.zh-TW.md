@@ -1,5 +1,7 @@
 # Kaleidoscope Grilling Gameplay Core
 
+**G88 餐盤互動／姿態候選**：保留 G87 的互動及 yaw 更新修復，補上 helper 移除失敗保護；使用全新身份。見根目錄 docs/STATUS-A2.8.88.md。
+
 **G87 餐盤互動／姿態候選**：保留既有餐盤、色盤及營養修復；指向餐盤的原生進食與槽位 yaw 更新採限定修復。新候選仍須原生驗收。見根目錄 docs/STATUS-A2.8.87.md。
 
 本分支 canonical runtime：**A2.8.10 Use Repair**。見 [本批修復與驗證邊界](../../../docs/STATUS-A2.8.10.md)；歷史版本紀錄保留供追溯。

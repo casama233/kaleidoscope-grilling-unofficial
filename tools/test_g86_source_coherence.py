@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 PALETTE_SOURCE_BASE='c85cb34f591079c0b06878b8e565e7f262833e49'
 PLATE_SOURCE_BASE='07208cd8b8a047ed3e5be9a38596054b1818dcdc'
 UNION_SOURCE_BASE='6e714853d029f93f0186efa2e96e192e87735a74'
+HARDENING_SOURCE_BASE='81d08da044c52ba5e06bb2de1bd803ea6977b041'
 PROJECT='projects/grilling/gameplay_core/'
 PALETTES={PROJECT+f'resource_pack/textures/secret_food_palette/food_100_{i}.png' for i in range(7)}
 def source(ref,path):return subprocess.check_output(['git','show',ref+':'+path],cwd=ROOT)
@@ -17,9 +18,10 @@ G87_DELTAS={
  PROJECT+'behavior_pack/scripts/a25_plate_recipe_runtime.js':'g87-plate-use-reviewed-delta.json',
  PROJECT+'behavior_pack/scripts/station_contents_visual_runtime.js':'g87-plate-yaw-reviewed-delta.json'
 }
-def apply_runtime_delta(before,path,filename):
+G88_DELTAS={PROJECT+'behavior_pack/scripts/station_contents_visual_runtime.js':'g88-plate-cleanup-reviewed-delta.json'}
+def apply_runtime_delta(before,path,filename,release=(2,8,87),base=UNION_SOURCE_BASE):
  d=json.loads((ROOT/'tools/fixtures'/filename).read_text())
- assert d['schema']==1 and d['release']==[2,8,87] and d['path']==path
+ assert d['schema']==1 and d['release']==list(release) and d['path']==path and d['base_commit']==base
  assert hashlib.sha256(before).hexdigest()==d['before_sha256']
  text=before.decode('utf-8');ops=d['operations']
  assert ops and all(0<=o['start']<=o['end']<=len(text) for o in ops)
@@ -62,7 +64,11 @@ class SourceCoherence(unittest.TestCase):
   self.assertEqual(actual['index'],100);self.assertEqual(actual['palette'],row['palette'])
  def test_both_histories_are_append_only_and_fresh_identity_is_86(self):
   now=json.loads((ROOT/'release-history.json').read_text())
-  for ref in [PALETTE_SOURCE_BASE,PLATE_SOURCE_BASE]:
+  version=tuple(json.loads((ROOT/'baseline.json').read_text())['version'])
+  refs=[PALETTE_SOURCE_BASE,PLATE_SOURCE_BASE]
+  if version>(2,8,86):refs.append(UNION_SOURCE_BASE)
+  if version>(2,8,87):refs.append(HARDENING_SOURCE_BASE)
+  for ref in refs:
    for version,value in json.loads(source(ref,'release-history.json')).items():self.assertEqual(now[version],value,version)
   version=tuple(json.loads((ROOT/'baseline.json').read_text())['version'])
   self.assertGreaterEqual(version,(2,8,86))
@@ -80,6 +86,9 @@ class SourceCoherence(unittest.TestCase):
     if path.endswith('/manifest.json'):continue
     if path in G87_DELTAS:
      data=apply_runtime_delta(source(UNION_SOURCE_BASE,path),path,G87_DELTAS[path])
+     if version>=(2,8,88) and path in G88_DELTAS:
+      self.assertEqual(data,source(HARDENING_SOURCE_BASE,path),'Frozen G87 renderer differs from reviewed yaw delta')
+      data=apply_runtime_delta(data,path,G88_DELTAS[path],(2,8,88),HARDENING_SOURCE_BASE)
      self.assertEqual(p.read_bytes(),data,path)
     else:self.assertEqual(git_blob(p.read_bytes()),expected[path],path)
 if __name__=='__main__':unittest.main()
