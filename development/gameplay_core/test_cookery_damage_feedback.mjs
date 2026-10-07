@@ -13,6 +13,7 @@ import {flatulenceSoundOrigin,flatulenceSoundPitch} from '../../projects/grillin
 const root=new URL('../../',import.meta.url),read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const main=read('projects/grilling/gameplay_core/behavior_pack/scripts/main.js');
 const flatulenceOracle=JSON.parse(read('development/gameplay_core/fixtures/java-flatulence-sound-160.json'));
+const flatulenceWorld=JSON.parse(read('development/gameplay_core/fixtures/java-flatulence-world-160.json'));
 const floatBits=value=>{const view=new DataView(new ArrayBuffer(4));view.setFloat32(0,value);return view.getUint32(0).toString(16).padStart(8,'0')};
 const fxGet=main.slice(main.indexOf('function fxGet('),main.indexOf('function fxSet('));
 function actor({living=true,typeId='minecraft:cow',families=['mob'],health=10,effect='hinder',until=2000}={}){
@@ -24,7 +25,7 @@ function actor({living=true,typeId='minecraft:cow',families=['mob'],health=10,ef
   getDynamicProperty:key=>key===FX_KEY?JSON.stringify({[effect]:{until,amp:0}}):undefined,
   addEffect:(...v)=>applied.push(v),applyImpulse:v=>impulses.push(v)};
 }
-function harness({legacy=false,draw=.5}={}){
+function harness({legacy=false,draw=.5,worldCaptureBefore=false}={}){
  let pitchDraws=0;const pitchRandom=()=>{pitchDraws++;return draw};
  const callbacks={},context=vm.createContext({console,
   Math:Object.assign(Object.create(Math),{random:()=>draw}),SNEAK_LAST:new Map(),FLATULENCE_SOUND_ID,isCookeryLivingEntity,flatulenceSoundOrigin,flatulenceSoundPitch:()=>flatulenceSoundPitch(pitchRandom),
@@ -35,7 +36,7 @@ function harness({legacy=false,draw=.5}={}){
  const handler=legacy?"world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});":
   main.slice(main.indexOf('world.afterEvents.entityHurt.subscribe(e=>{'),main.indexOf('function canUseSecretSkewer('));
  vm.runInContext(handler,context);
- const line=main.split('\n').find(x=>x.includes('const sneak=!!p.isSneaking'));
+ const line=worldCaptureBefore?flatulenceWorld.before_source.line:main.split('\n').find(x=>x.includes('const sneak=!!p.isSneaking'));
  return {callbacks,get pitchDraws(){return pitchDraws},hurt:event=>callbacks.entityHurt?.(event),tick:entity=>{context.p=entity;vm.runInContext('(()=>{'+line+'})()',context)}};
 }
 function expectSlow(target){assert.equal(target.applied.length,1);const [name,ticks,options]=target.applied[0];assert.equal(name,'slowness');assert.equal(ticks,100);assert.equal(options.amplifier,1);assert.equal(options.showParticles,true)}
@@ -189,4 +190,29 @@ test('owned Cloud uses the existing G atlas/velocity contract and retains its de
  assert.equal(cloud.components['minecraft:emitter_rate_instant'].num_particles,1);assert.equal(cloud.components['minecraft:particle_appearance_billboard'].uv.texture_width,64);
  const text=JSON.stringify(cloud);assert.ok(text.includes('variable.kg_velocity.x'));assert.ok(!text.includes('variable.kt_'));assert.ok(!text.includes('kaleidoscope_tavern:'));
  const proof=JSON.parse(read('development/gameplay_core/fixtures/java-cookery-effect-feedback-160.json'));assert.equal(proof.client,false);assert.ok(proof.boundaries.some(x=>x.includes('Nearest-player')));
+});
+
+
+test('flatulence world capture keeps the original pre-Cloud dimension while sound reads fresh post-Cloud coordinates',()=>{
+ for(const before of [true,false]){
+  const h=harness({worldCaptureBefore:before}),subject=actor({effect:'flatulence'}),original=subject.dimension,newSounds=[];
+  const moved={x:-1.01,y:72.3,z:-.2},other={playSound:(...args)=>newSounds.push(args)};let current=original,dimensionReads=0;
+  Object.defineProperty(subject,'dimension',{get(){dimensionReads++;return current}});
+  original.spawnParticle=(id,point)=>{subject.particles.push([id,point]);if(subject.particles.length===1){current=other;subject.location={...moved}}};
+  subject.isSneaking=true;h.tick(subject);
+  assert.equal(subject.particles.length,10);assert.equal(subject.impulses.length,1);assert.equal(h.pitchDraws,1);
+  const expectedCloud={x:2,y:80.25,z:3};for(const [,point] of subject.particles)assert.deepEqual(point,expectedCloud);
+  assert.equal(subject.sound.length,before?0:1);assert.equal(newSounds.length,before?1:0);assert.equal(dimensionReads,before?2:flatulenceWorld.contract.server_world_reads);
+  const cue=(before?newSounds:subject.sound)[0];assert.equal(cue[0],'kg_cookery.flatulence');assert.deepEqual(cue[1],{x:-1.5,y:72.5,z:-.5});assert.equal(cue[2].volume,1);assert.equal(cue[2].pitch,1);
+ }
+});
+test('flatulence world capture does not repeat a post-Cloud dimension getter that has become unavailable',()=>{
+ for(const before of [true,false]){
+  const h=harness({worldCaptureBefore:before}),subject=actor({effect:'flatulence'}),original=subject.dimension;let reads=0,cloudStarted=false;
+  Object.defineProperty(subject,'dimension',{get(){reads++;if(cloudStarted)throw Error('Unavailable post-Cloud world');return original}});
+  original.spawnParticle=(id,point)=>{cloudStarted=true;subject.particles.push([id,point])};
+  subject.isSneaking=true;assert.doesNotThrow(()=>h.tick(subject));
+  assert.equal(subject.particles.length,10);assert.equal(subject.impulses.length,1);assert.equal(reads,before?2:flatulenceWorld.contract.server_world_reads);assert.equal(subject.sound.length,before?0:1);assert.equal(h.pitchDraws,before?0:flatulenceWorld.contract.pitch_draws);
+  if(!before)assert.deepEqual(subject.sound[0][1],{x:2.5,y:80.5,z:3.5});
+ }
 });
