@@ -1,7 +1,8 @@
 import {PROJECTILE_DODGE_GROUND_ROWS} from './projectile_dodge_ground_catalog.js';
+import {PROJECTILE_DODGE_OWNED_GROUND_ROWS} from './projectile_dodge_owned_ground_catalog.js';
 const axes=['x','y','z'];
 const intMin=-2147483648,intMax=2147483647;
-const rows=new Map(PROJECTILE_DODGE_GROUND_ROWS.map(row=>[row.typeId,row]));
+const rows=new Map([...PROJECTILE_DODGE_GROUND_ROWS,...PROJECTILE_DODGE_OWNED_GROUND_ROWS].map(row=>[row.typeId,row]));
 const aliasTuples=new Map(PROJECTILE_DODGE_GROUND_ROWS.filter(row=>row.nativeAliases).map(row=>[row.typeId,new Set(row.nativeAliases.tuples.map(tuple=>JSON.stringify(tuple)))]));
 const unsupported=reason=>({supported:false,reason});
 const own=(object,key)=>Object.prototype.hasOwnProperty.call(object,key);
@@ -34,5 +35,5 @@ export function classifyProjectileDodgeGroundCell({typeId,states}={}){
   // combinations and could grant a different vanilla identity its motion.
   if(alias&&!aliasTuples.get(typeId).has(JSON.stringify([...alias.primaryKeys,...alias.extraKeys].map(key=>states[key]))))return unsupported('ground_block_states_unsupported');
  }catch{return unsupported('ground_block_states_unavailable')}
- return {supported:true,blocksMotion:row.blocksMotion,reason:'reviewed_original_motion'};
+ return {supported:true,blocksMotion:row.blocksMotion,reason:row.sourceKind?'reviewed_author_source_motion':'reviewed_original_motion'};
 }
