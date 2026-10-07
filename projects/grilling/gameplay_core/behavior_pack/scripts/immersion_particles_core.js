@@ -1,5 +1,6 @@
 /** Java 1.1.1 event counts and positions; owned instant-one emitters retain Mojang sprite/motion profiles. */
 const BURSTS=Object.freeze({
+ flatulence:{id:'kaleidoscope_grilling:feedback_cloud',count:10,center:[0,.25,0],spread:[.25,.25,.25],speed:.1},
  seasoningFinished:{id:'kaleidoscope_grilling:feedback_villager_happy',count:12,center:[0,1,0],spread:[.25,.35,.25],speed:.05},
  seasoningAdded:{id:'kaleidoscope_grilling:feedback_endrod',count:5,center:[.5,.7,.5],spread:[.12,.12,.12],speed:.01},
  oilPressImpact:{id:'kaleidoscope_grilling:feedback_basic_crit',count:14,center:[.5,.9,.5],spread:[.32,.18,.32],speed:.08},

@@ -230,8 +230,8 @@ system.afterEvents.scriptEventReceive.subscribe(ev=>{
    const s=r.station,d=world.getDimension(s.dimensionId),b=d.getBlock({x:s.x,y:s.y,z:s.z});if(b?.typeId===EMPTY_POT){let state=readSharedPlacedOil(b);if(r.legacyType&&['canola','secret_chili','premium_chili'].includes(r.legacyType)&&!state.type&&state.count>0&&state.count<=64)state=writeSharedPlacedOil(b,{...state,type:r.legacyType,revision:state.revision+1});emitBlock(b,state);}return;
   }
   const p=world.getAllPlayers().find(x=>x.id===r.playerId),e=p?.getComponent('minecraft:equippable'),slot=e?.getEquipmentSlot(r.hand==='off'?EquipmentSlot.Offhand:EquipmentSlot.Mainhand);
-  let ok=false;if(slot?.hasItem()){const item=slot.getItem();if(item.typeId===r.expectedId&&JSON.stringify(item.getRawLore())===r.expectedLore){const next=publishLegacyHostOil(item);slot.setItem(next);ok=itemSame(slot.getItem(),next)}}
-  system.sendScriptEvent('senluo:oil_snapshot_response',JSON.stringify({api:1,id:r.id,ok}));
+  let ok=false,publishedOil;if(slot?.hasItem()){const item=slot.getItem();if(item.typeId===r.expectedId&&JSON.stringify(item.getRawLore())===r.expectedLore){const next=publishLegacyHostOil(item);slot.setItem(next);ok=itemSame(slot.getItem(),next);if(ok)publishedOil=readPublicOil(next).state}}
+  system.sendScriptEvent('senluo:oil_snapshot_response',JSON.stringify({api:1,id:r.id,ok,publishedOil}));
  }catch(e){console.warn('[Cookery Oil API] snapshot retained '+e)}
 });
 world.beforeEvents.playerInteractWithBlock.subscribe(ev=>{
