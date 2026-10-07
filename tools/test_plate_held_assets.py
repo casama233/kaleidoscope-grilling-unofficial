@@ -94,10 +94,10 @@ class PlateHeldAssets(unittest.TestCase):
         for count in range(6):
             for row in range(count, 5): self.assertEqual(held.slot_pose(row, count), {'position': [0, 0, 0], 'rotation': [0, 0, 0]})
 
-    def test_first_person_frames_preserve_authored_projection_at_the_hand(self):
+    def test_first_person_frames_preserve_authored_projection_plus_hand_camera_correction(self):
         # Check the generated bone frame against the separately assembled Java
-        # model transform. There is no artificial viewport-fitting translation;
-        # native acceptance of placement, clipping and grip is still open.
+        # model transform plus the explicit native-review camera correction.
+        # Native acceptance of placement, clipping and grip is still open.
         for hand in ('right', 'left'):
             sign = 1 if hand == 'right' else -1
             base, camera = native_skewer_calibration(hand)
@@ -105,10 +105,11 @@ class PlateHeldAssets(unittest.TestCase):
                 bone_matrix(held.plate_pose('fp', hand)), translate([0, -24, 0]))
             expected = chain(translate([0, -24, -32.4]), translate([9.039*sign, 15.682, 20.8]),
                 translate([0, 3.75, 0]), xyz([0, -135*sign, 0]), scale([.4]*3), translate([-8]*3))
+            offset = [-1*sign, 6, -3]
             for source in itertools.product((1, 8, 15), (0, 2), (1, 8, 15)):
                 result = point(actual, [source[0]-8, source[1]+24, source[2]-8])
-                for a, b in zip(result, point(expected, source)):
-                    self.assertAlmostEqual(a, b, places=7)
+                for a, b, delta in zip(result, point(expected, source), offset):
+                    self.assertAlmostEqual(a, b+delta, places=7)
                 self.assertTrue(all(math.isfinite(v) for v in result))
 
     def test_real_decoder_owner_and_visibility_expressions_in_both_hands(self):
@@ -262,8 +263,8 @@ class PlateFirstPersonFraming(unittest.TestCase):
             self.assertTrue(points, (hand, count, alias))
             sign = 1 if hand == 'right' else -1
             self.assertTrue(all(all(math.isfinite(v) for v in p) and
-                p[2] < -.1 and sign*p[0] > 0 and p[1] < 0 for p in points),
-                f'Complete model leaves authored hand quadrant: {hand}/{count}/{alias}')
+                p[2] < -.1 and sign*p[0] > 0 for p in points),
+                f'Complete model leaves hand side or camera front: {hand}/{count}/{alias}')
 
     def test_projection_covers_the_actual_identity_geometry_hierarchy(self):
         for alias, geometry in self.geometries.items():
@@ -282,14 +283,15 @@ class PlateFirstPersonFraming(unittest.TestCase):
                     self.assertNotIn('parent', bone)
                     self.assertEqual(bone['binding'], held.BINDING)
 
-    def test_authored_tray_center_stays_at_the_hand_without_scale_inflation(self):
+    def test_calibrated_tray_center_stays_at_the_hand_without_scale_inflation(self):
+        self.assertEqual(held.PLATE_FP_CAMERA_OFFSET, [-1, 6, -3])
         for hand, sign in (('right', 1), ('left', -1)):
             pose = held.plate_pose('fp', hand)
             self.assertEqual(pose['scale'], [.4]*3)
             frame = chain(reference_frame(hand), bone_matrix(pose), translate([0, -24, 0]))
             # Reflected source model center X/Z8, tray body Y1, lifted Y24.
             center = point(frame, [0, 25, 0])
-            for actual, expected in zip(center, [9.039*sign, -7.368, -11.6]):
+            for actual, expected in zip(center, [8.039*sign, -1.368, -14.6]):
                 self.assertAlmostEqual(actual, expected, places=7)
 
     def test_prior_viewport_translation_reproduces_small_centered_tray(self):
@@ -299,15 +301,17 @@ class PlateFirstPersonFraming(unittest.TestCase):
         # not native-pixel or all-FOV acceptance.
         for hand, sign in (('right', 1), ('left', -1)):
             current = self.cases[hand, 0, 'body']
-            previous = [[p[0]-4*sign, p[1]+3.1, p[2]-9] for p in current]
+            previous = [[p[0]-3*sign, p[1]-2.9, p[2]-6] for p in current]
             def bounds(points, axis):
                 values = [p[axis]/-p[2] for p in points]
                 return min(values), max(values)
             new_x, old_x = bounds(current, 0), bounds(previous, 0)
             new_y, old_y = bounds(current, 1), bounds(previous, 1)
-            self.assertGreater(new_x[1]-new_x[0], 1.9*(old_x[1]-old_x[0]))
+            self.assertGreater(new_x[1]-new_x[0], 1.4*(old_x[1]-old_x[0]))
             self.assertGreater(sign*sum(new_x)/2, sign*sum(old_x)/2)
-            self.assertLess(sum(new_y)/2, sum(old_y)/2)
+            # Native zero-offset review had only a food tip at the bottom edge.
+            # Retain a positive lift instead of restoring the old far-depth fit.
+            self.assertGreater(sum(new_y)/2, sum(old_y)/2)
             self.assertTrue(all(.025 < sign*p[0]/-p[2] < .535 and
                 -.285 < p[1]/-p[2] < -.015 for p in previous))
             self.assertFalse(all(.025 < sign*p[0]/-p[2] < .535 and

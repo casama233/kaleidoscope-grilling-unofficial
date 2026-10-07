@@ -56,10 +56,13 @@ PALETTE_RADIX, ROW_RADIX = 214, 123
 PALETTE_MAX, PAIR_MAX, MARKER_MIN, MARKER_MAX, INVALID_MARKER = 9800343, 15128, 10, 747, 748
 IDLE_STYLES = (0, 4, 6)
 BINDING = 'q.item_slot_to_bone_name(context.item_slot)'
-# Keep the authored first-person frame at the hand. The former camera offset
-# [-4, 3.1, -9] pulled both trays inward and farther away to satisfy an invented
-# whole-model viewport gate, producing the small centered native G96 pose.
-# Edge cropping, equip motion and actual grip remain native-client gates.
+# Bedrock hand-camera calibration candidate, not an authored Java translation.
+# Native G96 [-4, 3.1, -9] was small/centered; removing it completely placed
+# almost the entire tray below the screen even at level pitch. Lift the intact
+# Java frame at closer hand depth, keeping it toward the outer hand instead of
+# enforcing full-model containment. Native grip/edge-cropping acceptance remains
+# open; do not interpret the head-centered matrix harness as an engine camera.
+PLATE_FP_CAMERA_OFFSET = [-1, 6, -3]
 # This opt-in client diagnostic is not a rendering/runtime repair. The BP
 # exact count1 fixture alone uses dormant word4=1 while its QA tag is enabled.
 # Either raw hand flag with exact fixture marker133 enables the probe without
@@ -127,8 +130,8 @@ def plate_pose(view, hand):
 
     The canonical source geometry is X-reflected, centered at X/Z eight, and
     raised Y24. This is the same source_offset as the existing skewer hand rig.
-    FP keeps the authored Java placement instead of fitting every source corner
-    into a fully visible viewport. A held tray may extend beyond the screen.
+    FP applies the native-review hand-camera correction below without changing
+    the authored shape, scale or rotation. A held tray may leave the screen.
     No player or arm replacement, socket cancellation, or guessed held Euler.
     """
     key = ('firstperson_' if view == 'fp' else 'thirdperson_') + hand + 'hand'
@@ -148,7 +151,8 @@ def plate_pose(view, hand):
         base, camera = native_skewer_calibration(hand)
         java = chain(translate([9.039*sign, 15.682, 20.8]), translate(tr), xyz(r),
             scale(size), translate([-8, -8, -8]))
-        target = chain(camera, translate([0, -24, -32.4]), java, translate(source_offset))
+        camera_offset = [PLATE_FP_CAMERA_OFFSET[0]*sign, *PLATE_FP_CAMERA_OFFSET[1:]]
+        target = chain(camera, translate(camera_offset), translate([0, -24, -32.4]), java, translate(source_offset))
         local = mul(rigid_inverse(base), target)
     position = point(local, [0, 24, 0]); position[1] -= 24; position[0] *= -1
     rotation = mul(local, scale([1/x for x in size]))
