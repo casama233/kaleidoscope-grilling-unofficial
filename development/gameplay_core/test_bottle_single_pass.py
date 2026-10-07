@@ -96,6 +96,8 @@ def shifted_cubes(original, x_offset):
 def visibility_value(expression, values):
     if isinstance(expression, (bool, int)):
         return bool(expression)
+    if expression == 'v.kg_bottle_owner_occupied == 1': return True
+    expression = expression.removeprefix('v.kg_bottle_owner_occupied == 1 && ')
     match = re.fullmatch(r'\s*\(?\s*v\.kg_bottle_layer_(\d+)\s*==\s*(\d+)\s*\)?\s*', expression)
     if not match:
         raise AssertionError('Unexpected dynamic visibility syntax: ' + str(expression))
@@ -262,7 +264,7 @@ class SinglePassAudit(unittest.TestCase):
                 tint = candidates[0]
                 expressions = [expression for row in rc.get('part_visibility', []) for pattern, expression in row.items() if pattern == b['name']]
                 self.assertEqual(len(expressions), 1)
-                m = re.fullmatch(r'\s*\(?\s*v\.kg_bottle_layer_(\d+)\s*==\s*(\d+)\s*\)?\s*', expressions[0])
+                m = re.fullmatch(r'\s*\(?\s*v\.kg_bottle_layer_(\d+)\s*==\s*(\d+)\s*\)?\s*', expressions[0].removeprefix('v.kg_bottle_owner_occupied == 1 && '))
                 self.assertIsNotNone(m)
                 layer, index = map(int, m.groups())
                 self.assertEqual(layer, tint // 2)

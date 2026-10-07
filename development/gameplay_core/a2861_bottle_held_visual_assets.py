@@ -109,6 +109,26 @@ def update_numeric_scripts(desc):
         scripts[phase] = [s for s in scripts.get(phase, []) if not s.startswith('v.kg_bottle_')]
     scripts['initialize'].append('v.kg_bottle_off_hand = 0;')
     scripts['pre_animation'].append("v.kg_bottle_off_hand = c.item_slot == 'off_hand';")
+    reads = []
+    for hand in ['off', 'main']:
+        name = NS + 'bottle_' + hand + '_7'
+        reads.append("(c.owning_entity->q.has_property('" + name + "') ? c.owning_entity->q.property('" + name + "') : 0)")
+    scripts['initialize'] += ['v.kg_bottle_owner_word = 748;', 'v.kg_bottle_owner_occupied = 0;']
+    scripts['pre_animation'].append('v.kg_bottle_owner_word = v.kg_bottle_off_hand ? ' + reads[0] + ' : ' + reads[1] + ';')
+    for word in (5, 6):
+        reads = []
+        for hand in ['off', 'main']:
+            name = NS + 'bottle_' + hand + '_' + str(word)
+            reads.append("(c.owning_entity->q.has_property('" + name + "') ? c.owning_entity->q.property('" + name + "') : 0)")
+        variable = 'v.kg_bottle_owner_pair_' + str(word)
+        scripts['initialize'].append(variable + ' = 0;')
+        scripts['pre_animation'].append(variable + ' = v.kg_bottle_off_hand ? ' + reads[0] + ' : ' + reads[1] + ';')
+    identifier = desc['identifier']
+    occupied = "((c.item_slot == 'off_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.offhand','" + identifier + "')) || (c.item_slot == 'main_hand' && c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','" + identifier + "')))"
+    # Plate palette words may be millions. Clamping them to9 alone would draw
+    # eight unknown seasoning layers after a hand switch. Keep the raw owner
+    # marker and actual hand identity as a shared content-pass guard.
+    scripts['pre_animation'].append('v.kg_bottle_owner_occupied = ' + occupied + ' && v.kg_bottle_owner_word >= 0 && v.kg_bottle_owner_word <= 9' + ''.join(' && v.kg_bottle_owner_pair_' + str(word) + ' >= 0 && v.kg_bottle_owner_pair_' + str(word) + ' <= 9' for word in (5, 6)) + ';')
     for layer in range(8):
         var = 'v.kg_bottle_layer_' + str(layer)
         reads = []
@@ -143,7 +163,7 @@ def build():
     placed_index = {g['description']['identifier']: g for g in placed_geometry['minecraft:geometry']}
     shell = load(RP / 'models/entity/a286_hand/kg_a2733.seasoning_bottle_hand.geo.json')['minecraft:geometry'][0]
     combined = combined_shell(shell, 'geometry.kg_bottle_held.combined')
-    visibility = [{'*': False}, {'grip': True}, {'shell': True}]
+    visibility = [{'*': False}, {'grip': True}, {'shell': 'v.kg_bottle_owner_occupied == 1'}]
     for tint in range(16):
         for value in range(1, 10):
             name = f'pending_{tint}_color_{value}'
@@ -155,7 +175,7 @@ def build():
                 cube['uv'] = {face: {'uv': [x + 4, y + 4], 'uv_size': [8, 8]}
                               for face in cube['uv']}
             combined['bones'].append(bone)
-            visibility.append({name: f'v.kg_bottle_layer_{tint // 2} == {value}'})
+            visibility.append({name: f'v.kg_bottle_owner_occupied == 1 && v.kg_bottle_layer_{tint // 2} == {value}'})
     materials = [{'*': 'Material.contents'}, {'shell': 'Material.default'}]
     controllers = {
         'controller.render.kg_bottle_held.dynamic': {

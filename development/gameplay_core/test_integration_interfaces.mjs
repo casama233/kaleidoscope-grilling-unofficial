@@ -125,3 +125,25 @@ test('client correlates server responses, separates instances, times out and clo
  const timeout=a.request('discover'),rejected=assert.rejects(timeout,/timeout/);const [timer,callback]=[...timers][0];timers.delete(timer);callback();await rejected;
  const waiting=b.request('discover'),closed=assert.rejects(waiting,/closed/);b.close();await closed;a.close();assert.equal(listeners.size,0);assert.equal(timers.size,0);
 });
+
+test('held cache generation follows semantic mapping changes, not replay, restore order or unrelated registry edits',()=>{
+ registry.resetIntegrationRegistry();const initial=registry.heldVisualRegistryRevision();
+ registry.registerProducer({producerId:'test:generation',items:['minecraft:apple'],kinds:['cuisine']});
+ registry.registerProjectionDescriptor({itemId:'test:display',provider:'test:renderer'});assert.equal(registry.heldVisualRegistryRevision(),initial);
+ const a={itemId:'test:held_a',referenceItemId:'minecraft:apple'},b={itemId:'test:held_b',referenceItemId:'minecraft:carrot'};
+ registry.registerHeldVisual(a);registry.registerHeldVisual(b);const changed=registry.heldVisualRegistryRevision();assert.equal(changed,initial+2);
+ const snapshot=registry.integrationRegistrySnapshot();
+ const detached=registry.integrationRegistrySnapshot();detached.held[0].referenceItemId='minecraft:bread';assert.equal(registry.secretVisualIndex(a.itemId),registry.secretVisualIndex('minecraft:apple'));assert.equal(registry.heldVisualRegistryRevision(),changed);
+ registry.restoreIntegrationRegistry({...snapshot,producers:[],projections:[],held:[...snapshot.held].reverse()});assert.equal(registry.heldVisualRegistryRevision(),changed);
+ assert.equal(registry.registerHeldVisual(a).replayed,true);assert.equal(registry.heldVisualRegistryRevision(),changed);
+ assert.throws(()=>registry.registerHeldVisual({...a,referenceItemId:'minecraft:bread'}),/conflict/);assert.equal(registry.heldVisualRegistryRevision(),changed);
+ registry.restoreIntegrationRegistry({...snapshot,held:[a,{...b,referenceItemId:'minecraft:bread'}]});assert.equal(registry.heldVisualRegistryRevision(),changed+1);
+ assert.throws(()=>registry.restoreIntegrationRegistry({...snapshot,held:[a,{itemId:'test:unknown',referenceItemId:'test:missing'}]}),/resource release/);assert.equal(registry.heldVisualRegistryRevision(),changed+2);assert.deepEqual(registry.integrationRegistrySnapshot().held,[]);
+ registry.resetIntegrationRegistry();assert.equal(registry.heldVisualRegistryRevision(),changed+2);
+});
+test('production registration rollback preserves held cache generation when its alias mapping is unchanged',()=>{
+ let reject=false;const e=engine({fault(kind,key){if(reject&&kind==='property'&&key.includes('integration_registry')){reject=false;throw Error('after registry write')}}});
+ const held={itemId:'test:held_alias',referenceItemId:'minecraft:apple'};e.invoke('register_held_visual',{registration:held});const before=registry.heldVisualRegistryRevision();
+ reject=true;assert.throws(()=>e.register(),/after registry write/);assert.equal(registry.heldVisualRegistryRevision(),before);assert.equal(registry.secretVisualIndex(held.itemId),registry.secretVisualIndex('minecraft:apple'));
+ assert.equal(e.invoke('register_held_visual',{registration:held}).replayed,true);assert.equal(registry.heldVisualRegistryRevision(),before);
+});

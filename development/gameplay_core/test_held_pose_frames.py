@@ -34,6 +34,10 @@ class HeldPoseFrameTests(unittest.TestCase):
         expected=expected_animations();checked=0
         for p in (RP/'attachables').glob('*.json'):
             desc=json.loads(p.read_text())['minecraft:attachable']['description']
+            if desc['identifier']=='kaleidoscope_grilling:skewer_plate':
+                # The source plate has a separate count/row hierarchy and its
+                # own pinned display frames, tested in test_plate_held_assets.
+                continue
             for hand in ('right','left'):
                 bones=expected[desc['animations']['fp_'+hand]]['bones']
                 base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith(('animation.kg_a287.skewer','animation.kg_a286.bottle')) else calibration(hand))

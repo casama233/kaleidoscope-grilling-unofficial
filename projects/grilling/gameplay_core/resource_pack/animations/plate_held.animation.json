@@ -1,0 +1,223 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_plate_held.fp_right": {
+      "loop": true,
+      "bones": {
+        "plate_pose": {
+          "position": [
+            -2.15601965,
+            4.53282703,
+            -1.52083612
+          ],
+          "rotation": [
+            144.29802713,
+            -35.1993506,
+            69.31136321
+          ],
+          "scale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        }
+      }
+    },
+    "animation.kg_plate_held.fp_left": {
+      "loop": true,
+      "bones": {
+        "plate_pose": {
+          "position": [
+            -15.039,
+            1.232,
+            11.6
+          ],
+          "rotation": [
+            -0.0,
+            45.0,
+            0.0
+          ],
+          "scale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        }
+      }
+    },
+    "animation.kg_plate_held.tp_right": {
+      "loop": true,
+      "bones": {
+        "plate_pose": {
+          "position": [
+            0.05779134,
+            -3.6004283,
+            -4.75519806
+          ],
+          "rotation": [
+            144.71633973,
+            30.3886326,
+            159.03184112
+          ],
+          "scale": [
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    },
+    "animation.kg_plate_held.tp_left": {
+      "loop": true,
+      "bones": {
+        "plate_pose": {
+          "position": [
+            -0.05779134,
+            -3.6004283,
+            -4.75519806
+          ],
+          "rotation": [
+            144.71633973,
+            -30.3886326,
+            -159.03184112
+          ],
+          "scale": [
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    },
+    "animation.kg_plate_held.layout": {
+      "loop": true,
+      "bones": {
+        "plate_slot_0": {
+          "position": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 2.4000000000000004 : v.kg_plate_count == 3 ? 2.4000000000000004 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 4 : v.kg_plate_count == 2 ? 4.15 : v.kg_plate_count == 3 ? 3.95 : v.kg_plate_count == 4 ? 3.95 : 3.95",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? -1.7000000000000002 : v.kg_plate_count == 2 ? -2.05 : v.kg_plate_count == 3 ? -1.6500000000000004 : v.kg_plate_count == 4 ? -1.6500000000000004 : -1.6500000000000004"
+          ],
+          "rotation": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0"
+          ]
+        },
+        "plate_fixed_0": {
+          "position": [
+            0,
+            1.8,
+            1.8
+          ],
+          "rotation": [
+            0,
+            0,
+            -180
+          ],
+          "scale": 1.2
+        },
+        "plate_slot_1": {
+          "position": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? -2.4000000000000004 : v.kg_plate_count == 3 ? -2.4000000000000004 : v.kg_plate_count == 4 ? -4.550000000000001 : -4.550000000000001",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 4.2 : v.kg_plate_count == 3 ? 4 : v.kg_plate_count == 4 ? 4 : 4",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? -2.0999999999999996 : v.kg_plate_count == 3 ? -1.7000000000000002 : v.kg_plate_count == 4 ? -1.7000000000000002 : -1.7000000000000002"
+          ],
+          "rotation": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0"
+          ]
+        },
+        "plate_fixed_1": {
+          "position": [
+            0,
+            1.8,
+            1.8
+          ],
+          "rotation": [
+            0,
+            0,
+            -180
+          ],
+          "scale": 1.2
+        },
+        "plate_slot_2": {
+          "position": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 4.55 : 4.55",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 7.375 : v.kg_plate_count == 4 ? 4 : 4",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? -0.34999999999999964 : v.kg_plate_count == 4 ? -1.7000000000000002 : -1.7000000000000002"
+          ],
+          "rotation": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 22.5 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0"
+          ]
+        },
+        "plate_fixed_2": {
+          "position": [
+            0,
+            1.8,
+            1.8
+          ],
+          "rotation": [
+            0,
+            0,
+            -180
+          ],
+          "scale": 1.2
+        },
+        "plate_slot_3": {
+          "position": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : -2.4000000000000004",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 7.325 : 7.325",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? -0.2999999999999998 : -0.5999999999999996"
+          ],
+          "rotation": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 45 : 22.5",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0"
+          ]
+        },
+        "plate_fixed_3": {
+          "position": [
+            0,
+            1.8,
+            1.8
+          ],
+          "rotation": [
+            0,
+            0,
+            -180
+          ],
+          "scale": 1.2
+        },
+        "plate_slot_4": {
+          "position": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 2.3",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 7.375",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : -0.6500000000000004"
+          ],
+          "rotation": [
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 22.5",
+            "v.kg_plate_count == 0 ? 0 : v.kg_plate_count == 1 ? 0 : v.kg_plate_count == 2 ? 0 : v.kg_plate_count == 3 ? 0 : v.kg_plate_count == 4 ? 0 : 0"
+          ]
+        },
+        "plate_fixed_4": {
+          "position": [
+            0,
+            1.8,
+            1.8
+          ],
+          "rotation": [
+            0,
+            0,
+            -180
+          ],
+          "scale": 1.2
+        }
+      }
+    }
+  }
+}

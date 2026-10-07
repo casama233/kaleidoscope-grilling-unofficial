@@ -8,7 +8,7 @@ import {prepareEatingItems,forgetEatingItem,selectedEatingProfile} from './eatin
 import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback,ordinaryFatalFeedback} from './immersion_effect_feedback.js';
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
-import './bottle_held_visual_runtime.js';
+import {configurePlateHeldReader} from './bottle_held_visual_runtime.js';
 import './integration_api_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
@@ -1203,4 +1203,5 @@ world.afterEvents.playerLeave.subscribe(({playerId})=>{
 
 configureSecretVisuals(readEffectiveSkewerRows,restoreIngredient);
 configureSecretHeldReader(readEffectiveSkewerRows,readSkewerRows);
+configurePlateHeldReader(readEffectiveSkewerRows);
 configureSecretGrillReader(readEffectiveSkewerRows);
