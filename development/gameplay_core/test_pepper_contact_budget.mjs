@@ -5,6 +5,8 @@ import {readFileSync} from 'node:fs';
 import {PepperContactWork,contactBlockBounds,contactContains} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/pepper_contact_work.js';
 import {overlappedBlockPositions} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_contact_core.js';
 import * as pepper from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_core.js';
+import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
+import {bonemealAgeIncrease} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2714_houttuynia_crop_core.js';
 const bp=new URL('../../projects/grilling/gameplay_core/behavior_pack/',import.meta.url);
 const runtime=readFileSync(new URL('scripts/a2748_pepper_tree_runtime.js',bp),'utf8');
 const box=(x=.5,y=1,z=.5,s=.3)=>({center:{x,y,z},extent:{x:s,y:.9,z:s}});
@@ -79,9 +81,13 @@ test('Actual runtime recovers old saved leaves without recurring all-dimension s
  const events=new Proxy({}, {get:(obj,name)=>obj[name]??=( {subscribe(fn){(listeners[name]??=[]).push(fn);}} )});
  const system={get currentTick(){return now;},beforeEvents:{startup:{subscribe(fn){fn({blockComponentRegistry:{registerCustomComponent:(id,value)=>components[id]=value}});}}},runInterval:(fn,n)=>intervals.push({fn,n})};
  const world={afterEvents:events,beforeEvents:events,getAbsoluteTime:()=>now,getAllPlayers:()=>[],getDimension:id=>{assert.equal(id,d.id);return d;}};
- // Execute the real runtime with its imported dependencies supplied as API doubles.
- const body=runtime.replace(/^import[\s\S]*?;\s*/gm,'').replaceAll('export ','');
- const context=vm.createContext({...pepper,PepperContactWork,world,system,console});vm.runInContext(body,context);
+ // Keep the fertilizer registry and callbacks real; only native APIs use doubles.
+ const strip=source=>source.replace(/^import[\s\S]*?;\s*/gm,'').replaceAll('export ','');
+ const context=vm.createContext({...pepper,PepperContactWork,commitSteps,bonemealAgeIncrease,world,system,console,EquipmentSlot:{Mainhand:'main',Offhand:'off'},GameMode:{Creative:'Creative',Survival:'Survival'}});
+ vm.runInContext(strip(readFileSync(new URL('scripts/plant_fertilizer.js',bp),'utf8')),context);
+ vm.runInContext(strip(runtime),context);
+ assert.equal(context.hasPlantFertilizer({typeId:pepper.PEPPER_SAPLING_ID}),true);
+ assert.equal(components[pepper.SAPLING_COMPONENT_ID].onPlayerInteract,context.interactWithPlantFertilizer);
  const leaf={typeId:pepper.PEPPER_LEAVES_ID,dimension:d,location:{x:0,y:0,z:0}};
  assert.equal(queries.length,0);assert.equal(intervals.length,1);assert.equal(intervals[0].n,1);
  for(now=0;now<=30;now++){if(now%5===0)components[pepper.LEAVES_COMPONENT_ID].onTick({block:leaf});intervals[0].fn();}
