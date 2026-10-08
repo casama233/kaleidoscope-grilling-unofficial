@@ -3,9 +3,12 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+import sys
 import unittest
 from PIL import Image
 import build_bottle_fill_proxies as build
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
+from held_visual_channels import bottle_bank_ready
 
 class BottleFillProxyAssets(unittest.TestCase):
     def test_exact_hidden_item_and_clear_recipe_contract_for_all_16(self):
@@ -59,6 +62,14 @@ class BottleFillProxyAssets(unittest.TestCase):
             name=build.name_for(kind,fill);base='empty_seasoning_bottle' if kind=='partial' else 'pending_seasoning'
             expected=build.load(build.RP/'attachables'/f'{base}.attachable.json')
             expected['minecraft:attachable']['description']['identifier']=build.NS+name
+            # G119 keeps the complete dynamic route but checks this proxy's
+            # exact held identity. Admit only that one owner-ready row change.
+            rows=expected['minecraft:attachable']['description']['scripts']['pre_animation']
+            prefix='v.kg_bottle_owner_ready = '
+            owners=[i for i,row in enumerate(rows) if row.startswith(prefix)]
+            self.assertEqual(len(owners),1,name)
+            self.assertEqual(rows[owners[0]],prefix+bottle_bank_ready(build.NS+base)+';',name)
+            rows[owners[0]]=prefix+bottle_bank_ready(build.NS+name)+';'
             actual=build.load(build.RP/'attachables'/f'{name}.attachable.json')
             self.assertEqual(actual,expected,name)
             d=actual['minecraft:attachable']['description']
