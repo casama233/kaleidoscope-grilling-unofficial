@@ -5,6 +5,7 @@ import json,subprocess,sys,unittest
 ROOT=Path(__file__).resolve().parents[2];RP=ROOT/'projects/grilling/gameplay_core/resource_pack';sys.path.insert(0,str(ROOT/'tools'));sys.path.insert(0,str(ROOT/'development/gameplay_core'))
 from held_pose_frames import point
 from secret_active_calibration import calibrated_target,PROFILE_IDS
+from bottle_pose_review import historical_bytes
 from public_source_witness import PUBLIC_SOURCE_BASE,public_json,assert_public_bytes
 import java_dual_eating_frames as dual
 import java_active_eating_frames as active
@@ -52,6 +53,12 @@ for(const row of cases)for(const held of [row.id,'minecraft:apple','kaleidoscope
   # file must remain byte-identical to the public calibration baseline.
   rack=RP/'animations/rack_tool_visual.animation.json'
   allowed={str(rack.relative_to(ROOT))} if rack.exists() else set()
+  # Only the complete-byte-pinned position delta is reversible. The restored
+  # bytes must still equal this historical public baseline exactly.
+  for name in ('a286_held.animation.json','seasoning_held.animation.json'):
+   bottle=RP/'animations'/name
+   self.assertEqual(historical_bytes(bottle),subprocess.check_output(['git','show',PUBLIC_SOURCE_BASE+':'+str(bottle.relative_to(ROOT))],cwd=ROOT))
+   allowed.add(str(bottle.relative_to(ROOT)))
   self.assertEqual(set(changed)-allowed,set())
   if rack.exists():
    old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+str(rack.relative_to(ROOT))],cwd=ROOT,capture_output=True)

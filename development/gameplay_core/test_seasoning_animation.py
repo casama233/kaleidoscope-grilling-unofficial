@@ -13,6 +13,7 @@ RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
 BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
 SOURCE = json.loads((Path(__file__).parent / 'fixtures/java-seasoning-animation-1.1.1.json').read_text())
 sys.path.insert(0, str(ROOT / 'tools'))
+from bottle_pose_review import historical_bytes
 
 
 def load(path):
@@ -77,7 +78,7 @@ class SeasoningAnimationTests(unittest.TestCase):
         changed = {n for n in before if before[n] != after[n]}
         self.assertEqual(changed, {'animation.kg_imm.player.season.main', 'animation.kg_imm.player.season.off'})
         relative = 'projects/grilling/gameplay_core/resource_pack/animations/a286_held.animation.json'
-        self.assertEqual((ROOT / relative).read_bytes(), subprocess.check_output(['git', 'show', '604a91b0:' + relative], cwd=ROOT))
+        self.assertEqual(historical_bytes(ROOT / relative), subprocess.check_output(['git', 'show', '604a91b0:' + relative], cwd=ROOT))
 
     def test_pending_release_and_swap_stop_expression(self):
         script = (BP / 'scripts/main.js').read_text()

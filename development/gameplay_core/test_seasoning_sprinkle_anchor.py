@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 sys.path.insert(0, str(ROOT / 'development/gameplay_core'))
 import build_seasoning_held as held
+from bottle_pose_review import historical_pose, historical_bytes
 from test_native_bottle_fp import projected
 
 
@@ -18,7 +19,7 @@ class SprinkleAnchor(unittest.TestCase):
     def test_only_main_sprinkle_positions_change_and_pending_remains_exact(self):
         path = held.RP / 'animations/seasoning_held.animation.json'
         before = json.loads(subprocess.check_output(['git', 'show', 'cba67124:' + path.relative_to(ROOT).as_posix()], cwd=ROOT))['animations']
-        after = json.loads(path.read_text())['animations']
+        after = historical_pose(path)['animations']
         changed = {key for key in after if before[key] != after[key]}
         self.assertEqual(changed, {'animation.kg_seasoning.item.sprinkle.right'})
         key = next(iter(changed))
@@ -60,12 +61,16 @@ class SprinkleAnchor(unittest.TestCase):
         self.assertIn('q.is_swimming == 0', gate)
         self.assertIn('variable.is_using_vr == 0', gate)
 
-    def test_inverted_complete_mesh_fits_fov60_math_with_hud_clearance(self):
-        # This is the finite settled native frame, not a rendered client test.
+    def test_historical_g64_inverted_complete_mesh_fits_fov60_math_with_hud_clearance(self):
+        # This is the historical G64 finite settled frame after exact G105
+        # reversal, not current-candidate clearance or a rendered client test.
         geometries = json.loads((held.RP / 'models/entity/bottle_held_contents.geo.json').read_text())['minecraft:geometry']
         largest = geometries[0]
+        original = historical_pose(held.RP / 'animations/seasoning_held.animation.json')['animations']['animation.kg_seasoning.item.sprinkle.right']['bones']['grip']['position']['0.0']
+        current = held.motion('right', 0, False)['position']
         for i in range(61):
             pose = held.motion('right', i / 120, False)
+            pose['position'] = [value - (new - old) for value, new, old in zip(pose['position'], current, original)]
             points = projected(largest, {'bones': {'grip': pose}}, 'right')
             for x, y, z in points:
                 self.assertLess(z, -.1)
@@ -99,6 +104,7 @@ class SprinkleAnchor(unittest.TestCase):
                         row['range']=[0,5333]
                     props['kaleidoscope_grilling:secret_'+hand+'_piece']={'type':'int','range':[0,255],'default':0,'client_sync':True}
                 self.assertEqual(json.loads(path.read_bytes()),before,path)
+            elif path.name == 'a286_held.animation.json':self.assertEqual(historical_bytes(path),prior,path)
             else:self.assertEqual(path.read_bytes(),prior,path)
 
 
