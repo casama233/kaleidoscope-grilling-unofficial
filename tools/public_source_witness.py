@@ -36,6 +36,41 @@ def public_json(relative_path):
     return json.loads(public_bytes(relative_path))
 
 
+PEPPER_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js'
+REVIEWED_PEPPER_BASE = 'dccbe92aca2973d498614653b4bda8b7f736e80c'
+
+
+def _pepper_delta():
+    return json.loads((ROOT / 'development/gameplay_core/fixtures/pepper-growth-2.8.118.json').read_text())
+
+
+@lru_cache(maxsize=1)
+def _pepper_preimage():
+    # The selected G69 witness does not list pepper; keep that manifest frozen
+    # and read only this path from the already pinned complete public commit.
+    return subprocess.check_output(['git', 'show', PUBLIC_SOURCE_BASE + ':' + PEPPER_PATH], cwd=ROOT)
+
+
+@lru_cache(maxsize=1)
+def _reviewed_pepper_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_PEPPER_BASE + ':' + PEPPER_PATH], cwd=ROOT)
+
+
+def reviewed_pepper_bytes(before_sha256):
+    # Continue the G60/G67/G68 chain from its exact public preimage. The full
+    # reviewed candidate file, not an editable fixture hash, defines G118 bytes.
+    delta = _pepper_delta()
+    assert delta['schema'] == 1 and delta['release'] == [2, 8, 118]
+    assert delta['source_commit'] == REVIEWED_PEPPER_BASE
+    assert delta['previous_public_commit'] == PUBLIC_SOURCE_BASE
+    assert set(delta['changes']) == {PEPPER_PATH}, 'Reviewed G118 pepper scope changed'
+    row = delta['changes'][PEPPER_PATH]
+    assert row['before_sha256'] == before_sha256 == hashlib.sha256(_pepper_preimage()).hexdigest(), 'Reviewed G118 pepper has wrong public preimage'
+    repaired = _reviewed_pepper_source()
+    assert hashlib.sha256(repaired).hexdigest() == row['after_sha256'], 'Reviewed G118 pepper source bytes mismatch'
+    return repaired
+
+
 MAIN_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
 REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
 REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'

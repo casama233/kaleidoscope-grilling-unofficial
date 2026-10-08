@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':18,'commits':18})
+  self.assertEqual(verify(),{'refs':19,'commits':19})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -112,6 +112,12 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   self.assertEqual(repaired,public._reviewed_parity_source())
   with self.assertRaisesRegex(AssertionError,'wrong public preimage'):
    public._g118_parity_bytes(before+b'\n')
+  pepper=public._pepper_delta();pepper_before=hashlib.sha256(public._pepper_preimage()).hexdigest()
+  self.assertEqual(pepper['source_commit'],public.REVIEWED_PEPPER_BASE)
+  self.assertIn(public.REVIEWED_PEPPER_BASE,inventory())
+  self.assertEqual(public.reviewed_pepper_bytes(pepper_before),public._reviewed_pepper_source())
+  with self.assertRaisesRegex(AssertionError,'wrong public preimage'):
+   public.reviewed_pepper_bytes('0'*64)
  def test_g118_parity_witness_rejects_extra_bytes_even_with_a_matching_fixture_hash(self):
   load=public._main_delta;delta=load('g118-main-reviewed-delta.json')
   repaired=public.expected_main_bytes((2,8,118))
@@ -120,6 +126,13 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   with patch.object(public,'_main_delta',side_effect=lambda name:changed if name=='g118-main-reviewed-delta.json' else load(name)):
    with self.assertRaisesRegex(AssertionError,'Reviewed G118 source differs outside'):
     public.expected_main_bytes((2,8,118))
+  # A matching edited hash also cannot widen the separate whole-file pepper pin.
+  pepper=public._pepper_delta();pepper_before=hashlib.sha256(public._pepper_preimage()).hexdigest()
+  repaired=public.reviewed_pepper_bytes(pepper_before);changed=copy.deepcopy(pepper)
+  changed['changes'][public.PEPPER_PATH]['after_sha256']=hashlib.sha256(repaired+b'\n').hexdigest()
+  with patch.object(public,'_pepper_delta',return_value=changed):
+   with self.assertRaisesRegex(AssertionError,'Reviewed G118 pepper source bytes mismatch'):
+    public.reviewed_pepper_bytes(pepper_before)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
