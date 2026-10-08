@@ -1,10 +1,12 @@
 import {canonicalFoodId} from './eating_profile_ids.js';
-import {world,system} from '@minecraft/server';
+import {system} from '@minecraft/server';
 import {getMainHand,getOffHand,isCreative} from './a2735_player_io.js';
 import {eatingStillCurrent} from './a285_eating_transaction.js';
 import {secretVisualIndex} from './integration_registry_core.js';
 import {secretVisualState,partialVisualState} from './secret_visual_state.js';
-let reader,rawReader;const signatures=new Map(),completedHands=new Map();
+import {heldVisualKind,writeHeldVisual,invalidateHeldVisual,HELD_VISUAL_EMPTY} from './held_visual_transport.js';
+import {registerHeldVisualProvider,reportHeldVisualError} from './held_visual_dispatch_runtime.js';
+let reader,rawReader;const completedHands=new Map();
 export function configureSecretHeldReader(read,readRaw){reader=read;rawReader=readRaw;}
 export function syncSecretHeld(player,{beginHand,completedUse}={}){
  if(!reader)return;
@@ -20,24 +22,31 @@ export function syncSecretHeld(player,{beginHand,completedUse}={}){
    completed.set(completedUse.hand,completedUse);
   }
  }
- const rows={};
- for(const [hand,current] of [['main',getMainHand(player)],['off',getOffHand(player)]]){
+ for(const [hand,read] of [['main',getMainHand],['off',getOffHand]])try{
+  const current=read(player);
   const done=completed?.get(hand);
   if(done&&!eatingStillCurrent(done,current,player.selectedSlotIndex,system.currentTick))completed.delete(hand);
+  const kind=heldVisualKind(current?.typeId);
+  if(kind==='empty'){writeHeldVisual(player,hand,'empty',HELD_VISUAL_EMPTY);continue;}
+  if(kind!=='secret')continue;
   const stack=completed?.has(hand)?undefined:current;
   const id=canonicalFoodId(stack?.typeId);
   const ingredients=id==='kaleidoscope_grilling:secret_skewer'?secretVisualState(stack,reader):id==='kaleidoscope_grilling:unfinished_skewer'?partialVisualState(stack,reader):[];
-  for(let i=0;i<3;i++)rows['kaleidoscope_grilling:secret_'+hand+'_'+i]=ingredients[i]??0;
   // Pinned Java helper resolution reads the original last snapshot, not the
   // cooked/effective rows and not a destructively shortened bite-stage list.
   const raw=canonicalFoodId(stack?.typeId)==='kaleidoscope_grilling:secret_skewer'&&rawReader?rawReader(stack):[];
-  rows['kaleidoscope_grilling:secret_'+hand+'_piece']=secretVisualIndex(raw[raw.length-1]?.id);
+  writeHeldVisual(player,hand,'secret',[
+   ...Array(8).fill(0),...Array.from({length:3},(_,i)=>ingredients[i]??0),secretVisualIndex(raw[raw.length-1]?.id)
+  ]);
+ }catch(error){
+  try{invalidateHeldVisual(player,hand)}catch{}
+  reportHeldVisualError('ingredients '+hand,player,error);
  }
- const signature=JSON.stringify(rows);if(signatures.get(player.id)===signature)return;
- for(const [key,value] of Object.entries(rows))player.setProperty(key,value);
- signatures.set(player.id,signature);
 }
-world.afterEvents.playerInventoryItemChange.subscribe(e=>system.run(()=>{try{completedHands.delete(e.player.id);syncSecretHeld(e.player)}catch(error){console.warn('[Grilling held ingredients] '+error)}}));
-world.afterEvents.playerHotbarSelectedSlotChange.subscribe(e=>system.run(()=>{try{completedHands.get(e.player.id)?.delete('main');syncSecretHeld(e.player)}catch(error){console.warn('[Grilling held ingredients] '+error)}}));
-world.afterEvents.playerLeave.subscribe(e=>{signatures.delete(e.playerId);completedHands.delete(e.playerId)});
-system.runInterval(()=>{for(const player of world.getAllPlayers())try{syncSecretHeld(player)}catch(error){console.warn('[Grilling held ingredients] '+error)}},20);
+registerHeldVisualProvider('ingredients',syncSecretHeld,{
+ period:20,
+ inventory:id=>completedHands.delete(id),
+ hotbar:id=>completedHands.get(id)?.delete('main'),
+ spawn:id=>completedHands.delete(id),
+ leave:id=>completedHands.delete(id)
+});
