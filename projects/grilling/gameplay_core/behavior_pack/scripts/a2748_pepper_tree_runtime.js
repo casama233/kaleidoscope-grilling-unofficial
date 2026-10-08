@@ -1,6 +1,7 @@
 import {PepperContactWork} from './pepper_contact_work.js';
 import {world,system,ItemStack,BlockPermutation} from '@minecraft/server';
-import {getMainHand,getOffHand,setHand,findHandEntry,isCreative} from './a2735_player_io.js';
+import {getMainHand,getOffHand,setHand,isCreative} from './a2735_player_io.js';
+import {registerPlantFertilizer,interactWithPlantFertilizer,plantMutationAllowed,commitPlantSteps,samePlantPermutation} from './plant_fertilizer.js';
 import {
  PEPPER_LOG_ID,PEPPER_LEAVES_ID,PEPPER_SAPLING_ID,SICHUAN_PEPPER_ID,PEPPER_WORLDGEN_SEED_ID,
  LEAVES_COMPONENT_ID,SAPLING_COMPONENT_ID,LOG_COMPONENT_ID,
@@ -71,31 +72,25 @@ function damageTool(player,entry){
   else{d.damage=next;setHand(player,entry.hand,stack)}
  }catch{}
 }
-function consumeOne(player,entry){
- if(!entry||isCreative(player))return;
- try{
-  const s=entry.stack;if(s.amount<=1)setHand(player,entry.name,undefined);
-  else{s.amount-=1;setHand(player,entry.name,s)}
- }catch{}
-}
 function enchantLevel(stack,id){
  try{return Math.max(0,Number(stack?.getComponent('minecraft:enchantable')?.getEnchantment(id)?.level??0)||0)}catch{return 0}
 }
 
 function connectedToPepperLog(start){
  const d=start.dimension,base=start.location,queue=[{x:base.x,y:base.y,z:base.z,dist:0}],seen=new Set([base.x+'|'+base.y+'|'+base.z]);
+ let unloaded=false;
  while(queue.length){
   const cur=queue.shift();
   if(cur.dist>=LEAF_DECAY_DISTANCE)continue;
   for(const [dx,dy,dz] of DIRS){
    const p={x:cur.x+dx,y:cur.y+dy,z:cur.z+dz},k=p.x+'|'+p.y+'|'+p.z;if(seen.has(k))continue;seen.add(k);
-   let b;try{b=d.getBlock(p)}catch{continue}
-   if(!b)continue;
+   let b;try{b=d.getBlock(p)}catch{unloaded=true;continue}
+   if(!b){unloaded=true;continue;}
    if(b.typeId===PEPPER_LOG_ID)return true;
    if(b.typeId===PEPPER_LEAVES_ID)queue.push({...p,dist:cur.dist+1});
   }
  }
- return false;
+ return unloaded?null:false;
 }
 
 function leafPermutation(hasPepper=false,persistent=false){
@@ -107,7 +102,7 @@ function leafPermutation(hasPepper=false,persistent=false){
 function logPermutation(){
  return BlockPermutation.resolve(PEPPER_LOG_ID,{'minecraft:block_face':'up'});
 }
-export function placePepperTree(sapling,outcome={}){
+export function placePepperTree(sapling,outcome={},journal=null){
  outcome.status="blocked";
  const h=pepperTreeHeight(Math.random()),d=sapling.dimension,o=sapling.location;
  if(!isDirt(at(d,o,0,-1,0)))return false;
@@ -123,6 +118,9 @@ export function placePepperTree(sapling,outcome={}){
   const block=at(d,o,p.x,p.y,p.z);if(!block)return false;
   if(block.typeId==='minecraft:air')writes.push({block,before:block.permutation,after:leafPermutation(p.hasPepper,false)});
  }
+ // Fertilizer plans may include a preceding sapling-stage advance. Publish all
+ // tree blocks with that use's hand debit in one rollback-protected transaction.
+ if(journal){for(const entry of writes)journal.set(entry.block,entry.after);outcome.status="grown";return true;}
  const committed=[];outcome.status="deferred";
  try{
   for(const entry of writes){committed.push(entry);entry.block.setPermutation(entry.after);}
@@ -154,6 +152,15 @@ function advanceSapling(block){
  return placePepperTree(block);
 }
 
+registerPlantFertilizer(PEPPER_SAPLING_ID,(block,journal,random)=>{
+ const permutation=journal.read(block),stage=Number(permutation.getState(SAPLING_STAGE_STATE))||0;
+ if(saplingBonemealSucceeds(random())){
+  if(nextSaplingAction(stage)==='advance')journal.set(block,permutation.withState(SAPLING_STAGE_STATE,1));
+  else placePepperTree(block,{},journal);
+ }
+ return true;
+});
+
 function sting(entity){
  if(!entity||!entity.getComponent('minecraft:health')||entity.typeId==='minecraft:fox'||entity.typeId==='minecraft:bee')return;
  try{entity.addEffect('slowness',10,{amplifier:0,showParticles:false})}catch{}
@@ -165,21 +172,51 @@ function sting(entity){
  }catch{}
 }
 
+function settleLeafDrops(block,plan){
+ if(!block||block.typeId!==PEPPER_LEAVES_ID||!plantMutationAllowed(block))return false;
+ const before=block.permutation,steps=[{
+  apply(){block.setType('minecraft:air');return block.typeId==='minecraft:air';},
+  rollback(){block.setPermutation(before);return samePlantPermutation(block.permutation,before);}
+ }];
+ for(const [id,count] of [[PEPPER_LEAVES_ID,plan.leaves],[PEPPER_SAPLING_ID,plan.saplings],['minecraft:stick',plan.sticks],[SICHUAN_PEPPER_ID,plan.pepper]]){
+  if(!count)continue;
+  let entity,attempted=false,acknowledged=false;
+  steps.push({
+   apply(){
+    attempted=true;
+    entity=block.dimension.spawnItem(new ItemStack(id,count),{x:block.x+.5,y:block.y+.4,z:block.z+.5});
+    const item=entity?.getComponent('minecraft:item')?.itemStack;
+    acknowledged=entity?.isValid===true&&item?.typeId===id&&item?.amount===count;
+    if(!acknowledged)throw Error('Pepper leaf drop was not acknowledged');
+   },
+   rollback(){
+    if(!attempted)return;
+    // A spawn that throws after creating its item has no safe handle to remove.
+    // Quarantine an unknown outcome instead of restoring a retryable drop source.
+    if(!acknowledged)throw Error('Pepper leaf drop outcome unknown');
+    entity.remove();
+    if(entity.isValid!==false)throw Error('Pepper leaf drop removal was not acknowledged');
+   }
+  });
+ }
+ return commitPlantSteps(block,steps);
+}
+function decayLeaves(block){
+ return settleLeafDrops(block,pepperLeafBreakPlan({
+  shears:false,silkTouch:false,fortune:0,hasPepper:!!state(block,HAS_PEPPER_STATE,false),
+  saplingRandom:Math.random(),stickRandom:Math.random()
+ }));
+}
 function breakLeaves(block,player,tool,hasPepper){
  if(!block||block.typeId!==PEPPER_LEAVES_ID)return;
- const creative=isCreative(player);
- try{block.setType('minecraft:air')}catch{return}
- if(creative)return;
+ if(isCreative(player)){settleLeafDrops(block,{});return;}
  const fortune=enchantLevel(tool,'fortune')||enchantLevel(tool,'minecraft:fortune');
  const silk=(enchantLevel(tool,'silk_touch')||enchantLevel(tool,'minecraft:silk_touch'))>0;
  const plan=pepperLeafBreakPlan({
   shears:tool?.typeId==='minecraft:shears',silkTouch:silk,fortune,hasPepper,
   saplingRandom:Math.random(),stickRandom:Math.random()
  });
- if(plan.leaves)drop(block,PEPPER_LEAVES_ID,plan.leaves);
- if(plan.saplings)drop(block,PEPPER_SAPLING_ID,plan.saplings);
- if(plan.sticks)drop(block,'minecraft:stick',plan.sticks);
- if(plan.pepper)drop(block,SICHUAN_PEPPER_ID,plan.pepper);
+ if(!settleLeafDrops(block,plan))return;
  try{block.dimension.playSound('dig.grass',block.location)}catch{}
 }
 
@@ -193,13 +230,16 @@ system.beforeEvents.startup.subscribe(init=>{
   onRandomTick(event){
    try{
     const block=event.block;
-    if(!state(block,PERSISTENT_STATE,false)&&!connectedToPepperLog(block)){block.setType('minecraft:air');return}
+    if(!plantMutationAllowed(block))return;
+    // Java fruits before LeavesBlock.randomTick performs natural decay.
     if(!state(block,HAS_PEPPER_STATE,false)&&shouldFruitPepperLeaf(Math.random()))setState(block,HAS_PEPPER_STATE,true);
+    if(!state(block,PERSISTENT_STATE,false)&&connectedToPepperLog(block)===false)decayLeaves(block);
    }catch{}
   },
   onPlayerInteract(event){
    try{
     const block=event.block,player=event.player;if(!player||getMainHand(player))return;
+    if(!plantMutationAllowed(block))return;
     if(!state(block,HAS_PEPPER_STATE,false))return;
     drop(block,SICHUAN_PEPPER_ID,harvestedPepperCount(Math.random()));
     awardMountainFragrance(player);
@@ -221,14 +261,7 @@ system.beforeEvents.startup.subscribe(init=>{
   onRandomTick(event){
    try{if(saplingRandomTickSucceeds(lightAbove(event.block),Math.random()))advanceSapling(event.block)}catch{}
   },
-  onPlayerInteract(event){
-   try{
-    const p=event.player;if(!p)return;
-    const meal=findHandEntry(p,'minecraft:bone_meal');if(!meal)return;
-    consumeOne(p,meal);
-    if(saplingBonemealSucceeds(Math.random()))advanceSapling(event.block);
-   }catch{}
-  }
+  onPlayerInteract:interactWithPlantFertilizer
  });
 
  init.blockComponentRegistry.registerCustomComponent(LOG_COMPONENT_ID,{
@@ -247,9 +280,15 @@ system.beforeEvents.startup.subscribe(init=>{
 
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  try{
-  if(e.block.typeId!==PEPPER_LEAVES_ID)return;
-  const loc={...e.block.location},dim=e.block.dimension,p=e.player,tool=e.itemStack?.clone(),hasPepper=!!state(e.block,HAS_PEPPER_STATE,false);
-  e.cancel=true;system.run(()=>breakLeaves(dim.getBlock(loc),p,tool,hasPepper));
+  if(e.cancel||e.block.typeId!==PEPPER_LEAVES_ID)return;
+  const loc={...e.block.location},dim=e.block.dimension,p=e.player,tool=e.itemStack?.clone(),before=e.block.permutation;
+  const hasPepper=!!before.getState(HAS_PEPPER_STATE);
+  e.cancel=true;system.run(()=>{
+   try{
+    const block=dim.getBlock(loc);
+    if(block&&samePlantPermutation(block.permutation,before))breakLeaves(block,p,tool,hasPepper);
+   }catch{}
+  });
  }catch{}
 });
 

@@ -67,6 +67,16 @@ def current_behavior_expectation(before, kind, stem, version):
             geometry = components.get('minecraft:geometry')
             if geometry is not None:
                 geometry['bone_visibility']['rack_seasoning_4'] = "q.block_state('kaleidoscope_grilling:seasoning_occupancy_high') == 1"
+    if version >= (2,8,118) and kind == 'item' and stem in ('houttuynia', 'pepper_sapling'):
+        expected['minecraft:item']['components']['minecraft:compostable'] = {
+            'composting_chance': 65 if stem == 'houttuynia' else 30,
+        }
+    if version >= (2,8,118) and kind == 'block' and stem == 'skewer_recipe':
+        c = expected['minecraft:block']['components']
+        c['minecraft:selection_box'] = {'origin': [-5, 1.5, 7.75], 'size': [10, 13, 0.25]}
+        c['kaleidoscope_grilling:recipe_support'] = {}
+        c['minecraft:tick'] = {'interval_range': [20, 20], 'looping': True}
+        c['minecraft:movable'] = {'movement_type': 'immovable'}
     return expected
 
 
@@ -78,6 +88,26 @@ def main():
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            if kind == 'item' and path.stem == 'pepper_leaves':
+                assert version >= (2,8,118)
+                # G118 exposes the existing block item to native composting;
+                # its label reuses the historical block alias without adding one.
+                assert json.loads(path.read_bytes()) == {
+                    'format_version': '1.26.50',
+                    'minecraft:item': {
+                        'description': {
+                            'identifier': 'kaleidoscope_grilling:pepper_leaves',
+                            'menu_category': {'category': 'equipment', 'group': 'kaleidoscope_cookery:itemGroup.name.other_blocks'},
+                        },
+                        'components': {
+                            'minecraft:display_name': {'value': 'kaleidoscope_grilling.display.block.pepper_leaves'},
+                            'minecraft:max_stack_size': 64,
+                            'minecraft:block_placer': {'block': 'kaleidoscope_grilling:pepper_leaves', 'replace_block_item': True},
+                            'minecraft:compostable': {'composting_chance': 30},
+                        },
+                    },
+                }, path
+                continue
             if kind == 'item' and path.stem.endswith('_native_plain'):
                 assert version >= (2,8,67) and path.stem.removesuffix('_native_plain') in ALL_EATING_ITEMS
                 plain=json.loads(path.read_bytes())['minecraft:item']
@@ -116,7 +146,7 @@ def main():
             after = json.loads(path.read_bytes())
             old = before['minecraft:' + kind]['components'].get('minecraft:display_name')
             if old is None:
-                assert after == before, path
+                assert after == current_behavior_expectation(before, kind, path.stem, version), path
                 continue
             value = old['value'] if isinstance(old, dict) else old
             key = ('kaleidoscope_grilling.display.' +
@@ -149,6 +179,7 @@ def main():
         old = language(prior(path))
         current = language(path.read_bytes())
         approved = {}
+        guide_added = set()
         if version >= (2,8,74):
             name = 'g75-guide-reviewed-delta.json' if version >= (2,8,75) else 'g74-guide-reviewed-delta.json'
             approved = json.loads((ROOT / 'tools/fixtures' / name).read_text())['locales'][locale]
@@ -158,9 +189,26 @@ def main():
             assert set(approved) == expected_keys
             for key, change in approved.items():
                 assert old[key] == change['before'] and current[key] == change['after'], 'Reviewed guide delta drift'
+        if version >= (2,8,118):
+            delta = json.loads((ROOT / 'tools/fixtures/g118-guide-reviewed-delta.json').read_text())
+            assert delta['schema'] == 1 and delta['release'] == [2,8,118]
+            changes = delta['locales'][locale]
+            expected_keys = {f'guide.kg.body.kaleidoscope_grilling:{entry}.{n}'
+                for entry, paragraphs in {
+                    'big_vat': (2,5), 'houttuynia': (2,), 'oil_press': (2,5,6),
+                    'oil_residue': (1,2,3,4), 'pepper_sapling': (1,5,6),
+                }.items() for n in paragraphs}
+            assert set(changes) == expected_keys and not (set(changes) & set(approved))
+            for key, change in changes.items():
+                assert old.get(key) == change['before'] and current[key] == change['after'], 'Reviewed G118 guide delta drift'
+                if change['before'] is None:
+                    assert key not in old
+                    guide_added.add(key)
+            assert len(guide_added) == 7
+            approved.update(changes)
         assert all(current.get(k) == v for k, v in old.items() if k not in approved), 'Plain names/guide text changed'
         config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
-        assert set(current) - set(old) == set(aliases) | public_keys | config_keys, 'Unexpected localization override'
+        assert set(current) - set(old) == set(aliases) | public_keys | config_keys | guide_added, 'Unexpected localization override'
         assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'
         released = language(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
         assert set(released) - set(old) == set(aliases), 'Historical label-only release drift'

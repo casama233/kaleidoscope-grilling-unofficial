@@ -2,6 +2,8 @@ import {loadHotRuntime} from './load_hot_runtime_vm.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {SECRET_CREATOR_KEY} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js';
+import {creatorLore} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/localized_lore_core.js';
 
 class ItemStack{
  constructor(typeId,amount=1,food=true){this.typeId=typeId;this.amount=amount;this.food=food;this.dp=new Map();this.lore=[];this.nameTag=''}
@@ -89,3 +91,61 @@ for(const portable of [false,true]){
  assert.equal(remainder.amount,3);assert.equal(hot.hotUntil(remainder),2499);assert.deepEqual(remainder.getRawLore(),before);
 }
 console.log('Partial merges retain full private/public carriers without a cosmetic lore overflow: PASS');
+
+// Use the actual creator writer so this test follows the canonical property
+// and automatically generated RawMessage, rather than an unused alias key.
+const main=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/main.js',import.meta.url),'utf8');
+const creatorBegin=main.indexOf('function setSecretCreator('),creatorEnd=main.indexOf('\nfunction ',creatorBegin+1);
+const creatorContext=vm.createContext({...data,SECRET_CREATOR_KEY,creatorLore});
+vm.runInContext(main.slice(creatorBegin,creatorEnd),creatorContext);
+function secret(name,amount){
+ const stack=heat(new ItemStack('kaleidoscope_grilling:secret_skewer',amount),1200);
+ data.setItemProperty(stack,'kaleidoscope_grilling:skewer_ingredients','same ingredient payload');
+ data.setItemLore(stack,[{text:'shared keepsake'},...data.getItemRawLore(stack)]);
+ return creatorContext.setSecretCreator(stack,{name,id:'player:'+name});
+}
+const alice=secret('Alice',62),bob=secret('Bob',5),secretBag=new Container(1);
+assert.equal(hot.sameForHeatMerge(alice,bob),true);
+secretBag.setItem(0,alice);secretBag.addItem=stack=>stack;
+const aliceCreator=data.getItemProperty(alice,SECRET_CREATOR_KEY),bobLore=bob.getRawLore();
+const bobRemainder=hot.mergeIntoContainer(secretBag,bob,1000);
+assert.equal(secretBag.getItem(0).amount,64);assert.equal(bobRemainder.amount,3);
+assert.equal(data.getItemProperty(secretBag.getItem(0),SECRET_CREATOR_KEY),aliceCreator);
+assert.ok(data.getItemRawLore(secretBag.getItem(0)).some(line=>JSON.stringify(line)===JSON.stringify(creatorLore('Alice'))));
+assert.equal(data.getItemProperty(bobRemainder,SECRET_CREATOR_KEY),data.getItemProperty(bob,SECRET_CREATOR_KEY));
+assert.deepEqual(bobRemainder.getRawLore(),bobLore);
+for(const change of [
+ stack=>{stack.nameTag='custom named serving'},
+ stack=>data.setItemLore(stack,[...data.getItemRawLore(stack),creatorLore('A foreign author')]),
+ stack=>data.setItemProperty(stack,'kaleidoscope_grilling:creator','foreign metadata'),
+ stack=>data.setItemProperty(stack,'kaleidoscope_grilling:skewer_ingredients','different ingredients'),
+ stack=>data.setItemProperty(stack,SECRET_CREATOR_KEY,'malformed creator')
+]){const changed=secret('Bob',1);change(changed);assert.equal(hot.sameForHeatMerge(alice,changed),false)}
+console.log('Canonical secret creators merge while target authors, exact remainders and foreign metadata are retained: PASS');
+
+for(const asMessage of [false,true]){
+ const legacy=secret('Carol',1),literal='§7製作者: Carol';
+ const lore=data.getItemRawLore(legacy).filter(line=>line?.translate!=='tooltip.kaleidoscope_grilling.creator');
+ data.setItemLore(legacy,[...lore,asMessage?{text:literal}:literal]);
+ const before=legacy.getRawLore();
+ assert.equal(hot.sameForHeatMerge(alice,legacy),true);
+ assert.deepEqual(legacy.getRawLore(),before);
+ const cleaned=hot.withoutAutomaticCreatorLore(legacy);
+ assert.ok(!cleaned.some(line=>line===literal||line?.text===literal));
+ assert.deepEqual(legacy.getRawLore(),before);
+}
+const mixed=secret('Bob',1);data.setItemLore(mixed,[...data.getItemRawLore(mixed),{text:'§7製作者: Bob'}]);
+assert.equal(hot.sameForHeatMerge(alice,mixed),true);
+const template=secret('Alice',1),foreign=['§7製作者: Alice — keepsake',{text:'§7製作者: Someone else'},creatorLore('Original recipe note')];
+data.setItemLore(template,[...data.getItemRawLore(template),...foreign]);
+const beforeTemplate=template.getRawLore(),oldCreator=data.getItemProperty(template,SECRET_CREATOR_KEY);
+const replacementLore=hot.withoutAutomaticCreatorLore(template);
+assert.deepEqual(template.getRawLore(),beforeTemplate);assert.equal(data.getItemProperty(template,SECRET_CREATOR_KEY),oldCreator);
+data.setItemProperty(template,SECRET_CREATOR_KEY,JSON.stringify({name:'Bob',id:'player:Bob'}));
+data.setItemLore(template,[...replacementLore,creatorLore('Bob')]);
+const replacedLore=data.getItemRawLore(template);
+assert.ok(!replacedLore.some(line=>JSON.stringify(line)===JSON.stringify(creatorLore('Alice'))));
+assert.equal(replacedLore.filter(line=>JSON.stringify(line)===JSON.stringify(creatorLore('Bob'))).length,1);
+for(const line of foreign)assert.ok(replacedLore.some(actual=>JSON.stringify(actual)===JSON.stringify(line)));
+assert.equal(hot.sameForHeatMerge(template,secret('Bob',1)),false);
+console.log('Recipe-book legacy author lines and pre-replacement cleanup retain unrelated creator-like lore: PASS');

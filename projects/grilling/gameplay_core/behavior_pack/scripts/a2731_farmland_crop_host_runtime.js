@@ -1,5 +1,6 @@
 import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
 import {farmlandCropTable} from './a2731_farmland_crop_host_core.js';
+import {registerPlantFertilizer,interactWithPlantFertilizer} from './plant_fertilizer.js';
 import {
  STRAW_HATS,
  canolaSurvive,matureCanolaCount,
@@ -54,24 +55,6 @@ function setAge(block,ageState,maxAge,age){
 function creative(player){
  try{return player.getGameMode?.()===GameMode.Creative}catch{return false}
 }
-function boneMealSlot(player){
- try{
-  const eq=player.getComponent('minecraft:equippable');
-  for(const hand of [EquipmentSlot.Mainhand,EquipmentSlot.Offhand]){
-   const slot=eq?.getEquipmentSlot(hand),stack=slot?.hasItem()?slot.getItem():undefined;
-   if(stack?.typeId==='minecraft:bone_meal')return {slot,stack};
-  }
- }catch{}
- return undefined;
-}
-function consumeBoneMeal(player,entry){
- if(!entry||creative(player))return;
- try{
-  const stack=entry.stack;
-  if(stack.amount<=1)entry.slot.setItem(undefined);
-  else{stack.amount-=1;entry.slot.setItem(stack)}
- }catch{}
-}
 function fortuneLevel(stack){
  try{
   const c=stack?.getComponent('minecraft:enchantable');
@@ -114,16 +97,16 @@ function componentFor(cfg){
     if(shouldAdvanceAge(light,speed,Math.random()))setAge(block,cfg.ageState,cfg.maxAge,age+1);
    }catch{}
   },
-  onPlayerInteract(event){
-   try{
-    const player=event.player;if(!player)return;
-    const age=ageOf(event.block,cfg.ageState);if(age>=cfg.maxAge)return;
-    const meal=boneMealSlot(player);if(!meal)return;
-    if(setAge(event.block,cfg.ageState,cfg.maxAge,Math.min(cfg.maxAge,age+bonemealAgeIncrease(Math.random()))))consumeBoneMeal(player,meal);
-   }catch{}
-  }
+  onPlayerInteract:interactWithPlantFertilizer
  };
 }
+
+for(const cfg of farmlandCropTable())registerPlantFertilizer(cfg.cropId,(block,journal,random)=>{
+ const permutation=journal.read(block),age=Number(permutation.getState(cfg.ageState))||0;
+ if(age>=cfg.maxAge)return false;
+ journal.set(block,permutation.withState(cfg.ageState,Math.min(cfg.maxAge,age+bonemealAgeIncrease(random()))));
+ return true;
+});
 
 system.beforeEvents.startup.subscribe(init=>{
  for(const cfg of farmlandCropTable()){

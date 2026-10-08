@@ -10,7 +10,7 @@ import {registerSecretSmoking,resolveSecretSmokedId,resetSecretCompatRegistry} f
 import {slotWrite} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_transfer_plan.js';
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
 import {grillVisualStage} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/grill_visual_core.js';
-const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url),source=fs.readFileSync(new URL('main.js',root),'utf8'),visual=fs.readFileSync(new URL('station_contents_visual_runtime.js',root),'utf8');
+const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url),source=fs.readFileSync(new URL('main.js',root),'utf8');
 function fn(text,name){const start=text.indexOf('function '+name+'(');assert.ok(start>=0,name);let end=text.indexOf('{',start)+1,depth=1;while(depth){const c=text[end++];if(c==='{')depth++;if(c==='}')depth--}return text.slice(start,end)}
 class Stack{
  constructor(typeId,amount=1){if(typeId==='fixture:missing')throw Error('missing item');this.typeId=typeId;this.amount=amount;this.props={};this.nameTag='';this.lore=[];this.damage=0;}
@@ -35,7 +35,7 @@ function fixture({flips=3,lit=false,stacks=[skewer(),skewer(),skewer()]}={}){
  const names=['readRowsFromKey','readSkewerRows','validSecretIngredientRows','isSecretCooked','readEffectiveSkewerRows','cookedIngredientRows','setCookedIngredientRows','dynamicFood','cookedStack','handleGrill'];
  if(source.includes('function commitGrillFlip('))names.push('commitGrillFlip');
  vm.runInContext(names.map(n=>fn(source,n)).join('\n'),ctx);
- return {ctx,rows,sounds,notices,animations,writes,block,player,get state(){return state},get metadataWrites(){return metadataWrites},get quarantined(){return quarantined},run:()=>ctx.handleGrill(block,player),failSlot(slot,permanent=false){fail={slot,permanent}},failState(){failState=true},failMetadata(n=1){failMetadata=n},get cached(){return rows.map(s=>s?.props[SECRET_COOKED_INGREDIENTS_KEY])},cooked:s=>ctx.cookedStack(s,state),visual(s,prefer){const shown=[];const v={canonicalFoodId,reader:ctx.readEffectiveSkewerRows,restore:r=>Object.assign(new Stack(r.id),structuredClone(r.native??{})),resolveSecretSmokedId,ItemStack:Stack,pose:(_b,x,y,z)=>({x,y,z}),render:(_r,_b,_k,item)=>shown.push(item?.typeId)};vm.runInNewContext(fn(visual,'composed'),v);v.composed({},block,'grill/0',s,{dx:0,y:0,dz:0},prefer,new Set());return shown}};
+ return {ctx,rows,sounds,notices,animations,writes,block,player,get state(){return state},get metadataWrites(){return metadataWrites},get quarantined(){return quarantined},run:()=>ctx.handleGrill(block,player),failSlot(slot,permanent=false){fail={slot,permanent}},failState(){failState=true},failMetadata(n=1){failMetadata=n},get cached(){return rows.map(s=>s?.props[SECRET_COOKED_INGREDIENTS_KEY])},cooked:s=>ctx.cookedStack(s,state),visual(s,prefer){return Array.from(ctx.readEffectiveSkewerRows(s,prefer),row=>row.id)}};
 }
 test('first three flips never create the cooked ingredient cache',()=>{for(const flips of [0,1,2]){const f=fixture({flips});f.run();assert.equal(f.state.flips,flips+1);assert.equal(f.metadataWrites,0);assert(f.cached.every(x=>x===undefined));}});
 test('fourth flip snapshots all secret slots even while unlit, without finishing the item',()=>{

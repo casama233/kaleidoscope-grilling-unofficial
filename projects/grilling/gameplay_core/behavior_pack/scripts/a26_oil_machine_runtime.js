@@ -18,6 +18,7 @@ import {captureWritableHand} from './a2735_player_io.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {createOilPressRegistry} from './oil_press_registry.js';
 import {ensureOilHandPublished} from './oil_api_client.js';
+import {hasPlantFertilizer,usePlantFertilizer,samePlantPermutation} from './plant_fertilizer.js';
 
 const PRESS_PREFIX='kaleidoscope_grilling:a26_press_';
 const VAT_PREFIX='kaleidoscope_grilling:a26_vat_';
@@ -250,7 +251,7 @@ function startPress(block,p,amount){
 function interactPress(block,p,item,hand=null){
  assertOilMachineSafe(block);
  const state=readPress(block);
- if(state.waiting||state.progress>=PRESS_REQUIRED_PROGRESS){finishPress(block,p);return}
+ if(state.waiting){finishPress(block,p);return}
  const actualHand=hand??(item?handFor(p,item.typeId):null);
  if(item?.typeId===OIL_CAKE_ID){
   const x=pressAddCake(state);if(!x.ok){javaInteractionFeedback(p,'press_full');return}
@@ -283,20 +284,6 @@ function interactVat(block,p,item,hand=null){
 
 }
 
-function doubleCropGrowth(block,p,hand){
- let states;try{states=block.permutation.getAllStates()}catch{return false}
- const keyName=['growth','minecraft:growth','age','minecraft:age'].find(k=>typeof states[k]==='number');if(!keyName)return false;
- const current=Number(states[keyName]);let max=current;
- for(let v=current+1;v<=15;v++)try{block.permutation.withState(keyName,v);max=v}catch{break}
- if(max<=current)return false;
- let next=current;
- for(let pass=0;pass<2;pass++)next=Math.min(max,next+2+Math.floor(Math.random()*4));
- try{block.setPermutation(block.permutation.withState(keyName,next))}catch{return false}
- if(!creative(p))decHand(p,hand,1);
- try{block.dimension.spawnParticle('minecraft:crop_growth_emitter',{x:block.x+.5,y:block.y+.5,z:block.z+.5})}catch{}
- return true;
-}
-
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
  try{
   const b=e.block,p=e.player,intent=captureInteractionIntent(p,e.itemStack),hand=intent.hand,item=held(p,hand),first=isInitialBlockPress(e.isFirstEvent);
@@ -307,8 +294,17 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
    const target=targetFor(b,e.blockFace);if(replaceable(target)){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location},face=e.blockFace;defer(()=>{const current=held(p,hand);if(current?.typeId===BIG_VAT_ID)placePackedVat(dim.getBlock(loc),face,p,current,hand)});return}
   }
   if(item?.typeId===OIL_RESIDUE_ID){
-   let can=false;try{const states=b.permutation.getAllStates();can=['growth','minecraft:growth','age','minecraft:age'].some(k=>typeof states[k]==='number')}catch{}
-   if(can){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location};defer(()=>doubleCropGrowth(dim.getBlock(loc),p,hand));return}
+   if(hasPlantFertilizer(b)){
+    e.cancel=true;if(!first)return;
+    const dim=b.dimension,loc={...b.location},before=b.permutation;
+    defer(()=>{
+     try{
+      const target=dim.getBlock(loc);
+      if(held(p,hand)?.typeId!==OIL_RESIDUE_ID||!target||!samePlantPermutation(target.permutation,before))return;
+      usePlantFertilizer(target,p,hand);
+     }catch{}
+    });return;
+   }
   }
  }catch{}
 });

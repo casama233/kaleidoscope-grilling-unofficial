@@ -1,8 +1,9 @@
 # 煙火目前缺口與待重現問題
 
-Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.117，2026-10-08。
+Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.118，2026-10-08。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
-G116承接餐盤營養界限與防誤食；G117修復瓶爆炸取消及手持提前結算界限。其他功能原型仍分開保留，真人驗收待完成。
+G116承接餐盤營養界限與防誤食；G117修復瓶爆炸取消及手持提前結算界限。
+G118補本日一比一稽核的核心、農業與容器機制差異；完整逐項狀態見[G118](STATUS-A2.8.118.md)。真人驗收仍待完成。
 現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
 
 ## SKEWER-GUI：任意食材秘製串 inventory icon
@@ -95,18 +96,22 @@ G116 `a25_plate_recipe_runtime.js` 已承接
 
 ## PLATE-PLACED-DISPLAY：已放置餐盤缺完整內容投影
 
-**狀態：來源確認相關功能未入主幹；舊原生候選有 tiny-edge-pixel／朝向問題。**
+**狀態：G118新增專用來源實作與回歸；本候選原生／client復驗待完成。舊原生候選的 tiny-edge-pixel／朝向問題保留其原身份。**
 
 重現：餐盤插入普通熟牛肉串與秘製串，按1–5份、四朝向放置；
 立即查看、取出一份、再載入區塊，記錄是否顯示完整串及原作布局。
 Java 預期：顯示真實內容、對應布局與 source FIXED transform；成功交易後更新一次，失敗不改顯示。
 
-current renderer 仍走 generic equipment／composed 路由，沒有獨立 `plate_visual_core.js`。
-有效來源分散在 [PR146](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/146)、
+G118的`plate_recipe_visual_core.js`及`plate_food_visual`讀取目前保存的固定／秘製串，
+共用現行烤架mesh與palette，按原作布局、FIXED變換及四朝向定位。成功交易後排入有界更新，
+只有確認helper移除後才釋放配額；重載重新從保存資料索引。普通／外部物品仍有明列後備路徑。
+source／API doubles不能接受原生畫面；實際四朝向、1–5份及重載需重測，見[G118](STATUS-A2.8.118.md)。
+
+歷史來源分散在 [PR146](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/146)、
 [PR147](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/147)、
 [PR149](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/149)、
 [PR152](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/152)。
-重新整合時保留當前 palette、ownership 和後續修補，不用舊發版 artifact 覆蓋。
+本次保留當前 palette、ownership 和後續修補，未用舊發版 artifact 覆蓋。
 
 ## PLATE-HELD-CONTENTS／DECODE：未入主幹的手持餐盤原型
 

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    118
+  ],
+  "reviewed_commit": "4a75af7ca1b54d30a2f877593c55a0f535423baf",
+  "scope": "Exactly the reviewed G117 -> G118 main.js changes: F10 start-duration snapshots and custom hot-effect extension; F15 whole-batch native-compatible grill delivery; F16 operation-specific Creative oil and seasoning consumption. Preserve the complete G117 preimage, every earlier delta, and all other main.js bytes. This source witness does not add native or client acceptance.",
+  "before_sha256": "49e540b9628a7444566b97cf2d2bd30e5e6c910b4b12bb4aed6007632bb6dc4a",
+  "after_sha256": "0feca3e6bf760fe808e610494ccf91ad3130e15f5cf281e6f39910de616899b8",
+  "operations": [
+    {
+      "start": 2805,
+      "end": 2856,
+      "before": "import {slotWrite} from './rack_transfer_plan.js';\n",
+      "after": "import {slotWrite,planInventoryInsert} from './rack_transfer_plan.js';\n"
+    },
+    {
+      "start": 15740,
+      "end": 15826,
+      "before": " const storage=captureWritableHand(player,hand),mutate=mutateHand&&!creative(player);\n",
+      "after": " // The operation planner owns Creative rules: durability is exempt, while\n // Java brushing and seasoning consume their tool contents in either mode.\n const storage=captureWritableHand(player,hand),mutate=mutateHand;\n"
+    },
+    {
+      "start": 32667,
+      "end": 32750,
+      "before": " const empty=[];for(let i=0;i<target.size;i++)if(!target.getItem(i))empty.push(i);\n",
+      "after": " // Reserve native-compatible stacks and empty slots for the whole batch before\n // debiting the grill. Heat/creator exceptions belong only to manual sorting.\n const planned=Array.from({length:target.size},(_,i)=>target.getItem(i)?.clone()),changed=new Set(),drops=[];\n const view={size:target.size,getItem:i=>planned[i]?.clone(),setItem(i,stack){planned[i]=stack?.clone();changed.add(i)}};\n for(const {output} of rows){\n  const delivery=planInventoryInsert(view,output);\n  for(const step of delivery.steps)step.apply();\n  if(delivery.remainder)drops.push(delivery.remainder);\n }\n"
+    },
+    {
+      "start": 32811,
+      "end": 32987,
+      "before": " for(const row of rows){const slot=empty.shift();steps.push(slot!==undefined?slotWrite(target,slot,row.output):acknowledgedDrop(player.dimension,row.output,player.location));}\n",
+      "after": " for(const slot of changed)steps.push(slotWrite(target,slot,planned[slot]));\n for(const drop of drops)steps.push(acknowledgedDrop(player.dimension,drop,player.location));\n"
+    },
+    {
+      "start": 35167,
+      "end": 35267,
+      "before": " if(creative(player))return {...oil,heat,remaining:oil.count,next:oil.before.clone(),mutate:false};\n",
+      "after": " // Java's player brushOil call consumes one oil point per occupied slot in Creative too.\n"
+    },
+    {
+      "start": 59937,
+      "end": 60016,
+      "before": "function fxSnapshot(entity){return JSON.parse(JSON.stringify(readFx(entity)))}\n",
+      "after": "function fxSnapshot(entity){\n const out={},t=now();\n for(const [name,v] of Object.entries(readFx(entity)))out[name]={duration:Math.max(0,v.until-t)};\n return out;\n}\n"
+    },
+    {
+      "start": 60494,
+      "end": 60779,
+      "before": "function doubleNewFx(player,before){const current=readFx(player),t=now();for(const [name,v] of Object.entries(current)){if(name==='invincible')continue;const old=before[name]?.until??t;if(v.until<=old)continue;v.until=old>t?old+(v.until-old)*2:t+(v.until-t)*2}writeFx(player,current)}\n",
+      "after": "function doubleNewFx(player,before){\n const current=readFx(player),t=now();\n for(const [name,v] of Object.entries(current)){\n  if(name==='invincible')continue;\n  // Java compares completion-time remaining duration with the start snapshot,\n  // so time spent eating cannot become an additional hot-food reward.\n  const old=before[name]?.duration??0,duration=Math.max(0,v.until-t);\n  if(duration<=old)continue;\n  v.until=t+old+(duration-old)*2;\n }\n writeFx(player,current);\n}\n"
+    }
+  ]
+}

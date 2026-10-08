@@ -1,9 +1,11 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.117
+## Current maintained baseline: 2.8.118
 
-[G117保存與手持營養修補](docs/STATUS-A2.8.117.md)：尊重較後的爆炸取消，並在提前食用結算時刷新飽和度界限。
-保留[G116餐盤營養與插串防誤食](docs/STATUS-A2.8.116.md)；放置／手持餐盤視覺工作仍分開追蹤。
+[G118機制對照修補](docs/STATUS-A2.8.118.md)：補串譜與廚具架保存、施肥／凋葉、原作配方、
+熱食效果與合併、烤架出料及放置支撐，新增放置餐盤內容與牆上串譜結果顯示。
+承接[G117手持營養與瓶保存](docs/STATUS-A2.8.117.md)
+和[G116餐盤營養與插串防誤食](docs/STATUS-A2.8.116.md)。聲畫與真人驗收範圍仍分開記錄。
 
 森羅物語：煙火的非官方基岩版移植。目標是跟隨 Java 原作，保留其玩法與沉浸體驗；**完整一比一移植與現行真人驗收仍未完成**。
 

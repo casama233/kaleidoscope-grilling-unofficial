@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.47",
+  "version": "0.3.48",
   "revision": "kg-guide-a3-2875",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -842,13 +842,16 @@
       },
       "body": {
         "zh_CN": [
-          "种植与用途：折耳根可种植；可切成碎折耳根，或用于凉拌折耳根与炒肉。初始种源请按当前世界生成情况确认。"
+          "种植与用途：折耳根可种植；可切成碎折耳根，或用于凉拌折耳根与炒肉。初始种源请按当前世界生成情况确认。",
+          "折耳根也可放入堆肥桶；每份有 65% 机会增加一层堆肥。"
         ],
         "zh_TW": [
-          "種植與用途：折耳根可種植；可切成碎折耳根，或用於涼拌折耳根與炒肉。初始種源請按目前世界生成情況確認。"
+          "種植與用途：折耳根可種植；可切成碎折耳根，或用於涼拌折耳根與炒肉。初始種源請按目前世界生成情況確認。",
+          "折耳根也可放入堆肥桶；每份有 65% 機會增加一層堆肥。"
         ],
         "en_US": [
-          "Farming and use: Houttuynia can be planted, chopped, used in Cold Houttuynia or stir-fried pork. Initial access depends on the current world-generation setup."
+          "Farming and use: Houttuynia can be planted, chopped, used in Cold Houttuynia or stir-fried pork. Initial access depends on the current world-generation setup.",
+          "Houttuynia can also go into a Composter. Each item has a 65% chance to raise the compost level by one."
         ]
       },
       "kinds": [
@@ -1118,13 +1121,22 @@
       },
       "body": {
         "zh_CN": [
-          "取得与使用：榨油副产物；对具有受支持生长阶段的作物使用可促进生长。"
+          "油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。",
+          "目前支持 8 类植物：油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。其他植物目前不能用油渣催生。",
+          "一次有效使用合计只消耗 1 个油渣；成熟作物和不受支持的目标不消耗，创造模式也不消耗。",
+          "花椒树苗每次施肥有 45% 机会推进生长；即使两次都没有长大，有效使用仍会消耗 1 个油渣。"
         ],
         "zh_TW": [
-          "取得與使用：榨油副產物；對具有受支援生長階段的作物使用可促進生長。"
+          "油渣是榨油副產物，每批可得到 4 個。對支援的植物使用時，會連續嘗試 2 次骨粉施肥，每次都遵循該植物自己的生長規則。",
+          "目前支援 8 類植物：油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。其他植物目前不能用油渣催生。",
+          "一次有效使用合計只消耗 1 個油渣；成熟作物和不受支援的目標不消耗，創造模式也不消耗。",
+          "花椒樹苗每次施肥有 45% 機會推進生長；即使兩次都沒有長大，有效使用仍會消耗 1 個油渣。"
         ],
         "en_US": [
-          "Acquisition and use: an oil-press by-product. Use it on crops with supported growth states to advance their growth."
+          "Oil Residue is an oil-press by-product, with 4 produced per batch. Using it on a supported plant makes 2 consecutive bone-meal attempts, each following that plant's own growth rules.",
+          "Currently supports 8 plant types: Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes. Other plants cannot currently be fertilized with Oil Residue.",
+          "A valid use consumes only 1 Oil Residue in total. Fully grown crops and unsupported targets consume none; Creative mode also consumes none.",
+          "Each application on a pepper sapling has a 45% chance to advance growth. A valid use still consumes 1 Oil Residue even if neither attempt makes the sapling grow."
         ]
       },
       "kinds": [
@@ -1133,7 +1145,11 @@
       "recipes": [],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/oil_residue.json",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_runtime.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_runtime.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/plant_fertilizer.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2731_farmland_crop_host_runtime.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2714_houttuynia_crop_runtime.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/oil_residue",
@@ -2923,24 +2939,27 @@
       "body": {
         "zh_CN": [
           "先制作油饼：8 份菜籽粉围住 1 个小麦，可得到 1 个油饼；榨油器必须先装满 4 个油饼。",
-          "榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。",
+          "榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。达到 16 点后，还需等待 10 游戏刻（约 0.5 秒）才会出油。",
           "完成一批会输出 4 桶菜籽油和 4 个油渣，但附近必须有能一次接下 4 桶菜籽油的大缸。",
           "没有大缸、大缸已满或装着别的流体时，机器会等待；处理容器后再次使用即可重试。",
-          "工作台图样（空位为 ·）：\nLIL\nF·F\nLHL\nL = 任意原木；I = 铁锭；F = 橡木栅栏；H = 漏斗"
+          "工作台图样（空位为 ·）：\nLIL\nF·G\nLHL\nL = 任意原木；I = 铁锭；F、G = 下列任意栅栏，可混搭；H = 漏斗",
+          "支持 12 种原版栅栏：橡木、云杉木、白桦木、丛林木、金合欢木、深色橡木、红树木、樱花木、竹、绯红、诡异和下界砖栅栏。左右两格可以使用不同种类。"
         ],
         "zh_TW": [
           "先製作油餅：8 份菜籽粉圍住 1 個小麥，可得到 1 個油餅；榨油器必須先裝滿 4 個油餅。",
-          "榨油進度需要 16 點：鐵砧每次推進 4 點；石頭、圓石、深板岩、深板岩圓石或黑石每次推進 1 點。",
+          "榨油進度需要 16 點：鐵砧每次推進 4 點；石頭、圓石、深板岩、深板岩圓石或黑石每次推進 1 點。達到 16 點後，還需等待 10 遊戲刻（約 0.5 秒）才會出油。",
           "完成一批會輸出 4 桶菜籽油和 4 個油渣，但附近必須有能一次接下 4 桶菜籽油的大缸。",
           "沒有大缸、大缸已滿或裝著別的流體時，機器會等待；處理容器後再次使用即可重試。",
-          "工作台圖樣（空位為 ·）：\nLIL\nF·F\nLHL\nL = 任意原木；I = 鐵錠；F = 橡木柵欄；H = 漏斗"
+          "工作台圖樣（空位為 ·）：\nLIL\nF·G\nLHL\nL = 任意原木；I = 鐵錠；F、G = 下列任意柵欄，可混搭；H = 漏斗",
+          "支援 12 種原版柵欄：橡木、杉木、樺木、叢林木、相思木、黑橡木、紅樹林木、櫻花木、竹、緋紅、扭曲和地獄磚柵欄。左右兩格可以使用不同種類。"
         ],
         "en_US": [
           "First make Oil Cake: surround 1 Wheat with 8 Canola Powder. The Oil Press must be loaded with all 4 cakes before pressing.",
-          "A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press.",
+          "A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press. After reaching 16, wait another 10 game ticks (about 0.5 seconds) for the oil.",
           "A completed batch produces 4 buckets of Canola Oil and 4 Oil Residue, but a nearby Big Vat must be able to accept all 4 buckets at once.",
           "If no vat is available, it is full, or it contains another fluid, the press waits. Fix the container and interact again to retry.",
-          "Crafting-table pattern (· = empty):\nLIL\nF·F\nLHL\nL = Any log；I = Iron Ingot；F = Oak Fence；H = Hopper"
+          "Crafting-table pattern (· = empty):\nLIL\nF·G\nLHL\nL = Any log; I = Iron Ingot; F and G = Any supported fences, including mixed types; H = Hopper",
+          "Supports 12 vanilla fence types: Oak, Spruce, Birch, Jungle, Acacia, Dark Oak, Mangrove, Cherry, Bamboo, Crimson, Warped, and Nether Brick. The two fence slots may use different types."
         ]
       },
       "kinds": [
@@ -2950,8 +2969,10 @@
       "recipes": [],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/blocks/oil_press.json",
-        "projects/grilling/guide/content.a2.json#guide_oil_press",
-        "projects/grilling/gameplay_core/behavior_pack/recipes/oil_press.json"
+        "projects/grilling/gameplay_core/behavior_pack/recipes/oil_press.json",
+        "projects/grilling/gameplay_core/behavior_pack/recipes/oil_press_fences/oil_press_bamboo_nether_brick.json",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_runtime.js"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/oil_press",
@@ -2972,24 +2993,24 @@
       "body": {
         "zh_CN": [
           "大缸容量为 8 桶，一次只能保存一种流体；支持水、熔岩、菜籽油、秘制辣椒油和高级辣椒油。",
-          "用对应的桶可灌入或取出；空手使用会显示当前流体与桶数。",
+          "用对应的桶可灌入或取出；空手使用可查看当前桶数与容量。",
           "三种烟火油可以直接灌入 Cookery 油壶：每消耗 1 桶，为油壶增加 8 点油。",
           "打掉装有内容的大缸时，掉落的大缸会保存流体种类与桶数，再次放置可恢复。",
-          "工作台图样（空位为 ·）：\nB·B\nBUB\nBBB\nB = 红砖块；U = 桶"
+          "用 7 颗红砖和 1 个桶合成。工作台图样（空位为 ·）：\nB·B\nBUB\nBBB\nB = 红砖；U = 桶"
         ],
         "zh_TW": [
           "大缸容量為 8 桶，一次只能保存一種流體；支援水、熔岩、菜籽油、秘製辣椒油和高級辣椒油。",
-          "用對應的桶可灌入或取出；空手使用會顯示目前流體與桶數。",
+          "用對應的桶可灌入或取出；空手使用可查看目前桶數與容量。",
           "三種煙火油可以直接灌入 Cookery 油壺：每消耗 1 桶，為油壺增加 8 點油。",
           "打掉裝有內容的大缸時，掉落的大缸會保存流體種類與桶數，再次放置可恢復。",
-          "工作台圖樣（空位為 ·）：\nB·B\nBUB\nBBB\nB = 紅磚塊；U = 桶"
+          "用 7 顆紅磚和 1 個桶合成。工作台圖樣（空位為 ·）：\nB·B\nBUB\nBBB\nB = 紅磚；U = 桶"
         ],
         "en_US": [
           "A Big Vat holds 8 buckets and only one fluid type at a time: water, lava, Canola Oil, Secret Chili Oil, or Premium Chili Oil.",
-          "Use the matching bucket to fill or extract it; use an empty hand to view its current fluid and bucket count.",
+          "Use the matching bucket to fill or extract it; use an empty hand to view its current bucket count and capacity.",
           "The three Grilling oils can fill a Cookery Oil Pot directly: each vat bucket adds 8 oil points.",
           "Breaking a filled vat preserves its fluid type and amount on the dropped vat item; placing it again restores the contents.",
-          "Crafting-table pattern (· = empty):\nB·B\nBUB\nBBB\nB = Bricks；U = Bucket"
+          "Craft with 7 Brick items and 1 Bucket. Crafting-table pattern (· = empty):\nB·B\nBUB\nBBB\nB = Brick; U = Bucket"
         ]
       },
       "kinds": [
@@ -2999,8 +3020,9 @@
       "recipes": [],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/blocks/big_vat.json",
-        "projects/grilling/guide/content.a2.json#guide_big_vat",
-        "projects/grilling/gameplay_core/behavior_pack/recipes/big_vat.json"
+        "projects/grilling/gameplay_core/behavior_pack/recipes/big_vat.json",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a26_oil_machine_runtime.js"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/big_vat",
@@ -3020,22 +3042,28 @@
       },
       "body": {
         "zh_CN": [
-          "花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生。",
+          "花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生；油渣会连续尝试施肥两次。",
           "结果的花椒树叶空手采收会掉落 1–2 份花椒，并恢复为未结果状态。",
           "花椒树叶带刺：踩上去会短暂减速并造成伤害；狐狸和蜜蜂不会被刺。",
-          "取得：破坏花椒树叶可能掉落树苗；剪刀或精准采集可取得叶块。花椒原木可合成 4 块橡木木板。"
+          "取得：破坏花椒树叶可能掉落树苗；剪刀或精准采集可取得叶块。花椒原木可合成 4 块橡木木板。",
+          "自然长出的树叶失去附近花椒原木的支撑后会凋落：有 10% 机会掉落树苗、2% 机会掉落木棍；结果的叶子还会掉落 1 份花椒。玩家放置的叶子不会自然凋落。",
+          "花椒树苗和树叶都可放入堆肥桶；每份有 30% 机会增加一层堆肥。"
         ],
         "zh_TW": [
-          "花椒樹苗種在泥土類方塊上；光照達到 9 以上會隨機生長，骨粉也可嘗試催生。",
+          "花椒樹苗種在泥土類方塊上；光照達到 9 以上會隨機生長，骨粉也可嘗試催生；油渣會連續嘗試施肥兩次。",
           "結果的花椒樹葉空手採收會掉落 1–2 份花椒，並恢復為未結果狀態。",
           "花椒樹葉帶刺：踩上去會短暫減速並造成傷害；狐狸和蜜蜂不會被刺。",
-          "取得：破壞花椒樹葉可能掉落樹苗；剪刀或精準採集可取得葉塊。花椒原木可合成 4 塊橡木木板。"
+          "取得：破壞花椒樹葉可能掉落樹苗；剪刀或精準採集可取得葉塊。花椒原木可合成 4 塊橡木木板。",
+          "自然長出的樹葉失去附近花椒原木的支撐後會凋落：有 10% 機會掉落樹苗、2% 機會掉落木棒；結果的葉子還會掉落 1 份花椒。玩家放置的葉子不會自然凋落。",
+          "花椒樹苗和樹葉都可放入堆肥桶；每份有 30% 機會增加一層堆肥。"
         ],
         "en_US": [
-          "Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly, and Bone Meal can also attempt to advance growth.",
+          "Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly. Bone Meal can attempt to advance growth; Oil Residue makes two consecutive attempts.",
           "Use an empty hand on fruiting leaves to harvest 1–2 Sichuan Pepper, returning the leaves to an unfruited state.",
           "Pepper leaves sting: stepping on them briefly slows and damages entities, except foxes and bees.",
-          "Acquisition: pepper leaves can drop saplings; shears or Silk Touch recover the leaf block. A pepper log crafts into 4 oak planks."
+          "Acquisition: pepper leaves can drop saplings; shears or Silk Touch recover the leaf block. A pepper log crafts into 4 oak planks.",
+          "Naturally grown leaves decay when no nearby pepper log supports them. Decay has a 10% chance to drop a sapling and a 2% chance to drop a stick; fruiting leaves also drop 1 Sichuan Pepper. Player-placed leaves do not decay.",
+          "Pepper saplings and leaves can both go into a Composter. Each item has a 30% chance to raise the compost level by one."
         ]
       },
       "kinds": [
@@ -3045,8 +3073,12 @@
       "recipes": [],
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/blocks/pepper_sapling.json",
-        "projects/grilling/guide/content.a2.json#guide_pepper_tree",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js"
+        "projects/grilling/gameplay_core/behavior_pack/items/pepper_sapling.json",
+        "projects/grilling/gameplay_core/behavior_pack/items/pepper_leaves.json",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/plant_fertilizer.js",
+        "projects/grilling/gameplay_core/behavior_pack/recipes/oak_planks_from_pepper_log.json"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/pepper_sapling",

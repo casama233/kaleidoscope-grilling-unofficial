@@ -468,6 +468,7 @@ guide.kg.name.kaleidoscope_grilling:green_pepper_squid_tentacles=青椒炒鱿鱼
 guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.1=操作：按 Cookery 炒锅流程加油、投入配方食材，加热 10 秒后以碗盛出。
 guide.kg.name.kaleidoscope_grilling:houttuynia=折耳根
 guide.kg.body.kaleidoscope_grilling:houttuynia.1=种植与用途：折耳根可种植；可切成碎折耳根，或用于凉拌折耳根与炒肉。初始种源请按当前世界生成情况确认。
+guide.kg.body.kaleidoscope_grilling:houttuynia.2=折耳根也可放入堆肥桶；每份有 65% 机会增加一层堆肥。
 guide.kg.name.kaleidoscope_grilling:houttuynia_powder=折耳根粉
 guide.kg.body.kaleidoscope_grilling:houttuynia_powder.1=没有折耳根粉时，常规调料效果基础持续约 3 分钟。
 guide.kg.body.kaleidoscope_grilling:houttuynia_powder.2=加入 1–3 份折耳根粉会把调料效果时间 ×2；达到 4 份或更多时 ×4。
@@ -483,7 +484,10 @@ guide.kg.name.kaleidoscope_grilling:oil_cake=油饼
 guide.kg.body.kaleidoscope_grilling:oil_cake.1=工作台图样（空位为 ·）：\nPPP\nPWP\nPPP\nP = 菜籽粉；W = 小麦
 guide.kg.body.kaleidoscope_grilling:oil_cake.2=用途：4 个油饼装满一台榨油器；完整一批产 4 桶菜籽油与 4 个油渣。
 guide.kg.name.kaleidoscope_grilling:oil_residue=油渣
-guide.kg.body.kaleidoscope_grilling:oil_residue.1=取得与使用：榨油副产物；对具有受支持生长阶段的作物使用可促进生长。
+guide.kg.body.kaleidoscope_grilling:oil_residue.1=油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。
+guide.kg.body.kaleidoscope_grilling:oil_residue.2=目前支持 8 类植物：油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。其他植物目前不能用油渣催生。
+guide.kg.body.kaleidoscope_grilling:oil_residue.3=一次有效使用合计只消耗 1 个油渣；成熟作物和不受支持的目标不消耗，创造模式也不消耗。
+guide.kg.body.kaleidoscope_grilling:oil_residue.4=花椒树苗每次施肥有 45% 机会推进生长；即使两次都没有长大，有效使用仍会消耗 1 个油渣。
 guide.kg.name.kaleidoscope_grilling:onion=洋葱
 guide.kg.body.kaleidoscope_grilling:onion.1=取得与种植：戴 Cookery 草帽在生存模式打短草，有机会取得；种在耕地上，成熟后收获。
 guide.kg.name.kaleidoscope_grilling:onion_powder=洋葱粉
@@ -592,21 +596,24 @@ guide.kg.body.kaleidoscope_grilling:grill.7=如果暂时不想继续，先用铲
 guide.kg.body.kaleidoscope_grilling:grill.8=服务器可选择原版食用模式：关闭独立进食动画后，烤串以 1.25 秒完成原生食用，不播放专属音效与进度条；松开取消不会额外扣串。
 guide.kg.name.kaleidoscope_grilling:oil_press=榨油器
 guide.kg.body.kaleidoscope_grilling:oil_press.1=先制作油饼：8 份菜籽粉围住 1 个小麦，可得到 1 个油饼；榨油器必须先装满 4 个油饼。
-guide.kg.body.kaleidoscope_grilling:oil_press.2=榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。
+guide.kg.body.kaleidoscope_grilling:oil_press.2=榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。达到 16 点后，还需等待 10 游戏刻（约 0.5 秒）才会出油。
 guide.kg.body.kaleidoscope_grilling:oil_press.3=完成一批会输出 4 桶菜籽油和 4 个油渣，但附近必须有能一次接下 4 桶菜籽油的大缸。
 guide.kg.body.kaleidoscope_grilling:oil_press.4=没有大缸、大缸已满或装着别的流体时，机器会等待；处理容器后再次使用即可重试。
-guide.kg.body.kaleidoscope_grilling:oil_press.5=工作台图样（空位为 ·）：\nLIL\nF·F\nLHL\nL = 任意原木；I = 铁锭；F = 橡木栅栏；H = 漏斗
+guide.kg.body.kaleidoscope_grilling:oil_press.5=工作台图样（空位为 ·）：\nLIL\nF·G\nLHL\nL = 任意原木；I = 铁锭；F、G = 下列任意栅栏，可混搭；H = 漏斗
+guide.kg.body.kaleidoscope_grilling:oil_press.6=支持 12 种原版栅栏：橡木、云杉木、白桦木、丛林木、金合欢木、深色橡木、红树木、樱花木、竹、绯红、诡异和下界砖栅栏。左右两格可以使用不同种类。
 guide.kg.name.kaleidoscope_grilling:big_vat=大缸
 guide.kg.body.kaleidoscope_grilling:big_vat.1=大缸容量为 8 桶，一次只能保存一种流体；支持水、熔岩、菜籽油、秘制辣椒油和高级辣椒油。
-guide.kg.body.kaleidoscope_grilling:big_vat.2=用对应的桶可灌入或取出；空手使用会显示当前流体与桶数。
+guide.kg.body.kaleidoscope_grilling:big_vat.2=用对应的桶可灌入或取出；空手使用可查看当前桶数与容量。
 guide.kg.body.kaleidoscope_grilling:big_vat.3=三种烟火油可以直接灌入 Cookery 油壶：每消耗 1 桶，为油壶增加 8 点油。
 guide.kg.body.kaleidoscope_grilling:big_vat.4=打掉装有内容的大缸时，掉落的大缸会保存流体种类与桶数，再次放置可恢复。
-guide.kg.body.kaleidoscope_grilling:big_vat.5=工作台图样（空位为 ·）：\nB·B\nBUB\nBBB\nB = 红砖块；U = 桶
+guide.kg.body.kaleidoscope_grilling:big_vat.5=用 7 颗红砖和 1 个桶合成。工作台图样（空位为 ·）：\nB·B\nBUB\nBBB\nB = 红砖；U = 桶
 guide.kg.name.kaleidoscope_grilling:pepper_sapling=花椒树
-guide.kg.body.kaleidoscope_grilling:pepper_sapling.1=花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生。
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.1=花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生；油渣会连续尝试施肥两次。
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.2=结果的花椒树叶空手采收会掉落 1–2 份花椒，并恢复为未结果状态。
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.3=花椒树叶带刺：踩上去会短暂减速并造成伤害；狐狸和蜜蜂不会被刺。
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.4=取得：破坏花椒树叶可能掉落树苗；剪刀或精准采集可取得叶块。花椒原木可合成 4 块橡木木板。
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.5=自然长出的树叶失去附近花椒原木的支撑后会凋落：有 10% 机会掉落树苗、2% 机会掉落木棍；结果的叶子还会掉落 1 份花椒。玩家放置的叶子不会自然凋落。
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.6=花椒树苗和树叶都可放入堆肥桶；每份有 30% 机会增加一层堆肥。
 guide.kg.name.minecraft:redstone=红石粉
 guide.kg.body.minecraft:redstone.1=调料中有 1–3 份红石：趁热食用时获得速度 I，基础持续约 3 分钟。
 guide.kg.body.minecraft:redstone.2=达到 4 份或更多红石时提升为速度 II。
