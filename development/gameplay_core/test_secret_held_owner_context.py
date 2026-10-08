@@ -11,6 +11,7 @@ BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
 sys.path.insert(0, str(ROOT / 'tools'))
 from public_source_witness import assert_public_bytes, public_json
 from secret_skewer_assets import held_geometries, partial_geometries, slot_cubes, shaft_cubes
+from held_visual_channels import WORD_A_MAX, WORD_B_MAX
 from test_eating_observer_projection import node
 
 
@@ -51,7 +52,7 @@ class SecretHeldOwnerContextTests(unittest.TestCase):
                 self.assertIn('c.owning_entity->q.has_property', statement)
                 self.assertIn(', 0, 5333)', statement)
                 for hand in ('main', 'off'):
-                    self.assertEqual(props[f'kaleidoscope_grilling:secret_{hand}_{i}']['range'], [0, 5333])
+                    self.assertEqual(props[f'kaleidoscope_grilling:secret_{hand}_{i}']['range'], [0, (WORD_A_MAX, WORD_B_MAX, 5333)[i]])
             for hand in ('main', 'off'):
                 self.assertEqual(props[f'kaleidoscope_grilling:secret_{hand}_piece']['range'], [0, 255])
 
@@ -129,7 +130,9 @@ for (const terminalWait of [0, 1]) for (const empty of [false, true]) {
   if (v['kg_secret_style_' + i] !== Math.floor(expected[i] / 768)) throw Error('Wrong owner stage');
  }
  const complete = !d.identifier.endsWith(':unfinished_skewer');
+ const marker = ownerPresent && !empty ? values['kaleidoscope_grilling:secret_' + hand + '_piece'] : 0;
  const occupied = ownerPresent && exactItem && selectedWeapon === weapon &&
+  marker >= 0 && marker <= 213 &&
   (!complete || (expected.some(value => value > 0) && terminalWait === 0));
  if (Boolean(v.kg_secret_owner_occupied) !== occupied) throw Error('Owner identity/hand/empty/terminal guard escaped');
  if (complete) {

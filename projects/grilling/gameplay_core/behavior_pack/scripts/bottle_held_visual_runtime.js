@@ -1,10 +1,9 @@
-import {world,system} from '@minecraft/server';
 import {getMainHand,getOffHand} from './a2735_player_io.js';
 import {getItemProperty} from './itemData.js';
 import {SEASONING_LIST_KEY,normalizeSeasoningList} from './a2743_seasoning_contract_core.js';
 import {bottleHeldVisualPlan,isBottleHeldVisualItem} from './bottle_held_visual_core.js';
-
-const signatures=new Map();
+import {heldVisualKind,writeHeldVisual,invalidateHeldVisual,HELD_VISUAL_BOTTLE,HELD_VISUAL_EMPTY} from './held_visual_transport.js';
+import {registerHeldVisualProvider,reportHeldVisualError} from './held_visual_dispatch_runtime.js';
 
 export function readBottleHeldSeasonings(stack){
  if(!isBottleHeldVisualItem(stack?.typeId))return [];
@@ -15,25 +14,15 @@ export function readBottleHeldSeasonings(stack){
 
 // Derived client properties only; never replace or write a held ItemStack.
 export function syncBottleHeld(player){
- const rows={};
- for(const [hand,stack] of [['main',getMainHand(player)],['off',getOffHand(player)]]){
+ for(const [hand,read] of [['main',getMainHand],['off',getOffHand]])try{
+  const stack=read(player),kind=heldVisualKind(stack?.typeId);
+  if(kind==='empty'){writeHeldVisual(player,hand,'empty',HELD_VISUAL_EMPTY);continue;}
+  if(kind!=='bottle')continue;
   const plan=bottleHeldVisualPlan(stack?.typeId,readBottleHeldSeasonings(stack));
-  for(let i=0;i<plan.length;i++)rows['kaleidoscope_grilling:bottle_'+hand+'_'+i]=plan[i];
+  writeHeldVisual(player,hand,'bottle',[...plan,0,0,0,HELD_VISUAL_BOTTLE]);
+ }catch(error){
+  try{invalidateHeldVisual(player,hand)}catch{}
+  reportHeldVisualError('bottle contents '+hand,player,error);
  }
- const signature=JSON.stringify(rows);
- if(signatures.get(player.id)===signature)return;
- // A failed write can leave some properties updated. Invalidate the old cache
- // before writing, so reverting hands also retries a complete projection.
- signatures.delete(player.id);
- for(const [key,value] of Object.entries(rows))player.setProperty(key,value);
- signatures.set(player.id,signature);
 }
-
-function syncSafely(player){
- try{syncBottleHeld(player)}catch(error){console.warn('[Grilling held bottle contents] '+error)}
-}
-
-world.afterEvents.playerInventoryItemChange.subscribe(e=>system.run(()=>syncSafely(e.player)));
-world.afterEvents.playerHotbarSelectedSlotChange.subscribe(e=>system.run(()=>syncSafely(e.player)));
-world.afterEvents.playerLeave.subscribe(e=>signatures.delete(e.playerId));
-system.runInterval(()=>{for(const player of world.getAllPlayers())syncSafely(player)},5);
+registerHeldVisualProvider('bottle contents',syncBottleHeld);

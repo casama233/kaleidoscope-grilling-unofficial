@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.48",
+  "version": "0.3.49",
   "revision": "kg-guide-a3-2875",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -1120,23 +1120,32 @@
         "en_US": "Oil Residue"
       },
       "body": {
-        "zh_CN": [
-          "油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。",
-          "目前支持 8 类植物：油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。其他植物目前不能用油渣催生。",
-          "一次有效使用合计只消耗 1 个油渣；成熟作物和不受支持的目标不消耗，创造模式也不消耗。",
-          "花椒树苗每次施肥有 45% 机会推进生长；即使两次都没有长大，有效使用仍会消耗 1 个油渣。"
-        ],
         "zh_TW": [
           "油渣是榨油副產物，每批可得到 4 個。對支援的植物使用時，會連續嘗試 2 次骨粉施肥，每次都遵循該植物自己的生長規則。",
-          "目前支援 8 類植物：油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。其他植物目前不能用油渣催生。",
-          "一次有效使用合計只消耗 1 個油渣；成熟作物和不受支援的目標不消耗，創造模式也不消耗。",
-          "花椒樹苗每次施肥有 45% 機會推進生長；即使兩次都沒有長大，有效使用仍會消耗 1 個油渣。"
+          "支援油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。",
+          "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草與蕨。其他植物仍需各自適配。",
+          "一次有效使用總共只消耗 1 個油渣；已無可用施肥作用或不受支援的目標不消耗，創造模式也不消耗。花椒苗每次有 45% 機會推進生長，兩次都沒長大、短草上方被堵而沒長大，仍算有效使用。",
+          "主手非潛行對已有果實的甜莓使用時，會先採果而不扣油渣。潛行或實際副手使用時，未完全成熟的甜莓仍可施肥；完全成熟時不扣料。",
+          "可可每次長一階；洞穴藤只結發光莓，不延長。短草與蕨上方有空間時長成雙高植物。",
+          "完整雙高花每次作用掉 1 朵同種花；粉紅花簇未滿時增加一份，已滿時掉 1 份。滿花簇或雙高花一次油渣可掉 2 份；關閉方塊掉落時不產出，但仍消耗一次油渣。"
+        ],
+        "zh_CN": [
+          "油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。",
+          "支持油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。",
+          "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草与蕨。其他植物仍需各自适配。",
+          "一次有效使用总共只消耗 1 个油渣；已无可用施肥作用或不受支持的目标不消耗，创造模式也不消耗。花椒苗每次有 45% 机会推进生长，两次都没长大、短草上方被堵而没长大，仍算有效使用。",
+          "主手非潜行对已有果实的甜莓使用时，会先采果而不扣油渣。潜行或实际副手使用时，未完全成熟的甜莓仍可施肥；完全成熟时不扣料。",
+          "可可每次长一阶；洞穴藤只结发光浆果，不延长。短草与蕨上方有空间时长成双高植物。",
+          "完整双高花每次作用掉 1 朵同种花；粉红色花簇未满时增加一份，已满时掉 1 份。满花簇或双高花一次油渣可掉 2 份；关闭方块掉落时不产出，但仍消耗一次油渣。"
         ],
         "en_US": [
           "Oil Residue is an oil-press by-product, with 4 produced per batch. Using it on a supported plant makes 2 consecutive bone-meal attempts, each following that plant's own growth rules.",
-          "Currently supports 8 plant types: Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes. Other plants cannot currently be fertilized with Oil Residue.",
-          "A valid use consumes only 1 Oil Residue in total. Fully grown crops and unsupported targets consume none; Creative mode also consumes none.",
-          "Each application on a pepper sapling has a 45% chance to advance growth. A valid use still consumes 1 Oil Residue even if neither attempt makes the sapling grow."
+          "Supports Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes.",
+          "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, and Ferns. Other plants still need individual adapters.",
+          "Each valid use consumes only 1 Oil Residue in total; unavailable growth actions and unsupported targets consume none. Creative mode consumes none. Each pepper attempt has a 45% growth chance. Two failed rolls or blocked headroom above short grass still count as a valid use.",
+          "A non-sneaking main-hand use on a fruiting Sweet Berry Bush harvests it without using Oil Residue. Sneaking or an actual offhand use can still fertilize a partly grown bush; a fully grown bush consumes none.",
+          "Cocoa advances one stage per attempt. Cave Vines gain Glow Berries without extending. Short Grass and Ferns become tall plants when there is room above.",
+          "Each attempt on an intact tall flower drops one matching item. Pink Petals gain one flower until full, then drop one item per attempt. One Oil Residue can produce 2 items from full petals or tall flowers. Disabling block drops prevents those items but still consumes one Oil Residue."
         ]
       },
       "kinds": [
@@ -1149,7 +1158,8 @@
         "projects/grilling/gameplay_core/behavior_pack/scripts/plant_fertilizer.js",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2731_farmland_crop_host_runtime.js",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2714_houttuynia_crop_runtime.js",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js",
+        "docs/evidence/vanilla-plant-fertilizer.md"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/oil_residue",
@@ -2049,21 +2059,24 @@
           "烤串盘最多保存 5 串；拿烤串对盘使用可放入，空手使用会取回最后放入的一串。",
           "直接食用装有多串的盘子时，会优先吃掉盘中基础饱食值最高的一串。",
           "有内容的盘子可以潜行放置；打掉或收回时会保留盘内烤串数据。",
-          "桌面餐盘优先可由服务器设置关闭；关闭时，潜行手持烤串使用厨房桌子，会保留厨房原有的展示操作。"
+          "桌面餐盘优先可由服务器设置关闭；关闭时，潜行手持烤串使用厨房桌子，会保留厨房原有的展示操作。",
+          "手持盘按保存的 1–5 份内容排列固定烤串、普通串与秘制串；两手各自读取该盘数据。外部烤串若没有对应模型，该份位置会留空，食物数据仍保留。"
         ],
         "zh_TW": [
           "取得：主手持烤串，潛行對桌子或實心方塊的頂面使用，可放成烤串盤；回收時保留盤內內容。",
           "烤串盤最多保存 5 串；拿烤串對盤使用可放入，空手使用會取回最後放入的一串。",
           "直接食用裝有多串的盤子時，會優先吃掉盤中基礎飽食值最高的一串。",
           "有內容的盤子可以潛行放置；打掉或收回時會保留盤內烤串資料。",
-          "桌面餐盤優先可由伺服器設定關閉；關閉時，潛行手持烤串使用廚房桌子，會保留廚房原有的展示操作。"
+          "桌面餐盤優先可由伺服器設定關閉；關閉時，潛行手持烤串使用廚房桌子，會保留廚房原有的展示操作。",
+          "手持盤依保存的 1–5 份內容排列固定烤串、普通串與秘製串；兩手各自讀取該盤資料。外部烤串若沒有對應模型，該份位置會留空，食物資料仍保留。"
         ],
         "en_US": [
           "Acquisition: sneak-use a main-hand skewer on the top of a table or solid block to place a skewer plate. Recovering the plate preserves its contents.",
           "A Skewer Plate stores up to 5 skewers. Use a skewer on it to add one; use an empty hand to remove the most recently inserted skewer.",
           "Eating from a plate with several skewers consumes the one with the highest base nutrition first.",
           "A non-empty plate can be sneak-placed, and its stored skewer data is preserved when carried again.",
-          "The server can disable plate priority on Cookery tables. Sneak-using a held skewer then keeps Cookery’s original table display interaction."
+          "The server can disable plate priority on Cookery tables. Sneak-using a held skewer then keeps Cookery’s original table display interaction.",
+          "Held plates arrange their 1–5 saved servings of fixed, ordinary, and custom skewers. Each hand reads its own plate. An external skewer without a matching model leaves its position empty while preserving the stored food."
         ]
       },
       "kinds": [
@@ -2073,7 +2086,8 @@
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/skewer_plate.json",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_runtime.js",
-        "projects/grilling/guide/content.a2.json#guide_plate"
+        "projects/grilling/guide/content.a2.json#guide_plate",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/plate_held_visual_runtime.js"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/skewer_plate",
@@ -2719,18 +2733,21 @@
       "body": {
         "zh_CN": [
           "调料中加入不死图腾粉并趁热食用，会获得重金属保命效果。",
-          "效果仍在时遭受本应致命的伤害，会消耗保命效果并把生命保到 1 点。",
-          "触发后会进入约 10 分钟的重金属中毒；中毒期间再次使用这类保命调料不会绕过限制。"
+          "可确认的致命伤害会消耗一次保命效果，并把生命设为 1 点。",
+          "触发后会进入约 10 分钟的重金属中毒；中毒期间再次使用这类保命调料不会绕过限制。",
+          "目前与伤害吸收及原生不死图腾的判定顺序尚未完全对齐；有剩余吸收盾时，仍可能无法及时触发保命。"
         ],
         "zh_TW": [
           "調料中加入不死圖騰粉並趁熱食用，會獲得重金屬保命效果。",
-          "效果仍在時遭受本應致命的傷害，會消耗保命效果並把生命保到 1 點。",
-          "觸發後會進入約 10 分鐘的重金屬中毒；中毒期間再次使用這類保命調料不會繞過限制。"
+          "可確認的致命傷害會消耗一次保命效果，並把生命設為 1 點。",
+          "觸發後會進入約 10 分鐘的重金屬中毒；中毒期間再次使用這類保命調料不會繞過限制。",
+          "目前與傷害吸收及原生不死圖騰的判定順序尚未完全對齊；有剩餘吸收盾時，仍可能無法及時觸發保命。"
         ],
         "en_US": [
           "Add Totem Powder to seasoning and eat it hot to gain the Heavy Metal survival effect.",
-          "While active, otherwise-lethal damage consumes the survival effect and leaves you at 1 health.",
-          "After triggering, Heavy Metal Poisoning lasts about 10 minutes; using more of the same survival seasoning does not bypass that poisoned state."
+          "Damage confirmed as lethal consumes the survival effect once and sets health to 1.",
+          "After triggering, Heavy Metal Poisoning lasts about 10 minutes; using more of the same survival seasoning does not bypass that poisoned state.",
+          "Damage absorption and native Totem ordering are not fully matched. A partly spent absorption shield can still prevent this effect from triggering in time."
         ]
       },
       "kinds": [
@@ -2750,7 +2767,8 @@
       "source_refs": [
         "projects/grilling/gameplay_core/behavior_pack/items/totem_powder.json",
         "projects/grilling/guide/content.a2.json#guide_seasoning_totem",
-        "projects/grilling/gameplay_core/behavior_pack/scripts/a2727_cookery_host_recipes_core.js"
+        "projects/grilling/gameplay_core/behavior_pack/scripts/a2727_cookery_host_recipes_core.js",
+        "projects/grilling/gameplay_core/behavior_pack/scripts/heavy_metal_damage_runtime.js"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/totem_powder",

@@ -113,18 +113,46 @@ source／API doubles不能接受原生畫面；實際四朝向、1–5份及重�
 [PR152](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/152)。
 本次保留當前 palette、ownership 和後續修補，未用舊發版 artifact 覆蓋。
 
-## PLATE-HELD-CONTENTS／DECODE：未入主幹的手持餐盤原型
+## PLATE-HELD-CONTENTS／DECODE：G119 手持盤來源實作，原生待驗
 
-**狀態：新功能與其診斷原型，不能稱 current main 已有或已修好。**
+**狀態：G119 已新增 canonical reader、共享通道、獨立 count 與專用手持模型；本候選原生／真人畫面仍待接受。**
 
-原型重現：滿盤／單份餐盤在雙手查看，對 secret-alt、普通牛肉及 count 1／4 記錄原生顯示和已保存資料。
-舊 G95 控制組記錄 stored1／4 被讀成0／3；palette 低位仍未確定。
-[PR164](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/164) 的 +0.5 count 修補候選尚未完成其原生驗收。
+重現／驗收：普通熟牛肉串與不同秘製串分別裝成 1–5 份，主副手同時拿盤或另一手拿瓶／秘製串；
+確認順序、顏色、份數、切槽、重新登入及其他玩家視角。Java 預期是每槽實際內容與對應布局。
 
-Java 預期：手持顯示每槽實際食物與份數，不漏串、不錯解碼、不洩露其他玩家內容。
-[PR153](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/153) 的子系統尚未入 current main；
-#155／156／158／161／163／164 應保留在同一問題脈絡，不能孤立把公式貼到不存在的 current decoder。
-也不能把 float32 數值模型當成引擎或客戶端結果。
+G119 直接讀取保存 envelope；每手既有 12 個欄位由單一 writer/cache 仲裁，
+每份以兩個小於 2²⁰ 的 word 傳輸，份數獨立 0–5，沒有把舊 +0.5 貼到不存在的 decoder。
+手持與放置的 FIXED 旋轉分開，完整路徑與限制見 [G119](STATUS-A2.8.119.md)。
+未對應的外部模型保留原槽位與資料；這些來源檢查不等於實際客户端正確。
+
+舊 G95 的 stored1／4→0／3、tiny-edge-pixels 與 secret-alt 空顯示保留原候選身份。
+[PR153](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/153)及
+[PR164](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/164)等原型／診斷未整包導入，
+其舊原生觀察不能接受本版的新 transport 與姿態。
+
+## HEAVY-METAL-COMMIT：保命效果提交失敗仍可能改生命
+
+**狀態：G119 修正來源結算；死亡／圖騰及吸收值能力仍未完全等價。**
+
+G118 的 deferred 救命依序呼叫 fxClear／fxSet，兩者吞掉 effect writer 的例外，
+可能在效果尚未消耗時仍把生命設為 1 或播放聲音。排程拋錯還可能保留 pending。
+G119 成功排程後才取消；一次轉移效果並核對 fresh 前像／實際 raw，再確認生命寫入。
+已保護但結果不明的相同效果保持隔離；不重播傷害或盲目退還保命。
+
+仍需驗證：本候選的原生傷害、後續 addon 改寫、圖騰競合、部分吸收盾、效果保存與真人聲畫。
+預留未跨重登／crash持久化。詳細 [API 與來源邊界](evidence/heavy-metal-and-inventory-api-20261009.md)。
+
+## OIL-RESIDUE-PLANTS：明列 18 植物，通用骨粉仍未完成
+
+**狀態：G119 新增 10 種來源適配並保留原 8 種；沒有假設所有 growth 狀態具有相同成熟值。**
+
+新增可可、甜莓、粉紅花簇、無果洞穴藤、四種雙高花及短草／蕨，
+兩次作用只扣一次，花卉掉落與完整上下半進入同一交易及恢復邊界。
+甜莓的非潛行主手採果、潛行／副手施肥按 NeoForge 1.21.1 呼叫鏈處理，Forge 差異明列。
+
+仍需適配：甜菜中間年齡、瓜梗成熟當次結果、竹子stage、其他feature及外部植物；
+還需本候選正常玩家施肥／採果、上下半、掉落與重載驗收。
+具體來源、ID/state映射與未知結果處理見 [植物證據](evidence/vanilla-plant-fertilizer.md)。
 
 ## EATING-ACCEPTANCE：逐口、雙手、停止與離線
 

@@ -36,8 +36,11 @@ class G75SourceConservationTests(unittest.TestCase):
     def test_combined_source_rejects_regressions_in_either_lineage_and_unrelated_bytes(self):
         path = public.ROOT / public.MAIN_PATH
         source = path.read_bytes()
+        version=tuple(json.loads((public.ROOT/'baseline.json').read_text())['version'])
+        metal_import=(b"import {handleHeavyMetalBeforeHurt,forgetHeavyMetalRescue} from './heavy_metal_damage_runtime.js';\n"
+                      if version>=(2,8,119) else b"import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';\n")
         mutations = (
-            (b"import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';\n", b''),
+            (metal_import, b''),
             (b"import {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';\n", b''),
             (b' ordinaryFatalFeedback(player);\n', b''),
             (b' const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);', b' const id=eaten.typeId;dangerousPreservation(player,id);'),

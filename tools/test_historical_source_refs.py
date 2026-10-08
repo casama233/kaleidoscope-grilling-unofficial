@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':19,'commits':19})
+  self.assertEqual(verify(),{'refs':23,'commits':23})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -133,6 +133,47 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   with patch.object(public,'_pepper_delta',return_value=changed):
    with self.assertRaisesRegex(AssertionError,'Reviewed G118 pepper source bytes mismatch'):
     public.reviewed_pepper_bytes(pepper_before)
+ def test_g119_remaining_delta_keeps_g118_and_the_public_main_witness(self):
+  load=public._main_delta;delta=load('g119-main-reviewed-delta.json')
+  before=public.expected_main_bytes((2,8,118));repaired=public.expected_main_bytes((2,8,119))
+  self.assertEqual(before,public._reviewed_parity_source())
+  self.assertEqual(delta['reviewed_commit'],public.REVIEWED_REMAINING_BASE)
+  self.assertIn(public.REVIEWED_REMAINING_BASE,inventory())
+  self.assertEqual(len(delta['operations']),5)
+  self.assertEqual(public._apply_main_operations(before,delta),repaired)
+  self.assertEqual(repaired,public._reviewed_remaining_source())
+  with self.assertRaisesRegex(AssertionError,'wrong public preimage'):
+   public._g119_remaining_bytes(before+b'\n')
+  changed=copy.deepcopy(delta);op=changed['operations'][-1];original=op['after'];op['after']+='\n'
+  changed['after_sha256']=hashlib.sha256(repaired.replace(original.encode(),op['after'].encode(),1)).hexdigest()
+  with patch.object(public,'_main_delta',side_effect=lambda name:changed if name=='g119-main-reviewed-delta.json' else load(name)):
+   with self.assertRaisesRegex(AssertionError,'Reviewed G119 source differs outside'):
+    public.expected_main_bytes((2,8,119))
+ def test_g119_held_witness_preserves_g69_and_rejects_widened_scope_or_hashes(self):
+  delta=public._held_channel_delta()
+  self.assertEqual(len(public.HELD_CHANNEL_PATHS),5)
+  self.assertIn(public.REVIEWED_HELD_CHANNEL_BASE,inventory())
+  for relative in sorted(public.HELD_CHANNEL_PATHS):
+   with self.subTest(path=relative):
+    original=public.public_bytes(relative);repaired=public.reviewed_held_bytes(relative)
+    self.assertNotEqual(original,repaired)
+    self.assertEqual(hashlib.sha256(original).hexdigest(),public.witness()['files'][relative])
+    self.assertEqual((ROOT/relative).read_bytes(),repaired)
+    public.assert_public_bytes(self,ROOT/relative)
+    with patch.object(Path,'read_bytes',return_value=repaired+b'\n'):
+     with self.assertRaisesRegex(AssertionError,'outside reviewed scope'):
+      public.assert_public_bytes(self,ROOT/relative)
+  relative=sorted(public.HELD_CHANNEL_PATHS)[0]
+  wrong=copy.deepcopy(delta);wrong['changes'][relative]['before_sha256']='0'*64
+  with patch.object(public,'_held_channel_delta',return_value=wrong):
+   with self.assertRaisesRegex(AssertionError,'wrong public preimage'):public.reviewed_held_bytes(relative)
+  wrong=copy.deepcopy(delta);wrong['changes'][relative]['after_sha256']=hashlib.sha256(public.reviewed_held_bytes(relative)+b'\n').hexdigest()
+  with patch.object(public,'_held_channel_delta',return_value=wrong):
+   with self.assertRaisesRegex(AssertionError,'source bytes mismatch'):public.reviewed_held_bytes(relative)
+  wrong=copy.deepcopy(delta);wrong['changes'][public.MAIN_PATH]=wrong['changes'][relative]
+  with patch.object(public,'_held_channel_delta',return_value=wrong):
+   with self.assertRaisesRegex(AssertionError,'scope changed'):public.reviewed_held_bytes(relative)
+  with self.assertRaisesRegex(AssertionError,'outside scope'):public.reviewed_held_bytes(public.MAIN_PATH)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)

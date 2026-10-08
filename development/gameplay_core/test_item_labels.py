@@ -13,12 +13,14 @@ ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
 BASE='1cf16f39f449ee5ce95190ef9088e575d133f928'  # Merged 2.8.45 runtime, including the prior repairs.
 LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
+PREVIOUS_GUIDE_BASE='f7bd2d26367c113ab8881bc67e9f5e69624917ff'
+REVIEWED_GUIDE_BASE='8099dc2d211e79c881548a2abc90c06e6c876dc5'
 LABELS = {'en_US': 'Kaleidoscope Grilling', 'zh_CN': '森罗物语烟火',
           'zh_TW': '森羅物語煙火'}
 
 
-def prior(path):
-    return subprocess.check_output(['git', 'show', BASE + ':' +
+def prior(path, source_base=BASE):
+    return subprocess.check_output(['git', 'show', source_base + ':' +
                                    path.relative_to(ROOT).as_posix()], cwd=ROOT)
 
 
@@ -178,6 +180,7 @@ def main():
         path = PROJECT / 'resource_pack/texts' / (locale + '.lang')
         old = language(prior(path))
         current = language(path.read_bytes())
+        previous_guide = language(prior(path, PREVIOUS_GUIDE_BASE)) if version >= (2,8,119) else current
         approved = {}
         guide_added = set()
         if version >= (2,8,74):
@@ -200,12 +203,40 @@ def main():
                 }.items() for n in paragraphs}
             assert set(changes) == expected_keys and not (set(changes) & set(approved))
             for key, change in changes.items():
-                assert old.get(key) == change['before'] and current[key] == change['after'], 'Reviewed G118 guide delta drift'
+                # G118 remains an immutable historical step; later reviewed
+                # paragraphs must chain from its exact text, not replace it.
+                assert old.get(key) == change['before'] and previous_guide[key] == change['after'], 'Reviewed G118 guide delta drift'
                 if change['before'] is None:
                     assert key not in old
                     guide_added.add(key)
             assert len(guide_added) == 7
             approved.update(changes)
+        if version >= (2,8,119):
+            delta = json.loads((ROOT / 'tools/fixtures/g119-guide-reviewed-delta.json').read_text())
+            assert delta['schema'] == 1 and delta['release'] == [2,8,119]
+            assert delta['previous_public_commit'] == PREVIOUS_GUIDE_BASE
+            assert delta['reviewed_commit'] == REVIEWED_GUIDE_BASE
+            assert set(delta['locales']) == set(LABELS)
+            changes = delta['locales'][locale]
+            expected_keys = {f'guide.kg.body.kaleidoscope_grilling:{entry}.{n}'
+                for entry, paragraphs in {
+                    'oil_residue': (2,3,4,5,6,7), 'skewer_plate': (6,),
+                    'totem_powder': (2,4),
+                }.items() for n in paragraphs}
+            assert set(changes) == expected_keys, 'Reviewed G119 guide scope changed'
+            reviewed = language(prior(path, REVIEWED_GUIDE_BASE))
+            assert {key for key in set(previous_guide) | set(reviewed)
+                if previous_guide.get(key) != reviewed.get(key)} == expected_keys, 'G119 guide witness changed outside reviewed scope'
+            for key, change in changes.items():
+                assert set(change) == {'before', 'after'}
+                assert previous_guide.get(key) == change['before'], 'Reviewed G119 guide preimage drift'
+                assert reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G119 guide delta drift'
+                if change['before'] is None:
+                    assert key not in old and key not in approved
+                    guide_added.add(key)
+            assert len(guide_added) == 12
+            approved.update(changes)
+        assert all(current[key] == change['after'] for key, change in approved.items()), 'Reviewed guide final text drift'
         assert all(current.get(k) == v for k, v in old.items() if k not in approved), 'Plain names/guide text changed'
         config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
         assert set(current) - set(old) == set(aliases) | public_keys | config_keys | guide_added, 'Unexpected localization override'

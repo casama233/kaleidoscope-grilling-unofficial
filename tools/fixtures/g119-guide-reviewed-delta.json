@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    119
+  ],
+  "scope": "Exact G118 to G119 guide 0.3.49 progression for Oil Residue, Skewer Plate and Totem Powder in three languages. Preserve G118 preimages, all other guide text, plain names and inventory aliases. Null preimage means a new numbered paragraph.",
+  "previous_public_commit": "f7bd2d26367c113ab8881bc67e9f5e69624917ff",
+  "reviewed_commit": "8099dc2d211e79c881548a2abc90c06e6c876dc5",
+  "locales": {
+    "en_US": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": "Currently supports 8 plant types: Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes. Other plants cannot currently be fertilized with Oil Residue.",
+        "after": "Supports Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "A valid use consumes only 1 Oil Residue in total. Fully grown crops and unsupported targets consume none; Creative mode also consumes none.",
+        "after": "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, and Ferns. Other plants still need individual adapters."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": "Each application on a pepper sapling has a 45% chance to advance growth. A valid use still consumes 1 Oil Residue even if neither attempt makes the sapling grow.",
+        "after": "Each valid use consumes only 1 Oil Residue in total; unavailable growth actions and unsupported targets consume none. Creative mode consumes none. Each pepper attempt has a 45% growth chance. Two failed rolls or blocked headroom above short grass still count as a valid use."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.5": {
+        "before": null,
+        "after": "A non-sneaking main-hand use on a fruiting Sweet Berry Bush harvests it without using Oil Residue. Sneaking or an actual offhand use can still fertilize a partly grown bush; a fully grown bush consumes none."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": null,
+        "after": "Cocoa advances one stage per attempt. Cave Vines gain Glow Berries without extending. Short Grass and Ferns become tall plants when there is room above."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.7": {
+        "before": null,
+        "after": "Each attempt on an intact tall flower drops one matching item. Pink Petals gain one flower until full, then drop one item per attempt. One Oil Residue can produce 2 items from full petals or tall flowers. Disabling block drops prevents those items but still consumes one Oil Residue."
+      },
+      "guide.kg.body.kaleidoscope_grilling:skewer_plate.6": {
+        "before": null,
+        "after": "Held plates arrange their 1–5 saved servings of fixed, ordinary, and custom skewers. Each hand reads its own plate. An external skewer without a matching model leaves its position empty while preserving the stored food."
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.2": {
+        "before": "While active, otherwise-lethal damage consumes the survival effect and leaves you at 1 health.",
+        "after": "Damage confirmed as lethal consumes the survival effect once and sets health to 1."
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.4": {
+        "before": null,
+        "after": "Damage absorption and native Totem ordering are not fully matched. A partly spent absorption shield can still prevent this effect from triggering in time."
+      }
+    },
+    "zh_CN": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": "目前支持 8 类植物：油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。其他植物目前不能用油渣催生。",
+        "after": "支持油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "一次有效使用合计只消耗 1 个油渣；成熟作物和不受支持的目标不消耗，创造模式也不消耗。",
+        "after": "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草与蕨。其他植物仍需各自适配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": "花椒树苗每次施肥有 45% 机会推进生长；即使两次都没有长大，有效使用仍会消耗 1 个油渣。",
+        "after": "一次有效使用总共只消耗 1 个油渣；已无可用施肥作用或不受支持的目标不消耗，创造模式也不消耗。花椒苗每次有 45% 机会推进生长，两次都没长大、短草上方被堵而没长大，仍算有效使用。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.5": {
+        "before": null,
+        "after": "主手非潜行对已有果实的甜莓使用时，会先采果而不扣油渣。潜行或实际副手使用时，未完全成熟的甜莓仍可施肥；完全成熟时不扣料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": null,
+        "after": "可可每次长一阶；洞穴藤只结发光浆果，不延长。短草与蕨上方有空间时长成双高植物。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.7": {
+        "before": null,
+        "after": "完整双高花每次作用掉 1 朵同种花；粉红色花簇未满时增加一份，已满时掉 1 份。满花簇或双高花一次油渣可掉 2 份；关闭方块掉落时不产出，但仍消耗一次油渣。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:skewer_plate.6": {
+        "before": null,
+        "after": "手持盘按保存的 1–5 份内容排列固定烤串、普通串与秘制串；两手各自读取该盘数据。外部烤串若没有对应模型，该份位置会留空，食物数据仍保留。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.2": {
+        "before": "效果仍在时遭受本应致命的伤害，会消耗保命效果并把生命保到 1 点。",
+        "after": "可确认的致命伤害会消耗一次保命效果，并把生命设为 1 点。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.4": {
+        "before": null,
+        "after": "目前与伤害吸收及原生不死图腾的判定顺序尚未完全对齐；有剩余吸收盾时，仍可能无法及时触发保命。"
+      }
+    },
+    "zh_TW": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": "目前支援 8 類植物：油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。其他植物目前不能用油渣催生。",
+        "after": "支援油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "一次有效使用合計只消耗 1 個油渣；成熟作物和不受支援的目標不消耗，創造模式也不消耗。",
+        "after": "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草與蕨。其他植物仍需各自適配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": "花椒樹苗每次施肥有 45% 機會推進生長；即使兩次都沒有長大，有效使用仍會消耗 1 個油渣。",
+        "after": "一次有效使用總共只消耗 1 個油渣；已無可用施肥作用或不受支援的目標不消耗，創造模式也不消耗。花椒苗每次有 45% 機會推進生長，兩次都沒長大、短草上方被堵而沒長大，仍算有效使用。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.5": {
+        "before": null,
+        "after": "主手非潛行對已有果實的甜莓使用時，會先採果而不扣油渣。潛行或實際副手使用時，未完全成熟的甜莓仍可施肥；完全成熟時不扣料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": null,
+        "after": "可可每次長一階；洞穴藤只結發光莓，不延長。短草與蕨上方有空間時長成雙高植物。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.7": {
+        "before": null,
+        "after": "完整雙高花每次作用掉 1 朵同種花；粉紅花簇未滿時增加一份，已滿時掉 1 份。滿花簇或雙高花一次油渣可掉 2 份；關閉方塊掉落時不產出，但仍消耗一次油渣。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:skewer_plate.6": {
+        "before": null,
+        "after": "手持盤依保存的 1–5 份內容排列固定烤串、普通串與秘製串；兩手各自讀取該盤資料。外部烤串若沒有對應模型，該份位置會留空，食物資料仍保留。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.2": {
+        "before": "效果仍在時遭受本應致命的傷害，會消耗保命效果並把生命保到 1 點。",
+        "after": "可確認的致命傷害會消耗一次保命效果，並把生命設為 1 點。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:totem_powder.4": {
+        "before": null,
+        "after": "目前與傷害吸收及原生不死圖騰的判定順序尚未完全對齊；有剩餘吸收盾時，仍可能無法及時觸發保命。"
+      }
+    }
+  }
+}

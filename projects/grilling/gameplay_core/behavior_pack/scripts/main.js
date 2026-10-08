@@ -4,7 +4,7 @@ import {tryProjectileDodgeMovement} from './projectile_dodge_movement_runtime.js
 import {isCookeryLivingEntity} from './cookery_living_class.js';
 import {projectileDodgeTeleportFeedback,FLATULENCE_SOUND_ID} from './projectile_dodge_audio_runtime.js';
 import {reserveProjectileDodge,settleProjectileDodge,abandonProjectileDodge,forgetProjectileDodge} from './projectile_dodge_runtime.js';
-import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';
+import {handleHeavyMetalBeforeHurt,forgetHeavyMetalRescue} from './heavy_metal_damage_runtime.js';
 import {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';
 import {isPlainEatingId,SKEWER_EATING_IDS} from './eating_profile_ids.js';
 import {beginSeasoningMotion,syncSeasoningMotion} from './seasoning_motion_runtime.js';
@@ -15,6 +15,7 @@ import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,
 import {interactionParticleBurst,grillAmbientParticles} from './immersion_particles_runtime.js';
 import './hot_lore_runtime.js';
 import './bottle_held_visual_runtime.js';
+import './plate_held_visual_runtime.js';
 import './integration_api_runtime.js';
 import {grillingConfig} from './server_config_runtime.js';
 import {seasoningLore,creatorLore} from './localized_lore_core.js';
@@ -1069,10 +1070,9 @@ world.afterEvents.itemStopUse.subscribe(e=>{
 });
 // Native use poses cancel with the use action; no global zero-pose reset may override
 // the next held item. Release server bookkeeping as well when a player disconnects.
-world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
-world.afterEvents.entityDie.subscribe(e=>forgetProjectileDodge(e.deadEntity));
-world.afterEvents.entityRemove.subscribe(e=>forgetProjectileDodge(e.removedEntityId));
-const PENDING_METAL_RESCUES=new Map();
+world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);forgetHeavyMetalRescue(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});
+world.afterEvents.entityDie.subscribe(e=>{forgetProjectileDodge(e.deadEntity);forgetHeavyMetalRescue(e.deadEntity)});
+world.afterEvents.entityRemove.subscribe(e=>{forgetProjectileDodge(e.removedEntityId);forgetHeavyMetalRescue(e.removedEntityId)});
 world.beforeEvents.entityHurt.subscribe(e=>{
  if(e.cancel)return;
  const target=e.hurtEntity,cause=e.damageSource?.cause;
@@ -1084,26 +1084,9 @@ world.beforeEvents.entityHurt.subscribe(e=>{
   }catch(error){abandonProjectileDodge(claim);console.warn('[Grilling projectile dodge schedule] '+error)}}
  }
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
- const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');
- if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){
-  // Reserve synchronously: deferred writes must not enqueue duplicate rescues.
-  // BDS exposes provisional post-hit health here; compare that value to zero,
-  // not incoming damage to already-reduced health. Cancellation restores it.
-  // Native remaining absorption is unavailable: skip ambiguous hits rather
-  // than consuming rescue for a shield-blocked nonfatal hit.
-  // Later addon cancellation/rewrite and exact Java death ordering remain separate.
-  const token={until:hm.until,amp:hm.amp};PENDING_METAL_RESCUES.set(target.id,token);e.cancel=true;
-  system.run(()=>{try{
-   if(PENDING_METAL_RESCUES.get(target.id)!==token)return;
-   const current=fxGet(target,'heavy_metal'),health=target.getComponent?.('minecraft:health');
-   // Milk, death, logout or effect replacement may invalidate a queued rescue.
-   if(!current||current.until!==token.until||current.amp!==token.amp||fxGet(target,'heavy_metal_poisoning')||!health||health.currentValue<=0)return;
-   fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);health.setCurrentValue(1);
-   target.dimension.playSound('kg_java21.heavy_metal',target.location);
-  }catch(error){console.warn('[Grilling heavy metal] '+error)}finally{if(PENDING_METAL_RESCUES.get(target.id)===token)PENDING_METAL_RESCUES.delete(target.id)}});
- }
+ handleHeavyMetalBeforeHurt(e);
 });
-world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
+world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHurt.subscribe(e=>{
  // Cookery HinderEvent follows damage from a living attacker, including its
  // projectile; a melee contact event cannot represent that source contract.

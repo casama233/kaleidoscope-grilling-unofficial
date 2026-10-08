@@ -2,6 +2,7 @@
  * doubles. These are not Minecraft players or native collision-order proof. */
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import * as lifecycle from '../../projects/grilling/gameplay_core/behavior_pack/scripts/effect_lifecycle_core.js';
+import * as heavyMetalCore from '../../projects/grilling/gameplay_core/behavior_pack/scripts/heavy_metal_damage_core.js';
 import {tryProjectileDodgeMovement as move} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/projectile_dodge_movement_runtime.js';
 const base=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url),read=n=>fs.readFileSync(new URL(n,base),'utf8');
 const strip=s=>s.replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(class|const|function|async))/g,'').replace(/^export \{[^}]*\};/gm,'');
@@ -27,7 +28,10 @@ function fixture(remaining=200,{old=false,teleportSuccess=true}={}){
  const effects=vm.runInContext('({readEffects,writeEffects,clearEffects,effectTime,projectileDodgeTime,readProjectileDodgeState,debitProjectileDodge,forgetProjectileDodgeState})',runtime);
  const reservation=vm.createContext({...effects,effectTime:effects.projectileDodgeTime,console});vm.runInContext(strip(read('projectile_dodge_runtime.js')),reservation);
  const api=vm.runInContext('({reserveProjectileDodge,settleProjectileDodge,abandonProjectileDodge,forgetProjectileDodge})',reservation);
- const context=vm.createContext({...effects,...api,world,system,console,tryProjectileDodgeMovement:entity=>move(entity,{random:()=>.75}),projectileDodgeTeleportFeedback(entity,base){entity.dimension.playSound('qa:teleport',base)},Math:Object.assign(Object.create(Math),{random:()=>.75}),now:()=>state.time,invincibleDamageFeedback(){state.invincibleFeedback++},definitelyLethalProvisionalHealth:()=>false,PENDING_METAL_RESCUES:new Map(),ACTIVE_EATS:new Map(),CUISINE_EATS:new Map(),PLATE_EATS:new Map(),PENDING_USES:new Map(),SETTLED:new Map(),VIGOR_LAST:new Map(),SNEAK_LAST:new Map(),NUMB_VISUAL:new Set(),stopSoundHandle(){},forgetEatingItem(){},EAT_PROFILE_PROPERTY:'profile',EAT_HAND_PROPERTY:'hand',EAT_PROJECTION_PROPERTY:'projection',EAT_NATIVE_TICKS_PROPERTY:'native_ticks',EAT_ELAPSED_TICKS_PROPERTY:'elapsed_ticks'});
+ const metalContext=vm.createContext({...lifecycle,...heavyMetalCore,writeEffects:effects.writeEffects,world,system,console});
+ vm.runInContext(strip(read('heavy_metal_damage_runtime.js')),metalContext);
+ const metal=vm.runInContext('({handleHeavyMetalBeforeHurt,forgetHeavyMetalRescue})',metalContext);
+ const context=vm.createContext({...effects,...api,...metal,world,system,console,tryProjectileDodgeMovement:entity=>move(entity,{random:()=>.75}),projectileDodgeTeleportFeedback(entity,base){entity.dimension.playSound('qa:teleport',base)},Math:Object.assign(Object.create(Math),{random:()=>.75}),now:()=>state.time,invincibleDamageFeedback(){state.invincibleFeedback++},definitelyLethalProvisionalHealth:()=>false,PENDING_METAL_RESCUES:new Map(),ACTIVE_EATS:new Map(),CUISINE_EATS:new Map(),PLATE_EATS:new Map(),PENDING_USES:new Map(),SETTLED:new Map(),VIGOR_LAST:new Map(),SNEAK_LAST:new Map(),NUMB_VISUAL:new Set(),stopSoundHandle(){},forgetEatingItem(){},EAT_PROFILE_PROPERTY:'profile',EAT_HAND_PROPERTY:'hand',EAT_PROJECTION_PROPERTY:'projection',EAT_NATIVE_TICKS_PROPERTY:'native_ticks',EAT_ELAPSED_TICKS_PROPERTY:'elapsed_ticks'});
  vm.runInContext(fx+'\n'+(old?baseline.subscriber:before),context);
  if(!old){for(const line of main.split('\n').filter(x=>x.startsWith('world.afterEvents.')&&(x.includes('forgetProjectileDodge('))))vm.runInContext(line,context);}
  function hit({actor=entity,projectile=true,cancel=false,cause='projectile'}={}){const event={cancel,hurtEntity:actor,damage:1,damageSource:{cause,...(projectile?{damagingProjectile:{id:'arrow'}}:{})}};state.restricted=true;try{hitCallback(event)}finally{state.restricted=false}return event;}

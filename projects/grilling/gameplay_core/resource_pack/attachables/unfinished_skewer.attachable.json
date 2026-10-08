@@ -1554,7 +1554,7 @@
           "v.kg_secret_style_2 = math.floor(v.kg_secret_ingredient_2/768);",
           "v.kg_secret_partial_count = math.max(v.kg_secret_style_0,v.kg_secret_style_1);",
           "v.kg_secret_partial_state = v.kg_secret_partial_count > 0 ? v.kg_secret_shape_0*16 + (v.kg_secret_partial_count > 1 ? v.kg_secret_shape_1*4 : 0) : 0;",
-          "v.kg_secret_owner_occupied = c.item_slot == 'off_hand' ? c.owning_entity->q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:unfinished_skewer') : c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:unfinished_skewer');",
+          "v.kg_secret_owner_occupied = (c.item_slot == 'off_hand' ? c.owning_entity->q.is_item_name_any('slot.weapon.offhand','kaleidoscope_grilling:unfinished_skewer') : c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','kaleidoscope_grilling:unfinished_skewer')) && ((c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:secret_off_piece') ? c.owning_entity->q.property('kaleidoscope_grilling:secret_off_piece') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:secret_main_piece') ? c.owning_entity->q.property('kaleidoscope_grilling:secret_main_piece') : 0)) >= 0 && (c.item_slot == 'off_hand' ? (c.owning_entity->q.has_property('kaleidoscope_grilling:secret_off_piece') ? c.owning_entity->q.property('kaleidoscope_grilling:secret_off_piece') : 0) : (c.owning_entity->q.has_property('kaleidoscope_grilling:secret_main_piece') ? c.owning_entity->q.property('kaleidoscope_grilling:secret_main_piece') : 0)) <= 213);",
           "v.kg_bite_stage = 0;"
         ],
         "animate": [

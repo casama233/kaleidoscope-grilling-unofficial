@@ -13,13 +13,19 @@ export function readEffects(entity){
  let raw,value,rawReadable=false;try{raw=entity.getDynamicProperty(FX_KEY);rawReadable=true;value=typeof raw==='string'?JSON.parse(raw):{}}catch{value={}}
  const effects=activeEffects(value,effectTime());if(rawReadable)observeDodge(entity,raw);save(entity,{tick:system.currentTick,raw,effects,rawReadable});return copyEffects(effects);
 }
-export function writeEffects(entity,value,{refreshProjectileDodge=false}={}){
+export function writeEffects(entity,value,{refreshProjectileDodge=false,expectedRaw}={}){
  const effects=activeEffects(value,effectTime()),raw=effectPayload(effects,effectTime());
  let old=snapshot(entity);if(old?.tick!==system.currentTick){readEffects(entity);old=snapshot(entity)}
  // Explicit refresh/clear owns the actual stored field, including a same-byte
  // successful refresh. An unacknowledged mutator is not a new effect generation.
  if(old?.rawReadable===false){discard(entity);throw Error('Effect state read is unacknowledged');}
- const beforeRaw=refreshProjectileDodge?entity.getDynamicProperty(FX_KEY):old?.raw;
+ // Transaction callers with a freshly read source must compare against that
+ // actual field even when the ordinary same-tick cache equals the desired state.
+ let beforeRaw=old?.raw;
+ if(refreshProjectileDodge||expectedRaw!==undefined){
+  try{beforeRaw=entity.getDynamicProperty(FX_KEY)}catch(error){if(expectedRaw!==undefined)discard(entity);throw error}
+ }
+ if(expectedRaw!==undefined&&beforeRaw!==expectedRaw){observeDodge(entity,beforeRaw);discard(entity);throw Error('Effect state preimage changed');}
  const before=dodgeDescriptor(beforeRaw),state=observeDodge(entity,beforeRaw);
  let actual=beforeRaw;
  if(raw!==beforeRaw){

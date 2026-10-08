@@ -36,6 +36,40 @@ def public_json(relative_path):
     return json.loads(public_bytes(relative_path))
 
 
+REVIEWED_HELD_CHANNEL_BASE = 'b37ec0d78b75f61e441a97fe31746dab5aac7fef'
+HELD_CHANNEL_PATHS = frozenset({
+    'projects/grilling/gameplay_core/behavior_pack/entities/player.json',
+    'projects/grilling/gameplay_core/behavior_pack/scripts/secret_held_runtime.js',
+    'projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer.attachable.json',
+    'projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer_java_three_alt.attachable.json',
+    'projects/grilling/gameplay_core/resource_pack/attachables/unfinished_skewer.attachable.json',
+})
+
+
+def _held_channel_delta():
+    return json.loads((ROOT / 'tools/fixtures/g119-held-channel-reviewed-delta.json').read_text())
+
+
+def reviewed_held_bytes(relative_path):
+    # The G69 manifest and public_bytes/public_json keep their original meaning.
+    # Only these five reviewed G119 files may continue from their exact preimage.
+    path = Path(relative_path)
+    if path.is_absolute():
+        path = path.relative_to(ROOT)
+    key = path.as_posix()
+    assert key in HELD_CHANNEL_PATHS, 'Reviewed G119 held path outside scope'
+    delta = _held_channel_delta()
+    assert delta['schema'] == 1 and delta['release'] == [2, 8, 119]
+    assert delta['previous_public_commit'] == PUBLIC_SOURCE_BASE
+    assert delta['reviewed_commit'] == REVIEWED_HELD_CHANNEL_BASE
+    assert set(delta['changes']) == HELD_CHANNEL_PATHS, 'Reviewed G119 held scope changed'
+    row = delta['changes'][key]
+    assert hashlib.sha256(public_bytes(key)).hexdigest() == row['before_sha256'], 'Reviewed G119 held has wrong public preimage'
+    repaired = subprocess.check_output(['git', 'show', REVIEWED_HELD_CHANNEL_BASE + ':' + key], cwd=ROOT)
+    assert hashlib.sha256(repaired).hexdigest() == row['after_sha256'], 'Reviewed G119 held source bytes mismatch'
+    return repaired
+
+
 PEPPER_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js'
 REVIEWED_PEPPER_BASE = 'dccbe92aca2973d498614653b4bda8b7f736e80c'
 
@@ -75,6 +109,7 @@ MAIN_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
 REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
 REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
 REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
+REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -158,6 +193,23 @@ def _g118_parity_bytes(expected):
     assert len(delta['operations']) == 7, 'Reviewed G118 source requires exactly seven edits'
     repaired = _apply_main_operations(expected, delta)
     assert repaired == _reviewed_parity_source(), 'Reviewed G118 source differs outside parity deltas'
+    return repaired
+
+
+@lru_cache(maxsize=1)
+def _reviewed_remaining_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_REMAINING_BASE + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g119_remaining_bytes(expected):
+    # Preserve the complete G118 preimage. The five reviewed main edits only
+    # route held plates and the acknowledged Heavy Metal settlement/cleanup.
+    delta = _main_delta('g119-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 119]
+    assert delta['reviewed_commit'] == REVIEWED_REMAINING_BASE
+    assert len(delta['operations']) == 5, 'Reviewed G119 source requires exactly five edits'
+    repaired = _apply_main_operations(expected, delta)
+    assert repaired == _reviewed_remaining_source(), 'Reviewed G119 source differs outside remaining deltas'
     return repaired
 
 
@@ -261,6 +313,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _g117_conservation_bytes(expected)
         if version >= (2, 8, 118):
             expected = _g118_parity_bytes(expected)
+        if version >= (2, 8, 119):
+            expected = _g119_remaining_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)
@@ -274,9 +328,14 @@ def assert_public_bytes(testcase, path):
     if not path.is_absolute():
         path = ROOT / path
     expected = public_bytes(path)
-    if path.relative_to(ROOT).as_posix() == MAIN_PATH:
+    relative = path.relative_to(ROOT).as_posix()
+    if relative == MAIN_PATH:
         version = json.loads((ROOT / 'baseline.json').read_text())['version']
         expected = expected_main_bytes(version)
+    elif relative in HELD_CHANNEL_PATHS:
+        version = json.loads((ROOT / 'baseline.json').read_text())['version']
+        if tuple(version) >= (2, 8, 119):
+            expected = reviewed_held_bytes(relative)
     testcase.assertEqual(path.read_bytes(), expected, 'Repaired public-source bytes changed outside reviewed scope: ' + str(path.relative_to(ROOT)))
 
 

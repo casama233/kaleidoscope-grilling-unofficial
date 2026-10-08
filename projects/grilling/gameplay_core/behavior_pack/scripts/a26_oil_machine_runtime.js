@@ -294,13 +294,14 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
    const target=targetFor(b,e.blockFace);if(replaceable(target)){e.cancel=true;if(!first)return;const dim=b.dimension,loc={...b.location},face=e.blockFace;defer(()=>{const current=held(p,hand);if(current?.typeId===BIG_VAT_ID)placePackedVat(dim.getBlock(loc),face,p,current,hand)});return}
   }
   if(item?.typeId===OIL_RESIDUE_ID){
-   if(hasPlantFertilizer(b)){
+   const secondaryUse=p.isSneaking===true;
+   if(hasPlantFertilizer(b,item.typeId,hand,secondaryUse)){
     e.cancel=true;if(!first)return;
     const dim=b.dimension,loc={...b.location},before=b.permutation;
     defer(()=>{
      try{
       const target=dim.getBlock(loc);
-      if(held(p,hand)?.typeId!==OIL_RESIDUE_ID||!target||!samePlantPermutation(target.permutation,before))return;
+      if((p.isSneaking===true)!==secondaryUse||held(p,hand)?.typeId!==OIL_RESIDUE_ID||!target||!samePlantPermutation(target.permutation,before))return;
       usePlantFertilizer(target,p,hand);
      }catch{}
     });return;

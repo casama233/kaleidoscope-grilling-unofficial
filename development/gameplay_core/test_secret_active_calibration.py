@@ -8,6 +8,7 @@ from secret_active_calibration import calibrated_target,PROFILE_IDS
 from bottle_pose_review import historical_bytes
 from public_source_witness import PUBLIC_SOURCE_BASE,public_json,assert_public_bytes
 from build_plate_display import build as plate_display_assets
+from build_plate_held import build as plate_held_assets
 import java_dual_eating_frames as dual
 import java_active_eating_frames as active
 from test_eating_observer_projection import node
@@ -65,6 +66,18 @@ for(const row of cases)for(const held of [row.id,'minecraft:apple','kaleidoscope
   self.assertEqual(set(animations['animation.kg_station.plate_food']['bones']),{'root'})
   self.assertEqual(plate.read_bytes(),plate_display_assets()[plate],'placed-plate animation must match the complete G118 generator output')
   allowed.add(str(plate.relative_to(ROOT)))
+  # G119 admits one separate held-plate family with its complete source-derived
+  # pose/layout bytes. No existing eating/helper animation enters this delta.
+  held_plate=RP/'animations/plate_held.animation.json'
+  old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+str(held_plate.relative_to(ROOT))],cwd=ROOT,capture_output=True)
+  self.assertNotEqual(old.returncode,0,'held-plate exception must only admit a new file')
+  animations=json.loads(held_plate.read_text())['animations']
+  self.assertEqual(set(animations),{'animation.kg_plate_held.'+alias for alias in ('fp_right','fp_left','tp_right','tp_left','layout')})
+  for alias in ('fp_right','fp_left','tp_right','tp_left'):
+   self.assertEqual(set(animations['animation.kg_plate_held.'+alias]['bones']),{'plate_pose'})
+  self.assertEqual(set(animations['animation.kg_plate_held.layout']['bones']),{f'plate_{kind}_{i}' for kind in ('slot','fixed') for i in range(5)})
+  self.assertEqual(held_plate.read_bytes(),plate_held_assets()[held_plate],'held-plate animation must match the complete G119 generator output')
+  allowed.add(str(held_plate.relative_to(ROOT)))
   # Only the complete-byte-pinned position delta is reversible. The restored
   # bytes must still equal this historical public baseline exactly.
   for name in ('a286_held.animation.json','seasoning_held.animation.json'):

@@ -1,12 +1,12 @@
 # 煙火舊 PR 處置與保留工作
 
-更新：2026-10-08。重新比對的 canonical 基準為 **2.8.116／`b4bd3229f254adf58be1ee413f89daa1ab9c4df0`**。
+更新：2026-10-09（香港）；追加 G118/G119 來源承接進度。18 個舊 head 的重新比對基準仍為 **2.8.116／`b4bd3229f254adf58be1ee413f89daa1ab9c4df0`**。
 18個舊草稿的原head列在下表；`ahead`、版號落後與PR是否開啟都不是功能已被承接的判據。
 本頁更新處置依據，**沒有在本地文件中宣告任何PR已關閉或合併**；GitHub操作與當時head應另行讀回。
 
 [原Phase 0快照](https://github.com/casama233/kaleidoscope-grilling-unofficial/blob/b4bd3229f254adf58be1ee413f89daa1ab9c4df0/docs/audit/PR-TRIAGE.md)保留G114當時的判斷。
 G116已承接#148的餐盤營養界限與#150的防誤食，不能再把這兩項列為未修。
-本輪瓶爆炸取消及手持提前食用飽和度修補另見[BUGS](../BUGS.md)，不冒稱為舊餐盤視覺功能完成。
+G117瓶保存與手持營養、G118放置盤／串譜顯示及G119手持盤各有獨立來源實作，詳見[現況表](../PARITY-MATRIX.md)。以下舊head與原生診斷身份保持；不以新增實作代表原生／真人已接受。
 
 ## 18個草稿的逐項處置
 
@@ -24,25 +24,25 @@ G116已承接#148的餐盤營養界限與#150的防誤食，不能再把這兩�
 | [#149](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/149)／[6e714853d029](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/6e714853d029f93f0186efa2e96e192e87735a74) | 舊整合線由分項工作取代 | 主要是#146–148與當時Java palette的union，沒有獨立新玩法delta。營養已吸收，placed顯示未入基準；現行另有後續素材／料理適配。 | 從PLATE-PLACED-DISPLAY承接有效差異，保留現行palette。 |
 | [#150](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/150)／[39e6dd145a84](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/39e6dd145a84abdf921382aef9c90833061aa955) | 防誤食已吸收，保留helper顯示差異 | G116已用`skewerUseTargetsPlate`仲裁block／item-use，另保留較近entity、前景outline與合法air-use。count-transition helper清理／yaw仍屬未入基準的專用renderer。 | PLATE-USE-ARBITRATION已修來源；cleanup／yaw併入PLATE-PLACED-DISPLAY。 |
 | [#152](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/152)／[fdc9892edcb7](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/fdc9892edcb714c22e1b014943b4ce86c4a2570d) | 保留功能來源，重提current-main修補 | ordinary model115完整mesh、source nativeYaw四朝向仍未入基準。原G89只觀察普通串／五牛肉四朝向，不代表all variants。 | PLATE-PLACED-DISPLAY。 |
-| [#153](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/153)／[6fbc56f9b49d](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/6fbc56f9b49d033f5df106123311096ee39f8702) | 保留未完成的新功能來源 | 五行／八word的手持餐盤core、builder、geometry與controller未入基準；secret-alt空顯示及native解碼未解決。現行没有`plate_held_visual_core.js`或`build_plate_held.py`。 | PLATE-HELD-CONTENTS及DECODE；需從current main整合。 |
+| [#153](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/153)／[6fbc56f9b49d](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/6fbc56f9b49d033f5df106123311096ee39f8702) | 保留未完成的新功能來源 | 原五行／八word原型未整包導入；G119已從G118建立新的core、builder、geometry與controller，採每份兩word＋獨立count。舊secret-alt／native解碼診斷保留，仍需新候選原生驗收。 | PLATE-HELD-CONTENTS及DECODE；[G119來源承接](../STATUS-A2.8.119.md)，C/D待驗。 |
 | [#155](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/155)／[b29737b25054](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/b29737b250544fea2e3ab712bad30c2c04498809) | Cloud已吸收，保留held診斷 | Cloud語法由canonical G101 scalar contract承接／改進；plate raw-word及first-person診斷仍屬未入基準的#153子系統。保留G90 secret-alt空／四牛肉可見的對照。 | PLATE-HELD-CONTENTS；不以Cloud已修代表整份PR已完成。 |
 | [#156](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/156)／[9d7185abc8ec](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/9d7185abc8ec98a53aa315cc18b13ea51c074786) | 診斷證據歸檔 | G92 default-off client canary、四posts、state53 control與legend；無已驗收生產玩法。 | 下方G92文檔；PLATE-HELD-DECODE。 |
 | [#158](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/158)／[44c5fd8a786a](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/44c5fd8a786addf6cf1881ba5f7d665f0f492b0c) | 診斷證據歸檔 | G93 raw word4=1、marker133及owner-bank輸入；G92服務端flag正確但client controls缺失。reciprocal-boundary只是當时假設。 | 下方G93文檔；PLATE-HELD-DECODE。 |
 | [#161](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/161)／[4014645d132e](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/4014645d132ec676791b2aa39752db37d84abb2e) | 診斷證據歸檔 | 舊G94二進位QA板的identity是`4014645d…`，不是canonical G94；8×8幾何控制板未入基準。原raw/native結果仍不可解讀。 | 下方獨立G94文檔；PLATE-HELD-DECODE。 |
 | [#163](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/163)／[ca6a2d077706](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/ca6a2d0777066b4bcdce278d1d0f501a39fbc2c5) | 診斷證據歸檔 | G95只改善QA板opaque UV、backing與label；packing／storage／arithmetic沒有新修補。後續stored1／4讀0／3故障需保留。 | 下方G95文檔；PLATE-HELD-DECODE。 |
-| [#164](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/164)／[90b8a624474e](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/90b8a624474e4f2fd526df2b633408a7ad5f3f1f) | 保留未驗證的held修補候選 | count-only `+0.5`只適用未入基準的held decoder；native stored1／4讀0／3已記錄，但G96候選未有原生驗收，palette低位仍未確定。 | 與#153／155一同處理；不孤立貼入不存在的current decoder。 |
+| [#164](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/164)／[90b8a624474e](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/90b8a624474e4f2fd526df2b633408a7ad5f3f1f) | 保留未驗證的held修補候選 | count-only `+0.5`只適用未入基準的held decoder；native stored1／4讀0／3已記錄，但G96候選未有原生驗收，palette低位仍未確定。 | G119另建有界word與獨立count，未套用舊+0.5；舊原生診斷續留。 |
 | [#172](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/172)／[39a7c9adf459](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/39a7c9adf45968b48d1213287a37766a57cf6829) | 已吸收，可關閉舊草稿 | 兩個bottle pose animation、held-pose generator／review工具與現行相同；消費時`seasoningLore`已有ingredient count。原G109identity不能回填。 | 現行瓶路徑；SEASONING-FLOW仍需真人復驗。 |
 | [#174](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/174)／[57d9068a5a08](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/57d9068a5a08262661ec050b22cc694114ad3f59) | 已吸收，可關閉舊草稿 | 加料／取回derived lore與missing-base chat已由G113承接，G114另修singleton RawMessage正規化、保留metadata。舊簽名不得覆蓋現在更完整的RawMessage支援。 | 現行`refreshBottleIngredientLore`／`warnMissingSeasoningBase`及G114回歸。 |
 
 ## 尚未完成工作的固定入口
 
-G117起點的可執行承接issue已建立：[放置餐盤 #181](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/181)與[手持餐盤內容／解碼 #182](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/182)。兩條線保留完整舊head、限定移植範圍與source／native／client驗收要求；placed顯示不依賴held尚未確定的解碼。建立追蹤不表示功能已驗收。
+G117起點的可執行承接issue已建立：[放置餐盤 #181](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/181)與[手持餐盤內容／解碼 #182](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/182)。兩條線保留完整舊head、限定移植範圍與source／native／client驗收要求；G118已補placed來源、G119補held來源，兩者皆保留獨立原生／client邊界。建立追蹤或有新實作都不表示已驗收。
 
 | 工作 | 保留來源 | 從現行來源接續的要求 |
 | --- | --- | --- |
 | [PLATE-PLACED-DISPLAY](../BUGS.md#plate-placed-display已放置餐盤缺完整內容投影) | #146／147／148顯示部分／149／150顯示部分／152 | 完整mesh、ordinary串、source FIXED布局、四朝向、initial/body rotation、成功交易後dirty與helper清理失敗守恆。保留現行palette、ownership及G116餐盤營養／防誤食，不引入舊QA主檔。 |
-| [PLATE-HELD-CONTENTS／DECODE](../BUGS.md#plate-held-contentsdecode未入主幹的手持餐盤原型) | 功能#153；#155 held診斷；#164 count候選 | 五行真實內容、雙手owner／registry、secret-alt、普通串與數量投影。現行尚無此子系統，不能先宣稱修好了decoder。 |
-| [PLATE-HELD-DECODE](../BUGS.md#plate-held-contentsdecode未入主幹的手持餐盤原型) | #156／158／161／163原生控制與#164候選 | 從可讀控制開始定位stored1／4→0／3及palette低位；區分JS／float32推算、native引擎與真人顯示。`+0.5`不得當作已驗收答案。 |
+| [PLATE-HELD-CONTENTS／DECODE](../BUGS.md#plate-held-contentsdecodeg119-手持盤來源實作原生待驗) | 功能#153；#155 held診斷；#164 count候選 | G119已新增五份真實內容、每手owner、普通／秘製串與獨立份數投影；接續需同一候選的原生同步、secret-alt、兩手切換及真人呈現，不能僅靠生成器接受。 |
+| [PLATE-HELD-DECODE](../BUGS.md#plate-held-contentsdecodeg119-手持盤來源實作原生待驗) | #156／158／161／163原生控制與#164候選 | 從可讀控制開始定位stored1／4→0／3及palette低位；區分JS／float32推算、native引擎與真人顯示。`+0.5`不得當作已驗收答案。 |
 | [EATING-ACCEPTANCE](../BUGS.md#eating-acceptance逐口雙手停止與離線) | #145 bounded原候選文檔 | 保留主手結算／正常relog與未啟動副手的事實；以新候選補真正原生事件／客戶端入口，無模擬玩家。 |
 | [SEASONING-FLOW](../BUGS.md#seasoning-flow自填瓶取回搖勻撒料) | #172／174已承接來源與G114修補 | 真人同瓶取回→80-tick搖勻→撒料、實際count、姿態及GUI仍有獨立驗收範圍。已吸收源碼不等於全部聲畫／client通過。 |
 
