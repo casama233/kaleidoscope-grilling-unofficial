@@ -1,4 +1,4 @@
-## Current maintained baseline: 2.8.110
+## Current maintained baseline: 2.8.113
 
 **G104 烤串背包與指南圖示修補**：空籤改用原作 GUI 竹籤，完成籤用原作三份遮罩及 fallback 色合成固定圖示；修正把三維 UV 圖集當成背包 sprite 的来源错误。[本版範圍](docs/STATUS-A2.8.104.md)明列固定平台替代、未完成的每物品動態顏色／數量／variants 與待真人驗收。
 

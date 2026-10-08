@@ -46,7 +46,7 @@ import './skewer_compat_runtime.js';
 import {EquipmentSlot,GameMode,EnchantmentType} from '@minecraft/server';
 import {captureEatingIdentity,eatingStillCurrent,eatingEventMatches,commitEating} from './a285_eating_transaction.js';
 import {completedUseStillCurrent} from './a2810_use_transaction.js';
-import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
+import {interactionFeedback,interactionFailure,javaInteractionFeedback,javaInteractionChat} from './a283_interaction_feedback.js';
 import {showJavaEatingHud} from './java_eating_hud_runtime.js';
 import {refreshPlacedBottleAfterPickup} from './a2770_placed_visual_runtime.js';
 import './guide/main.js';
@@ -487,7 +487,7 @@ function planSeasoningBottle(player,hand,needed){
  const stack=heldByHand(player,hand);if(!isSpecialSeasoningId(stack?.typeId))return {ok:false,reason:'not_seasoning'};
  const uses=getUses(stack),remaining=16-uses;if(remaining<needed)return {ok:false,reason:'insufficient',remaining};
  const ingredients=readSeasonings(stack),before=stack.clone();
- if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
+ // Both Java block callers use the consuming season overload in Creative too.
  const nextUses=uses+needed;
  if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
  const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses,ingredients.length))}catch{}
@@ -614,12 +614,19 @@ function commitBottleAndHand(block,current,nextItems,storage,nextHand,mutateHand
  return ok;
 }
 function pushBottle(block,player,held,hand='main'){
- const current=nativeBottles(block);if(current.items.length>=SEASONING_MAX_BOTTLES){message(player,'§c最多只能堆'+SEASONING_MAX_BOTTLES+'瓶');return false}
+ const current=nativeBottles(block);if(current.items.length>=SEASONING_MAX_BOTTLES)return false
  const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
  const items=[...current.items,copyOne(storage.before)];
  const ok=commitBottleAndHand(block,current,items,storage,next,!free);
  if(!ok)interactionFailure(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
  else blockSound(block,'seasoning_bottle_stack',1);return ok;
+}
+function refreshBottleIngredientLore(stack,data){
+ // Only derived Grilling count/status lines change; native metadata stays owned.
+ const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);
+ const derived=data.ingredients.length||data.kind==='pending'?seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind==='empty'}):[];
+ const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];
+ setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');
 }
 function handleSeasoningBlock(block,player,hand='main'){
  const current=nativeBottles(block),items=current.items.map(x=>x.clone());
@@ -627,14 +634,14 @@ function handleSeasoningBlock(block,player,hand='main'){
  if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}
  const topItem=items.at(-1),top=bottleDataFromItem(topItem);
  if(id&&Object.hasOwn(SEASONING_KINDS,id)){
-  if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}
+  if(top.kind==='special'){javaInteractionFeedback(player,top.ingredients.length>=SEASONING_CAPACITY?'bottle_full':'invalid_seasoning');return}
   if(top.ingredients.length>=SEASONING_CAPACITY){javaInteractionFeedback(player,'bottle_full');return}
   const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
   top.ingredients.push(id);
   // Java's explicit EMPTY -> PENDING promotion creates a fresh semantic item.
   // Same-kind fill changes preserve all stable-API metadata through readback.
   if(top.kind==='empty'&&hasSeasoningBase(top.ingredients))items[items.length-1]=bottleItem({...top,kind:'pending'});
-  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}
+  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');refreshBottleIngredientLore(topItem,top);items[items.length-1]=retargetBottleFillStack(topItem);}
   if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
   awardSeasoningMilestones(player,top.ingredients);
   blockSound(block,'action_success',.65);
@@ -645,12 +652,16 @@ function handleSeasoningBlock(block,player,hand='main'){
   const storage=captureWritableHand(player,hand);let item=items.pop();const data=bottleDataFromItem(item);
   if(storage.before)throw new Error('Grilling: take-bottle hand is no longer empty');
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
-  else item=retargetBottleFillStack(item);
+  else{if(data.kind!=='special')refreshBottleIngredientLore(item,data);item=retargetBottleFillStack(item);}
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
-  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}
+  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1);warnMissingSeasoningBase(player,item)}
   return;
  }
- javaInteractionFeedback(player,'invalid_seasoning');
+ javaInteractionFeedback(player,top.ingredients.length>=SEASONING_CAPACITY?'bottle_full':'invalid_seasoning');
+}
+function warnMissingSeasoningBase(player,stack){
+ const ingredients=readSeasonings(stack);
+ if(ingredients.length&&!hasSeasoningBase(ingredients))javaInteractionChat(player,'missing_base_seasoning');
 }
 function sameBottleTarget(block,snapshot){
  return block&&block.typeId===snapshot.typeId&&Object.entries(snapshot.states).every(([key,value])=>block.permutation.getState(key)===value);
@@ -745,16 +756,16 @@ function queueBottlePlacement(player,targetBlock,intent,proposed){
 function scheduleNativeBottleBreak(e){
  if(e.cancel||!isSeasoningBlock(e.block.typeId))return;e.cancel=true;
  try{
-  const dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);
+  const player=e.player,dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);
   const owner=world.getDynamicProperty(stationStorageKey(e.block)),projection=world.getDynamicProperty(seasoningBlockKey(e.block));
   system.run(()=>{try{
    const block=dimension.getBlock(location);
    if(!sameBottleTarget(block,snapshot)||world.getDynamicProperty(stationStorageKey(block))!==owner||world.getDynamicProperty(seasoningBlockKey(block))!==projection)return;
-   breakNativeBottles(block);
+   breakNativeBottles(block,true,player);
   }catch(error){console.warn('[Grilling bottle break] '+error)}});
  }catch(error){console.warn('[Grilling bottle break capture] '+error)}
 }
-function breakNativeBottles(block,dropContents=true){
+function breakNativeBottles(block,dropContents=true,player){
  if(!block||!isSeasoningBlock(block.typeId))return false;
  const current=nativeBottles(block),permutation=block.permutation,drops=[];
  const steps=(dropContents?current.items:[]).map(item=>{let entity,attempted=false;return {
@@ -765,6 +776,7 @@ function breakNativeBottles(block,dropContents=true){
   {apply(){block.setType('minecraft:air')},rollback(){block.setPermutation(permutation)}});
  const result=commitSteps(steps);if(!bottleRollbackStatus(block,result))return false;
  try{retireEmptyStationContainer(block)}catch(error){console.warn('[Grilling bottle break storage retirement] '+error)}
+ if(dropContents&&player)for(const item of current.items)warnMissingSeasoningBase(player,item);
  return true;
 }
 // Java support loss returns AIR without the playerWillDestroy payout. The

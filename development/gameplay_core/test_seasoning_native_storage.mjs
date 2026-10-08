@@ -6,6 +6,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import * as core from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {seasoningLore} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/localized_lore_core.js';
+import {javaInteractionMessage,createFailureFeedbackGate} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/interaction_feedback_core.js';
 import * as visuals from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2766_special_seasoning_visual_core.js';
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
 import {slotWrite} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_transfer_plan.js';
@@ -31,7 +33,7 @@ function decorated(kind='special',uses=15){
  s.props={[core.SEASONING_LIST_KEY]:JSON.stringify(kind==='empty'?[]:core.BASE_SEASONINGS),[core.SEASONING_USES_KEY]:uses,[core.SEASONING_VARIANT_KEY]:5,'other:boolean':true,'other:number':7,'other:string':'kept','other:vector':{x:1,y:2,z:3}};return s;
 }
 function fixture({withPlacedVisuals=false}={}){
- const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[],drops=[],visualCalls=[];let serial=0,hand,fail=()=>false,mode='survival';
+ const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[],drops=[],visualCalls=[],messages=[],feedback=[],customMessages=[];let serial=0,hand,fail=()=>false,mode='survival';
  const mutate=(key,action)=>{action();if(fail(key))throw Error('Injected '+key);};
  const container=(id,size)=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone()},setItem(i,s){mutate(id+':slot'+i,()=>this.rows[i]=s?.clone())}});
  const dimension={id:'minecraft:overworld',getBlock(p){const k=[p.x,p.y,p.z].join('/');if(!blocks.has(k))blocks.set(k,makeBlock(p));return blocks.get(k);},getEntities(q){return [...entities.values()].filter(e=>e.typeId===q.type&&(!q.location||Math.hypot(e.location.x-q.location.x,e.location.y-q.location.y,e.location.z-q.location.z)<=q.maxDistance))},spawnParticle(){},spawnEntity(typeId,location){
@@ -48,17 +50,17 @@ function fixture({withPlacedVisuals=false}={}){
   afterEvents:Object.fromEntries(['playerPlaceBlock','playerInteractWithBlock','playerBreakBlock'].map(name=>[name,{subscribe(){}}]))};
  // These storage roundtrips explicitly place pending bottles with Java's sneak
  // gesture; standing use is covered by test_seasoning_native_hands.mjs.
- const holder={id:'test-player',dimension,location:{x:0,y:65,z:0},isSneaking:true,selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
+ const holder={sendMessage:m=>messages.push(structuredClone(m)),id:'test-player',dimension,location:{x:0,y:65,z:0},isSneaking:true,selectedSlotIndex:0,isValid:true,getGameMode:()=>mode};
  let context,api,placed;
  const load=()=>{
   const system={currentTick:10,run:f=>queue.push(f),runInterval(){},runJob(job){for(const step of job){}}};
   const visualContext=vm.createContext({...placedCore,visitUniqueTracked,INGREDIENT_COLORS,world,system,console:{warn(){}},grillingConfig:()=>({placedHelpers:1024}),HOST_BLOCK_ID:'kaleidoscope_cookery:oil_pot',readPlacedOilPotState(){throw Error('Not a bottle target')}});
   vm.runInContext(strip(read('a2770_placed_visual_queue.js')),visualContext);
   const visualQueue=vm.runInContext('({markPlacedVisualDirty,dirtyPlacedVisuals,visualLocationKey})',visualContext);
-  context=vm.createContext({canonicalFoodId,forgetEatingItem(){},...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
+  context=vm.createContext({seasoningLore,canonicalFoodId,forgetEatingItem(){},...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
    EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
-   readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
-   markPlacedVisualDirty:visualQueue.markPlacedVisualDirty,refreshPlacedBottleAfterPickup(){},blockSound(){},message(){},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
+   readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),getItemRawLore:s=>structuredClone(s.lore),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
+   markPlacedVisualDirty:visualQueue.markPlacedVisualDirty,refreshPlacedBottleAfterPickup(){},blockSound(){},message(...args){customMessages.push(args)},javaInteractionChat(player,key){player.sendMessage?.({translate:'message.kaleidoscope_grilling.'+key})},javaInteractionFeedback(_p,key){feedback.push(key)},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
    heldMain:()=>hand?.clone(),heldByHand:()=>hand?.clone(),creative:()=>mode==='creative',
    captureWritableHand(_,which='main'){if(which==='off')return {before:undefined,write(){throw Error('Empty offhand fixture')}};const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
    captureInteractionIntent:()=>({hand:'main',signature:JSON.stringify(hand)}),interactionIntentStillCurrent:(_,intent)=>JSON.stringify(hand)===intent.signature});
@@ -71,12 +73,12 @@ function fixture({withPlacedVisuals=false}={}){
    context.refreshPlacedBottleAfterPickup=placed.refreshPlacedBottleAfterPickup;
   }
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);
-  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
+  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','refreshBottleIngredientLore','warnMissingSeasoningBase','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
   const main=read('main.js');vm.runInContext('const pendingBottlePlacements=new Set();\n'+fn(main,'queueBottlePlacement')+'\n'+names.map(n=>fn(main,n)).join('\n'),context);
   api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage,retargetBottleFillStack})',context);
  };
  load();const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
- return {world,dimension,block,holder,dp,entities,queue,drops,visualCalls,permutation,get api(){return api},get placed(){return placed},get hand(){return hand},set hand(s){hand=s?.clone()},setMode(v){mode=v},reload(){load()},failOnce(target){let once=true;fail=k=>once&&k===target?(once=false,true):false},setFault(fn){fail=fn},place(){const e={block,player:holder,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;}};
+ return {world,dimension,block,holder,dp,entities,queue,drops,messages,visualCalls,feedback,customMessages,permutation,get api(){return api},get placed(){return placed},get hand(){return hand},set hand(s){hand=s?.clone()},setMode(v){mode=v},reload(){load()},failOnce(target){let once=true;fail=k=>once&&k===target?(once=false,true):false},setFault(fn){fail=fn},place(){const e={block,player:holder,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;}};
 }
 const equal=(a,b)=>assert.equal(JSON.stringify(a),JSON.stringify(b));
 for(const uses of [1,15])test('first placement and pickup preserve exact finished native stack uses '+uses,()=>{
@@ -91,7 +93,7 @@ test('four differently named stacks survive independent runtime reload and varia
 });
 test('pending remains pending and retains unrelated metadata when incomplete ingredients are added',()=>{
  const f=fixture(),s=decorated('pending');s.props[core.SEASONING_LIST_KEY]='[]';f.hand=s;f.place();f.hand=new Stack('minecraft:redstone');f.api.handleSeasoningBlock(f.block,f.holder);const stored=f.api.nativeBottles(f.block).items[0];
- assert.equal(stored.typeId,PENDING+'_f1');assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone']);
+ assert.equal(stored.typeId,PENDING+'_f1');assert.equal(stored.nameTag,s.nameTag);equal(stored.lore.filter(l=>l.text),s.lore.filter(l=>l.text));assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone']);
 });
 test('empty with incomplete ingredients preserves metadata, explicit empty-to-pending promotion recreates it',()=>{
  const f=fixture(),s=decorated('empty');f.hand=s;f.place();
@@ -104,7 +106,7 @@ for(const kind of ['empty','pending'])test('partial '+kind+' add/pickup/replacem
  }
  const stored=f.api.nativeBottles(f.block).items[0];
  assert.equal(stored.typeId,N+(kind==='empty'?'partial':'pending')+'_seasoning_f2');equal(JSON.parse(stored.props[core.SEASONING_LIST_KEY]),['minecraft:redstone',core.BASE_SEASONINGS[0]]);
- assert.equal(stored.nameTag,s.nameTag);equal(stored.lore,s.lore);assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');
+ assert.equal(stored.nameTag,s.nameTag);equal(stored.lore.filter(l=>l.text),s.lore.filter(l=>l.text));assert.equal(stored.opaqueNative,undefined,'Opaque data cannot be projected across a type change');
  f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
  f.place();equal(f.api.nativeBottles(f.block).items[0],stored);
  f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);
@@ -212,7 +214,7 @@ test('retirement with unexpected nonempty inventory fails closed and preserves i
 });
 
 for(const kind of ['partial','pending'])for(let fill=1;fill<=8;fill++)test(`${kind} fill ${fill} native place/reload/pickup retains the exact proxy stack`,()=>{
- const f=fixture(),s=decorated(kind==='partial'?'empty':'pending');s.typeId=N+kind+'_seasoning_f'+fill;s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(fill).fill('minecraft:redstone'));
+ const f=fixture(),s=decorated(kind==='partial'?'empty':'pending');s.typeId=N+kind+'_seasoning_f'+fill;s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(fill).fill('minecraft:redstone'));s.lore.push(...seasoningLore(undefined,fill,{pending:kind==='pending',missingBase:kind==='partial'}));
  f.hand=s;f.place();equal(f.api.nativeBottles(f.block).items[0],s);f.reload();equal(f.api.nativeBottles(f.block).items[0],s);
  f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
 });
@@ -316,4 +318,73 @@ test('untracked surviving stack remains queued for normal reconstruction after p
  assert.equal(f.placed.tracked.size,0);f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,second);
  assert.equal(f.placed.tracked.size,0);assert.equal(placedEntities(f).length,0);assert.equal(f.placed.dirtyPlacedVisuals.size,1);
  f.placed.pump();assert.equal(placedEntities(f).length,1);equal(f.api.nativeBottles(f.block).items,[first]);
+});
+
+const countKey='tooltip.kaleidoscope_grilling.seasoning.ingredients';
+const countOf=s=>s.lore.find(l=>l.translate===countKey)?.with?.[0];
+const allEight=['kaleidoscope_grilling:totem_powder',...core.BASE_SEASONINGS,...Object.keys(core.SEASONING_KINDS).filter(id=>id!=='kaleidoscope_grilling:totem_powder'&&!core.BASE_SEASONINGS.includes(id))];
+test('totem first then three bases counts 4 through 8 across pickup replacement and runtime reload',()=>{
+ const f=fixture();f.hand=new Stack(EMPTY);f.place();
+ for(let i=0;i<allEight.length;i++){
+  f.hand=new Stack(allEight[i],3);f.api.handleSeasoningBlock(f.block,f.holder);assert.equal(f.hand.amount,2);
+  const stored=f.api.nativeBottles(f.block).items[0];assert.equal(countOf(stored),String(i+1));equal(f.api.bottleDataFromItem(stored).ingredients,allEight.slice(0,i+1));
+  assert.equal(core.isPendingSeasoningId(stored.typeId),i>=3);
+  f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,stored);f.place();f.reload();equal(f.api.nativeBottles(f.block).items[0],stored);
+ }
+ const before=f.api.nativeBottles(f.block).items[0];f.hand=new Stack('minecraft:redstone',3);f.api.handleSeasoningBlock(f.block,f.holder);assert.equal(f.hand.amount,3);equal(f.api.nativeBottles(f.block).items[0],before);
+});
+for(const kind of ['empty','pending'])test(kind+' same-kind count preserves independent bottle metadata and custom lore',()=>{
+ const f=fixture(),lower=decorated('special'),s=decorated(kind);lower.nameTag='Lower untouched';f.hand=lower;f.place();
+ s.props[core.SEASONING_LIST_KEY]='[]';s.lore.push(...seasoningLore(undefined,0,{pending:kind==='pending',missingBase:kind==='empty'}));f.hand=s;f.api.pushBottle(f.block,f.holder,s);
+ for(let i=1;i<=8;i++){
+  f.hand=new Stack('minecraft:redstone',3);f.api.handleSeasoningBlock(f.block,f.holder);const rows=f.api.nativeBottles(f.block).items,stored=rows[1];equal(rows[0],lower);
+  assert.equal(countOf(stored),String(i));equal(stored.lore.filter(l=>l.text),s.lore.filter(l=>l.text));
+  for(const key of ['nameTag','amount','keepOnDeath','lockMode','canDestroy','canPlaceOn'])equal(stored[key],s[key]);
+  for(const [key,value] of Object.entries(s.props))if(key!==core.SEASONING_LIST_KEY)equal(stored.props[key],value);
+  assert.equal(core.isPendingSeasoningId(stored.typeId),kind==='pending');f.reload();equal(f.api.nativeBottles(f.block).items,rows);
+ }
+});
+test('pending promotion count specifically advances from 4 to 8',()=>{
+ const f=fixture();f.hand=f.api.bottleItem({kind:'pending',ingredients:allEight.slice(0,4),uses:0,variant:0});f.place();assert.equal(countOf(f.api.nativeBottles(f.block).items[0]),'4');
+ for(const id of allEight.slice(4)){f.hand=new Stack(id,3);f.api.handleSeasoningBlock(f.block,f.holder)}
+ f.hand=undefined;f.api.handleSeasoningBlock(f.block,f.holder);assert.equal(countOf(f.hand),'8');equal(f.api.bottleDataFromItem(f.hand).ingredients,allEight);
+});
+
+const warning={translate:'message.kaleidoscope_grilling.missing_base_seasoning'};
+for(const kind of ['empty','pending','special'])for(const ingredients of [[],['minecraft:redstone'],[...core.BASE_SEASONINGS]])test(kind+' pickup exact chat warning '+JSON.stringify(ingredients),()=>{
+ const f=fixture(),s=decorated(kind);s.props[core.SEASONING_LIST_KEY]=JSON.stringify(ingredients);f.hand=s;f.place();f.api.handleSeasoningBlock(f.block,f.holder);equal(f.messages,ingredients.length&&!core.hasSeasoningBase(ingredients)?[warning]:[]);
+});
+test('failed pickup does not warn or mutate original bottle',()=>{
+ const f=fixture(),s=decorated('pending');s.props[core.SEASONING_LIST_KEY]='["minecraft:redstone"]';f.hand=s;f.place();f.failOnce('hand');f.api.handleSeasoningBlock(f.block,f.holder);equal(f.messages,[]);equal(f.api.nativeBottles(f.block).items[0],s);
+});
+for(const fail of [false,true])test('player break four bottles warning follows successful transaction '+!fail,()=>{
+ const f=fixture(),original=[];for(const ingredients of [[],['minecraft:redstone'],[...core.BASE_SEASONINGS],['kaleidoscope_grilling:totem_powder']]){const s=decorated('pending');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(ingredients);original.push(s);f.hand=s;if(original.length===1)f.place();else f.api.pushBottle(f.block,f.holder,s)}
+ if(fail)f.failOnce('entity1:slot0');f.api.scheduleNativeBottleBreak({block:f.block,player:f.holder,cancel:false});while(f.queue.length)f.queue.shift()();
+ equal(f.messages,fail?[]:[warning,warning]);if(fail){equal(f.api.nativeBottles(f.block).items,original);assert.equal(f.drops.length,0)}else{equal(f.drops.map(d=>d.item),original);assert.equal(f.block.typeId,'minecraft:air')}
+});
+test('nonplayer destruction and support loss never emit missing-base chat',()=>{
+ for(const support of [false,true]){const f=fixture(),s=decorated('pending');s.props[core.SEASONING_LIST_KEY]='["minecraft:redstone"]';f.hand=s;f.place();if(support){f.block.below().setType('minecraft:air');f.api.tickNativeBottleSupport(f.block)}else f.api.breakNativeBottles(f.block);equal(f.messages,[])}
+});
+
+for(const kind of ['empty','pending'])for(const fail of [false,true])test(kind+' stale full8 pickup repairs only owned lore, transactional failure='+fail,()=>{
+ const f=fixture(),s=decorated(kind),ingredients=kind==='pending'?allEight:Array(8).fill('minecraft:redstone');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(ingredients);s.typeId=core.seasoningFillVisualId(s.typeId,ingredients);s.lore.push(...seasoningLore(undefined,4,{pending:kind==='pending',missingBase:kind==='empty'}));f.hand=s;f.place();
+ if(fail)f.failOnce('hand');f.api.handleSeasoningBlock(f.block,f.holder);
+ if(fail){assert.equal(f.hand,undefined);equal(f.api.nativeBottles(f.block).items[0],s);return}
+ const expected=s.clone();expected.lore=[...s.lore.filter(l=>l.text),...seasoningLore(undefined,8,{pending:kind==='pending',missingBase:kind==='empty'})];equal(f.hand,expected);equal(f.hand.props,s.props);
+ f.place();f.reload();equal(f.api.nativeBottles(f.block).items[0],expected);f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,expected);
+});
+
+for(const count of [1,8])for(const input of [core.BASE_SEASONINGS[0],'minecraft:stone'])test('source rejection key for '+input+' on '+count+'/8 finished',()=>{
+ const f=fixture(),s=decorated('special');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(count).fill(core.BASE_SEASONINGS[0]));f.hand=s;f.place();const before=f.api.nativeBottles(f.block).items;f.hand=new Stack(input);f.api.handleSeasoningBlock(f.block,f.holder);assert.deepEqual(f.feedback,[count===8?'bottle_full':'invalid_seasoning']);assert.deepEqual(f.customMessages,[]);equal(f.api.nativeBottles(f.block).items,before);assert.equal(f.hand.amount,1);
+});
+test('fifth bottle remains quiet and unconsumed',()=>{
+ const f=fixture();for(let i=0;i<4;i++){f.hand=decorated('empty');if(i)f.api.pushBottle(f.block,f.holder,f.hand);else f.place();}f.hand=decorated('pending');const before=f.hand;assert.equal(f.api.pushBottle(f.block,f.holder,f.hand),false);equal(f.hand,before);assert.deepEqual(f.customMessages,[]);assert.deepEqual(f.feedback,[]);
+});
+
+test('the original false-overlay missing-base message goes to translated chat',()=>{
+ const chat=[],bar=[],context=vm.createContext({javaInteractionMessage,createFailureFeedbackGate,system:{currentTick:0},world:{afterEvents:{playerLeave:{subscribe(){}}}}});
+ vm.runInContext(strip(read('a283_interaction_feedback.js'))+';this.chat=javaInteractionChat;',context);
+ const player={sendMessage(v){chat.push(v)},onScreenDisplay:{setActionBar(v){bar.push(v)}}};
+ assert.equal(context.chat(player,'missing_base_seasoning'),true);assert.deepEqual(JSON.parse(JSON.stringify(chat)),[javaInteractionMessage('missing_base_seasoning')]);assert.deepEqual(bar,[]);
+ assert.equal(context.chat(player,'invented_key'),false);assert.equal(chat.length,1);
 });

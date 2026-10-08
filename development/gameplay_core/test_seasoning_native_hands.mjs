@@ -89,7 +89,7 @@ function fixture(){
   EquipmentSlot:{Offhand:'offhand'},GameMode:{Survival:'survival',Creative:'creative'},
   BlockPermutation:{resolve:permutation},SEASONING_BLOCK:core.SEASONING_PLACE_BLOCK_ID,
   console:{warn(){},error(){}},markPlacedVisualDirty(){},refreshPlacedBottleAfterPickup(){},blockSound(){},message(){},
-  javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},interactionParticleBurst(){},transactionStatus:r=>r.ok,
+  javaInteractionChat(player,key){player.sendMessage?.({translate:'message.kaleidoscope_grilling.'+key})},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},interactionParticleBurst(){},transactionStatus:r=>r.ok,
   EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
   seasoningLore:()=>[],
  });
@@ -107,7 +107,7 @@ function fixture(){
  for(const name of ['family_station_storage.js','a2743_seasoning_block_adapter.js','seasoning_native_storage.js'])run(strip(read(name)));
  run('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;');
  const functions=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles',
-  'bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget',
+  'bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','refreshBottleIngredientLore','warnMissingSeasoningBase','handleSeasoningBlock','sameBottleTarget',
   'bottleTargetSnapshot','scheduleNativeBottlePlacement','tryScheduleOffhandBottleInteraction','queueBottlePlacement'];
  const source=read('main.js');
  run(source.slice(source.indexOf('const bottleInteractionSupports='),source.indexOf('function tryScheduleOffhandBottleInteraction(')));

@@ -141,6 +141,14 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             delta = _main_delta('g110-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 110]
             expected = _apply_main_operations(expected, delta)
+        if version >= (2, 8, 111):
+            delta = _main_delta('g111-main-reviewed-delta.json')
+            assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 111]
+            expected = _apply_main_operations(expected, delta)
+        if version >= (2, 8, 113):
+            delta = _main_delta('g113-main-reviewed-delta.json')
+            assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 113]
+            expected = _apply_main_operations(expected, delta)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)
