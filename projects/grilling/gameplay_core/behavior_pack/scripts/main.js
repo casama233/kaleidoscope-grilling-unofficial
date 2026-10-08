@@ -799,10 +799,15 @@ function scheduleNativeBottleExplosion(e){
   else keep.push(block);
  }
  if(!pending.length)return;e.setImpactedBlocks(keep);
- system.run(()=>{for(const row of pending)try{
-  const block=row.dimension.getBlock(row.location);
-  if(bottleActionStillCurrent(block,row.captured))breakNativeBottles(block,false);
- }catch(error){console.warn('[Grilling bottle explosion recovery] '+error)}});
+ system.run(()=>{
+  // Later before-event subscribers may cancel. Keep native contents intact
+  // unless the deferred event still confirms the explosion may proceed.
+  try{if(e.cancel!==false)return}catch(error){console.warn('[Grilling bottle explosion status] '+error);return}
+  for(const row of pending)try{
+   const block=row.dimension.getBlock(row.location);
+   if(bottleActionStillCurrent(block,row.captured))breakNativeBottles(block,false);
+  }catch(error){console.warn('[Grilling bottle explosion recovery] '+error)}
+ });
 }
 function handleCustomBlockInteraction(block,player,intent){
  if(!block||(block.typeId!==GRILL_ID&&!isSeasoningBlock(block.typeId)))return;
@@ -886,7 +891,14 @@ function hungerSettle(player,id,active){
    const c=mainContainer(player);if(!c)throw new Error('Inventory unavailable');c.setItem(active.use.slot,stack);
   }
  };
- if(!commitEating({debit:()=>{if(!creative(player))write(next)},reward:()=>{h.setCurrentValue(hunger);sat.setCurrentValue(saturation)},
+ if(!commitEating({debit:()=>{if(!creative(player))write(next)},reward:()=>{
+  h.setCurrentValue(hunger);
+  // As with plate nutrition, the pre-hunger saturation view may retain its
+  // old cap. Refresh inside the transaction so failure restores the serving.
+  const currentSat=player.getComponent('minecraft:player.saturation');
+  if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');
+  currentSat.setCurrentValue(Math.min(saturation,currentSat.effectiveMax));
+ },
   restoreFood:()=>{if(!creative(player))write(before)},restoreNutrition:()=>{h.setCurrentValue(oldH);sat.setCurrentValue(oldS)}}))return false;
 
  if(RAW_NAUSEA[id])try{player.addEffect('nausea',60,{showParticles:true})}catch{};if(id===MYSTERIOUS_ID)try{player.addEffect('nausea',100,{showParticles:true})}catch{};if(id===DARK_ID)try{player.addEffect('blindness',200,{showParticles:true})}catch{}

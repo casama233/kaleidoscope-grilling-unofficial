@@ -38,6 +38,7 @@ def public_json(relative_path):
 
 MAIN_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
 REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
+REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -88,6 +89,23 @@ def _apply_main_operations(expected, delta):
     expected = text.encode('utf-8')
     assert hashlib.sha256(expected).hexdigest() == delta['after_sha256'], 'Reviewed main delta is incomplete'
     return expected
+
+
+@lru_cache(maxsize=1)
+def _reviewed_conservation_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_CONSERVATION_BASE + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g117_conservation_bytes(expected):
+    # Append the two reviewed G116 -> G117 repairs; retain every earlier preimage.
+    # As with G115, an editable delta/hash cannot admit bytes outside the public commit.
+    delta = _main_delta('g117-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 117]
+    assert delta['reviewed_commit'] == REVIEWED_CONSERVATION_BASE
+    assert len(delta['operations']) == 2, 'Reviewed G117 source requires exactly two repairs'
+    repaired = _apply_main_operations(expected, delta)
+    assert repaired == _reviewed_conservation_source(), 'Reviewed G117 source differs outside conservation deltas'
+    return repaired
 
 
 def _local_bottle_main_bytes(expected, version):
@@ -186,6 +204,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _apply_main_operations(expected, delta)
         if version >= (2, 8, 115):
             expected = _g115_nutrition_bytes(expected)
+        if version >= (2, 8, 117):
+            expected = _g117_conservation_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)

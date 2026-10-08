@@ -1,8 +1,8 @@
 # 煙火目前缺口與待重現問題
 
-Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.116，2026-10-08。
+Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.117，2026-10-08。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
-G116窄修補承接了餐盤營養界限與防誤食；其他功能原型仍分開保留，真人驗收待完成。
+G116承接餐盤營養界限與防誤食；G117修復瓶爆炸取消及手持提前結算界限。其他功能原型仍分開保留，真人驗收待完成。
 現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
 
 ## SKEWER-GUI：任意食材秘製串 inventory icon
@@ -36,6 +36,21 @@ Java 預期：EMPTY→PENDING→80-tick held-use→SPECIAL，成功調味才消�
 `main.js` 的 `refreshBottleIngredientLore`／`warnMissingSeasoningBase`／取瓶與 seasoning handlers。
 失敗的舊瓶如何編碼已被保留為來源回歸案例；本輪没有再做真人操作。
 
+## SEASONING-EXPLOSION-CANCEL：後續取消爆炸仍清除瓶與內容
+
+**狀態：G116來源可重現；G117已在延後結算前確認取消狀態，未沿用舊候選的原生／client驗收。**
+
+重現：放置含自訂名稱、外來metadata與材料的調料瓶，讓原生爆炸before-event先經過瓶handler，
+再由較後訂閱者設 `cancel=true`，最後執行已排程工作。
+G116仍把瓶變成AIR、清除native容器與兩筆保存資料，沒有掉落。
+
+`scheduleNativeBottleExplosion`現在與既有餐盤路徑一致：延後工作只在 `cancel===false` 時繼續，
+取消或讀取event失敗均保留方塊、完整ItemStack與原有ownership；既有目標／owner快照檢查保留。
+原本未取消爆炸的Java毀損與不掉落行為不變。
+既有 [native-storage API回歸](../development/gameplay_core/test_seasoning_native_storage.mjs)新增一項具體故障案例，
+直接執行production函式並核對完整瓶資料、容器identity與保存記錄；這是B，並非BDS或真人爆炸操作證據。
+此次runtime變更使用新的G117identity；完整家族准入另行記錄，不能重用G116包證據。
+
 ## PLATE-SATURATION：餐盤營養寫入使用舊飽和度界限
 
 **狀態：G116已承接營養窄修補；production函式回歸通過，受影響Player／client待LIVE復驗。**
@@ -49,6 +64,22 @@ Java 預期：完成食用後按食物資料加飢餓與飽和度，且只結算
 G116 的 `addSecretNutrition` 在 hunger 寫入後重新取得 saturation，尊重 live effectiveMax；
 刷新／寫入失敗仍回滾，沒有導入舊餐盤union。[修補範圍與LIVE場景](STATUS-A2.8.116.md)；
 [PR148](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/148) 保留原故障與來源。
+
+## HANDHELD-SATURATION：手持串提前結算沿用舊飽和度界限
+
+**狀態：G116的餐盤修補沒有覆蓋這條手持路徑；G117已修正production結算，實際Player／client仍待復驗。**
+
+重現：hunger=10、saturation=10，手持兩份熟牛肉串，在25-tick checkpoint後停止使用。
+使用餐盤G116回歸已有的native captured-cap模型，舊 `hungerSettle` 先讀取cap=10的saturation view，
+再將hunger提高至15並用舊view寫saturation=15，導致整筆交易退回10／10且不消耗、不給效果。
+hunger=10、saturation=2的對照則可以成功，說明不是所有提前停止都失敗。
+
+現在hunger寫入後才重取saturation component，在其即時effectiveMax內完成原配方的營養結算。
+取得或寫入失敗仍回復完整食物與原hunger／saturation；不修改份數、25-tick checkpoint、
+熱食倍數、一次結算、原生完整食用或既有餐盤路徑。
+[實際handler回歸](../development/gameplay_core/test_eating_native_completion.mjs)涵蓋新cap、較低有效cap、
+metadata保留、重複stop／complete不再扣料，以及refresh／寫入失敗回滾。
+這是production函式與API模型的B；不是新的真人飢餓值或原生食用事件觀察。
 
 ## PLATE-USE-ARBITRATION：點餐盤時意外食用手持剩餘串
 

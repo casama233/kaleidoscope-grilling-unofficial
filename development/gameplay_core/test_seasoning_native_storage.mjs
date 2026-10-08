@@ -180,6 +180,17 @@ test('cancelled explosion and replaced bottle cannot destroy an unrelated new ow
  if(!cancelled)f.block.setType('minecraft:stone');while(f.queue.length)f.queue.shift()();assert.equal(f.entities.size,1);assert.equal(f.drops.length,0);
  }
 });
+test('later cancellation or unreadable explosion preserves the bottle and exact saved ownership',()=>{
+ for(const status of ['cancelled','unreadable']){
+  const f=fixture(),bottle=decorated();f.hand=bottle;f.place();
+  const saved=[...f.dp],owners=[...f.entities.keys()];let deferred=false;
+  const event={get cancel(){if(deferred&&status==='unreadable')throw Error('Event no longer readable');return deferred},getImpactedBlocks:()=>[f.block],setImpactedBlocks(){}};
+  f.api.scheduleNativeBottleExplosion(event);assert.equal(f.queue.length,1);deferred=true;
+  while(f.queue.length)f.queue.shift()();
+  assert.equal(f.block.typeId,N+'seasoning_bottle_1',status);equal([...f.dp],saved);equal([...f.entities.keys()],owners);
+  equal(f.api.nativeBottles(f.block).items,[bottle]);assert.equal(f.drops.length,0);
+ }
+});
 test('support removal failure restores original native contents instead of losing them',()=>{
  const f=fixture(),s=decorated();f.hand=s;f.place();f.block.below().setType('minecraft:air');f.failOnce('block:64');f.api.tickNativeBottleSupport(f.block);
  assert.equal(f.block.typeId,N+'seasoning_bottle_1');equal(f.api.nativeBottles(f.block).items[0],s);assert.equal(f.drops.length,0);

@@ -37,7 +37,7 @@ function fixture(){
  let state=logic.initialState(),off,tick=1000,failHand=false;const metadata=new Map(),grill=new Container(3),bag=new Container(12),sounds=[],settlements=[],notices=[];
  const world={getAbsoluteTime:()=>tick,getDynamicProperty:k=>metadata.get(k),setDynamicProperty:(k,v)=>v===undefined?metadata.delete(k):metadata.set(k,v)};items.configureItemDataWorld(world);
  const dimension={playSound(){},spawnItem(){throw Error('unexpected drop')}},block={isValid:true,typeId:data.GRILL_ID,x:0,y:0,z:0,location:{x:0,y:0,z:0},dimension};
- const hunger={currentValue:0,effectiveMax:20,setCurrentValue(v){this.currentValue=v}},saturation={currentValue:0,setCurrentValue(v){this.currentValue=v}};
+ const hunger={currentValue:0,effectiveMax:20,setCurrentValue(v){this.currentValue=v}},saturation={currentValue:0,effectiveMax:20,setCurrentValue(v){this.currentValue=v}};
  const holder={id:'storage-adapter',name:'Storage adapter',selectedSlotIndex:0,isSneaking:false,dimension,location:block.location,playAnimation(){},getComponent:id=>id.endsWith('hunger')?hunger:id.endsWith('saturation')?saturation:undefined};
  const write=(hand,s)=>{if(hand==='off')off=s?.clone();else bag.setItem(0,s);if(failHand){failHand=false;throw Error('injected hand write')}};
  const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},finishedFoodMeta,grillingConfig:()=>CONFIG_DEFAULTS,...data,...logic,...skewers,...secretShape,...items,...snapshots,...seasoning,...bottleVisuals,...oil,...tools,...heat,world,system:{get currentTick(){return tick}},ItemStack:Stack,foodFacts,primitiveStackProps,commitSteps,commitTwoParty,slotWrite,captureEatingIdentity,eatingStillCurrent,commitEating,

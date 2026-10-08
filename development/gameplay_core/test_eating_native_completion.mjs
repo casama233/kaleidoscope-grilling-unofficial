@@ -35,7 +35,7 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
  const state={stack:new Stack(amount),other:new Stack(1),creative};state.stack.typeId=mealId;
  state.other.typeId='minecraft:torch';state.other.nameTag='Keep opposite equipment';state.other.props={foreign:'unchanged'};
  const hunger={effectiveMax:20,get currentValue(){return nutrition.hunger},setCurrentValue(n){nutrition.hunger=n}};
- const saturation={get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
+ const saturation={effectiveMax:20,get currentValue(){return nutrition.saturation},setCurrentValue(n){nutrition.saturation=n}};
  const bag={setItem(_slot,stack){counts.manualWrites++;state.stack=stack?.clone()}};
  const equipment={setEquipment(_slot,stack){counts.manualWrites++;state.stack=stack?.clone();return true}};
  if(helperEmpty)state.other=undefined;
@@ -126,6 +126,42 @@ for(const delta of [23,24,25])test(`real hungerSettle production body retains re
  assert.deepEqual(f.counts,{nativeDebits:0,manualWrites:delta>=24?1:0,nativeRewards:0,manualRewards:delta>=24?1:0});
  assert.equal(f.state.stack.amount,delta>=24?1:2);assert.equal(f.nutrition.hunger,delta>=24?15:10);
  f.complete({tick:190});assert.equal(f.counts.nativeRewards,0);
+});
+
+// Match the captured-cap native attribute model already used by the G116 plate
+// regression. Each new component view captures the hunger at that query.
+function capturedSaturation(f,{maximum=20,failure}={}){
+ const get=f.player.getComponent.bind(f.player);let rejectWrite=failure==='write';
+ f.player.getComponent=type=>{
+  if(!type.endsWith('saturation'))return get(type);
+  if(f.nutrition.hunger===15&&failure==='missing')return undefined;
+  if(f.nutrition.hunger===15&&failure==='read')throw Error('Current saturation unavailable');
+  const cap=Math.min(maximum,f.nutrition.hunger);
+  return {effectiveMax:cap,get currentValue(){return f.nutrition.saturation},setCurrentValue(value){
+   if(!Number.isFinite(value)||value>cap)throw Error('Native saturation bounds');
+   f.nutrition.saturation=Math.fround(value);
+   if(rejectWrite&&f.nutrition.hunger===15){rejectWrite=false;throw Error('After saturation write');}
+  }};
+ };
+}
+test('handheld early release refreshes captured saturation bounds and respects the current cap',()=>{
+ for(const [initial,maximum,expected] of [[2,20,8],[10,20,15],[10,12,12]]){
+  const f=fixture({realEffects:true});f.nutrition.saturation=initial;capturedSaturation(f,{maximum});
+  const before=f.state.stack.clone();f.startUse();f.stop({tick:125,remaining:65});f.flush();
+  assert.equal(f.nutrition.hunger,15);assert.equal(f.nutrition.saturation,expected);
+  const remaining=before.clone();remaining.amount--;assert.deepEqual(f.state.stack,remaining);
+  assert.equal(f.counts.manualWrites,1);assert.equal(f.counts.manualRewards,1);assert.equal(f.nativeEffects.get('strength').duration,200);
+  f.stop({tick:125,remaining:65});f.complete({tick:190});f.flush();
+  assert.equal(f.counts.manualWrites,1);assert.equal(f.counts.manualRewards,1);assert.equal(f.counts.nativeRewards,0);
+ }
+});
+test('failed handheld saturation refresh or write restores the exact serving and nutrition',()=>{
+ for(const failure of ['missing','read','write']){
+  const f=fixture({realEffects:true});f.nutrition.saturation=10;capturedSaturation(f,{failure});
+  const before=f.state.stack.clone();f.startUse();f.stop({tick:125,remaining:65});f.flush();
+  assert.deepEqual(f.state.stack,before);assert.deepEqual(f.nutrition,{hunger:10,saturation:10});
+  assert.equal(f.counts.manualRewards,0);assert.deepEqual(f.effects,[]);
+ }
 });
 
 test('THREE_RANDOM production start follows its captured native duration without changing either stack',()=>{
