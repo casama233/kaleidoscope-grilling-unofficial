@@ -5,9 +5,10 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {RACK_TOOL_VISUAL_TYPE,RACK_TOOL_MODEL_INDEX,rackToolVisualModel} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_tool_visual_data.js';
 import {TOOL_ITEM_IDS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_core.js';
+import {PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,plateMeshPlan,recipeIconModel} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/plate_recipe_visual_core.js';
 const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js',import.meta.url),'utf8');
 const TYPE='kaleidoscope_grilling:equipment_visual';
-const start=source.indexOf('function render(row,'),end=source.indexOf('\nfunction composed(',start);
+const start=source.indexOf('function render(row,'),end=source.indexOf('\nexport function syncStationContentsVisual(',start);
 function fixture(){
  const row={parts:new Map()},spawned=[],removed=[],native=[];
  const dimension={spawnEntity(typeId,location){
@@ -15,9 +16,9 @@ function fixture(){
   spawned.push(entity);return entity;
  }};
  const block={dimension};
- const ctx=vm.createContext({TYPE,RACK_TOOL_VISUAL_TYPE,rackToolVisualModel,helpers:0,lastCapacityWarning:-1200,system:{currentTick:0},console,grillingConfig:()=>({contentsHelpers:32}),
+ const ctx=vm.createContext({TYPE,RACK_TOOL_VISUAL_TYPE,rackToolVisualModel,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,plateMeshPlan,recipeIconModel,reader:undefined,helpers:0,lastCapacityWarning:-1200,system:{currentTick:0},console,grillingConfig:()=>({contentsHelpers:32}),
   metadataSignature:JSON.stringify,captureSkewerMetadata:s=>structuredClone(s),renderItemType:(entity,stack)=>native.push({entity,stack}),
-  discard(r,k){const old=r.parts.get(k);if(old){old.entity.remove();r.parts.delete(k);ctx.helpers--;}}});
+  discard(r,k){const old=r.parts.get(k);if(old){old.entity.remove();r.parts.delete(k);ctx.helpers--;}return true;}});
  vm.runInContext(source.slice(start,end),ctx);
  return {row,block,spawned,removed,native,render:(stack,mode=0,k='rack/5',angle=0)=>ctx.render(row,block,k,stack,{location:{x:1,y:2,z:3},angle},mode)};
 }
@@ -59,7 +60,7 @@ test('new helpers preserve all four facing rotations and independent slot identi
   f.render(undefined,0,'rack/6');assert.deepEqual([...f.row.parts.keys()],['rack/5','rack/7','rack/8']);
  }
 });
-test('startup clears both transient render types and does not add a second visual loop',()=>{
- assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE])'));
+test('startup clears only the four transient render types and does not add a second visual loop',()=>{
+ assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE])'));
  assert.equal((source.match(/system\.runInterval\(pump,1\)/g)??[]).length,1);
 });

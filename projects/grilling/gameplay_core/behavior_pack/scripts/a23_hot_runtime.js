@@ -1,6 +1,7 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemRawLore,setItemLore} from './itemData.js';
 import {SEASONING_LIST_KEY} from './a2743_seasoning_contract_core.js';
-import {heatLore,isHeatLore} from './localized_lore_core.js';
+import {heatLore,isHeatLore,creatorLore} from './localized_lore_core.js';
+import {SECRET_CREATOR_KEY} from './a24_skewering_core.js';
 import {world} from '@minecraft/server';
 import {readPublicFood,writePublicFood,isFoodPayloadLine,bucketHotUntil} from './host_api/food_api_core.js';
 import {weightedHeat,NORMAL_HEAT_WINDOW} from './a23_hot_merge.js';
@@ -8,9 +9,7 @@ import {commitSteps} from './a277_grill_transaction_core.js';
 
 const HOT='kaleidoscope_grilling:hot_until';
 const IGNORE=new Set([
- HOT,SEASONING_LIST_KEY,'kaleidoscope_grilling:model_variants','kaleidoscope_grilling:creator',
- 'kaleidoscope_grilling:creator_name','kaleidoscope_grilling:creator_uuid',
- 'SkewerModelVariants','Creator','CreatorName','CreatorUuid'
+ HOT,SEASONING_LIST_KEY,'kaleidoscope_grilling:model_variants','SkewerModelVariants',SECRET_CREATOR_KEY
 ]);
 function now(){try{return world.getAbsoluteTime()}catch{return 0}}
 function norm(v){
@@ -21,6 +20,23 @@ function norm(v){
  return String(v);
 }
 function baseLore(stack){return getItemRawLore(stack).filter(x=>!isHeatLore(x)&&!isFoodPayloadLine(x))}
+export function withoutAutomaticCreatorLore(stack,lore=getItemRawLore(stack)){
+ const kept=[...lore];let creator;
+ try{creator=JSON.parse(getItemProperty(stack,SECRET_CREATOR_KEY))}catch{return kept}
+ if(typeof creator?.name!=='string'||typeof creator?.id!=='string')return kept;
+ const translated=JSON.stringify(norm(creatorLore(creator.name))),literal='§7製作者: '+creator.name;
+ const legacyMessage=JSON.stringify({text:literal});let removedTranslated=false,removedLegacy=false;
+ // Threading writes one translated line; older recipe-book crafting writes a
+ // literal line. Only exact lines for the recorded author are ours to remove.
+ // Return a copy so merge comparison never changes the target author's lore.
+ for(let i=kept.length-1;i>=0;i--){
+  const signature=JSON.stringify(norm(kept[i]));
+  if(!removedTranslated&&signature===translated){kept.splice(i,1);removedTranslated=true;}
+  else if(!removedLegacy&&(kept[i]===literal||signature===legacyMessage)){kept.splice(i,1);removedLegacy=true;}
+ }
+ return kept;
+}
+function mergeLore(stack){return withoutAutomaticCreatorLore(stack,baseLore(stack))}
 function props(stack,includeHot=false){
  let ids=[];try{ids=getItemPropertyIds(stack)}catch{}
  return ids.filter(k=>includeHot||!IGNORE.has(k)).sort().map(k=>{let v;try{v=getItemProperty(stack,k)}catch{}return [k,norm(v)]});
@@ -51,7 +67,7 @@ export function mergeSignature(stack){
  const publicFood=readPublicFood(stack);
  // A damaged public record must never merge into another stack. Preserve its raw bytes.
  const seasoning=publicFood.present?(publicFood.valid?publicFood.state.seasoning:{invalid:stack.getRawLore()}):legacySeasoningSignature(stack);
- return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:baseLore(stack),seasoning,nativeVariant:publicFood.valid?publicFood.state.nativeVariant:undefined,props:props(stack,false)});
+ return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:mergeLore(stack),seasoning,nativeVariant:publicFood.valid?publicFood.state.nativeVariant:undefined,props:props(stack,false)});
 }
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
 export function hotUntil(stack){const p=readPublicFood(stack);if(p.present)return p.valid?p.state.hotUntil:0;try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}

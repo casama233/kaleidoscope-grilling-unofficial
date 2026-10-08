@@ -6,7 +6,10 @@ import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './s
 import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw} from './plate_transaction_core.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
-import {hasSolidTop} from './blockSupport.js';
+import {hasSolidTop,hasFullCubeCollision,hasSturdySide} from './blockSupport.js';
+import {withoutAutomaticCreatorLore} from './a23_hot_runtime.js';
+import {creatorLore} from './localized_lore_core.js';
+import {queueStationContentsVisual} from './station_contents_visual_queue.js';
 import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';
 import {world,system,ItemStack,EnchantmentType} from '@minecraft/server';
 import {
@@ -168,6 +171,7 @@ function plateHandStep(captured,next){
 function plateTransaction(block,steps){
  const result=commitPlateSteps(steps,reason=>quarantinePlate(block,reason));
  if(!result.ok)console.warn('[Grilling plate transaction] '+result.error);
+ if(result.ok)try{queueStationContentsVisual(block)}catch{}
  return result.ok;
 }
 function syncPlateCount(block,count){
@@ -196,11 +200,110 @@ function bookItem(record,recordedStack,template){
  if(getItemProperty(out,BOOK_RECORD_KEY)!==serialized)throw Error('Grilling: recipe record was not saved');
  return out;
 }
-function readRecipeBlock(block){
- try{const raw=world.getDynamicProperty(posKey(RECIPE_PREFIX,block));return typeof raw==='string'?JSON.parse(raw):null}catch{return null}
+const recipeFaults=new Set();let recipePlacementSequence=0;
+function recipeFaultKey(block){return posKey(RECIPE_PREFIX,block)+'_transaction_fault'}
+function assertRecipeAvailable(block){
+ const key=recipeFaultKey(block);
+ if(recipeFaults.has(key)||world.getDynamicProperty(key)!==undefined)throw Error('Grilling: recipe transaction quarantined');
+ if(world.getDynamicProperty(posKey(RECIPE_PREFIX,block)+'_delivery')!==undefined)throw Error('Grilling: recipe delivery requires recovery');
 }
-function writeRecipeBlock(block,book){world.setDynamicProperty(posKey(RECIPE_PREFIX,block),JSON.stringify(stackRow(book)))}
-function clearRecipeBlock(block){world.setDynamicProperty(posKey(RECIPE_PREFIX,block))}
+function quarantineRecipe(block,reason){
+ const key=recipeFaultKey(block);recipeFaults.add(key);world.setDynamicProperty(key,String(reason));
+ if(world.getDynamicProperty(key)!==String(reason))throw Error('Grilling: recipe quarantine did not persist');
+}
+function recipeTransaction(block,steps){
+ const result=commitPlateSteps(steps,reason=>quarantineRecipe(block,reason));
+ if(!result.ok)console.warn('[Grilling recipe transaction] '+result.error);
+ if(result.ok)try{queueStationContentsVisual(block)}catch{}
+ return result.ok;
+}
+function readRecipeBlock(block){
+ assertRecipeAvailable(block);
+ const raw=world.getDynamicProperty(posKey(RECIPE_PREFIX,block));if(raw===undefined)return null;
+ if(typeof raw!=='string')throw Error('Grilling: unreadable recipe storage');
+ const row=JSON.parse(raw);
+ if(!row||row.id!==BOOK_ID||(row.native&&(row.native.version!==1||row.native.id!==BOOK_ID)))throw Error('Grilling: invalid recipe storage');
+ return row;
+}
+function recipePropertyStep(key,before,after){
+ return verifiedPlateStep({read:()=>world.getDynamicProperty(key),write:value=>world.setDynamicProperty(key,value),before,after});
+}
+function recipeActionSnapshot(block){
+ return {dimension:block.dimension,location:{...block.location},states:metadataSignature(block.permutation.getAllStates()),saved:world.getDynamicProperty(posKey(RECIPE_PREFIX,block))};
+}
+function sameRecipeForAction(row){
+ const block=row.dimension.getBlock(row.location);
+ return block?.typeId===RECIPE_BLOCK_ID&&metadataSignature(block.permutation.getAllStates())===row.states&&world.getDynamicProperty(posKey(RECIPE_PREFIX,block))===row.saved?block:undefined;
+}
+function recipeRemovalStep(block){
+ const before=block.permutation;
+ return {
+  apply(){block.setType('minecraft:air');if(block.typeId!=='minecraft:air')throw Error('Grilling: recipe removal rejected')},
+  rollback(){block.setPermutation(before);if(block.typeId!==before.type.id||metadataSignature(block.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: recipe removal rollback rejected')}
+ };
+}
+function recipeInventoryDelivery(player,book){
+ const container=mainContainer(player);if(!container)return undefined;
+ // Recipe books stack to one. Plan a single empty slot, with native readback,
+ // rather than retrying addItem after an exception that may follow its write.
+ for(let slot=0;slot<Math.min(36,container.size);slot++)if(!container.getItem(slot))return plateHandStep({before:undefined,read:()=>container.getItem(slot),write:stack=>container.setItem(slot,stack)},book);
+ return undefined;
+}
+function settleRecipeBlock(block,{player,pickup=false}={}){
+ if(!block||block.typeId!==RECIPE_BLOCK_ID)return false;
+ const row=readRecipeBlock(block),book=restoreStack(row),snapshot=recipeActionSnapshot(block),dimension=block.dimension;
+ if(row&&(!book||!readBookRecord(book)))throw Error('Grilling: recorded recipe cannot be restored');
+ const drop=book&&(pickup||!creative(player))?book:undefined;
+ const key=posKey(RECIPE_PREFIX,block),receiptKey=key+'_delivery',beforeReceipt=world.getDynamicProperty(receiptKey);
+ const receipt={v:1,phase:'prepared',dimension:dimension.id,location:snapshot.location,states:snapshot.states,saved:snapshot.saved};
+ const prepared=JSON.stringify(receipt),credited=JSON.stringify({...receipt,phase:'credited'});
+ let escrow,spawnAttempted=false;
+ const inventory=drop&&pickup?recipeInventoryDelivery(player,drop):undefined;
+ const signature=stack=>stack?metadataSignature({amount:stack.amount,...captureSkewerMetadata(stack)}):'';
+ const delivery=inventory??{
+  apply(){
+   if(!drop)return;
+   try{
+    spawnAttempted=true;
+    escrow=dimension.spawnItem(drop,{x:block.x+.5,y:block.y+.5,z:block.z+.5});
+    if(escrow?.isValid!==true||signature(escrow.getComponent('minecraft:item')?.itemStack)!==signature(drop))throw Error('Grilling: recipe drop readback differs');
+   }catch(error){if(!escrow)quarantineRecipe(block,'recipe drop spawn outcome unknown; saved book retained');throw error}
+  },
+  rollback(){
+   if(!spawnAttempted)return;
+   if(!escrow)throw Error('Grilling: recipe spawn result unavailable');
+   if(escrow.isValid===false)return;
+   if(escrow.isValid!==true||signature(escrow.getComponent('minecraft:item')?.itemStack)!==signature(drop))throw Error('Grilling: recipe drop ownership unconfirmed');
+   try{escrow.remove()}catch(error){if(escrow.isValid!==false)throw error}
+   if(escrow.isValid!==false)throw Error('Grilling: recipe drop cleanup unconfirmed');
+  }
+ };
+ return recipeTransaction(block,[recipePropertyStep(receiptKey,beforeReceipt,prepared),delivery,
+  recipePropertyStep(receiptKey,prepared,credited),recipePropertyStep(key,snapshot.saved,undefined),recipeRemovalStep(block),recipePropertyStep(receiptKey,credited,undefined)]);
+}
+// A verified credit may survive a restart before source cleanup. Finish only
+// cleanup; this path never issues an item. A prepared/unknown credit cannot be
+// replayed safely, so retain its source snapshot for explicit recovery.
+function recoverRecipeDelivery(block){
+ if(!block)return false;
+ const key=posKey(RECIPE_PREFIX,block),receiptKey=key+'_delivery',raw=world.getDynamicProperty(receiptKey);if(raw===undefined)return false;
+ if(recipeFaults.has(recipeFaultKey(block))||world.getDynamicProperty(recipeFaultKey(block))!==undefined)return false;
+ const receipt=JSON.parse(String(raw));
+ if(receipt?.v!==1||receipt.phase!=='credited'||receipt.dimension!==block.dimension.id||metadataSignature(receipt.location)!==metadataSignature(block.location))return false;
+ const saved=world.getDynamicProperty(key);
+ if((saved!==undefined&&saved!==receipt.saved)||(block.typeId===RECIPE_BLOCK_ID&&metadataSignature(block.permutation.getAllStates())!==receipt.states)){
+  quarantineRecipe(block,'credited recipe cleanup target changed; no second delivery');return false;
+ }
+ return recipeTransaction(block,[recipePropertyStep(key,saved,undefined),...(block.typeId===RECIPE_BLOCK_ID?[recipeRemovalStep(block)]:[]),recipePropertyStep(receiptKey,raw,undefined)]);
+}
+function recoverRecordedRecipeDeliveries(){
+ for(const key of world.getDynamicPropertyIds())if(key.startsWith(RECIPE_PREFIX)&&key.endsWith('_delivery'))try{
+  const receipt=JSON.parse(String(world.getDynamicProperty(key)));
+  if(receipt?.phase!=='credited'||typeof receipt.dimension!=='string'||!['x','y','z'].every(axis=>Number.isSafeInteger(receipt.location?.[axis])))continue;
+  const block=world.getDimension(receipt.dimension).getBlock(receipt.location);
+  if(block&&posKey(RECIPE_PREFIX,block)+'_delivery'===key)recoverRecipeDelivery(block);
+ }catch(error){console.warn('[Grilling recipe delivery recovery] retained '+error)}
+}
 function faceName(face){return String(face??'').toLowerCase()}
 function faceOffset(face){
  switch(faceName(face)){case'north':return{x:0,y:0,z:-1};case'south':return{x:0,y:0,z:1};case'west':return{x:-1,y:0,z:0};case'east':return{x:1,y:0,z:0};case'up':return{x:0,y:1,z:0};case'down':return{x:0,y:-1,z:0};default:return null}
@@ -213,8 +316,8 @@ function setFacing(block,face){
 }
 function placePlateOn(support,face,player,source,hand='main'){
  if(faceName(face)!=='up'||!player.isSneaking)return false;
- if(support.typeId===COOKERY_TABLE&&!grillingConfig().interceptCookeryTableWhenPlacingPlate&&isSkewer(source))return false;
- if(support.typeId!==COOKERY_TABLE&&!hasSolidTop(support))return false;
+ if(support.typeId===COOKERY_TABLE&&!grillingConfig().interceptCookeryTableWhenPlacingPlate)return false;
+ if(support.typeId!==COOKERY_TABLE&&hasFullCubeCollision(support)!==true)return false;
  const target=blockAtOffset(support,{x:0,y:1,z:0});if(!isAirReplaceable(target))return false;
  let rows=[];
  if(source?.typeId===PLATE_ID)rows=plateRowsFromItem(source);
@@ -323,9 +426,10 @@ function craftFromBook(player,book,stickHand='off'){
  if(record.resultId===SECRET_ID&&record.recordedStack){
   output=restoreStack(record.recordedStack);
   if(output){
+   const lore=withoutAutomaticCreatorLore(output);
    setItemProperty(output,SECRET_COOKED_KEY,false);
    setItemProperty(output,SECRET_CREATOR_KEY,JSON.stringify({name:player.name,id:player.id}));
-   const lore=getItemRawLore(output).filter(x=>!(typeof x==='string'?x:x?.text??'').startsWith('§7製作者:'));lore.push('§7製作者: '+player.name);setItemLore(output,lore);
+   setItemLore(output,[...lore,creatorLore(player.name)]);
   }
  }else if(record.resultId!==SECRET_ID)output=new ItemStack(record.resultId,1);
  if(!output)return false;
@@ -362,8 +466,18 @@ function convertCookeryRecipe(player){
 function placeRecipeBlock(support,face,player,book,hand='main'){
  const f=faceName(face);if(!['north','south','west','east'].includes(f))return false;
  const record=readBookRecord(book);if(!record){message(player,'§c空白烤串食譜不能貼牆');return true}
+ if(hasSturdySide(support,f)!==true)return false;
  const target=blockAtOffset(support,faceOffset(face));if(!isAirReplaceable(target))return false;
- target.setType(RECIPE_BLOCK_ID);setFacing(target,f);writeRecipeBlock(target,book);decrementHand(player,hand,1);
+ assertRecipeAvailable(target);const key=posKey(RECIPE_PREFIX,target);
+ if(world.getDynamicProperty(key)!==undefined)throw Error('Grilling: orphaned recipe contents require recovery');
+ const captured=captureWritableHand(player,hand);if(interactionStackSignature(captured.before)!==interactionStackSignature(book))return false;
+ const next=captured.before?.clone();if(!next)return false;
+ const remainder=next.amount===1?undefined:next;if(remainder)remainder.amount--;
+ const before=target.permutation,saved=JSON.stringify({...stackRow(book),placementId:system.currentTick+':'+(++recipePlacementSequence)});
+ // Restore the snapshot before touching the hand, including native metadata.
+ if(!readBookRecord(restoreStack(JSON.parse(saved))))throw Error('Grilling: recipe placement cannot be restored');
+ const place={apply(){target.setType(RECIPE_BLOCK_ID);target.setPermutation(target.permutation.withState('minecraft:cardinal_direction',f));if(target.typeId!==RECIPE_BLOCK_ID||target.permutation.getState('minecraft:cardinal_direction')!==f)throw Error('Grilling: recipe placement rejected')},rollback(){target.setPermutation(before);if(target.typeId!==before.type.id||metadataSignature(target.permutation.getAllStates())!==metadataSignature(before.getAllStates()))throw Error('Grilling: recipe placement rollback rejected')}};
+ if(!recipeTransaction(target,[place,recipePropertyStep(key,undefined,saved),...(creative(player)?[]:[plateHandStep(captured,remainder)])]))return false;
  try{target.dimension.playSound('block.itemframe.place',target.location,{volume:.8,pitch:1})}catch{}return true;
 }
 function handleRecipeBlock(block,player,hand='main'){
@@ -371,12 +485,11 @@ function handleRecipeBlock(block,player,hand='main'){
  const row=readRecipeBlock(block),book=restoreStack(row),held=heldByHand(player,hand);
  if(isRecipeStick(held)&&book){craftFromBook(player,book,hand);return}
  if(held)return;
- clearRecipeBlock(block);block.setType('minecraft:air');if(book)give(player,book);
+ if(!settleRecipeBlock(block,{player,pickup:true}))return;
  try{block.dimension.playSound('block.itemframe.remove_item',block.location,{volume:.8,pitch:1})}catch{}
 }
 function breakRecipe(block,player){
- if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const row=readRecipeBlock(block),book=restoreStack(row),loc={x:block.x+.5,y:block.y+.5,z:block.z+.5},dim=block.dimension;
- clearRecipeBlock(block);block.setType('minecraft:air');if(!creative(player)&&book)dim.spawnItem(book,loc);
+ return settleRecipeBlock(block,{player});
 }
 
 world.beforeEvents.itemUse.subscribe(e=>{
@@ -405,14 +518,14 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
   }
   if(block.typeId===RECIPE_BLOCK_ID){
    if(item&&!isRecipeStick(item))return;
-   e.cancel=true;if(!first)return;const loc={...block.location},dim=block.dimension;defer(()=>handleRecipeBlock(dim.getBlock(loc),p,hand));return;
+   e.cancel=true;if(!first)return;const snapshot=recipeActionSnapshot(block);defer(()=>handleRecipeBlock(sameRecipeForAction(snapshot),p,hand));return;
   }
   if(p.isSneaking&&hand==='main'&&item&&COOKERY_RECIPE_ITEMS.has(item.typeId)&&isRecordableStack(heldOff(p))){
    e.cancel=true;if(!first)return;defer(()=>convertCookeryRecipe(p));return;
   }
   if(p.isSneaking&&item&&(item.typeId===PLATE_ID||isSkewer(item))&&faceName(e.blockFace)==='up'){
    if(isSkewer(item)&&hand!=='main')return;
-   if(block.typeId===COOKERY_TABLE&&isSkewer(item)&&!grillingConfig().interceptCookeryTableWhenPlacingPlate)return;
+   if(block.typeId===COOKERY_TABLE&&!grillingConfig().interceptCookeryTableWhenPlacingPlate)return;
    const loc={...block.location},dim=block.dimension,face=e.blockFace;e.cancel=true;if(!first)return;defer(()=>placePlateOn(dim.getBlock(loc),face,p,heldByHand(p,hand),hand));return;
   }
   if(item?.typeId===BOOK_ID&&['north','south','west','east'].includes(faceName(e.blockFace))){
@@ -423,24 +536,27 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
 
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  try{
+  if(e.cancel)return;
   if(e.block.typeId===PLATE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakPlate(dim.getBlock(loc),p));return}
-  if(e.block.typeId===RECIPE_BLOCK_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>breakRecipe(dim.getBlock(loc),p));return}
+  if(e.block.typeId===RECIPE_BLOCK_ID){e.cancel=true;const p=e.player,snapshot=recipeActionSnapshot(e.block);system.run(()=>{try{breakRecipe(sameRecipeForAction(snapshot),p)}catch(error){console.warn('[Grilling recipe break] retained '+error)}});return}
  }catch{}
 });
 world.beforeEvents.explosion.subscribe(e=>{
- if(e.cancel)return;
- const keep=[],plates=[];
+ try{if(e.cancel!==false)return}catch{return}
+ const keep=[],plates=[],recipes=[];let protectedTarget=false;
  for(const block of e.getImpactedBlocks()){
-  if(block.typeId===PLATE_BLOCK_ID)plates.push({dimension:block.dimension,location:{...block.location}});
+  if(block.typeId===PLATE_BLOCK_ID){protectedTarget=true;plates.push({dimension:block.dimension,location:{...block.location}})}
+  else if(block.typeId===RECIPE_BLOCK_ID){protectedTarget=true;try{recipes.push(recipeActionSnapshot(block))}catch(error){console.warn('[Grilling recipe explosion capture] retained '+error)}}
   else keep.push(block);
  }
- if(!plates.length)return;
- e.setImpactedBlocks(keep);
+ if(!protectedTarget)return;
+ e.setImpactedBlocks(keep);if(!plates.length&&!recipes.length)return;
  system.run(()=>{
   // Another before-event subscriber may cancel after this one. Do not settle a
   // cancelled or unreadable event; no storage/drop mutation has happened yet.
   try{if(e.cancel!==false)return}catch(error){console.warn('[Grilling plate explosion status] '+error);return}
   for(const row of plates)try{breakPlate(row.dimension.getBlock(row.location))}catch(error){console.warn('[Grilling plate explosion recovery] '+error)}
+  for(const row of recipes)try{breakRecipe(sameRecipeForAction(row))}catch(error){console.warn('[Grilling recipe explosion recovery] retained '+error)}
  });
 });
 function recipeSupport(block){
@@ -450,26 +566,49 @@ function recipeSupport(block){
  }catch{return undefined}
 }
 function detachUnsupportedRecipe(block){
- if(!block||block.typeId!==RECIPE_BLOCK_ID)return;const support=recipeSupport(block);if(hasSolidTop(support))return;
- const row=readRecipeBlock(block),book=restoreStack(row),dim=block.dimension,loc={x:block.x+.5,y:block.y+.5,z:block.z+.5};
- clearRecipeBlock(block);block.setType('minecraft:air');if(book)dim.spawnItem(book,loc);
+ if(!block||block.typeId!==RECIPE_BLOCK_ID)return;
+ recoverRecipeDelivery(block);if(block.typeId!==RECIPE_BLOCK_ID)return;
+ if(recipeFaults.has(recipeFaultKey(block))||world.getDynamicProperty(recipeFaultKey(block))!==undefined||world.getDynamicProperty(posKey(RECIPE_PREFIX,block)+'_delivery')!==undefined)return;
+ const support=recipeSupport(block),facing=block.permutation.getState('minecraft:cardinal_direction');
+ // An unloaded/unreadable support is not evidence of removal. Native block
+ // ticks resume when the chunk loads, including non-player neighbor changes.
+ if(!support||hasSturdySide(support,facing)!==false)return;
+ settleRecipeBlock(block);
+}
+function detachRecipeNeighbors(dimension,location){
+ for(const off of [{x:1,y:0,z:0},{x:-1,y:0,z:0},{x:0,y:0,z:1},{x:0,y:0,z:-1}]){
+  const block=dimension.getBlock({x:location.x+off.x,y:location.y,z:location.z+off.z});
+  if(block?.typeId===RECIPE_BLOCK_ID)detachUnsupportedRecipe(block);
+ }
 }
 world.afterEvents.playerBreakBlock.subscribe(e=>{
  try{
   const dim=e.block.dimension,loc={...e.block.location};system.run(()=>{
    const above=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});if(above?.typeId===PLATE_BLOCK_ID&&!hasSolidTop(dim.getBlock(loc)))breakPlate(above);
-   for(const off of [{x:1,y:0,z:0},{x:-1,y:0,z:0},{x:0,y:0,z:1},{x:0,y:0,z:-1}]){
-    const b=dim.getBlock({x:loc.x+off.x,y:loc.y,z:loc.z+off.z});if(b?.typeId===RECIPE_BLOCK_ID)detachUnsupportedRecipe(b);
-   }
+   detachRecipeNeighbors(dim,loc);
   });
  }catch{}
 });
 
 // Prepared or unknown crash outcomes require review; replay never grants a new plate.
 export function a25RetryPlateDelivery(){return false;}
-world.afterEvents.blockExplode.subscribe(e=>{const d=e.dimension??e.block.dimension,at={...e.block.location};system.run(()=>{try{const b=d.getBlock({x:at.x,y:at.y+1,z:at.z});if(b?.typeId===PLATE_BLOCK_ID&&!hasSolidTop(d.getBlock(at)))breakPlate(b);}catch(error){console.warn('[Grilling plate support] retained '+error)}});});
+world.afterEvents.blockExplode.subscribe(e=>{const d=e.dimension??e.block.dimension,at={...e.block.location};system.run(()=>{try{const b=d.getBlock({x:at.x,y:at.y+1,z:at.z});if(b?.typeId===PLATE_BLOCK_ID&&!hasSolidTop(d.getBlock(at)))breakPlate(b);detachRecipeNeighbors(d,at);}catch(error){console.warn('[Grilling container support] retained '+error)}});});
+system.beforeEvents.startup.subscribe(({blockComponentRegistry})=>{
+ blockComponentRegistry.registerCustomComponent('kaleidoscope_grilling:recipe_support',{onTick(e){try{detachUnsupportedRecipe(e.block)}catch(error){console.warn('[Grilling recipe support] retained '+error)}}});
+});
+// The block tick handles loaded recipes. This sparse receipt scan also finishes
+// a credited cleanup whose source block had already become air before restart.
+system.runInterval(recoverRecordedRecipeDeliveries,200);
 
 export function a25ReadPlateBlock(block){return readPlateBlock(block)}
+export function a25ReadRecipeDisplayStack(block){
+ const row=readRecipeBlock(block),book=restoreStack(row);if(!book)return undefined;
+ const record=readBookRecord(book);if(!record)return undefined;
+ // Match Java readRecipeStack: the recorded native stack precedes the ID
+ // fallback. In particular, retain the secret ingredients/variants/cooked cache.
+ if(record.recordedStack)return restoreStack(record.recordedStack);
+ return record.resultId?new ItemStack(record.resultId,1):undefined;
+}
 export function a25ReadRecipeBlockSnapshot(block){
  const row=readRecipeBlock(block),book=restoreStack(row);if(!book)return null;
  const record=readBookRecord(book);if(!record||typeof record.resultId!=='string'||!record.resultId)return null;

@@ -1,4 +1,5 @@
-import {system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
+import {system,ItemStack} from '@minecraft/server';
+import {registerPlantFertilizer,interactWithPlantFertilizer} from './plant_fertilizer.js';
 import {
  CROP_ID,HOUTTUYNIA_ID,COMPONENT_ID,AGE_STATE,RED_STATE,MAX_AGE,
  placementRedVariant,canCropSurvive,bonemealAgeIncrease,
@@ -45,28 +46,12 @@ function setAge(block,age){
   return true;
  }catch{return false}
 }
-function boneMealSlot(player){
- try{
-  const eq=player.getComponent('minecraft:equippable');
-  for(const hand of [EquipmentSlot.Mainhand,EquipmentSlot.Offhand]){
-   const slot=eq?.getEquipmentSlot(hand);
-   const stack=slot?.hasItem()?slot.getItem():undefined;
-   if(stack?.typeId==='minecraft:bone_meal')return {slot,stack};
-  }
- }catch{}
- return undefined;
-}
-function creative(player){
- try{return player.getGameMode?.()===GameMode.Creative}catch{return false}
-}
-function consumeBoneMeal(player,entry){
- if(!entry||creative(player))return;
- try{
-  const stack=entry.stack;
-  if(stack.amount<=1)entry.slot.setItem(undefined);
-  else{stack.amount-=1;entry.slot.setItem(stack)}
- }catch{}
-}
+registerPlantFertilizer(CROP_ID,(block,journal,random)=>{
+ const permutation=journal.read(block),age=Number(permutation.getState(AGE_STATE))||0;
+ if(age>=MAX_AGE)return false;
+ journal.set(block,preserveRed(block,permutation.withState(AGE_STATE,Math.min(MAX_AGE,age+bonemealAgeIncrease(random())))));
+ return true;
+});
 
 system.beforeEvents.startup.subscribe(init=>{
  init.blockComponentRegistry.registerCustomComponent(COMPONENT_ID,{
@@ -96,13 +81,6 @@ system.beforeEvents.startup.subscribe(init=>{
     if(shouldAdvanceAge(light,speed,Math.random()))setAge(block,age+1);
    }catch{}
   },
-  onPlayerInteract(event){
-   try{
-    const player=event.player;if(!player)return;
-    const age=Number(state(event.block,AGE_STATE,0))||0;if(age>=MAX_AGE)return;
-    const meal=boneMealSlot(player);if(!meal)return;
-    if(setAge(event.block,Math.min(MAX_AGE,age+bonemealAgeIncrease(Math.random()))))consumeBoneMeal(player,meal);
-   }catch{}
-  }
+  onPlayerInteract:interactWithPlantFertilizer
  });
 });

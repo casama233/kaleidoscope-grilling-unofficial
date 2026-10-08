@@ -24,8 +24,8 @@ function fixture({count=16,creative=false,full=false,off=false,potReject=false}=
  const context=vm.createContext({...core,commitSteps,createOilPressRegistry,world,console:{warn(){}},ItemStack:Stack,system:{currentTick:0,runInterval(fn){intervals.push(fn)},run(){},runTimeout(){}},creative:()=>creative,playerContainer:()=>container,ensureOilHandPublished:()=>true,held:(_,hand)=>hand==='off'?offhand.clone():slots[0]?.clone(),
   captureWritableHand(_,hand){const before=hand==='off'?offhand.clone():slots[0]?.clone();return {before,write(s){if(hand==='off'){offhand=s?.clone();mayFail('offhand',s);}else container.setItem(0,s);}};},
   COOKERY_EMPTY:'kaleidoscope_cookery:oil_pot',COOKERY_FILLED:'kaleidoscope_cookery:oil_pot_filled',
-  readCookeryOilPot:s=>({type:s.props.type,count:s.props.count}),buildCookeryOilPot(type,count,s){if(potReject)return undefined;const out=s.clone();out.typeId='kaleidoscope_cookery:oil_pot_filled';out.props={type,count};return out;},interactionFeedback(){}});
- vm.runInContext(raw,context);const api=vm.runInContext('({takeVatBucket,fillVatFromBucket,fillPotFromVat,finishPress,readVat,writeVat,readPress,writePress,registerPress,registry:pressRegistry})',context);
+  readCookeryOilPot:s=>({type:s.props.type,count:s.props.count}),buildCookeryOilPot(type,count,s){if(potReject)return undefined;const out=s.clone();out.typeId='kaleidoscope_cookery:oil_pot_filled';out.props={type,count};return out;},interactionFeedback(){},javaInteractionFeedback(){}});
+ vm.runInContext(raw,context);const api=vm.runInContext('({takeVatBucket,fillVatFromBucket,fillPotFromVat,finishPress,interactPress,readVat,writeVat,readPress,writePress,registerPress,registry:pressRegistry})',context);
  function block(id,x){const b={typeId:id,x,y:64,z:0,dimension,location:{x,y:64,z:0},permutation:{withState(){return this},getState(){return 'north'}},setPermutation(){}};blocks.set(x+'|64|0',b);return b;}
  const vat=block(core.BIG_VAT_ID,1);api.writeVat(vat,{type:'canola',buckets:4});
  return {api,vat,block,slots,drops,dp,world,holder,intervals,hand:off?'off':'main',held:()=>off?offhand:slots[0],setFault(fn){fault=fn;},unload(v){unloaded=v;},setPot(){const p=new Stack('kaleidoscope_cookery:oil_pot_filled');p.props={type:'canola',count:8};p.lore=Array.from({length:20},(_,i)=>'custom '+i);slots[0]=p;return p;}};
@@ -75,4 +75,28 @@ test('residue spawn failure restores batch and oil before a retry',()=>{
  const f=fixture(),press=f.block(core.OIL_PRESS_ID,0);f.api.writeVat(f.vat,{type:'',buckets:0});f.api.writePress(press,{cakes:4,progress:16,completionDelay:0});let once=true;
  f.setFault(k=>{if(once&&k==='spawn'){once=false;return true;}return false;});assert.throws(()=>f.api.finishPress(press));assert.equal(f.api.readVat(f.vat).buckets,0);assert.equal(f.api.readPress(press).cakes,4);assert.equal(f.drops.length,0);
  f.api.finishPress(press);assert.equal(f.api.readVat(f.vat).buckets,4);assert.equal(f.drops[0].stack.amount,4);
+});
+test('interacting throughout the normal ten-tick completion delay cannot settle early',()=>{
+ const f=fixture(),press=f.block(core.OIL_PRESS_ID,0);
+ f.api.writeVat(f.vat,{type:'',buckets:0});
+ f.api.writePress(press,{cakes:4,progress:16,completionDelay:10});
+ for(let tick=0;tick<10;tick++){
+  f.api.interactPress(press,f.holder,undefined);
+  assert.equal(f.api.readVat(f.vat).buckets,0);
+  assert.equal(f.drops.length,0);
+  assert.equal(f.api.readPress(press).completionDelay,10-tick);
+  f.intervals[0]();
+ }
+ assert.equal(f.api.readVat(f.vat).buckets,4);
+ assert.equal(f.drops.length,1);assert.equal(f.drops[0].stack.amount,4);
+ f.api.interactPress(press,f.holder,undefined);f.intervals[0]();
+ assert.equal(f.api.readVat(f.vat).buckets,4);assert.equal(f.drops.length,1);
+});
+test('container waiting after completion still retries immediately on interaction',()=>{
+ const f=fixture(),press=f.block(core.OIL_PRESS_ID,0);
+ f.api.writeVat(f.vat,{type:'',buckets:0});
+ f.api.writePress(press,{cakes:4,progress:16,completionDelay:0,waiting:true});
+ f.api.interactPress(press,f.holder,undefined);
+ assert.equal(f.api.readVat(f.vat).buckets,4);assert.equal(f.api.readPress(press).cakes,0);
+ assert.equal(f.drops.length,1);
 });

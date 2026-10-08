@@ -1,8 +1,10 @@
 """Exact source sprites and same-ID sapling routing; no client simulation."""
-import hashlib,json,unittest,base64,gzip
+import hashlib,json,unittest,base64,gzip,sys
 from pathlib import Path
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[2];PACK=ROOT/'projects/grilling/gameplay_core';BP=PACK/'behavior_pack';RP=PACK/'resource_pack';SOURCE=Path(__file__).parent/'fixtures/java-item-icons-1.1.1'
+sys.path.insert(0,str(ROOT/'tools'))
+from public_source_witness import reviewed_pepper_bytes
 def read(p):return json.loads(p.read_text())
 def dimensions(p):
  with Image.open(p) as image:return image.size
@@ -49,6 +51,10 @@ class ItemIcons(unittest.TestCase):
       self.assertEqual(set(contact),set(reviewed))
       self.assertEqual(after,contact[name]['before_sha256'])
       after=contact[name]['after_sha256']
+     if tuple(read(BP/'manifest.json')['header']['version']) >= (2,8,118):
+      repaired=reviewed_pepper_bytes(after)
+      self.assertEqual(repaired,data,name)
+      after=hashlib.sha256(repaired).hexdigest()
      self.assertEqual(after,hashlib.sha256(data).hexdigest(),name)
      data=gzip.decompress(base64.b64decode(row['before_gzip_base64']))
    # Inventory attribution changes only this string. Keep the original hash

@@ -29,24 +29,55 @@ function fixture(){
  const write=(key,fn)=>{fn();if(fail(key))throw Error('Injected '+key);};
  const container=(key,size)=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone();},setItem(i,s){write(key+':'+i,()=>this.rows[i]=s?.clone());}});
  const inv=container('inv',36),dimension={id:'minecraft:overworld',getBlock:p=>blocks.find(b=>b.x===p.x&&b.y===p.y&&b.z===p.z),playSound:(...args)=>sounds.push(args)};
- const permutation=states=>({getState:name=>states[name],withState(name,value){
+ const permutation=states=>({getState:name=>states[name],getAllStates:()=>({...states}),withState(name,value){
   const domain=name==='minecraft:cardinal_direction'?['north','east','south','west']:rackStateDomains[name];
   assert.ok(domain?.includes(value),`${name} cannot store ${value}`);return permutation({...states,[name]:value});
  }});
  const block=(x=0,y=64,z=0)=>{const b={typeId:core.ADVANCED_RACK_BLOCK_ID,x,y,z,dimension,location:{x,y,z},permutation:permutation({'minecraft:cardinal_direction':'north','kaleidoscope_grilling:spice_level':0,[layout.RACK_OCCUPANCY_STATE]:0,[layout.RACK_OCCUPANCY_HIGH_STATE]:0}),permutationWrites:0,setPermutation(p){this.permutationWrites++;write('permutation'+x,()=>this.permutation=p);}};b.c=container('rack'+x,9);blocks.push(b);return b;};
  const world={getDynamicProperty:k=>dp.get(k),setDynamicProperty(k,v){write(k,()=>v===undefined?dp.delete(k):dp.set(k,v));},beforeEvents:Object.fromEntries(['playerInteractWithBlock','playerBreakBlock','explosion'].map(name=>[name,{subscribe(fn){callbacks[name]=fn;}}]))};
  const playerInventory=p=>p.inv??inv;
- const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,captureRackHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,stationContainer:b=>b.c,console:{warn:(...args)=>logs.push(args.join(' '))},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
+ const storageKey=b=>'test_storage/'+b.dimension.id+'/'+b.x+'/'+b.y+'/'+b.z;
+ const context=vm.createContext({...core,...plan,...layout,rackSlotAtHit,captureRackHit,commitSteps,captureStackIntentSnapshot,stackIntentSnapshotMatches,world,storageKey,creative:()=>false,stationContainer:b=>b.c,console:{warn:(...args)=>logs.push(args.join(' '))},system:{run:fn=>queue.push(fn),beforeEvents:{startup:{subscribe(fn){startup=fn;}}}},CommandPermissionLevel:{Any:0},interactionFeedback(){},markStationContentsDirty:b=>dirty.push(b),playerInventory,getMainHand:p=>playerInventory(p).getItem(p.selectedSlotIndex),captureInteractionIntent:(p,e)=>captureInteractionIntentFromStacks(e,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex),interactionIntentStillCurrent:(p,intent)=>interactionIntentMatchesStacks(intent,playerInventory(p).getItem(p.selectedSlotIndex),p.offhand,p.selectedSlotIndex)});
  vm.runInContext(source('a2746_rack_state_adapter.js'),context);
  vm.runInContext(source('rack_transactions.js'),context);
  // Isolated module scope keeps actual runtime helper names separate from adapter declarations.
  const load=(name,expose)=>vm.runInContext('(()=>{'+source(name)+';return {'+expose+'};})()',context);
- const runtime=load('a2746_advanced_rack_runtime.js','swapWithHotbar,depositSelected,withdrawToInventory,depositMatching,interactRackSlot,clearEmptySlotFilter');
+ const runtime=load('a2746_advanced_rack_runtime.js','swapWithHotbar,depositSelected,withdrawToInventory,depositMatching,interactRackSlot,clearEmptySlotFilter,setBreakObserver(fn){manuallyBreakRack=fn}');
  const automation=load('a2746_rack_automation_api.js','borrowAdvancedRackItem,returnAdvancedRackItem');
  const tx=vm.runInContext('({depositInventorySlot,planRackInsert,commitRackTransfer,rackContainer,rackFiltersKey,readRackFilters,syncRackDisplay})',context);
  const holder={inputInfo:{lastInputModeUsed:'KeyboardAndMouse'},eye:{x:.5,y:64.72,z:-2},view:{x:0,y:0,z:1},getHeadLocation(){return {...this.eye};},getViewDirection(){return {...this.view};},typeId:'minecraft:player',isValid:true,isSneaking:false,selectedSlotIndex:0,dimension,location:{x:0,y:64,z:0},getDynamicProperty:k=>dp.get('holder:'+k),setDynamicProperty:(k,v)=>v===undefined?dp.delete('holder:'+k):dp.set('holder:'+k,v)};
- return {logs,inv,block,world,dp,tx,runtime,automation,holder,dimension,dirty,sounds,callbacks,commands,makeInventory:name=>container(name,36),flush(){while(queue.length)queue.shift()();},start(){startup({customCommandRegistry:{registerCommand(spec,run){commands.set(spec.name,{spec,run});}}});},setFault(fn){fail=fn;},failOnce(target){let once=true;fail=key=>once&&key===target?(once=false,true):false;}};
+ return {logs,inv,block,world,dp,tx,runtime,automation,holder,dimension,dirty,sounds,callbacks,commands,storageKey,makeInventory:name=>container(name,36),flush(){while(queue.length)queue.shift()();},start(){startup({customCommandRegistry:{registerCommand(spec,run){commands.set(spec.name,{spec,run});}}});},setFault(fn){fail=fn;},failOnce(target){let once=true;fail=key=>once&&key===target?(once=false,true):false;}};
 }
+test('rack explosion dispatch honors early, late and unreadable cancellation before payout',()=>{
+ for(const mode of ['valid','before','after','unreadable_before','unreadable_after']){
+  const f=fixture(),block=f.block(),calls=[];block.c.rows[0]=seasoning(7);f.runtime.setBreakObserver((b,drop)=>calls.push({b,drop}));
+  let deferred=false,edits=0,kept;const other={typeId:'minecraft:stone'};
+  const event={get cancel(){if(mode==='unreadable_before'||(mode==='unreadable_after'&&deferred))throw Error('event unreadable');return mode==='before'||(mode==='after'&&deferred)},getImpactedBlocks:()=>[other,block],setImpactedBlocks(rows){edits++;kept=rows}};
+  f.callbacks.explosion(event);deferred=true;f.flush();
+  assert.equal(calls.length,mode==='valid'?1:0,mode);assert.equal(edits,['before','unreadable_before'].includes(mode)?0:1,mode);
+  if(edits)assert.deepEqual([...kept],[other]);if(calls.length){assert.equal(calls[0].b,block);assert.equal(calls[0].drop,true)}
+  assert.equal(block.c.rows[0].amount,7,'dispatch inspection does not touch native items');
+ }
+});
+test('deferred rack explosion refuses a different block, owner token, filter snapshot or facing',()=>{
+ for(const mode of ['type','owner','filter','facing']){
+  const f=fixture(),block=f.block(),calls=[];f.world.setDynamicProperty(f.storageKey(block),'owner:first');f.runtime.setBreakObserver(b=>calls.push(b));
+  f.callbacks.explosion({cancel:false,getImpactedBlocks:()=>[block],setImpactedBlocks(){}});
+  if(mode==='type')block.typeId='minecraft:stone';if(mode==='owner')f.world.setDynamicProperty(f.storageKey(block),'owner:replacement');
+  if(mode==='filter')f.world.setDynamicProperty(f.tx.rackFiltersKey(block),'[]');if(mode==='facing')block.setPermutation(block.permutation.withState('minecraft:cardinal_direction','east'));
+  f.flush();assert.equal(calls.length,0,mode);
+ }
+});
+test('rack break ignores already-cancelled gestures and rechecks replacement identity',()=>{
+ const f=fixture(),block=f.block(),calls=[];f.runtime.setBreakObserver(b=>calls.push(b));
+ f.callbacks.playerBreakBlock({cancel:true,block,player:f.holder});f.flush();assert.equal(calls.length,0);
+ f.callbacks.playerBreakBlock({cancel:false,block,player:f.holder});f.world.setDynamicProperty(f.storageKey(block),'replacement');f.flush();assert.equal(calls.length,0);
+ f.callbacks.playerBreakBlock({cancel:false,block,player:f.holder});f.flush();assert.equal(calls.length,1);
+});
+test('unreadable rack snapshot remains excluded from native explosion destruction',()=>{
+ const f=fixture(),block=f.block(),calls=[];let kept;f.runtime.setBreakObserver(b=>calls.push(b));block.permutation.getAllStates=()=>{throw Error('unreadable state')};
+ f.callbacks.explosion({cancel:false,getImpactedBlocks:()=>[block],setImpactedBlocks(rows){kept=rows}});f.flush();assert.equal(kept.length,0);assert.equal(calls.length,0);
+});
 const snapshot=f=>JSON.stringify({inv:f.inv.rows,dp:[...f.dp]});
 test('Java public rack tags are independent per slot, including dual-tag items',()=>{
  const seasoningTag='kaleidoscope_grilling:advanced_rack_seasonings',toolTag='kaleidoscope_grilling:advanced_rack_tools';
@@ -143,7 +174,7 @@ test('normal event deposits into each empty clicked slot and empty-hand pickup r
   const neighbors=JSON.stringify(b.c.rows),held=slot<5?seasoning(9):tool();f.inv.rows[0]=held.clone();
   assert.equal(click(f,b,slot).cancel,true);f.flush();assert.deepEqual(b.c.rows[slot],held);assert.equal(f.inv.rows[0],undefined);
   click(f,b,slot);f.flush();assert.deepEqual(f.inv.rows[0],held);assert.equal(b.c.rows[slot],undefined);assert.equal(JSON.stringify(b.c.rows),neighbors);
-  assert.deepEqual(f.sounds.map(row=>row[0]),['item.item_frame.add_item','item.item_frame.remove_item']);
+  assert.deepEqual(f.sounds.map(row=>row[0]),['block.itemframe.add_item','block.itemframe.remove_item']);
  }
 });
 test('normal held-item click never withdraws or overwrites an occupied slot; full inventory rejects unsafe sneak swap',()=>{
@@ -236,7 +267,7 @@ test('failed display writes keep native stacks and filters intact and the derive
 test('rack runtime has no form API or opener; shortcut command directly returns matching stacks',()=>{
  const runtimeSource=fs.readFileSync(new URL('a2746_advanced_rack_runtime.js',base),'utf8');assert.doesNotMatch(runtimeSource,/ActionFormData|server-ui|openRackForm|openSlotForm|openRackManagement/);
  const f=fixture(),b=f.block();f.start();f.inv.rows[0]=seasoning(8);f.world.setDynamicProperty(f.tx.rackFiltersKey(b),JSON.stringify([core.rackCanonicalFilter(f.inv.rows[0].typeId)]));
- f.commands.get('kaleidoscope_grilling:rack').run({sourceEntity:f.holder});f.flush();assert.equal(b.c.rows[0].amount,8);assert.equal(f.inv.rows[0],undefined);assert.equal(f.sounds[0][0],'item.item_frame.add_item');
+ f.commands.get('kaleidoscope_grilling:rack').run({sourceEntity:f.holder});f.flush();assert.equal(b.c.rows[0].amount,8);assert.equal(f.inv.rows[0],undefined);assert.equal(f.sounds[0][0],'block.itemframe.add_item');
 });
 test('bulk command accepts identical main/offhand items but still rejects stale mainhand snapshots',()=>{
  const f=fixture(),b=f.block();f.start();f.inv.rows[0]=new Stack('minecraft:totem_of_undying');f.holder.offhand=f.inv.rows[0].clone();f.inv.rows[1]=seasoning(8);

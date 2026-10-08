@@ -21,6 +21,9 @@
       "minecraft:block_placer": {
         "block": "kaleidoscope_grilling:pepper_sapling",
         "replace_block_item": true
+      },
+      "minecraft:compostable": {
+        "composting_chance": 30
       }
     }
   }

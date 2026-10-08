@@ -44,6 +44,9 @@
           "minecraft:soul_sand"
         ],
         "replace_block_item": false
+      },
+      "minecraft:compostable": {
+        "composting_chance": 65
       }
     }
   }

@@ -36,9 +36,45 @@ def public_json(relative_path):
     return json.loads(public_bytes(relative_path))
 
 
+PEPPER_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js'
+REVIEWED_PEPPER_BASE = 'dccbe92aca2973d498614653b4bda8b7f736e80c'
+
+
+def _pepper_delta():
+    return json.loads((ROOT / 'development/gameplay_core/fixtures/pepper-growth-2.8.118.json').read_text())
+
+
+@lru_cache(maxsize=1)
+def _pepper_preimage():
+    # The selected G69 witness does not list pepper; keep that manifest frozen
+    # and read only this path from the already pinned complete public commit.
+    return subprocess.check_output(['git', 'show', PUBLIC_SOURCE_BASE + ':' + PEPPER_PATH], cwd=ROOT)
+
+
+@lru_cache(maxsize=1)
+def _reviewed_pepper_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_PEPPER_BASE + ':' + PEPPER_PATH], cwd=ROOT)
+
+
+def reviewed_pepper_bytes(before_sha256):
+    # Continue the G60/G67/G68 chain from its exact public preimage. The full
+    # reviewed candidate file, not an editable fixture hash, defines G118 bytes.
+    delta = _pepper_delta()
+    assert delta['schema'] == 1 and delta['release'] == [2, 8, 118]
+    assert delta['source_commit'] == REVIEWED_PEPPER_BASE
+    assert delta['previous_public_commit'] == PUBLIC_SOURCE_BASE
+    assert set(delta['changes']) == {PEPPER_PATH}, 'Reviewed G118 pepper scope changed'
+    row = delta['changes'][PEPPER_PATH]
+    assert row['before_sha256'] == before_sha256 == hashlib.sha256(_pepper_preimage()).hexdigest(), 'Reviewed G118 pepper has wrong public preimage'
+    repaired = _reviewed_pepper_source()
+    assert hashlib.sha256(repaired).hexdigest() == row['after_sha256'], 'Reviewed G118 pepper source bytes mismatch'
+    return repaired
+
+
 MAIN_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
 REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
 REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
+REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -105,6 +141,23 @@ def _g117_conservation_bytes(expected):
     assert len(delta['operations']) == 2, 'Reviewed G117 source requires exactly two repairs'
     repaired = _apply_main_operations(expected, delta)
     assert repaired == _reviewed_conservation_source(), 'Reviewed G117 source differs outside conservation deltas'
+    return repaired
+
+
+@lru_cache(maxsize=1)
+def _reviewed_parity_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_PARITY_BASE + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g118_parity_bytes(expected):
+    # Append only the reviewed F10/F15/F16 main.js changes to the exact G117
+    # source. The immutable commit remains authoritative if a fixture is edited.
+    delta = _main_delta('g118-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 118]
+    assert delta['reviewed_commit'] == REVIEWED_PARITY_BASE
+    assert len(delta['operations']) == 7, 'Reviewed G118 source requires exactly seven edits'
+    repaired = _apply_main_operations(expected, delta)
+    assert repaired == _reviewed_parity_source(), 'Reviewed G118 source differs outside parity deltas'
     return repaired
 
 
@@ -206,6 +259,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _g115_nutrition_bytes(expected)
         if version >= (2, 8, 117):
             expected = _g117_conservation_bytes(expected)
+        if version >= (2, 8, 118):
+            expected = _g118_parity_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)

@@ -2,10 +2,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-class Stack{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount}}
+class Stack{
+ constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount}
+ clone(){return new Stack(this.typeId,this.amount)}
+ isStackableWith(other){return this.typeId===other.typeId}
+}
 class Perm{
- constructor(states={}){this.states={...states}}
+ constructor(states={}){this.type={id:'kaleidoscope_grilling:houttuynia_crop'};this.states={...states}}
  getState(id){return this.states[id]}
+ getAllStates(){return {...this.states}}
  withState(id,value){return new Perm({...this.states,[id]:value})}
 }
 const startup=[],drops=[],randoms=[];
@@ -15,12 +20,17 @@ const EquipmentSlot={Mainhand:'main',Offhand:'off'};
 const GameMode={Creative:'Creative',Survival:'Survival'};
 const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Boolean,Error,Math:math});
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
-const core=new vm.SourceTextModule(fs.readFileSync(new URL('a2714_houttuynia_crop_core.js',root),'utf8'),{context,identifier:'core'});
-const rt=new vm.SourceTextModule(fs.readFileSync(new URL('a2714_houttuynia_crop_runtime.js',root),'utf8'),{context,identifier:'runtime'});
-const server=new vm.SyntheticModule(['system','ItemStack','EquipmentSlot','GameMode'],function(){
- this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',EquipmentSlot);this.setExport('GameMode',GameMode);
+const modules=new Map();
+function sourceModule(url){
+ const id=url.href;
+ if(!modules.has(id))modules.set(id,new vm.SourceTextModule(fs.readFileSync(url,'utf8'),{context,identifier:id}));
+ return modules.get(id);
+}
+const rt=sourceModule(new URL('a2714_houttuynia_crop_runtime.js',root));
+const server=new vm.SyntheticModule(['world','system','ItemStack','EquipmentSlot','GameMode'],function(){
+ this.setExport('world',{getDynamicProperty(){},setDynamicProperty(){}});this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',EquipmentSlot);this.setExport('GameMode',GameMode);
 },{context,identifier:'server'});
-await rt.link(async spec=>spec==='@minecraft/server'?server:core);await rt.evaluate();
+await rt.link((spec,parent)=>spec==='@minecraft/server'?server:sourceModule(new URL(spec,parent.identifier)));await rt.evaluate();
 assert.equal(startup.length,1);
 let component;
 startup[0]({blockComponentRegistry:{registerCustomComponent(id,obj){assert.equal(id,'kaleidoscope_grilling:houttuynia_crop_logic');component=obj}}});

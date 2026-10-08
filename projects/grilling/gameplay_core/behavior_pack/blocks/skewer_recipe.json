@@ -25,14 +25,14 @@
       "minecraft:collision_box": false,
       "minecraft:selection_box": {
         "origin": [
-          -6,
+          -5,
           1.5,
-          7.5
+          7.75
         ],
         "size": [
-          12,
+          10,
           13,
-          0.5
+          0.25
         ]
       },
       "minecraft:destructible_by_mining": {
@@ -43,6 +43,14 @@
       },
       "minecraft:connection_rule": {
         "accepts_connections_from": "none"
+      },
+      "kaleidoscope_grilling:recipe_support": {},
+      "minecraft:tick": {
+        "interval_range": [20, 20],
+        "looping": true
+      },
+      "minecraft:movable": {
+        "movement_type": "immovable"
       }
     },
     "permutations": [

@@ -489,6 +489,7 @@ guide.kg.name.kaleidoscope_grilling:green_pepper_squid_tentacles=Green Pepper Sq
 guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.1=Use the Cookery wok: add oil and the listed ingredients, cook for 10 seconds, then serve with a bowl.
 guide.kg.name.kaleidoscope_grilling:houttuynia=Houttuynia
 guide.kg.body.kaleidoscope_grilling:houttuynia.1=Farming and use: Houttuynia can be planted, chopped, used in Cold Houttuynia or stir-fried pork. Initial access depends on the current world-generation setup.
+guide.kg.body.kaleidoscope_grilling:houttuynia.2=Houttuynia can also go into a Composter. Each item has a 65% chance to raise the compost level by one.
 guide.kg.name.kaleidoscope_grilling:houttuynia_powder=Houttuynia Powder
 guide.kg.body.kaleidoscope_grilling:houttuynia_powder.1=Without Houttuynia Powder, regular seasoning effects have a base duration of about 3 minutes.
 guide.kg.body.kaleidoscope_grilling:houttuynia_powder.2=Adding 1–3 Houttuynia Powder multiplies seasoning-effect duration by 2; 4 or more multiplies it by 4.
@@ -504,7 +505,10 @@ guide.kg.name.kaleidoscope_grilling:oil_cake=Oil Cake
 guide.kg.body.kaleidoscope_grilling:oil_cake.1=Crafting-table pattern (· = empty):\nPPP\nPWP\nPPP\nP = Canola Powder；W = Wheat
 guide.kg.body.kaleidoscope_grilling:oil_cake.2=Use: four Oil Cakes fill an Oil Press. A completed batch yields four buckets of Canola Oil and four Oil Residues.
 guide.kg.name.kaleidoscope_grilling:oil_residue=Oil Residue
-guide.kg.body.kaleidoscope_grilling:oil_residue.1=Acquisition and use: an oil-press by-product. Use it on crops with supported growth states to advance their growth.
+guide.kg.body.kaleidoscope_grilling:oil_residue.1=Oil Residue is an oil-press by-product, with 4 produced per batch. Using it on a supported plant makes 2 consecutive bone-meal attempts, each following that plant's own growth rules.
+guide.kg.body.kaleidoscope_grilling:oil_residue.2=Currently supports 8 plant types: Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes. Other plants cannot currently be fertilized with Oil Residue.
+guide.kg.body.kaleidoscope_grilling:oil_residue.3=A valid use consumes only 1 Oil Residue in total. Fully grown crops and unsupported targets consume none; Creative mode also consumes none.
+guide.kg.body.kaleidoscope_grilling:oil_residue.4=Each application on a pepper sapling has a 45% chance to advance growth. A valid use still consumes 1 Oil Residue even if neither attempt makes the sapling grow.
 guide.kg.name.kaleidoscope_grilling:onion=Onion
 guide.kg.body.kaleidoscope_grilling:onion.1=Acquisition and farming: break short grass in Survival while wearing a Cookery Straw Hat for a chance to obtain it. Plant on farmland and harvest when mature.
 guide.kg.name.kaleidoscope_grilling:onion_powder=Onion Powder
@@ -613,21 +617,24 @@ guide.kg.body.kaleidoscope_grilling:grill.7=If you need to stop, extinguish the 
 guide.kg.body.kaleidoscope_grilling:grill.8=The server can select vanilla eating mode. With custom eating animations disabled, skewers use a 1.25-second native use action without the custom sounds or progress bar. Releasing a cancelled use adds no extra item debit.
 guide.kg.name.kaleidoscope_grilling:oil_press=Wooden Oil Press
 guide.kg.body.kaleidoscope_grilling:oil_press.1=First make Oil Cake: surround 1 Wheat with 8 Canola Powder. The Oil Press must be loaded with all 4 cakes before pressing.
-guide.kg.body.kaleidoscope_grilling:oil_press.2=A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press.
+guide.kg.body.kaleidoscope_grilling:oil_press.2=A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press. After reaching 16, wait another 10 game ticks (about 0.5 seconds) for the oil.
 guide.kg.body.kaleidoscope_grilling:oil_press.3=A completed batch produces 4 buckets of Canola Oil and 4 Oil Residue, but a nearby Big Vat must be able to accept all 4 buckets at once.
 guide.kg.body.kaleidoscope_grilling:oil_press.4=If no vat is available, it is full, or it contains another fluid, the press waits. Fix the container and interact again to retry.
-guide.kg.body.kaleidoscope_grilling:oil_press.5=Crafting-table pattern (· = empty):\nLIL\nF·F\nLHL\nL = Any log；I = Iron Ingot；F = Oak Fence；H = Hopper
+guide.kg.body.kaleidoscope_grilling:oil_press.5=Crafting-table pattern (· = empty):\nLIL\nF·G\nLHL\nL = Any log; I = Iron Ingot; F and G = Any supported fences, including mixed types; H = Hopper
+guide.kg.body.kaleidoscope_grilling:oil_press.6=Supports 12 vanilla fence types: Oak, Spruce, Birch, Jungle, Acacia, Dark Oak, Mangrove, Cherry, Bamboo, Crimson, Warped, and Nether Brick. The two fence slots may use different types.
 guide.kg.name.kaleidoscope_grilling:big_vat=Big Vat
 guide.kg.body.kaleidoscope_grilling:big_vat.1=A Big Vat holds 8 buckets and only one fluid type at a time: water, lava, Canola Oil, Secret Chili Oil, or Premium Chili Oil.
-guide.kg.body.kaleidoscope_grilling:big_vat.2=Use the matching bucket to fill or extract it; use an empty hand to view its current fluid and bucket count.
+guide.kg.body.kaleidoscope_grilling:big_vat.2=Use the matching bucket to fill or extract it; use an empty hand to view its current bucket count and capacity.
 guide.kg.body.kaleidoscope_grilling:big_vat.3=The three Grilling oils can fill a Cookery Oil Pot directly: each vat bucket adds 8 oil points.
 guide.kg.body.kaleidoscope_grilling:big_vat.4=Breaking a filled vat preserves its fluid type and amount on the dropped vat item; placing it again restores the contents.
-guide.kg.body.kaleidoscope_grilling:big_vat.5=Crafting-table pattern (· = empty):\nB·B\nBUB\nBBB\nB = Bricks；U = Bucket
+guide.kg.body.kaleidoscope_grilling:big_vat.5=Craft with 7 Brick items and 1 Bucket. Crafting-table pattern (· = empty):\nB·B\nBUB\nBBB\nB = Brick; U = Bucket
 guide.kg.name.kaleidoscope_grilling:pepper_sapling=Sichuan Pepper Tree
-guide.kg.body.kaleidoscope_grilling:pepper_sapling.1=Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly, and Bone Meal can also attempt to advance growth.
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.1=Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly. Bone Meal can attempt to advance growth; Oil Residue makes two consecutive attempts.
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.2=Use an empty hand on fruiting leaves to harvest 1–2 Sichuan Pepper, returning the leaves to an unfruited state.
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.3=Pepper leaves sting: stepping on them briefly slows and damages entities, except foxes and bees.
 guide.kg.body.kaleidoscope_grilling:pepper_sapling.4=Acquisition: pepper leaves can drop saplings; shears or Silk Touch recover the leaf block. A pepper log crafts into 4 oak planks.
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.5=Naturally grown leaves decay when no nearby pepper log supports them. Decay has a 10% chance to drop a sapling and a 2% chance to drop a stick; fruiting leaves also drop 1 Sichuan Pepper. Player-placed leaves do not decay.
+guide.kg.body.kaleidoscope_grilling:pepper_sapling.6=Pepper saplings and leaves can both go into a Composter. Each item has a 30% chance to raise the compost level by one.
 guide.kg.name.minecraft:redstone=Redstone Dust
 guide.kg.body.minecraft:redstone.1=With 1–3 Redstone in the seasoning, eating it hot grants Speed I for a base duration of about 3 minutes.
 guide.kg.body.minecraft:redstone.2=At 4 or more Redstone, it becomes Speed II.

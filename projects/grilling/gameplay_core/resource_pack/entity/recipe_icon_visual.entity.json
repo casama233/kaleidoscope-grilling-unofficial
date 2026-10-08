@@ -1,0 +1,65 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:recipe_icon_visual",
+      "materials": {
+        "default": "entity_alphatest_one_sided"
+      },
+      "textures": {
+        "s0": "textures/items/raw_beef_skewer",
+        "s1": "textures/items/grilled_beef_skewer",
+        "s2": "textures/items/raw_bun_slice_skewer",
+        "s3": "textures/items/grilled_bun_slice_skewer",
+        "s4": "textures/items/raw_caterpillar_skewer",
+        "s5": "textures/items/grilled_caterpillar_skewer",
+        "s6": "textures/items/raw_chicken_skin_skewer",
+        "s7": "textures/items/grilled_chicken_skin_skewer",
+        "s8": "textures/items/raw_ender_pearl_skewer",
+        "s9": "textures/items/grilled_ender_pearl_skewer",
+        "s10": "textures/items/raw_fish_skewer",
+        "s11": "textures/items/grilled_fish_skewer",
+        "s12": "textures/items/raw_fried_egg_skewer",
+        "s13": "textures/items/grilled_fried_egg_skewer",
+        "s14": "textures/items/raw_gluten_skewer",
+        "s15": "textures/items/grilled_gluten_skewer",
+        "s16": "textures/items/raw_golden_skewer",
+        "s17": "textures/items/grilled_golden_skewer",
+        "s18": "textures/items/raw_lamb_skewer",
+        "s19": "textures/items/grilled_lamb_skewer",
+        "s20": "textures/items/raw_meat_and_bone_skewer",
+        "s21": "textures/items/grilled_meat_and_bone_skewer",
+        "s22": "textures/items/raw_meatball_skewer",
+        "s23": "textures/items/grilled_meatball_skewer",
+        "s24": "textures/items/raw_mid_wing_skewer",
+        "s25": "textures/items/grilled_mid_wing_skewer",
+        "s26": "textures/items/raw_mushroom_skewer",
+        "s27": "textures/items/grilled_mushroom_skewer",
+        "s28": "textures/items/raw_pork_belly_skewer",
+        "s29": "textures/items/grilled_pork_belly_skewer",
+        "s30": "textures/items/raw_potato_slice_skewer",
+        "s31": "textures/items/grilled_potato_slice_skewer",
+        "s32": "textures/items/raw_slime_skewer",
+        "s33": "textures/items/grilled_slime_skewer",
+        "s34": "textures/items/raw_squid_tentacle_skewer",
+        "s35": "textures/items/grilled_squid_tentacle_skewer",
+        "s36": "textures/items/raw_sweet_potato_sheet_skewer",
+        "s37": "textures/items/grilled_sweet_potato_sheet_skewer",
+        "s38": "textures/items/ordinary_skewer",
+        "slime0": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_0",
+        "slime1": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_1",
+        "slime2": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_2",
+        "slime3": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_3",
+        "slime4": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_4"
+      },
+      "geometry": {
+        "default": "geometry.kg_station.recipe_icon"
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_station.recipe_icon": "q.property('kaleidoscope_grilling:ready')"
+        }
+      ]
+    }
+  }
+}
