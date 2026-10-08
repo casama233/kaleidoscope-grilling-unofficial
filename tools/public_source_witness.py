@@ -37,6 +37,37 @@ def public_json(relative_path):
 
 
 MAIN_PATH = 'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
+REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
+NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
+ const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
+ const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
+ const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
+}
+"""
+NUTRITION_G115 = b"""function addSecretNutrition(player,stack,meta){
+ const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
+ const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
+ // Hunger updates can leave the earlier saturation view with stale bounds.
+ // Use the live native cap; a failed refresh must roll back the plate debit.
+ const currentSat=player.getComponent('minecraft:player.saturation');
+ if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');
+ const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);currentSat.setCurrentValue(Math.min(hunger,currentSat.effectiveMax,currentSat.currentValue+gain));
+}
+"""
+
+
+@lru_cache(maxsize=1)
+def _reviewed_nutrition_source():
+    return subprocess.check_output(['git', 'show', REVIEWED_NUTRITION_BASE + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g115_nutrition_bytes(expected):
+    # Only the already reviewed G114 -> public G115 function is admitted.
+    # Neither current checkout bytes nor a caller-supplied hash defines truth.
+    assert expected.count(NUTRITION_G114) == 1, 'Reviewed nutrition preimage changed'
+    repaired = expected.replace(NUTRITION_G114, NUTRITION_G115, 1)
+    assert repaired == _reviewed_nutrition_source(), 'Reviewed G115 source differs outside nutrition delta'
+    return repaired
 
 
 def _main_delta(filename):
@@ -153,6 +184,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             delta = _main_delta('g114-main-reviewed-delta.json')
             assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 114]
             expected = _apply_main_operations(expected, delta)
+        if version >= (2, 8, 115):
+            expected = _g115_nutrition_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)

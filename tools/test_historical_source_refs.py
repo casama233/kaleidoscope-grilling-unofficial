@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':15,'commits':15})
+  self.assertEqual(verify(),{'refs':16,'commits':16})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -63,6 +63,15 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   for op in delta['operations']:
    changed=source.replace(op['after'].encode(),op['before'].encode())
    self.assertNotEqual(changed,source)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
+  before=public.expected_main_bytes((2,8,114))
+  repaired=public.expected_main_bytes((2,8,115))
+  self.assertEqual(repaired,before.replace(public.NUTRITION_G114,public.NUTRITION_G115,1))
+  self.assertIn(public.REVIEWED_NUTRITION_BASE,inventory())
+  for changed in (repaired.replace(public.NUTRITION_G115,public.NUTRITION_G114,1),repaired.replace(b'currentSat.effectiveMax,',b'',1)):
+   self.assertNotEqual(changed,repaired)
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
      public.assert_public_bytes_with_g71_bottles(self,path)
