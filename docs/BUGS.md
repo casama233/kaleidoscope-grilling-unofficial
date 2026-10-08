@@ -2,7 +2,8 @@
 
 Phase 0 稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`，2026-10-08。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
-本輪未修任何項目，未改變現有 issue／PR 狀態。
+本輪重整了建置與驗證工具，沒有修改玩法或合併下列功能原型。
+現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
 
 ## SKEWER-GUI：任意食材秘製串 inventory icon
 
@@ -107,11 +108,11 @@ G81 已修有完整 counter 證據的 stop→leave 分支，未知／0 counter�
 
 | 項目 | 已知事實 | 下一步，不是本輪修補 |
 | --- | --- | --- |
-| 破壞性旧 build 入口 | `build.py` 删除 current gameplay_core 并写旧版本；当前release不调用它 | 隔离输出／拒绝现行baseline重建，修正文档 |
-| 舊 workflow 直接寫主幹 | 兩個 localization workflow 有寫權與舊 augment；目前會被版本gate拒絕 | 歸檔／收窄觸發和權限，不假稱已覆蓋main |
-| 驗證鏈重複 | 現行同一鏈重複呼叫熱食合併、seasoning storage、bottle FP 等 | 依功能合併入口，保留一次有效證據和必要邊界 |
+| 舊 build 入口 | 重整後預設拒絕，只有全新且位於 Git 工作樹外的明確輸出可用；不再刪除既有目錄 | 已修工具；66個augment仍是歷史入口，不能當現行release鏈 |
+| 舊 workflow 直接寫主幹 | 兩個 localization workflow 已移到 `docs/legacy_workflows`，Actions不再執行 | 已退出自動執行，歷史內容保留；没有證據稱它們曾覆蓋今日main |
+| 驗證鏈重複 | 四組已審查重複命令在當前一次source-receipt驗證內重用成功結果 | 已去重；保留失敗／來源漂移拒絕及historical standalone行為 |
 | 效能 | 有手動 BDS profiling，尚無約定的通過預算；家族有 slowdown／記憶體警告 | 独立当前场景量測，再決定上限；不能把 logging 成功當能效已修復 |
 | 真自訂流體／Numb準星／Pepper entityInside／任意 mod smoking | 有已記錄平台替代或未完成项 | 按選定API與實際場景重審，分別決定近似／等待，不永久憑舊README放棄 |
 
 完整 PR 處置來源與范围見 [稽核表](audit/PR-TRIAGE.md)；
-需要維護者選擇下一阶段優先序，本輪不將這些提案直接合併或刪除歷史證據。
+下一階段按具體玩家問題從current main逐項修復；本輪不將這些舊提案直接合併或刪除歷史證據。

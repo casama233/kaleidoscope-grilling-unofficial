@@ -4,10 +4,12 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
 from vibrant_gate import check_pair
+from verification_session import SESSION_ENV
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "projects/grilling/gameplay_core"
@@ -323,7 +325,13 @@ def main() -> None:
     command = [sys.executable, str(DEV / verifier)]
     if args.compiled:
         command.append("--compiled")
-    subprocess.run(command, check=True)
+    environment = dict(os.environ)
+    environment.pop(SESSION_ENV, None)
+    # Only this current source-receipt run has the existing immutable-input
+    # boundary. Standalone/full historical verifiers retain every command.
+    if source_before is not None and verifier == "verify_a28114.py":
+        environment[SESSION_ENV] = verifier
+    subprocess.run(command, check=True, env=environment)
     if args.compiled:
         verify_compiled_exact()
     if args.write_source_validation is not None:

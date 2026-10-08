@@ -13,6 +13,36 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import verify_current as gate
+import verification_session as session
+
+
+class CurrentSessionTests(unittest.TestCase):
+    def test_success_reuse_requires_same_command_cwd_env_and_ends_with_session(self):
+        command = [sys.executable, "source_check.py"]
+        passed = subprocess.CompletedProcess(command, 0)
+        with patch.object(session.subprocess, "run", return_value=passed) as run:
+            with session.current_source_validation_session():
+                session.run_checked_once(command, cwd=gate.ROOT, env={"CHECK_INPUT": "one"})
+                session.run_checked_once(command, cwd=gate.ROOT, env={"CHECK_INPUT": "one"})
+                self.assertEqual(run.call_count, 1)
+                session.run_checked_once(command + ["--different"], cwd=gate.ROOT, env={"CHECK_INPUT": "one"})
+                session.run_checked_once(command, cwd=gate.DEV, env={"CHECK_INPUT": "one"})
+                session.run_checked_once(command, cwd=gate.ROOT, env={"CHECK_INPUT": "two"})
+                self.assertEqual(run.call_count, 4)
+            session.run_checked_once(command, cwd=gate.ROOT, env={"CHECK_INPUT": "one"})
+            self.assertEqual(run.call_count, 5)
+
+    def test_failed_check_is_not_reused(self):
+        command = [sys.executable, "source_check.py"]
+        failed = subprocess.CalledProcessError(1, command)
+        passed = subprocess.CompletedProcess(command, 0)
+        with patch.object(session.subprocess, "run", side_effect=[failed, passed]) as run:
+            with session.current_source_validation_session():
+                with self.assertRaises(subprocess.CalledProcessError):
+                    session.run_checked_once(command)
+                session.run_checked_once(command)
+                session.run_checked_once(command)
+                self.assertEqual(run.call_count, 2)
 
 
 class WorkflowCoverageTests(unittest.TestCase):

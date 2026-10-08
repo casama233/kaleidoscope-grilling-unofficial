@@ -2,6 +2,7 @@ import json, subprocess
 from pathlib import Path
 from verify_a283 import BP, RP, ROOT, main as previous_gate
 from verify_a284 import eating_gate
+from verification_session import run_checked_once
 
 def survival_gate():
     script=(BP/'scripts/main.js').read_text()
@@ -24,7 +25,7 @@ def survival_gate():
     assert 'sameBottleTarget(block,target)' in script
     assert 'copyOne(storage.before)' in script
     assert 'SEASON_PLACE_CACHE' not in script
-    subprocess.run(['node','--test',str(Path(__file__).with_name('test_seasoning_native_storage.mjs'))],cwd=ROOT,check=True)
+    run_checked_once(['node','--test',str(Path(__file__).with_name('test_seasoning_native_storage.mjs'))],cwd=ROOT)
     for name in ['empty_seasoning_bottle','pending_seasoning','special_seasoning']+[p.stem for p in (BP/'items').glob('special_seasoning_r*_v*.json')]:
         recipe=json.loads((BP/f'recipes/clear_{name}.json').read_text())['minecraft:recipe_shapeless']
         assert recipe['ingredients']==[{'item':'kaleidoscope_grilling:'+name}]

@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 from verify_a2861 import main as previous
+from verification_session import run_checked_once
 
 ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
@@ -18,7 +19,10 @@ def native_variants_gate(expected_version=(2, 8, 62)):
     # PR124's final .55 invariants supplement the independent .61 verifier chain.
     # Historical verifiers from the other release lineage remain unchanged.
     for generator in ('build_native_eating_variants.py', 'build_eating_motion.py'):
-        subprocess.run([sys.executable, str(ROOT / 'tools' / generator), '--check'], check=True)
+        if generator == 'build_eating_motion.py':
+            run_checked_once([sys.executable, str(ROOT / 'tools' / generator), '--check'])
+        else:
+            subprocess.run([sys.executable, str(ROOT / 'tools' / generator), '--check'], check=True)
     variants = list((BP / 'items').glob('*_java_three_alt.json'))
     assert len(variants) == 22, len(variants)
     for path in variants:

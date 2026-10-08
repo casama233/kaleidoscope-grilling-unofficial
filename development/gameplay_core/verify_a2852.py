@@ -2,8 +2,9 @@
 import subprocess,sys
 from pathlib import Path
 from verify_a2851 import main as baseline
+from verification_session import run_checked_once
 def main():
     baseline()
-    subprocess.run([sys.executable,str(Path(__file__).with_name('test_native_bottle_fp.py'))],check=True)
+    run_checked_once([sys.executable,str(Path(__file__).with_name('test_native_bottle_fp.py'))])
     print('A2.8.52 bottle native projection PASS; client rendering unaccepted')
 if __name__=='__main__':main()

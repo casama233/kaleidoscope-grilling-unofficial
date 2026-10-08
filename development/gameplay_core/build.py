@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, json, re, shutil, urllib.request, uuid
+import argparse, hashlib, json, re, shutil, urllib.request, uuid
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -18,6 +18,23 @@ EXPECTED={
  'common/src/main/resources/assets/kaleidoscope_grilling/lang/zh_cn.json':'bbc7465f6bf6ab0c698729e9800fbc3c03ae56db',
  'common/src/main/resources/assets/kaleidoscope_grilling/lang/en_us.json':'807c7f40618d409ca17ccb4c0a39e211a84a7b18',
 }
+
+def legacy_output(argv=None):
+    parser=argparse.ArgumentParser(
+        description='Historical A2.0 reconstruction only. Use package_current.py for the maintained release.'
+    )
+    parser.add_argument('--legacy-output',type=Path,required=True,
+                        help='new absolute directory outside every Git checkout; never release input')
+    requested=parser.parse_args(argv).legacy_output.expanduser()
+    if not requested.is_absolute():
+        parser.error('--legacy-output must be an absolute path')
+    output=requested.resolve()
+    if requested.is_symlink() or output.exists():
+        parser.error('--legacy-output must be a new directory; existing paths are never replaced')
+    for parent in (output,*output.parents):
+        if (parent/'.git').exists():
+            parser.error('--legacy-output cannot be inside a Git checkout or worktree')
+    return output
 
 def blob(v:bytes)->str:
     return hashlib.sha1(b'blob '+str(len(v)).encode()+b'\0'+v).hexdigest()
@@ -91,10 +108,15 @@ def source_icon(item_id):
     suffix='raw' if item_id.startswith('raw_') else 'cooked'
     return f'{base}_skewer_{suffix}.png'
 
-def main():
+def main(argv=None):
+    # Refuse the old default before reading source metadata, fetching or writing.
+    global OUT
+    OUT=legacy_output(argv)
     guard=json.loads((ROOT/'.repo-target.json').read_text())
     if guard['repository']!='casama233/kaleidoscope-grilling-unofficial' or guard['repository_id']!=1377218440:
         raise RuntimeError('wrong repository')
+    # Reserve the explicitly isolated output once; no historical rebuild deletes it.
+    OUT.mkdir(parents=True,exist_ok=False)
     raw={p:fetch(p) for p in EXPECTED}
     java=raw[next(p for p in raw if p.endswith('ModItems.java'))].decode()
     skewers=json.loads(raw[next(p for p in raw if p.endswith('skewers.json'))])
@@ -112,8 +134,6 @@ def main():
     missing=sorted(required-set(food))
     if missing:
         raise RuntimeError('food parser missing '+str(missing))
-    if OUT.exists():
-        shutil.rmtree(OUT)
     bp=OUT/'behavior_pack'
     rp=OUT/'resource_pack'
     bp.mkdir(parents=True,exist_ok=True)
