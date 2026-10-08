@@ -106,7 +106,7 @@ function skewerUseTargetsPlate(player,stack){
  if(!isSkewer(stack))return false;
  try{
   if(player.isSneaking&&captureInteractionIntent(player,stack).hand==='off')return false;
-  const hit=player.getBlockFromViewDirection?.({maxDistance:6});
+  const hit=player.getBlockFromViewDirection?.({maxDistance:6,includePassableBlocks:true});
   if(hit?.block?.typeId!==PLATE_BLOCK_ID)return false;
   // SDK 2.9: faceLocation is block-relative; entity distance is ray-origin to
   // bounds. Compare the head ray's actual plate hit, not the block's center.

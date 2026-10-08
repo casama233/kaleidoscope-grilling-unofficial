@@ -4,10 +4,10 @@ import os
 from verify_a28114 import main as previous
 from verification_session import SESSION_ENV, current_source_validation_session
 
-def main():
+def main(expected_version=(2, 8, 115)):
     # Existing inherited tests exercise the real nutrition and plate callbacks.
-    previous(expected_version=(2, 8, 115))
-    print('G115 plate source repairs PASS; real player and client acceptance remain separate')
+    previous(expected_version=expected_version)
+    print('Plate source repairs PASS; real player and client acceptance remain separate')
 
 if __name__ == '__main__':
     if os.environ.pop(SESSION_ENV, None) == Path(__file__).name:

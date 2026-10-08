@@ -1,8 +1,8 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.115
+## Current maintained baseline: 2.8.116
 
-[G115餐盤修補與實測場景](docs/STATUS-A2.8.115.md)：營養界限刷新與插串誤食仲裁。
+[G116餐盤修補與實測場景](docs/STATUS-A2.8.116.md)：營養界限刷新與插串誤食仲裁。
 
 森羅物語：煙火的非官方基岩版移植。目標是跟隨 Java 原作，保留其玩法與沉浸體驗；**完整一比一移植與現行真人驗收仍未完成**。
 

@@ -1,8 +1,8 @@
 # 煙火目前缺口與待重現問題
 
-Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.115，2026-10-08。
+Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；當前修補來源2.8.116，2026-10-08。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
-G115窄修補承接了餐盤營養界限與防誤食；其他功能原型仍分開保留，真人驗收待完成。
+G116窄修補承接了餐盤營養界限與防誤食；其他功能原型仍分開保留，真人驗收待完成。
 現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
 
 ## SKEWER-GUI：任意食材秘製串 inventory icon
@@ -38,7 +38,7 @@ Java 預期：EMPTY→PENDING→80-tick held-use→SPECIAL，成功調味才消�
 
 ## PLATE-SATURATION：餐盤營養寫入使用舊飽和度界限
 
-**狀態：G115已承接營養窄修補；production函式回歸通過，受影響Player／client待LIVE復驗。**
+**狀態：G116已承接營養窄修補；production函式回歸通過，受影響Player／client待LIVE復驗。**
 
 重現參數：舊 native trace 中 hunger 10→13 寫入成功後，cached saturation view 的 max仍為10，
 後續寫入12.353846153846154造成 `ArgumentOutOfBoundsError`，交易退回食物與營養。
@@ -46,21 +46,21 @@ Java 預期：EMPTY→PENDING→80-tick held-use→SPECIAL，成功調味才消�
 
 Java 預期：完成食用後按食物資料加飢餓與飽和度，且只結算一次；
 原生寫入失敗則完整回滾，不可吞物品、虛構 attribute max 或丟失應有增益。
-G115 的 `addSecretNutrition` 在 hunger 寫入後重新取得 saturation，尊重 live effectiveMax；
-刷新／寫入失敗仍回滾，沒有導入舊餐盤union。[修補範圍與LIVE場景](STATUS-A2.8.115.md)；
+G116 的 `addSecretNutrition` 在 hunger 寫入後重新取得 saturation，尊重 live effectiveMax；
+刷新／寫入失敗仍回滾，沒有導入舊餐盤union。[修補範圍與LIVE場景](STATUS-A2.8.116.md)；
 [PR148](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/148) 保留原故障與來源。
 
 ## PLATE-USE-ARBITRATION：點餐盤時意外食用手持剩餘串
 
-**狀態：G115已承接block／item-use仲裁；原生輸入次序與client仍待LIVE復驗。**
+**狀態：G116已承接block／item-use仲裁；原生輸入次序與client仍待LIVE復驗。**
 
 重現：手持多份可食用串，對餐盤進行正常插入；停止操作後觀察手持剩餘數量、hunger及延遲吃的動作。
 另做空氣中合法食用、其他方塊與取消操作控制組。
 
 Java 預期：成功餐盤互動遵守 block／item use 次序，不額外啟動獨立的 air-eating 或扣另一份食物。
-G115 `a25_plate_recipe_runtime.js` 已承接
+G116 `a25_plate_recipe_runtime.js` 已承接
 [PR150](https://github.com/casama233/kaleidoscope-grilling-unofficial/pull/150) 的窄防誤食路由，並核對較近entity，
-保留合法air-use與潛行副手例外。實際Player／client驗收仍獨立，見[G115場景](STATUS-A2.8.115.md)。
+保留合法air-use與潛行副手例外。實際Player／client驗收仍獨立，見[G116場景](STATUS-A2.8.116.md)。
 
 ## PLATE-PLACED-DISPLAY：已放置餐盤缺完整內容投影
 
