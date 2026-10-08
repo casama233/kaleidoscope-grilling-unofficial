@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    111
+  ],
+  "scope": "Accepted same-kind ingredient count/status refresh and exact Java pickup/player-break chat warning. Native item, projection and transaction ownership unchanged.",
+  "before_sha256": "9dc47fe72bcc8dfe1632f8931a39c05029bf11ba0aa8c0a9ad03fab4c57d1c64",
+  "after_sha256": "928ee9843d2aaa53734e21305daaeba02f3cd6129c1b957699d84ae8b96f5712",
+  "operations": [
+    {
+      "start": 45238,
+      "end": 45238,
+      "before": "",
+      "after": "function warnMissingSeasoningBase(player,ingredients){\n // Java pickup/playerWillDestroy uses chat (displayClientMessage false).\n if(!player||!ingredients.length||hasSeasoningBase(ingredients))return;\n try{player.sendMessage({translate:'message.kaleidoscope_grilling.missing_base_seasoning'})}catch(error){console.warn('[Grilling bottle warning] '+error)}\n}\n"
+    },
+    {
+      "start": 46204,
+      "end": 46440,
+      "before": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}\n",
+      "after": "  else{\n   setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');\n   // Retyping preserves lore, so refresh only our derived count/status here.\n   // Keep unrelated custom lore and all native item metadata on the same stack.\n   const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);\n   const lore=[...getItemRawLore(topItem).filter(line=>!owned.includes(line?.translate)),...seasoningLore(undefined,top.ingredients.length,{pending:top.kind==='pending',missingBase:top.kind==='empty'})];\n   setItemLore(topItem,lore);if(JSON.stringify(getItemRawLore(topItem))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');\n   items[items.length-1]=retargetBottleFillStack(topItem);\n  }\n"
+    },
+    {
+      "start": 47198,
+      "end": 47289,
+      "before": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}\n",
+      "after": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1);warnMissingSeasoningBase(player,data.ingredients)}\n"
+    },
+    {
+      "start": 53993,
+      "end": 54100,
+      "before": "  const dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);\n",
+      "after": "  const player=e.player,dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);\n"
+    },
+    {
+      "start": 54473,
+      "end": 54503,
+      "before": "   breakNativeBottles(block);\n",
+      "after": "   breakNativeBottles(block,true,player);\n"
+    },
+    {
+      "start": 54643,
+      "end": 54697,
+      "before": "function breakNativeBottles(block,dropContents=true){\n",
+      "after": "function breakNativeBottles(block,dropContents=true,player){\n"
+    },
+    {
+      "start": 55686,
+      "end": 55686,
+      "before": "",
+      "after": " if(player)for(const item of current.items)warnMissingSeasoningBase(player,bottleDataFromItem(item).ingredients);\n"
+    }
+  ]
+}

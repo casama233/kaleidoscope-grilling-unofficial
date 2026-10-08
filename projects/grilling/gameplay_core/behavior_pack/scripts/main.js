@@ -621,6 +621,11 @@ function pushBottle(block,player,held,hand='main'){
  if(!ok)interactionFailure(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
  else blockSound(block,'seasoning_bottle_stack',1);return ok;
 }
+function warnMissingSeasoningBase(player,ingredients){
+ // Java pickup/playerWillDestroy uses chat (displayClientMessage false).
+ if(!player||!ingredients.length||hasSeasoningBase(ingredients))return;
+ try{player.sendMessage({translate:'message.kaleidoscope_grilling.missing_base_seasoning'})}catch(error){console.warn('[Grilling bottle warning] '+error)}
+}
 function handleSeasoningBlock(block,player,hand='main'){
  const current=nativeBottles(block),items=current.items.map(x=>x.clone());
  const held=heldByHand(player,hand),id=held?.typeId;
@@ -634,7 +639,15 @@ function handleSeasoningBlock(block,player,hand='main'){
   // Java's explicit EMPTY -> PENDING promotion creates a fresh semantic item.
   // Same-kind fill changes preserve all stable-API metadata through readback.
   if(top.kind==='empty'&&hasSeasoningBase(top.ingredients))items[items.length-1]=bottleItem({...top,kind:'pending'});
-  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}
+  else{
+   setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');
+   // Retyping preserves lore, so refresh only our derived count/status here.
+   // Keep unrelated custom lore and all native item metadata on the same stack.
+   const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);
+   const lore=[...getItemRawLore(topItem).filter(line=>!owned.includes(line?.translate)),...seasoningLore(undefined,top.ingredients.length,{pending:top.kind==='pending',missingBase:top.kind==='empty'})];
+   setItemLore(topItem,lore);if(JSON.stringify(getItemRawLore(topItem))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');
+   items[items.length-1]=retargetBottleFillStack(topItem);
+  }
   if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
   awardSeasoningMilestones(player,top.ingredients);
   blockSound(block,'action_success',.65);
@@ -647,7 +660,7 @@ function handleSeasoningBlock(block,player,hand='main'){
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
   else item=retargetBottleFillStack(item);
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
-  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}
+  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1);warnMissingSeasoningBase(player,data.ingredients)}
   return;
  }
  javaInteractionFeedback(player,'invalid_seasoning');
@@ -745,16 +758,16 @@ function queueBottlePlacement(player,targetBlock,intent,proposed){
 function scheduleNativeBottleBreak(e){
  if(e.cancel||!isSeasoningBlock(e.block.typeId))return;e.cancel=true;
  try{
-  const dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);
+  const player=e.player,dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);
   const owner=world.getDynamicProperty(stationStorageKey(e.block)),projection=world.getDynamicProperty(seasoningBlockKey(e.block));
   system.run(()=>{try{
    const block=dimension.getBlock(location);
    if(!sameBottleTarget(block,snapshot)||world.getDynamicProperty(stationStorageKey(block))!==owner||world.getDynamicProperty(seasoningBlockKey(block))!==projection)return;
-   breakNativeBottles(block);
+   breakNativeBottles(block,true,player);
   }catch(error){console.warn('[Grilling bottle break] '+error)}});
  }catch(error){console.warn('[Grilling bottle break capture] '+error)}
 }
-function breakNativeBottles(block,dropContents=true){
+function breakNativeBottles(block,dropContents=true,player){
  if(!block||!isSeasoningBlock(block.typeId))return false;
  const current=nativeBottles(block),permutation=block.permutation,drops=[];
  const steps=(dropContents?current.items:[]).map(item=>{let entity,attempted=false;return {
@@ -765,6 +778,7 @@ function breakNativeBottles(block,dropContents=true){
   {apply(){block.setType('minecraft:air')},rollback(){block.setPermutation(permutation)}});
  const result=commitSteps(steps);if(!bottleRollbackStatus(block,result))return false;
  try{retireEmptyStationContainer(block)}catch(error){console.warn('[Grilling bottle break storage retirement] '+error)}
+ if(player)for(const item of current.items)warnMissingSeasoningBase(player,bottleDataFromItem(item).ingredients);
  return true;
 }
 // Java support loss returns AIR without the playerWillDestroy payout. The

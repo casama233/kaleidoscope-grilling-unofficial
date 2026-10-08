@@ -1,4 +1,7 @@
-"""Complete-model bottle projection, separate from Minecraft client acceptance.
+"""Historical G61 complete-model projection, separate from client acceptance.
+
+G105 preserves this old full-visibility gate by reversing its exact reviewed
+position-only delta; the natural-grip candidate has separate current-frame tests.
 
 The pinned native frame is settled, wide skin, zero bob and non-VR. Actual eye
 position, FOV interpretation and animation blending remain client gates. Check
@@ -8,11 +11,16 @@ front of the near plane. Equip lowering may intentionally leave the viewport.
 import copy
 import json
 import math
+import sys
 from pathlib import Path
 import unittest
 from held_pose_frames import point
 from test_native_skewer_fp import reference_frame, visible
 from test_native_bottle_fp import cases, projected, projected_by_bone, geometry_index, CURRENT, RP
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from bottle_pose_review import historical_pose
+FRAMING_BASE = historical_pose(RP / 'animations/a286_held.animation.json')['animations']
 
 BEFORE = json.loads((Path(__file__).parent / 'fixtures/bottle-frame-before-2.8.61-framing.json').read_text())['animations']
 
@@ -56,7 +64,7 @@ class NativeBottleFullFrustum(unittest.TestCase):
     def assert_complete(self, aspect, axis):
         failures = []
         for name, hand, ref, geometry in self.routes:
-            by_bone = projected_by_bone(geometry, CURRENT['animation.kg_a286.bottle_fp_' + hand], hand)
+            by_bone = projected_by_bone(geometry, FRAMING_BASE['animation.kg_a286.bottle_fp_' + hand], hand)
             self.assertTrue(any(by_bone.values()), ref)
             for bone in geometry['bones']:
                 # An empty hierarchy root is valid; an empty renderable layer
@@ -67,16 +75,16 @@ class NativeBottleFullFrustum(unittest.TestCase):
                     failures.append((name, hand, ref, bone['name']))
         self.assertEqual(len(failures), 0, f'{len(failures)} shell/content bone routes do not fit {axis}60 at aspect={aspect}; first five: {failures[:5]}')
 
-    def test_all_corners_vertical60_aspect149(self):
+    def test_historical_g61_all_corners_vertical60_aspect149(self):
         self.assert_complete(1.49, 'vertical')
 
-    def test_all_corners_horizontal60_aspect149(self):
+    def test_historical_g61_all_corners_horizontal60_aspect149(self):
         self.assert_complete(1.49, 'horizontal')
 
-    def test_all_corners_vertical60_aspect16by9(self):
+    def test_historical_g61_all_corners_vertical60_aspect16by9(self):
         self.assert_complete(16 / 9, 'vertical')
 
-    def test_all_corners_horizontal60_aspect16by9(self):
+    def test_historical_g61_all_corners_horizontal60_aspect16by9(self):
         self.assert_complete(16 / 9, 'horizontal')
 
     def test_combined_empty_pending_include_shell_and_all_eight_layers_nine_colors(self):
@@ -135,7 +143,8 @@ class NativeBottleFullFrustum(unittest.TestCase):
             after = projected(geometry, CURRENT[key], hand)
             self.assertEqual(len(before), len(after))
             for old, current in zip(before, after):
-                for a, b, expected in zip(old, current, (-3 * sign, 5, -6)):
+                offset = (-1 * sign, 3, -3) if FRAMING_BASE != CURRENT else (-3 * sign, 5, -6)
+                for a, b, expected in zip(old, current, offset):
                     self.assertAlmostEqual(b - a, expected, places=7)
 
     def test_prior_any_corner_pass_is_rejected_by_complete_model_gate(self):

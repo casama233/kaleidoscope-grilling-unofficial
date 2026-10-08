@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':14,'commits':14})
+  self.assertEqual(verify(),{'refs':15,'commits':15})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -66,6 +66,14 @@ class HistoricalSourceRefsTests(unittest.TestCase):
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
      public.assert_public_bytes_with_g71_bottles(self,path)
+ def test_g111_fill_count_and_warning_delta_rejects_unrelated_mutations(self):
+  path=ROOT/public.MAIN_PATH;source=path.read_bytes()
+  delta=public._main_delta('g111-main-reviewed-delta.json')
+  self.assertEqual(delta['release'],[2,8,111])
+  self.assertEqual(public._apply_main_operations(public.expected_main_bytes((2,8,110)),delta),source)
+  for changed in (source+b'\n',source.replace(b"warnMissingSeasoningBase(player,data.ingredients)",b"warnMissingSeasoningBase(player,[])")):
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):public.assert_public_bytes_with_g71_bottles(self,path)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
