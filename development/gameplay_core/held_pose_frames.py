@@ -108,10 +108,11 @@ def make_pose(family, view, hand):
         # region. This explicit exception is covered by the viewport regression.
         if family=='rack': tr=[-3*sign,4.5,-2]
         java=chain(translate([9.039*sign,15.682,20.8]),translate(tr),xyz(r),scale(size),translate([-8,-8,-8]))
-        # The Java bottle rotation/.72 scale stay authored. Move its complete
-        # shell, cap and contents inward, upward and farther from the camera;
-        # the narrower full-model viewport gate covers both hands and aspects.
-        camera_offset=[-3*sign,5,-6] if family=='bottle' else [0,0,0]
+        # Keep Java bottle rotation/.72 scale. The G105 bounded grip candidate
+        # reduces G61's inward/upward/depth retreat by [2*sign,-2,+3]. Normal
+        # lower/right edge cropping is allowed; source frusta are diagnostics.
+        # Native idle/use/return and supported-hand acceptance remain separate.
+        camera_offset=[-1*sign,3,-3] if family=='bottle' else [0,0,0]
         target=chain(camera,translate(camera_offset),translate([0,-24,-32.4]),java,translate(source_offset))
         local=mul(rigid_inverse(base),target)
         position=point(local,[0,24,0]);position[1]-=24;position[0]*=-1

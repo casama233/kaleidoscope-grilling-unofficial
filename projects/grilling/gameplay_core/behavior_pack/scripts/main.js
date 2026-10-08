@@ -1,3 +1,4 @@
+import {isOwnedBottleLore,bottleLoreSignature,bottleLoreMismatch} from './bottle_lore_core.js';
 import {flatulenceSoundOrigin,flatulenceSoundPitch} from './flatulence_sound_runtime.js';
 import {tryProjectileDodgeMovement} from './projectile_dodge_movement_runtime.js';
 import {isCookeryLivingEntity} from './cookery_living_class.js';
@@ -623,10 +624,10 @@ function pushBottle(block,player,held,hand='main'){
 }
 function refreshBottleIngredientLore(stack,data){
  // Only derived Grilling count/status lines change; native metadata stays owned.
- const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);
  const derived=data.ingredients.length||data.kind==='pending'?seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind==='empty'}):[];
- const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];
- setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');
+ const lore=[...getItemRawLore(stack).filter(line=>!isOwnedBottleLore(line)),...derived];
+ const properties=()=>metadataSignature(Object.fromEntries(getItemPropertyIds(stack).map(key=>[key,getItemProperty(stack,key)]))),beforeProperties=properties();
+ setItemLore(stack,lore);if(properties()!==beforeProperties)throw new Error('Bottle lore metadata write rejected');const actual=getItemRawLore(stack);if(bottleLoreSignature(actual)!==bottleLoreSignature(lore))throw new Error('Bottle ingredient lore write rejected: '+bottleLoreMismatch(lore,actual));
 }
 function handleSeasoningBlock(block,player,hand='main'){
  const current=nativeBottles(block),items=current.items.map(x=>x.clone());

@@ -1,3 +1,4 @@
+import * as bottleLoreCore from '../../projects/grilling/gameplay_core/behavior_pack/scripts/bottle_lore_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
 /**
  * Canonical function-body integration with API doubles, not an engine certificate.
@@ -84,7 +85,7 @@ function fixture(){
   getComponent:id=>id==='minecraft:inventory'?{container:inventory}:id==='minecraft:equippable'?equipment:undefined};
  let context,api;
  const load=()=>{
- context=vm.createContext({...core,...visuals,...tx,...plans,...support,...intent,
+ context=vm.createContext({...bottleLoreCore,...core,...visuals,...tx,...plans,...support,...intent,
   hostWorld:world,world,system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},
   EquipmentSlot:{Offhand:'offhand'},GameMode:{Survival:'survival',Creative:'creative'},
   BlockPermutation:{resolve:permutation},SEASONING_BLOCK:core.SEASONING_PLACE_BLOCK_ID,
