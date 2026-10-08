@@ -70,8 +70,8 @@ for(const hand of ['main','off']){
   const f=fixture(),before=f.bottle(ingredientsFor(3),14);f.hands[hand]=before;
   const plan=f.api.planSeasoningBottle({},hand,3);assert.equal(plan.ok,false);assert.equal(plan.reason,'insufficient');assert.equal(plan.remaining,2);assert.equal(f.api.getUses(before),14);assert.deepEqual(items.getItemRawLore(before),lore.seasoningLore(2,3));
  });
- test(`${hand} creative use retains the exact bottle lore and ingredients`,()=>{
+ test(`${hand} creative use consumes the same doses as the Java block interaction`,()=>{
   const f=fixture({creative:true}),ingredients=ingredientsFor(8),before=f.bottle(ingredients,1);f.hands[hand]=before;
-  const plan=f.api.planSeasoningBottle({},hand,3);assert.equal(plan.ok,true);assert.equal(plan.mutate,false);assert.deepEqual(plan.next,before);assert.deepEqual([...plan.ingredients],ingredients);
+  const plan=f.api.planSeasoningBottle({},hand,3);assert.equal(plan.ok,true);assert.equal(plan.mutate,true);assert.equal(f.api.getUses(plan.next),4);assert.deepEqual(items.getItemRawLore(plan.next),lore.seasoningLore(12,ingredients.length));assert.deepEqual([...plan.ingredients],ingredients);assert.equal(f.api.getUses(before),1);
  });
 }

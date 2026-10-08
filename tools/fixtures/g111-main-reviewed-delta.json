@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    111
+  ],
+  "scope": "Current Java Creative seasoning debit, quiet fifth bottle, rejection-key selection, translated missing-base chat after committed pickup/player break; all other Main bytes conserved.",
+  "before_sha256": "9dc47fe72bcc8dfe1632f8931a39c05029bf11ba0aa8c0a9ad03fab4c57d1c64",
+  "after_sha256": "1f90d2c5b7f60f6fc991a85608a4886080d784b76f82dcc9b56c19fb90534259",
+  "operations": [
+    {
+      "start": 3851,
+      "end": 3962,
+      "before": "import {interactionFeedback,interactionFailure,javaInteractionFeedback} from './a283_interaction_feedback.js';\n",
+      "after": "import {interactionFeedback,interactionFailure,javaInteractionFeedback,javaInteractionChat} from './a283_interaction_feedback.js';\n"
+    },
+    {
+      "start": 35172,
+      "end": 35268,
+      "before": " if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};\n",
+      "after": " // Both Java block callers use the consuming season overload in Creative too.\n"
+    },
+    {
+      "start": 44713,
+      "end": 44863,
+      "before": " const current=nativeBottles(block);if(current.items.length>=SEASONING_MAX_BOTTLES){message(player,'§c最多只能堆'+SEASONING_MAX_BOTTLES+'瓶');return false}\n",
+      "after": " const current=nativeBottles(block);if(current.items.length>=SEASONING_MAX_BOTTLES)return false\n"
+    },
+    {
+      "start": 45601,
+      "end": 45671,
+      "before": "  if(top.kind==='special'){message(player,'§7最上層是完成調料，不能再加料');return}\n",
+      "after": "  if(top.kind==='special'){javaInteractionFeedback(player,top.ingredients.length>=SEASONING_CAPACITY?'bottle_full':'invalid_seasoning');return}\n"
+    },
+    {
+      "start": 47198,
+      "end": 47289,
+      "before": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1)}\n",
+      "after": "  else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1);warnMissingSeasoningBase(player,item)}\n"
+    },
+    {
+      "start": 47302,
+      "end": 47356,
+      "before": " javaInteractionFeedback(player,'invalid_seasoning');\n",
+      "after": " javaInteractionFeedback(player,top.ingredients.length>=SEASONING_CAPACITY?'bottle_full':'invalid_seasoning');\n}\nfunction warnMissingSeasoningBase(player,stack){\n const ingredients=readSeasonings(stack);\n if(ingredients.length&&!hasSeasoningBase(ingredients))javaInteractionChat(player,'missing_base_seasoning');\n"
+    },
+    {
+      "start": 53993,
+      "end": 54100,
+      "before": "  const dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);\n",
+      "after": "  const player=e.player,dimension=e.block.dimension,location={...e.block.location},snapshot=bottleTargetSnapshot(e.block);\n"
+    },
+    {
+      "start": 54473,
+      "end": 54503,
+      "before": "   breakNativeBottles(block);\n",
+      "after": "   breakNativeBottles(block,true,player);\n"
+    },
+    {
+      "start": 54643,
+      "end": 54697,
+      "before": "function breakNativeBottles(block,dropContents=true){\n",
+      "after": "function breakNativeBottles(block,dropContents=true,player){\n"
+    },
+    {
+      "start": 55686,
+      "end": 55686,
+      "before": "",
+      "after": " if(dropContents&&player)for(const item of current.items)warnMissingSeasoningBase(player,item);\n"
+    }
+  ]
+}

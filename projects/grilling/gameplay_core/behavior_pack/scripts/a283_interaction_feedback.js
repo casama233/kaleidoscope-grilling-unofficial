@@ -12,6 +12,12 @@ export function javaInteractionFeedback(player,key,args=[],red=false){
  try{player.onScreenDisplay.setActionBar(text);return true}catch{return false}
 }
 
+// Java displayClientMessage(..., false) belongs in chat, never the actionbar.
+export function javaInteractionChat(player,key,args=[]){
+ const text=javaInteractionMessage(key,args);if(!player||!text)return false;
+ try{player.sendMessage(text);return true}catch{return false}
+}
+
 // Bedrock storage faults are operator diagnostics, not new Java HUD messages.
 // Repeated attempts do not flood the Content Log.
 const failures=createFailureFeedbackGate();

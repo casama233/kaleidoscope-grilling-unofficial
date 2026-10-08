@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import * as core from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {javaInteractionMessage,createFailureFeedbackGate} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/interaction_feedback_core.js';
 import * as visuals from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2766_special_seasoning_visual_core.js';
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
 import {slotWrite} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_transfer_plan.js';
@@ -31,7 +32,7 @@ function decorated(kind='special',uses=15){
  s.props={[core.SEASONING_LIST_KEY]:JSON.stringify(kind==='empty'?[]:core.BASE_SEASONINGS),[core.SEASONING_USES_KEY]:uses,[core.SEASONING_VARIANT_KEY]:5,'other:boolean':true,'other:number':7,'other:string':'kept','other:vector':{x:1,y:2,z:3}};return s;
 }
 function fixture({withPlacedVisuals=false}={}){
- const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[],drops=[],visualCalls=[];let serial=0,hand,fail=()=>false,mode='survival';
+ const dp=new Map(),entities=new Map(),blocks=new Map(),queue=[],drops=[],visualCalls=[],feedback=[],chats=[],messages=[];let serial=0,hand,fail=()=>false,mode='survival';
  const mutate=(key,action)=>{action();if(fail(key))throw Error('Injected '+key);};
  const container=(id,size)=>({size,rows:Array(size),getItem(i){return this.rows[i]?.clone()},setItem(i,s){mutate(id+':slot'+i,()=>this.rows[i]=s?.clone())}});
  const dimension={id:'minecraft:overworld',getBlock(p){const k=[p.x,p.y,p.z].join('/');if(!blocks.has(k))blocks.set(k,makeBlock(p));return blocks.get(k);},getEntities(q){return [...entities.values()].filter(e=>e.typeId===q.type&&(!q.location||Math.hypot(e.location.x-q.location.x,e.location.y-q.location.y,e.location.z-q.location.z)<=q.maxDistance))},spawnParticle(){},spawnEntity(typeId,location){
@@ -58,7 +59,7 @@ function fixture({withPlacedVisuals=false}={}){
   context=vm.createContext({canonicalFoodId,forgetEatingItem(){},...core,...visuals,interactionParticleBurst(){},world,console:{warn(){}},system:{currentTick:10,run:f=>queue.push(f)},ItemStack:Stack,captureSkewerMetadata,restoreSkewerMetadata,metadataSignature,EnchantmentType:class {constructor(id){this.id=id}},GameMode:{Survival:'survival',Creative:'creative'},commitSteps,slotWrite,hasSolidTop,
    EMPTY_SEASONING_ID:EMPTY,PENDING_SEASONING:PENDING,SEASON_USES_KEY:core.SEASONING_USES_KEY,SEASON_VARIANT_KEY:core.SEASONING_VARIANT_KEY,
    readSeasonings:s=>JSON.parse(s?.props[core.SEASONING_LIST_KEY]??'[]'),setSeasonings(s,v){s.props[core.SEASONING_LIST_KEY]=JSON.stringify(v);},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v,setItemLore:(s,v)=>s.lore=structuredClone(v),specialSeasoningVariant:s=>s.props[core.SEASONING_VARIANT_KEY]??0,
-   markPlacedVisualDirty:visualQueue.markPlacedVisualDirty,refreshPlacedBottleAfterPickup(){},blockSound(){},message(){},javaInteractionFeedback(){},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
+   markPlacedVisualDirty:visualQueue.markPlacedVisualDirty,refreshPlacedBottleAfterPickup(){},blockSound(){},message(...args){messages.push(args)},javaInteractionChat(_p,key){chats.push(key)},javaInteractionFeedback(_p,key){feedback.push(key)},interactionFailure(){},awardSeasoningMilestones(){},transactionStatus:r=>r.ok,
    heldMain:()=>hand?.clone(),heldByHand:()=>hand?.clone(),creative:()=>mode==='creative',
    captureWritableHand(_,which='main'){if(which==='off')return {before:undefined,write(){throw Error('Empty offhand fixture')}};const before=hand?.clone();return {before,write(s){mutate('hand',()=>hand=s?.clone())}}},
    captureInteractionIntent:()=>({hand:'main',signature:JSON.stringify(hand)}),interactionIntentStillCurrent:(_,intent)=>JSON.stringify(hand)===intent.signature});
@@ -71,12 +72,12 @@ function fixture({withPlacedVisuals=false}={}){
    context.refreshPlacedBottleAfterPickup=placed.refreshPlacedBottleAfterPickup;
   }
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);
-  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
+  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','warnMissingSeasoningBase','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
   const main=read('main.js');vm.runInContext('const pendingBottlePlacements=new Set();\n'+fn(main,'queueBottlePlacement')+'\n'+names.map(n=>fn(main,n)).join('\n'),context);
   api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage,retargetBottleFillStack})',context);
  };
  load();const block=dimension.getBlock({x:0,y:64,z:0});block.below().setType('minecraft:stone');
- return {world,dimension,block,holder,dp,entities,queue,drops,visualCalls,permutation,get api(){return api},get placed(){return placed},get hand(){return hand},set hand(s){hand=s?.clone()},setMode(v){mode=v},reload(){load()},failOnce(target){let once=true;fail=k=>once&&k===target?(once=false,true):false},setFault(fn){fail=fn},place(){const e={block,player:holder,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;}};
+ return {world,dimension,block,holder,dp,entities,queue,drops,visualCalls,feedback,chats,messages,permutation,get api(){return api},get placed(){return placed},get hand(){return hand},set hand(s){hand=s?.clone()},setMode(v){mode=v},reload(){load()},failOnce(target){let once=true;fail=k=>once&&k===target?(once=false,true):false},setFault(fn){fail=fn},place(){const e={block,player:holder,face:'Up',permutationToPlace:permutation(N+'seasoning_bottle_1'),cancel:false};api.scheduleNativeBottlePlacement(e);while(queue.length)queue.shift()();return e;}};
 }
 const equal=(a,b)=>assert.equal(JSON.stringify(a),JSON.stringify(b));
 for(const uses of [1,15])test('first placement and pickup preserve exact finished native stack uses '+uses,()=>{
@@ -316,4 +317,41 @@ test('untracked surviving stack remains queued for normal reconstruction after p
  assert.equal(f.placed.tracked.size,0);f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,second);
  assert.equal(f.placed.tracked.size,0);assert.equal(placedEntities(f).length,0);assert.equal(f.placed.dirtyPlacedVisuals.size,1);
  f.placed.pump();assert.equal(placedEntities(f).length,1);equal(f.api.nativeBottles(f.block).items,[first]);
+});
+
+// Source-backed Java rejection and missing-base chat. These call the production
+// storage/hand transaction, not a separate mirror of the decisions.
+for(const kind of ['empty','pending','special'])test(kind+' pickup warns only for nonempty incomplete base',()=>{
+ const f=fixture(),s=decorated(kind);s.props[core.SEASONING_LIST_KEY]=JSON.stringify([core.BASE_SEASONINGS[0]]);f.hand=s;f.place();
+ f.api.handleSeasoningBlock(f.block,f.holder);assert.deepEqual(f.chats,['missing_base_seasoning']);assert.deepEqual(f.feedback,[]);assert.deepEqual(f.messages,[]);
+});
+for(const list of [[],core.BASE_SEASONINGS])test('pickup is quiet for '+list.length+' complete or empty ingredients',()=>{
+ const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(list);f.hand=s;f.place();
+ f.api.handleSeasoningBlock(f.block,f.holder);assert.deepEqual(f.chats,[]);
+});
+for(const count of [1,8])for(const ingredient of [core.BASE_SEASONINGS[0],'minecraft:stone'])test('reject '+ingredient+' on finished '+count+'/8 with Java key',()=>{
+ const f=fixture(),s=decorated('special');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(count).fill(core.BASE_SEASONINGS[0]));f.hand=s;f.place();
+ const before=f.api.nativeBottles(f.block).items;f.hand=new Stack(ingredient);f.api.handleSeasoningBlock(f.block,f.holder);
+ assert.deepEqual(f.feedback,[count===8?'bottle_full':'invalid_seasoning']);assert.deepEqual(f.messages,[]);equal(f.api.nativeBottles(f.block).items,before);assert.equal(f.hand.amount,1);
+});
+test('a fifth bottle is rejected quietly without consuming its hand',()=>{
+ const f=fixture();for(let i=0;i<4;i++){f.hand=decorated('empty');if(i)f.api.pushBottle(f.block,f.holder,f.hand);else f.place();}
+ f.hand=decorated('pending');const before=f.hand;assert.equal(f.api.pushBottle(f.block,f.holder,f.hand),false);equal(f.hand,before);assert.deepEqual(f.messages,[]);assert.deepEqual(f.feedback,[]);assert.equal(f.api.nativeBottles(f.block).items.length,4);
+});
+test('player break warns once per incomplete bottle; support loss stays quiet',()=>{
+ const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify([core.BASE_SEASONINGS[0]]);f.hand=s;f.place();
+ f.hand=s;f.api.pushBottle(f.block,f.holder,f.hand);assert.equal(f.api.breakNativeBottles(f.block,true,f.holder),true);assert.deepEqual(f.chats,['missing_base_seasoning','missing_base_seasoning']);
+ const q=fixture();q.hand=s;q.place();assert.equal(q.api.breakNativeBottles(q.block,false),true);assert.deepEqual(q.chats,[]);assert.equal(q.drops.length,0);
+});
+test('rejected pickup transaction restores contents and emits no missing-base chat',()=>{
+ const f=fixture(),s=decorated('empty');s.props[core.SEASONING_LIST_KEY]=JSON.stringify([core.BASE_SEASONINGS[0]]);f.hand=s;f.place();f.failOnce('hand');
+ f.api.handleSeasoningBlock(f.block,f.holder);assert.deepEqual(f.chats,[]);assert.equal(f.hand,undefined);equal(f.api.nativeBottles(f.block).items[0],s);
+});
+
+test('the original false-overlay missing-base message goes to translated chat',()=>{
+ const chat=[],bar=[],context=vm.createContext({javaInteractionMessage,createFailureFeedbackGate,system:{currentTick:0},world:{afterEvents:{playerLeave:{subscribe(){}}}}});
+ vm.runInContext(strip(read('a283_interaction_feedback.js'))+';this.chat=javaInteractionChat;',context);
+ const player={sendMessage(v){chat.push(v)},onScreenDisplay:{setActionBar(v){bar.push(v)}}};
+ assert.equal(context.chat(player,'missing_base_seasoning'),true);assert.deepEqual(JSON.parse(JSON.stringify(chat)),[javaInteractionMessage('missing_base_seasoning')]);assert.deepEqual(bar,[]);
+ assert.equal(context.chat(player,'invented_key'),false);assert.equal(chat.length,1);
 });
