@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess,sys
 from verify_a2827 import main as baseline
+from verification_session import run_checked_once, session_active
 ROOT=Path(__file__).resolve().parents[2]
 RP=ROOT/'projects/grilling/gameplay_core/resource_pack'
 
@@ -33,7 +34,10 @@ def verify_sound_registry(defs,proof,version):
 def main():
     baseline()
     subprocess.run(['node','--test','development/gameplay_core/test_immersion_audio.mjs','development/gameplay_core/test_localized_heat_lore.mjs','development/gameplay_core/test_pending_audio.mjs','development/gameplay_core/test_full_skewer_flow.mjs'],cwd=ROOT,check=True)
-    subprocess.run(['node','--experimental-vm-modules','development/gameplay_core/test_hot_food_manual_merge.mjs'],cwd=ROOT,check=True)
+    if session_active():
+        run_checked_once(['node','--experimental-vm-modules',str(ROOT/'development/gameplay_core/test_hot_food_manual_merge.mjs')],cwd=ROOT)
+    else:
+        subprocess.run(['node','--experimental-vm-modules','development/gameplay_core/test_hot_food_manual_merge.mjs'],cwd=ROOT,check=True)
     proof=json.loads((ROOT/'development/gameplay_core/fixtures/released-audio-1.1.1.json').read_text())
     assert len(proof['assets'])==17 and len(proof['sound_events'])==13
     assert proof['audio_transformations'] is False and proof['client_acceptance'] is False

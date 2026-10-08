@@ -3,6 +3,7 @@ from pathlib import Path
 import ast,json,re,subprocess,sys
 import a287_binding_repair as repair
 import importlib.util
+from verification_session import run_checked_once
 _spec=importlib.util.spec_from_file_location('tools_build_eating',Path(__file__).resolve().parents[2]/'tools/build_eating_motion.py')
 _motion=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_motion)
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
@@ -243,7 +244,7 @@ def parity_batch2_gate():
  cuisine=(BP/'scripts/a2750_cookery_cuisine_runtime.js').read_text()
  assert 'kaleidoscope_grilling:cookery_output_ready' not in cuisine  # event constant stays in the contract module
  assert 'COOKERY_OUTPUT_READY_EVENT' in cuisine and 'applyAuthoritativeCookeryOutput' in cuisine
- subprocess.run(['node','--experimental-vm-modules',str(Path(__file__).with_name('test_hot_food_manual_merge.mjs'))],check=True)
+ run_checked_once(['node','--experimental-vm-modules',str(Path(__file__).with_name('test_hot_food_manual_merge.mjs'))])
  subprocess.run(['node',str(Path(__file__).with_name('test_cookery_output_contract_core.mjs'))],check=True)
  print('A287 generic hot-food manual merge and authoritative Cookery output contract: PASS')
 
