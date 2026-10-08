@@ -8,7 +8,13 @@ export function secretVisualState(stack,reader,stage){
  const ingredients=reader?.(stack,visualStage>=4?true:undefined)??[];
  let cached;try{cached=JSON.parse(getItemProperty(stack,CACHED)??'null')}catch{}
  const hasCookedSnapshot=Array.isArray(cached)&&cached.length===3;
- const variants=readModelVariants(getItemProperty(stack,SECRET_MODEL_VARIANTS_KEY),ingredients.length);
+ return secretVisualRows(ingredients,getItemProperty(stack,SECRET_MODEL_VARIANTS_KEY),visualStage,hasCookedSnapshot);
+}
+
+// The same current palette/shape projection is also used for saved plate rows;
+// they do not need to be reconstructed into or written onto an ItemStack.
+export function secretVisualRows(ingredients,variantData,visualStage,hasCookedSnapshot=false){
+ const variants=readModelVariants(variantData,ingredients.length);
  return Array.from({length:3},(_,i)=>{
   if(!ingredients[i])return 0;
   const food=secretVisualIndex(ingredients[i].id);

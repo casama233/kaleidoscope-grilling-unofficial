@@ -61,15 +61,24 @@ def binding_assets():
  for p in sorted((RP/'attachables').glob('*.json')):
   if p.stem.endswith('_java_three_alt.attachable'):continue
   d=load(p)['minecraft:attachable']['description'];selected=[]
+  pose_routes=d['scripts']['animate']
+  if d['identifier']=='kaleidoscope_grilling:skewer_plate':
+   # One explicit new family: compare the entire source-derived payload before
+   # selecting the four hand poses. The always-active layout is not a pose.
+   from build_plate_held import build as build_held_plate
+   assert version>=(2,8,119),p
+   for target,content in build_held_plate().items():assert target.read_bytes()==content,target
+   assert len(pose_routes)==5 and pose_routes[-1]=='layout',p
+   pose_routes=pose_routes[:-1]
   for first in (0,1):
    for slot,hand in [('main_hand','right'),('off_hand','left')]:
     for bone in (hand+'item',hand+'Item','custom_'+hand+'_grip'):
-     matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone)]
+     matches=[key for row in pose_routes for key,expr in row.items() if expression(expr,first,slot,bone)]
      expected=('fp_' if first else 'tp_')+hand
      idle_expected=idle_pose_alias(version,d['identifier'],first,hand)
      assert matches==[idle_expected],(p,first,slot,bone,matches)
      for profile in (1,2,3,4,5):
-      using_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
+      using_matches=[key for row in pose_routes for key,expr in row.items() if expression(expr,first,slot,bone,True,profile)]
       eating='eat_alt_'+hand if profile==4 and 'eat_alt_'+hand in d['animations'] else 'eat_'+hand
       projected='fp_eat_'+hand
       projected_code={'one':1,'two':2,'three':3,'three_alt':4,'four':5}.get(d['animations'].get(projected,'').split('.')[-2] if projected in d['animations'] else '')
@@ -82,10 +91,10 @@ def binding_assets():
       # falls back to the native display. Local authored motion is FP-only in
       # .61; third-person never inherits a camera-space item displacement.
       for projection,posture in [(False,None)]+[(True,s) for s in ('is_sneaking','is_swimming','is_gliding','is_riding')]:
-       fallback=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
+       fallback=[key for row in pose_routes for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,projection=projection,posture=posture)]
        assert fallback==[expected]+local_eating,(p,profile,projection,posture,fallback)
       for inactive in (0,2 if slot=='main_hand' else 1):
-       inactive_matches=[key for row in d['scripts']['animate'] for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
+       inactive_matches=[key for row in pose_routes for key,expr in row.items() if expression(expr,first,slot,bone,True,profile,inactive)]
        assert inactive_matches==[idle_expected],(p,profile,inactive,inactive_matches)
      cases+=1
     selected.append(expected)
@@ -110,7 +119,21 @@ def binding_assets():
     secret_helper_binding_gate(p,d,ref,g)
     continue
    assert b['binding']=='q.item_slot_to_bone_name(context.item_slot)' and 'parent' not in b,(p,ref,b)
-   if ref.startswith('geometry.kg_a287.'):
+   if ref.startswith('geometry.kg_plate_held.'):
+    assert d['identifier']=='kaleidoscope_grilling:skewer_plate' and not b.get('cubes'),ref
+    assert g['bones'][1]=={'name':'plate_pose','parent':'grip','pivot':[0,24,0]},ref
+    if ref=='geometry.kg_plate_held.body':
+     assert len(g['bones'])==3 and g['bones'][-1]['name']=='plate_body',ref
+    else:
+     assert len(g['bones'])==5,ref
+     row=g['bones'][-1]['name'].removeprefix('plate_row_')
+     assert row in ('0','1','2','3','4'),ref
+     assert g['bones'][2]=={'name':'plate_slot_'+row,'parent':'plate_pose','pivot':[0,24,0]},ref
+     assert g['bones'][3]=={'name':'plate_fixed_'+row,'parent':'plate_slot_'+row,'pivot':[0,24,0]},ref
+     assert g['bones'][-1]['parent']=='plate_fixed_'+row,ref
+    assert set(animations[d['animations']['layout']]['bones'])=={f'plate_{kind}_{i}' for kind in ('slot','fixed') for i in range(5)},ref
+    for alias in ('fp_right','fp_left','tp_right','tp_left'):assert set(animations[d['animations'][alias]]['bones'])=={'plate_pose'},ref
+   elif ref.startswith('geometry.kg_a287.'):
     # A2.8.14 splits binding, display pose and handle-origin correction.
     assert len(g['bones'])==3 and not b.get('cubes'),ref
     pose,model=g['bones'][1:]
@@ -172,7 +195,7 @@ def binding_assets():
     assert d['render_controllers']==old['render_controllers'] and d['textures']==old['textures']
     assert set(d['geometry'])==set(old['geometry'])
   rows.append({'item':d['identifier'],'geometries':list(d['geometry'].values()),'poses':selected,'bound_bone':'grip'})
- expected_count=124 if version>=(2,8,71) else 108 if version>=(2,8,68) else 107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if version >= (2,8,32) else 107
+ expected_count=125 if version>=(2,8,119) else 124 if version>=(2,8,71) else 108 if version>=(2,8,68) else 107 if (RP/'attachables/secret_skewer.attachable.json').exists() else 106 if version >= (2,8,32) else 107
  assert len(rows)==expected_count and cases==expected_count*12,(len(rows),cases)
  # Regression reproduction: old dispatch can select zero poses for a normalized bone name.
  old=repair.source(RP/'attachables/empty_seasoning_bottle.attachable.json')['minecraft:attachable']['description']

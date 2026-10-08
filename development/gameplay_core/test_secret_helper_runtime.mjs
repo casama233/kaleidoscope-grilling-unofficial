@@ -5,19 +5,21 @@ import assert from 'node:assert/strict';
 import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import {secretVisualState,partialVisualState} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/secret_visual_state.js';
 import {secretVisualIndex} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/integration_registry_core.js';
+import {isBottleHeldVisualItem} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_core.js';
 import {captureEatingIdentity,eatingStillCurrent} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_eating_transaction.js';
 
 const file=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/secret_held_runtime.js',import.meta.url);
 const source=readFileSync(file,'utf8').replace(/^import .*;\n/gm,'').replaceAll('export function ','function ');
+const shared=name=>readFileSync(new URL(name,file),'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport (?=(const|function))/g,'');
 const raw=[{id:'minecraft:apple'},{id:'minecraft:carrot'},{id:'minecraft:beef',name:'Original raw snapshot',props:{foreign:7}}];
 const cooked=[{id:'minecraft:apple'},{id:'minecraft:carrot'},{id:'minecraft:cooked_beef'}];
 const serving=(id='kaleidoscope_grilling:secret_skewer',amount=1)=>({typeId:id,amount,raw:structuredClone(raw),cooked:structuredClone(cooked),creator:'Preserved creator',maxAmount:1,getDynamicProperty(){return undefined}});
 function fixture(main,off){
  const held={main,off},properties={},writes=[];
- const callbacks={},events=Object.fromEntries(['playerInventoryItemChange','playerHotbarSelectedSlotChange','playerLeave'].map(name=>[name,{subscribe:f=>callbacks[name]=f}]));
+ const callbacks={},events=Object.fromEntries(['playerInventoryItemChange','playerHotbarSelectedSlotChange','playerSpawn','playerLeave'].map(name=>[name,{subscribe:f=>callbacks[name]=f}]));
  const player={id:'owner',selectedSlotIndex:3,setProperty(k,v){properties[k]=v;writes.push([k,v]);}};
- const context={canonicalFoodId,secretVisualIndex,secretVisualState,partialVisualState,eatingStillCurrent,isCreative:()=>!!held.creative,getMainHand:()=>held.main,getOffHand:()=>held.off,world:{afterEvents:events,getAllPlayers:()=>[player]},system:{currentTick:100,run:f=>f(),runInterval(){}},console};
- vm.runInNewContext(source+'\nthis.api={configureSecretHeldReader,syncSecretHeld};',context);
+ const context={canonicalFoodId,isBottleHeldVisualItem,secretVisualIndex,secretVisualState,partialVisualState,eatingStillCurrent,isCreative:()=>!!held.creative,getMainHand:()=>held.main,getOffHand:()=>held.off,world:{afterEvents:events,getAllPlayers:()=>[player]},system:{currentTick:100,run:f=>f(),runInterval(){}},console};
+ vm.runInNewContext(shared('held_visual_transport.js')+'\n'+shared('held_visual_dispatch_runtime.js')+'\n'+source+'\nthis.api={configureSecretHeldReader,syncSecretHeld};',context);
  const api=context.api;api.configureSecretHeldReader(s=>s.cooked,s=>s.raw);
  return {api,player,held,properties,writes,callbacks};
 }
@@ -25,7 +27,8 @@ test('effective cooked main slots and original raw last helper are separate read
  const item=serving(),before=JSON.stringify(item),f=fixture(item);f.api.syncSecretHeld(f.player);
  assert.equal(f.properties['kaleidoscope_grilling:secret_main_2'],secretVisualIndex('minecraft:cooked_beef'));
  assert.equal(f.properties['kaleidoscope_grilling:secret_main_piece'],secretVisualIndex('minecraft:beef'));
- assert.equal(JSON.stringify(item),before);assert.equal(f.writes.length,8);
+ assert.equal(JSON.stringify(item),before);const written=f.writes.length;
+ f.api.syncSecretHeld(f.player);assert.equal(f.writes.length,written);
 });
 test('canonical and ALT resolve both owning hands without selecting visual-bite rows',()=>{
  const main=serving('kaleidoscope_grilling:secret_skewer_java_three_alt'),off=serving();off.raw[2]={id:'minecraft:potato'};
@@ -42,7 +45,7 @@ test('missing raw reader fails closed instead of borrowing cooked helper food',(
 test('raw-last-only change refreshes the visual signature while cooked slots remain intact',()=>{
  const f=fixture(serving());f.api.syncSecretHeld(f.player);const n=f.writes.length;
  f.held.main.raw[2]={id:'minecraft:porkchop'};f.api.syncSecretHeld(f.player);
- assert.equal(f.writes.length,n+8);assert.equal(f.properties['kaleidoscope_grilling:secret_main_piece'],secretVisualIndex('minecraft:porkchop'));
+ assert.ok(f.writes.length>n);assert.equal(f.properties['kaleidoscope_grilling:secret_main_piece'],secretVisualIndex('minecraft:porkchop'));
  assert.equal(f.properties['kaleidoscope_grilling:secret_main_2'],secretVisualIndex('minecraft:cooked_beef'));
 });
 test('post-debit empty hand clears every owner mesh index; retained/new serving stays visible',()=>{

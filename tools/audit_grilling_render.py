@@ -8,6 +8,7 @@ import sys
 import zlib
 from collections import Counter
 from copy import deepcopy
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +27,15 @@ VANILLA_TEXTURE_PATHS = {
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+@lru_cache(maxsize=1)
+def held_plate_assets():
+    # A named new subsystem with an exact generator contract, not a blanket
+    # exception for other animation files or arbitrary attachables.
+    sys.path.insert(0, str(ROOT / 'tools'))
+    from build_plate_held import build
+    return build()
 
 
 def geometry_ref(value):
@@ -492,6 +502,23 @@ def check_current_display_contracts(findings, geometry_index, animations):
     admitted = projection_items()
     for path in sorted((RP / "attachables").glob("*.json")):
         desc = load_json(path)["minecraft:attachable"]["description"]
+        if desc['identifier']=='kaleidoscope_grilling:skewer_plate' and version>=(2,8,119):
+            counts['plate']+=1
+            for target,content in held_plate_assets().items():
+                expected_plate=json.loads(content)
+                matches=load_json(target)==expected_plate
+                if target==path:
+                    matches=matches and desc==expected_plate['minecraft:attachable']['description']
+                elif target.name=='plate_held.geo.json':
+                    matches=matches and all(geometry_index.get(g['description']['identifier'],{}).get('geo')==g
+                                            for g in expected_plate['minecraft:geometry'])
+                elif target.name=='plate_held.animation.json':
+                    matches=matches and all(animations.get(name,{}).get('body')==body
+                                            for name,body in expected_plate['animations'].items())
+                if not matches:
+                    add(findings,'error','held_plate_source_contract',str(target.relative_to(ROOT)),
+                        'held plate differs from its current mesh/palette/owner and Java frame generator')
+            continue
         ids = desc.get("animations", {})
         canonical_id = desc["identifier"].removesuffix("_java_three_alt")
         family = "skewer" if canonical_id.endswith("_skewer") else "rack" if desc["identifier"] == "kaleidoscope_grilling:advanced_rack" else "bottle"
@@ -613,6 +640,7 @@ def check_current_display_contracts(findings, geometry_index, animations):
         expected_bottles|={f'kaleidoscope_grilling:{kind}_seasoning_f{fill}' for kind in ('partial','pending') for fill in range(1,9)}
     expected_counts={"skewer":40,"bottle":len(expected_bottles)}
     if version>=(2,8,68):expected_counts["partial"]=1
+    if version>=(2,8,119):expected_counts['plate']=1
     if counts != expected_counts or bottle_ids != expected_bottles or len(skewer_refs) != 150:
         add(findings, "error", "held_inventory_contract", "attachables", "unexpected held family/bite-stage coverage", dict(counts))
 

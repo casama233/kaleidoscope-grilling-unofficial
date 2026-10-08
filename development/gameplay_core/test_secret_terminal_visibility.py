@@ -40,13 +40,18 @@ for(const d of descriptions)for(const hand of ['main_hand','off_hand']){
 
     def test_public_repaired_terminal_scripts_are_conserved_and_generator_is_idempotent(self):
         # PR134 already contains the repair. This freezes those public source
-        # bytes and checks current generator behavior, not a private-before delta.
+        # bytes plus the exact G119 owner row, retaining the full terminal mask.
+        from build_secret_held import owner_occupancy
         for item in terminal.OWNED:
             path = RP / 'attachables' / (item.split(':')[1] + '.attachable.json')
             assert_public_bytes(self, path)
             source = public_json(path)
             after = json.loads(path.read_text())
-            terminal.apply(source['minecraft:attachable']['description'])
+            description = source['minecraft:attachable']['description']
+            rows = description['scripts']['pre_animation']
+            self.assertEqual(sum(row.startswith('v.kg_secret_owner_occupied = ') for row in rows), 1)
+            description['scripts']['pre_animation'] = [owner_occupancy(description['identifier']) if row.startswith('v.kg_secret_owner_occupied = ') else row for row in rows]
+            terminal.apply(description)
             self.assertEqual(after, source)
             self.assertEqual(terminal.apply(deepcopy(after['minecraft:attachable']['description'])), after['minecraft:attachable']['description'])
         assert_public_bytes(self, RP / 'render_controllers/secret_held.render_controllers.json')

@@ -2,9 +2,33 @@
 import itertools
 import json
 import math
+import re
+import sys
 import unittest
 from held_pose_frames import (RP, expected_animations, make_pose, bone_matrix, chain,
     translate, rotate, point, rigid_inverse, calibration, native_skewer_calibration, zyx)
+sys.path.insert(0,str(RP.parents[3]/'tools'))
+from build_plate_held import animations as plate_animations
+
+def plate_layout_value(value,count):
+    """Read the generated count selector, without simulating any player API."""
+    if isinstance(value,(int,float)):return value
+    while True:
+        branch=re.fullmatch(r'v\.kg_plate_count == ([0-5]) \? (-?\d+(?:\.\d+)?) : (.+)',value)
+        if not branch:return float(value)
+        if int(branch[1])==count:return float(branch[2])
+        value=branch[3]
+
+def plate_child_matrix(combined,geometry,layout,count):
+    if geometry['description']['identifier']=='geometry.kg_plate_held.body':return combined
+    result=chain(combined,translate([0,24,0]))
+    # These are the actual generated ancestor bones, in their declared order.
+    for bone in geometry['bones'][2:-1]:
+        pose=layout[bone['name']]
+        resolved={key:[plate_layout_value(x,count) for x in value] if isinstance(value,list)
+                  else plate_layout_value(value,count) for key,value in pose.items()}
+        result=chain(result,bone_matrix(resolved))
+    return chain(result,translate([0,-24,0]))
 
 class HeldPoseFrameTests(unittest.TestCase):
     def test_runtime_is_reproducible_and_not_raw_java_euler(self):
@@ -32,11 +56,16 @@ class HeldPoseFrameTests(unittest.TestCase):
         index={g['description']['identifier']:g for p in (RP/'models').rglob('*.json')
                for g in json.loads(p.read_text()).get('minecraft:geometry',[])}
         expected=expected_animations();checked=0
+        plate=plate_animations()['animations']
+        plate_file=RP/'animations/plate_held.animation.json'
+        if plate_file.exists():
+            self.assertEqual(json.loads(plate_file.read_text())['animations'],plate)
+            expected.update(plate)
         for p in (RP/'attachables').glob('*.json'):
             desc=json.loads(p.read_text())['minecraft:attachable']['description']
             for hand in ('right','left'):
                 bones=expected[desc['animations']['fp_'+hand]]['bones']
-                base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith(('animation.kg_a287.skewer','animation.kg_a286.bottle')) else calibration(hand))
+                base,camera=(native_skewer_calibration(hand) if desc['animations']['fp_'+hand].startswith(('animation.kg_a287.skewer','animation.kg_a286.bottle','animation.kg_plate_held.')) else calibration(hand))
                 combined=chain(rigid_inverse(camera),base,translate([0,24,0]))
                 for bone in bones.values():combined=chain(combined,bone_matrix(bone))
                 combined=chain(combined,translate([0,-24,0]))
@@ -51,24 +80,32 @@ class HeldPoseFrameTests(unittest.TestCase):
                         self.assertTrue(desc['scripts']['pre_animation'][-1].startswith('v.kg_java_piece_visible = '))
                         self.assertIn('q.is_using_item',desc['scripts']['pre_animation'][-1])
                         continue
-                    positions=[]
-                    for bone in index[ref]['bones']:
-                        for cube in bone.get('cubes',[]):
-                            origin=cube['origin'];size=cube['size']
-                            pivot=cube.get('pivot',[0,0,0]);pivot=[-pivot[0],pivot[1],pivot[2]]
-                            rotation=cube.get('rotation',[0,0,0])
-                            cm=chain(combined,translate(pivot),zyx([-rotation[0],-rotation[1],rotation[2]]),translate([-x for x in pivot]))
-                            for corner in itertools.product((0,1),repeat=3):
-                                v=[origin[i]+corner[i]*size[i]for i in range(3)];v[0]*=-1
-                                positions.append(point(cm,v))
-                    if ref.startswith('geometry.kg_secret_held.part_') and ref.endswith('_0'):
-                        self.assertFalse(positions,ref) # Slot zero deliberately hides an unsupported ingredient.
-                        continue
-                    self.assertTrue(positions,ref)
-                    self.assertTrue(all(math.isfinite(v)for pnt in positions for v in pnt),ref)
-                    visible=[v for v in positions if v[2]<-.1 and abs(v[0]/v[2])<1.3 and abs(v[1]/v[2])<.75]
-                    self.assertTrue(visible,(desc['identifier'],hand,ref))
-                    checked+=1
+                    geometry=index[ref];counts=[None]
+                    if ref.startswith('geometry.kg_plate_held.'):
+                        self.assertEqual(desc['identifier'],'kaleidoscope_grilling:skewer_plate')
+                        # A row is checked only in source layouts in which it is
+                        # present; body coordinates do not depend on the count.
+                        counts=[0] if ref.endswith('.body') else range(int(geometry['bones'][-1]['name'].rsplit('_',1)[1])+1,6)
+                    for count in counts:
+                        local=combined if count is None else plate_child_matrix(combined,geometry,plate['animation.kg_plate_held.layout']['bones'],count)
+                        positions=[]
+                        for bone in geometry['bones']:
+                            for cube in bone.get('cubes',[]):
+                                origin=cube['origin'];size=cube['size']
+                                pivot=cube.get('pivot',[0,0,0]);pivot=[-pivot[0],pivot[1],pivot[2]]
+                                rotation=cube.get('rotation',[0,0,0])
+                                cm=chain(local,translate(pivot),zyx([-rotation[0],-rotation[1],rotation[2]]),translate([-x for x in pivot]))
+                                for corner in itertools.product((0,1),repeat=3):
+                                    v=[origin[i]+corner[i]*size[i]for i in range(3)];v[0]*=-1
+                                    positions.append(point(cm,v))
+                        if (ref.startswith('geometry.kg_secret_held.part_') and ref.endswith('_0')) or ref.startswith('geometry.kg_plate_held.empty_'):
+                            self.assertFalse(positions,ref) # Empty fallback models deliberately contain no cubes.
+                            continue
+                        self.assertTrue(positions,ref)
+                        self.assertTrue(all(math.isfinite(v)for pnt in positions for v in pnt),ref)
+                        visible=[v for v in positions if v[2]<-.1 and abs(v[0]/v[2])<1.3 and abs(v[1]/v[2])<.75]
+                        self.assertTrue(visible,(desc['identifier'],hand,ref,count))
+                        checked+=1
         self.assertGreater(checked,400)
 
     def test_single_bound_root_and_no_player_override(self):

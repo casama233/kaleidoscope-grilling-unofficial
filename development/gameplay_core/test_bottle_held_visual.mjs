@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import * as visuals from '../../projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_core.js';
 import * as seasoning from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 
 const N='kaleidoscope_grilling:',EMPTY=N+'empty_seasoning_bottle',PENDING=N+'pending_seasoning';
 const ids=[N+'dragon_egg_powder',N+'green_chili_powder',N+'houttuynia_powder',N+'onion_powder',N+'sichuan_pepper',N+'totem_powder','minecraft:gunpowder','minecraft:redstone'];
@@ -52,14 +53,18 @@ function fixture(){
  const equipment={getEquipment(slot){assert.equal(slot,'offhand');return off},setEquipment(){throw Error('Visual runtime must not write equipment')}};
  const player={id:'holder',selectedSlotIndex:2,getComponent(id){return id==='minecraft:inventory'?{container:component}:id==='minecraft:equippable'?equipment:undefined},setProperty(key,value){writes.push([key,value]);const rejected=failure?.(key);if(rejected&&failureBefore)throw Error('Injected property write failure before mutation');properties.set(key,value);if(rejected)throw Error('Injected property write failure after mutation')}};
  const players=[player];
- const world={afterEvents:Object.fromEntries(['playerInventoryItemChange','playerHotbarSelectedSlotChange','playerLeave'].map(name=>[name,{subscribe(callback){callbacks[name]=callback}}])),getAllPlayers:()=>players,getDynamicProperty(){throw Error('Unstackable bottles must read native item properties')},setDynamicProperty(){throw Error('Visual runtime must not write world metadata')}};
- const system={run:callback=>queue.push(callback),runInterval(callback,ticks){intervals.push({callback,ticks})}};
- const context=vm.createContext({...visuals,...seasoning,world,system,EquipmentSlot:{Offhand:'offhand'},GameMode:{Creative:'creative'},console:{warn:value=>warnings.push(value)}});
+ const world={afterEvents:Object.fromEntries(['playerInventoryItemChange','playerHotbarSelectedSlotChange','playerSpawn','playerLeave'].map(name=>[name,{subscribe(callback){callbacks[name]=callback}}])),getAllPlayers:()=>players,getDynamicProperty(){throw Error('Unstackable bottles must read native item properties')},setDynamicProperty(){throw Error('Visual runtime must not write world metadata')}};
+ const system={currentTick:100,run:callback=>queue.push(callback),runInterval(callback,ticks){intervals.push({callback,ticks})}};
+ const context=vm.createContext({...visuals,...seasoning,canonicalFoodId,world,system,EquipmentSlot:{Offhand:'offhand'},GameMode:{Creative:'creative'},console:{warn:value=>warnings.push(value)}});
  vm.runInContext(strip(read('a2735_player_io.js')),context);
  // itemDataCore has module-private world state. Keep it in its own scope,
  // as the real ESM import does, instead of shadowing the Minecraft world.
  vm.runInContext('Object.assign(globalThis,(function(){'+strip(read('itemDataCore.js'))+';return {configureItemDataWorld,getItemProperty};})())',context);
  vm.runInContext('configureItemDataWorld(world)',context);
+ // Load the production shared writer and dispatcher. These existing adapter
+ // regressions must exercise the real cache/owner path after the G119 split.
+ vm.runInContext(strip(read('held_visual_transport.js')),context);
+ vm.runInContext(strip(read('held_visual_dispatch_runtime.js')),context);
  vm.runInContext(strip(read('bottle_held_visual_runtime.js')),context);
  const api=vm.runInContext('({syncBottleHeld,readBottleHeldSeasonings})',context);
  const stack=(typeId,ingredients,...explicitRaw)=>Object.freeze({typeId,amount:1,maxAmount:1,nameTag:'Preserve me',getDynamicProperty(key){assert.equal(key,seasoning.SEASONING_LIST_KEY);if(readFailure===true||typeof readFailure==='function'&&readFailure(this))throw Error('Injected item read failure');return explicitRaw.length?explicitRaw[0]:JSON.stringify(ingredients)},setDynamicProperty(){throw Error('Visual runtime must not write item metadata')},setLore(){throw Error('Visual runtime must not write lore')}});
@@ -78,8 +83,9 @@ test('real reader and hand adapters publish independent hands without changing n
  const f=fixture();f.main=f.stack(EMPTY,[ids[1],ids[4]]);f.off=f.stack(PENDING,[ids[7],'external:spice']);
  const main=f.main,off=f.off;f.api.syncBottleHeld(f.player);
  assert.deepEqual(f.layers('main'),[2,5,0,0,0,0,0,0]);assert.deepEqual(f.layers('off'),[8,9,0,0,0,0,0,0]);
- assert.strictEqual(f.main,main);assert.strictEqual(f.off,off);assert.equal(f.main.nameTag,'Preserve me');assert.equal(f.writes.length,16);
- f.api.syncBottleHeld(f.player);assert.equal(f.writes.length,16);
+ assert.strictEqual(f.main,main);assert.strictEqual(f.off,off);assert.equal(f.main.nameTag,'Preserve me');
+ assert.equal(f.properties.get(N+'secret_main_piece'),214);assert.equal(f.properties.get(N+'secret_off_piece'),214);
+ const written=f.writes.length;f.api.syncBottleHeld(f.player);assert.equal(f.writes.length,written);
 });
 test('malformed or missing data clears contents without trying to rewrite it',()=>{
  const f=fixture();for(const raw of [undefined,'broken','{}','null','[4,null]']){
@@ -99,9 +105,9 @@ test('five-tick interval picks up offhand-only changes and clears unequipped bot
 });
 test('failed property writes retry the complete projection and cache only successful state',()=>{
  const f=fixture();f.main=f.stack(EMPTY,[ids[0]]);let fail=true;f.setFailure(key=>key===N+'bottle_main_1'&&fail?(fail=false,true):false);
- f.intervals[0].callback();assert.equal(f.warnings.length,1);assert.equal(f.writes.length,2);
- f.intervals[0].callback();assert.equal(f.writes.length,18);assert.deepEqual(f.layers('main'),[1,0,0,0,0,0,0,0]);
- f.intervals[0].callback();assert.equal(f.writes.length,18);
+ f.intervals[0].callback();assert.equal(f.warnings.length,1);assert.equal(f.properties.get(N+'secret_main_piece'),254);
+ f.intervals[0].callback();assert.deepEqual(f.layers('main'),[1,0,0,0,0,0,0,0]);assert.equal(f.properties.get(N+'secret_main_piece'),214);
+ const written=f.writes.length;f.intervals[0].callback();assert.equal(f.writes.length,written);
 });
 test('reverting hands after a partial write failure restores the previous projection',()=>{
  const f=fixture();f.main=f.stack(EMPTY,[ids[0]]);f.api.syncBottleHeld(f.player);
@@ -110,12 +116,14 @@ test('reverting hands after a partial write failure restores the previous projec
  f.main=f.stack(EMPTY,[ids[0]]);f.intervals[0].callback();assert.deepEqual(f.layers('main'),[1,0,0,0,0,0,0,0]);
 });
 test('item property read errors retry when the native item becomes readable',()=>{
- const f=fixture();f.main=f.stack(EMPTY,[ids[2]]);f.setReadFailure(true);f.intervals[0].callback();assert.equal(f.writes.length,0);assert.equal(f.warnings.length,1);
+ const f=fixture();f.main=f.stack(EMPTY,[ids[2]]);f.setReadFailure(true);f.intervals[0].callback();
+ assert.equal(f.writes.filter(([key])=>key.startsWith(N+'bottle_main_')).length,0);assert.equal(f.properties.get(N+'secret_main_piece'),254);assert.equal(f.warnings.length,1);
  f.setReadFailure(false);f.intervals[0].callback();assert.deepEqual(f.layers('main'),[3,0,0,0,0,0,0,0]);
 });
 test('player leave clears successful cache for the same player ID',()=>{
- const f=fixture();f.main=f.stack(PENDING,[ids[3]]);f.api.syncBottleHeld(f.player);assert.equal(f.writes.length,16);
- f.callbacks.playerLeave({playerId:f.player.id});f.api.syncBottleHeld(f.player);assert.equal(f.writes.length,32);
+ const f=fixture();f.main=f.stack(PENDING,[ids[3]]);f.api.syncBottleHeld(f.player);const written=f.writes.length;
+ f.callbacks.playerLeave({playerId:f.player.id});f.api.syncBottleHeld(f.player);assert.ok(f.writes.length>written);
+ assert.deepEqual(f.layers('main'),[4,0,0,0,0,0,0,0]);assert.equal(f.properties.get(N+'secret_main_piece'),214);
 });
 
 test('swapping distinct held bottles swaps projections without cross-hand stale layers',()=>{
@@ -138,12 +146,14 @@ for(const hand of ['main','off'])test(`${hand} malformed or missing DP clears an
   assert.deepEqual(f.layers(hand),zeros());assert.deepEqual(f.layers(opposite),[5,0,0,0,0,0,0,0]);assert.strictEqual(f[hand],broken);assert.strictEqual(f[opposite],other);
  }
 });
-for(const hand of ['main','off'])test(`${hand}-only DP read failure publishes no partial rows and retries when readable`,()=>{
+for(const hand of ['main','off'])test(`${hand}-only DP read failure hides that hand, preserves its payload and retries independently`,()=>{
  const f=fixture(),opposite=hand==='main'?'off':'main';f[hand]=f.stack(EMPTY,[ids[0]]);f[opposite]=f.stack(PENDING,[ids[1]]);f.api.syncBottleHeld(f.player);
  const unreadable=f.stack(EMPTY,[ids[7]]);f[hand]=unreadable;f[opposite]=f.stack(PENDING,[ids[6]]);
- f.setReadFailure(s=>s===unreadable);f.intervals[0].callback();assert.equal(f.writes.length,16);assert.equal(f.warnings.length,1);
- assert.deepEqual(f.layers(hand),[1,0,0,0,0,0,0,0]);assert.deepEqual(f.layers(opposite),[2,0,0,0,0,0,0,0]);
- f.setReadFailure(false);f.intervals[0].callback();assert.equal(f.writes.length,32);
+ const written=f.writes.length;f.setReadFailure(s=>s===unreadable);f.intervals[0].callback();assert.equal(f.warnings.length,1);
+ assert.equal(f.writes.slice(written).filter(([key])=>key.startsWith(N+'bottle_'+hand+'_')).length,0);
+ assert.equal(f.properties.get(N+'secret_'+hand+'_piece'),254);
+ assert.deepEqual(f.layers(hand),[1,0,0,0,0,0,0,0]);assert.deepEqual(f.layers(opposite),[7,0,0,0,0,0,0,0]);
+ f.setReadFailure(false);f.intervals[0].callback();assert.equal(f.properties.get(N+'secret_'+hand+'_piece'),214);
  assert.deepEqual(f.layers(hand),[8,0,0,0,0,0,0,0]);assert.deepEqual(f.layers(opposite),[7,0,0,0,0,0,0,0]);
 });
 for(const hand of ['main','off'])for(const index of [0,7])for(const before of [false,true])test(`failed ${hand} layer ${index} ${before?'before':'after'} property mutation retries both hands after reverting to cached state`,()=>{
@@ -153,20 +163,23 @@ for(const hand of ['main','off'])for(const index of [0,7])for(const before of [f
  let once=true;f.setFailure(key=>key===N+'bottle_'+hand+'_'+index&&once?(once=false,true):false,{before});
  f.intervals[0].callback();assert.equal(f.warnings.length,1);
  const attempts=f.writes.length;f.main=originalMain;f.off=originalOff;f.intervals[0].callback();
- assert.equal(f.writes.length,attempts+16,'An old successful signature must not suppress full retry');
+ assert.ok(f.writes.length>attempts,'An old successful signature must not suppress retry');
  assert.deepEqual(f.layers('main'),[1,0,0,0,0,0,0,0]);assert.deepEqual(f.layers('off'),[2,0,0,0,0,0,0,0]);
- f.intervals[0].callback();assert.equal(f.writes.length,attempts+16);
+ assert.equal(f.properties.get(N+'secret_main_piece'),214);assert.equal(f.properties.get(N+'secret_off_piece'),214);
+ const written=f.writes.length;f.intervals[0].callback();assert.equal(f.writes.length,written);
 });
 test('interval isolates projections and successful caches between separate players',()=>{
  const f=fixture(),other=f.addPlayer('other-holder');f.main=f.stack(EMPTY,[ids[0]]);f.off=f.stack(PENDING,[ids[7]]);
  other.main=f.stack(EMPTY,[ids[0]]);other.off=f.stack(PENDING,[ids[7]]);f.intervals[0].callback();
- assert.equal(f.writes.length,16);assert.equal(other.writes.length,16,'An identical projection for another ID is still published');
+ assert.ok(f.writes.length>0);assert.equal(other.writes.length,f.writes.length,'An identical projection for another ID is still published');
+ const otherWritten=other.writes.length;
  f.main=f.stack(EMPTY,[ids[4]]);f.intervals[0].callback();assert.deepEqual(f.layers('main'),[5,0,0,0,0,0,0,0]);
- assert.deepEqual(other.layers('main'),[1,0,0,0,0,0,0,0]);assert.equal(other.writes.length,16);
- f.callbacks.playerLeave({playerId:f.player.id});f.intervals[0].callback();assert.equal(f.writes.length,48);assert.equal(other.writes.length,16);
+ assert.deepEqual(other.layers('main'),[1,0,0,0,0,0,0,0]);assert.equal(other.writes.length,otherWritten);
+ const written=f.writes.length;f.callbacks.playerLeave({playerId:f.player.id});f.intervals[0].callback();assert.ok(f.writes.length>written);assert.equal(other.writes.length,otherWritten);
 });
 test('one unreadable player cannot prevent the interval from publishing another player',()=>{
  const f=fixture(),other=f.addPlayer('healthy-holder'),broken=f.stack(EMPTY,[ids[0]]);f.main=broken;other.main=f.stack(PENDING,[ids[6]]);
- f.setReadFailure(s=>s===broken);f.intervals[0].callback();assert.equal(f.writes.length,0);assert.equal(f.warnings.length,1);
- assert.deepEqual(other.layers('main'),[7,0,0,0,0,0,0,0]);assert.equal(other.writes.length,16);
+ f.setReadFailure(s=>s===broken);f.intervals[0].callback();assert.equal(f.writes.filter(([key])=>key.startsWith(N+'bottle_main_')).length,0);assert.equal(f.warnings.length,1);
+ assert.equal(f.properties.get(N+'secret_main_piece'),254);
+ assert.deepEqual(other.layers('main'),[7,0,0,0,0,0,0,0]);assert.ok(other.writes.length>0);
 });

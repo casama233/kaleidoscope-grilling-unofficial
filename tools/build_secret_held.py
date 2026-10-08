@@ -10,6 +10,7 @@ from build_secret_palettes import build as build_palettes
 from secret_idle_calibration import augment as augment_idle
 from secret_terminal_visibility import augment as augment_terminal
 from generated_food_sprite import helper_assets
+from held_visual_channels import secret_bank_ready
 ROOT=Path(__file__).resolve().parents[1];P=ROOT/'projects/grilling/gameplay_core';RP=P/'resource_pack';BP=P/'behavior_pack'
 FIX=ROOT/'development/gameplay_core/fixtures/secret-visual-catalog.json'
 PIECE_BINDING="q.item_slot_to_bone_name(context.item_slot == 'main_hand' ? 'off_hand' : 'main_hand')"
@@ -17,7 +18,9 @@ def owner_occupancy(identifier):
  occupied="c.item_slot == 'off_hand' ? c.owning_entity->q.is_item_name_any('slot.weapon.offhand','"+identifier+"') : c.owning_entity->q.is_item_name_any('slot.weapon.mainhand','"+identifier+"')"
  if identifier!='kaleidoscope_grilling:unfinished_skewer':
   occupied='('+occupied+") && (v.kg_secret_ingredient_0 > 0 || v.kg_secret_ingredient_1 > 0 || v.kg_secret_ingredient_2 > 0)"
- return 'v.kg_secret_owner_occupied = '+occupied+';'
+ # This hand's bank may still contain a plate/bottle payload while native
+ # equipment changes propagate. Retain the existing item/empty/terminal gates.
+ return 'v.kg_secret_owner_occupied = ('+occupied+') && '+secret_bank_ready()+';'
 def build():
  rows=json.loads(FIX.read_text())['items'];assert len(rows)==213,'Update property encoding/tests for a changed visual catalog'
  textures={'stick':'textures/secret_skewer_stick',**palette_refs(len(rows))}

@@ -8,6 +8,7 @@ from unittest.mock import patch
 from pathlib import Path
 from PIL import Image
 import a2861_bottle_held_visual_assets as held
+from held_visual_channels import WORD_A_MAX, WORD_B_MAX, bottle_bank_ready
 
 ROOT=Path(__file__).resolve().parents[2]
 RP=held.RP
@@ -159,10 +160,12 @@ class BottleVisualAssets(unittest.TestCase):
             d=load(RP/f'attachables/{item}.attachable.json')['minecraft:attachable']['description']
             self.assertNotRegex(json.dumps(d['render_controllers']),r'\b(?:c|context|q|query)\.')
             initial=[v for v in d['scripts']['initialize'] if v.startswith('v.kg_bottle_')];pre=[v for v in d['scripts']['pre_animation'] if v.startswith('v.kg_bottle_')]
-            self.assertEqual(initial,['v.kg_bottle_off_hand = 0;']+
+            self.assertEqual(initial,['v.kg_bottle_off_hand = 0;','v.kg_bottle_owner_ready = 0;']+
                 [f'v.kg_bottle_layer_{i} = 0;' for i in range(8)])
             self.assertEqual(pre[0],"v.kg_bottle_off_hand = c.item_slot == 'off_hand';")
-            for i,expression in enumerate(pre[1:]):
+            self.assertEqual(pre[1],'v.kg_bottle_owner_ready = '+bottle_bank_ready(d['identifier'])+';')
+            for i,expression in enumerate(pre[2:]):
+                self.assertTrue(expression.startswith(f'v.kg_bottle_layer_{i} = v.kg_bottle_owner_ready ? '))
                 for hand in ['main','off']:
                     self.assertIn(f"c.owning_entity->q.property('kaleidoscope_grilling:bottle_{hand}_{i}')",expression)
                     self.assertIn(f"c.owning_entity->q.has_property('kaleidoscope_grilling:bottle_{hand}_{i}')",expression)
@@ -172,25 +175,27 @@ class BottleVisualAssets(unittest.TestCase):
             # integral and bounded before either layer's texture array reads it.
             source=json.dumps(pre)
             script="""
-const expressions=EXPRESSIONS.map(s=>s.replaceAll('c.owning_entity->q.','owner_q.'));
+const expressions=EXPRESSIONS.map(s=>s.replaceAll('c.owning_entity->q.','owner_q.')),identifier=IDENTIFIER;
 for(const slot of ['main_hand','off_hand']) {
  const c={item_slot:slot},v={},main=[0,1,2,3,4,5,6,9],off=[8,7,6,5,4,3,2,1];
  const q={property:()=>{throw Error('Property read from attachable instead of owning entity')}};
- const owner_q={has_property:()=>true,property:name=>name.includes(':bottle_off_')?off[Number(name.split('_').at(-1))]:main[Number(name.split('_').at(-1))]};
+ const owner_q={has_property:()=>true,
+  is_item_name_any:(weapon,...ids)=>weapon===(slot==='off_hand'?'slot.weapon.offhand':'slot.weapon.mainhand')&&ids.includes(identifier),
+  property:name=>name.endsWith('_piece')?214:name.includes(':bottle_off_')?off[Number(name.split('_').at(-1))]:main[Number(name.split('_').at(-1))]};
  const math={floor:Math.floor,clamp:(x,a,b)=>Math.max(a,Math.min(b,x))};
  const evaluate=()=>{for(const expression of expressions)new Function('c','v','q','owner_q','math',expression)(c,v,q,owner_q,math)};
  evaluate();
  const expected=slot==='off_hand'?off:main;
  for(let i=0;i<8;i++)if(v['kg_bottle_layer_'+i]!==expected[i])throw Error('Hand data crossed: '+slot+' layer '+i);
  for(const value of [-8,2.9,20]) {
-  owner_q.property=()=>value;
+  owner_q.property=name=>name.endsWith('_piece')?214:value;
   evaluate();
   for(let i=0;i<8;i++)if(v['kg_bottle_layer_'+i]!==Math.floor(Math.max(0,Math.min(9,value))))throw Error('Unbounded texture index');
  }
  owner_q.has_property=()=>false;owner_q.property=()=>{throw Error('Missing property read')};evaluate();
  for(let i=0;i<8;i++)if(v['kg_bottle_layer_'+i]!==0)throw Error('Missing property did not clear layer');
 }
-""".replace('EXPRESSIONS',source)
+""".replace('EXPRESSIONS',source).replace('IDENTIFIER',json.dumps(d['identifier']))
             subprocess.run(['node','-e',script],check=True,capture_output=True,text=True)
 
     def test_all_bottle_gui_icons_cannot_change_particle_palette(self):
@@ -234,7 +239,7 @@ for(const slot of ['main_hand','off_hand']) {
         self.assertLessEqual(len(props),32)
         for hand in ['main','off']:
             for i in range(8):
-                self.assertEqual(props[f'kaleidoscope_grilling:bottle_{hand}_{i}'],{'type':'int','range':[0,9],'default':0,'client_sync':True})
+                self.assertEqual(props[f'kaleidoscope_grilling:bottle_{hand}_{i}'],{'type':'int','range':[0,WORD_A_MAX if i%2==0 else WORD_B_MAX],'default':0,'client_sync':True})
 
 if __name__=='__main__':
     unittest.main()

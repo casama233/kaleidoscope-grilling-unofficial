@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    119
+  ],
+  "reviewed_commit": "1e8011e1f71833739ea12097e80c0f69a21c844e",
+  "before_sha256": "0feca3e6bf760fe808e610494ccf91ad3130e15f5cf281e6f39910de616899b8",
+  "after_sha256": "3a084acdff9d8c8d0bba3a1ea49ee83cd8dd6a925a2e902066c1e3a59cf29064",
+  "operations": [
+    {
+      "start": 576,
+      "end": 656,
+      "before": "import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';\n",
+      "after": "import {handleHeavyMetalBeforeHurt,forgetHeavyMetalRescue} from './heavy_metal_damage_runtime.js';\n"
+    },
+    {
+      "start": 1444,
+      "end": 1486,
+      "before": "import './bottle_held_visual_runtime.js';\n",
+      "after": "import './bottle_held_visual_runtime.js';\nimport './plate_held_visual_runtime.js';\n"
+    },
+    {
+      "start": 80464,
+      "end": 81024,
+      "before": "world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);PENDING_METAL_RESCUES.delete(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});\nworld.afterEvents.entityDie.subscribe(e=>forgetProjectileDodge(e.deadEntity));\nworld.afterEvents.entityRemove.subscribe(e=>forgetProjectileDodge(e.removedEntityId));\nconst PENDING_METAL_RESCUES=new Map();\n",
+      "after": "world.afterEvents.playerLeave.subscribe(e=>{forgetProjectileDodge(e.playerId);forgetHeavyMetalRescue(e.playerId);forgetEatingItem(e.playerId);stopSoundHandle(PENDING_USES.get(e.playerId)?.audio);stopSoundHandle(ACTIVE_EATS.get(e.playerId)?.audio);for(const map of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED])map.delete(e.playerId)});\nworld.afterEvents.entityDie.subscribe(e=>{forgetProjectileDodge(e.deadEntity);forgetHeavyMetalRescue(e.deadEntity)});\nworld.afterEvents.entityRemove.subscribe(e=>{forgetProjectileDodge(e.removedEntityId);forgetHeavyMetalRescue(e.removedEntityId)});\n"
+    },
+    {
+      "start": 81024,
+      "end": 83280,
+      "before": "world.beforeEvents.entityHurt.subscribe(e=>{\n if(e.cancel)return;\n const target=e.hurtEntity,cause=e.damageSource?.cause;\n if(e.damageSource?.damagingProjectile){\n  const claim=reserveProjectileDodge(target);\n  if(claim){try{\n   system.run(()=>settleProjectileDodge(target,claim,()=>{const moved=tryProjectileDodgeMovement(target);if(moved.success)projectileDodgeTeleportFeedback(target,moved.origin)}));\n   e.cancel=true;return;\n  }catch(error){abandonProjectileDodge(claim);console.warn('[Grilling projectile dodge schedule] '+error)}}\n }\n if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}\n const hm=fxGet(target,'heavy_metal'),hp=target.getComponent?.('minecraft:health');\n if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){\n  // Reserve synchronously: deferred writes must not enqueue duplicate rescues.\n  // BDS exposes provisional post-hit health here; compare that value to zero,\n  // not incoming damage to already-reduced health. Cancellation restores it.\n  // Native remaining absorption is unavailable: skip ambiguous hits rather\n  // than consuming rescue for a shield-blocked nonfatal hit.\n  // Later addon cancellation/rewrite and exact Java death ordering remain separate.\n  const token={until:hm.until,amp:hm.amp};PENDING_METAL_RESCUES.set(target.id,token);e.cancel=true;\n  system.run(()=>{try{\n   if(PENDING_METAL_RESCUES.get(target.id)!==token)return;\n   const current=fxGet(target,'heavy_metal'),health=target.getComponent?.('minecraft:health');\n   // Milk, death, logout or effect replacement may invalidate a queued rescue.\n   if(!current||current.until!==token.until||current.amp!==token.amp||fxGet(target,'heavy_metal_poisoning')||!health||health.currentValue<=0)return;\n   fxClear(target,'heavy_metal');fxSet(target,'heavy_metal_poisoning',12000);health.setCurrentValue(1);\n   target.dimension.playSound('kg_java21.heavy_metal',target.location);\n  }catch(error){console.warn('[Grilling heavy metal] '+error)}finally{if(PENDING_METAL_RESCUES.get(target.id)===token)PENDING_METAL_RESCUES.delete(target.id)}});\n }\n});\n",
+      "after": "world.beforeEvents.entityHurt.subscribe(e=>{\n if(e.cancel)return;\n const target=e.hurtEntity,cause=e.damageSource?.cause;\n if(e.damageSource?.damagingProjectile){\n  const claim=reserveProjectileDodge(target);\n  if(claim){try{\n   system.run(()=>settleProjectileDodge(target,claim,()=>{const moved=tryProjectileDodgeMovement(target);if(moved.success)projectileDodgeTeleportFeedback(target,moved.origin)}));\n   e.cancel=true;return;\n  }catch(error){abandonProjectileDodge(claim);console.warn('[Grilling projectile dodge schedule] '+error)}}\n }\n if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}\n handleHeavyMetalBeforeHurt(e);\n});\n"
+    },
+    {
+      "start": 83280,
+      "end": 84073,
+      "before": "world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){PENDING_METAL_RESCUES.delete(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n",
+      "after": "world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n"
+    }
+  ]
+}

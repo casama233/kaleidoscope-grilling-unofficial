@@ -6,7 +6,7 @@ and a completed three-mask sprite in the author's fallback color. This static
 fallback fixes the UV-layout icon; ordered per-stack colors, count and variants
 remain unresolved. See [G104 scope](STATUS-A2.8.104.md).
 
-Research checked 2026-10-06. **Exact per-stack Java GUI parity remains unresolved.**
+Research rechecked 2026-10-09 (Hong Kong; 2026-10-08 UTC). **Exact per-stack Java GUI parity remains unresolved.**
 The documented stable Bedrock icon/API surfaces below do not provide a verified
 route from arbitrary ordered skewer ingredients to three independently colored
 inventory-icon layers. This is a bounded support finding, not proof that every
@@ -26,6 +26,13 @@ undocumented or future JSON UI technique is impossible.
 No rendered-client experiment was performed for this research. Static schemas,
 Script API declarations, BDS loading and Python image checks cannot certify an
 inventory icon on the target client.
+
+The latest official `Mojang/bedrock-samples` main was read back at this recheck
+and still resolves to the same `46ba6ea9` pin. Its actual 2.9.0/2.2.0 bindings,
+modern icon schema, Molang queries and native inventory renderer were reread;
+no newly supported three-position per-stack color/variant bridge was found.
+The current Microsoft stable ItemStack, ItemDyeableComponent and icon references
+agree with that bounded finding. See the compact [API recheck record][api-recheck].
 
 ## What the Java GUI actually draws
 
@@ -171,3 +178,4 @@ is included in this document or the QA compositor.
 [ui-api]: https://github.com/Mojang/bedrock-samples/blob/46ba6ea985fb5a92d79a9419198f10dda14c199d/metadata/script_modules/%40minecraft/server-ui-bindings_2.2.0.json
 [custom-form]: https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server-ui/customform?view=minecraft-bedrock-stable#image
 [legacy-icon]: https://feedback.minecraft.net/hc/en-us/articles/360052592091-Minecraft-1-16-100-Bedrock
+[api-recheck]: evidence/heavy-metal-and-inventory-api-20261009.md

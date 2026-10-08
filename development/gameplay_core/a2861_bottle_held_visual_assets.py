@@ -9,6 +9,7 @@ from pathlib import Path
 import argparse
 import json
 import re
+import sys
 from PIL import Image
 import a2770_placed_visual_assets as placed
 
@@ -16,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[2]
 RP = ROOT / 'projects/grilling/gameplay_core/resource_pack'
 BP = ROOT / 'projects/grilling/gameplay_core/behavior_pack'
 NS = 'kaleidoscope_grilling:'
+sys.path.insert(0, str(ROOT / 'tools'))
+from held_visual_channels import bottle_bank_ready
 ATLAS = 'textures/held/bottle_shell_palette'
 SOURCE_TEXTURES = ('textures/blocks/seasoning_bottle',
                    'textures/a2766_special_seasoning/palette_v5',
@@ -108,7 +111,9 @@ def update_numeric_scripts(desc):
     for phase in ['initialize', 'pre_animation']:
         scripts[phase] = [s for s in scripts.get(phase, []) if not s.startswith('v.kg_bottle_')]
     scripts['initialize'].append('v.kg_bottle_off_hand = 0;')
+    scripts['initialize'].append('v.kg_bottle_owner_ready = 0;')
     scripts['pre_animation'].append("v.kg_bottle_off_hand = c.item_slot == 'off_hand';")
+    scripts['pre_animation'].append('v.kg_bottle_owner_ready = ' + bottle_bank_ready(desc['identifier']) + ';')
     for layer in range(8):
         var = 'v.kg_bottle_layer_' + str(layer)
         reads = []
@@ -117,7 +122,7 @@ def update_numeric_scripts(desc):
             reads.append("(c.owning_entity->q.has_property('" + name + "') ? c.owning_entity->q.property('" + name + "') : 0)")
         prop = '(v.kg_bottle_off_hand ? ' + reads[0] + ' : ' + reads[1] + ')'
         scripts['initialize'].append(var + ' = 0;')
-        scripts['pre_animation'].append(var + ' = math.floor(math.clamp(' + prop + ', 0, 9));')
+        scripts['pre_animation'].append(var + ' = v.kg_bottle_owner_ready ? math.floor(math.clamp(' + prop + ', 0, 9)) : 0;')
 
 
 def route(desc, identifier, controller):

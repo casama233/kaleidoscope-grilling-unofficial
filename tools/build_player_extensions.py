@@ -28,6 +28,14 @@ def build():
  if (ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/seasoning_motion_runtime.js').is_file():
   for name,maximum in [('season_hand',2),('season_phase',10),('pending_hand',2)]:
    props[PREFIX+name]={'type':'int','range':[0,maximum],'default':0,'client_sync':True}
+ if (ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/plate_held_visual_core.js').is_file():
+  from held_visual_channels import WORD_A_MAX,WORD_B_MAX,channel_name,verify_server_constants
+  verify_server_constants()
+  # Preserve the existing names, defaults, integer types and client-sync flags.
+  # In a plate hand only, ten channels carry five split row payloads. Count
+  # uses secret_*_2 unchanged; its independent value remains exactly 0..5.
+  for hand in ('main','off'):
+   for index in range(10):props[channel_name(hand,index)]['range']=[0,WORD_A_MAX if index%2==0 else WORD_B_MAX]
  assert len(props)<=32,'Player client property limit exceeded'
  groups=entity.setdefault('component_groups',{});events=entity.setdefault('events',{})
  ids=[PREFIX+'dragon_health_'+str(i) for i in range(3)]
