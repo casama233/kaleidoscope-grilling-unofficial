@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    112
+  ],
+  "scope": "Share exact owned ingredient/status lore refresh with transactional partial/PENDING pickup, preserving real native metadata and ingredient ownership.",
+  "before_sha256": "928ee9843d2aaa53734e21305daaeba02f3cd6129c1b957699d84ae8b96f5712",
+  "after_sha256": "aab06e4f0acb7d9daf59eff06f9a6fd6c5132db5ebdea886951a07714bb574db",
+  "operations": [
+    {
+      "start": 45247,
+      "end": 45247,
+      "before": "",
+      "after": "refreshBottleIngredientLore(stack,data){\n // Only derived Grilling count/status lines change; native metadata stays owned.\n const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);\n const derived=data.ingredients.length||data.kind==='pending'?seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind==='empty'}):[];\n const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];\n setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');\n}\nfunction "
+    },
+    {
+      "start": 46749,
+      "end": 46780,
+      "before": "// Retyping preserves lore, so ",
+      "after": ""
+    },
+    {
+      "start": 46787,
+      "end": 46788,
+      "before": " ",
+      "after": "B"
+    },
+    {
+      "start": 46789,
+      "end": 46790,
+      "before": "n",
+      "after": "tt"
+    },
+    {
+      "start": 46791,
+      "end": 46798,
+      "before": "y our d",
+      "after": ""
+    },
+    {
+      "start": 46799,
+      "end": 46923,
+      "before": "rived count/status here.\n   // Keep unrelated custom lore and all native item metadata on the same stack.\n   const owned=['i",
+      "after": "I"
+    },
+    {
+      "start": 46932,
+      "end": 47231,
+      "before": "s','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);\n   const lore=[...getItemRawLore(topItem).filter(line=>!owned.includes(line?.translate)),...seasoningLore(undefined,top.ingredients.length,{pending:top.kind==='pending',missingBase:top.kind==='empty'})];\n   setItem",
+      "after": ""
+    },
+    {
+      "start": 47244,
+      "end": 47283,
+      "before": "lore);if(JSON.stringify(getItemRawLore(",
+      "after": ""
+    },
+    {
+      "start": 47286,
+      "end": 47371,
+      "before": "Item))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected'",
+      "after": ""
+    },
+    {
+      "start": 48053,
+      "end": 48054,
+      "before": " ",
+      "after": "{if(data.kind!=='special')refreshBottleIngredientLore(item,data);"
+    },
+    {
+      "start": 48089,
+      "end": 48089,
+      "before": "",
+      "after": "}"
+    }
+  ]
+}

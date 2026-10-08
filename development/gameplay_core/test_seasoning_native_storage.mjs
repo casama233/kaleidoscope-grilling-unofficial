@@ -72,7 +72,7 @@ function fixture({withPlacedVisuals=false}={}){
    context.refreshPlacedBottleAfterPickup=placed.refreshPlacedBottleAfterPickup;
   }
   vm.runInContext('const readBottleStack=readPlacedSeasoningStack,writeBottleStack=writePlacedSeasoningStack,isSeasoningBlock=isSeasoningBlockId,stationStorageKey=storageKey;',context);
-  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','warnMissingSeasoningBase','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
+  const names=['copyOne','reducedStack','getUses','setUses','bottleDataFromItem','bottleItem','setBottleVisual','nativeBottles','bottleRollbackStatus','bottleProjectionStep','commitBottleAndHand','pushBottle','refreshBottleIngredientLore','warnMissingSeasoningBase','handleSeasoningBlock','sameBottleTarget','bottleTargetSnapshot','bottleActionSnapshot','bottleActionStillCurrent','scheduleNativeBottlePlacement','scheduleNativeBottleBreak','breakNativeBottles','tickNativeBottleSupport','scheduleNativeBottleExplosion'];
   const main=read('main.js');vm.runInContext('const pendingBottlePlacements=new Set();\n'+fn(main,'queueBottlePlacement')+'\n'+names.map(n=>fn(main,n)).join('\n'),context);
   api=vm.runInContext('({nativeBottles,pushBottle,handleSeasoningBlock,bottleActionSnapshot,bottleActionStillCurrent,scheduleNativeBottlePlacement,scheduleNativeBottleBreak,breakNativeBottles,tickNativeBottleSupport,scheduleNativeBottleExplosion,bottleDataFromItem,bottleItem,seasoningBlockKey,stationContainer,inspectStationStorage,retargetBottleFillStack})',context);
  };
@@ -213,7 +213,7 @@ test('retirement with unexpected nonempty inventory fails closed and preserves i
 });
 
 for(const kind of ['partial','pending'])for(let fill=1;fill<=8;fill++)test(`${kind} fill ${fill} native place/reload/pickup retains the exact proxy stack`,()=>{
- const f=fixture(),s=decorated(kind==='partial'?'empty':'pending');s.typeId=N+kind+'_seasoning_f'+fill;s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(fill).fill('minecraft:redstone'));
+ const f=fixture(),s=decorated(kind==='partial'?'empty':'pending');s.typeId=N+kind+'_seasoning_f'+fill;s.props[core.SEASONING_LIST_KEY]=JSON.stringify(Array(fill).fill('minecraft:redstone'));s.lore.push(...seasoningLore(undefined,fill,{pending:kind==='pending',missingBase:kind==='partial'}));
  f.hand=s;f.place();equal(f.api.nativeBottles(f.block).items[0],s);f.reload();equal(f.api.nativeBottles(f.block).items[0],s);
  f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,s);assert.equal(f.block.typeId,'minecraft:air');assert.equal(f.entities.size,0);
 });
@@ -363,4 +363,12 @@ for(const fail of [false,true])test('player break four bottles warning follows s
 });
 test('nonplayer destruction and support loss never emit missing-base chat',()=>{
  for(const support of [false,true]){const f=fixture(),s=decorated('pending');s.props[core.SEASONING_LIST_KEY]='["minecraft:redstone"]';f.hand=s;f.place();if(support){f.block.below().setType('minecraft:air');f.api.tickNativeBottleSupport(f.block)}else f.api.breakNativeBottles(f.block);equal(f.messages,[])}
+});
+
+for(const kind of ['empty','pending'])for(const fail of [false,true])test(kind+' stale full8 pickup repairs only owned lore, transactional failure='+fail,()=>{
+ const f=fixture(),s=decorated(kind),ingredients=kind==='pending'?allEight:Array(8).fill('minecraft:redstone');s.props[core.SEASONING_LIST_KEY]=JSON.stringify(ingredients);s.typeId=core.seasoningFillVisualId(s.typeId,ingredients);s.lore.push(...seasoningLore(undefined,4,{pending:kind==='pending',missingBase:kind==='empty'}));f.hand=s;f.place();
+ if(fail)f.failOnce('hand');f.api.handleSeasoningBlock(f.block,f.holder);
+ if(fail){assert.equal(f.hand,undefined);equal(f.api.nativeBottles(f.block).items[0],s);return}
+ const expected=s.clone();expected.lore=[...s.lore.filter(l=>l.text),...seasoningLore(undefined,8,{pending:kind==='pending',missingBase:kind==='empty'})];equal(f.hand,expected);equal(f.hand.props,s.props);
+ f.place();f.reload();equal(f.api.nativeBottles(f.block).items[0],expected);f.api.handleSeasoningBlock(f.block,f.holder);equal(f.hand,expected);
 });

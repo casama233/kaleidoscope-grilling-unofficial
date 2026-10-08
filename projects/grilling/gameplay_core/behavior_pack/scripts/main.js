@@ -621,6 +621,13 @@ function pushBottle(block,player,held,hand='main'){
  if(!ok)interactionFailure(player,'§c放瓶失敗，已嘗試回復調料與手持物品');
  else blockSound(block,'seasoning_bottle_stack',1);return ok;
 }
+function refreshBottleIngredientLore(stack,data){
+ // Only derived Grilling count/status lines change; native metadata stays owned.
+ const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);
+ const derived=data.ingredients.length||data.kind==='pending'?seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind==='empty'}):[];
+ const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];
+ setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');
+}
 function warnMissingSeasoningBase(player,ingredients){
  // Java pickup/playerWillDestroy uses chat (displayClientMessage false).
  if(!player||!ingredients.length||hasSeasoningBase(ingredients))return;
@@ -641,11 +648,7 @@ function handleSeasoningBlock(block,player,hand='main'){
   if(top.kind==='empty'&&hasSeasoningBase(top.ingredients))items[items.length-1]=bottleItem({...top,kind:'pending'});
   else{
    setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');
-   // Retyping preserves lore, so refresh only our derived count/status here.
-   // Keep unrelated custom lore and all native item metadata on the same stack.
-   const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);
-   const lore=[...getItemRawLore(topItem).filter(line=>!owned.includes(line?.translate)),...seasoningLore(undefined,top.ingredients.length,{pending:top.kind==='pending',missingBase:top.kind==='empty'})];
-   setItemLore(topItem,lore);if(JSON.stringify(getItemRawLore(topItem))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');
+   refreshBottleIngredientLore(topItem,top);
    items[items.length-1]=retargetBottleFillStack(topItem);
   }
   if(!commitBottleAndHand(block,current,items,storage,next,!free)){interactionFailure(player,'§c加料失敗，已嘗試回復原料');return}
@@ -658,7 +661,7 @@ function handleSeasoningBlock(block,player,hand='main'){
   const storage=captureWritableHand(player,hand);let item=items.pop();const data=bottleDataFromItem(item);
   if(storage.before)throw new Error('Grilling: take-bottle hand is no longer empty');
   if(data.kind==='empty'&&hasSeasoningBase(data.ingredients))item=bottleItem({...data,kind:'pending'});
-  else item=retargetBottleFillStack(item);
+  else{if(data.kind!=='special')refreshBottleIngredientLore(item,data);item=retargetBottleFillStack(item);}
   if(!commitBottleAndHand(block,current,items,storage,item))interactionFailure(player,'§c取瓶失敗，已嘗試回復調料');
   else{refreshPlacedBottleAfterPickup(block);blockSound(block,'seasoning_bottle_place',1);warnMissingSeasoningBase(player,data.ingredients)}
   return;

@@ -70,10 +70,21 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   path=ROOT/public.MAIN_PATH;source=path.read_bytes()
   delta=public._main_delta('g111-main-reviewed-delta.json')
   self.assertEqual(delta['release'],[2,8,111])
-  self.assertEqual(public._apply_main_operations(public.expected_main_bytes((2,8,110)),delta),source)
+  self.assertEqual(public._apply_main_operations(public.expected_main_bytes((2,8,110)),delta),public.expected_main_bytes((2,8,111)))
   for changed in (source+b'\n',source.replace(b"warnMissingSeasoningBase(player,data.ingredients)",b"warnMissingSeasoningBase(player,[])")):
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):public.assert_public_bytes_with_g71_bottles(self,path)
+ def test_g112_pickup_delta_retains_prior_candidate_and_rejects_mutations(self):
+  path=ROOT/public.MAIN_PATH;source=path.read_bytes()
+  delta=public._main_delta('g112-main-reviewed-delta.json')
+  self.assertEqual(delta['release'],[2,8,112])
+  self.assertEqual(public._apply_main_operations(public.expected_main_bytes((2,8,111)),delta),source)
+  public.assert_public_bytes_with_g71_bottles(self,path)
+  for changed in (source+b'\n',source.replace(b"if(data.kind!=='special')",b"if(false)")):
+   self.assertNotEqual(changed,source)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
