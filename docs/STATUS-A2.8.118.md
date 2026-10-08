@@ -77,6 +77,7 @@ Java基線代理另外讀取兩版Mojang官方client JAR中的fences／wooden_fe
 CI也要求五份工作站開發鏡像與canonical一致；已同步唯一落後的廚具架鏡像並通過原檢查。
 物品圖示的歷史守衛追加G118花椒單檔見證：保留G60→67→68前像鏈，再與公開候選`dccbe92a`的整檔bytes比較；圖示入口6／6及原歷史來源入口12／12通過。19個commit引用均明列，原93-object provenance包維持不變。
 花椒接觸測試的舊VM補載真正`plant_fertilizer.js`及其production依賴，保留接觸範圍、查詢次數、豁免、傷害與冷卻斷言，另確認樹苗已註冊且使用同一互動callback；該入口10／10通過。另一代理唯讀檢查目前驗證鏈中的同類載入點，未發現第二個缺注入caller。
+手持校準守衛僅追加本版新建的`plate_food_visual.animation.json`：確認公開舊基線無此檔、只有指定餐盤animation／root bone、整檔bytes符合既有generator，才允許此新增檔；所有原手持／進食／瓶子來源斷言維持。該入口3／3及餐盤資產生成檢查通過，沒有擴大其他新動畫的放行範圍。
 以上CI收尾只修改非輸出鏡像／測試，G118凍結的BP／RP與封裝雜湊維持相同。
 
 ## 明確保留的差異與恢復界線
