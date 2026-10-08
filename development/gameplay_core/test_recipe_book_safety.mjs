@@ -2,7 +2,9 @@ import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pa
 /** Executes runtime function bodies with API/storage doubles; no client claims. */
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import fs from 'node:fs';
 import {commitSteps} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a277_grill_transaction_core.js';
-import {secretFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js';
+import {secretFood,recipeTable,SECRET_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js';
+import {PLATE_ID,PLATE_BLOCK_ID,BOOK_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_core.js';
+import {RAW_SKEWER_TAG,GRILLED_SKEWER_TAG} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_compat_core.js';
 const N='kaleidoscope_grilling:',url=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_runtime.js',import.meta.url),src=fs.readFileSync(url,'utf8');
 function fn(name){const start=src.indexOf('function '+name+'(');assert.ok(start>=0,name);let end=src.indexOf('{',start)+1,n=1;for(;n;end++){if(src[end]==='{')n++;if(src[end]==='}')n--}return src.slice(start,end)}
 class Stack{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.props={};this.lore=[]}getTags(){return this.tags??[]}clone(){return Object.assign(new Stack(this.typeId,this.amount),structuredClone({...this}))}}
@@ -29,13 +31,13 @@ test('plate computes cooked-secret food from cooked rows but duplicates from raw
  const out=ctx.run({typeId:N+'secret_skewer'});assert.equal(out.nutrition,8);assert.equal(out.duplicate,true);
 });
 test('four-paper blank recipe and one-book reset retain paper economy',()=>{const dir=new URL('../recipes/',url);const blank=JSON.parse(fs.readFileSync(new URL('skewer_recipe_book_blank.json',dir),'utf8'))['minecraft:recipe_shaped'];assert.deepEqual(blank.pattern,['PP','PP']);assert.equal(blank.key.P.item,'minecraft:paper');assert.equal(blank.result.item,N+'skewer_recipe_book');const clear=JSON.parse(fs.readFileSync(new URL('clear_skewer_recipe_book.json',dir),'utf8'))['minecraft:recipe_shapeless'];assert.deepEqual(clear.ingredients,[{item:N+'skewer_recipe_book'}]);assert.equal(clear.result.item,N+'skewer_recipe_book');});
-const {recipeTable}=await import('../../projects/grilling/gameplay_core/behavior_pack/scripts/a24_skewering_core.js');
 test('all 20 fixed recipe books fit the native 50-character lore-line limit',()=>{const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},ItemStack:Stack,BOOK_ID:N+'skewer_recipe_book',BOOK_RECORD_KEY:'record',cloneOne:s=>s.clone(),getItemLore:s=>s.lore,getItemRawLore:s=>s.lore,setItemLore(s,rows){assert.ok(rows.length<=20);for(const row of rows)assert.ok(row.length<=50,row);s.lore=rows},getItemProperty:(s,k)=>s.props[k],setItemProperty:(s,k,v)=>s.props[k]=v});vm.runInContext(fn('bookItem')+';this.run=bookItem',ctx);for(const recipe of recipeTable()){const s=ctx.run({resultId:recipe.id});assert.equal(JSON.parse(s.props.record).resultId,recipe.id)}});
 test('before-event book use schedules work without restricted amount writes',()=>{
  let callback,scheduled=false;const item={typeId:N+'skewer_recipe_book',clone(){return {set amount(_v){throw Error('restricted amount')}}}};
- const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},system:{run:f=>{scheduled=true}},PLATE_ID:'plate',BOOK_ID:N+'skewer_recipe_book',COOKERY_RECIPE_ITEMS:new Set(),captureInteractionIntent:()=>({hand:'main'}),interactionStackSignature:()=>'',heldOff:()=>undefined});
+ const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},recipeTable,SECRET_ID,RAW_SKEWER_TAG,GRILLED_SKEWER_TAG,world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},system:{run:f=>{scheduled=true}},PLATE_ID,PLATE_BLOCK_ID,BOOK_ID,COOKERY_RECIPE_ITEMS:new Set(),captureInteractionIntent:()=>({hand:'main'}),interactionStackSignature:()=>'',heldOff:()=>undefined});
  const start=src.indexOf('world.beforeEvents.itemUse.subscribe'),end=src.indexOf('world.beforeEvents.playerInteractWithBlock.subscribe',start);
- vm.runInContext(fn('cloneOne')+'\n'+src.slice(start,end),ctx);const event={source:{},itemStack:item,cancel:false};callback(event);assert.equal(event.cancel,true);assert.equal(scheduled,true);
+ const classificationStart=src.indexOf('const FIXED_IDS=new Set();'),classificationEnd=src.indexOf('function enc(',classificationStart);
+ vm.runInContext(src.slice(classificationStart,classificationEnd)+'\n'+fn('isSkewer')+'\n'+fn('skewerUseTargetsPlate')+'\n'+fn('cloneOne')+'\n'+src.slice(start,end),ctx);const event={source:{},itemStack:item,cancel:false};callback(event);assert.equal(event.cancel,true);assert.equal(scheduled,true);
 });
 test('oversized plate preflight never debits the inserted skewer',()=>{
  let debits=0,writes=0;const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},PLATE_BLOCK_ID:'plate',heldByHand:()=>({typeId:'skewer'}),readPlateBlock:()=>[],isSkewer:()=>true,stackRow:()=>({id:'skewer'}),plateAdd:()=>({ok:true,rows:[{id:'skewer'}]}),plateItem(){throw Error('32767 bytes')},decrementHand(){debits++;return true},writePlateBlock(){writes++},useSound(){},message(){},interactionFailure(){},javaInteractionFeedback(){}});
