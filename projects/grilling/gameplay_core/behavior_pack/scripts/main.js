@@ -30,7 +30,7 @@ import {foodFacts} from './food_snapshot_core.js';
 import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {readNativeBottles,isNativeBottleItem} from './seasoning_native_storage.js';
-import {slotWrite} from './rack_transfer_plan.js';
+import {slotWrite,planInventoryInsert} from './rack_transfer_plan.js';
 import {acknowledgedDrop,commitStationTransfer} from './grill_transfer.js';
 import './dragon_powder_runtime.js';
 import './a288_parity_runtime.js';
@@ -210,7 +210,9 @@ function transactionStatus(result,label){
  return result.ok;
 }
 function commitGrillAndHand(block,beforeState,nextState,player,hand,beforeStack,nextStack,mutateHand=true){
- const storage=captureWritableHand(player,hand),mutate=mutateHand&&!creative(player);
+ // The operation planner owns Creative rules: durability is exempt, while
+ // Java brushing and seasoning consume their tool contents in either mode.
+ const storage=captureWritableHand(player,hand),mutate=mutateHand;
  return commitStationTransfer(block,[
   {apply:()=>writeState(block,nextState),rollback:()=>writeState(block,beforeState)},
   {apply:()=>{if(mutate)storage.write(nextStack)},rollback:()=>{if(mutate)storage.write(storage.before)}}
@@ -447,9 +449,18 @@ function extract(block,player,all=false){
  const rows=[];for(let i=0;i<3;i++){const raw=c.getItem(i);if(!raw)continue;rows.push({slot:i,output:outputFor(raw,state,outputKind(state))});if(!all)break;}
  if(!rows.length)return 0;
  const target=mainContainer(player);if(!target)throw new Error('Grilling: output inventory unavailable');
- const empty=[];for(let i=0;i<target.size;i++)if(!target.getItem(i))empty.push(i);
+ // Reserve native-compatible stacks and empty slots for the whole batch before
+ // debiting the grill. Heat/creator exceptions belong only to manual sorting.
+ const planned=Array.from({length:target.size},(_,i)=>target.getItem(i)?.clone()),changed=new Set(),drops=[];
+ const view={size:target.size,getItem:i=>planned[i]?.clone(),setItem(i,stack){planned[i]=stack?.clone();changed.add(i)}};
+ for(const {output} of rows){
+  const delivery=planInventoryInsert(view,output);
+  for(const step of delivery.steps)step.apply();
+  if(delivery.remainder)drops.push(delivery.remainder);
+ }
  const steps=rows.map(row=>slotWrite(c,row.slot,undefined));
- for(const row of rows){const slot=empty.shift();steps.push(slot!==undefined?slotWrite(target,slot,row.output):acknowledgedDrop(player.dimension,row.output,player.location));}
+ for(const slot of changed)steps.push(slotWrite(target,slot,planned[slot]));
+ for(const drop of drops)steps.push(acknowledgedDrop(player.dimension,drop,player.location));
  if(rows.length===occupied(block))steps.push({apply:()=>resetBlock(block,state.lit),rollback:()=>writeState(block,state)});
  const result=commitStationTransfer(block,steps,'extract');
  if(!result.ok){interactionFailure(player,'§c取串失敗；已回復可確認的內容，請查看紀錄');return 0}
@@ -485,7 +496,7 @@ function planCookeryOil(player,hand,needed){
  const stack=heldByHand(player,hand),oil=planCookeryOilPotConsumption(stack,needed);
  if(!oil.ok)return oil;
  const heat=heatForOil(oil.type);
- if(creative(player))return {...oil,heat,remaining:oil.count,next:oil.before.clone(),mutate:false};
+ // Java's player brushOil call consumes one oil point per occupied slot in Creative too.
  return {...oil,heat,mutate:true};
 }
 function planSeasoningBottle(player,hand,needed){
@@ -821,10 +832,25 @@ function fxGet(entity,name){const v=readFx(entity)[name];return v&&Number(v.unti
 function fxSet(entity,name,ticks,amp=0){const fx=readFx(entity);fx[name]={until:now()+Math.max(1,ticks|0),amp:amp|0};writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}
 function fxClear(entity,name){const fx=readFx(entity);delete fx[name];writeFx(entity,fx,{refreshProjectileDodge:name==='projectile_dodge'})}
 function fxReduce(entity,name,ticks){const fx=readFx(entity),v=fx[name];if(!v)return;v.until-=ticks;if(v.until<=now())delete fx[name];writeFx(entity,fx)}
-function fxSnapshot(entity){return JSON.parse(JSON.stringify(readFx(entity)))}
+function fxSnapshot(entity){
+ const out={},t=now();
+ for(const [name,v] of Object.entries(readFx(entity)))out[name]={duration:Math.max(0,v.until-t)};
+ return out;
+}
 function nativeSnapshot(entity){const out={};try{for(const e of entity.getEffects())out[e.typeId]={duration:e.duration,amplifier:e.amplifier}}catch{}return out}
 function doubleNewNative(player,before){try{for(const e of player.getEffects()){const old=before[e.typeId]?.duration??0;if(e.duration<=old)continue;const duration=old+(e.duration-old)*2;player.removeEffect(e.typeId);player.addEffect(e.typeId,Math.max(1,duration),{amplifier:e.amplifier,showParticles:true})}}catch{}}
-function doubleNewFx(player,before){const current=readFx(player),t=now();for(const [name,v] of Object.entries(current)){if(name==='invincible')continue;const old=before[name]?.until??t;if(v.until<=old)continue;v.until=old>t?old+(v.until-old)*2:t+(v.until-t)*2}writeFx(player,current)}
+function doubleNewFx(player,before){
+ const current=readFx(player),t=now();
+ for(const [name,v] of Object.entries(current)){
+  if(name==='invincible')continue;
+  // Java compares completion-time remaining duration with the start snapshot,
+  // so time spent eating cannot become an additional hot-food reward.
+  const old=before[name]?.duration??0,duration=Math.max(0,v.until-t);
+  if(duration<=old)continue;
+  v.until=t+old+(duration-old)*2;
+ }
+ writeFx(player,current);
+}
 function applyFixedEffect(player,id){
  id=canonicalFoodId(id);
  const e=COOKED_EFFECTS[id];if(!e||!e.effect)return;const ticks=Math.max(1,e.seconds*20);
