@@ -8,6 +8,8 @@ import * as tx from '../../projects/grilling/gameplay_core/behavior_pack/scripts
 import * as plate from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a25_plate_recipe_core.js';
 import * as snapshot from '../../projects/grilling/gameplay_core/behavior_pack/scripts/skewer_item_snapshot.js';
 import * as item from '../../projects/grilling/gameplay_core/behavior_pack/scripts/itemDataCore.js';
+import * as intentCore from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2762_interaction_intent_core.js';
+import {isInitialBlockPress} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a275_grill_input_core.js';
 const base=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const source=fs.readFileSync(new URL('a25_plate_recipe_runtime.js',base),'utf8').replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(function|const))/g,'');
 class Stack{
@@ -37,9 +39,11 @@ function fixture(savedDp){
  const setHand=(p,h,s)=>{const key=h==='off'?'off':p.selectedSlotIndex;slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')};
  const captureWritableHand=(p,h)=>{const key=h==='off'?'off':p.selectedSlotIndex;return {before:slots.get(key)?.clone(),read:()=>slots.get(key),write(s){slots.set(key,s?.clone());if(fault?.('hand',s))throw Error('hand post-write failure')}}};
  const c=vm.createContext({canonicalFoodId,...tx,...plate,...snapshot,...item,recipeTable:()=>[{id:N+'raw_beef_skewer',cooked:N+'grilled_beef_skewer'}],RAW_SKEWER_TAG:'raw',GRILLED_SKEWER_TAG:'grilled',ItemStack:Stack,
-  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(){}},playerInteractWithBlock:{subscribe(){}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{blockExplode:{subscribe(){}},playerBreakBlock:{subscribe(){}}}},
+  world:{getDynamicProperty:k=>dp.get(k),setDynamicProperty:write,beforeEvents:{itemUse:{subscribe(fn){events.itemUse=fn}},playerInteractWithBlock:{subscribe(fn){events.blockUse=fn}},playerBreakBlock:{subscribe(){}},explosion:{subscribe(fn){events.explosion=fn}}},afterEvents:{blockExplode:{subscribe(){}},playerBreakBlock:{subscribe(){}}}},
   system:{run(fn){scheduled.push(fn)}},console:{warn(){}},SECRET_ID:N+'secret_skewer',captureWritableHand,
-  heldByHand:held,setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,
+  heldByHand:held,heldMain:p=>held(p,'main'),heldOff:p=>held(p,'off'),setHand,creative:p=>p?.creative??false,hasSolidTop:()=>true,isInitialBlockPress,
+  captureInteractionIntent:(p,s)=>intentCore.captureInteractionIntentFromStacks(s,held(p,'main'),held(p,'off'),p.selectedSlotIndex),
+  interactionIntentStillCurrent:(p,i)=>intentCore.interactionIntentMatchesStacks(i,held(p,'main'),held(p,'off'),p.selectedSlotIndex),
   interactionStackSignature:s=>s?JSON.stringify(s):'',interactionFeedback(){},UNFINISHED_ID:N+'unfinished_skewer'});
  vm.runInContext(source+'\nglobalThis.api={readPlateBlock,placePlateOn,handlePlateBlock,plateStorageStep,plateTransaction,posKey,plateFaultKey,breakPlate};',c);
  const api=c.api,key=api.posKey(N+'a25_plate_',block);
@@ -156,3 +160,22 @@ test('persisted quarantine blocks transfers after production module reload',()=>
 });
 
 test('prepared plate delivery survives module reload and prevents a second credit',()=>{const f=fixture();f.rows(2);f.dp.set(f.key+'_delivery',JSON.stringify({phase:'prepared',saved:f.dp.get(f.key)}));const restored=fixture(f.dp);assert.throws(()=>restored.api.breakPlate(restored.block),/delivery requires recovery/);assert.equal(restored.entities.length,0);});
+
+test('plate-targeted item use cannot eat a second skewer, while other gestures retain their ownership',()=>{
+ const setup=()=>{const f=fixture(),s=food();s.amount=3;f.slots.set(0,s);f.holder.isSneaking=false;f.holder.getHeadLocation=()=>({x:.5,y:80.1,z:-3});f.holder.getBlockFromViewDirection=()=>({block:f.block,faceLocation:{x:.5,y:.1,z:0}});f.holder.getEntitiesFromViewDirection=()=>[];return f;};
+ for(const order of ['item_before_block','item_after_debit']){
+  const f=setup(),original=f.slots.get(0).clone(),blockUse={block:f.block,player:f.holder,itemStack:original.clone(),isFirstEvent:true,cancel:false};
+  const use=()=>{const stack=f.slots.get(0).clone(),event={source:f.holder,itemStack:stack,cancel:false},before=JSON.stringify(stack);f.events.itemUse(event);assert.equal(event.cancel,true,order);assert.equal(JSON.stringify(f.slots.get(0)),before);assert.equal(f.scheduled.length,0);};
+  if(order==='item_before_block')use();
+  f.events.blockUse(blockUse);assert.equal(blockUse.cancel,true);f.flush();
+  if(order==='item_after_debit')use();
+  assert.equal(f.api.readPlateBlock(f.block).length,1);assert.equal(f.slots.get(0).amount,2);
+  const remaining=f.slots.get(0).clone();remaining.amount=original.amount;assert.deepEqual(snapshot.captureSkewerMetadata(remaining),snapshot.captureSkewerMetadata(original));
+ }
+ const full=setup();full.rows(5);const fullUse={source:full.holder,itemStack:full.slots.get(0).clone(),cancel:false};full.events.itemUse(fullUse);assert.equal(fullUse.cancel,true);assert.equal(full.slots.get(0).amount,3);assert.equal(full.api.readPlateBlock(full.block).length,5);
+ for(const target of [undefined,{typeId:'minecraft:stone'}]){const f=setup();f.holder.getBlockFromViewDirection=()=>target?{block:target}:undefined;const event={source:f.holder,itemStack:f.slots.get(0).clone(),cancel:false};f.events.itemUse(event);assert.equal(event.cancel,false);assert.equal(f.slots.get(0).amount,3);assert.equal(f.scheduled.length,0);}
+ for(const [distance,cancel] of [[1,false],[4,true]]){const f=setup();f.holder.getEntitiesFromViewDirection=()=>[{distance,entity:{typeId:'minecraft:cow'}}];const event={source:f.holder,itemStack:f.slots.get(0).clone(),cancel:false};f.events.itemUse(event);assert.equal(event.cancel,cancel,'entity at '+distance);assert.equal(f.slots.get(0).amount,3);assert.equal(f.scheduled.length,0);}
+ const unreadable=setup();unreadable.holder.getEntitiesFromViewDirection=()=>{throw Error('ray unavailable')};const unreadableUse={source:unreadable.holder,itemStack:unreadable.slots.get(0).clone(),cancel:false};unreadable.events.itemUse(unreadableUse);assert.equal(unreadableUse.cancel,false);assert.equal(unreadable.slots.get(0).amount,3);assert.equal(unreadable.scheduled.length,0);
+ const off=setup();off.slots.set(0,new Stack('minecraft:stone'));off.slots.set('off',food());off.holder.isSneaking=true;const offUse={source:off.holder,itemStack:off.slots.get('off').clone(),cancel:false};off.events.itemUse(offUse);assert.equal(offUse.cancel,false);assert.equal(off.slots.get('off').amount,1);
+ const cancelled=setup();cancelled.holder.getBlockFromViewDirection=()=>assert.fail('an already-cancelled gesture must not be inspected');cancelled.events.itemUse({source:cancelled.holder,itemStack:cancelled.slots.get(0).clone(),cancel:true});assert.equal(cancelled.slots.get(0).amount,3);assert.equal(cancelled.scheduled.length,0);
+});

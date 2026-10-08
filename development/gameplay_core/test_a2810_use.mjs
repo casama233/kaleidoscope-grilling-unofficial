@@ -16,14 +16,22 @@ class Stack{
  getRawLore(){return this.lore.map(text=>({text}));}getLore(){return this.lore;} setLore(v){this.lore=v;}
  getDynamicPropertyIds(){return Object.keys(this.props);}getDynamicProperty(k){return this.props[k];}setDynamicProperty(k,v){this.props[k]=v;}
 }
-function fixture({hand='main',consumed=true,creative=false,failure,selected=3,script=source,foodId='test:food'}={}){
+function fixture({hand='main',consumed=true,creative=false,failure,selected=3,script=source,foodId='test:food',nativeNutrition=''}={}){
  const plate=new Stack(plateId);plate.rows=[{id:foodId,props:{ingredients:'apple'}},{id:'test:second',props:{}}];plate.props.rows=JSON.stringify(plate.rows);
  const pending=new Stack(pendingId);pending.list=['pepper','onion','chili'];pending.props.ingredients=JSON.stringify(pending.list);
  const slots=new Map([[3,consumed?undefined:plate.clone()]]);let off=hand==='off'?(consumed?undefined:plate.clone()):undefined,awards=0,effects=0;
  const secretFinishes=[],finishOrder=[];
- const hunger={currentValue:10,setCurrentValue(v){this.currentValue=v;}},sat={currentValue:2,setCurrentValue(v){this.currentValue=v;}};
+ const hunger={currentValue:10,effectiveMax:20,setCurrentValue(v){this.currentValue=v;}},sat={currentValue:nativeNutrition?10:2,setCurrentValue(v){this.currentValue=v;}};
+ let rejectSaturation=failure==='saturationWrite';
+ const saturationView=()=>{
+  if(!nativeNutrition)return sat;
+  if(hunger.currentValue===13&&failure==='saturationMissing')return undefined;
+  if(hunger.currentValue===13&&failure==='saturationRead')throw Error('current saturation unavailable');
+  const cap=nativeNutrition==='fresh'?hunger.currentValue:10;
+  return {effectiveMax:cap,get currentValue(){return sat.currentValue;},setCurrentValue(v){if(!Number.isFinite(v)||v>cap)throw Error('native saturation bounds');sat.currentValue=Math.fround(v);if(rejectSaturation){rejectSaturation=false;throw Error('post-write saturation failure');}}};
+ };
  const write=(h,v,slot=player.selectedSlotIndex)=>{if(failure==='debit'&&v?.typeId===plateId&&v.rows.length===1)throw Error('write rejected');if(failure==='pendingWrite'&&v?.typeId==='test:filled')throw Error('write rejected');if(h==='off')off=v;else slots.set(slot,v);};
- const player={id:'p',selectedSlotIndex:selected,creative,getComponent(id){return id.endsWith('hunger')?hunger:id.endsWith('saturation')?sat:id.endsWith('equippable')?{setEquipment(_,v){write('off',v);return true;}}:null;}};
+ const player={id:'p',selectedSlotIndex:selected,creative,getComponent(id){return id.endsWith('hunger')?hunger:id.endsWith('saturation')?saturationView():id.endsWith('equippable')?{setEquipment(_,v){write('off',v);return true;}}:null;}};
  const active={plate:plate.clone(),stack:pending.clone(),hand,use:captureEatingIdentity(plate,hand,3)};
  const plateMap=new Map([['p',active]]),pendingMap=new Map();
  const context={canonicalFoodId,seasoningLore,setItemProperty,setItemLore,PLATE_EATS:plateMap,PENDING_USES:pendingMap,completedUseStillCurrent,commitEating,stopSoundHandle(){},seasoningFinished(){},
@@ -37,6 +45,11 @@ function fixture({hand='main',consumed=true,creative=false,failure,selected=3,sc
  ItemStack:Stack,readSeasonings:s=>s.list,setSeasonings:(s,v)=>{if(failure!=='seasonData')s.list=v;},setUses(){},getUses:()=>0,hasSeasoningBase:()=>true,message(){},specialSeasoningVisualId:()=> 'test:filled',SEASONING_VARIANT_MAX:7,SEASON_VARIANT_KEY:'variant',SEASONING_MAX_USES:16,SEASONING_CAPACITY:8,PENDING_SEASONING:pendingId,handFor:()=>({name:'main'}),awardSeasoningFinishedChallenges(){awards++;}};
  const text=script.slice(script.indexOf('function '+(script.includes('function writeUseHand')?'writeUseHand':'completePlateUse')+'('),script.indexOf('world.afterEvents.itemStartUse.subscribe'));
  vm.createContext(context);vm.runInContext(text,context);
+ if(nativeNutrition){
+  context.dynamicFood=()=>({nutrition:3,saturation:.3923076923076923});
+  context.grillingConfig=()=>({saturationMultiplier:1.25});
+  vm.runInContext(script.slice(script.indexOf('function addSecretNutrition('),script.indexOf('function clearContainer(')),context);
+ }
  return {player,plate,pending,active,plateMap,pendingMap,context,hunger,sat,slots,secretFinishes,finishOrder,get off(){return off;},get effects(){return effects;},get awards(){return awards;},usePlate(){context.completePlateUse(player,plate.clone());},
  usePending(){context.completePending(player,pending.clone());},setPending(){if(hand==='off')off=pending.clone();else slots.set(3,pending.clone());pendingMap.set('p',{stack:pending.clone(),hand,use:captureEatingIdentity(pending,hand,3)});}};
 }
@@ -99,4 +112,18 @@ for(const foodId of [secretId+'_java_three_alt',secretId+'_native_plain']){
  const f=fixture({foodId,script:uncanonicalized});f.usePlate();
  assert.equal(f.hunger.currentValue,14);assert.equal(f.secretFinishes.length,0);cases++;
 }
-console.log(`A2810: ${cases} completion/rollback regression scenarios PASS (actual handlers; no client event simulation)`);
+// Retained G84 failure: a saturation view capped at10 rejected target12.353846.
+// These production-function/storage-operation doubles do not certify BDS/player use.
+const nativeMeal=secretId+'_java_three_alt';
+function expectFreshSaturation(f){f.usePlate();assert.equal(f.hunger.currentValue,13);assert.equal(f.sat.currentValue,Math.fround(12.353846153846154));assert.equal(f.slots.get(3).rows.length,1);assert.equal(f.secretFinishes.length,1);f.usePlate();assert.equal(f.secretFinishes.length,1);}
+expectFreshSaturation(fixture({foodId:nativeMeal,nativeNutrition:'fresh'}));
+const capped=fixture({foodId:nativeMeal,nativeNutrition:'fixed'});capped.usePlate();assert.equal(capped.hunger.currentValue,13);assert.equal(capped.sat.currentValue,10);assert.equal(capped.secretFinishes.length,1);
+for(const failure of ['saturationMissing','saturationRead','saturationWrite']){
+ const f=fixture({foodId:nativeMeal,nativeNutrition:'fresh',failure});f.usePlate();assert.equal(f.slots.get(3).rows.length,2);assert.equal(f.hunger.currentValue,10);assert.equal(f.sat.currentValue,10);assert.equal(f.secretFinishes.length,0);assert.equal(f.effects,0);
+}
+// Directed implementation mutation: reusing the captured view fails the same
+// fresh-cap completion expectation, without changing any production files.
+const staleView=source.replace("const currentSat=player.getComponent('minecraft:player.saturation');","const currentSat=sat;");
+assert.notEqual(staleView,source);
+assert.throws(()=>expectFreshSaturation(fixture({foodId:nativeMeal,nativeNutrition:'fresh',script:staleView})),assert.AssertionError);
+console.log(`A2810: ${cases} retained completion/rollback scenarios plus bounded saturation refresh/cap/failure regression PASS (actual handlers; no client event simulation)`);

@@ -100,6 +100,25 @@ function isSkewer(stack){
  if(FIXED_IDS.has(canonicalFoodId(stack.typeId))||canonicalFoodId(stack.typeId)===SECRET_ID)return true;
  try{return !!(stack.hasTag?.(RAW_SKEWER_TAG)||stack.hasTag?.(GRILLED_SKEWER_TAG))}catch{return false}
 }
+// Plate block-use and item-use callbacks are independent. Keep the Java
+// SUCCESS/CONSUME gesture from also starting native eating, in either order.
+function skewerUseTargetsPlate(player,stack){
+ if(!isSkewer(stack))return false;
+ try{
+  if(player.isSneaking&&captureInteractionIntent(player,stack).hand==='off')return false;
+  const hit=player.getBlockFromViewDirection?.({maxDistance:6});
+  if(hit?.block?.typeId!==PLATE_BLOCK_ID)return false;
+  // SDK 2.9: faceLocation is block-relative; entity distance is ray-origin to
+  // bounds. Compare the head ray's actual plate hit, not the block's center.
+  const head=player.getHeadLocation?.(),face=hit.faceLocation,block=hit.block;
+  if(!['x','y','z'].every(axis=>Number.isFinite(head?.[axis])&&Number.isFinite(face?.[axis])&&Number.isFinite(block[axis])))return false;
+  const distance=Math.hypot(block.x+face.x-head.x,block.y+face.y-head.y,block.z+face.z-head.z);
+  if(!Number.isFinite(distance)||distance<=0||distance>6)return false;
+  const entities=player.getEntitiesFromViewDirection?.({maxDistance:distance,ignoreBlockCollision:true});
+  // An entity in front, a tie or unreadable results cannot prove plate ownership.
+  return Array.isArray(entities)&&entities.every(target=>target?.entity&&Number.isFinite(target.distance)&&target.distance>distance);
+ }catch{return false}
+}
 function skewerIngredientIds(stack){return parseRowsProperty(stack,SKEWER_INGREDIENTS_KEY,3).map(x=>x.id)}
 function isRecordableStack(stack){
  if(!stack)return false;const ingredients=skewerIngredientIds(stack);
@@ -363,6 +382,7 @@ function breakRecipe(block,player){
 world.beforeEvents.itemUse.subscribe(e=>{
  try{
   if(e.cancel)return;const id=e.itemStack?.typeId,p=e.source;
+  if(skewerUseTargetsPlate(p,e.itemStack)){e.cancel=true;return}
   if(id===PLATE_ID&&plateRowsFromItem(e.itemStack).length===0){e.cancel=true;message(p,'§7空烤串盤不能食用');return}
   const intent=captureInteractionIntent(p,e.itemStack);if(intent.hand!=='main')return;
   if(COOKERY_RECIPE_ITEMS.has(id)&&isRecordableStack(heldOff(p))){

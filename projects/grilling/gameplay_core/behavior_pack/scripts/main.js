@@ -411,7 +411,11 @@ function secretRemainders(player,stack){
 function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
- const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);sat.setCurrentValue(Math.min(hunger,sat.currentValue+gain));
+ // Hunger updates can leave the earlier saturation view with stale bounds.
+ // Use the live native cap; a failed refresh must roll back the plate debit.
+ const currentSat=player.getComponent('minecraft:player.saturation');
+ if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');
+ const gain=d.nutrition*d.saturation*2*(meta?.hot?grillingConfig().saturationMultiplier:1);currentSat.setCurrentValue(Math.min(hunger,currentSat.effectiveMax,currentSat.currentValue+gain));
 }
 function addNestedNutrition(player,stack,meta){addSecretNutrition(player,stack,meta)}
 function clearContainer(block){const c=inv(block);if(c)for(let i=0;i<3;i++)c.setItem(i,undefined)}

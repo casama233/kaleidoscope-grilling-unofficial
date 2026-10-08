@@ -128,6 +128,7 @@ VERIFIERS = {
     (2, 8, 111): "verify_a28111.py",
     (2, 8, 113): "verify_a28113.py",
     (2, 8, 114): "verify_a28114.py",
+    (2, 8, 115): "verify_a28115.py",
     (2, 8, 8): "verify_a288_local.py",
 }
 
@@ -329,7 +330,7 @@ def main() -> None:
     environment.pop(SESSION_ENV, None)
     # Only this current source-receipt run has the existing immutable-input
     # boundary. Standalone/full historical verifiers retain every command.
-    if source_before is not None and verifier == "verify_a28114.py":
+    if source_before is not None and verifier in {"verify_a28114.py", "verify_a28115.py"}:
         environment[SESSION_ENV] = verifier
     subprocess.run(command, check=True, env=environment)
     if args.compiled:
