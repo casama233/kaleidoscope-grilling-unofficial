@@ -1,7 +1,7 @@
 import {markStationContentsDirty} from './station_contents_visual_runtime.js';
 import {planRackInsert,commitRackTransfer,depositInventorySlot} from './rack_transactions.js';
 import {slotWrite,remainderOf,planInventoryInsert} from './rack_transfer_plan.js';
-import {retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';
+import {retireEmptyStationContainer,quarantineStation,storageKey} from './family_station_storage.js';
 import {rackSlotAtHit} from './a285_rack_quick_pick.js';
 import {captureRackHit} from './rack_aim_hit.js';
 import {captureInteractionIntent,interactionIntentStillCurrent} from './a2762_interaction_intent_adapter.js';
@@ -19,7 +19,7 @@ import {
  bindingInRange,RACK_PAYLOAD_KEY
 } from './a2746_advanced_rack_core.js';
 import {
- rackContainer,readRackFilters,writeRackFilters,clearRackFilters,captureRackFilters,
+ rackContainer,readRackFilters,writeRackFilters,clearRackFilters,captureRackFilters,rackFiltersKey,
  readRackItems,writeRackItems,clearRackItems,syncRackDisplay
 } from './a2746_rack_state_adapter.js';
 import {readRackPayloadItem,writeRackPayloadItem,encodeRackPayload} from './a2746_rack_item_codec.js';
@@ -32,6 +32,15 @@ function tags(stack){try{return stack?.getTags?.()??[]}catch{return []}}
 const message=interactionFeedback;
 function resolveRack(dimension,location){
  try{const b=dimension.getBlock(location);return b?.typeId===ADVANCED_RACK_BLOCK_ID?b:undefined}catch{return undefined}
+}
+function rackBreakSnapshot(block){
+ return {dimension:block.dimension,location:loc(block),states:JSON.stringify(block.permutation.getAllStates()),
+  owner:world.getDynamicProperty(storageKey(block)),filters:world.getDynamicProperty(rackFiltersKey(block))};
+}
+function sameRackForBreak(row){
+ const block=resolveRack(row.dimension,row.location);
+ return block&&JSON.stringify(block.permutation.getAllStates())===row.states&&
+  world.getDynamicProperty(storageKey(block))===row.owner&&world.getDynamicProperty(rackFiltersKey(block))===row.filters?block:undefined;
 }
 function rackInUseRange(player,block){
  if(!player||!block||player.dimension.id!==block.dimension.id)return false;
@@ -153,7 +162,7 @@ function depositMatching(player,block){
 
 const ui=(key,withArgs=[])=>({translate:'ui.kaleidoscope_grilling.advanced_rack.'+key,with:withArgs});
 function playRackSound(block,placing){
- try{block.dimension.playSound(placing?'item.item_frame.add_item':'item.item_frame.remove_item',
+ try{block.dimension.playSound(placing?'block.itemframe.add_item':'block.itemframe.remove_item',
   {x:block.x+.5,y:block.y+.5,z:block.z+.5},{volume:1,pitch:1})}catch{}
 }
 
@@ -299,17 +308,23 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
 });
 
 world.beforeEvents.playerBreakBlock.subscribe(event=>{
- if(event.block.typeId!==ADVANCED_RACK_BLOCK_ID)return;
- event.cancel=true;const block=event.block,drop=!creative(event.player);
- system.run(()=>manuallyBreakRack(block,drop));
+ if(event.cancel||event.block.typeId!==ADVANCED_RACK_BLOCK_ID)return;
+ event.cancel=true;const row=rackBreakSnapshot(event.block),drop=!creative(event.player);
+ system.run(()=>{try{const block=sameRackForBreak(row);if(block)manuallyBreakRack(block,drop)}catch(error){console.warn('[Grilling rack break identity] '+error)}});
 });
 world.beforeEvents.explosion.subscribe(event=>{
- const keep=[],racks=[];
+ try{if(event.cancel!==false)return}catch{return}
+ const keep=[],racks=[];let protectedRack=false;
  for(const block of event.getImpactedBlocks()){
-  if(block.typeId===ADVANCED_RACK_BLOCK_ID)racks.push(block);else keep.push(block);
+  if(block.typeId===ADVANCED_RACK_BLOCK_ID){protectedRack=true;try{racks.push(rackBreakSnapshot(block))}catch(error){console.warn('[Grilling rack explosion capture] retained '+error)}}else keep.push(block);
  }
- if(!racks.length)return;
- event.setImpactedBlocks(keep);system.run(()=>{for(const block of racks)manuallyBreakRack(block,true)});
+ if(!protectedRack)return;
+ event.setImpactedBlocks(keep);if(!racks.length)return;system.run(()=>{
+  // The final event status belongs to every before-event subscriber. Keep a
+  // cancelled/unreadable event and a replacement rack out of deferred payout.
+  try{if(event.cancel!==false)return}catch(error){console.warn('[Grilling rack explosion status] '+error);return}
+  for(const row of racks)try{const block=sameRackForBreak(row);if(block)manuallyBreakRack(block,true)}catch(error){console.warn('[Grilling rack explosion recovery] '+error)}
+ });
 });
 
 system.beforeEvents.startup.subscribe(event=>{
