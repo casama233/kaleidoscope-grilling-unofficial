@@ -1,5 +1,16 @@
 # 維護變更
 
+## 2.8.117：爆炸取消保存與手持營養界限
+
+調料瓶的延後爆炸工作會再確認event仍未取消；後續訂閱者取消或event不可讀時，
+保留方塊、原生容器、完整ItemStack及保存ownership，延續原目標快照檢查。
+手持串提前結算在hunger寫入後重新取得saturation並尊重live effectiveMax；
+刷新／寫入失敗仍完整退回食物與營養，保留一次消耗及一次效果。
+
+包／模組／配對依賴117、guide0.3.47及兩個bridge輸出名稱同步；UUID與作者Cookery1.6.0相依保留。
+18個舊草稿的已吸收差異、未完成placed／held功能及原診斷文檔集中在現有[PR索引](docs/audit/PR-TRIAGE.md)。
+[修補證據與原生／client界線](docs/STATUS-A2.8.117.md)；本版沒有引入舊餐盤視覺union。
+
 ## 2.8.116：保留前方花／藤的互動目標
 
 承接115的餐盤營養與防誤食修補，視線查詢明確保留passable block輪廓，

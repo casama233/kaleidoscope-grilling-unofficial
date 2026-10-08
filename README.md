@@ -1,8 +1,9 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.116
+## Current maintained baseline: 2.8.117
 
-[G116餐盤修補與實測場景](docs/STATUS-A2.8.116.md)：營養界限刷新與插串誤食仲裁。
+[G117保存與手持營養修補](docs/STATUS-A2.8.117.md)：尊重較後的爆炸取消，並在提前食用結算時刷新飽和度界限。
+保留[G116餐盤營養與插串防誤食](docs/STATUS-A2.8.116.md)；放置／手持餐盤視覺工作仍分開追蹤。
 
 森羅物語：煙火的非官方基岩版移植。目標是跟隨 Java 原作，保留其玩法與沉浸體驗；**完整一比一移植與現行真人驗收仍未完成**。
 
@@ -57,7 +58,7 @@ CI 的當前入口是 `development/gameplay_core/verify_current.py`；
 - [Java 移植對照表](docs/PARITY-MATRIX.md)：現況及下一條固定牛肉串流程。
 - [缺口與重現](docs/BUGS.md)：未完成項和具體失敗。
 - [重整變更](CHANGELOG.md)：當前工具／文件調整。
-- [Phase 0 決策](docs/audit/AUDIT.md)、[PR 處置建議](docs/audit/PR-TRIAGE.md)：原始稽核快照，不把未合併原型當成交付。
+- [Phase 0 決策](docs/audit/AUDIT.md)保留原始稽核快照；[PR 處置與保留工作](docs/audit/PR-TRIAGE.md)已重新比對G116，保留各原型的固定來源。
 - [release-history.json](release-history.json) 與 `docs/STATUS-A*.md`：各版身份與當時的證據範圍。
 - [重整前 README](https://github.com/casama233/kaleidoscope-grilling-unofficial/blob/6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a/README.md)：完整歷史敘述，舊命令不作為今天的建置指示。
 
