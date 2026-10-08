@@ -26,7 +26,7 @@ F01–F16沿用本日一比一稽核編號。「來源修補」只表示目前�
 | F12 | 成功取放改用已登錄的`block.itemframe.add_item`／`block.itemframe.remove_item`。 | `a2746_advanced_rack_runtime.js` |
 | F13 | 串譜按黏貼的指定側面判定支撐，選取框改回10×13×0.25。區分collision與support shape：葉塊不支撐，靈魂砂／堆肥箱側面可支撐，開啟地板門只有一側；樓梯依朝向／轉角。未知形狀不推定支撐。 | `blockSupport.js`；`blocks/skewer_recipe.json`；[官方形狀取證](evidence/g118-support-shapes.md) |
 | F14 | 放盤要求完整立方碰撞；單串與打包餐盤共用Cookery桌面截獲開關。瓶子的既有頂面支撐判據保持獨立。 | `blockSupport.js`；`a25_plate_recipe_runtime.js::placePlateOn` |
-| F15 | 烤架出料先為整批預留原生相容的未滿stack，再空槽／掉落餘量；中途寫入失敗回復整批。 | `main.js::planFreeInventoryOutputs` |
+| F15 | 烤架出料先為整批預留原生相容的未滿stack，再空槽／掉落餘量；中途寫入失敗回復整批。 | `main.js::extract`／`rack_transfer_plan.js::planInventoryInsert` |
 | F16 | Creative刷油與撒料依planner扣量，修除提交函式的第二層豁免；Creative打火石仍免耗耐久。 | `main.js::planCookeryOil`／`commitGrillAndHand` |
 
 上述runtime檔案均在[canonical scripts](../projects/grilling/gameplay_core/behavior_pack/scripts/)；
@@ -55,6 +55,7 @@ F01–F16沿用本日一比一稽核編號。「來源修補」只表示目前�
 | --- | --- |
 | `test_food_finish.mjs` | 5／5；自訂／原生效果duration與排除項。 |
 | `test_full_skewer_flow.mjs` | 30／30；原生相容堆疊、整批預留、掉落餘量、回滾及Creative油／調料／打火石。與G117整合的fixture衝突解決後同入口再通過。 |
+| `test_core_skewer_cycle.mjs` | 33／33；CI指出舊VM未提供新的實際planner及配方掃描未處理子目錄，已補正。以異質metadata保持第二槽寫入故障可達，保留整批回滾並比對完整原始資料；遞迴檢查全部配方。 |
 | `test_hot_food_manual_merge.mjs` | 9組PASS；真正作者鍵、翻譯／legacy自動lore、metadata與來源餘量。 |
 | `test_plant_fertilizer_runtime.mjs` | 30／30；載入實際植物模組與油渣事件，涵蓋hand／target過期、整樹回滾、未知掉落與多人先採果競態。 |
 | `test_oil_transactions.mjs` | 21／21；保留交易檢查，新增正常10-tick等待與waiting重試。 |
@@ -73,6 +74,8 @@ Java基線代理另外讀取兩版Mojang官方client JAR中的fences／wooden_fe
 此為來源數學覆核，未以Bedrock客戶端執行。顯示資產生成一致性由`tools/build_plate_display.py --check`檢查。
 所有API doubles檢查屬B；語法、生成一致性、來源witness、版本與封裝只屬前置完整性检查。
 本機不重跑歷史全套；同一候選完整必要套件由PR CI執行。
+CI也要求五份工作站開發鏡像與canonical一致；已同步唯一落後的廚具架鏡像並通過原檢查。
+以上CI收尾只修改非輸出鏡像／測試，G118凍結的BP／RP與封裝雜湊維持相同。
 
 ## 明確保留的差異與恢復界線
 
