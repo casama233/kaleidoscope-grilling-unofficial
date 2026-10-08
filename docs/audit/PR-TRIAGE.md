@@ -36,6 +36,8 @@ G116已承接#148的餐盤營養界限與#150的防誤食，不能再把這兩�
 
 ## 尚未完成工作的固定入口
 
+G117起點的可執行承接issue已建立：[放置餐盤 #181](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/181)與[手持餐盤內容／解碼 #182](https://github.com/casama233/kaleidoscope-grilling-unofficial/issues/182)。兩條線保留完整舊head、限定移植範圍與source／native／client驗收要求；placed顯示不依賴held尚未確定的解碼。建立追蹤不表示功能已驗收。
+
 | 工作 | 保留來源 | 從現行來源接續的要求 |
 | --- | --- | --- |
 | [PLATE-PLACED-DISPLAY](../BUGS.md#plate-placed-display已放置餐盤缺完整內容投影) | #146／147／148顯示部分／149／150顯示部分／152 | 完整mesh、ordinary串、source FIXED布局、四朝向、initial/body rotation、成功交易後dirty與helper清理失敗守恆。保留現行palette、ownership及G116餐盤營養／防誤食，不引入舊QA主檔。 |

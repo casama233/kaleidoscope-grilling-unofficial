@@ -1,5 +1,5 @@
 from pathlib import Path
-import io,json,tempfile,unittest
+import copy,hashlib,io,json,tempfile,unittest
 from unittest.mock import patch
 from historical_source_refs import ROOT,encoded_listing,inventory,literal_refs,verify
 import public_source_witness as public
@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':16,'commits':16})
+  self.assertEqual(verify(),{'refs':17,'commits':17})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -75,6 +75,31 @@ class HistoricalSourceRefsTests(unittest.TestCase):
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
      public.assert_public_bytes_with_g71_bottles(self,path)
+ def test_g117_conservation_repairs_retain_preimages_and_reject_widened_delta(self):
+  path=ROOT/public.MAIN_PATH;load=public._main_delta
+  delta=load('g117-main-reviewed-delta.json')
+  before=public.expected_main_bytes((2,8,116));repaired=public.expected_main_bytes((2,8,117))
+  self.assertEqual(before,public.expected_main_bytes((2,8,115)))
+  self.assertEqual(delta['reviewed_commit'],public.REVIEWED_CONSERVATION_BASE)
+  self.assertIn(public.REVIEWED_CONSERVATION_BASE,inventory())
+  self.assertEqual(len(delta['operations']),2)
+  self.assertIn('if(e.cancel!==false)return',delta['operations'][0]['after'])
+  self.assertIn("const currentSat=player.getComponent('minecraft:player.saturation')",delta['operations'][1]['after'])
+  self.assertEqual(public._apply_main_operations(before,delta),repaired)
+  self.assertEqual(repaired,public._reviewed_conservation_source())
+  self.assertEqual(path.read_bytes(),repaired)
+  for op in delta['operations']:
+   changed=repaired.replace(op['after'].encode(),op['before'].encode(),1)
+   self.assertNotEqual(changed,repaired)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
+  # Updating a fixture's operation and matching hash still cannot widen public scope.
+  changed=copy.deepcopy(delta);op=changed['operations'][-1];original=op['after'];op['after']+='\n'
+  changed['after_sha256']=hashlib.sha256(repaired.replace(original.encode(),op['after'].encode(),1)).hexdigest()
+  with patch.object(public,'_main_delta',side_effect=lambda name:changed if name=='g117-main-reviewed-delta.json' else load(name)):
+   with self.assertRaisesRegex(AssertionError,'Reviewed G117 source differs outside'):
+    public.expected_main_bytes((2,8,117))
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
