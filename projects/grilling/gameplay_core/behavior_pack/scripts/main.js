@@ -490,7 +490,7 @@ function planSeasoningBottle(player,hand,needed){
  if(creative(player))return {ok:true,ingredients,uses,before,next:before.clone(),mutate:false};
  const nextUses=uses+needed;
  if(nextUses>=16)return {ok:true,ingredients,uses:nextUses,before,next:new ItemStack(EMPTY_SEASONING_ID,1),mutate:true};
- const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses))}catch{}
+ const next=retargetSpecialSeasoningStack(stack,nextUses,specialSeasoningVariant(stack));if(!next)return {ok:false,reason:'visual_state'};setUses(next,nextUses);try{setItemLore(next,seasoningLore(16-nextUses,ingredients.length))}catch{}
  return {ok:true,ingredients,uses:nextUses,before,next,mutate:true};
 }
 // The fourth successful flip freezes secret ingredient conversions in storage.
@@ -914,7 +914,9 @@ function completePending(player,stack){
  const a=PENDING_USES.get(player.id);
  if(!a||!completedUseStillCurrent(a.use,stack,heldByHand(player,a.hand),player.selectedSlotIndex))return;
  PENDING_USES.delete(player.id);stopSoundHandle(a.audio);
- const list=readSeasonings(stack);if(!hasSeasoningBase(list)){javaInteractionFeedback(player,'missing_base_seasoning');return}
+ // Both current Java branches finish any PENDING identity. Legacy pending
+ // bottles may lack a base ingredient; EMPTY promotion owns that requirement.
+ const list=readSeasonings(stack);
  const variant=Math.floor(Math.random()*(SEASONING_VARIANT_MAX+1)),out=new ItemStack(specialSeasoningVisualId(0,variant),1);setSeasonings(out,list);setUses(out,0);
  setItemProperty(out,SEASON_VARIANT_KEY,variant);setItemLore(out,seasoningLore(SEASONING_MAX_USES,list.length));
  if(JSON.stringify(readSeasonings(out))!==JSON.stringify(list)||getUses(out)!==0)throw new Error('Seasoning data write failed');

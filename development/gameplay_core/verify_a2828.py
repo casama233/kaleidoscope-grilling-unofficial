@@ -18,6 +18,16 @@ def verify_sound_registry(defs,proof,version):
         expected_names|=set(aliases)
         for name,value in aliases.items():
             assert defs.get(name)==value, 'Reviewed G85 sound definition differs: '+name
+    if tuple(version)>=(2,8,110):
+        name='kg_java21.seasoning_finished'
+        original=proof['sound_events']['action_success']['sounds']
+        sounds=[]
+        for sample in original:
+            sample={'name':sample} if isinstance(sample,str) else dict(sample)
+            sample['name']='sounds/kg_imm/'+sample['name'].split(':',1)[-1]
+            sounds.append(sample)
+        assert defs.get(name)=={'category':'player','sounds':sounds,'max_distance':16}, 'Reviewed pending finish alias differs'
+        expected_names.add(name)
     assert set(defs)==expected_names, 'Missing or unreviewed sound event'
 
 def main():

@@ -50,6 +50,22 @@ class HistoricalSourceRefsTests(unittest.TestCase):
    with patch.object(Path,'read_bytes',return_value=changed):
     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
      public.assert_public_bytes_with_g71_bottles(self,path)
+ def test_g110_completion_and_material_lore_are_exactly_reviewed(self):
+  path=ROOT/'projects/grilling/gameplay_core/behavior_pack/scripts/main.js'
+  delta=json.loads((ROOT/'tools/fixtures/g110-main-reviewed-delta.json').read_text())
+  self.assertEqual(delta['release'],[2,8,110]);self.assertEqual(len(delta['operations']),2)
+  self.assertEqual(delta['operations'][0]['before'],'seasoningLore(16-nextUses)')
+  self.assertEqual(delta['operations'][0]['after'],'seasoningLore(16-nextUses,ingredients.length)')
+  self.assertIn("if(!hasSeasoningBase(list))",delta['operations'][1]['before'])
+  self.assertNotIn("if(!hasSeasoningBase(list))",delta['operations'][1]['after'])
+  source=path.read_bytes()
+  public.assert_public_bytes_with_g71_bottles(self,path)
+  for op in delta['operations']:
+   changed=source.replace(op['after'].encode(),op['before'].encode())
+   self.assertNotEqual(changed,source)
+   with patch.object(Path,'read_bytes',return_value=changed):
+    with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+     public.assert_public_bytes_with_g71_bottles(self,path)
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)
