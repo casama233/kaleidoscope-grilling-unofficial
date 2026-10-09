@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    124
+  ],
+  "reviewed_commit": "469441bc6556b5e91adedfd44876ac072572012a",
+  "before_sha256": "1d17d1396acc9be260f785b3ade16b80ba080dc90db405f51cef6ca3ce6988d6",
+  "after_sha256": "6b19ed4a732fdac6805ed436c3d8796964624ef42e7266c77655a619ebb7836a",
+  "operations": [
+    {
+      "start": 6279,
+      "end": 6341,
+      "before": " SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,SEASONING_KINDS,\n",
+      "after": " SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,isSeasoningIngredient,seasoningEffectCounts,\n"
+    },
+    {
+      "start": 47646,
+      "end": 47690,
+      "before": " if(id&&Object.hasOwn(SEASONING_KINDS,id)){\n",
+      "after": " if(id&&isSeasoningIngredient(id)){\n"
+    },
+    {
+      "start": 62335,
+      "end": 62470,
+      "before": "function counts(list){const out={};for(const id of list){const kind=SEASONING_KINDS[id];if(kind)out[kind]=(out[kind]??0)+1}return out}\n",
+      "after": "function counts(list){return seasoningEffectCounts(list)}\n"
+    }
+  ]
+}

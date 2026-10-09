@@ -1,10 +1,12 @@
 # 煙火現況對照表
 
-更新：2026-10-09；[G122炒鍋、品質與所有權修補](STATUS-A2.8.122.md)基於已合併 [G121 酒館指南橋接](STATUS-A2.8.121.md)／`2dde8f71d46c9787e2e41b5dd2dc20bc87d6918b`。
-來源版本2.8.122；下列既有BDS／LIVE觀察快照為04:42 UTC的T126／G114／W103、作者Cookery1.6.0；
-G122尚無本候選的新家族部署證據，不能沿用舊觀察為新功能驗收。
+更新：2026-10-09；已發版來源 [G123指南正文鍵修補](STATUS-A2.8.123.md)／`080b04959f469626da36180198da6489435df5be`，保留 [G122炒鍋、品質與所有權](STATUS-A2.8.122.md)及 [G121酒館指南橋接](STATUS-A2.8.121.md)。
+來源版本2.8.123已與T142／W119完成42包首次／重啟、最新停服存檔演練及LIVE部署；真正Cookery registry收到227條目／31分類／681組三語正文。
+下列標註舊版本的操作觀察仍保留當時範圍，家族載入、資料保存及指南接收不等於原生玩家事件或真人聲畫驗收。
 先前未合併機制候選 `f27d40a7c1bab951398e3fc3d3906bcc416c5c3f` 的修補納入 G122；正式 G121 的指南橋接與歷史保持。
 完整客戶端驗收仍是 `client=false`、`production_ready=false`。
+
+本輪未凍結候選修補 [調料資料重新載入](BUGS.md#seasoning-data-reload調料准入與效果寫死)：取料、既有食物效果與HUD使用同一目前映射，沿用公開Server-only API保存交易；沒有改Cookery私有producer。原型保留，候選的新原生／client／發版證據另記。
 
 Java 選定來源為作者 [`9a1acdab27698457bec16c9362678e574895a28c`](https://github.com/breezeth-CN/KaleidoscopeGrilling/tree/9a1acdab27698457bec16c9362678e574895a28c)。
 2026-10-09（香港）重新核對的正式維護發布為
@@ -20,7 +22,7 @@ Java 選定來源為作者 [`9a1acdab27698457bec16c9362678e574895a28c`](https://
 
 | 項目 | Java 原邏輯／A 證據 | 當前 Bedrock runtime／B 證據 | 真 BDS／C 範圍 | 真人畫面、音效／D 範圍 | 尚未完成／來源參照 |
 | --- | --- | --- | --- | --- | --- |
-| 環境與完整家族 | 原作兩個 loader 分支各自追蹤；來源 pin 不證明移植完成。 | G122；最低 engine1.26.50、既有驗證 BDS1.26.51.1；server2.9.0／server-ui2.2.0；Cookery1.6.0 與本版 family API0.2.9。 | G114既有42包首次／重啟、最新停服存檔首次／重啟通過，0玩家；18筆玩家資料及2個自訂容器保留。**只證明載入與記錄的保存範圍。** | 沒有當前候選的完整 Java↔Bedrock 全玩法驗收。 | 不能把42包載入稱完整玩法通過。保留了存檔原有 GameTest／upcoming_creator_features 等實驗旗標；未執行 GameTest，也未證明關閉全部實驗仍可完整運作。[Phase0範圍](audit/AUDIT.md) |
+| 環境與完整家族 | 原作兩個 loader 分支各自追蹤；來源 pin 不證明移植完成。 | G123；最低 engine1.26.50；server2.9.0／server-ui2.2.0；Cookery1.6.0 與已登記 family API0.2.10。 | G123／T142／W119的42包首次／重啟、最新停服存檔首次／重啟通過，0玩家；18筆玩家資料及2個自訂容器保留。**只證明載入與記錄的保存範圍。** | 沒有當前候選的完整 Java↔Bedrock 全玩法驗收。 | 不能把42包載入稱完整玩法通過。保留了存檔原有 GameTest／upcoming_creator_features 等實驗旗標；未執行 GameTest，也未證明關閉全部實驗仍可完整運作。[Phase0範圍](audit/AUDIT.md) |
 | Cookery／Tavern 指南共用入口 | 家族指南導航整合，與 Java 原作機制還原分開記錄。 | 保留已合併 G121 的玩家來源、章節、nonce、語系及 40 tick 確認；返回回主頁、關閉不重開、逾時續原入口。 | G121 的來源／協定檢查保留，尚無本候選完整家族原生 UI 交接 C。 | 開啟、返回、關閉、逾時與多語操作仍待 G122 真人驗收。 | [G121 原範圍](STATUS-A2.8.121.md)、[G122 承接](STATUS-A2.8.122.md#版本沿革與-g121-指南橋接)；煙火仍只有既有 Cookery 書內一個入口，酒館章節使用 Tavern 自己的共用指南。 |
 | 固定牛肉串：正常取得 | 一份生牛肉加工出2份牛肉塊；固定配方依序使用牛肉塊／紅辣椒／牛肉塊。這是來源／資料契約，尚無整段 A trace。 | 完整家族 Board API0.1.0 的 replace 配方保留4刀、再一次持刀釋放、輸出2塊；B涵蓋材料、取消、出料交易與回滾。普通未擴充 Cookery 能力另列。 | 舊 Board probe 有真 ItemStack／drop／狀態及重啟資料；其代用容器並非玩家持刀事件。當前 family載入不能補成 G114砧板操作C。 | G114 正常取材、4刀耐久、釋放、取消與拾取仍待同候選完整操作。 | 舊 Cookery1.0.8 取得阻塞已被家族 API 承接，不能當今天仍未修；註冊 accepted 也不是實際取得成功。[G31契約](STATUS-A2.8.31.md)、[Cookery1.6適配](STATUS-A2.8.72.md) |
 | 固定牛肉串：穿製 | 原配方的食材順序與 raw→grilled 對應已固定。 | 主副手穿製、固定配方與 snapshot 有實作；B涵蓋扣料、剩餘物與交易失敗。 | 舊 G29 核心 probe 從已提供的物品進管線；`playerUseEvents=false`、`naturalAcquisition=false`。 | 空氣／方塊／實體入口、潛行、連按、換槽、滿包仍需真操作；不能沿用舊候選為G114完整D。 | 優先限定這一配方，避免用注入生串代表生存全流程。[原流程證據](evidence/skewer-flow-native-2.8.29.json) |

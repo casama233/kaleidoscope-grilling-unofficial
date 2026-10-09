@@ -19,6 +19,20 @@ TINT_COLUMNS=8
 
 def dump(value):return (json.dumps(value,ensure_ascii=False,indent=2)+'\n').encode()
 def load(path):return json.loads(path.read_text(encoding='utf-8-sig'))
+def builtin_seasoning_ingredient_ids(behavior_root=None):
+ behavior_root=BP if behavior_root is None else Path(behavior_root)
+ contract=(behavior_root/'scripts/a2743_seasoning_contract_core.js').read_text()
+ body=re.search(r'SEASONING_KINDS=Object.freeze\((\{.*?\})\)',contract,re.S).group(1)
+ ids=re.findall(r"'([^']+)'\s*:",body)
+ if '...DEFAULT_SEASONING_EFFECTS' in body:
+  # Static palette inputs only: G124 shares six defaults plus two bases.
+  # Live providers cannot add runtime textures, and source JS is not evaluated.
+  defaults=(behavior_root/'scripts/seasoning_registry_core.js').read_text()
+  block=re.search(r'DEFAULT_SEASONING_EFFECTS=Object.freeze\((\{.*?\})\)',defaults,re.S)
+  assert block is not None,'Static seasoning defaults are not readable'
+  ids+=re.findall(r"'([^']+)'\s*:",block.group(1))
+ ids=sorted(ids);assert len(ids)==8 and len(set(ids))==8
+ return ids
 def sha(data):return hashlib.sha256(data).hexdigest()
 def blob(data):return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
 def out(path,value):OUT[path.relative_to(ROOT).as_posix()]=value if isinstance(value,bytes) else dump(value)
@@ -119,9 +133,7 @@ def pending_assets(controllers,description,geometries):
   key='pending_color_'+str(index)
   out(RP/('textures/a2770_placed/'+key+'.png'),png(Image.new('RGBA',(16,16),((rgb>>16)&255,(rgb>>8)&255,rgb&255,255))))
  palette=ingredient_palette()
- contract=(BP/'scripts/a2743_seasoning_contract_core.js').read_text()
- body=re.search(r'SEASONING_KINDS=Object.freeze\((\{.*?\})\)',contract,re.S).group(1)
- ids=sorted(re.findall(r"'([^']+)'\s*:",body));assert len(ids)==8 and len(set(ids))==8
+ ids=builtin_seasoning_ingredient_ids()
  pairs=[None]+[palette[id] for id in ids]+[[0xB86B45,0xE0A56A]]
  colors=sorted({rgb for pair in pairs[1:] for rgb in pair})
  assert len(colors)==18

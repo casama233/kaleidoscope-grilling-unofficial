@@ -15,7 +15,8 @@ def main(expected_version=(2, 8, 123)):
     catalog = 'projects/grilling/guide/catalog.a3.json'
     original = json.loads(subprocess.check_output(['git', 'show', GUIDE_LOCALE_BASE + ':' + catalog], cwd=ROOT))
     current = json.loads((ROOT / catalog).read_text(encoding='utf-8'))
-    assert original.pop('version') == '0.3.52' and current.pop('version') == '0.3.53', 'G123 guide identity differs'
+    guide_version = '0.3.54' if tuple(expected_version) >= (2, 8, 124) else '0.3.53'
+    assert original.pop('version') == '0.3.52' and current.pop('version') == guide_version, 'Maintained guide identity differs'
     assert current == original, 'G123 changed the released G122 guide content'
     for locale in ('zh_CN', 'zh_TW', 'en_US'):
         path = f'projects/grilling/gameplay_core/resource_pack/texts/{locale}.lang'

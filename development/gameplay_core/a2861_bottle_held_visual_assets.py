@@ -31,11 +31,7 @@ def load(path):
 
 
 def ingredient_ids():
-    source = (BP / 'scripts/a2743_seasoning_contract_core.js').read_text()
-    body = re.search(r'SEASONING_KINDS=Object.freeze\((\{.*?\})\)', source, re.S).group(1)
-    ids = sorted(re.findall(r"'([^']+)'\s*:", body))
-    assert len(ids) == 8 and len(set(ids)) == 8
-    return ids
+    return placed.builtin_seasoning_ingredient_ids(BP)
 
 
 def palette_pairs():
