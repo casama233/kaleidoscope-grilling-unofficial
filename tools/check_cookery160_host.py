@@ -3,9 +3,35 @@ from pathlib import Path
 import hashlib,json,os,subprocess,tempfile,urllib.request,zipfile
 ROOT=Path(__file__).resolve().parents[1]
 BP=ROOT/'projects/grilling/gameplay_core/behavior_pack'
+def check_tavern_guide_bridge():
+ # Protocol/scheduler adapter doubles only; no Minecraft runtime or bot.
+ module=(BP/'scripts/host_api/guide_labels_core.js').as_uri()
+ fixture="import {createTavernGuideBridge,TAVERN_GUIDE_CHAPTER as C,TAVERN_GUIDE_EVENTS as E} from "+json.dumps(module)+";\n"+r"""
+import assert from 'node:assert/strict';
+function adapter(){
+ let receive,leave,sequence=0;const scheduled=new Map(),sent=[],returned=[];
+ const system={currentTick:0,afterEvents:{scriptEventReceive:{subscribe(fn){receive=fn}}},runTimeout(fn,ticks){const id=++sequence;scheduled.set(id,{fn,at:this.currentTick+ticks});return id},clearRun(id){scheduled.delete(id)},run(fn){return this.runTimeout(fn,1)}};
+ const world={afterEvents:{playerLeave:{subscribe(fn){leave=fn}}}};
+ const caller={id:'ui-caller',typeId:'minecraft:player',isValid:true,runCommand(command){const [verb,event,...rest]=command.split(' ');assert.equal(verb,'scriptevent');sent.push({event,row:JSON.parse(rest.join(' '))});}};
+ const bridge=createTavernGuideBridge({system,world,onReturn:(owner,outcome)=>returned.push([owner.id,outcome]),warn:()=>{}});
+ const advance=async n=>{for(let i=0;i<n;i++){system.currentTick++;for(const [id,row]of [...scheduled])if(row.at<=system.currentTick){scheduled.delete(id);row.fn();}await Promise.resolve();await Promise.resolve();}};
+ const emit=(event,row,source=caller)=>receive({id:event,message:JSON.stringify(row),sourceEntity:source});
+ return {system,caller,bridge,sent,returned,advance,emit,leave:id=>leave({playerId:id})};
+}
+const happy=adapter();assert.equal(await happy.bridge.open(happy.caller,'foreign:chapter','en_US'),false);assert.equal(await happy.bridge.open(happy.caller,C,'other'),false);assert.equal(happy.sent.length,0);
+const opening=happy.bridge.open(happy.caller,C,'en_US'),request=happy.sent[0].row;
+for(const [change,source]of [[{nonce:'wrong'},happy.caller],[{locale:'zh_TW'},happy.caller],[{},undefined],[{},{id:'another',typeId:'minecraft:player'}],[{},{id:request.playerId,typeId:'minecraft:zombie'}]])happy.emit(E.ack,{...request,...change,ok:true},source===undefined?null:source);
+assert.equal(happy.sent.length,1);happy.emit(E.ack,{...request,ok:true});assert.equal(await opening,true);assert.equal(happy.sent[1].event,E.start);assert.deepEqual(happy.sent[1].row,request);
+happy.emit(E.ack,{...request,ok:true});assert.equal(happy.sent.length,2);assert.equal(await happy.bridge.open(happy.caller,C,'en_US'),true);assert.equal(happy.sent.length,2);
+happy.emit(E.return,{...request,outcome:'back'},{id:'another',typeId:'minecraft:player'});assert.equal(happy.returned.length,0);happy.emit(E.return,{...request,outcome:'back'});happy.emit(E.return,{...request,outcome:'back'});await happy.advance(1);assert.deepEqual(happy.returned,[[request.playerId,'back']]);
+for(const outcome of ['closed','unavailable']){const a=adapter(),p=a.bridge.open(a.caller,C,'zh_TW'),r=a.sent[0].row;a.emit(E.ack,{...r,ok:true});assert.equal(await p,true);a.emit(E.return,{...r,outcome});await a.advance(1);assert.equal(a.returned.length,outcome==='closed'?0:1);}
+for(const mode of ['declined','timeout','leave','send_failed']){const a=adapter();if(mode==='send_failed')a.caller.runCommand=()=>{throw Error('unavailable')};const p=a.bridge.open(a.caller,C,'zh_CN'),r=a.sent[0]?.row;if(mode==='declined')a.emit(E.ack,{...r,ok:false});else if(mode==='timeout')await a.advance(40);else if(mode==='leave')a.leave(a.caller.id);assert.equal(await p,mode==='leave');if(r)a.emit(E.ack,{...r,ok:true});assert.equal(a.sent.filter(x=>x.event===E.start).length,0);await a.advance(40);assert.equal(a.returned.length,0);}
+console.log('Tavern chapter acknowledged handoff, source/nonce matching, timeout fallback and return cleanup PASS; no rendered-client acceptance');
+"""
+ subprocess.run(['node','--input-type=module','-e',fixture],check=True)
 def check():
  spec=json.loads((BP/'host-extensions/board-api.json').read_text())
- assert spec['host_uuid']=='5df753c9-3436-4fba-87f1-a2da3651cfcf' and spec['version']==([0,2,7] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,120) else [0,2,6] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,74) else [0,2,5])
+ assert spec['host_uuid']=='5df753c9-3436-4fba-87f1-a2da3651cfcf' and spec['version']==([0,2,8] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,121) else [0,2,7] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,120) else [0,2,6] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,74) else [0,2,5])
  assert spec['archive_sha256']=='da12fe6d39d7514aff1de3c963d69899324d771be5ca0fc3da1ccb759c7ad458'
  with tempfile.TemporaryDirectory() as tmp:
   base=Path(tmp);archive=Path(os.environ['COOKERY_160_ARCHIVE']) if os.environ.get('COOKERY_160_ARCHIVE') else base/'author.mcaddon'
@@ -52,5 +78,6 @@ hand.item=new ItemStack(FILLED_POT,1);assert.equal(consumeOilFromHeldContainer(o
 console.log('Cookery 1.6.0 original foreign container route/debit/empty remainder and shared author can dispatch PASS');
 """
     p=base/'foreign-oil.mjs';p.write_text(fixture);subprocess.run(['node',str(p)],check=True)
-  print('All eight reviewed 1.6.0 targets, syntax and scoped oil adapter PASS; native/client gates remain separate')
+  check_tavern_guide_bridge()
+  print('All eight reviewed 1.6.0 targets, syntax and scoped oil/guide adapters PASS; native/client gates remain separate')
 if __name__=='__main__':check()
