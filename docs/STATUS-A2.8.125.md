@@ -2,6 +2,8 @@
 
 本次從 G124 main `de445c13985cdcdab0f2353ef259aaa13e523e08` 分出操作、視覺、沉浸三個修補分支，整合時交叉審查。包／模組／自有相依為 2.8.125，指南身份 0.3.55，既有內容、UUID、Cookery 1.6.0 及 family API 0.2.10 保留。前版 STATUS 與 release-history 保持原身份。
 
+已公開的修補來源見證為 [`2ef4b7b6ffa782316378dc5d8fef3f9217b098bf`](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/2ef4b7b6ffa782316378dc5d8fef3f9217b098bf)。完整 Git tree 與整合來源相符；main 的十七處精確變更接續 G124 原前像，舊來源鏈不改寫，fixture 本身不能擴大該公開 commit 所允許的來源。
+
 Java 對照為 [作者 `9a1acdab27698457bec16c9362678e574895a28c`](https://github.com/breezeth-CN/KaleidoscopeGrilling/tree/9a1acdab27698457bec16c9362678e574895a28c)，Forge 1.20.1／NeoForge 1.21.1 分別核對。這是來源修補；沒有執行完整 Java JAR 或取得本候選的真人對照影片。
 
 ## 烤架取消與延後目標

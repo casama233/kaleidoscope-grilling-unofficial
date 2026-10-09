@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    125
+  ],
+  "previous_public_commit": "469441bc6556b5e91adedfd44876ac072572012a",
+  "reviewed_commit": "2ef4b7b6ffa782316378dc5d8fef3f9217b098bf",
+  "before_sha256": "6b19ed4a732fdac6805ed436c3d8796964624ef42e7266c77655a619ebb7836a",
+  "after_sha256": "a542cc1227ceca16535ae064f25d86d056f24b7a02e519d5b27e1e732b95d96d",
+  "operations": [
+    {
+      "start": 2663,
+      "end": 2797,
+      "before": "import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';\n",
+      "after": "import {updateGrillAudio,removeGrillAudio,blockSound,useSound,seasoningShakeSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';\nimport {updateNumbVisual,forgetNumbVisual,suppressNumbVisual} from './numb_visual_runtime.js';\n"
+    },
+    {
+      "start": 3057,
+      "end": 3057,
+      "before": "",
+      "after": "import {nativeItemSignature,ownedItemStep,planOwnedInventoryDelivery,commitPlayerItemTransaction} from './owned_item_transaction_core.js';\n"
+    },
+    {
+      "start": 3373,
+      "end": 3535,
+      "before": "import {stationContainer,retireEmptyStationContainer,quarantineStation,inspectStationStorage,storageKey as stationStorageKey} from './family_station_storage.js';\n",
+      "after": "import {stationContainer,peekStationContainer,retireEmptyStationContainer,quarantineStation,inspectStationStorage,storageKey as stationStorageKey} from './family_station_storage.js';\n"
+    },
+    {
+      "start": 5126,
+      "end": 5126,
+      "before": "",
+      "after": "import './oil_pot_ambient_runtime.js';\n"
+    },
+    {
+      "start": 10523,
+      "end": 10552,
+      "before": "const NUMB_VISUAL=new Set();\n",
+      "after": ""
+    },
+    {
+      "start": 16661,
+      "end": 17470,
+      "before": "// A full inventory rejects threading/disassembly and restores both hands.\n// Never gamble remaining ingredients on an unacknowledged world drop.\nfunction prepareOutputDelivery(player,outputs){\n const container=mainContainer(player);if(!container)throw new Error('Grilling: output inventory unavailable');\n const before=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone());\n return {\n  apply(){for(const output of outputs){const remaining=mergeIntoContainer(container,output,undefined,true);if(remaining)throw new Error('Grilling: make inventory space for remaining skewers/ingredients')}},\n  rollback(){let failed=0;for(let i=0;i<before.length;i++)try{container.setItem(i,before[i])}catch{failed++}if(failed)throw new Error('Grilling: output rollback failed for '+failed+' writes');}\n };\n",
+      "after": "function prepareOutputDelivery(player,outputs,startingItems){\n return planOwnedInventoryDelivery(mainContainer(player),outputs,{startingItems,dimension:player.dimension,location:player.location});\n"
+    },
+    {
+      "start": 26464,
+      "end": 26849,
+      "before": " const delivery=outputs.length?prepareOutputDelivery(player,outputs):null;\n const steps=[\n  {apply(){if(!free)main.write(nextMain)},rollback(){if(!free)main.write(food)}},\n  {apply(){other.write(next)},rollback(){other.write(off)}}\n ];\n if(delivery)steps.push(delivery);\n if(!transactionStatus(commitSteps(steps),'threading')){interactionFailure(player,'§c穿串失敗，已嘗試回復原料');return false}\n",
+      "after": " const container=mainContainer(player);if(!container)throw Error('Grilling: output inventory unavailable');\n const startingItems=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone()),selected=player.selectedSlotIndex;\n if(nativeItemSignature(startingItems[selected])!==nativeItemSignature(food))throw Error('Grilling: threading hand changed');\n if(!free)startingItems[selected]=nextMain?.clone();\n const delivery=prepareOutputDelivery(player,outputs,startingItems);let offRecovered=true;\n const offWrite=ownedItemStep({read:()=>other.read(),write:stack=>other.write(stack),before:off,after:next,canRestore:delivery.canRestoreInputs});\n const mainWrite=ownedItemStep({read:()=>main.read(),write:stack=>main.write(stack),before:food,after:nextMain,canRestore:()=>offRecovered&&delivery.canRestoreInputs()});\n // The new offhand skewer is itself a credit. Its recovery must be confirmed\n // before refunding the ingredient, even when every inventory drop was undone.\n const offStep={apply(){offRecovered=false;offWrite.apply()},rollback(){offWrite.rollback();offRecovered=true}};\n const steps=[...(free?[]:[mainWrite]),offStep,...delivery.steps];\n if(!transactionStatus(commitPlayerItemTransaction(world,player,steps,{tick:system.currentTick,label:'threading'}),'threading')){interactionFailure(player,'§c穿串未完成；已回復可確認的原料，未確認交易請查看紀錄');return false}\n"
+    },
+    {
+      "start": 27382,
+      "end": 27566,
+      "before": " if(!transactionStatus(commitSteps([\n  {apply(){other.write(next)},rollback(){other.write(off)}},delivery\n ]),'disassembly')){interactionFailure(player,'§c拆串失敗，已嘗試回復原料');return false}\n",
+      "after": " const debit=ownedItemStep({read:()=>other.read(),write:stack=>other.write(stack),before:off,after:next,canRestore:delivery.canRestoreInputs});\n if(!transactionStatus(commitPlayerItemTransaction(world,player,[debit,...delivery.steps],{tick:system.currentTick,label:'disassembly'}),'disassembly')){interactionFailure(player,'§c拆串未完成；已回復可確認的原料，未確認交易請查看紀錄');return false}\n"
+    },
+    {
+      "start": 35743,
+      "end": 35743,
+      "before": "",
+      "after": "// Deferred destruction owns only the captured station and its native contents.\n// Inspection must not allocate a backing inventory in a before-event callback.\nfunction grillBreakSnapshot(block){\n if(!block?.isValid||block.typeId!==GRILL_ID)throw new Error('Grill target unavailable');\n const {phaseTicks,flipCooldown,...operation}=readState(block),container=peekStationContainer(block);\n // clone is available in restricted execution; full canDestroy/canPlaceOn\n // metadata getters are not. Compare those frozen native clones after defer.\n const contents=container?Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone()??null):undefined;\n return {dimension:block.dimension,location:{...block.location},states:metadataSignature(block.permutation.getAllStates()),\n  owner:world.getDynamicProperty(stationStorageKey(block)),operation:metadataSignature(operation),\n  contents};\n}\nfunction sameGrillForBreak(captured){\n const block=captured.dimension.getBlock(captured.location);\n if(!block?.isValid||block.typeId!==GRILL_ID)return;\n const current=grillBreakSnapshot(block);\n // Normal cooking/cooldown clock advancement does not replace a station. A\n // changed phase, owner, facing or item payload does invalidate this action.\n if(current.states!==captured.states||current.owner!==captured.owner||current.operation!==captured.operation)return;\n const contentsSignature=items=>items===undefined?undefined:metadataSignature(items.map(item=>item?{amount:item.amount,metadata:captureSkewerMetadata(item)}:null));\n if(contentsSignature(current.contents)!==contentsSignature(captured.contents))return;\n return block;\n}\nfunction scheduleGrillExplosion(event){\n try{if(event.cancel!==false)return}catch{return}\n const pending=[],keep=[];let protectedGrill=false;\n for(const block of event.getImpactedBlocks()){\n  if(block.typeId!==GRILL_ID){keep.push(block);continue}\n  protectedGrill=true;\n  try{pending.push(grillBreakSnapshot(block))}catch(error){console.warn('[Grilling explosion capture] retained '+error)}\n }\n if(!protectedGrill)return;\n event.setImpactedBlocks(keep);if(!pending.length)return;\n system.run(()=>{\n  // A later subscriber can still cancel this event. An unreadable final\n  // status is not permission to destroy a station or release its contents.\n  try{if(event.cancel!==false)return}catch(error){console.warn('[Grilling explosion status] '+error);return}\n  for(const captured of pending)try{const block=sameGrillForBreak(captured);if(block)customBreak(block,undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}\n });\n}\nfunction scheduleGrillPlayerBreak(event){\n if(event.cancel||event.block.typeId!==GRILL_ID)return;\n event.cancel=true;\n try{\n  const captured=grillBreakSnapshot(event.block),player=event.player;\n  system.run(()=>{try{const block=sameGrillForBreak(captured);if(block)customBreak(block,player)}catch(error){console.warn('[Grilling break recovery] '+error)}});\n }catch(error){console.warn('[Grilling break capture] retained '+error)}\n}\n"
+    },
+    {
+      "start": 39749,
+      "end": 39843,
+      "before": "   try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}\n",
+      "after": "   // 1.3 s brush clip plus 0.12 s native blend-out: keep Numb off for 29 ticks.\n   try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12});suppressNumbVisual(player,system.currentTick,29)}catch{}\n"
+    },
+    {
+      "start": 39857,
+      "end": 40144,
+      "before": " if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}}return}\n",
+      "after": " if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12});suppressNumbVisual(player,system.currentTick,29)}catch{}}return}\n"
+    },
+    {
+      "start": 71415,
+      "end": 71598,
+      "before": "  PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:useSound(e.source,'shake_seasoning',.8)});\n",
+      "after": "  PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:seasoningShakeSound(e.source)});\n"
+    },
+    {
+      "start": 82378,
+      "end": 83165,
+      "before": "world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n",
+      "after": "world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);forgetNumbVisual(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});\n"
+    },
+    {
+      "start": 88765,
+      "end": 89199,
+      "before": "world.beforeEvents.explosion.subscribe(e=>{\n if(e.cancel)return;\n const grills=[],keep=[];for(const b of e.getImpactedBlocks()){if(b.typeId===GRILL_ID)grills.push({d:b.dimension,p:{...b.location}});else keep.push(b)}\n if(!grills.length)return;e.setImpactedBlocks(keep);\n system.run(()=>{for(const row of grills)try{customBreak(row.d.getBlock(row.p),undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}});\n});\n",
+      "after": "world.beforeEvents.explosion.subscribe(scheduleGrillExplosion);\n"
+    },
+    {
+      "start": 89271,
+      "end": 89438,
+      "before": " if(e.block.typeId===GRILL_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>customBreak(dim.getBlock(loc),p));return}\n",
+      "after": " if(e.block.typeId===GRILL_ID){scheduleGrillPlayerBreak(e);return}\n"
+    },
+    {
+      "start": 95655,
+      "end": 95970,
+      "before": "  const numb=fxGet(p,'numb');if(numb&&!ACTIVE_EATS.has(p.id)){if(system.currentTick%12===0)try{p.playAnimation('animation.kg_a22.player.numb',{blendOutTime:.08})}catch{};NUMB_VISUAL.add(p.id)}else if(!numb&&NUMB_VISUAL.delete(p.id)){try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}\n",
+      "after": "  updateNumbVisual(p,!!fxGet(p,'numb')&&!ACTIVE_EATS.has(p.id)&&!PENDING_USES.has(p.id)&&!(p.getProperty('kaleidoscope_grilling:season_phase')>0),system.currentTick);\n"
+    },
+    {
+      "start": 96169,
+      "end": 96229,
+      "before": " NUMB_VISUAL.delete(playerId);forgetDragonHealth(playerId);\n",
+      "after": " forgetNumbVisual(playerId);forgetDragonHealth(playerId);\n"
+    }
+  ]
+}
