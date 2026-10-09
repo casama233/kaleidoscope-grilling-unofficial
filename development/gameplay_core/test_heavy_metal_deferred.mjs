@@ -1,4 +1,5 @@
 import {definitelyLethalProvisionalHealth,sameHeavyMetalEffect,planHeavyMetalTransition} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/heavy_metal_damage_core.js';
+import * as heavyMetalClaim from '../../projects/grilling/gameplay_core/behavior_pack/scripts/heavy_metal_claim_core.js';
 import * as lifecycle from '../../projects/grilling/gameplay_core/behavior_pack/scripts/effect_lifecycle_core.js';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
@@ -8,17 +9,17 @@ const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/beha
 const runtimeFile=name=>fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/'+name,import.meta.url),'utf8');
 const stripModule=text=>text.replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(class|const|function|async))/g,'');
 function fixture(){
- const queue=[],fx=new Map([['heavy_metal',{until:1000,amp:0}]]),sounds=[];
+ const queue=[],fx=new Map([['heavy_metal',{until:1000,amp:0}]]),claims=new Map(),sounds=[];
  const health={currentValue:8,setCurrentValue(v){this.currentValue=v}};
  const target={id:'entity',getComponent:()=>health,dimension:{playSound:id=>sounds.push(id)},location:{x:0,y:0,z:0},
-  getDynamicProperty:key=>key===lifecycle.FX_KEY?JSON.stringify(Object.fromEntries(fx)):undefined,
-  setDynamicProperty(key,raw){if(key!==lifecycle.FX_KEY)return;fx.clear();for(const [name,value] of Object.entries(raw===undefined?{}:JSON.parse(raw)))fx.set(name,value)}};
+  getDynamicProperty:key=>key===lifecycle.FX_KEY?JSON.stringify(Object.fromEntries(fx)):claims.get(key),
+  setDynamicProperty(key,raw){if(key===heavyMetalClaim.HEAVY_METAL_CLAIM_KEY){if(raw===undefined)claims.delete(key);else claims.set(key,raw);return}if(key!==lifecycle.FX_KEY)return;fx.clear();for(const [name,value] of Object.entries(raw===undefined?{}:JSON.parse(raw)))fx.set(name,value)}};
  let handler;const world={getAbsoluteTime:()=>0,beforeEvents:{entityHurt:{subscribe:fn=>handler=fn}}},system={currentTick:0,run:fn=>queue.push(fn)};
  // Keep the existing scenarios against the actual effect writer and dedicated
  // rescue implementation, reached through main's single production subscriber.
  const effects=vm.createContext({console,world,system,...lifecycle,nativeDragonHealth(){}});
  vm.runInContext(stripModule(runtimeFile('effect_state_runtime.js')),effects);
- const metal=vm.createContext({console,world,system,...lifecycle,definitelyLethalProvisionalHealth,sameHeavyMetalEffect,planHeavyMetalTransition,
+ const metal=vm.createContext({console,world,system,...lifecycle,...heavyMetalClaim,definitelyLethalProvisionalHealth,sameHeavyMetalEffect,planHeavyMetalTransition,
   writeEffects:vm.runInContext('writeEffects',effects)});
  vm.runInContext(stripModule(runtimeFile('heavy_metal_damage_runtime.js')),metal);
  const context=vm.createContext({console,world,system,fxGet:(_t,id)=>fx.get(id),handleHeavyMetalBeforeHurt:vm.runInContext('handleHeavyMetalBeforeHurt',metal)});

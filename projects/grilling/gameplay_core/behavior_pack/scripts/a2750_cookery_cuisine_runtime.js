@@ -44,6 +44,24 @@ function writeCuisineState(block,state){
 function clearCuisineAt(dimensionId,location){
  try{world.setDynamicProperty(cuisineStateKeyAt(dimensionId,location.x,location.y,location.z),undefined);system.sendScriptEvent('kaleidoscope_cookery:cuisine_metadata',JSON.stringify({api:1,station:{dimensionId,...location},state:{seasoning:[],oilType:''}}));return true}catch{return false}
 }
+function cuisineRemovalSnapshot(block){
+ const dimension=block.dimension,location={...block.location},stateKey=cuisineStateKey(block);
+ return {dimension,location,typeId:block.typeId,stateKey,raw:world.getDynamicProperty(stateKey)};
+}
+function clearRemovedCuisine(event,rows){
+ // Another before-event subscriber may cancel after our capture. An expired
+ // event is not evidence that destruction completed.
+ try{if(event.cancel!==false)return}catch(error){console.warn('[Grilling cuisine removal status] retained '+error);return}
+ for(const row of rows)try{
+  const live=row.dimension.getBlock(row.location);
+  // An unloaded location, the original station or a replacement station does
+  // not authorize deletion. Keep the exact captured metadata if it changed.
+  if(!live||live.typeId===row.typeId||stationKind(live.typeId)||world.getDynamicProperty(row.stateKey)!==row.raw)continue;
+  let failure;try{world.setDynamicProperty(row.stateKey,undefined)}catch(error){failure=error}
+  if(world.getDynamicProperty(row.stateKey)!==undefined)throw failure??Error('cuisine removal readback');
+  system.sendScriptEvent('kaleidoscope_cookery:cuisine_metadata',JSON.stringify({api:1,station:{dimensionId:row.dimension.id,...row.location},state:{seasoning:[],oilType:''}}));
+ }catch(error){console.warn('[Grilling cuisine removal] retained '+error)}
+}
 function hostHasOil(block){
  try{return block?.permutation?.getState('kaleidoscope_cookery:has_oil')===true}catch{return false}
 }
@@ -208,15 +226,16 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
 });
 world.beforeEvents.playerBreakBlock.subscribe(event=>{
  try{
-  if(!stationKind(event.block?.typeId))return;
-  const dimensionId=event.block.dimension.id,location={...event.block.location};system.run(()=>clearCuisineAt(dimensionId,location));
+  if(event.cancel!==false||!stationKind(event.block?.typeId))return;
+  const row=cuisineRemovalSnapshot(event.block);system.run(()=>clearRemovedCuisine(event,[row]));
  }catch{}
 });
 world.beforeEvents.explosion.subscribe(event=>{
  try{
+  if(event.cancel!==false)return;
   const rows=[];
-  for(const block of event.getImpactedBlocks())if(stationKind(block?.typeId))rows.push({dimensionId:block.dimension.id,location:{...block.location}});
-  if(rows.length)system.run(()=>{for(const row of rows)clearCuisineAt(row.dimensionId,row.location)});
+  for(const block of event.getImpactedBlocks())if(stationKind(block?.typeId))rows.push(cuisineRemovalSnapshot(block));
+  if(rows.length)system.run(()=>clearRemovedCuisine(event,rows));
  }catch{}
 });
 export function readCuisineExtensionState(block){return readCuisineState(block)}

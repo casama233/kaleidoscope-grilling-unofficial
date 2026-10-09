@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    120
+  ],
+  "scope": "Exact G119 to G120 guide 0.3.50 Oil Residue paragraphs 3 and 8 in three languages. Preserve every other guide paragraph, plain name and inventory alias. Null preimage means a new numbered paragraph.",
+  "previous_public_commit": "8099dc2d211e79c881548a2abc90c06e6c876dc5",
+  "reviewed_commit": "187e179d58f48fbc9b4d57b5f01cff90b7489ee6",
+  "locales": {
+    "en_US": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, and Ferns. Other plants still need individual adapters.",
+        "after": "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, Ferns, Pumpkin Stems, Melon Stems, Rooted Dirt, Twisting Vines, and Weeping Vines. Other plants still need individual adapters."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.8": {
+        "before": null,
+        "after": "Immature stems gain 2–5 stages per attempt. On reaching maturity, they attempt fruit growth using light, farmland, and neighboring stems; a blocked random direction produces no fruit. Mature stems cannot be fertilized again. Rooted Dirt grows Hanging Roots into air below it. Twisting Vines grow upward and Weeping Vines downward from their connected tip into air; age 25 still accepts fertilizer."
+      }
+    },
+    "zh_CN": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草与蕨。其他植物仍需各自适配。",
+        "after": "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草、蕨、南瓜茎、西瓜茎、缠根泥土、缠怨藤和垂泪藤。其他植物仍需各自适配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.8": {
+        "before": null,
+        "after": "未成熟瓜茎每次长 2–5 阶；刚成熟时根据光照、耕地与周围植株尝试结果，随机方向被挡便不结果。已成熟瓜茎不能再施肥。缠根泥土下方为空气时会长出垂根。 缠怨藤向上、垂泪藤向下，从相连末端向空气延长；末端年龄 25 仍可施肥。"
+      }
+    },
+    "zh_TW": {
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草與蕨。其他植物仍需各自適配。",
+        "after": "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草、蕨、南瓜梗、西瓜梗、纏根土、扭曲藤與垂淚藤。其他植物仍需各自適配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.8": {
+        "before": null,
+        "after": "未成熟瓜梗每次長 2–5 階；剛成熟時依光照、耕地與周邊植株嘗試結瓜，隨機方向被擋便不結果。已成熟瓜梗不能再施肥。纏根土下方為空氣時會長出懸根。 扭曲藤向上、垂淚藤向下，從相連末端向空氣延長；末端年齡 25 仍可施肥。"
+      }
+    }
+  }
+}

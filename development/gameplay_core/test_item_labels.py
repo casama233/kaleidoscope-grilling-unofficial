@@ -15,6 +15,7 @@ BASE='1cf16f39f449ee5ce95190ef9088e575d133f928'  # Merged 2.8.45 runtime, includ
 LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
 PREVIOUS_GUIDE_BASE='f7bd2d26367c113ab8881bc67e9f5e69624917ff'
 REVIEWED_GUIDE_BASE='8099dc2d211e79c881548a2abc90c06e6c876dc5'
+CURRENT_GUIDE_BASE='187e179d58f48fbc9b4d57b5f01cff90b7489ee6'
 LABELS = {'en_US': 'Kaleidoscope Grilling', 'zh_CN': '森罗物语烟火',
           'zh_TW': '森羅物語煙火'}
 
@@ -230,11 +231,32 @@ def main():
             for key, change in changes.items():
                 assert set(change) == {'before', 'after'}
                 assert previous_guide.get(key) == change['before'], 'Reviewed G119 guide preimage drift'
-                assert reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G119 guide delta drift'
+                assert reviewed[key] == change['after'], 'Reviewed G119 guide delta drift'
                 if change['before'] is None:
                     assert key not in old and key not in approved
                     guide_added.add(key)
             assert len(guide_added) == 12
+            approved.update(changes)
+        if version >= (2,8,120):
+            delta = json.loads((ROOT / 'tools/fixtures/g120-guide-reviewed-delta.json').read_text())
+            assert delta['schema'] == 1 and delta['release'] == [2,8,120]
+            assert delta['previous_public_commit'] == REVIEWED_GUIDE_BASE
+            assert delta['reviewed_commit'] == CURRENT_GUIDE_BASE
+            assert set(delta['locales']) == set(LABELS)
+            changes = delta['locales'][locale]
+            expected_keys = {f'guide.kg.body.kaleidoscope_grilling:oil_residue.{n}' for n in (3,8)}
+            assert set(changes) == expected_keys, 'Reviewed G120 guide scope changed'
+            latest_reviewed = language(prior(path, CURRENT_GUIDE_BASE))
+            assert {key for key in set(reviewed) | set(latest_reviewed)
+                if reviewed.get(key) != latest_reviewed.get(key)} == expected_keys, 'G120 guide witness changed outside reviewed scope'
+            for key, change in changes.items():
+                assert set(change) == {'before', 'after'}
+                assert reviewed.get(key) == change['before'], 'Reviewed G120 guide preimage drift'
+                assert latest_reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G120 guide delta drift'
+                if change['before'] is None:
+                    assert key not in old and key not in approved
+                    guide_added.add(key)
+            assert len(guide_added) == 13
             approved.update(changes)
         assert all(current[key] == change['after'] for key, change in approved.items()), 'Reviewed guide final text drift'
         assert all(current.get(k) == v for k, v in old.items() if k not in approved), 'Plain names/guide text changed'

@@ -11,7 +11,7 @@ async function fixture(){
  let tick=1099;const props=new Map(),context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Math,Boolean,Error,Date});
  const world={getAbsoluteTime:()=>tick,getDynamicProperty:k=>props.get(k),setDynamicProperty:(k,v)=>v===undefined?props.delete(k):props.set(k,v)};
  const system={get currentTick(){return tick},run(){},sendScriptEvent(){},afterEvents:{scriptEventReceive:{subscribe(){}}}};
- const server=new vm.SyntheticModule(['world','system','ItemStack','EquipmentSlot'],function(){this.setExport('world',world);this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',{})},{context});
+ const server=new vm.SyntheticModule(['world','system','ItemStack','EquipmentSlot','GameMode'],function(){this.setExport('world',world);this.setExport('system',system);this.setExport('ItemStack',Stack);this.setExport('EquipmentSlot',{});this.setExport('GameMode',{Creative:'Creative'})},{context});
  // Tooltip event scheduling is unrelated to heat writes; its pure lore module is real.
  const tooltipEvents=new vm.SyntheticModule([],function(){},{context});
  const modules=new Map();

@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "id": "kaleidoscope_grilling:family-api-0.2.6",
+  "id": "kaleidoscope_grilling:family-api-0.2.7",
   "version": [
     0,
     2,
-    6
+    7
   ],
   "host_uuid": "5df753c9-3436-4fba-87f1-a2da3651cfcf",
   "archive_sha256": "da12fe6d39d7514aff1de3c963d69899324d771be5ca0fc3da1ccb759c7ad458",
@@ -20,7 +20,7 @@
   },
   "patched_files": {
     "scripts/api/extensionRegistry.js": "22fe74e62afe471515cb0196ba33dd43c07750edb5dd0522ed4a898837d63947",
-    "scripts/custom_components/blocks/directStation.js": "8909fdd6d65a5f2eee40ef0cc9bf92d79582b71945195e7385aa94e00f892ed3",
+    "scripts/custom_components/blocks/directStation.js": "56362c05e9705e122087dabeb9d26c6e9ff7c67641245e953ef8a1a06d5dd7d0",
     "scripts/custom_components/blocks/oilPot.js": "862c3b196283e315c5862a66584acf7b0c2620fc494515d0aad196f7e2470f86",
     "items/kitchen/oil_pot.json": "fba383920613d0e153bfd1438eaf2825b97bbce2c26486995448b14d35b83f0f",
     "items/kitchen/oil_pot_filled.json": "0296061e7db00b0979303f6800f829daf628cab4929e7e0825125a3a470ff7f3",
@@ -30,7 +30,7 @@
   },
   "imports": {
     "scripts/api/extensionRegistry.js": "import {BOARD_CAPABILITIES,registerBoardV2Recipe} from \"./board_api_runtime.js\";\nimport {OIL_CAPABILITIES} from \"./oil_api_core.js\";\nimport {CUISINE_CAPABILITIES} from \"./cuisine_api_host.js\";\nimport {GUIDE_CAPABILITIES} from \"./guide_labels_core.js\";\nimport {INGREDIENT_CAPABILITIES} from \"./ingredient_api_host.js\";\n",
-    "scripts/custom_components/blocks/directStation.js": "import {handleBoardV2,recoverBoardV2} from \"../../api/board_api_runtime.js\";\nimport {giveCuisineOutput,beginCuisineCarrier,nextCuisineBatch,recoverCuisineOutput} from \"../../api/cuisine_api_host.js\";\nimport {lastConsumedOil,handleSharedStationOil} from \"../../api/oil_api_host.js\";\n",
+    "scripts/custom_components/blocks/directStation.js": "import {handleBoardV2,recoverBoardV2} from \"../../api/board_api_runtime.js\";\nimport {giveCuisineOutput,consumeCuisineCarrier,nextCuisineBatch,recoverCuisineOutput,prepareCuisineBurn,giveBurntCuisineOutput} from \"../../api/cuisine_api_host.js\";\nimport {lastConsumedOil,handleSharedStationOil} from \"../../api/oil_api_host.js\";\n",
     "scripts/custom_components/blocks/oilPot.js": "import {publishHostOil,hostOilCountOverride,sharedPlacedCount,updateSharedPlacedCount,consumeSharedOilFromHeldPot,captureSharedOilPlacement,handleSharedPlacedOil,recoverSharedOilPot} from \"../../api/oil_api_host.js\";\n",
     "scripts/events/guidebook.js": "import {publicMethodLabel,publicExtensionName} from \"../api/guide_labels_core.js\";\nconst authorGuidebookItemName=guidebookItemName,authorRecipeIngredientName=recipeIngredientName;\n",
     "scripts/events/foodItemReturns.js": "import {registerAuthorFoodReturns} from \"../api/ingredient_api_host.js\";\n",
@@ -173,13 +173,19 @@
       "path": "scripts/custom_components/blocks/directStation.js",
       "anchor": "   consume(p);\n   // Batched bowl/container dishes",
       "position": "before",
-      "text": "beginCuisineCarrier(p);\n"
+      "text": "consumeCuisineCarrier(b,p,d,\"pot\",car);//"
     },
     {
       "path": "scripts/custom_components/blocks/directStation.js",
-      "anchor": "if(car)consume(p);if(d.result.suspicious)",
+      "anchor": "if(car)consume(p);",
       "position": "before",
-      "text": "if(car)beginCuisineCarrier(p);"
+      "text": "if(car)consumeCuisineCarrier(b,p,d,\"stockpot\",car);/*"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "if(car)consume(p);",
+      "position": "after",
+      "text": "*/"
     },
     {
       "path": "scripts/custom_components/blocks/directStation.js",
@@ -233,7 +239,7 @@
       "path": "scripts/custom_components/blocks/directStation.js",
       "anchor": " if(id===\"kaleidoscope_cookery:pot\"){\n  // Wok state is mutually exclusive",
       "position": "before",
-      "text": " if(id==\"kaleidoscope_cookery:pot\"&&recoverCuisineOutput(b,d)){clearDisplays(b);syncPotStates(b,{});return;}\n"
+      "text": " if(id==\"kaleidoscope_cookery:pot\"&&recoverCuisineOutput(b,d,{save,raw:b=>world.getDynamicProperty(k(b))})){clearDisplays(b);syncPotStates(b,{});return;}\n"
     },
     {
       "path": "scripts/events/foodItemReturns.js",
@@ -252,6 +258,24 @@
       "anchor": "if(!consumeOilFromHeldContainer(p))return true;d.oil=true;d.oilTicks=1200;",
       "position": "before",
       "text": "if(id===\"kaleidoscope_cookery:oil_pot_filled\")return handleSharedStationOil(b,p,d,{save,load,sync:syncPotStates});\n  "
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "function burnWok(b,d){",
+      "position": "after",
+      "text": "\n prepareCuisineBurn(b,d,{save,raw:b=>world.getDynamicProperty(k(b))});"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "  give(p,\"minecraft:charcoal\",Math.max(1,Number(d.charcoalCount??1)));",
+      "position": "before",
+      "text": "  giveBurntCuisineOutput(b,p,d,{save,raw:b=>world.getDynamicProperty(k(b))});/*"
+    },
+    {
+      "path": "scripts/custom_components/blocks/directStation.js",
+      "anchor": "  give(p,\"minecraft:charcoal\",Math.max(1,Number(d.charcoalCount??1)));",
+      "position": "after",
+      "text": "*/"
     }
   ],
   "copies": {

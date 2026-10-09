@@ -4,14 +4,14 @@ import * as oil from '../../projects/grilling/gameplay_core/behavior_pack/script
 import * as food from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
 import {registerSecretIngredientBehavior,applySecretBehaviorExtension,resetSecretCompatRegistry} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/secret_compat_core.js';
 const base='projects/grilling/gameplay_core/behavior_pack/scripts/';
-class Item{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.lore=[];this.props={};}getRawLore(){return structuredClone(this.lore)}setLore(v){this.lore=structuredClone(v)}getDynamicProperty(k){return this.props[k]}getDynamicPropertyIds(){return Object.keys(this.props)}setDynamicProperty(k,v){if(v===undefined)delete this.props[k];else this.props[k]=v}clone(){const n=new Item(this.typeId,this.amount);Object.assign(n,structuredClone({...this}));return n}}
+class Item{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.lore=[];this.props={};}isStackableWith(other){return this.maxAmount!==1&&other?.maxAmount!==1&&this.typeId===other?.typeId&&this.nameTag===other?.nameTag&&JSON.stringify(this.lore)===JSON.stringify(other?.lore)&&JSON.stringify(this.props)===JSON.stringify(other?.props)}getRawLore(){return structuredClone(this.lore)}setLore(v){this.lore=structuredClone(v)}getDynamicProperty(k){return this.props[k]}getDynamicPropertyIds(){return Object.keys(this.props)}setDynamicProperty(k,v){if(v===undefined)delete this.props[k];else this.props[k]=v}clone(){const n=new Item(this.typeId,this.amount);Object.assign(n,structuredClone({...this}));return n}}
 class Slot{constructor(item){this.item=item?.clone();this.fail=0}hasItem(){return !!this.item}getItem(){return this.item?.clone()}setItem(s){if(this.fail-->0)throw Error('slot write fault');this.item=s?.clone()}}
 function fixture(name,savedProperties){const properties=new Map(savedProperties),faults=new Map(),emitted=[],subscriptions={},drops=[];
  const signal=key=>({subscribe(fn){(subscriptions[key]??=[]).push(fn)}});
  const world={getDynamicProperty:k=>properties.get(k),setDynamicProperty(k,v){if(faults.get(k)){faults.set(k,faults.get(k)-1);throw Error('property fault')}if(v===undefined)properties.delete(k);else properties.set(k,v)},getAbsoluteTime:()=>1000,getAllPlayers:()=>[],getEntity:id=>drops.find(d=>d.id===id),afterEvents:{playerSpawn:signal('spawn'),playerPlaceBlock:signal('place')},beforeEvents:{playerInteractWithBlock:signal('interact'),playerBreakBlock:signal('break'),explosion:signal('explosion')}};
  const system={currentTick:100,run(){},runTimeout(){},afterEvents:{scriptEventReceive:signal('script')},sendScriptEvent:(id,message)=>emitted.push({id,data:JSON.parse(message)})};
  const ctx={...oil,...food,world,system,ItemStack:Item,EquipmentSlot:{Mainhand:'Mainhand',Offhand:'Offhand'},GameMode:{Creative:'Creative'},console};
- let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'consumeSharedOilFromHeldPot,readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil,publishLegacyHostOil':'deliverCuisineOutput,readCuisineMetadata')+'};';vm.runInNewContext(code,ctx);
+ let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'consumeSharedOilFromHeldPot,readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil,publishLegacyHostOil':'deliverCuisineOutput,readCuisineMetadata,recoverCuisineOutput,nextCuisineBatch,prepareCuisineBurn')+'};';vm.runInNewContext(code,ctx);
  const dim={id:'minecraft:overworld',getBlock:()=>block,spawnItem(s){const item=s.clone(),d={id:'drop'+drops.length,getComponent:()=>({itemStack:item}),remove(){drops.splice(drops.indexOf(d),1)}};drops.push(d);return d}};
  const block={dimension:dim,x:40,y:80,z:64,typeId:oil.EMPTY_POT,permutation:{getState:()=>false,withState(_k,v){this.getState=()=>v;return this}},setPermutation(p){this.permutation=p}};
  return {api:ctx.api,properties,faults,emitted,drops,block,Slot,emitScript(event){for(const fn of subscriptions.script??[])fn(event)}};}
@@ -51,6 +51,124 @@ test('unknown prepared output is retained without another credit; acknowledged j
  f.properties.delete(k);let calls=0;const write=f.properties.set.bind(f.properties);f.properties.set=(key,value)=>{if(key===k&&++calls===2)throw Error('commit journal');return write(key,value)};
  assert.equal(f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options).phase,'committed');f.properties.set=write;
  assert.equal(f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options).replayed,true);assert.equal(items.filter(Boolean).length,1);
+});
+
+// G120 receipt regressions use the existing storage-only adapters. No player
+// object, native interaction event or simulated-player API is constructed.
+test('unacknowledged cuisine preparation and batch reservation cannot authorize output',()=>{
+ const f=fixture('cuisine_api_host.js'),items=[],container={size:1,getItem:i=>items[i],setItem(i,s){items[i]=s}},write=f.properties.set.bind(f.properties);
+ f.properties.set=(key,value)=>key.startsWith('senluo:cuisine_output:')?f.properties:write(key,value);
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',{container,targetBlock:f.block,operationId:'prepare-readback'}),/readback/);
+ assert.throws(()=>f.api.nextCuisineBatch(f.block),/readback/);
+ assert.equal(items.filter(Boolean).length,0);assert.equal(f.drops.length,0);
+});
+test('unconfirmed cuisine slot rollback stays quarantined without another credit',()=>{
+ const f=fixture('cuisine_api_host.js'),items=[];let writes=0;
+ const container={size:1,getItem:i=>items[i]?.clone(),setItem(i,s){if(++writes===1){items[i]=s.clone();throw Error('credit written')}/* ignored rollback */}};
+ const options={container,targetBlock:f.block,operationId:'rollback-readback'},receiptKey='senluo:cuisine_output:minecraft:overworld:40,80,64:rollback-readback';
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options),error=>error.deliveryOutcomeUnknown===true);
+ assert.equal(JSON.parse(f.properties.get(receiptKey)).phase,'quarantined');assert.equal(items[0].amount,1);
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options),/quarantined/);assert.equal(writes,2);
+});
+test('native custom-data disagreement cannot acknowledge or erase an output with the same public fingerprint',()=>{
+ for(const destination of ['slot','entity']){
+  const f=fixture('cuisine_api_host.js'),items=[],options={operationId:'native-ownership-'+destination};
+  if(destination==='slot')Object.assign(options,{targetBlock:f.block,container:{size:1,getItem:i=>items[i]?.clone(),setItem(i,s){items[i]=s?.clone();if(items[i])items[i].props['foreign:data']='different'}}});
+  else{const spawn=f.block.dimension.spawnItem.bind(f.block.dimension);f.block.dimension.spawnItem=s=>{const d=spawn(s);d.getComponent().itemStack.props['foreign:data']='different';return d};}
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options),error=>error.deliveryOutcomeUnknown===true);
+  const retained=items[0]??f.drops[0]?.getComponent().itemStack;assert.equal(retained?.props['foreign:data'],'different');
+  const receiptKey='senluo:cuisine_output:minecraft:overworld:40,80,64:'+options.operationId;
+  assert.equal(JSON.parse(f.properties.get(receiptKey)).phase,'quarantined');
+ }
+ const f=fixture('cuisine_api_host.js'),single=new Item('qa:single_food');single.maxAmount=1;
+ assert.equal(f.api.deliverCuisineOutput(f.block,{},single.typeId,1,'pot',{nativeStack:single,operationId:'nonstackable-ack'}).phase,'committed');
+ assert.equal(f.drops.length,1);
+});
+test('prepared cuisine receipt cannot use another recipient container as delivery evidence',()=>{
+ const f=fixture('cuisine_api_host.js'),items=[],container={size:1,getItem:i=>items[i]?.clone(),setItem(i,s){items[i]=s?.clone()}},write=f.properties.set.bind(f.properties);
+ const receiptKey='senluo:cuisine_output:minecraft:overworld:40,80,64:recipient';let receipts=0;
+ f.properties.set=(key,value)=>{if(key===receiptKey&&++receipts===2)throw Error('commit unavailable');return write(key,value)};
+ const options={container,playerId:'recipient-a',operationId:'recipient'};
+ assert.equal(f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options).recoveryPending,true);
+ const other={size:1,getItem:()=>items[0].clone(),setItem(){throw Error('unrelated container must remain untouched')}};
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',{...options,container:other,playerId:'recipient-b'}),/unresolved/);
+ assert.equal(f.api.deliverCuisineOutput(f.block,{},'qa:food',1,'pot',options).replayed,true);
+});
+test('takeout credit and destruction share the same saved portion count without losing its remainder',()=>{
+ const f=fixture('cuisine_api_host.js'),items=[],container={size:1,getItem:i=>items[i]?.clone(),setItem(i,s){items[i]=s?.clone()}};
+ const data={result:{id:'qa:food',count:3},grillingOutputEpoch:77};
+ f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{container,targetBlock:f.block,operationId:'pot:77:3'});
+ // Exercise an existing committed receipt from before settlementVersion was
+ // introduced. Its one acknowledged portion remains authoritative.
+ const receiptKey='senluo:cuisine_output:minecraft:overworld:40,80,64:pot:77:3',prior=JSON.parse(f.properties.get(receiptKey));delete prior.settlementVersion;delete prior.kind;f.properties.set(receiptKey,JSON.stringify(prior));
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);
+ assert.equal(items[0].amount,1);assert.equal(f.drops.length,1);assert.equal(f.drops[0].getComponent().itemStack.amount,2);
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.drops.length,1);
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,{...data,result:{...data.result,count:2}},'qa:food',1,'pot',{operationId:'pot:77:2'}),/destruction retained/);
+ data.result.count=1;data.grillingOutputEpoch=78;
+ f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:78:1'});
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.drops.length,2);
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:78:1'}),/destruction retained/);
+});
+test('unknown or legacy-unverified takeout rollback cannot become a destruction payout',()=>{
+ for(const prior of [{phase:'prepared',settlementVersion:1},{phase:'quarantined',settlementVersion:1},{phase:'rolled_back'}]){
+  const f=fixture('cuisine_api_host.js'),data={result:{id:'qa:food',count:3},grillingOutputEpoch:79};
+  f.properties.set('senluo:cuisine_output:minecraft:overworld:40,80,64:pot:79:3',JSON.stringify({...prior,output:{id:'qa:food',amount:1}}));
+  assert.throws(()=>f.api.recoverCuisineOutput(f.block,data),/unresolved/);assert.equal(f.drops.length,0);assert.equal(data.result.count,3);
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:79:2'}),/destruction retained/);
+ }
+});
+test('committed legacy destruction fences its entire epoch while a new batch remains usable',()=>{
+ const f=fixture('cuisine_api_host.js'),data={result:{id:'qa:food',count:2},grillingOutputEpoch:80};
+ f.properties.set('senluo:cuisine_output:minecraft:overworld:40,80,64:break:pot:80:3',JSON.stringify({phase:'committed',output:{id:'qa:food',amount:3}}));
+ assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:80:2'}),/destruction retained/);
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.drops.length,0);
+ const fresh={result:{id:'qa:food',count:1},grillingOutputEpoch:81};
+ assert.equal(f.api.deliverCuisineOutput(f.block,fresh,'qa:food',1,'pot',{operationId:'pot:81:1'}).phase,'committed');assert.equal(f.drops.length,1);
+});
+test('prepared destruction with an acknowledged drop only settles its fence on retry',()=>{
+ const f=fixture('cuisine_api_host.js'),data={result:{id:'qa:food',count:2},grillingOutputEpoch:82},write=f.properties.set.bind(f.properties);let fences=0;
+ f.properties.set=(key,value)=>{if(key==='senluo:cuisine_recovery:minecraft:overworld:40,80,64:pot:82'&&++fences===2)throw Error('terminal fence unavailable');return write(key,value)};
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.drops.length,1);
+ assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.drops.length,1);
+});
+test('an existing nonobject recovery fence cannot be mistaken for an unused batch',()=>{
+ for(const raw of ['null','false','0',false,0,'{}','[]']){
+  const f=fixture('cuisine_api_host.js'),data={result:{id:'qa:food',count:2},grillingOutputEpoch:83};
+  f.properties.set('senluo:cuisine_recovery:minecraft:overworld:40,80,64:pot:83',raw);
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:83:2'}),/recovery fence/);
+  assert.throws(()=>f.api.recoverCuisineOutput(f.block,data),/recovery fence/);assert.equal(f.drops.length,0);
+ }
+});
+test('charcoal takeout and break share one plain receipt and fence stale food from the same epoch',()=>{
+ for(const first of ['takeout','break']){
+  const f=fixture('cuisine_api_host.js'),items=[],container={size:1,getItem:i=>items[i]?.clone(),setItem(i,s){items[i]=s?.clone()}};
+  const data={burnt:true,charcoalCount:3,grillingOutputEpoch:84,grillingBurnOrigin:{version:1,epoch:84,resultId:'qa:food',sourceCount:3}};
+  const collect=()=>f.api.deliverCuisineOutput(f.block,data,'minecraft:charcoal',3,'burnt',{container,targetBlock:f.block,operationId:'burnt:pot:84'});
+  if(first==='takeout'){collect();assert.equal(f.api.recoverCuisineOutput(f.block,data),true)}
+  else{assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(collect().replayed,true)}
+  assert.equal(items.filter(Boolean).length+f.drops.length,1);
+  const output=items[0]??f.drops[0].getComponent().itemStack;
+  assert.equal(output.amount,3);assert.deepEqual(output.getRawLore(),[]);assert.equal(food.readPublicFood(output).present,false);assert.equal(f.emitted.length,0);
+  const stale={result:{id:'qa:food',count:2},grillingOutputEpoch:84};
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,stale,'qa:food',1,'pot',{operationId:'pot:84:2'}),/burnt batch retained/);
+  assert.throws(()=>f.api.recoverCuisineOutput(f.block,stale),/burnt batch retained/);
+ }
+});
+test('burn origin is saved before result loss and an acknowledged old takeout cannot become charcoal',()=>{
+ const f=fixture('cuisine_api_host.js'),active={items:['qa:ingredient'],recipe:{result:'qa:food',count:1},started:true};let stored=JSON.stringify(active);
+ const host={raw:()=>stored,save(_b,next){stored=JSON.stringify(next)}};
+ f.properties.set('senluo:cuisine_output:minecraft:overworld:40,80,64:break:pot:legacy:1',JSON.stringify({phase:'committed',output:{id:'qa:previous_food',amount:1}}));
+ f.api.prepareCuisineBurn(f.block,active,host);assert.equal(active.grillingOutputEpoch,1);assert.equal(active.grillingBurnOrigin.sourceCount,0);assert.equal(JSON.parse(stored).grillingOutputEpoch,1);
+ const ignored={items:['qa:ingredient'],recipe:{result:'qa:food',count:1},started:true},before=JSON.stringify(ignored);
+ assert.throws(()=>f.api.prepareCuisineBurn(f.block,ignored,{raw:()=>before,save(){}}),/save readback/);assert.equal(ignored.grillingOutputEpoch,undefined);
+ const data={result:{id:'qa:food',count:3},grillingOutputEpoch:85};
+ f.api.deliverCuisineOutput(f.block,data,'qa:food',1,'pot',{operationId:'pot:85:3'});
+ assert.throws(()=>f.api.prepareCuisineBurn(f.block,data,{raw:()=>JSON.stringify(data),save(){throw Error('credited source must remain intact')}}),/takeout retained/);
+ assert.equal(data.result.count,3);assert.equal(data.grillingBurnOrigin,undefined);
+ const legacy={burnt:true,charcoalCount:2,grillingOutputEpoch:85};
+ assert.throws(()=>f.api.recoverCuisineOutput(f.block,legacy,{raw:()=>JSON.stringify(legacy),save(){}}),/legacy burnt food outcome retained/);
+ assert.equal(f.drops.length,1);
 });
 test('custom food inherits all containers, effects and chili damage without duplicating base effects',()=>{
  resetSecretCompatRegistry();assert(registerSecretIngredientBehavior({input:'qa:food',behavior:{mode:'replace',effects:[{effect:'speed',ticks:200}],convertTo:'minecraft:bowl',remainders:[{id:'minecraft:flower_pot',count:1},{id:'minecraft:blue_ice',count:1}],damage:2}}));

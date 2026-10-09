@@ -2,10 +2,11 @@ import {world,system} from '@minecraft/server';
 import {FX_KEY,activeEffects} from './effect_lifecycle_core.js';
 import {writeEffects} from './effect_state_runtime.js';
 import {definitelyLethalProvisionalHealth,sameHeavyMetalEffect,planHeavyMetalTransition} from './heavy_metal_damage_core.js';
+import {HEAVY_METAL_CLAIM_KEY,parseHeavyMetalClaim,heavyMetalClaimPayload} from './heavy_metal_claim_core.js';
 
-// One claim per entity. An already canceled hit cannot refund its claim merely
-// because the later storage acknowledgement failed. Quarantine lasts while the
-// same raw effect remains, including expiry/clock rollback; it is session-local.
+// The map only owns queued work. The entity's persistent claim closes the same
+// until/amplifier across logout or script reload, even if settlement never ran.
+// Do not expire that receipt or infer a new effect from a clock rollback.
 const rescues=new Map();
 function snapshot(entity){
  const time=world.getAbsoluteTime();
@@ -16,14 +17,38 @@ function snapshot(entity){
  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Heavy Metal effect state is invalid');
  return {time,raw,hasMetal:Object.hasOwn(value,'heavy_metal'),effects:activeEffects(value,time),rawMetal:activeEffects({heavy_metal:value.heavy_metal},-Infinity).heavy_metal};
 }
+function claimSnapshot(entity){
+ const raw=entity.getDynamicProperty(HEAVY_METAL_CLAIM_KEY);
+ return {raw,claim:parseHeavyMetalClaim(raw)};
+}
+function replaceClaim(entity,expectedRaw,wanted){
+ if(entity.getDynamicProperty(HEAVY_METAL_CLAIM_KEY)!==expectedRaw)
+  throw Error('Heavy Metal claim preimage changed');
+ let writeError;
+ try{entity.setDynamicProperty(HEAVY_METAL_CLAIM_KEY,wanted)}catch(error){writeError=error}
+ // A setter can apply before throwing. Only the actual readback establishes
+ // this barrier; an unavailable or different value never authorizes cancel.
+ if(entity.getDynamicProperty(HEAVY_METAL_CLAIM_KEY)!==wanted)
+  throw writeError??Error('Heavy Metal claim write was not acknowledged');
+}
+function restoreUncanceledClaim(entity,token){
+ const actual=entity.getDynamicProperty(HEAVY_METAL_CLAIM_KEY);
+ if(actual===token.claimBefore)return;
+ // No cleanup may overwrite another receipt, including a later incarnation.
+ if(actual!==token.claimRaw)throw Error('Heavy Metal claim changed before rollback');
+ replaceClaim(entity,token.claimRaw,token.claimBefore);
+}
 function release(id,token){if(rescues.get(id)===token)rescues.delete(id)}
 export function forgetHeavyMetalRescue(entityOrId){
+ // Leave/death/remove/respawn invalidate callbacks without touching saved data.
+ // A playerLeave ID or an invalid entity handle needs no property write here.
  try{rescues.delete(typeof entityOrId==='string'?entityOrId:entityOrId.id)}catch{}
 }
 function settle(entity,id,token){
  if(rescues.get(id)!==token||token.phase!=='pending')return;
  try{
   if(entity.isValid===false){release(id,token);return}
+  if(claimSnapshot(entity).raw!==token.claimRaw)throw Error('Heavy Metal claim ownership changed');
   const state=snapshot(entity);
   if(state.time<token.time)throw Error('Heavy Metal absolute clock moved backwards');
   const next=planHeavyMetalTransition(state.effects,token,state.time);
@@ -52,6 +77,7 @@ function settle(entity,id,token){
  }catch(error){
   // A canceled hit is already protection. Do not grant another one on an
   // unchanged/unreadable effect, retry unknown writes, or replay native damage.
+  // Keep the pre-cancel persistent receipt even when this callback is forgotten.
   if(token.phase!=='paid')token.phase='quarantined';
   console.warn('[Grilling heavy metal] '+error);
  }finally{if(token.phase==='paid')release(id,token)}
@@ -61,10 +87,10 @@ function settle(entity,id,token){
  * invincibility. This module adds no competing event subscription.
  */
 export function handleHeavyMetalBeforeHurt(event){
- if(event.cancel||!(event.damage>0))return false;
- let id,token;
+ let entity,id,token;
  try{
-  const entity=event.hurtEntity;id=entity.id;
+  if(event.cancel||!(event.damage>0))return false;
+  entity=event.hurtEntity;id=entity.id;
   if(typeof id!=='string'||entity.isValid===false)return false;
   const state=snapshot(entity),old=rescues.get(id);
   if(old){
@@ -73,15 +99,30 @@ export function handleHeavyMetalBeforeHurt(event){
   }
   const metal=state.effects.heavy_metal;
   if(!sameHeavyMetalEffect(metal,metal)||state.effects.heavy_metal_poisoning)return false;
+  const prior=claimSnapshot(entity);
+  if(sameHeavyMetalEffect(prior.claim,metal))return false;
   const health=entity.getComponent('minecraft:health');
   if(!health||!definitelyLethalProvisionalHealth(health.currentValue,entity.getEffect?.('absorption')))return false;
-  token={...metal,time:state.time,phase:'pending'};rescues.set(id,token);
-  // A throwing scheduler may already have queued its callback. Releasing this
-  // exact token makes that callback inert before native damage is allowed on.
+  token={...metal,time:state.time,phase:'reserving',claimBefore:prior.raw,claimRaw:heavyMetalClaimPayload(metal,state.time)};
+  rescues.set(id,token);
+  // Stable server 2.9.0 explicitly permits dynamic-property setters in
+  // restricted_execution. Native health and sound stay in the deferred callback.
+  replaceClaim(entity,token.claimBefore,token.claimRaw);
+  token.phase='pending';
   system.run(()=>settle(entity,id,token));
-  event.cancel=true;return true;
+  let cancelError;try{event.cancel=true}catch(error){cancelError=error}
+  if(event.cancel!==true)throw cancelError??Error('Heavy Metal cancellation was not acknowledged');
+  return true;
  }catch(error){
-  if(token)release(id,token);
-  console.warn('[Grilling heavy metal admission] '+error);return false;
+  let cancelled;try{cancelled=event.cancel}catch{}
+  if(token){
+   if(cancelled===false){
+    // A scheduler may queue and then throw. Revoke its exact token before
+    // restoring only our receipt, and only after confirmed non-cancellation.
+    release(id,token);
+    try{restoreUncanceledClaim(entity,token)}catch(rollback){console.warn('[Grilling heavy metal claim retained] '+rollback)}
+   }else token.phase='quarantined'; // Unknown cancellation cannot refund protection.
+  }
+  console.warn('[Grilling heavy metal admission] '+error);return cancelled===true;
  }
 }

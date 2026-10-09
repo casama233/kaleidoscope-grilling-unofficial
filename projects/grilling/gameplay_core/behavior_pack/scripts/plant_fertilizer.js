@@ -1,6 +1,6 @@
 import {world,EquipmentSlot,GameMode,BlockPermutation,ItemStack} from '@minecraft/server';
 import {commitSteps} from './a277_grill_transaction_core.js';
-import {bonemealAgeIncrease} from './a2714_houttuynia_crop_core.js';
+import {bonemealAgeIncrease,javaCropGrowthSpeed,javaCropGrowthChance} from './a2714_houttuynia_crop_core.js';
 
 const BONE_MEAL='minecraft:bone_meal',OIL_RESIDUE='kaleidoscope_grilling:oil_residue';
 const handlers=new Map();
@@ -38,6 +38,11 @@ function writePermutation(block,permutation){
  block.setPermutation(permutation);
  return samePlantPermutation(block.permutation,permutation);
 }
+function readPlantLight(block){
+ const total=block.getLightLevel(),sky=block.getSkyLightLevel();
+ if(![total,sky].every(value=>Number.isInteger(value)&&value>=0&&value<=15))throw Error('Plant fertilizer light unavailable');
+ return {total,sky};
+}
 function growthJournal(){
  const observed=new Map(),deliveries=[];
  function observe(block){
@@ -47,8 +52,16 @@ function growthJournal(){
  }
  return {
   read(block){const entry=observe(block);return entry.after??entry.before;},
-  set(block,after){
-   observe(block).after=after;
+  set(block,after,{afterNeighbors=false}={}){
+   Object.assign(observe(block),{after,afterNeighbors});
+  },
+  light(block){
+   const entry=observe(block);
+   entry.light??=readPlantLight(block);
+   // Java getRawBrightness(pos,0) keeps un-subtracted sky light. Bedrock
+   // exposes total and sky brightness separately; their maximum is the
+   // bounded adapter, not a claim of tested night/weather equivalence.
+   return Math.max(entry.light.total,entry.light.sky);
   },
   drop(block,id,random){
    const stack=new ItemStack(id,1),p=block.location;
@@ -72,9 +85,17 @@ function growthJournal(){
     }
    });
   },
-  current(){return [...observed.values()].every(({block,before})=>samePlantPermutation(block.permutation,before));},
+  current(){return [...observed.values()].every(({block,before,light})=>{
+   if(!samePlantPermutation(block.permutation,before))return false;
+   if(!light)return true;
+   const current=readPlantLight(block);
+   return current.total===light.total&&current.sky===light.sky;
+  });},
   blocks(){return [...observed.values()].map(entry=>entry.block);},
-  steps(){return [...observed.values()].filter(entry=>entry.after).map(({block,before,after})=>({
+  steps(){return [...observed.values()].filter(entry=>entry.after)
+   // The fruit must exist before its stem is attached. Keep all existing
+   // handlers' ordering; only explicitly dependent writes move to the end.
+   .sort((a,b)=>Number(a.afterNeighbors)-Number(b.afterNeighbors)).map(({block,before,after})=>({
    apply:()=>writePermutation(block,after),rollback:()=>writePermutation(block,before)
   })).concat(deliveries);}
  };
@@ -180,8 +201,8 @@ registerPlantFertilizer('minecraft:pink_petals',(block,journal,random)=>{
  return true;
 });
 
-function plantNeighbor(block,journal,dy){
- const p=block.location,target=block.dimension.getBlock({x:p.x,y:p.y+dy,z:p.z});
+function plantNeighbor(block,journal,dy,dx=0,dz=0){
+ const p=block.location,target=block.dimension.getBlock({x:p.x+dx,y:p.y+dy,z:p.z+dz});
  // Missing/unloaded is not air and must not consume an unplanned attempt.
  if(!target)throw Error('Plant fertilizer neighbour unavailable');
  return {block:target,permutation:journal.read(target)};
@@ -229,5 +250,97 @@ for(const [id,tall] of [['minecraft:short_grass','minecraft:tall_grass'],['minec
  }
  // TallGrassBlock.isValidBonemealTarget/isBonemealSuccess are true even if
  // performBonemeal finds blocked headroom. Such an accepted use still costs 1.
+ return true;
+});
+
+// RootedDirtBlock only accepts air below and produces exactly one hanging
+// roots block. The second oil-residue pass sees occupied space and is invalid.
+registerPlantFertilizer('minecraft:dirt_with_roots',(block,journal)=>{
+ const below=plantNeighbor(block,journal,-1);
+ if(below.permutation.type.id!=='minecraft:air')return false;
+ journal.set(below.block,BlockPermutation.resolve('minecraft:hanging_roots'));
+ return true;
+});
+
+// Java Direction.Plane.HORIZONTAL order is NORTH, EAST, SOUTH, WEST. Only a
+// single direction is sampled; blocked sides do not cause a search/re-roll.
+const FERTILIZER_STEM_DIRECTIONS=Object.freeze([
+ Object.freeze({dx:0,dz:-1,facing:2}),Object.freeze({dx:1,dz:0,facing:5}),
+ Object.freeze({dx:0,dz:1,facing:3}),Object.freeze({dx:-1,dz:0,facing:4})
+]);
+function stemGrowthSpeed(block,journal,id){
+ const cells=[];
+ for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){
+  const {permutation}=plantNeighbor(block,journal,-1,dx,dz);
+  const typeId=permutation.type.id,moisture=permutation.getState('moisturized_amount');
+  if(typeId==='minecraft:farmland'&&(!Number.isInteger(moisture)||moisture<0||moisture>7))throw Error('Plant fertilizer soil state unavailable');
+  cells.push({typeId,moisture});
+ }
+ const sameStem=(dx,dz)=>{
+  const {permutation}=plantNeighbor(block,journal,0,dx,dz);
+  // Java AttachedStemBlock is a different block and is not a matching crop
+  // in getGrowthSpeed. Bedrock encodes that distinction in facing_direction.
+  return permutation.type.id===id&&permutation.getState('facing_direction')===0;
+ };
+ return javaCropGrowthSpeed(cells,{
+  west:sameStem(-1,0),east:sameStem(1,0),north:sameStem(0,-1),south:sameStem(0,1),
+  northWest:sameStem(-1,-1),northEast:sameStem(1,-1),southWest:sameStem(-1,1),southEast:sameStem(1,1)
+ });
+}
+for(const [id,fruit] of [['minecraft:melon_stem','minecraft:melon_block'],['minecraft:pumpkin_stem','minecraft:pumpkin']])registerPlantFertilizer(id,(block,journal,random)=>{
+ const permutation=journal.read(block),age=permutation.getState('growth');
+ if(!Number.isInteger(age)||age<0||age>=7||permutation.getState('facing_direction')!==0)return false;
+ const nextAge=Math.min(7,age+bonemealAgeIncrease(random())),grown=permutation.withState('growth',nextAge);
+ journal.set(block,grown);
+ // performBonemeal invokes randomTick only on the pass that first reaches
+ // seven. An already mature (even unattached) stem is never another attempt.
+ if(nextAge!==7||journal.light(block)<9)return true;
+ const speed=stemGrowthSpeed(block,journal,id);
+ if(random()>=javaCropGrowthChance(speed))return true;
+ const direction=FERTILIZER_STEM_DIRECTIONS[Math.floor(random()*4)];
+ const target=plantNeighbor(block,journal,0,direction.dx,direction.dz);
+ const support=plantNeighbor(block,journal,-1,direction.dx,direction.dz);
+ if(target.permutation.type.id!=='minecraft:air'||!FERTILIZER_GRASS_SOILS.has(support.permutation.type.id))return true;
+ journal.set(target.block,BlockPermutation.resolve(fruit));
+ journal.set(block,grown.withState('facing_direction',direction.facing),{afterNeighbors:true});
+ return true;
+});
+
+function netherVineGrowthLength(random){
+ let chance=1,length=0;
+ while(random()<chance){chance*=.826;length++;}
+ return length;
+}
+function netherVineTip(block,journal,id,ageState,dy){
+ let tip={block,permutation:journal.read(block)};
+ for(;;){
+  const age=tip.permutation.getState(ageState);
+  if(!Number.isInteger(age)||age<0||age>25)throw Error('Plant fertilizer vine age unavailable');
+  const next=plantNeighbor(tip.block,journal,dy);
+  if(next.permutation.type.id!==id)return {tip,next};
+  tip=next;
+ }
+}
+for(const [id,ageState,dy] of [
+ ['minecraft:twisting_vines','twisting_vines_age',1],
+ ['minecraft:weeping_vines','weeping_vines_age',-1]
+])registerPlantFertilizer(id,(block,journal,random)=>{
+ // Java body use locates its connected head. Bedrock stores both as one ID,
+ // so the terminal same-ID block is the head. Start each oil-residue pass at
+ // the original clicked block, reading the previous pass's virtual growth.
+ let {tip,next}=netherVineTip(block,journal,id,ageState,dy);
+ if(next.permutation.type.id!=='minecraft:air')return false;
+ const length=netherVineGrowthLength(random);
+ let age=Math.min(tip.permutation.getState(ageState)+1,25);
+ for(let i=0;i<length&&next.permutation.type.id==='minecraft:air';i++){
+  // The former head becomes Java's ageless body (Bedrock representative age
+  // zero). New heads increment to 25; age 25 still accepts bone meal even
+  // though it stops Java's natural random growth.
+  journal.set(tip.block,tip.permutation.withState(ageState,0));
+  const grown=BlockPermutation.resolve(id,{[ageState]:age});
+  journal.set(next.block,grown);
+  tip={block:next.block,permutation:grown};age=Math.min(age+1,25);
+  if(i+1<length)next=plantNeighbor(tip.block,journal,dy);
+ }
  return true;
 });
