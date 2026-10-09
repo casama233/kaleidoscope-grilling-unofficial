@@ -1,8 +1,8 @@
-# G121：三道 Grilling 炒菜的 Java exact／flex 生命周期
+# G122：三道 Grilling 炒菜的 Java exact／flex 生命周期
 
 來源基準、兩個 Java 分支的固定 revision、六條原配方與品質規格見
 [cookery-flex-pot-lifecycle-20261009.md](cookery-flex-pot-lifecycle-20261009.md)。
-本頁記錄 G121 的實作範圍；它不把程式檢查、配方註冊或宿主載入當成玩家／客戶端驗收。
+本頁記錄 [G122](../STATUS-A2.8.122.md) 的實作範圍；它不把程式檢查、配方註冊或宿主載入當成玩家／客戶端驗收。
 
 ## 固定來源與實際入口
 
@@ -20,7 +20,7 @@
 函式開頭新增短掛鉤，實作在 Grilling 自有 `host_api/pot_api_core.js`、`pot_api_host.js`。
 沒有覆蓋、公開完整第三方原腳本，也沒有新增輪詢器、站點副本或玩家測試入口。
 
-宿主擴充為 family API 0.2.8，宣告實際能力 `grilling_pot_exact_flex_v1`；
+宿主擴充為 family API 0.2.9，宣告實際能力 `grilling_pot_exact_flex_v1`；
 它表示本頁的三菜適配，不是任意 Java datapack 的通用 flex 配方 API。
 新炒鍋入口要先在宿主 `getWokRecipes()` 的實際已接受列表中看到三條 exact 配方，
 逐一核對 ID、result、count、time、carrier 與 ingredient slots。

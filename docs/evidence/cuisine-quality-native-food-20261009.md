@@ -1,6 +1,6 @@
-# G121：flex 品質、原生營養與成品資料保存
+# G122：flex 品質、原生營養與成品資料保存
 
-日期：2026-10-09。這份證據對應 G121 的自有品質模組、12 個內部食物變體、公開 food metadata、
+日期：2026-10-09。這份證據對應 [G122](../STATUS-A2.8.122.md) 的自有品質模組、12 個內部食物變體、公開 food metadata、
 冷卻／合併／食材快照與料理進食入口。完整炒鍋配方和階段交接由本版的 pot adapter 負責；
 本頁不把純 Java 結果、Script API 宣告或 JSON 食物值當成實機食用、保存世界或客戶端驗收。
 
@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | Grilling 1.1.1 | [`9a1acdab27698457bec16c9362678e574895a28c`](https://github.com/breezeth-CN/KaleidoscopeGrilling/tree/9a1acdab27698457bec16c9362678e574895a28c)；兩分支 `ModItems.dish`、`FlavorFoodItem`、`CuisineQualitySupport` | 三菜基礎營養 9／8／10、modifier 0.7／0.6／0.8；只有持有品質的成品才縮放 |
 | Java Cookery Forge 1.6.0 | [`2f4e386ce23f49a385ddf003c67fc6415c55417a`](https://github.com/KaleidoscopeMods/KaleidoscopeCookery/tree/2f4e386ce23f49a385ddf003c67fc6415c55417a)；`QualityEvaluator`、`Quality`、`QualityUtils` | 核對演算法與 Forge 的 modifier 縮放語義 |
-| Java Cookery NeoForge 1.6.0 | [`4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c`](https://github.com/KaleidoscopeMods/KaleidoscopeCookery/tree/4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c)；同組品質類別 | **G121 的實際品質營養目標採用維護中的 NeoForge 1.21.1**；縮放的是 `FoodProperties.saturation()` 恢復值 |
+| Java Cookery NeoForge 1.6.0 | [`4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c`](https://github.com/KaleidoscopeMods/KaleidoscopeCookery/tree/4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c)；同組品質類別 | **G122 的實際品質營養目標採用維護中的 NeoForge 1.21.1**；縮放的是 `FoodProperties.saturation()` 恢復值 |
 | Java 標準庫 | [Java Random](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Random.html) 與實際 JDK `Collections.shuffle` | 48-bit LCG、`nextInt` 的高區間拒絕、同一 RNG 的比例洗牌 |
 | Bedrock | [`minecraft:food`](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponents/minecraft_food?view=minecraft-bedrock-stable)、[`World.seed`](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/world?view=minecraft-bedrock-stable#seed) | 原生營養與 modifier；世界種子直接讀十進位字串 |
 | 原生食用事件 | [`ItemUseBeforeEvent`](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemusebeforeevent?view=minecraft-bedrock-stable)、[`ItemCompleteUseAfterEvent`](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemcompleteuseafterevent?view=minecraft-bedrock-stable)、[`ItemStack`](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/minecraft/server/itemstack?view=minecraft-bedrock-stable) | 開始前可取消；完成事件提供實際使用物品；完整公開快照只在 after-event 讀取 |

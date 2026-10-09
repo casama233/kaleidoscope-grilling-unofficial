@@ -5,19 +5,21 @@ import subprocess
 from copy import deepcopy
 import re
 import struct
+import sys
 PROFILE_SOURCE=json.loads(re.search(r"PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)",subprocess.check_output(["git","show","d795c0e:projects/grilling/gameplay_core/behavior_pack/scripts/data.js"],cwd=Path(__file__).resolve().parents[2]).decode()).group(1))
 ALL_EATING_ITEMS={k.split(':')[1] for k in PROFILE_SOURCE}|{'secret_skewer'}
 RANDOM_ITEMS={k.split(":")[1] for k,v in PROFILE_SOURCE.items() if v=="THREE_RANDOM"}|{"secret_skewer"}
 from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
+from public_source_witness import CUISINE_CANDIDATE_BASE, cuisine_release_link
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
 BASE='1cf16f39f449ee5ce95190ef9088e575d133f928'  # Merged 2.8.45 runtime, including the prior repairs.
 LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
 PREVIOUS_GUIDE_BASE='f7bd2d26367c113ab8881bc67e9f5e69624917ff'
 REVIEWED_GUIDE_BASE='8099dc2d211e79c881548a2abc90c06e6c876dc5'
 CURRENT_GUIDE_BASE='187e179d58f48fbc9b4d57b5f01cff90b7489ee6'
-CUISINE_GUIDE_BASE='f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
 QUALITY_CUISINE_ITEMS = frozenset({'houttuynia_stir_fried_pork', 'green_pepper_squid_tentacles', 'braised_chicken_wings'})
 QUALITY_TOOLTIP_KEYS = frozenset('tooltip.kaleidoscope_grilling.cuisine_quality.' + name for name in ('superb', 'excellent', 'standard', 'poor'))
 LABELS = {'en_US': 'Kaleidoscope Grilling', 'zh_CN': '森罗物语烟火',
@@ -94,7 +96,9 @@ def main():
     bottle_eligibility = set()
     quality_aliases = set()
     quality_food = {}
-    if version >= (2,8,121):
+    if version >= (2,8,122):
+        cuisine_link = cuisine_release_link()
+        cuisine_source = cuisine_link['reviewed_commit']
         oracle = json.loads((ROOT / 'development/gameplay_core/fixtures/java-cuisine-quality-160.json').read_text())
         quality_food = {(row['baseId'].split(':',1)[1],row['quality']): row for row in oracle['neoforge_nutrition']}
         assert len(oracle['neoforge_nutrition']) == len(quality_food) == 12
@@ -104,8 +108,7 @@ def main():
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
             cuisine = re.fullmatch(r'(.+)_cuisine_q([0-3])', path.stem) if kind == 'item' else None
             if cuisine:
-                assert version >= (2,8,121) and cuisine.group(1) in QUALITY_CUISINE_ITEMS, 'Unreviewed cuisine alias: ' + str(path)
-                assert not CUISINE_GUIDE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
+                assert version >= (2,8,122) and cuisine.group(1) in QUALITY_CUISINE_ITEMS, 'Unreviewed cuisine alias: ' + str(path)
                 stem,quality = cuisine.group(1),int(cuisine.group(2))
                 expected = json.loads(path.with_name(stem+'.json').read_bytes())
                 item = expected['minecraft:item']
@@ -119,7 +122,7 @@ def main():
                 item['components']['minecraft:food']['saturation_modifier'] = struct.unpack('!f',struct.pack('!f',food['saturationGain']/(2*food['nutrition'])))[0]
                 actual = json.loads(path.read_bytes())
                 assert actual == expected, 'Cuisine alias changed unrelated base behaviour: ' + str(path)
-                assert actual == json.loads(prior(path,CUISINE_GUIDE_BASE)), 'Cuisine alias differs from reviewed public source: ' + str(path)
+                assert path.read_bytes() == prior(path,CUISINE_CANDIDATE_BASE) == prior(path,cuisine_source), 'Cuisine alias differs from its exact candidate/public release source: ' + str(path)
                 quality_aliases.add(path.stem)
                 continue
             if kind == 'item' and path.stem == 'pepper_leaves':
@@ -203,7 +206,7 @@ def main():
             count += 1
         counts[kind] = count
     assert counts == {'item': 156, 'block': 18}, counts
-    assert quality_aliases == ({f'{stem}_cuisine_q{quality}' for stem in QUALITY_CUISINE_ITEMS for quality in range(4)} if version >= (2,8,121) else set()), 'Missing/unexpected cuisine quality aliases'
+    assert quality_aliases == ({f'{stem}_cuisine_q{quality}' for stem in QUALITY_CUISINE_ITEMS for quality in range(4)} if version >= (2,8,122) else set()), 'Missing/unexpected cuisine quality aliases'
     if version >= (2, 8, 61):
         assert bottle_eligibility == BOTTLES, 'Missing/unexpected bottle eligibility route'
         assert check_authoring() == 67
@@ -291,24 +294,28 @@ def main():
                     guide_added.add(key)
             assert len(guide_added) == 13
             approved.update(changes)
-        if version >= (2,8,121):
-            assert not CUISINE_GUIDE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
-            delta = json.loads((ROOT / 'tools/fixtures/g121-guide-reviewed-delta.json').read_text())
+        if version >= (2,8,122):
+            # This unchanged fixture records an unmerged proposal labeled G121.
+            # Its exact text becomes active only in the linked G122 release.
+            delta = json.loads((ROOT / 'tools/fixtures' / cuisine_link['candidate_fixtures']['language']).read_text())
             assert delta['schema'] == 1 and delta['release'] == [2,8,121]
             assert delta['previous_public_commit'] == CURRENT_GUIDE_BASE
-            assert delta['reviewed_commit'] == CUISINE_GUIDE_BASE
+            assert delta['reviewed_commit'] == CUISINE_CANDIDATE_BASE
             assert set(delta['locales']) == set(LABELS)
             changes = delta['locales'][locale]
             expected_keys = {f'guide.kg.body.kaleidoscope_grilling:{stem}.{n}' for stem in QUALITY_CUISINE_ITEMS for n in range(1,8)}
             expected_keys |= {f'guide.kg.body.kaleidoscope_grilling:oil_residue.{n}' for n in (3,6)} | QUALITY_TOOLTIP_KEYS
-            assert set(changes) == expected_keys, 'Reviewed G121 language scope changed'
-            cuisine_reviewed = language(prior(path,CUISINE_GUIDE_BASE))
+            assert set(changes) == expected_keys, 'Reviewed cuisine candidate language scope changed'
+            cuisine_reviewed = language(prior(path,CUISINE_CANDIDATE_BASE))
+            published = prior(path,cuisine_source)
+            assert language(published) == cuisine_reviewed, 'G122 changed the exact reviewed cuisine language values'
+            assert path.read_bytes() == published, 'G122 language differs from its published source bytes'
             assert {key for key in set(latest_reviewed) | set(cuisine_reviewed)
-                if latest_reviewed.get(key) != cuisine_reviewed.get(key)} == expected_keys, 'G121 language witness changed outside reviewed scope'
+                if latest_reviewed.get(key) != cuisine_reviewed.get(key)} == expected_keys, 'Cuisine candidate language witness changed outside reviewed scope'
             for key, change in changes.items():
                 assert set(change) == {'before', 'after'}
-                assert latest_reviewed.get(key) == change['before'], 'Reviewed G121 language preimage drift'
-                assert cuisine_reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G121 language delta drift'
+                assert latest_reviewed.get(key) == change['before'], 'Reviewed cuisine candidate language preimage drift'
+                assert cuisine_reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G122 cuisine language delta drift'
                 if change['before'] is None:
                     assert key not in old and key not in approved
                     (quality_added if key in QUALITY_TOOLTIP_KEYS else guide_added).add(key)

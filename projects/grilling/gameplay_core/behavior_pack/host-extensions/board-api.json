@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "id": "kaleidoscope_grilling:family-api-0.2.8",
+  "id": "kaleidoscope_grilling:family-api-0.2.9",
   "version": [
     0,
     2,
-    8
+    9
   ],
   "host_uuid": "5df753c9-3436-4fba-87f1-a2da3651cfcf",
   "archive_sha256": "da12fe6d39d7514aff1de3c963d69899324d771be5ca0fc3da1ccb759c7ad458",
@@ -24,7 +24,7 @@
     "scripts/custom_components/blocks/oilPot.js": "862c3b196283e315c5862a66584acf7b0c2620fc494515d0aad196f7e2470f86",
     "items/kitchen/oil_pot.json": "fba383920613d0e153bfd1438eaf2825b97bbce2c26486995448b14d35b83f0f",
     "items/kitchen/oil_pot_filled.json": "0296061e7db00b0979303f6800f829daf628cab4929e7e0825125a3a470ff7f3",
-    "scripts/events/guidebook.js": "b2db327bddc9cca6844205a8ca4c66c29324f9211521c0b3e6fd6f1a70e606ae",
+    "scripts/events/guidebook.js": "8ee82b40ac619fcb246c03f8bb02884c9a02855171d99da9051e187d7a2c19aa",
     "scripts/events/foodItemReturns.js": "ad96f8eef52d0177f75fbdd67bb1d3ca274ce1b7850e848e5c4a4a99421cdc1b",
     "scripts/data/foodEffects.js": "4aed9ce799da391410c7d12a7cd22677c5b2a8ad2d7cf5ddbf4b4f70f78c4694"
   },
@@ -32,7 +32,7 @@
     "scripts/api/extensionRegistry.js": "import {BOARD_CAPABILITIES,registerBoardV2Recipe} from \"./board_api_runtime.js\";\nimport {OIL_CAPABILITIES} from \"./oil_api_core.js\";\nimport {CUISINE_CAPABILITIES} from \"./cuisine_api_host.js\";\nimport {GUIDE_CAPABILITIES} from \"./guide_labels_core.js\";\nimport {INGREDIENT_CAPABILITIES} from \"./ingredient_api_host.js\";\nimport {JAVA_POT_CAPABILITIES} from \"./pot_api_host.js\";\n",
     "scripts/custom_components/blocks/directStation.js": "import {handleBoardV2,recoverBoardV2} from \"../../api/board_api_runtime.js\";\nimport {giveCuisineOutput,consumeCuisineCarrier,nextCuisineBatch,recoverCuisineOutput,prepareCuisineBurn,giveBurntCuisineOutput} from \"../../api/cuisine_api_host.js\";\nimport {lastConsumedOil,handleSharedStationOil} from \"../../api/oil_api_host.js\";\nimport {handleJavaPotInteract,handleJavaPotTick,recoverJavaPot} from \"../../api/pot_api_host.js\";\n",
     "scripts/custom_components/blocks/oilPot.js": "import {publishHostOil,hostOilCountOverride,sharedPlacedCount,updateSharedPlacedCount,consumeSharedOilFromHeldPot,captureSharedOilPlacement,handleSharedPlacedOil,recoverSharedOilPot} from \"../../api/oil_api_host.js\";\n",
-    "scripts/events/guidebook.js": "import {publicMethodLabel,publicExtensionName} from \"../api/guide_labels_core.js\";\nconst authorGuidebookItemName=guidebookItemName,authorRecipeIngredientName=recipeIngredientName;\n",
+    "scripts/events/guidebook.js": "import {publicMethodLabel,publicExtensionName,createTavernGuideBridge} from \"../api/guide_labels_core.js\";\nconst authorGuidebookItemName=guidebookItemName,authorRecipeIngredientName=recipeIngredientName;\nconst tavernGuideBridge=createTavernGuideBridge({system,world,onReturn:player=>showMain(player)});\n",
     "scripts/events/foodItemReturns.js": "import {registerAuthorFoodReturns} from \"../api/ingredient_api_host.js\";\n",
     "scripts/data/foodEffects.js": "import {registerAuthorFoodEffects} from \"../api/ingredient_api_host.js\";\n"
   },
@@ -306,6 +306,12 @@
       "anchor": "function spillDirectStationContents(id,b,d){",
       "position": "after",
       "text": "\n if(recoverJavaPot(id,b,d,javaPotHost())){clearDisplays(b);syncPotStates(b,{});return;}"
+    },
+    {
+      "path": "scripts/events/guidebook.js",
+      "anchor": "async function showExtensionMain(player, extensionId) {",
+      "position": "after",
+      "text": "\n if(await tavernGuideBridge.open(player,extensionId,guidebookLocaleCode(player)))return;"
     }
   ],
   "copies": {
@@ -323,9 +329,9 @@
     "scripts/host_api/cuisine_quality_core.js": "scripts/api/cuisine_quality_core.js"
   },
   "expires": "2026-11-02",
-  "removal_condition": "Remove each reviewed hook when the pinned author release provides tested portable oil item/placed-state, output receipts and board contracts. Re-review every author update; preserve author identities.",
+  "removal_condition": "Remove each reviewed hook when the pinned author release provides tested portable oil item/placed-state, output receipts, board contracts and shared Tavern guide projection. Re-review every author update; preserve author identities.",
   "feedback": "docs/COOKERY-FAMILY-API-PROPOSAL.md",
-  "authorization": "User 2026-10-06 explicitly requires Cookery 1.6.0 adaptation, canonical Git repairs and full-family live deployment.",
+  "authorization": "User 2026-10-06 explicitly requires Cookery 1.6.0 adaptation, canonical Git repairs and full-family live deployment. User 2026-10-09 requires a complete readable Tavern guide renovation, retaining the shared independent and optional Cookery projection.",
   "json_updates": [
     {
       "path": "items/kitchen/oil_pot.json",

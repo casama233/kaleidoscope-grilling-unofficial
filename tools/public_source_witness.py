@@ -110,7 +110,8 @@ REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
 REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
 REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
 REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
-REVIEWED_CUISINE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
+CUISINE_CANDIDATE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
+REVIEWED_CUISINE_BASE = 'PENDING_G122_PUBLIC_SOURCE_WITNESS'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -215,21 +216,48 @@ def _g119_remaining_bytes(expected):
 
 
 @lru_cache(maxsize=1)
-def _reviewed_cuisine_source():
-    assert not REVIEWED_CUISINE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
-    return subprocess.check_output(['git', 'show', REVIEWED_CUISINE_BASE + ':' + MAIN_PATH], cwd=ROOT)
+def _cuisine_candidate_source():
+    return subprocess.check_output(['git', 'show', CUISINE_CANDIDATE_BASE + ':' + MAIN_PATH], cwd=ROOT)
 
 
-def _g121_cuisine_bytes(expected):
-    # G120 retained the exact public G119 main.js. Append only the seven
-    # quality admission/use-ownership edits; no earlier witness is replaced.
+def _cuisine_candidate_bytes(expected):
+    # Preserve the exact, unmerged cuisine proposal and its original fixture.
+    # Its G121 label is candidate history: the released G121 retained G120.
     delta = _main_delta('g121-main-reviewed-delta.json')
     assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 121]
     assert delta['previous_public_commit'] == REVIEWED_REMAINING_BASE
-    assert delta['reviewed_commit'] == REVIEWED_CUISINE_BASE
-    assert len(delta['operations']) == 7, 'Reviewed G121 source requires exactly seven edits'
+    assert delta['reviewed_commit'] == CUISINE_CANDIDATE_BASE
+    assert len(delta['operations']) == 7, 'Reviewed cuisine candidate requires exactly seven edits'
     repaired = _apply_main_operations(expected, delta)
-    assert repaired == _reviewed_cuisine_source(), 'Reviewed G121 source differs outside cuisine deltas'
+    assert repaired == _cuisine_candidate_source(), 'Reviewed cuisine candidate differs outside cuisine deltas'
+    return repaired
+
+
+def cuisine_release_link():
+    link = json.loads((ROOT / 'tools/fixtures/g122-cuisine-release-link.json').read_text())
+    assert link['schema'] == 1 and link['release'] == [2, 8, 122]
+    assert link['previous_release'] == [2, 8, 121]
+    assert link['candidate_status'] == 'unmerged'
+    assert link['candidate_commit'] == CUISINE_CANDIDATE_BASE
+    assert link['candidate_fixtures'] == {
+        'main': 'g121-main-reviewed-delta.json',
+        'language': 'g121-guide-reviewed-delta.json',
+    }, 'G122 candidate fixture scope changed'
+    assert link['reviewed_commit'] == REVIEWED_CUISINE_BASE
+    assert not REVIEWED_CUISINE_BASE.startswith('PENDING'), 'G122 public cuisine witness is pending publication'
+    return link
+
+
+@lru_cache(maxsize=1)
+def _reviewed_cuisine_source():
+    link = cuisine_release_link()
+    return subprocess.check_output(['git', 'show', link['reviewed_commit'] + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g122_cuisine_bytes(expected):
+    repaired = _cuisine_candidate_bytes(expected)
+    cuisine_release_link()
+    assert repaired == _reviewed_cuisine_source(), 'G122 public source differs from the exact cuisine candidate'
     return repaired
 
 
@@ -335,8 +363,10 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _g118_parity_bytes(expected)
         if version >= (2, 8, 119):
             expected = _g119_remaining_bytes(expected)
-        if version >= (2, 8, 121):
-            expected = _g121_cuisine_bytes(expected)
+        # Released G121 adds the shared Tavern entrance and retains G120 main.
+        # The separately reviewed cuisine candidate first enters release G122.
+        if version >= (2, 8, 122):
+            expected = _g122_cuisine_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)
