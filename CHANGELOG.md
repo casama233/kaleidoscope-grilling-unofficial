@@ -1,5 +1,11 @@
 # 維護變更
 
+## 2.8.124：調料資料重新載入與共用效果映射
+
+修復准入及食用效果寫死的來源差距。既有 Server-only integration API 接收有序調料資料根，保存讀回及失敗回滾共用原登記交易；舊 v1 存檔缺欄位仍可載入。原有食物的 ingredient IDs 不改寫，使用時依目前映射計數；main、HUD 與准入共享同一 resolver，預設資料不再另複製一份。
+
+包／模組及自有相依 2.8.124、指南 0.3.54；Cookery 1.6.0 與 family API 0.2.10 保留。沒有新增 Cookery 私有 producer 掛鉤、替換宿主全文或自動讀取 Java datapack。必要來源檢查、provider 及真人限制見 [G124](docs/STATUS-A2.8.124.md)。舊候選 Native／LIVE 證據保持原身份。
+
 ## 2.8.123：保留指南三語正文
 
 原 Cookery 1.6.0 的 Guidebook Extension registry 將 `mechanicsByLocale` 鍵套用小寫 token 驗證，丟棄 `zh_CN`／`zh_TW`／`en_US`。自有 `publicGuideLocale` 透過已登記的局部掛鉤保留標準語言鍵；分類、source、revision 等驗證不變。包／模組 2.8.123、指南 0.3.53、family API 0.2.10，保留 G122 玩法與作者身份。
