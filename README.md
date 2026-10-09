@@ -1,8 +1,10 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.120
+## Current maintained baseline: 2.8.121
 
-[G120持久化與出料修補](docs/STATUS-A2.8.120.md)：重金屬在取消傷害前保存並確認防重複結算記錄，
+[G121酒館指南共用入口](docs/STATUS-A2.8.121.md)：Cookery 的酒館章節交由酒館顯示同一份指南，
+以玩家來源與限時交接確認避免重複視窗；關閉不重開，返回才回 Cookery。
+承接[G120持久化與出料修補](docs/STATUS-A2.8.120.md)：重金屬在取消傷害前保存並確認防重複結算記錄，
 油渣新增瓜梗、纏根土及兩種下界藤，明列 23 類植物適配；料理工作站補取消保存與出料收據守恆。
 承接[G119剩餘差異修補](docs/STATUS-A2.8.119.md)：手持餐盤內容與獨立份數解碼，
 共用每手顯示通道，擴充原版植物施肥，並將重金屬保命改為一次確認提交。
