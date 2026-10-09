@@ -46,6 +46,12 @@ function oilItemSnapshot(stack){
   canPlaceOn:stack.getCanPlaceOn?.()??[],canDestroy:stack.getCanDestroy?.()??[]};
 }
 const sameOilItem=(a,b)=>stable(oilItemSnapshot(a))===stable(oilItemSnapshot(b));
+function ownsOilItem(actual,expected){
+ if(!sameOilItem(actual,expected))return false;if(!expected)return true;
+ // Persisted/exposed fields alone cannot authorize replacing a native item.
+ // Nonstackable or unreadable native identity retains the debit for recovery.
+ try{return expected.isStackableWith(expected.clone())===true&&actual.isStackableWith(expected)===true}catch{return false}
+}
 function writeOilReceipt(k,value){
  let failure;try{world.setDynamicProperty(k,value)}catch(e){failure=e}
  // A throwing writer may already have committed. Readback, not its return,
@@ -80,28 +86,39 @@ function acknowledgeOilDebit(k){
  }
 }
 
-export function consumeSharedOilSlot(slot,points=1,creative=false,{ownerId,retainReceipt=false,context}={}){
+export function consumeSharedOilSlot(slot,points=1,creative=false,{ownerId,retainReceipt=false,context,expected}={}){
  const recoveryKey=oilOwnerKey(ownerId);
  try{
   requireOilOwner(recoveryKey);
   const held=slot?.hasItem()?slot.getItem():undefined,read=readHostOilItem(held,{legacyFull:true});
   if(!read.valid||held?.typeId!==FILLED_POT)return {ok:false};
+  if(expected!==undefined&&!sameOilItem(held,expected))return {ok:false,reason:'oil source changed before debit'};
   const plan=planPublicOilConsumption(read.state,points);if(!plan.ok)return plan;
   const consumedType=read.state.type,heatTicks=consumedType==='premium_chili'?24000:consumedType==='secret_chili'?12000:1200;
   if(creative)return {ok:true,consumedType,heatTicks,remaining:read.state.count};
   const next=createPublicOilPot(ItemStack,plan.state.type,plan.state.count,held,plan.state.revision);next.setDynamicProperty(ITEM_KEY,plan.state.count||undefined);
-  const before=held.clone();beginOilDebit(recoveryKey,before,next,context);
+  const before=held.clone();beginOilDebit(recoveryKey,before,next,context);let handAttempted=false;
   try{
+   if(!sameOilItem(slot?.hasItem()?slot.getItem():undefined,before))throw Error('oil hand owner changed before debit');
+   handAttempted=true;
    if(slot.setItem(next)===false||!sameOilItem(slot.getItem(),next))throw Error('oil hand readback');
   }catch(error){
    try{
-    if(slot.setItem(before)===false||!sameOilItem(slot.getItem(),before))throw Error('oil hand rollback not acknowledged');
+    if(handAttempted){
+     const actual=slot?.hasItem()?slot.getItem():undefined;
+     if(!ownsOilItem(actual,before)){
+      if(!ownsOilItem(actual,next))throw Error('oil hand rollback ownership changed');
+      let failure;try{slot.setItem(before)}catch(error){failure=error}
+      if(!ownsOilItem(slot?.hasItem()?slot.getItem():undefined,before))throw failure??Error('oil hand rollback not acknowledged');
+     }
+    }
     finishOilDebit(recoveryKey);
    }catch(rollback){return {ok:false,recoveryRequired:true,recoveryKey,reason:String(error),rollback:String(rollback)}}
    return {ok:false,recoveryRequired:false,reason:String(error)};
   }
   const recoveryPending=!retainReceipt&&acknowledgeOilDebit(recoveryKey);
-  return {ok:true,consumedType,heatTicks,remaining:plan.state.count,...(retainReceipt?{recoveryKey}:{}),...(recoveryPending?{recoveryPending:true}:{})};
+  // Native clones remain ephemeral; public receipts are bounded fingerprints.
+  return {ok:true,consumedType,heatTicks,remaining:plan.state.count,...(retainReceipt?{recoveryKey,nativeBefore:before,nativeAfter:next.clone()}:{}),...(recoveryPending?{recoveryPending:true}:{})};
  }catch(error){return {ok:false,recoveryRequired:oilRecoveryPending(recoveryKey),recoveryKey,reason:String(error)};}
 }
 export function consumeSharedOilFromHeldPot(player){
@@ -113,19 +130,46 @@ export function consumeSharedOilFromHeldPot(player){
 export function commitSharedStationOil(b,slot,data,host,{creative=false,ownerId}={}){
  const faultKey='senluo:oil_station_fault:'+key('',b);
  if(oilStationFaults.has(faultKey)||world.getDynamicProperty(faultKey)!==undefined)throw Error('oil station requires recovery');
- const before=slot?.hasItem()?slot.getItem()?.clone():undefined,saved=JSON.parse(JSON.stringify(data));
- const result=consumeSharedOilSlot(slot,1,creative,{ownerId,retainReceipt:true,context:{station:location(b)}});if(!result.ok)return result;
+ if(typeof host.raw!=='function')throw Error('oil station raw readback unavailable');
+ const captured=slot?.hasItem()?slot.getItem()?.clone():undefined,saved=JSON.parse(JSON.stringify(data)),savedRaw=host.raw(b);
+ const encoded=value=>Object.keys(value).length?JSON.stringify(value):undefined;
+ if(savedRaw!==encoded(saved))throw Error('oil station source changed');
+ const result=consumeSharedOilSlot(slot,1,creative,{ownerId,retainReceipt:true,context:{station:location(b)},expected:captured});if(!result.ok)return result;
+ const {nativeBefore:before,nativeAfter:debited,...summary}=result;let stationAttempted=false,expectedState;
  try{
+  if(!creative&&(!before||!debited||!sameOilItem(slot?.hasItem()?slot.getItem():undefined,debited)))throw Error('oil debit postimage changed');
+  if(host.raw(b)!==savedRaw)throw Error('oil station owner changed after debit');
   data.oil=true;data.grillingOilType=result.consumedType;data.oilTicks=result.heatTicks;
-  host.save(b,data);const actual=host.load(b);
-  if(!actual.oil||actual.grillingOilType!==data.grillingOilType||actual.oilTicks!==data.oilTicks)throw Error('oil station save not acknowledged');
+  host.prepareState?.(data);expectedState=encoded(data);
+  if(host.raw(b)!==savedRaw)throw Error('oil station owner changed before save');
+  stationAttempted=true;host.save(b,data);
+  if(host.raw(b)!==expectedState)throw Error('oil station save not acknowledged');
   host.sync(b,data);
  }catch(error){
-  const rollback=[];
-  // Attempt both compensations even when one fails. Never abandon saved state
-  // restoration merely because the hand writer rejected its rollback.
-  if(!creative)try{if(slot.setItem(before)===false||!sameOilItem(slot.getItem(),before))throw Error('oil hand rollback');}catch(e){rollback.push(String(e))}
-  try{host.save(b,saved);if(stable(host.load(b))!==stable(saved))throw Error('oil station rollback');host.sync(b,saved);Object.keys(data).forEach(k=>delete data[k]);Object.assign(data,saved);}catch(e){rollback.push(String(e))}
+  const rollback=[];let stateRestored=false;
+  // The station may own oil after a write-then-throw. Remove/read back that
+  // ownership FIRST. An unknown or failed state rollback cannot refund its cost.
+  try{
+   const actual=host.raw(b);
+   if(actual===savedRaw)stateRestored=true;
+   else{
+    if(!stationAttempted||actual!==expectedState)throw Error('oil station rollback ownership changed');
+    let failure;try{host.save(b,saved)}catch(e){failure=e}
+    if(host.raw(b)!==savedRaw)throw failure??Error('oil station rollback readback');
+    stateRestored=true;
+   }
+   Object.keys(data).forEach(k=>delete data[k]);Object.assign(data,saved);
+   try{host.sync(b,saved)}catch(e){console.warn('[Cookery Oil API] restored state visual deferred '+e)}
+  }catch(e){rollback.push(String(e))}
+  if(stateRestored&&!creative)try{
+   const actual=slot?.hasItem()?slot.getItem():undefined;
+   if(!ownsOilItem(actual,before)){
+    if(!debited||!ownsOilItem(actual,debited))throw Error('oil hand rollback ownership changed');
+    let failure;try{slot.setItem(before)}catch(e){failure=e}
+    if(!ownsOilItem(slot?.hasItem()?slot.getItem():undefined,before))throw failure??Error('oil hand rollback readback');
+   }
+  }catch(e){rollback.push(String(e))}
+  if(!stateRestored&&!rollback.length)rollback.push('oil station rollback unproven; debit retained');
   if(!rollback.length&&result.recoveryKey)try{finishOilDebit(result.recoveryKey)}catch(e){rollback.push(String(e))}
   if(rollback.length){
    oilStationFaults.add(faultKey);
@@ -134,7 +178,7 @@ export function commitSharedStationOil(b,slot,data,host,{creative=false,ownerId}
   throw error;
  }
  const recoveryPending=result.recoveryKey&&acknowledgeOilDebit(result.recoveryKey);
- return {...result,...(recoveryPending?{recoveryPending:true}:{})};
+ return {...summary,...(recoveryPending?{recoveryPending:true}:{})};
 }
 export function handleSharedStationOil(b,p,data,host){
  try{const result=commitSharedStationOil(b,hand(p),data,host,{creative:p?.getGameMode?.()===GameMode.Creative,ownerId:p?.id});if(result.recoveryRequired)notice(p,'unavailable');}catch(e){notice(p,'unavailable');console.warn('[Cookery Oil API] station retained '+e)}return true;

@@ -36,7 +36,7 @@ function wok(recipe){
    api:KC_API,kind:'wok',source:SOURCE,
    recipe:Object.freeze({
     id:recipe.id,ingredients:Object.freeze([...recipe.ingredients]),
-    result:recipe.result,count:recipe.count,carrier:recipe.carrier,time:recipe.time
+    result:recipe.result,count:recipe.count,carrier:recipe.carrier,time:recipe.time,stirs:recipe.stirs
    })
   })
  });

@@ -16,7 +16,7 @@ system.runTimeout(async()=>{try{
   check(JSON.parse(world.getDynamicProperty(key('qa-oil38-normal'))).phase==='committed','terminal receipt');
   const uncertain=inventory.getSlot(1);uncertain.setItem(make('secret_chili',8));let writes=0;
   const fault={hasItem:()=>uncertain.hasItem(),getItem:()=>uncertain.getItem(),setItem(s){writes++;if(writes===1){uncertain.setItem(s);throw Error('injected applied debit')}if(writes===2)throw Error('injected rollback rejection');uncertain.setItem(s)}};
-  const savedKey='qa:oil_recovery38_station',host={save(_b,state){world.setDynamicProperty(savedKey,JSON.stringify(state))},load(){return JSON.parse(world.getDynamicProperty(savedKey)??'{}')},sync(){}};
+  const savedKey='qa:oil_recovery38_station',host={save(_b,state){world.setDynamicProperty(savedKey,JSON.stringify(state))},load(){return JSON.parse(world.getDynamicProperty(savedKey)??'{}')},raw(){return world.getDynamicProperty(savedKey)},sync(){}};
   const failed=commitSharedStationOil(b,fault,{},host,{ownerId:OWNER});check(!failed.ok&&failed.recoveryRequired,'unresolved debit');check(count(uncertain)===7,'one uncertain debit only');check(world.getDynamicProperty(savedKey)===undefined,'station not credited');
   const receipt=JSON.parse(world.getDynamicProperty(key(OWNER)));check(receipt.phase==='prepared','durable prepared');check(receipt.before.properties['qa:keepsake']==='preserved','original metadata retained');
   const replacement=inventory.getSlot(2);replacement.setItem(make('canola',20));check(!consumeSharedOilSlot(replacement,1,false,{ownerId:OWNER}).ok,'other slot blocked');check(count(replacement)===20,'replacement unchanged');

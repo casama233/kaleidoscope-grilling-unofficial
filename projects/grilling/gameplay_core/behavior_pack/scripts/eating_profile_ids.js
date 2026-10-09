@@ -1,10 +1,12 @@
 import {PROFILE_BY_ITEM} from './data.js';
+import {canonicalCuisineFoodId} from './host_api/cuisine_quality_core.js';
 export const ALT_SUFFIX='_java_three_alt';
 export const PLAIN_SUFFIX='_native_plain';
 export const SKEWER_EATING_IDS=new Set([...Object.keys(PROFILE_BY_ITEM),'kaleidoscope_grilling:secret_skewer']);
 export const RANDOM_EATING_IDS=new Set([...Object.keys(PROFILE_BY_ITEM).filter(id=>PROFILE_BY_ITEM[id]==='THREE_RANDOM'),'kaleidoscope_grilling:secret_skewer']);
 export function canonicalFoodId(id){
  if(typeof id!=='string')return id;
+ const cuisine=canonicalCuisineFoodId(id);if(cuisine!==id)return cuisine;
  if(id.endsWith(PLAIN_SUFFIX)){const base=id.slice(0,-PLAIN_SUFFIX.length);if(SKEWER_EATING_IDS.has(base))return base;}
  const base=id.endsWith(ALT_SUFFIX)?id.slice(0,-ALT_SUFFIX.length):id;return RANDOM_EATING_IDS.has(base)?base:id;
 }

@@ -1,6 +1,7 @@
 import {world,EquipmentSlot,GameMode,BlockPermutation,ItemStack} from '@minecraft/server';
 import {commitSteps} from './a277_grill_transaction_core.js';
 import {bonemealAgeIncrease,javaCropGrowthSpeed,javaCropGrowthChance} from './a2714_houttuynia_crop_core.js';
+import {createOwnedPlantWrite,plantFertilizerSteps} from './plant_fertilizer_transaction_core.js';
 
 const BONE_MEAL='minecraft:bone_meal',OIL_RESIDUE='kaleidoscope_grilling:oil_residue';
 const handlers=new Map();
@@ -34,14 +35,18 @@ export function samePlantPermutation(a,b){
  const actual=a.getAllStates(),expected=b.getAllStates();
  return Object.keys(actual).length===Object.keys(expected).length&&Object.keys(expected).every(key=>actual[key]===expected[key]);
 }
-function writePermutation(block,permutation){
- block.setPermutation(permutation);
- return samePlantPermutation(block.permutation,permutation);
-}
 function readPlantLight(block){
  const total=block.getLightLevel(),sky=block.getSkyLightLevel();
  if(![total,sky].every(value=>Number.isInteger(value)&&value>=0&&value<=15))throw Error('Plant fertilizer light unavailable');
  return {total,sky};
+}
+function readPlantWaterlogged(block){
+ const value=block.isWaterlogged;
+ if(typeof value!=='boolean')throw Error('Plant fertilizer water state unavailable');
+ return value;
+}
+function samePlantSnapshot(actual,expected){
+ return actual.waterlogged===expected.waterlogged&&samePlantPermutation(actual.permutation,expected.permutation);
 }
 function growthJournal(){
  const observed=new Map(),deliveries=[];
@@ -54,6 +59,11 @@ function growthJournal(){
   read(block){const entry=observe(block);return entry.after??entry.before;},
   set(block,after,{afterNeighbors=false}={}){
    Object.assign(observe(block),{after,afterNeighbors});
+  },
+  dry(block){
+   const entry=observe(block);
+   entry.waterlogged??=readPlantWaterlogged(block);
+   return entry.waterlogged===false;
   },
   light(block){
    const entry=observe(block);
@@ -69,24 +79,30 @@ function growthJournal(){
    // item entity's half-height (.125) removed from the vertical position.
    const location={x:p.x+.25+random()*.5,y:p.y+.125+random()*.5,z:p.z+.25+random()*.5};
    if(!world.gameRules.doTileDrops)return;
-   let entity,attempted=false,acknowledged=false;
+   let entity,entityId,attempted=false,acknowledged=false;
    deliveries.push({
     apply(){
      attempted=true;entity=block.dimension.spawnItem(stack,location);
+     entityId=entity?.id;
      const delivered=entity?.getComponent('minecraft:item')?.itemStack;
-     acknowledged=entity?.isValid===true&&sameStack(delivered,stack);
+     acknowledged=typeof entityId==='string'&&world.getEntity(entityId)?.id===entityId&&entity?.isValid===true&&sameStack(delivered,stack);
      if(!acknowledged)throw Error('Plant fertilizer drop was not acknowledged');
     },
     rollback(){
      if(!attempted)return;
      if(!acknowledged)throw Error('Plant fertilizer drop outcome unknown');
-     entity.remove();
-     if(entity.isValid!==false)throw Error('Plant fertilizer drop removal was not acknowledged');
+     // A missing/changed drop may already have been picked up or merged. It
+     // is not proof of our rollback and cannot authorize a fertilizer refund.
+     const current=world.getEntity(entityId);
+     if(current?.id!==entityId||current.isValid!==true||!sameStack(current.getComponent('minecraft:item')?.itemStack,stack))throw Error('Plant fertilizer drop ownership changed');
+     let failure;try{current.remove()}catch(error){failure=error}
+     if(world.getEntity(entityId)!==undefined)throw failure??Error('Plant fertilizer drop removal was not acknowledged');
     }
    });
   },
-  current(){return [...observed.values()].every(({block,before,light})=>{
+  current(){return [...observed.values()].every(({block,before,light,waterlogged})=>{
    if(!samePlantPermutation(block.permutation,before))return false;
+   if(waterlogged!==undefined&&readPlantWaterlogged(block)!==waterlogged)return false;
    if(!light)return true;
    const current=readPlantLight(block);
    return current.total===light.total&&current.sky===light.sky;
@@ -95,8 +111,13 @@ function growthJournal(){
   steps(){return [...observed.values()].filter(entry=>entry.after)
    // The fruit must exist before its stem is attached. Keep all existing
    // handlers' ordering; only explicitly dependent writes move to the end.
-   .sort((a,b)=>Number(a.afterNeighbors)-Number(b.afterNeighbors)).map(({block,before,after})=>({
-   apply:()=>writePermutation(block,after),rollback:()=>writePermutation(block,before)
+   .sort((a,b)=>Number(a.afterNeighbors)-Number(b.afterNeighbors)).map(({block,before,after,waterlogged})=>createOwnedPlantWrite({
+   read:()=>({permutation:block.permutation,waterlogged:waterlogged===undefined?undefined:readPlantWaterlogged(block)}),
+   write:snapshot=>block.setPermutation(snapshot.permutation),same:samePlantSnapshot,
+   before:{permutation:before,waterlogged},after:{permutation:after,waterlogged},
+   // A previous plant write can trigger the exact planned neighbour update.
+   // Other native permutations are unknown, not permission to overwrite them.
+   acceptPlannedAfter:true
   })).concat(deliveries);}
  };
 }
@@ -106,6 +127,7 @@ export function registerPlantFertilizer(id,handler){
 }
 export function hasPlantFertilizer(block,itemId,hand='main',secondaryUse=false){
  if(!block||!handlers.has(block.typeId))return false;
+ if(block.typeId==='minecraft:mangrove_propagule'&&block.permutation.getState('hanging')!==true)return false;
  if(itemId===OIL_RESIDUE&&block.typeId==='minecraft:sweet_berry_bush'){
   // NeoForge 1.21.1's default block interaction picks berries on a normal
   // main-hand use. Sneaking skips that interaction; it is not invoked for an
@@ -128,11 +150,6 @@ function sameStack(actual,expected){
  if(!actual||!expected)return actual===undefined&&expected===undefined;
  return actual.amount===expected.amount&&actual.typeId===expected.typeId&&actual.isStackableWith(expected);
 }
-function writeSlot(slot,stack){
- slot.setItem(stack?.clone());
- return sameStack(slot.hasItem()?slot.getItem():undefined,stack);
-}
-
 // Each pass calls the same plant handler as ordinary bone meal. Planning both
 // passes before mutation preserves plant-specific stages, RNG and tree writes.
 // An accepted sapling use consumes fertilizer even when its growth RNG misses,
@@ -152,13 +169,16 @@ export function usePlantFertilizer(block,player,hand){
   // Reads include unchanged partners/supports as well as written blocks.
   // Validate the complete native snapshots before the first debit or write.
   if((player.isSneaking===true)!==secondaryUse||!journal.current()||!sameStack(entry.slot.hasItem()?entry.slot.getItem():undefined,entry.stack))return false;
-  const steps=[];
+  let debit;
   if(player.getGameMode()!==GameMode.Creative){
    const before=entry.stack,after=before.amount>1?before.clone():undefined;
    if(after)after.amount--;
-   steps.push({apply:()=>writeSlot(entry.slot,after),rollback:()=>writeSlot(entry.slot,before)});
+   debit=createOwnedPlantWrite({
+    read:()=>entry.slot.hasItem()?entry.slot.getItem():undefined,
+    write:stack=>entry.slot.setItem(stack?.clone()),same:sameStack,before,after
+   });
   }
-  steps.push(...journal.steps());
+  const steps=plantFertilizerSteps(debit,journal.steps());
   if(!commitPlantSteps(block,steps,journal.blocks()))return false;
   try{const p=block.location;block.dimension.spawnParticle('minecraft:crop_growth_emitter',{x:p.x+.5,y:p.y+.5,z:p.z+.5})}catch{}
   return true;
@@ -259,6 +279,24 @@ registerPlantFertilizer('minecraft:dirt_with_roots',(block,journal)=>{
  const below=plantNeighbor(block,journal,-1);
  if(below.permutation.type.id!=='minecraft:air')return false;
  journal.set(below.block,BlockPermutation.resolve('minecraft:hanging_roots'));
+ return true;
+});
+
+registerPlantFertilizer('minecraft:mangrove_leaves',(block,journal)=>{
+ const below=plantNeighbor(block,journal,-1);
+ if(below.permutation.type.id!=='minecraft:air'||!journal.dry(below.block))return false;
+ journal.set(below.block,BlockPermutation.resolve('minecraft:mangrove_propagule',{hanging:true,propagule_stage:0}));
+ // Both oil-residue passes still target these leaves. The new propagule makes
+ // the second leaf application invalid; it does not mature the new seedling.
+ return true;
+});
+
+registerPlantFertilizer('minecraft:mangrove_propagule',(block,journal)=>{
+ const permutation=journal.read(block),age=permutation.getState('propagule_stage');
+ if(permutation.getState('hanging')!==true||!Number.isInteger(age)||age<0||age>=4||!journal.dry(block))return false;
+ // Only the hanging, dry branch has a complete state/rollback contract here.
+ // Ground-planted trees and waterlogged propagules remain unsupported.
+ journal.set(block,permutation.withState('propagule_stage',age+1));
  return true;
 });
 

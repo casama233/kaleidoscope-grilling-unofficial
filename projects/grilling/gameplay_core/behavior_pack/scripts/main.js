@@ -28,6 +28,7 @@ import {configureSecretGrillReader} from './grill_visual_runtime.js';
 import {configureSecretHeldReader,syncSecretHeld} from './secret_held_runtime.js';
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
+import {canUseCuisineFood,captureCuisineUse,cuisineUseEventMatches,completedCuisineUse} from './cuisine_eating_core.js';
 import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {readNativeBottles,isNativeBottleItem} from './seasoning_native_storage.js';
@@ -992,8 +993,10 @@ world.afterEvents.itemStartUse.subscribe(e=>{
   PLATE_EATS.set(e.source.id,{id,plate:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});return;
  }
   if(CUISINE_FOOD_SET.has(id)){
+   const use=captureCuisineUse(e.itemStack,heldMain(e.source),heldOff(e.source),e.source.selectedSlotIndex,system.currentTick,e.useDuration,now());
+   if(!use){CUISINE_EATS.delete(e.source.id);return;}
    const meta=stackMeta(e.itemStack),sat=e.source.getComponent('minecraft:player.saturation');
-   CUISINE_EATS.set(e.source.id,{id,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
+   CUISINE_EATS.set(e.source.id,{id,use,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});
    return;
   }
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
@@ -1029,7 +1032,8 @@ world.afterEvents.itemCompleteUse.subscribe(e=>{
  if(id===PLATE_ID){completePlateUse(e.source,e.itemStack);return}
   dangerousPreservation(e.source,id);
   if(CUISINE_FOOD_SET.has(id)){
-   const a=CUISINE_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};
+   const a=CUISINE_EATS.get(e.source.id);
+   if(!a||a.id!==id||!completedCuisineUse(a.use,e.itemStack,heldByHand(e.source,a.use.hand),e.source.selectedSlotIndex,system.currentTick,e.useDuration,now()))return;
    CUISINE_EATS.delete(e.source.id);a.meta=finishedFoodMeta(a.meta,now());afterCommitted(e.source,id,a.meta,a,true);return;
   }
   if(!FOOD_DATA[id]&&id!==SECRET_ID)return;
@@ -1048,10 +1052,12 @@ world.afterEvents.itemCompleteUse.subscribe(e=>{
 world.afterEvents.itemStopUse.subscribe(e=>{
  // Completion and stop can share a tick. Clear only the stopped session, after
  // completion has had a chance to commit; never delete a new use session.
- const id=e.source.id,plate=PLATE_EATS.get(id),pending=PENDING_USES.get(id);
+ const id=e.source.id,plate=PLATE_EATS.get(id),pending=PENDING_USES.get(id),cuisine=CUISINE_EATS.get(id);
  const pendingMatches=!e.itemStack||!pending||eatingEventMatches(pending.use,e.itemStack,now());
  system.run(()=>{if(PLATE_EATS.get(id)===plate)PLATE_EATS.delete(id);if(pendingMatches&&PENDING_USES.get(id)===pending){stopSoundHandle(pending?.audio);PENDING_USES.delete(id)}});
- CUISINE_EATS.delete(id);const a=ACTIVE_EATS.get(id);if(!a)return;
+ const cuisineMatches=!e.itemStack||!cuisine||cuisineUseEventMatches(cuisine.use,e.itemStack,now());
+ system.run(()=>{if(cuisineMatches&&CUISINE_EATS.get(id)===cuisine)CUISINE_EATS.delete(id)});
+ const a=ACTIVE_EATS.get(id);if(!a)return;
  if(e.itemStack&&!eatingEventMatches(a.use,e.itemStack,now()))return;
  if(a.start===system.currentTick&&SETTLED.get(id)===system.currentTick)return;
  const used=system.currentTick-a.start;stopEatSound(e.source,a.profile);
@@ -1110,6 +1116,7 @@ function canUseSecretSkewer(stack){
 }
 world.beforeEvents.itemUse.subscribe(e=>{
  if(e.cancel)return;
+ if(!canUseCuisineFood(e.itemStack)){e.cancel=true;return;}
  if(canonicalFoodId(e.itemStack?.typeId)===SECRET_ID&&!canUseSecretSkewer(e.itemStack)){e.cancel=true;return}
  try{
   const action=skewerAction(e.source,e.itemStack);

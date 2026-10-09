@@ -67,7 +67,7 @@ export function mergeSignature(stack){
  const publicFood=readPublicFood(stack);
  // A damaged public record must never merge into another stack. Preserve its raw bytes.
  const seasoning=publicFood.present?(publicFood.valid?publicFood.state.seasoning:{invalid:stack.getRawLore()}):legacySeasoningSignature(stack);
- return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:mergeLore(stack),seasoning,nativeVariant:publicFood.valid?publicFood.state.nativeVariant:undefined,props:props(stack,false)});
+ return JSON.stringify({type:stack?.typeId??'',name:stack?.nameTag??'',lore:mergeLore(stack),seasoning,nativeVariant:publicFood.valid?publicFood.state.nativeVariant:undefined,quality:publicFood.valid?publicFood.state.quality:undefined,props:props(stack,false)});
 }
 export function sameForHeatMerge(a,b){return !!a&&!!b&&mergeSignature(a)===mergeSignature(b)}
 export function hotUntil(stack){const p=readPublicFood(stack);if(p.present)return p.valid?p.state.hotUntil:0;try{return Number(getItemProperty(stack,HOT)??0)}catch{return 0}}

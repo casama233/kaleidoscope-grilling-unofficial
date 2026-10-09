@@ -1,6 +1,6 @@
 """Guide A3 data checks. No player interaction or client UI is simulated."""
 from __future__ import annotations
-import argparse, itertools, json, re, subprocess, sys
+import argparse, itertools, json, re, struct, subprocess, sys
 from pathlib import Path
 from build_grilling_guide import ROOT,SOURCE,PROJECT,BP,RP,LOCALES,load,validate_source
 GAME=ROOT/'projects/grilling/gameplay_core/behavior_pack'
@@ -27,6 +27,25 @@ def check_hidden_bottle_fill(item,owner):
     require(components==original['components'],'Fill proxy mechanic drift '+iid)
     return True
 
+def check_hidden_cuisine_quality(item,owner):
+    iid=item['description']['identifier']
+    match=re.fullmatch(NS+r'(braised_chicken_wings|green_pepper_squid_tentacles|houttuynia_stir_fried_pork)_cuisine_q([0-3])',iid)
+    if not match:return False
+    base=NS+match[1]
+    require(base in owner,'Quality variant has no canonical dish page '+iid)
+    original=load(GAME/'items'/(match[1]+'.json'))['minecraft:item']
+    expected=json.loads(json.dumps(original))
+    expected['description']['identifier']=iid
+    expected['description'].pop('menu_category',None)
+    rows=load(ROOT/'development/gameplay_core/fixtures/java-cuisine-quality-160.json')['neoforge_nutrition']
+    values=[row for row in rows if row['baseId']==base and row['quality']==int(match[2])]
+    require(len(values)==1,'Missing original Java quality food observation '+iid)
+    row=values[0]
+    expected['components']['minecraft:food']['nutrition']=row['nutrition']
+    expected['components']['minecraft:food']['saturation_modifier']=struct.unpack('<f',struct.pack('<f',row['saturationGain']/(2*row['nutrition'])))[0]
+    require(item==expected,'Quality variant changed identity, visibility or non-quality mechanics '+iid)
+    return True
+
 def check_facts(s):
     owner={}
     for e in s['entries']:
@@ -47,6 +66,7 @@ def check_facts(s):
         if re.fullmatch(NS+r'special_seasoning_r[1-8]_v[0-7]',iid):
             require(item['description']['menu_category']['category']=='none' and NS+'special_seasoning' in owner,'Private seasoning entry leaked');continue
         if check_hidden_bottle_fill(item,owner):continue
+        if check_hidden_cuisine_quality(item,owner):continue
         require(iid in owner,'Item absent '+iid);covered+=1
     for e in s['entries']:
         pairs=dict(e.get('nutrition_variants',{}))
@@ -65,6 +85,7 @@ def check_facts(s):
             require(any(r['method']=='Grill' and r['ingredients']==[rr['id']] and r['result']==rr['cooked'] for r in e['recipes']),'Cooked recipe missing')
         require(all(any('→' in x or '->' in x or 'order' in x.lower() for x in e['body'][l]) for l in LOCALES),'Recipe order missing '+rr['id'])
     host_count=0
+    flex_pot=pure('a2750_wok_food_core.js','flexWokRecipes') if tuple(load(ROOT/'baseline.json')['version'])>=(2,8,121) else []
     for reg in pure('a2727_cookery_host_recipes_core.js','recipeTable'):
         r=reg['payload']['recipe'];kind=reg['payload']['kind']
         if kind=='chopping_board_v2':
@@ -82,8 +103,13 @@ def check_facts(s):
         elif kind=='chopping_board':
             require(any(x['method']=='Chopping Board' and x['ingredients']==[r['input']] and x['count']==r['count'] for x in owner[r['result']]['recipes']),'Board recipe drift')
         else:
+            require(kind in {'wok','stockpot_exact'},'Unsupported guide recipe kind '+kind)
             method='Wok' if kind=='wok' else 'Stockpot';e=owner[r['result']]
             expected=[{'method':method,'ingredients':list(combo),'count':r.get('count',1),'time':r.get('time',0),'result':r['result']} for combo in itertools.product(*[x if isinstance(x,list) else [x] for x in r['ingredients']])]
+            if kind=='wok':
+                for flex in flex_pot:
+                    if flex['result']==r['result']:
+                        expected.extend({'method':'Wok','ingredients':list(combo),'count':flex['count'],'time':flex['time'],'result':flex['result']} for combo in itertools.product(*flex['ingredients']))
             require([x for x in e['recipes'] if x['method']==method]==expected,'Cookery exact recipe drift '+r['result'])
             if reg.get('requiresItems'):require(e.get('requires_any_item')==reg['requiresItems'],'Conditional Tavern requirement lost')
         host_count+=1

@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 BP=ROOT/'projects/grilling/gameplay_core/behavior_pack'
 def check():
  spec=json.loads((BP/'host-extensions/board-api.json').read_text())
- assert spec['host_uuid']=='5df753c9-3436-4fba-87f1-a2da3651cfcf' and spec['version']==([0,2,7] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,120) else [0,2,6] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,74) else [0,2,5])
+ assert spec['host_uuid']=='5df753c9-3436-4fba-87f1-a2da3651cfcf' and spec['version']==([0,2,8] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,121) else [0,2,7] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,120) else [0,2,6] if tuple(json.loads((ROOT/'baseline.json').read_text())['version'])>=(2,8,74) else [0,2,5])
  assert spec['archive_sha256']=='da12fe6d39d7514aff1de3c963d69899324d771be5ca0fc3da1ccb759c7ad458'
  with tempfile.TemporaryDirectory() as tmp:
   base=Path(tmp);archive=Path(os.environ['COOKERY_160_ARCHIVE']) if os.environ.get('COOKERY_160_ARCHIVE') else base/'author.mcaddon'

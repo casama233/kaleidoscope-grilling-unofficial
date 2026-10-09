@@ -1,4 +1,5 @@
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,setItemLore} from './itemData.js';
+import {canonicalCuisineFoodId} from './host_api/cuisine_quality_core.js';
 export {isHeatLore} from './localized_lore_core.js';
 // Java FoodTooltip.appendMaxim: DARK_GRAY + ITALIC; existing RP translation keys.
 export const MAXIM_ITEMS=Object.freeze([
@@ -9,7 +10,7 @@ export const MAXIM_ITEMS=Object.freeze([
 const PREFIX='kaleidoscope_grilling:';
 const KEYS=new Map(MAXIM_ITEMS.map(id=>[PREFIX+id,'tooltip.kaleidoscope_grilling.'+id+'.maxim']));
 const OWN_KEYS=new Set(KEYS.values());
-export function foodMaximKey(id){return KEYS.get(id)}
+export function foodMaximKey(id){return KEYS.get(canonicalCuisineFoodId(id))}
 export function readRawFoodLore(stack){
  // Do not flatten RawMessage translations through getLore(). A failed read is not empty lore.
  return stack.getRawLore();

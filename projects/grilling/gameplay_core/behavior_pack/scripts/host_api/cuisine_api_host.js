@@ -1,6 +1,7 @@
 /** Author-owned output transactions; native food state travels with the actual output. */
 import {world,system,ItemStack,EquipmentSlot,GameMode} from '@minecraft/server';
-import {writePublicFood,readPublicFood,normalizePublicFood,bucketHotUntil} from './food_api_core.js';
+import {writePublicFood,readPublicFood,readPublicFoodLore,normalizePublicFood,bucketHotUntil} from './food_api_core.js';
+import {canonicalCuisineFoodId,cuisineQualityItemId,cuisineQualityOfItem,cuisineQualityPayloadMatches} from './cuisine_quality_core.js';
 export const CUISINE_CAPABILITIES=Object.freeze(['cuisine_output_receipt_v2','secret_ingredient_consume_v1','cuisine_configuration_v1']);
 const CONFIG_KEY='senluo:cuisine_heat_and_seasoning_v1';
 const cuisineEnabled=()=>world.getDynamicProperty(CONFIG_KEY)!==false;
@@ -42,7 +43,7 @@ function readRecovery(b,data,id){
  for(let count=1;count<=64;count++){
   const operationId='break:pot:'+epoch+':'+count,legacyRaw=world.getDynamicProperty(RECEIPT_PREFIX+key(b)+':'+operationId);
   if(legacyRaw===undefined)continue;
-  const prior=JSON.parse(String(legacyRaw)),valid=prior.output?.id===id&&Number.isInteger(prior.output?.amount)&&prior.output.amount>=1&&prior.output.amount<=count;
+  const prior=JSON.parse(String(legacyRaw)),valid=requestedOutputId(prior)===id&&canonicalCuisineFoodId(prior.output?.id)===canonicalCuisineFoodId(id)&&Number.isInteger(prior.output?.amount)&&prior.output.amount>=1&&prior.output.amount<=count&&receiptQualityMatches(prior,savedCuisineQuality(data));
   const intent={version:1,kind:'pot',itemId:id,epoch,sourceCount:count,remaining:valid?prior.output.amount:null,operationId,phase:valid&&prior.phase==='committed'?'committed':'quarantined',legacy:true};
   writeReceipt(property,intent);return {property,raw:JSON.stringify(intent),intent};
  }
@@ -52,10 +53,34 @@ function sameRecovery(intent,batch,id){
  return intent?.version===1&&intent.kind==='pot'&&intent.itemId===id&&intent.epoch===cuisineEpoch(batch)
   &&Number.isInteger(intent.sourceCount)&&intent.sourceCount>=1&&intent.sourceCount<=64
   &&intent.operationId==='break:pot:'+intent.epoch+':'+intent.sourceCount
-  &&(intent.legacy===true||!!normalizePublicFood(intent.metadata))
+  &&(intent.legacy===true?savedCuisineQuality(batch)===undefined:!!normalizePublicFood(intent.metadata)&&intent.metadata.quality===savedCuisineQuality(batch))
   &&(['prepared','committed'].includes(intent.phase)
    ?Number.isInteger(intent.remaining)&&intent.remaining>=0&&intent.remaining<=intent.sourceCount
    :intent.phase==='quarantined');
+}
+const requestedOutputId=receipt=>receipt.requestedItemId??receipt.output?.id;
+function savedCuisineQuality(data){
+ const quality=data?.grillingPot?.quality;
+ if(quality!==undefined&&(!Number.isInteger(quality)||quality<0||quality>3||['burnt','charcoal'].includes(data.grillingPot.phase)))throw Error('cuisine saved quality invalid');
+ return quality;
+}
+function receiptQualityMatches(receipt,quality){
+ const actualId=receipt.output?.id,portable=readPublicFoodLore(receipt.output?.lore??[]);
+ const metadata=receipt.metadata===undefined?undefined:normalizePublicFood(receipt.metadata);
+ if(portable.present&&!portable.valid||receipt.metadata!==undefined&&!metadata)return false;
+ return cuisineQualityOfItem(actualId)===quality&&metadata?.quality===quality&&portable.state?.quality===quality&&cuisineQualityPayloadMatches(actualId,portable);
+}
+function canRebindBurntReceipt(b,data,prior,id,count,receiptId){
+ const p=data.grillingPot,origin=data.grillingBurnOrigin,epoch=cuisineEpoch(data),s=prior.station;
+ // A proven zero-credit attempt may change dish identity exactly once when
+ // this saved epoch has subsequently burned. No other receipt phase is reusable.
+ return id==='kaleidoscope_cookery:dark_cuisine'&&count===1&&p?.version===1&&p.phase==='burnt'&&p.epoch===epoch&&p.quality===undefined
+  &&Number.isSafeInteger(epoch)&&epoch>0&&data.result?.id===id&&data.result.count===count&&p.output?.id===id&&p.output.count===count
+  &&origin?.version===1&&origin.epoch===epoch&&origin.sourceCount===count&&typeof origin.resultId==='string'&&origin.resultId!==id
+  &&canonicalCuisineFoodId(origin.resultId)===origin.resultId&&requestedOutputId(prior)===origin.resultId&&canonicalCuisineFoodId(prior.output?.id)===origin.resultId
+  &&prior.api===2&&prior.kind==='pot'&&prior.phase==='rolled_back'&&prior.settlementVersion===1&&prior.output.amount===count
+  &&receiptId===key(b)+':pot:'+epoch+':'+count&&prior.receiptId===receiptId
+  &&s?.dimensionId===b.dimension.id&&s.x===b.x&&s.y===b.y&&s.z===b.z&&receiptQualityMatches(prior,origin.quality);
 }
 const carriers=new Map();
 const carrierItem=slot=>slot.hasItem()?slot.getItem():undefined;
@@ -122,12 +147,15 @@ function claimCarrier(player,outputReceipt,unknown=false){
 }
 export function nextCuisineBatch(b){const k=RECEIPT_PREFIX+key(b)+'_batch',previous=world.getDynamicProperty(k)??0,n=previous+1;if(!Number.isSafeInteger(previous)||previous<0||!Number.isSafeInteger(n))throw Error('batch sequence');writeAcknowledged(k,n);return n;}
 export function readCuisineMetadata(b,data={},kind='pot'){
- if(!cuisineEnabled())return {v:1,hotUntil:0,seasoning:[]};
+ const quality=savedCuisineQuality(data),extra=quality===undefined?{}:{quality};
+ // Java creates a fresh dark dish after its takeout mixin touched the old result.
+ if(data.grillingPot?.phase==='burnt')return {v:1,hotUntil:0,seasoning:[]};
+ if(!cuisineEnabled()){const plain=normalizePublicFood({v:1,hotUntil:0,seasoning:[],...extra});if(!plain)throw Error('cuisine quality invalid');return plain;}
  let state={seasoning:[],oilType:data.grillingOilType??(data.oil?'default':'')};
  const raw=world.getDynamicProperty(META_PREFIX+key(b));if(raw!==undefined)state={...state,...JSON.parse(String(raw))};
  const oilType=data.grillingOilType||state.oilType;
  const heat=kind==='stockpot'?1200:oilType==='premium_chili'?24000:oilType==='secret_chili'?12000:1200;
- const result=normalizePublicFood({v:1,hotUntil:bucketHotUntil(Number(world.getAbsoluteTime())+heat),seasoning:[...(state.seasoning??[])]});if(!result)throw Error('cuisine metadata invalid');return result;
+ const result=normalizePublicFood({v:1,hotUntil:bucketHotUntil(Number(world.getAbsoluteTime())+heat),seasoning:[...(state.seasoning??[])],...extra});if(!result)throw Error('cuisine metadata invalid');return result;
 }
 export function createNativeSuspiciousStew(b,variant=Math.floor(Math.random()*11)){
  if(!Number.isInteger(variant)||variant<0||variant>10)throw Error('stew variant');
@@ -139,7 +167,7 @@ export function createNativeSuspiciousStew(b,variant=Math.floor(Math.random()*11
 }
 const fingerprint=s=>({id:s.typeId,amount:s.amount,name:s.nameTag,lore:s.getRawLore()});
 function matchesFingerprint(s,f){return !!s&&JSON.stringify(fingerprint(s))===JSON.stringify(f);}
-function emit(receipt){if(receipt.kind==='burnt')return;try{system.sendScriptEvent('kaleidoscope_grilling:cookery_output_ready',JSON.stringify({version:2,receiptId:receipt.receiptId,station:receipt.station,target:receipt.target,metadata:receipt.metadata}));}catch(e){console.warn('[Cookery cuisine API] committed notification deferred '+receipt.receiptId+' '+e)}}
+function emit(receipt){if(receipt.kind==='burnt'||receipt.kind==='pot_input')return;try{system.sendScriptEvent('kaleidoscope_grilling:cookery_output_ready',JSON.stringify({version:2,receiptId:receipt.receiptId,station:receipt.station,target:receipt.target,metadata:receipt.metadata}));}catch(e){console.warn('[Cookery cuisine API] committed notification deferred '+receipt.receiptId+' '+e)}}
 function sameReceiptContainer(target,playerId,targetBlock){
  if(target?.kind==='player_slot')return !!playerId&&target.playerId===playerId;
  return target?.kind==='block_slot'&&!playerId&&!!targetBlock&&target.dimensionId===targetBlock.dimension.id&&target.x===targetBlock.x&&target.y===targetBlock.y&&target.z===targetBlock.z;
@@ -153,6 +181,10 @@ function finishReceipt(receiptKey,receipt){
 }
 export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,targetBlock,dropLocation,nativeStack,operationId,recoveryIntent}={}){
  if(!Number.isInteger(count)||count<1||count>64)throw Error('output amount invalid');
+ const plain=kind==='burnt'||kind==='pot_input';
+ if(kind==='burnt'&&(id!=='minecraft:charcoal'||nativeStack||recoveryIntent))throw Error('plain burnt output identity');
+ if(kind==='pot_input'&&(!nativeStack||recoveryIntent))throw Error('plain ingredient output identity');
+ if(!plain&&canonicalCuisineFoodId(id)!==id)throw Error('requested cuisine identity must be canonical');
  if(kind==='pot'){
   if(world.getDynamicProperty(burntReceiptKey(b,data))!==undefined)throw Error('cuisine burnt batch retained');
   const recovery=readRecovery(b,data,id);
@@ -166,7 +198,9 @@ export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,ta
  const old=world.getDynamicProperty(receiptKey);
  if(old!==undefined){
   const prior=JSON.parse(String(old));
-  if(prior.output?.id!==id||prior.output?.amount!==count||prior.kind!==undefined&&prior.kind!==kind)throw Error('cuisine operation conflict: '+receiptId);
+  const rebind=kind==='pot'&&canRebindBurntReceipt(b,data,prior,id,count,receiptId);
+  if(!rebind&&(requestedOutputId(prior)!==id||canonicalCuisineFoodId(prior.output?.id)!==canonicalCuisineFoodId(id)||prior.output?.amount!==count||prior.kind!==undefined&&prior.kind!==kind))throw Error('cuisine operation conflict: '+receiptId);
+  if(!plain&&!rebind&&!receiptQualityMatches(prior,savedCuisineQuality(data)))throw Error('cuisine receipt quality conflict: '+receiptId);
   if(prior.phase==='committed'){emit(prior);return {...prior,replayed:true};}
   if(prior.phase==='prepared'){
    // A retry by another player must not use that player's same-numbered slot
@@ -178,20 +212,22 @@ export function deliverCuisineOutput(b,data,id,count,kind,{container,playerId,ta
   }
   if(prior.phase!=='rolled_back'||prior.settlementVersion!==1)throw Error('cuisine receipt quarantined: '+receiptId);
  }
- const plain=kind==='burnt';if(plain&&(id!=='minecraft:charcoal'||nativeStack||recoveryIntent))throw Error('plain burnt output identity');
- const meta=plain?undefined:recoveryIntent?normalizePublicFood(recoveryIntent.metadata):readCuisineMetadata(b,data,kind),base=nativeStack?.clone()??new ItemStack(id,count);
- if(!plain&&!meta)throw Error('cuisine recovery metadata invalid');if(base.typeId!==id||base.amount!==count)throw Error('native output identity');
+ const meta=plain?undefined:recoveryIntent?normalizePublicFood(recoveryIntent.metadata):readCuisineMetadata(b,data,kind);
+ if(!plain&&!meta)throw Error('cuisine recovery metadata invalid');
+ const actualId=plain||meta.quality===undefined?id:cuisineQualityItemId(id,meta.quality);if(!actualId)throw Error('cuisine native quality identity');
+ const base=nativeStack?.clone()??new ItemStack(actualId,count);if(base.typeId!==actualId||base.amount!==count)throw Error('native output identity');
  let stack=base;
  if(!plain){
   const outputMeta=readPublicFood(base);if(outputMeta.present&&!outputMeta.valid)throw Error('native output metadata unreadable');
+  if(nativeStack&&(!cuisineQualityPayloadMatches(base.typeId,outputMeta)||outputMeta.state?.quality!==meta.quality))throw Error('native output quality conflict');
   if(outputMeta.valid&&outputMeta.state.nativeVariant!==undefined)meta.nativeVariant=outputMeta.state.nativeVariant;
   stack=writePublicFood(base,meta);if(meta.hotUntil>Number(world.getAbsoluteTime())&&stack.getRawLore().length<20)stack.setLore([...stack.getRawLore(),{rawtext:[{text:'§c🔥 '},{translate:'tooltip.kaleidoscope_grilling.smoky_warmth'},{text:' '+Math.ceil((meta.hotUntil-Number(world.getAbsoluteTime()))/20)+'s'}]}]);
  }
  let slot=-1,target,entity,entityObserved=false;
  if(container)for(let i=0;i<container.size;i++)if(!container.getItem(i)){slot=i;break;}
- if(slot>=0){if(!playerId&&!targetBlock)throw Error('output block target missing');target=playerId?{kind:'player_slot',playerId,slot,expectedId:id,expectedAmount:count}:{kind:'block_slot',...station(targetBlock),slot,expectedId:id,expectedAmount:count};}
- else target={kind:'item_entity',entityId:'pending',expectedId:id,expectedAmount:count};
- const receipt={api:2,settlementVersion:1,receiptId,kind,station:station(b),metadata:meta,target,output:fingerprint(stack),phase:'prepared'};
+ if(slot>=0){if(!playerId&&!targetBlock)throw Error('output block target missing');target=playerId?{kind:'player_slot',playerId,slot,expectedId:actualId,expectedAmount:count}:{kind:'block_slot',...station(targetBlock),slot,expectedId:actualId,expectedAmount:count};}
+ else target={kind:'item_entity',entityId:'pending',expectedId:actualId,expectedAmount:count};
+ const receipt={api:2,settlementVersion:1,receiptId,kind,requestedItemId:id,station:station(b),metadata:meta,target,output:fingerprint(stack),phase:'prepared'};
  // This acknowledgement precedes every output write/spawn. An ignored or
  // unreadable prepared write cannot leave an unrecorded credit to repeat.
  writeReceipt(receiptKey,receipt);
@@ -243,6 +279,7 @@ function assertUncreditedCuisine(b,data){
   if(raw!==undefined){const prior=JSON.parse(String(raw));if(prior?.phase!=='rolled_back'||prior.settlementVersion!==1)throw Error('cuisine takeout retained before burn');}
  }
 }
+export function assertCuisineBatchUncredited(b,data){assertUncreditedCuisine(b,data);}
 function isNewActiveCuisine(data){return data.grillingOutputEpoch===undefined&&!data.result&&!data.burnt&&data.grillingBurnOrigin===undefined&&data.started===true&&typeof data.recipe?.result==='string'&&Array.isArray(data.items)&&data.items.length>0;}
 function saveCuisineOrigin(b,data,next,host,requireActive=false){
  if(typeof host?.save!=='function'||typeof host?.raw!=='function')throw Error('cuisine origin host unavailable');
@@ -263,7 +300,7 @@ export function prepareCuisineBurn(b,data,host){
   saveCuisineOrigin(b,data,{...data,grillingOutputEpoch:epoch,grillingBurnOrigin:{version:1,epoch,resultId:'',sourceCount:0}},host,true);
  }
  assertUncreditedCuisine(b,data);
- const epoch=data.grillingOutputEpoch??nextCuisineBatch(b),origin={version:1,epoch,resultId:data.result?.id??'',sourceCount:data.result?Number(data.result.count??1):0};
+ const epoch=data.grillingOutputEpoch??nextCuisineBatch(b),quality=savedCuisineQuality(data),origin={version:1,epoch,resultId:data.result?.id??'',sourceCount:data.result?Number(data.result.count??1):0,...(quality===undefined?{}:{quality})};
  if(origin.resultId&&(!Number.isInteger(origin.sourceCount)||origin.sourceCount<1||origin.sourceCount>64))throw Error('cuisine burn source amount');
  // Capture the result before author burnWok clears it. For active cooking this
  // also persists the first epoch before any burnt state/output can be saved.
@@ -274,6 +311,7 @@ function prepareBurntOutput(b,data,host){
  const origin=data.grillingBurnOrigin;
  if(origin!==undefined){
   if(origin?.version!==1||origin.epoch!==cuisineEpoch(data)||typeof origin.resultId!=='string'||!Number.isInteger(origin.sourceCount)||origin.sourceCount<0||origin.sourceCount>64||!!origin.resultId!==(origin.sourceCount>0))throw Error('cuisine burnt origin invalid');
+  if(origin.quality!==undefined&&!cuisineQualityItemId(origin.resultId,origin.quality))throw Error('cuisine burnt origin quality invalid');
  }else{
   // Old burnt saves lost their result before this hook existed. If any prior
   // food credit is recorded, there is no honest way to infer remaining coal
@@ -312,7 +350,9 @@ export function recoverCuisineOutput(b,data,host){
   let count=sourceCount,reason='';
   if(raw!==undefined){
    const prior=JSON.parse(String(raw));
-   if(prior.output?.id!==id||!Number.isInteger(prior.output?.amount)||prior.output.amount<1||prior.output.amount>count)reason='cuisine recovery operation conflict';
+   const rebind=canRebindBurntReceipt(b,data,prior,id,count,key(b)+':'+operation);
+   if(!rebind&&(requestedOutputId(prior)!==id||canonicalCuisineFoodId(prior.output?.id)!==canonicalCuisineFoodId(id)||!Number.isInteger(prior.output?.amount)||prior.output.amount<1||prior.output.amount>count))reason='cuisine recovery operation conflict';
+   else if(!rebind&&!receiptQualityMatches(prior,savedCuisineQuality(data)))reason='cuisine recovery quality conflict';
    else if(prior.phase==='committed')count-=prior.output.amount;
    else if(prior.phase!=='rolled_back'||prior.settlementVersion!==1)reason='cuisine takeout outcome unresolved';
   }
