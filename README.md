@@ -1,6 +1,8 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.122
+## Current maintained baseline: 2.8.123
+
+[G123 指南正文語言鍵修補](docs/STATUS-A2.8.123.md)：Cookery 1.6.0 原 registry 接收條目與名稱後會丟棄三語正文；本版登記局部 locale 掛鉤，保留其他 token 驗證與 G122 修補。
 
 [G122炒鍋、品質與所有權修補](docs/STATUS-A2.8.122.md)：三道料理補保存備料／三翻／變質流程和原作彈性配方，
 品質原生食物、冷卻與食材快照接通；兩分支原 Java 純邏輯的 1,248 組品質與 12 組 NeoForge 食物值相符。

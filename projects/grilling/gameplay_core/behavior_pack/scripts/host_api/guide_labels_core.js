@@ -12,6 +12,8 @@ const methods={
 };
 export function publicMethodLabel(method,locale){const labels=methods[method];return labels?.[locale==='zh_CN'?0:locale==='zh_TW'?1:2];}
 export function publicExtensionName(extension,locale,id){const value=extension?.names?.[locale]?.[id];return typeof value==='string'&&value?value:undefined;}
+// Guide locale keys use the author's names/text locale format, not token IDs.
+export function publicGuideLocale(value){const locale=String(value??'').trim();return /^[a-z]{2}_[A-Z]{2}$/.test(locale)?locale:'';}
 
 // The author's other chapters retain their renderer. Tavern owns its chapter's
 // projection and UI; an acknowledged handoff avoids competing open forms.

@@ -21,7 +21,9 @@
 
 普通油的熱度是 1200 ticks，秘製辣椒油 12000，高級辣椒油 24000。炒鍋存檔與扣油共同讀回確認，失敗還原原壺及設備；已確認出料後通知失敗不會觸發再次獎勵。
 
-`host-extensions/board-api.json` 登記八份原作者文件的原 hash、微型插入位置與最終 hash，以及八個自主模組。兩個 item JSON 只新增 `minecraft:allow_off_hand: true`；assembler 拒絕其他 item 改寫、manifest 改写、漂移或身份替換。不把原作者完整腳本或 mcaddon 放入 Git。
+`host-extensions/board-api.json` 登記九份原作者文件的原 hash、微型插入位置與最終 hash，以及十二個自主模組。兩個 item JSON 只新增 `minecraft:allow_off_hand: true`；assembler 拒絕其他 item 改寫、manifest 改写、漂移或身份替換。不把原作者完整腳本或 mcaddon 放入 Git。
+
+G123 family API 0.2.10 增列 Guidebook Extension registry 的正文 locale 掛鉤。乾淨 Cookery 1.6.0 原檔錯用小寫 token 驗證，丟棄標準三語正文；自有 helper 僅在正文 locale 迴圈接受 `xx_YY`，保留通用 token 驗證。來源、重現及尚未送出的作者回報草稿見 [G123](STATUS-A2.8.123.md)。原作者提供等效修正後移除此 hook。
 
 暫時介面審查到期日為 2026-11-02。作者提供等效且驗證過的能力時移除相應 hook；每次作者升級重新審查，不自動安裝或修改家族鎖。未知交付收據需核對原世界實際物品，不能清空隔離標記盲重試。油壺只對已確認移除且投放已確認撤回的 pending operation 提供 `retrySharedOilRecovery`；quarantined 不准自動補發。
 
