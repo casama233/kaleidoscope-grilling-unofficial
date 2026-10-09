@@ -134,6 +134,8 @@ Flex 匹配還須依 Item 身分去重，再做 padded exact matching；不能�
 僅油渣頁的第 3 段及新增第 8 段改變；三語皆同步，其他名稱、alias 和指南正文保持。
 76 個條目、95 個配方、69 個圖示；payload 為 235 個傳輸 chunks。
 遊戲指南說明操作，不加入儲存協定或偽裝成已驗收的提示。
+三語第 3／8 段的精確前後像鎖定在[已公開來源提交](https://github.com/casama233/kaleidoscope-grilling-unofficial/commit/187e179d58f48fbc9b4d57b5f01cff90b7489ee6)，
+歷史 source refs 增至 24 個；G118／G119 指南前像與原名稱／alias 護欄保留。
 
 既有完整案例仍由必要 CI 執行。本機沒有新增／執行模擬玩家互動，沒有跑整條歷史 verifier。
 本機針對純 claim 資料、Java／SDK／state、語法、指南序列化及來源保護做檢查。
