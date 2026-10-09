@@ -1,24 +1,24 @@
 # 煙火目前缺口與待重現問題
 
-Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；目前已發版來源2.8.123，2026-10-09。
+Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；目前已發版來源2.8.124，2026-10-09。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
 G116承接餐盤營養界限與防誤食；G117修復瓶爆炸取消及手持提前結算界限。
 G118補本日一比一稽核的核心、農業與容器機制差異；完整逐項狀態見[G118](STATUS-A2.8.118.md)。真人驗收仍待完成。
 G119補手持盤及植物／效果提交；[G120](STATUS-A2.8.120.md)續修持久 claim、瓜梗與料理出料守恆。
 [G121](STATUS-A2.8.121.md)的正式酒館指南橋接保留；先前未合併機制候選移入 G122。
-[G122](STATUS-A2.8.122.md)接通三道炒鍋備料／三翻／品質，增補紅樹與寫入所有權；本候選原生與真人驗收仍未完成。
-[G123](STATUS-A2.8.123.md)修復原 Cookery 1.6.0 的三語正文鍵拒絕，已與 T142／W119 完成家族載入、保存演練及 LIVE 部署；真正 registry 接收 227 條目／31 分類／681 組三語正文。這些 C 證據不補成食用、鍋具或客戶端操作驗收。
+[G122](STATUS-A2.8.122.md)接通三道炒鍋備料／三翻／品質，增補紅樹與寫入所有權；具體原生操作與真人驗收仍按版本記錄保留範圍。
+[G123](STATUS-A2.8.123.md)修復原 Cookery 1.6.0 的三語正文鍵拒絕；[G124](STATUS-A2.8.124.md)修復調料資料重新載入。家族目前的 LIVE 配套、部署／保存／指南接收收據見[家族基線入口](https://github.com/casama233/kaleidoscope-tavern-unofficial/blob/main/family/BASELINE-STATUS.md)；家族載入及資料接收不補成食用、鍋具或客戶端操作驗收。
 現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
 
 ## SEASONING-DATA-RELOAD：調料准入與效果寫死
 
-**狀態：G123 可確認的來源差距；自有介面修補尚未凍結／發版，原生及真人驗收待完成。**
+**狀態：G123 的來源差距已由 G124 修正；明確 provider、原生玩家流程與真人效果驗收限制保留。**
 
 原 Java 的 `GrillingDataManager.apply` 從預設調料映射合併各資料根；`isSeasoningIngredient` 與 `seasoningCount` 在使用時讀目前映射。G123 的取料准入與食用計數卻讀固定 `SEASONING_KINDS`，無法接受新映射或讓已存食物遵循 reload。
 
-候選以單一自有 resolver 提供預設及當前映射，取料、效果與既有 HUD 共用；移除 main 的另一份硬編碼計數。明確的 `replace_seasoning_data` 經現有 Server-only integration API 與登記保存交易接收有序資料根，舊 v1 存檔保持可讀。後根覆寫、錯誤根不留部分更新、保存後拋錯會恢復記憶體及持久資料；未知 kind 不附加效果，三個 base ID、8 格及16次用量不變。
+G124 以單一自有 resolver 提供預設及當前映射，取料、效果與既有 HUD 共用；移除 main 的另一份硬編碼計數。明確的 `replace_seasoning_data` 經現有 Server-only integration API 與登記保存交易接收有序資料根，舊 v1 存檔保持可讀。後根覆寫、錯誤根不留部分更新、保存後拋錯會恢復記憶體及持久資料；未知 kind 不附加效果，三個 base ID、8 格及16次用量不變。
 
-既有 integration／食用 production consumer 回歸核對保存重載、寫入故障及已存 ingredient IDs 的效果變更；沒有新增組合矩陣或模擬玩家。原未合併 `grilling-seasoning-registry-20261008` 工作區保持，候選只承接經當前 Java 原碼核對的必要自有邏輯。此介面不自動讀 Java datapack，不代寫 Cookery 的私有 producer。[使用契約](BEDROCK-INTEGRATION-API.md#調料資料重新載入)
+既有 integration／食用 production consumer 回歸核對保存重載、寫入故障及已存 ingredient IDs 的效果變更；沒有新增組合矩陣或模擬玩家。原未合併 `grilling-seasoning-registry-20261008` 工作區保持，G124 只承接經當前 Java 原碼核對的必要自有邏輯。此介面不自動讀 Java datapack，不代寫 Cookery 的私有 producer。[使用契約](BEDROCK-INTEGRATION-API.md#調料資料重新載入)
 
 ## SKEWER-GUI：任意食材秘製串 inventory icon
 

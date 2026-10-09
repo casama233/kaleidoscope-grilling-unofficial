@@ -2,7 +2,9 @@
 
 ## Current maintained baseline: 2.8.124
 
-[G124 調料資料映射](docs/STATUS-A2.8.124.md)：沿用公開 Server-only API 保存及重新載入調料資料，取料、食用與 HUD 共用目前映射。保留 G123 locale 掛鉤及 G122 保存／品質，實際 provider、原生重啟與真人驗收仍另記。
+家族目前的 LIVE 配套、部署與逐檔收據、保存演練及指南接收範圍，統一見[家族基線入口](https://github.com/casama233/kaleidoscope-tavern-unofficial/blob/main/family/BASELINE-STATUS.md)。本倉庫的版本記錄保留各次修補及當時的驗證範圍。
+
+[G124 調料資料映射](docs/STATUS-A2.8.124.md)：沿用公開 Server-only API 保存及重新載入調料資料，取料、食用與 HUD 共用目前映射。保留 G123 locale 掛鉤及 G122 保存／品質，明確 provider、原生玩家操作與真人驗收限制仍依版本記錄分開保留。
 
 [G123 指南正文語言鍵修補](docs/STATUS-A2.8.123.md)：Cookery 1.6.0 原 registry 接收條目與名稱後會丟棄三語正文；本版登記局部 locale 掛鉤，保留其他 token 驗證與 G122 修補。
 
