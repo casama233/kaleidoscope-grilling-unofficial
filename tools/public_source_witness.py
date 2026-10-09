@@ -111,7 +111,7 @@ REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
 REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
 REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
 CUISINE_CANDIDATE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
-REVIEWED_CUISINE_BASE = 'PENDING_G122_PUBLIC_SOURCE_WITNESS'
+REVIEWED_CUISINE_BASE = '9fd92988f872ec1128aa071f2e045d54dbcdd4f4'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);

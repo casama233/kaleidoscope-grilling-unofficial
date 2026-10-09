@@ -9,5 +9,5 @@
     "main": "g121-main-reviewed-delta.json",
     "language": "g121-guide-reviewed-delta.json"
   },
-  "reviewed_commit": "PENDING_G122_PUBLIC_SOURCE_WITNESS"
+  "reviewed_commit": "9fd92988f872ec1128aa071f2e045d54dbcdd4f4"
 }
