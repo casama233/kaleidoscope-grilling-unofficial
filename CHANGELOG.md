@@ -1,5 +1,11 @@
 # 維護變更
 
+## 2.8.123：保留指南三語正文
+
+原 Cookery 1.6.0 的 Guidebook Extension registry 將 `mechanicsByLocale` 鍵套用小寫 token 驗證，丟棄 `zh_CN`／`zh_TW`／`en_US`。自有 `publicGuideLocale` 透過已登記的局部掛鉤保留標準語言鍵；分類、source、revision 等驗證不變。包／模組 2.8.123、指南 0.3.53、family API 0.2.10，保留 G122 玩法與作者身份。
+
+乾淨原包與套用後的實際 registry 回歸見 [G123 狀態](docs/STATUS-A2.8.123.md)。完整家族接收、原生載入、存檔演練及部署按家族流程另記；真人驗收仍待完成。
+
 ## 2.8.122：保存炒鍋、原作品質與施肥所有權
 
 三道料理保留原 exact 配方並接通 flex，保存九槽備料、第一鏟起算、三翻及成品／黑暗料理／木炭階段。
