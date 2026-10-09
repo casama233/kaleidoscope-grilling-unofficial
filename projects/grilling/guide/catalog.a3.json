@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "version": "0.3.49",
+  "version": "0.3.50",
   "revision": "kg-guide-a3-2875",
   "module_id": "kg_a1:grilling",
   "order": 300,
@@ -1123,29 +1123,32 @@
         "zh_TW": [
           "油渣是榨油副產物，每批可得到 4 個。對支援的植物使用時，會連續嘗試 2 次骨粉施肥，每次都遵循該植物自己的生長規則。",
           "支援油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。",
-          "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草與蕨。其他植物仍需各自適配。",
+          "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草、蕨、南瓜梗、西瓜梗、纏根土、扭曲藤與垂淚藤。其他植物仍需各自適配。",
           "一次有效使用總共只消耗 1 個油渣；已無可用施肥作用或不受支援的目標不消耗，創造模式也不消耗。花椒苗每次有 45% 機會推進生長，兩次都沒長大、短草上方被堵而沒長大，仍算有效使用。",
           "主手非潛行對已有果實的甜莓使用時，會先採果而不扣油渣。潛行或實際副手使用時，未完全成熟的甜莓仍可施肥；完全成熟時不扣料。",
           "可可每次長一階；洞穴藤只結發光莓，不延長。短草與蕨上方有空間時長成雙高植物。",
-          "完整雙高花每次作用掉 1 朵同種花；粉紅花簇未滿時增加一份，已滿時掉 1 份。滿花簇或雙高花一次油渣可掉 2 份；關閉方塊掉落時不產出，但仍消耗一次油渣。"
+          "完整雙高花每次作用掉 1 朵同種花；粉紅花簇未滿時增加一份，已滿時掉 1 份。滿花簇或雙高花一次油渣可掉 2 份；關閉方塊掉落時不產出，但仍消耗一次油渣。",
+          "未成熟瓜梗每次長 2–5 階；剛成熟時依光照、耕地與周邊植株嘗試結瓜，隨機方向被擋便不結果。已成熟瓜梗不能再施肥。纏根土下方為空氣時會長出懸根。 扭曲藤向上、垂淚藤向下，從相連末端向空氣延長；末端年齡 25 仍可施肥。"
         ],
         "zh_CN": [
           "油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。",
           "支持油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。",
-          "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草与蕨。其他植物仍需各自适配。",
+          "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草、蕨、南瓜茎、西瓜茎、缠根泥土、缠怨藤和垂泪藤。其他植物仍需各自适配。",
           "一次有效使用总共只消耗 1 个油渣；已无可用施肥作用或不受支持的目标不消耗，创造模式也不消耗。花椒苗每次有 45% 机会推进生长，两次都没长大、短草上方被堵而没长大，仍算有效使用。",
           "主手非潜行对已有果实的甜莓使用时，会先采果而不扣油渣。潜行或实际副手使用时，未完全成熟的甜莓仍可施肥；完全成熟时不扣料。",
           "可可每次长一阶；洞穴藤只结发光浆果，不延长。短草与蕨上方有空间时长成双高植物。",
-          "完整双高花每次作用掉 1 朵同种花；粉红色花簇未满时增加一份，已满时掉 1 份。满花簇或双高花一次油渣可掉 2 份；关闭方块掉落时不产出，但仍消耗一次油渣。"
+          "完整双高花每次作用掉 1 朵同种花；粉红色花簇未满时增加一份，已满时掉 1 份。满花簇或双高花一次油渣可掉 2 份；关闭方块掉落时不产出，但仍消耗一次油渣。",
+          "未成熟瓜茎每次长 2–5 阶；刚成熟时根据光照、耕地与周围植株尝试结果，随机方向被挡便不结果。已成熟瓜茎不能再施肥。缠根泥土下方为空气时会长出垂根。 缠怨藤向上、垂泪藤向下，从相连末端向空气延长；末端年龄 25 仍可施肥。"
         ],
         "en_US": [
           "Oil Residue is an oil-press by-product, with 4 produced per batch. Using it on a supported plant makes 2 consecutive bone-meal attempts, each following that plant's own growth rules.",
           "Supports Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes.",
-          "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, and Ferns. Other plants still need individual adapters.",
+          "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, Ferns, Pumpkin Stems, Melon Stems, Rooted Dirt, Twisting Vines, and Weeping Vines. Other plants still need individual adapters.",
           "Each valid use consumes only 1 Oil Residue in total; unavailable growth actions and unsupported targets consume none. Creative mode consumes none. Each pepper attempt has a 45% growth chance. Two failed rolls or blocked headroom above short grass still count as a valid use.",
           "A non-sneaking main-hand use on a fruiting Sweet Berry Bush harvests it without using Oil Residue. Sneaking or an actual offhand use can still fertilize a partly grown bush; a fully grown bush consumes none.",
           "Cocoa advances one stage per attempt. Cave Vines gain Glow Berries without extending. Short Grass and Ferns become tall plants when there is room above.",
-          "Each attempt on an intact tall flower drops one matching item. Pink Petals gain one flower until full, then drop one item per attempt. One Oil Residue can produce 2 items from full petals or tall flowers. Disabling block drops prevents those items but still consumes one Oil Residue."
+          "Each attempt on an intact tall flower drops one matching item. Pink Petals gain one flower until full, then drop one item per attempt. One Oil Residue can produce 2 items from full petals or tall flowers. Disabling block drops prevents those items but still consumes one Oil Residue.",
+          "Immature stems gain 2–5 stages per attempt. On reaching maturity, they attempt fruit growth using light, farmland, and neighboring stems; a blocked random direction produces no fruit. Mature stems cannot be fertilized again. Rooted Dirt grows Hanging Roots into air below it. Twisting Vines grow upward and Weeping Vines downward from their connected tip into air; age 25 still accepts fertilizer."
         ]
       },
       "kinds": [
@@ -1159,7 +1162,9 @@
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2731_farmland_crop_host_runtime.js",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2714_houttuynia_crop_runtime.js",
         "projects/grilling/gameplay_core/behavior_pack/scripts/a2748_pepper_tree_runtime.js",
-        "docs/evidence/vanilla-plant-fertilizer.md"
+        "docs/evidence/vanilla-plant-fertilizer.md",
+        "docs/evidence/stem-and-rooted-dirt-fertilizer-20261009.md",
+        "docs/evidence/nether-vine-fertilizer-20261009.md"
       ],
       "acquisition": "verified",
       "icon": "textures/ui/kg_grilling/catalog/oil_residue",
