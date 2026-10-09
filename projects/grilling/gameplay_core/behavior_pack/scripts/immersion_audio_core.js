@@ -5,6 +5,19 @@ export function stopSoundHandle(handle){
  if(!handle)return;
  try{handle.stop()}catch{} // A completed/unloaded native instance may already be gone.
 }
+/** Java has a moving local shake instance and a separate, uncancelled world
+ * one-shot for observers. The local Bedrock request deliberately has no fixed
+ * location; stable 2.9.0 offers no SoundInstance position/seek operation. */
+export function playSeasoningShakeAudio(player,observers,origin){
+ let local;
+ try{local=player.playSound('kg_imm.shake_seasoning',{volume:.8,pitch:1})}catch{}
+ if(origin)for(const observer of observers){
+  if(observer.id===player.id)continue;
+  try{observer.playSound('kg_imm.shake_seasoning',{location:origin,volume:.8,pitch:1})}catch{}
+ }
+ // Only the local sound is cancelled on release; observers hear the one-shot.
+ return local;
+}
 export function createGrillAudioController({play,stop=stopSoundHandle,repeatTicks=GRILL_LOOP_TICKS,staleTicks=GRILL_AUDIO_STALE_TICKS}){
  const active=new Map();
  return {

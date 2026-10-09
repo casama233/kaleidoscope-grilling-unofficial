@@ -85,10 +85,26 @@ test('wall recipe renders the supplied result snapshot, including secret state a
  for(const id of [NS+'raw_beef_skewer',NS+'ordinary_skewer',NS+'secret_skewer']){
   b.result=new Stack(id,{[NS+'skewer_ingredients']:JSON.stringify([{id:'minecraft:beef'},{id:'minecraft:potato'},{id:'minecraft:carrot'}])});const before=b.result.clone();f.sync(b);
   const e=[...f.api.targets.values()][0].parts.get('recipe/result').entity;
-  assert.equal(e.typeId,id.endsWith('secret_skewer')?visual.PLATE_FOOD_VISUAL_TYPE:visual.RECIPE_ICON_VISUAL_TYPE);assert.deepEqual(b.result,before);assert.equal(f.count(),1);
-  if(id.endsWith('secret_skewer'))assert.equal(e.properties[NS+'display_mode'],1);
+  assert.equal(e.typeId,id.endsWith('secret_skewer')?visual.CUSTOM_RECIPE_ICON_VISUAL_TYPE:visual.RECIPE_ICON_VISUAL_TYPE);assert.deepEqual(b.result,before);assert.equal(f.count(),1);
+  if(id.endsWith('secret_skewer')){
+   assert.equal(e.properties[NS+'gui_count'],3);
+   const colors=[0,1,2].map(i=>e.properties[NS+'gui_color_'+i]);assert.equal(new Set(colors).size,3);
+   b.result.props[NS+'model_variants']='[7,4,9]';b.result.props[NS+'secret_cooked']=true;
+   b.result.props[NS+'secret_cooked_ingredients']=JSON.stringify([{id:'minecraft:cooked_beef'},{id:'minecraft:baked_potato'},{id:'minecraft:carrot'}]);
+   const updated=b.result.clone();f.sync(b);assert.equal(f.count(),1);assert.deepEqual(b.result,updated);
+   assert.equal(e.properties[NS+'gui_bits'],5);assert.notDeepEqual([0,1,2].map(i=>e.properties[NS+'gui_color_'+i]),colors);
+  }
  }
  b.typeId='minecraft:air';f.sync(b);assert.equal(f.count(),0);assert.equal(f.api.targets.size,0);
+});
+test('premium vat projection updates within the existing quota and drops on empty/non-premium state without owning its fluid',()=>{
+ const f=fixture({cap:1}),b=f.add('big_vat'),state={[NS+'vat_level']:1,[NS+'vat_fluid']:'premium_chili'};
+ b.permutation={getState:key=>state[key]};f.dp.set(NS+'a26_vat_minecraft_overworld_p0_p64_p0','{"type":"premium_chili","buckets":1}');
+ const before=new Map(f.dp);f.api.index();f.api.pump();const e=f.spawned[0];
+ assert.equal(e.typeId,visual.VAT_PREMIUM_VISUAL_TYPE);assert.equal(e.properties[NS+'level'],1);assert.equal(f.count(),1);assert.equal(f.commands.length,0);
+ f.tick=48;state[NS+'vat_level']=4;f.sync(b);assert.equal(e.properties[NS+'frame'],3);assert.equal(e.properties[NS+'level'],4);assert.equal(f.spawned.length,1);
+ state[NS+'vat_fluid']='lava';f.sync(b);assert.equal(f.count(),0);assert.equal(e.valid,false);assert.deepEqual(f.dp,before);
+ state[NS+'vat_fluid']='premium_chili';state[NS+'vat_level']=0;f.sync(b);assert.equal(f.count(),0);
 });
 test('slime wall animation selects all five source frames on its four-tick clock within the shared display budget',()=>{
  const f=fixture(),b=f.add('skewer_recipe');b.result=new Stack(NS+'grilled_slime_skewer');
@@ -136,7 +152,7 @@ test('unrelated vanilla interactions never fill the station target queue, while 
 test('display resources reuse audited meshes/palette and constrain helpers to transient render-only properties',()=>{
  const grill=json('resource_pack/entity/grill_food_visual.entity.json')['minecraft:client_entity'].description,plate=json('resource_pack/entity/plate_food_visual.entity.json')['minecraft:client_entity'].description;
  assert.deepEqual(plate.geometry,grill.geometry);assert.deepEqual(plate.textures,grill.textures);assert.deepEqual(plate.render_controllers,grill.render_controllers);assert.ok(plate.scripts.pre_animation.every(s=>!s.includes('flip')));
- for(const name of ['plate_food_visual','recipe_icon_visual']){const b=json('behavior_pack/entities/'+name+'.json')['minecraft:entity'];assert.deepEqual(b.components['minecraft:transient'],{});assert.equal(b.components['minecraft:inventory'],undefined);assert.deepEqual(b.components['minecraft:physics'],{has_gravity:false,has_collision:false});assert.equal(b.description.properties[NS+'ready'].default,false);}
+ for(const name of ['plate_food_visual','recipe_icon_visual','custom_recipe_icon_visual','vat_premium_visual']){const b=json('behavior_pack/entities/'+name+'.json')['minecraft:entity'];assert.deepEqual(b.components['minecraft:transient'],{});assert.equal(b.components['minecraft:inventory'],undefined);assert.deepEqual(b.components['minecraft:physics'],{has_gravity:false,has_collision:false});assert.equal(b.description.properties[NS+'ready'].default,false);}
  const icon=json('resource_pack/entity/recipe_icon_visual.entity.json')['minecraft:client_entity'].description;
  for(const [id,index] of Object.entries(visual.RECIPE_ICON_MODELS)){const path=icon.textures['s'+index];assert.equal(path,'textures/items/'+id.slice(NS.length));const bytes=fs.readFileSync(new URL('resource_pack/'+path+'.png',base));assert.equal(bytes.readUInt32BE(16),16);assert.equal(bytes.readUInt32BE(20),16);}
  const cube=json('resource_pack/models/entity/recipe_icon_visual.geo.json')['minecraft:geometry'][0].bones[0].cubes[0];assert.deepEqual(cube.origin,[-3.84,-3.84,0]);assert.deepEqual(cube.size,[7.68,7.68,0]);assert.deepEqual(Object.keys(cube.uv),['north','south']);

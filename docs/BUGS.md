@@ -1,6 +1,6 @@
 # 煙火目前缺口與待重現問題
 
-Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；目前已發版來源2.8.124，2026-10-09。
+Phase 0 原始稽核基準：2.8.114／`6fc3ab711e90ae9f23739b18b1f28ef5f31bbf8a`；目前維護來源2.8.125，2026-10-09。
 本頁不把「缺證據」全部當作已證實程式 bug，也不把舊候選觀察沿用成現行驗收。
 G116承接餐盤營養界限與防誤食；G117修復瓶爆炸取消及手持提前結算界限。
 G118補本日一比一稽核的核心、農業與容器機制差異；完整逐項狀態見[G118](STATUS-A2.8.118.md)。真人驗收仍待完成。
@@ -9,6 +9,20 @@ G119補手持盤及植物／效果提交；[G120](STATUS-A2.8.120.md)續修持�
 [G122](STATUS-A2.8.122.md)接通三道炒鍋備料／三翻／品質，增補紅樹與寫入所有權；具體原生操作與真人驗收仍按版本記錄保留範圍。
 [G123](STATUS-A2.8.123.md)修復原 Cookery 1.6.0 的三語正文鍵拒絕；[G124](STATUS-A2.8.124.md)修復調料資料重新載入。家族目前的 LIVE 配套、部署／保存／指南接收收據見[家族基線入口](https://github.com/casama233/kaleidoscope-tavern-unofficial/blob/main/family/BASELINE-STATUS.md)；家族載入及資料接收不補成食用、鍋具或客戶端操作驗收。
 現況總表見 [PARITY-MATRIX.md](PARITY-MATRIX.md)，工具變更見 [CHANGELOG](../CHANGELOG.md)。
+
+## GRILL-DEFERRED-OWNER：取消或替換後誤拆烤架
+
+**狀態：G125 已修復來源路由，並有原生事件／API 窄診斷；完整拆爐與玩家驗收保留。**
+
+G124 先排程後直接 customBreak，較後 listener 取消爆炸仍會清除站點。G125 延後重讀 cancel，並核對 type、permutation、owner、完整物品及語義狀態；正常計時不阻止合法拆除。before 階段只 clone，完整 restricted metadata getter 改到 deferred。原生 BDS 1.26.52.3 的四個事件診斷通過，但使用 vanilla chest 作庫存 fixture，沒有 full customBreak／玩家／家族驗收。[G125 詳細邊界](STATUS-A2.8.125.md#烤架取消與延後目標)
+
+## ITEM-DELIVERY：榨油機延後扣料與滿背包拒絕
+
+**狀態：G125 已補站點身份、原生交付讀回及持久隔離；玩家完整操作待同候選復驗。**
+
+榨油機延後點擊若遇方塊替換，G124 可能先扣油渣才發現目標失效。現在在扣料前核對 instance／前像；只恢復自己的写入。原 Java `placeItemBackInInventory` 可將剩餘物落地，G124 串譜／穿串／拆串卻會因滿包拒絕。G125 共用扣料後的插入／剩餘掉落 planner，保留完整 metadata；產物收回未確認，不退回原料或覆寫外來槽位。[G125 操作範圍](STATUS-A2.8.125.md#操作交易與滿背包)
+
+G125 同時修正亮度、Numb 速度及可用場景聲畫路由；native inventory 圖示、秘製串 HUD 色彩通道、準星偏移等缺口仍見 [場景與介面限制](evidence/scene-visual-repair-20261009.md#investigated-surfaces-that-remain-incomplete)，沒有將適配聲畫改標為一比一。
 
 ## SEASONING-DATA-RELOAD：調料准入與效果寫死
 

@@ -27,13 +27,13 @@
       "textures": "textures/blocks/grill_lit"
     },
     "kg_a23_canola_oil": {
-      "textures": "textures/blocks/canola_oil"
+      "textures": "textures/blocks/java_oil/canola_still_first"
     },
     "kg_a23_secret_chili_oil": {
-      "textures": "textures/blocks/secret_chili_oil"
+      "textures": "textures/blocks/java_oil/secret_chili_still_first"
     },
     "kg_a23_premium_chili_oil": {
-      "textures": "textures/blocks/premium_chili_oil"
+      "textures": "textures/blocks/java_oil/premium_chili_still_first"
     },
     "kg_a25_plate": {
       "textures": "textures/blocks/skewer_plate"
@@ -169,6 +169,15 @@
     },
     "kg_a2748_pepper_sapling": {
       "textures": "textures/blocks/pepper_sapling"
+    },
+    "kg_a23_canola_oil_flow": {
+      "textures": "textures/blocks/java_oil/canola_flow_first"
+    },
+    "kg_a23_secret_chili_oil_flow": {
+      "textures": "textures/blocks/java_oil/secret_chili_flow_first"
+    },
+    "kg_a23_premium_chili_oil_flow": {
+      "textures": "textures/blocks/java_oil/premium_chili_flow_first"
     }
   }
 }

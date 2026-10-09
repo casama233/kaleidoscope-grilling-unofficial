@@ -9,9 +9,9 @@ const source=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/beha
 const runtimeFile=name=>fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/'+name,import.meta.url),'utf8');
 const stripModule=text=>text.replace(/^import\b[\s\S]*?;\s*/gm,'').replace(/\bexport (?=(class|const|function|async))/g,'');
 function fixture(){
- const queue=[],fx=new Map([['heavy_metal',{until:1000,amp:0}]]),claims=new Map(),sounds=[];
+ const queue=[],fx=new Map([['heavy_metal',{until:1000,amp:0}]]),claims=new Map(),sounds=[],particles=[];
  const health={currentValue:8,setCurrentValue(v){this.currentValue=v}};
- const target={id:'entity',getComponent:()=>health,dimension:{playSound:id=>sounds.push(id)},location:{x:0,y:0,z:0},
+ const target={id:'entity',getComponent:()=>health,dimension:{playSound:id=>sounds.push(id),spawnParticle:(id,location)=>particles.push({id,location})},location:{x:0,y:0,z:0},getHeadLocation:()=>({x:0,y:1.62,z:0}),
   getDynamicProperty:key=>key===lifecycle.FX_KEY?JSON.stringify(Object.fromEntries(fx)):claims.get(key),
   setDynamicProperty(key,raw){if(key===heavyMetalClaim.HEAVY_METAL_CLAIM_KEY){if(raw===undefined)claims.delete(key);else claims.set(key,raw);return}if(key!==lifecycle.FX_KEY)return;fx.clear();for(const [name,value] of Object.entries(raw===undefined?{}:JSON.parse(raw)))fx.set(name,value)}};
  let handler;const world={getAbsoluteTime:()=>0,beforeEvents:{entityHurt:{subscribe:fn=>handler=fn}}},system={currentTick:0,run:fn=>queue.push(fn)};
@@ -24,15 +24,16 @@ function fixture(){
  vm.runInContext(stripModule(runtimeFile('heavy_metal_damage_runtime.js')),metal);
  const context=vm.createContext({console,world,system,fxGet:(_t,id)=>fx.get(id),handleHeavyMetalBeforeHurt:vm.runInContext('handleHeavyMetalBeforeHurt',metal)});
  vm.runInContext(source.slice(source.indexOf('world.beforeEvents.entityHurt.subscribe(e=>{'),source.indexOf('world.afterEvents.playerSpawn.subscribe')),context);
- return {fx,health,sounds,queue,hit(cancel=false,damage=10){const before=health.currentValue;health.currentValue=before-damage;const e={hurtEntity:target,damage,damageSource:{cause:'entityAttack'},cancel};handler(e);if(e.cancel)health.currentValue=before;return e},flush(){while(queue.length)queue.shift()()}};
+ return {fx,health,sounds,particles,queue,hit(cancel=false,damage=10){const before=health.currentValue;health.currentValue=before-damage;const e={hurtEntity:target,damage,damageSource:{cause:'entityAttack'},cancel};handler(e);if(e.cancel)health.currentValue=before;return e},flush(){while(queue.length)queue.shift()()}};
 }
 test('one reservation for repeated same-tick lethal events; later event is not granted extra immunity',()=>{
  const f=fixture();assert.equal(f.hit().cancel,true);assert.equal(f.hit(false,1).cancel,false);assert.equal(f.queue.length,1);
- f.flush();assert.equal(f.health.currentValue,1);assert.equal(f.fx.has('heavy_metal'),false);assert.equal(f.fx.get('heavy_metal_poisoning').until,12000);assert.equal(f.sounds.length,1);
+ assert.equal(f.particles.length,0);f.flush();assert.equal(f.health.currentValue,1);assert.equal(f.fx.has('heavy_metal'),false);assert.equal(f.fx.get('heavy_metal_poisoning').until,12000);assert.equal(f.sounds.length,1);
+ assert.equal(f.particles.length,1);assert.equal(f.particles[0].id,'minecraft:totem_particle');assert.equal(f.particles[0].location.y,1.62);
 });
 for(const mode of ['milk','death','replacement'])test(`deferred rescue does not restore an invalidated ${mode} session`,()=>{
  const f=fixture();f.hit();if(mode==='milk')f.fx.clear();if(mode==='death')f.health.currentValue=0;if(mode==='replacement')f.fx.set('heavy_metal',{until:2000,amp:1});
- f.flush();assert.equal(f.fx.has('heavy_metal_poisoning'),false);assert.equal(f.sounds.length,0);assert.equal(f.health.currentValue,mode==='death'?0:8);
+ f.flush();assert.equal(f.fx.has('heavy_metal_poisoning'),false);assert.equal(f.sounds.length,0);assert.equal(f.particles.length,0);assert.equal(f.health.currentValue,mode==='death'?0:8);
 });
 test('a prior addon cancellation does not consume or schedule heavy metal',()=>{
  const f=fixture();f.hit(true);assert.equal(f.queue.length,0);assert.equal(f.fx.has('heavy_metal'),true);

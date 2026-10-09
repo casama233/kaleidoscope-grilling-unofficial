@@ -234,7 +234,7 @@ test('recipe pickup/break preserve exact native metadata, one delivery and clear
   assert.equal(f.api.breakRecipe(f.block,f.holder),false);
  }
 });
-test('recipe pickup with full inventory follows Java drop fallback once, without changing crafting full-bag rollback',()=>{
+test('recipe pickup with full inventory follows Java drop fallback once',()=>{
  const f=fixture(),r=f.recipe();for(let slot=0;slot<36;slot++)f.slots.set(slot,new Stack('minecraft:stone')); // Empty offhand can retrieve the page.
  f.api.handleRecipeBlock(f.block,f.holder,'off');assert.equal(f.entities.length,1);assert.equal(f.dp.has(r.key),false);assert.equal(f.block.typeId,'minecraft:air');assert.ok(f.slots.get(0));
 });

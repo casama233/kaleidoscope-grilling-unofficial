@@ -2,7 +2,7 @@ import {advancedRackToolVisuals} from './advanced_rack_visual_core.js';
 import {RACK_TOOL_VISUAL_TYPE,rackToolVisualModel} from './rack_tool_visual_data.js';
 import {rackDisplayPose,RACK_TOOL_VISUAL_Y} from './advanced_rack_layout.js';
 import {syncRackDisplay} from './a2746_rack_state_adapter.js';
-import {PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,plateMeshPlan,recipeIconModel,recipeAnimationFrame,plateSlotPose,recipeIconPose,recipeMeshPose} from './plate_recipe_visual_core.js';
+import {PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,CUSTOM_RECIPE_ICON_VISUAL_TYPE,VAT_PREMIUM_VISUAL_TYPE,plateMeshPlan,recipeIconModel,secretGuiIconPlan,recipeAnimationFrame,vatPremiumPlan,vatAnimationFrame,plateSlotPose,recipeIconPose,recipeMeshPose} from './plate_recipe_visual_core.js';
 import {takeStationContentsVisualDirty} from './station_contents_visual_queue.js';
 import {stationProjection,registerStationProjection} from './station_projection_core.js';
 import {readPublicFood} from './host_api/food_api_core.js';
@@ -46,13 +46,15 @@ export function renderItemType(entity,stack){
 }
 function pose(block,dx,y,dz){const angle={north:0,east:90,south:180,west:270}[block.permutation.getState('minecraft:cardinal_direction')]??0,r=angle*Math.PI/180;return {location:{x:block.x+.5+dx*Math.cos(r)-dz*Math.sin(r),y:block.y+y,z:block.z+.5+dx*Math.sin(r)+dz*Math.cos(r)},angle};}
 function render(row,b,k,stack,at,mode){
- let old=row.parts.get(k);if(!stack||!at){discard(row,k);return;}
+ let old=row.parts.get(k);const vat=mode===4?vatPremiumPlan(b):undefined;
+ if((mode===4?!vat:!stack)||!at){discard(row,k);return;}
  const rackModel=mode===0?rackToolVisualModel(stack.typeId):undefined,iconModel=mode===3?recipeIconModel(stack):undefined;
- const mesh=(mode===1||(mode===3&&iconModel===undefined))?plateMeshPlan(stack,reader):undefined;
- const type=rackModel!==undefined?RACK_TOOL_VISUAL_TYPE:iconModel!==undefined?RECIPE_ICON_VISUAL_TYPE:mesh?PLATE_FOOD_VISUAL_TYPE:TYPE;
+ const customIcon=mode===3?secretGuiIconPlan(stack,reader):undefined;
+ const mesh=(mode===1||(mode===3&&iconModel===undefined&&!customIcon))?plateMeshPlan(stack,reader):undefined;
+ const type=vat?VAT_PREMIUM_VISUAL_TYPE:customIcon?CUSTOM_RECIPE_ICON_VISUAL_TYPE:rackModel!==undefined?RACK_TOOL_VISUAL_TYPE:iconModel!==undefined?RECIPE_ICON_VISUAL_TYPE:mesh?PLATE_FOOD_VISUAL_TYPE:TYPE;
  if(old&&(old.entity?.isValid!==true||old.entity.typeId!==type)){if(!discard(row,k))return;old=undefined;}
- let frame=0;if(iconModel===33){let tick;try{tick=world.getAbsoluteTime()}catch{tick=system.currentTick}frame=recipeAnimationFrame(tick);}
- const signature=JSON.stringify({item:metadataSignature(captureSkewerMetadata(stack)),at,mode,type,rackModel,iconModel,mesh,frame});if(old?.signature===signature)return;
+ let frame=0;if(iconModel===33||vat){let tick;try{tick=world.getAbsoluteTime()}catch{tick=system.currentTick}frame=vat?vatAnimationFrame(tick):recipeAnimationFrame(tick);}
+ const signature=JSON.stringify({item:stack?metadataSignature(captureSkewerMetadata(stack)):undefined,at,mode,type,rackModel,iconModel,customIcon,vat,mesh,frame});if(old?.signature===signature)return;
  if(!old){
   if(helpers>=grillingConfig().contentsHelpers){if(system.currentTick-lastCapacityWarning>=1200){lastCapacityWarning=system.currentTick;console.warn("[Grilling contents capacity] render budget="+grillingConfig().contentsHelpers+"; storage unaffected; configure contentsHelpers after workload validation")}return;}
   // Reserve before spawning: an exception/unknown return may already have made
@@ -66,7 +68,12 @@ function render(row,b,k,stack,at,mode){
   if(type===TYPE){old.entity.setProperty('kaleidoscope_grilling:pose',mode===3?0:mode);renderItemType(old.entity,stack);}
   else{
    old.entity.setProperty('kaleidoscope_grilling:ready',false);
-   old.entity.setProperty('kaleidoscope_grilling:model',rackModel??iconModel??mesh.model);
+   if(vat){old.entity.setProperty('kaleidoscope_grilling:level',vat.level);old.entity.setProperty('kaleidoscope_grilling:frame',frame);}
+   else if(customIcon){
+    old.entity.setProperty('kaleidoscope_grilling:gui_count',customIcon.count);
+    old.entity.setProperty('kaleidoscope_grilling:gui_bits',customIcon.bits);
+    for(let i=0;i<3;i++)old.entity.setProperty('kaleidoscope_grilling:gui_color_'+i,customIcon.colors[i]);
+   }else old.entity.setProperty('kaleidoscope_grilling:model',rackModel??iconModel??mesh.model);
    if(iconModel!==undefined)old.entity.setProperty('kaleidoscope_grilling:frame',frame);
    if(mesh){old.entity.setProperty('kaleidoscope_grilling:display_mode',mode===3?1:0);for(let i=0;i<3;i++)old.entity.setProperty('kaleidoscope_grilling:secret_'+i,mesh.secret[i]);}
    old.entity.setProperty('kaleidoscope_grilling:ready',true);
@@ -99,10 +106,12 @@ export function syncStationContentsVisual(block,observers){
   }
  }else if(block.typeId==='kaleidoscope_grilling:skewer_recipe'){
   const stack=a25ReadRecipeDisplayStack(block),k='recipe/result';seen.add(k);
-  // Fixed GUI-16 icons are copied from Java. Secret results use the same
-  // metadata-driven mesh palette as plates, flattened like Java's fallback.
-  // Runtime-generated custom GUI-16 textures are not claimed on this platform.
-  render(row,block,k,stack,recipeIconModel(stack)!==undefined?recipeIconPose(block):recipeMeshPose(block),3);
+  // Java GUI-16 secret masks are composed by disjoint tinted layers. This uses
+  // the saved recipe result and does not change native inventory icon routing.
+  render(row,block,k,stack,recipeIconModel(stack)!==undefined||secretGuiIconPlan(stack,reader)?recipeIconPose(block):recipeMeshPose(block),3);
+ }else if(block.typeId==='kaleidoscope_grilling:big_vat'){
+  const k='vat/premium';seen.add(k);
+  render(row,block,k,undefined,{location:{x:block.x+.5,y:block.y,z:block.z+.5},angle:0},4);
  }else if(block.typeId==='kaleidoscope_grilling:grill'){
   // Personalized grill meshes belong to grill_visual_runtime; clear old icon parts.
  }else{clear(row);if(!row.parts.size)work.remove(key(block));return;}
@@ -111,12 +120,12 @@ export function syncStationContentsVisual(block,observers){
 function index(){if(indexing)return;indexing=true;system.runJob((function*(){try{for(const name of world.getDynamicPropertyIds()){
  let dimensionId,x,y,z;
  if(name.startsWith(STORAGE_PREFIX)){const p=name.slice(STORAGE_PREFIX.length).split('/');if(p.length===4)[dimensionId,x,y,z]=p;}
- else{const p=/^kaleidoscope_grilling:a25_(?:plate|recipe)_(minecraft_(?:overworld|nether|the_end))_([pm]\d+)_([pm]\d+)_([pm]\d+)$/.exec(name);if(p){dimensionId=p[1].replace('minecraft_', 'minecraft:');[x,y,z]=p.slice(2).map(n=>Number(n.slice(1))*(n[0]==='m'?-1:1));}}
+ else{const p=/^kaleidoscope_grilling:(?:a25_(?:plate|recipe)|a26_vat)_(minecraft_(?:overworld|nether|the_end))_([pm]\d+)_([pm]\d+)_([pm]\d+)$/.exec(name);if(p){dimensionId=p[1].replace('minecraft_', 'minecraft:');[x,y,z]=p.slice(2).map(n=>Number(n.slice(1))*(n[0]==='m'?-1:1));}}
  if(dimensionId&&[x,y,z].every(n=>Number.isSafeInteger(Number(n)))){const location={x:Number(x),y:Number(y),z:Number(z)},k=dimensionId+'|'+x+'|'+y+'|'+z;if(!targets.has(k))work.add(k,{dimensionId,location,parts:new Map()});}yield;
  }}catch(e){warn(e)}finally{indexing=false}})());}
 export function markStationContentsDirty(block){
  if(!block)return;const k=key(block);
- if(!targets.has(k)&&!['kaleidoscope_grilling:grill','kaleidoscope_grilling:advanced_rack_block','kaleidoscope_grilling:skewer_plate_block','kaleidoscope_grilling:skewer_recipe'].includes(block.typeId))return;
+ if(!targets.has(k)&&!['kaleidoscope_grilling:grill','kaleidoscope_grilling:advanced_rack_block','kaleidoscope_grilling:skewer_plate_block','kaleidoscope_grilling:skewer_recipe','kaleidoscope_grilling:big_vat'].includes(block.typeId))return;
  rememberStationVisual(block);work.mark(k);
 }
 function pump(){
@@ -135,7 +144,7 @@ for(const name of ['playerPlaceBlock','playerInteractWithBlock','playerBreakBloc
 // Grill/rack use their established deferred refresh. Plate/recipe transactions
 // publish explicit post-commit coordinates through the queue above.
 world.beforeEvents.playerInteractWithBlock.subscribe(e=>{if(['kaleidoscope_grilling:grill','kaleidoscope_grilling:advanced_rack_block'].includes(e.block.typeId)){const d=e.block.dimension,l={...e.block.location};system.run(()=>{try{markStationContentsDirty(d.getBlock(l))}catch{}})}});
-system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE])for(const e of world.getDimension(dim).getEntities({type})){
+system.run(()=>{for(const dim of ['overworld','nether','the_end'])try{for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,CUSTOM_RECIPE_ICON_VISUAL_TYPE,VAT_PREMIUM_VISUAL_TYPE])for(const e of world.getDimension(dim).getEntities({type})){
  const id=e.id,row={parts:new Map([[id,{entity:e,type}]])};helpers++;if(!discard(row,id))orphaned.set(id,row);
 }}catch(e){warn(e)};index();system.runInterval(pump,1);system.runInterval(index,400);});
 export const contentsVisualHelperCount=()=>helpers;
