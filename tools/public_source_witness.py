@@ -112,6 +112,7 @@ REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
 REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
 CUISINE_CANDIDATE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
 REVIEWED_CUISINE_BASE = '9fd92988f872ec1128aa071f2e045d54dbcdd4f4'
+REVIEWED_SEASONING_DATA_BASE = '469441bc6556b5e91adedfd44876ac072572012a'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -261,6 +262,17 @@ def _g122_cuisine_bytes(expected):
     return repaired
 
 
+def _g124_seasoning_data_bytes(expected):
+    delta = _main_delta('g124-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 124]
+    assert delta['reviewed_commit'] == REVIEWED_SEASONING_DATA_BASE
+    assert len(delta['operations']) == 3, 'G124 seasoning main scope changed'
+    repaired = _apply_main_operations(expected, delta)
+    reviewed = subprocess.check_output(['git', 'show', REVIEWED_SEASONING_DATA_BASE + ':' + MAIN_PATH], cwd=ROOT)
+    assert repaired == reviewed, 'G124 public source differs outside exact seasoning resolver delta'
+    return repaired
+
+
 def _local_bottle_main_bytes(expected, version):
     # These are local candidate identities, distinct from published G72/G73.
     for patch_version, filename in (
@@ -367,6 +379,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
         # The separately reviewed cuisine candidate first enters release G122.
         if version >= (2, 8, 122):
             expected = _g122_cuisine_bytes(expected)
+        if version >= (2, 8, 124):
+            expected = _g124_seasoning_data_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)

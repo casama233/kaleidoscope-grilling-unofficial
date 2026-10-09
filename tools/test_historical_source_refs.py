@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':28,'commits':28})
+  self.assertEqual(verify(),{'refs':29,'commits':29})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -89,6 +89,16 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   self.assertEqual(repaired,public._reviewed_conservation_source())
   source=path.read_bytes();current=json.loads((ROOT/'baseline.json').read_text())['version']
   self.assertEqual(source,public.expected_main_bytes(current))
+  if tuple(current)>=(2,8,124):
+   seasoning=load('g124-main-reviewed-delta.json')
+   self.assertEqual(len(seasoning['operations']),3)
+   self.assertIn(public.REVIEWED_SEASONING_DATA_BASE,inventory())
+   for op in seasoning['operations']:
+    changed=source.replace(op['after'].encode(),op['before'].encode(),1)
+    self.assertNotEqual(changed,source)
+    with patch.object(Path,'read_bytes',return_value=changed):
+     with self.assertRaisesRegex(AssertionError,'Source differs outside'):
+      public.assert_public_bytes_with_g71_bottles(self,path)
   for op in delta['operations']:
    changed=source.replace(op['after'].encode(),op['before'].encode(),1)
    self.assertNotEqual(changed,source)
