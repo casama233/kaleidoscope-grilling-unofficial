@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2];RP=ROOT/'projects/grilling/gameplay_cor
 from held_pose_frames import point
 from secret_active_calibration import calibrated_target,PROFILE_IDS
 from bottle_pose_review import historical_bytes
-from public_source_witness import PUBLIC_SOURCE_BASE,public_json,assert_public_bytes
+from public_source_witness import PUBLIC_SOURCE_BASE,REVIEWED_SCENE_INTERACTION_BASE,public_json,assert_public_bytes
 from build_plate_display import build as plate_display_assets
 from build_plate_held import build as plate_held_assets
 import java_dual_eating_frames as dual
@@ -84,6 +84,32 @@ for(const row of cases)for(const held of [row.id,'minecraft:apple','kaleidoscope
    bottle=RP/'animations'/name
    self.assertEqual(historical_bytes(bottle),subprocess.check_output(['git','show',PUBLIC_SOURCE_BASE+':'+str(bottle.relative_to(ROOT))],cwd=ROOT))
    allowed.add(str(bottle.relative_to(ROOT)))
+  # G125 changes only the Numb phase units/lifecycle and adds its own empty
+  # stop clip. Rebuild that exact delta from the complete public preimage;
+  # both the existing reviewed source and the checkout must match full bytes.
+  numb=RP/'animations/a22_numb.animation.json';numb_path=str(numb.relative_to(ROOT))
+  before=subprocess.check_output(['git','show',PUBLIC_SOURCE_BASE+':'+numb_path],cwd=ROOT)
+  expected=json.loads(before)
+  self.assertEqual(before,(json.dumps(expected,indent=2)+'\n').replace('\n','\r\n').encode(),'Numb public preimage serialization changed')
+  self.assertEqual(set(expected['animations']),{'animation.kg_a22.player.numb'})
+  clip=expected['animations']['animation.kg_a22.player.numb']
+  self.assertNotIn('loop',clip);self.assertNotIn('blend_weight',clip)
+  channels={'rightarm':(0,2),'leftarm':(0,2),'rightleg':(0,),'leftleg':(0,)}
+  self.assertEqual(set(clip['bones']),set(channels))
+  for bone,axes in channels.items():
+   for axis in axes:
+    expression=clip['bones'][bone]['rotation'][axis]
+    self.assertEqual(expression.count('q.life_time * 18.334'),1,(bone,axis))
+    clip['bones'][bone]['rotation'][axis]=expression.replace('q.life_time * 18.334','q.life_time * 366.6929889',1)
+  clip['loop']=True
+  clip['blend_weight']='math.clamp(q.modified_move_speed * 1.8, 0.0, 1.0) >= 0.04'
+  expected['animations']['animation.kg_a22.player.numb_stop']={'animation_length':0.05,'bones':{}}
+  # The reviewed G125 file also normalizes the old CRLF serialization to LF.
+  repaired=(json.dumps(expected,indent=2)+'\n').encode()
+  reviewed=subprocess.check_output(['git','show',REVIEWED_SCENE_INTERACTION_BASE+':'+numb_path],cwd=ROOT)
+  self.assertEqual(reviewed,repaired,'Reviewed G125 Numb differs outside the exact phase/lifecycle delta')
+  self.assertEqual(numb.read_bytes(),reviewed,'Numb animation must match the complete reviewed G125 source')
+  allowed.add(numb_path)
   self.assertEqual(set(changed)-allowed,set())
   if rack.exists():
    old=subprocess.run(['git','cat-file','-e',PUBLIC_SOURCE_BASE+':'+str(rack.relative_to(ROOT))],cwd=ROOT,capture_output=True)
