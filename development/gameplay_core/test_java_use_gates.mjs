@@ -1,4 +1,5 @@
 import {canonicalFoodId,eatingItemId,SKEWER_EATING_IDS,isPlainEatingId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
+import {canUseCuisineFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/cuisine_eating_core.js';
 import {FOOD_DATA as actualFoodData} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_data_lookup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,7 +14,7 @@ function fixture({id='fixed',sneak=false,full=true,allowFull=true,hot=false,acti
  const calls=[];let callback;
  const p={isSneaking:sneak,getComponent:()=>({currentValue:full?20:10,effectiveMax:20})};
  const item={typeId:id==='secret'?'kaleidoscope_grilling:secret_skewer':id,clone(){return this;}};
- vm.runInNewContext(source.slice(start,end),{canonicalFoodId,SKEWER_EATING_IDS,isPlainEatingId,world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},FOOD_DATA:new Proxy({fixed:{}},{get:(target,key)=>target[key]??actualFoodData[key]}),SECRET_ID:'kaleidoscope_grilling:secret_skewer',PLATE_ID:'plate',grillingConfig:()=>({fullHungerEating:allowFull,enableEatingAnimations:animations}),canUseSecretSkewer:()=>true,skewerAction:()=>action,scheduleSkewerAction:(_,a)=>calls.push(a),isHot:()=>hot,heldOff:()=>undefined,isFoodStack:()=>true,captureInteractionIntent:()=>({}),system:{run:f=>f()},interactionIntentStillCurrent:()=>true,mainContainer:()=>({}),compactMatchingHotFood:()=>calls.push('merge')});
+ vm.runInNewContext(source.slice(start,end),{canUseCuisineFood,canonicalFoodId,SKEWER_EATING_IDS,isPlainEatingId,world:{beforeEvents:{itemUse:{subscribe:f=>callback=f}}},FOOD_DATA:new Proxy({fixed:{}},{get:(target,key)=>target[key]??actualFoodData[key]}),SECRET_ID:'kaleidoscope_grilling:secret_skewer',PLATE_ID:'plate',grillingConfig:()=>({fullHungerEating:allowFull,enableEatingAnimations:animations}),canUseSecretSkewer:()=>true,skewerAction:()=>action,scheduleSkewerAction:(_,a)=>calls.push(a),isHot:()=>hot,heldOff:()=>undefined,isFoodStack:()=>true,captureInteractionIntent:()=>({}),system:{run:f=>f()},interactionIntentStillCurrent:()=>true,mainContainer:()=>({}),compactMatchingHotFood:()=>calls.push('merge')});
  const e={source:p,itemStack:item,cancel};callback(e);return {e,calls};
 }
 test('crouching blocks ordinary fixed secret and plate eating',()=>{for(const id of ['fixed','secret','plate'])assert.equal(fixture({id,sneak:true}).e.cancel,true,id);});

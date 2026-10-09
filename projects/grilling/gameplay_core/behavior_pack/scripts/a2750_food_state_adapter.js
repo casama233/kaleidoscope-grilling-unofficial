@@ -5,10 +5,22 @@ import {readRawFoodLore,isHeatLore,applyFoodMaxim} from './a2769_food_tooltip_co
 import './a2769_food_tooltip_runtime.js';
 import {heatLore} from './localized_lore_core.js';
 import {metadataSignature} from './skewer_item_snapshot.js';
-import {readPublicFood,writePublicFood,isFoodPayloadLine,FOOD_PAYLOAD_KEY,bucketHotUntil} from './host_api/food_api_core.js';
+import {readPublicFood,writePublicFood,isFoodPayloadLine,FOOD_PAYLOAD_KEY,bucketHotUntil,publicFoodLoreRows} from './host_api/food_api_core.js';
+import {cuisineQualityOfItem,cuisineQualityPayloadMatches,validCuisineQuality} from './host_api/cuisine_quality_core.js';
 
 export const HOT_UNTIL_KEY='kaleidoscope_grilling:hot_until';
 function now(){try{return Number(world.getAbsoluteTime())||system.currentTick}catch{return system.currentTick}}
+export function readFoodQuality(stack){
+ const portable=readPublicFood(stack);
+ return cuisineQualityPayloadMatches(stack?.typeId,portable)&&portable.valid?portable.state.quality:undefined;
+}
+export function setFoodQuality(stack,quality){
+ if(!stack||!validCuisineQuality(quality)||cuisineQualityOfItem(stack.typeId)!==quality)throw Error('cuisine quality/native item mismatch');
+ const portable=readPublicFood(stack);if(portable.present&&!portable.valid)throw Error('public food unreadable');
+ const state=portable.valid?portable.state:{v:1,hotUntil:hotUntil(stack),seasoning:readFoodSeasonings(stack)};
+ if(state.quality!==undefined&&state.quality!==quality)throw Error('cuisine quality already owned');
+ writePublicFood(stack,{...state,quality});return stack;
+}
 export function readFoodSeasonings(stack){
  const portable=readPublicFood(stack);if(portable.present)return portable.valid?normalizeSeasoningList(portable.state.seasoning):[];
  try{
@@ -36,7 +48,7 @@ function clearExpiredHeat(stack,base){
  const beforeData=metadataSignature(properties),priorHot=properties.find(([key])=>key===HOT_UNTIL_KEY)?.[1];
  const expectedData=metadataSignature(properties.filter(([key])=>key!==HOT_UNTIL_KEY));
  const clean=base.filter(line=>!isFoodPayloadLine(line)),cold=portable.valid?{...portable.state,hotUntil:0}:undefined;
- const expectedLore=metadataSignature(cold?[...clean,{translate:FOOD_PAYLOAD_KEY,with:[JSON.stringify(cold)]}]:clean);
+ const expectedLore=metadataSignature(cold?publicFoodLoreRows(clean,cold):clean);
  try{
   setItemProperty(stack,HOT_UNTIL_KEY,undefined);
   setItemLore(stack,clean);
@@ -94,8 +106,9 @@ export function setHotFood(stack,ticks){
  }
  return stack;
 }
-export function applyFoodMetadata(stack,{seasoning=[],hotTicks=0}={}){
+export function applyFoodMetadata(stack,{seasoning=[],hotTicks=0,quality}={}){
  if(!stack)return stack;
+ if(quality!==undefined)setFoodQuality(stack,quality);
  // Customize before writing dynamic properties; all cuisine outputs retain their
  // original hot duration. A tooltip failure must not suppress gameplay metadata.
  setHotFood(stack,hotTicks);setFoodSeasonings(stack,seasoning);

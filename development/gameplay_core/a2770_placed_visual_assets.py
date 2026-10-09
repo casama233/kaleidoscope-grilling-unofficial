@@ -241,6 +241,10 @@ def ingredient_palette():
  # They are not additional seasoning ingredients or Java palette identities.
  aliases={identifier+'_java_three_alt' for identifier,profile in profiles.items() if profile=='THREE_RANDOM'}|{'kaleidoscope_grilling:secret_skewer_java_three_alt'}
  aliases|={identifier+'_native_plain' for identifier in {*profiles,'kaleidoscope_grilling:secret_skewer'}}
+ # G121 quality variants reuse their canonical dish icons and visual indices.
+ # They are native nutrition identities, not additional seasoning palette items.
+ aliases|={NS+f'{name}_cuisine_q{quality}' for name in (
+  'houttuynia_stir_fried_pork','green_pepper_squid_tentacles','braised_chicken_wings') for quality in range(4)}
  for file in sorted((BP/'items').glob('*.json')):
   item=load(file)['minecraft:item']
   if item['description']['identifier'] in aliases:continue

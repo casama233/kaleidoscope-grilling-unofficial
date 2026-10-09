@@ -21,7 +21,7 @@ system.runTimeout(async()=>{try{
  if(!previous){writeSharedPlacedOil(pot,{v:1,type:'premium_chili',count:8,revision:1});bag.setItem(20,new ItemStack('kaleidoscope_grilling:premium_chili_oil_bucket'));check(fillSharedPlacedOil(pot,bag.getSlot(20),'premium_chili').ok,'native placed fill');}
  const placed=readSharedPlacedOil(pot);check(placed.type==='premium_chili'&&placed.count===16,'placed persisted');
  bag.setItem(21,new ItemStack('kaleidoscope_grilling:canola_oil_bucket'));check(!fillSharedPlacedOil(pot,bag.getSlot(21),'canola').ok,'placed mixed oil rejected');
- if(!previous){bag.setItem(22,createPublicOilPot(ItemStack,'secret_chili',8));const state={},key='qa:station-oil';check(commitSharedStationOil(kitchen,bag.getSlot(22),state,{save(_b,s){world.setDynamicProperty(key,JSON.stringify(s))},load:()=>JSON.parse(world.getDynamicProperty(key)),sync(){}}).ok,'native station commit');}
+ if(!previous){bag.setItem(22,createPublicOilPot(ItemStack,'secret_chili',8));const state={},key='qa:station-oil';check(commitSharedStationOil(kitchen,bag.getSlot(22),state,{save(_b,s){world.setDynamicProperty(key,JSON.stringify(s))},load:()=>JSON.parse(world.getDynamicProperty(key)),raw:()=>world.getDynamicProperty(key),sync(){}}).ok,'native station commit');}
  check(readPublicOil(bag.getItem(22)).state.count===7,'station debit persisted');
  const receipt=deliverCuisineOutput(kitchen,{grillingOilType:'premium_chili'},'minecraft:suspicious_stew',1,'pot',{container:bag,targetBlock:chest,operationId:'qa:stew-4',nativeStack:createNativeSuspiciousStew(kitchen,4)});
  const actual=bag.getItem(receipt.target.slot);check(readPublicFood(actual).state.hotUntil===receipt.metadata.hotUntil,'output metadata');check(previous?receipt.replayed:!receipt.replayed,'output replay');

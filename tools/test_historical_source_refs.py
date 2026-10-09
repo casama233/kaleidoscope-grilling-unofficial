@@ -12,7 +12,7 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   (r/'tools/fixtures/g66-historical-source-refs.json').write_text(json.dumps({'schema':1,'refs':rows}))
   return r
  def test_complete_active_source_refs_resolve_exactly(self):
-  self.assertEqual(verify(),{'refs':25,'commits':25})
+  self.assertEqual(verify(),{'refs':27,'commits':27})
   self.assertEqual(set(inventory()),literal_refs())
  def test_public_witness_rejects_tree_digest_and_current_source_byte_mutations(self):
   meta=public.witness();path=ROOT/'projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json'
@@ -174,6 +174,30 @@ class HistoricalSourceRefsTests(unittest.TestCase):
   with patch.object(public,'_held_channel_delta',return_value=wrong):
    with self.assertRaisesRegex(AssertionError,'scope changed'):public.reviewed_held_bytes(relative)
   with self.assertRaisesRegex(AssertionError,'outside scope'):public.reviewed_held_bytes(public.MAIN_PATH)
+ def test_g122_cuisine_preserves_released_g121_and_exact_unmerged_candidate(self):
+  load=public._main_delta;delta=load('g121-main-reviewed-delta.json')
+  before=public.expected_main_bytes((2,8,121));repaired=public.expected_main_bytes((2,8,122))
+  self.assertEqual(before,public.expected_main_bytes((2,8,120)))
+  self.assertEqual(before,public.expected_main_bytes((2,8,119)))
+  self.assertEqual(delta['previous_public_commit'],public.REVIEWED_REMAINING_BASE)
+  self.assertEqual(delta['reviewed_commit'],public.CUISINE_CANDIDATE_BASE)
+  self.assertIn(public.CUISINE_CANDIDATE_BASE,inventory())
+  self.assertIn(public.REVIEWED_CUISINE_BASE,inventory())
+  self.assertEqual(len(delta['operations']),7)
+  self.assertEqual(public._apply_main_operations(before,delta),repaired)
+  self.assertEqual(repaired,public._cuisine_candidate_source())
+  self.assertEqual(repaired,public._reviewed_cuisine_source())
+  with self.assertRaisesRegex(AssertionError,'wrong public preimage'):
+   public._g122_cuisine_bytes(before+b'\n')
+  # A matching edited hash cannot admit an eighth change to native-use logic.
+  changed=copy.deepcopy(delta);op=changed['operations'][-1];original=op['after'];op['after']+='\n'
+  changed['after_sha256']=hashlib.sha256(repaired.replace(original.encode(),op['after'].encode(),1)).hexdigest()
+  with patch.object(public,'_main_delta',side_effect=lambda name:changed if name=='g121-main-reviewed-delta.json' else load(name)):
+   with self.assertRaisesRegex(AssertionError,'Reviewed cuisine candidate differs outside'):
+    public.expected_main_bytes((2,8,122))
+  with patch.object(public,'_reviewed_cuisine_source',return_value=repaired+b'\n'):
+   with self.assertRaisesRegex(AssertionError,'G122 public source differs'):
+    public.expected_main_bytes((2,8,122))
  def test_short_literal_and_full_named_base_are_audited(self):
   full='1'*40;r=self.fixture("SOURCE_BASE='"+full+"'\nx=['git','show','abcdef12:code.json']",{full:full,'abcdef12':'a'*40})
   self.assertEqual(literal_refs(r),{full,'abcdef12'});inventory(r)

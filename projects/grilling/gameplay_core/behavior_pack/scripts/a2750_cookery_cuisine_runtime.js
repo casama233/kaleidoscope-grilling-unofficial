@@ -26,6 +26,11 @@ import {
 } from './cookery_output_contract_core.js';
 
 const message=interactionFeedback;
+let authoritativeCuisineHost=false;
+system.afterEvents.scriptEventReceive.subscribe(event=>{
+ if(event.id!=='kaleidoscope_cookery:api_ready')return;
+ try{const info=JSON.parse(event.message);if(info.api===1&&Array.isArray(info.capabilities))authoritativeCuisineHost=info.capabilities.includes('grilling_pot_exact_flex_v1');}catch{}
+});
 function isFirst(event){return event.isFirstEvent!==false}
 function readCuisineState(block){
  try{
@@ -152,12 +157,15 @@ function applySeasoning(player,block){
 }
 function finishHostInteraction(player,dimension,location,kind,beforeInventory,beforeHasOil,candidateOil,stateBefore){
  if(!grillingConfig().enableCookeryFoodHeatAndSeasoning)return;
- const block=dimension.getBlock(location),afterInventory=snapshotInventory(player),gains=inventoryGains(beforeInventory,afterInventory);
+ const block=dimension.getBlock(location),afterInventory=authoritativeCuisineHost?[]:snapshotInventory(player),gains=inventoryGains(beforeInventory,afterInventory);
  const afterHasOil=kind==='pot'&&block?.typeId===COOKERY_POT_ID?hostHasOil(block):false;
  if(kind==='pot'){
   const transition=planPotOilTransition(stateBefore,beforeHasOil,afterHasOil,candidateOil);
   if(transition.changed&&block?.typeId===COOKERY_POT_ID)writeCuisineState(block,transition.state);
  }
+ // Modern host output receipts identify actual dishes; raw ingredient removal
+ // must not be guessed to be a cooked output from an inventory increase.
+ if(authoritativeCuisineHost)return;
  const effective={...stateBefore,oilType:kind==='pot'?(stateBefore.oilType||(beforeHasOil?'default':'')):stateBefore.oilType};
  const plan=metadataPlan(kind,effective);
  let decorated=0;for(const gain of gains)if(rewriteGain(player,gain,plan))decorated++;
@@ -219,7 +227,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event=>{
   }
   if(!isFirst(event)||!grillingConfig().enableCookeryFoodHeatAndSeasoning)return;
   const dimension=event.block.dimension,location={...event.block.location};
-  const stateBefore=readCuisineState(event.block),beforeInventory=snapshotInventory(player);
+  const stateBefore=readCuisineState(event.block),beforeInventory=authoritativeCuisineHost?[]:snapshotInventory(player);
   const beforeHasOil=kind==='pot'?hostHasOil(event.block):false,candidateOil=kind==='pot'?typedHeldOil(used):'';
   system.run(()=>finishHostInteraction(player,dimension,location,kind,beforeInventory,beforeHasOil,candidateOil,stateBefore));
  }catch{}

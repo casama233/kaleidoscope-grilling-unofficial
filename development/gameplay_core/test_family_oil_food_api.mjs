@@ -2,6 +2,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import * as oil from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/oil_api_core.js';
 import * as food from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
+import * as quality from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/cuisine_quality_core.js';
 import {registerSecretIngredientBehavior,applySecretBehaviorExtension,resetSecretCompatRegistry} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/secret_compat_core.js';
 const base='projects/grilling/gameplay_core/behavior_pack/scripts/';
 class Item{constructor(typeId,amount=1){this.typeId=typeId;this.amount=amount;this.lore=[];this.props={};}isStackableWith(other){return this.maxAmount!==1&&other?.maxAmount!==1&&this.typeId===other?.typeId&&this.nameTag===other?.nameTag&&JSON.stringify(this.lore)===JSON.stringify(other?.lore)&&JSON.stringify(this.props)===JSON.stringify(other?.props)}getRawLore(){return structuredClone(this.lore)}setLore(v){this.lore=structuredClone(v)}getDynamicProperty(k){return this.props[k]}getDynamicPropertyIds(){return Object.keys(this.props)}setDynamicProperty(k,v){if(v===undefined)delete this.props[k];else this.props[k]=v}clone(){const n=new Item(this.typeId,this.amount);Object.assign(n,structuredClone({...this}));return n}}
@@ -10,7 +11,7 @@ function fixture(name,savedProperties){const properties=new Map(savedProperties)
  const signal=key=>({subscribe(fn){(subscriptions[key]??=[]).push(fn)}});
  const world={getDynamicProperty:k=>properties.get(k),setDynamicProperty(k,v){if(faults.get(k)){faults.set(k,faults.get(k)-1);throw Error('property fault')}if(v===undefined)properties.delete(k);else properties.set(k,v)},getAbsoluteTime:()=>1000,getAllPlayers:()=>[],getEntity:id=>drops.find(d=>d.id===id),afterEvents:{playerSpawn:signal('spawn'),playerPlaceBlock:signal('place')},beforeEvents:{playerInteractWithBlock:signal('interact'),playerBreakBlock:signal('break'),explosion:signal('explosion')}};
  const system={currentTick:100,run(){},runTimeout(){},afterEvents:{scriptEventReceive:signal('script')},sendScriptEvent:(id,message)=>emitted.push({id,data:JSON.parse(message)})};
- const ctx={...oil,...food,world,system,ItemStack:Item,EquipmentSlot:{Mainhand:'Mainhand',Offhand:'Offhand'},GameMode:{Creative:'Creative'},console};
+ const ctx={...oil,...food,...quality,world,system,ItemStack:Item,EquipmentSlot:{Mainhand:'Mainhand',Offhand:'Offhand'},GameMode:{Creative:'Creative'},console};
  let code=fs.readFileSync(base+'host_api/'+name,'utf8').replace(/^import .*;\n/gm,'').replace(/\bexport /g,'');code+='\nthis.api={'+(name==='oil_api_host.js'?'consumeSharedOilFromHeldPot,readHostOilItem,readSharedPlacedOil,writeSharedPlacedOil,consumeSharedOilSlot,fillSharedPlacedOil,recoverSharedOilPot,retrySharedOilRecovery,commitSharedStationOil,publishLegacyHostOil':'deliverCuisineOutput,readCuisineMetadata,recoverCuisineOutput,nextCuisineBatch,prepareCuisineBurn')+'};';vm.runInNewContext(code,ctx);
  const dim={id:'minecraft:overworld',getBlock:()=>block,spawnItem(s){const item=s.clone(),d={id:'drop'+drops.length,getComponent:()=>({itemStack:item}),remove(){drops.splice(drops.indexOf(d),1)}};drops.push(d);return d}};
  const block={dimension:dim,x:40,y:80,z:64,typeId:oil.EMPTY_POT,permutation:{getState:()=>false,withState(_k,v){this.getState=()=>v;return this}},setPermutation(p){this.permutation=p}};
@@ -155,6 +156,37 @@ test('charcoal takeout and break share one plain receipt and fence stale food fr
   assert.throws(()=>f.api.recoverCuisineOutput(f.block,stale),/burnt batch retained/);
  }
 });
+// G121 regression: storage receipts only; no player or interaction adapter.
+test('only a verified zero-credit original dish may rebind to its saved burnt dish',()=>{
+ const original='kaleidoscope_grilling:braised_chicken_wings',dark='kaleidoscope_cookery:dark_cuisine',operationId='pot:904:1';
+ function failedOriginal(){
+  const f=fixture('cuisine_api_host.js'),result={id:original,count:1,carrier:'minecraft:bowl'};
+  const data={grillingOutputEpoch:904,result,grillingPot:{version:1,epoch:904,phase:'finished',quality:0,output:result}};
+  const rejected={size:1,getItem:()=>undefined,setItem(){throw Error('uncredited output')}};
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,original,1,'pot',{container:rejected,targetBlock:f.block,operationId}));
+  const receiptKey='senluo:cuisine_output:minecraft:overworld:40,80,64:'+operationId;
+  assert.equal(JSON.parse(f.properties.get(receiptKey)).phase,'rolled_back');
+  let stored=JSON.stringify(data);f.api.prepareCuisineBurn(f.block,data,{raw:()=>stored,save(_b,next){stored=JSON.stringify(next)}});
+  assert.equal(data.grillingBurnOrigin.quality,0);
+  data.result={id:dark,count:1,carrier:'minecraft:bowl'};data.grillingPot.output=data.result;data.grillingPot.phase='burnt';delete data.grillingPot.quality;
+  return {f,data,receiptKey};
+ }
+ for(const first of ['takeout','break']){
+  const {f,data}=failedOriginal();
+  if(first==='takeout')assert.equal(f.api.deliverCuisineOutput(f.block,data,dark,1,'pot',{operationId}).phase,'committed');
+  assert.equal(f.api.recoverCuisineOutput(f.block,data),true);assert.equal(f.api.recoverCuisineOutput(f.block,data),true);
+  assert.equal(f.drops.length,1);const output=f.drops[0].getComponent().itemStack;
+  assert.equal(output.typeId,dark);assert.equal(food.readPublicFood(output).state.quality,undefined);assert.equal(food.readPublicFood(output).state.hotUntil,0);
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,dark,1,'pot',{operationId}),/destruction retained/);
+ }
+ for(const phase of ['prepared','committed','quarantined','mismatched_quality']){
+  const {f,data,receiptKey}=failedOriginal(),receipt=JSON.parse(f.properties.get(receiptKey));
+  if(phase==='mismatched_quality')data.grillingBurnOrigin.quality=3;else receipt.phase=phase;
+  f.properties.set(receiptKey,JSON.stringify(receipt));
+  assert.throws(()=>f.api.deliverCuisineOutput(f.block,data,dark,1,'pot',{operationId}),/conflict/);
+  assert.throws(()=>f.api.recoverCuisineOutput(f.block,data),/conflict/);assert.equal(f.drops.length,0);
+ }
+});
 test('burn origin is saved before result loss and an acknowledged old takeout cannot become charcoal',()=>{
  const f=fixture('cuisine_api_host.js'),active={items:['qa:ingredient'],recipe:{result:'qa:food',count:1},started:true};let stored=JSON.stringify(active);
  const host={raw:()=>stored,save(_b,next){stored=JSON.stringify(next)}};
@@ -177,7 +209,7 @@ test('custom food inherits all containers, effects and chili damage without dupl
 
 test('station oil save failure restores the native slot and state before retry',()=>{
  const f=fixture('oil_api_host.js'),slot=new Slot(oil.createPublicOilPot(Item,'secret_chili',8));let stored={},once=true;
- const data={},host={save(_b,s){stored=structuredClone(s);if(once){once=false;throw Error('station save')}},load:()=>stored,sync(){}};
+ const data={},host={save(_b,s){stored=structuredClone(s);if(once){once=false;throw Error('station save')}},load:()=>stored,raw:()=>Object.keys(stored).length?JSON.stringify(stored):undefined,sync(){}};
  assert.throws(()=>f.api.commitSharedStationOil(f.block,slot,data,host),/station save/);assert.equal(oil.readPublicOil(slot.getItem()).state.count,8);assert.deepEqual(stored,{});
  assert.equal(f.api.commitSharedStationOil(f.block,slot,data,host).ok,true);assert.equal(oil.readPublicOil(slot.getItem()).state.count,7);assert.equal(stored.oilTicks,12000);assert.equal(stored.grillingOilType,'secret_chili');
 });
@@ -185,7 +217,7 @@ test('station oil save failure restores the native slot and state before retry',
 // Ownership/slot objects below are storage adapters, not simulated engine players.
 const owner=(slot,id='owner-a')=>({id,getGameMode:()=> 'Survival',getComponent:()=>({getEquipmentSlot:()=>slot})});
 const ownerKey=id=>'senluo:oil_hand_fault:'+id;
-function stationHost(){let stored={};return {get stored(){return stored},save(_b,s){stored=structuredClone(s)},load:()=>stored,sync(){}}}
+function stationHost(){let stored={};return {get stored(){return stored},save(_b,s){stored=structuredClone(s)},load:()=>stored,raw:()=>Object.keys(stored).length?JSON.stringify(stored):undefined,sync(){}}}
 for(const mode of ['throws','silently-wrong'])test('partial hand debit with '+mode+' rollback blocks both routes and survives restart',()=>{
  const f=fixture('oil_api_host.js');let calls=0;
  class Broken extends Slot{setItem(s){calls++;if(calls===1){this.item=s.clone();throw Error('debit applied')}if(calls===2){if(mode==='throws')throw Error('restore rejected');this.item=s.clone();this.item.props['foreign:data']='lost';return}super.setItem(s)}}
@@ -278,4 +310,17 @@ test('Cookery configuration disables only new heat and seasoning, persists acros
  const g=fixture('cuisine_api_host.js',f.properties);assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,0);
  g.emitScript(config('true'));assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,0);
  g.emitScript(config(true));assert.equal(g.api.readCuisineMetadata(g.block).hotUntil,25000);assert.equal(g.api.readCuisineMetadata(g.block).seasoning[0],'minecraft:redstone');
+});
+
+// Concrete conservation regression: a station still owning its credited oil
+// after a rejected rollback cannot also refund the same oil point to the hand.
+test('failed station compensation retains the oil debit and quarantines both owners',()=>{
+ const f=fixture('oil_api_host.js'),h=stationHost(),save=h.save;let saves=0,writes=0;
+ class Count extends Slot{setItem(s){writes++;super.setItem(s)}}
+ const slot=new Count(oil.createPublicOilPot(Item,'canola',8));
+ h.save=(b,data)=>{if(++saves===1){save(b,data);throw Error('station after-write')}throw Error('station rollback rejected')};
+ assert.throws(()=>f.api.commitSharedStationOil(f.block,slot,{},h,{ownerId:'station-rollback'}),/station after-write/);
+ assert.equal(h.stored.oil,true);assert.equal(oil.readPublicOil(slot.getItem()).state.count,7);assert.equal(writes,1);
+ assert.equal(JSON.parse(f.properties.get(ownerKey('station-rollback'))).phase,'prepared');
+ assert.ok(f.properties.has('senluo:oil_station_fault:minecraft:overworld:40,80,64'));
 });

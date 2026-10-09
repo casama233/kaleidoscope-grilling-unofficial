@@ -14,6 +14,7 @@ import * as bottleVisuals from '../../projects/grilling/gameplay_core/behavior_p
 import * as oil from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2734_cookery_oil_pot_core.js';
 import * as portableOil from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/oil_api_core.js';
 import * as portableFood from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
+import * as cuisineQuality from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/cuisine_quality_core.js';
 import {resolveSecretSmokedId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/secret_compat_core.js';
 import * as tools from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a275_grill_input_core.js';
 import * as heat from '../../projects/grilling/gameplay_core/behavior_pack/scripts/localized_lore_core.js';
@@ -43,7 +44,7 @@ function fixture({creative=false}={}){
  const write=(hand,s)=>{if(hand==='off')off=s?.clone();else bag.setItem(0,s);if(failHand){failHand=false;throw Error('injected hand write')}};
  const ctx=vm.createContext({canonicalFoodId,forgetEatingItem(){},finishedFoodMeta,grillingConfig:()=>CONFIG_DEFAULTS,...data,...logic,...skewers,...secretShape,...items,...snapshots,...seasoning,...bottleVisuals,...oil,...tools,...heat,world,system:{get currentTick(){return tick}},ItemStack:Stack,foodFacts,primitiveStackProps,commitSteps,commitTwoParty,slotWrite,planInventoryInsert,captureEatingIdentity,eatingStillCurrent,commitEating,
   console:{warn(){}},COOKERY_FILLED:oil.COOKERY_FILLED_ID,SEASON_USES_KEY:seasoning.SEASONING_USES_KEY,SEASON_VARIANT_KEY:seasoning.SEASONING_VARIANT_KEY,OIL_TOOLS:{},
-  ...portableOil,...portableFood,ensureOilHandPublished:()=>true,OIL_TYPES:{canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}},heldMain:()=>bag.getItem(0),heldOff:()=>off,heldByHand:(_,hand)=>hand==='off'?off:bag.getItem(0),creative:()=>creative,
+  ...portableOil,...portableFood,...cuisineQuality,ensureOilHandPublished:()=>true,OIL_TYPES:{canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}},heldMain:()=>bag.getItem(0),heldOff:()=>off,heldByHand:(_,hand)=>hand==='off'?off:bag.getItem(0),creative:()=>creative,
   captureWritableHand:(_,hand)=>({before:(hand==='off'?off:bag.getItem(0))?.clone(),write:s=>write(hand,s)}),mainContainer:()=>bag,inv:()=>grill,occupied:()=>grill.rows.filter(Boolean).length,
   readState:()=>structuredClone(state),writeState:(_b,s)=>state=structuredClone(s),resetBlock:(_b,lit)=>state={...logic.initialState(),lit},commitStationTransfer:(_b,steps)=>commitSteps(steps),quarantineStation(){throw Error('quarantine')},
   blockSound:(_b,id)=>sounds.push(id),useSound:(_p,id)=>sounds.push(id),message(){},javaInteractionFeedback:(_p,key)=>notices.push(key),interactionFailure:(_p,text)=>notices.push(text),awardLookingThePart(){},awardGleamingWithOil(){},

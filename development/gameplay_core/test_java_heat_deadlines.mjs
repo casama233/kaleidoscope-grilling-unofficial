@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {bucketHotUntil,readPublicFood,writePublicFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
 import {SEASONING_LIST_KEY} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {canUseCuisineFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/cuisine_eating_core.js';
 const oracle=JSON.parse(fs.readFileSync(new URL('./fixtures/java-heat-deadlines.json',import.meta.url)));
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 async function fixture(){
@@ -118,6 +119,19 @@ test('host outputs preserve 19 user lines plus the public payload and skip the c
 });
 
 const propertySnapshot=(data,s)=>JSON.stringify(data.getItemPropertyIds(s).sort().map(k=>[k,data.getItemProperty(s,k)]));
+test('quality envelope survives cooling and stored raw lore without promoting a stripped or mismatched item',async()=>{
+ const {api}=await fixture(),s=new Stack(16),base='kaleidoscope_grilling:houttuynia_stir_fried_pork';s.typeId=base+'_cuisine_q0';
+ s.setLore([{text:'owner keepsake'}]);writePublicFood(s,{v:1,hotUntil:1000,seasoning:['minecraft:redstone'],quality:0});
+ assert.equal(canUseCuisineFood(s),true);api.refreshHotLore(s);
+ assert.deepEqual(readPublicFood(s).state,{v:1,hotUntil:0,seasoning:['minecraft:redstone'],quality:0});
+ const persisted=JSON.parse(JSON.stringify({id:s.typeId,lore:s.getRawLore()})),restored=new Stack(16);restored.typeId=persisted.id;restored.setLore(persisted.lore);
+ assert.equal(canUseCuisineFood(restored),true);assert.equal(restored.typeId,s.typeId);assert.deepEqual(restored.getRawLore()[0],{text:'owner keepsake'});
+ restored.typeId=base+'_cuisine_q1';assert.equal(canUseCuisineFood(restored),false);
+ restored.typeId=base;assert.equal(canUseCuisineFood(restored),false);
+ restored.typeId=s.typeId;restored.setLore([{text:'owner keepsake'}]);assert.equal(canUseCuisineFood(restored),false);
+ s.setLore(Array.from({length:19},(_,i)=>({text:'keepsake '+i})));writePublicFood(s,{v:1,hotUntil:0,seasoning:[],quality:0});
+ assert.equal(s.getRawLore().length,20);assert.equal(readPublicFood(s).state.quality,0);assert.equal(canUseCuisineFood(s),true);
+});
 async function expiredFixture(max=64){
  const f=await fixture(),s=new Stack(max);s.setLore([{text:'foreign keepsake'}]);
  f.data.setItemProperty(s,f.api.HOT_UNTIL_KEY,1000);

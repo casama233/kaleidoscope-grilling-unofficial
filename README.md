@@ -1,8 +1,12 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.121
+## Current maintained baseline: 2.8.122
 
-[G121酒館指南共用入口](docs/STATUS-A2.8.121.md)：Cookery 的酒館章節交由酒館顯示同一份指南，
+[G122炒鍋、品質與所有權修補](docs/STATUS-A2.8.122.md)：三道料理補保存備料／三翻／變質流程和原作彈性配方，
+品質原生食物、冷卻與食材快照接通；兩分支原 Java 純邏輯的 1,248 組品質與 12 組 NeoForge 食物值相符。
+油渣新增乾燥紅樹葉下生苗與懸掛苗成熟，明列 25 類；施肥與炒鍋退款先確認本次寫入所有權。
+先前未合併的機制候選移入 G122；版本沿革與當前驗證邊界見本版狀態頁。
+承接[G121酒館指南共用入口](docs/STATUS-A2.8.121.md)：Cookery 的酒館章節交由酒館顯示同一份指南，
 以玩家來源與限時交接確認避免重複視窗；關閉不重開，返回才回 Cookery。
 承接[G120持久化與出料修補](docs/STATUS-A2.8.120.md)：重金屬在取消傷害前保存並確認防重複結算記錄，
 油渣新增瓜梗、纏根土及兩種下界藤，明列 23 類植物適配；料理工作站補取消保存與出料收據守恆。
@@ -17,7 +21,7 @@
 當前版本、UUID、相依與來源身份以 [baseline.json](baseline.json) 為準。
 依賴作者 **Cookery 1.6.0**；最低 engine 宣告 1.26.50，當前驗證使用 BDS 1.26.51.1、
 `@minecraft/server` 2.9.0 與 `@minecraft/server-ui` 2.2.0。
-家族整合提供的砧板／油壺擴充能力，不能當作只安裝作者 Cookery 就有的功能。
+家族整合提供的砧板／油壺／炒鍋與酒館指南交接能力，不能當作只安裝作者 Cookery 就有的功能。
 
 查看 [Java 移植對照表](docs/PARITY-MATRIX.md) 了解已實作、平台替代與未完成項；
 具體失敗及重現方式在 [BUGS.md](docs/BUGS.md)。腳本、封裝或 BDS 載入成功都不代表畫面、聲音及操作已驗收。

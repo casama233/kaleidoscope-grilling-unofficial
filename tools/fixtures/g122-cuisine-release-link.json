@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "release": [2, 8, 122],
+  "previous_release": [2, 8, 121],
+  "scope": "The cuisine proposal labeled G121 remained unmerged. Released G121 retained G120 main.js and language content while adding the Tavern shared entrance. G122 first admits the exact original candidate deltas, then binds the resulting main, language and twelve native quality item sources to a new immutable public release witness. The two candidate fixtures remain unchanged.",
+  "candidate_status": "unmerged",
+  "candidate_commit": "f27d40a7c1bab951398e3fc3d3906bcc416c5c3f",
+  "candidate_fixtures": {
+    "main": "g121-main-reviewed-delta.json",
+    "language": "g121-guide-reviewed-delta.json"
+  },
+  "reviewed_commit": "9fd92988f872ec1128aa071f2e045d54dbcdd4f4"
+}
