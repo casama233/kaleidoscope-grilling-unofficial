@@ -9,7 +9,8 @@ import * as presentation from '../../projects/grilling/gameplay_core/behavior_pa
 import {captureEatingIdentity,eatingEventMatches,eatingStillCurrent,commitEating} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a285_eating_transaction.js';
 import {finishedFoodMeta} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/food_finish_core.js';
 import {FOOD_DATA,PROFILE_BY_ITEM,COOKED_EFFECTS,RAW_NAUSEA,MYSTERIOUS_ID,DARK_ID} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_data_lookup.js';
-import {SEASONING_KINDS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {seasoningEffectCounts} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
+import {replaceSeasoningData} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/seasoning_registry_core.js';
 import {canonicalFoodId,RANDOM_EATING_IDS,isAlternateEatingId,eatingItemId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import {supportsJavaEatingProjection,JAVA_FP_EATING_ITEMS_BY_PROFILE} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/java_eating_projection_items.js';
 const eatingItemSource=fs.readFileSync(new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_item_runtime.js',import.meta.url),'utf8');
@@ -53,7 +54,7 @@ function fixture({creative=false,duration=90,profile='FOUR',requested,hand='main
  const constants=source.match(/const MINIMUM_EAT_TICKS=\d+,RELEASE_CHECKPOINT_GRACE_TICKS=\d+;/)[0]+'\n'+source.match(/const BITE_TIMES=Object.freeze\(\{[\s\S]*?\}\);/)[0];
  vm.runInNewContext(constants+'\n'+source.slice(settleBegin,settleEnd)+'\n'+source.slice(begin,end),ctx);
  if(realEffects){
-  Object.assign(ctx,{COOKED_EFFECTS,SEASONING_KINDS,fxSet:(_player,key,ticks,amp=0)=>{effects.push([key,ticks]);customEffects[key]={until:ctx.system.currentTick+ticks,amp}},fxGet:(_player,key)=>customEffects[key],readFx:()=>customEffects,writeFx(){},nativeDragonHealth(){},awardMetalToleranceFailed(){},awardEatItHot(){},awardMentalPreparationFailed(){},goldenSkewerFeedback(){},applyOrdinary(){}});
+  Object.assign(ctx,{COOKED_EFFECTS,seasoningEffectCounts,fxSet:(_player,key,ticks,amp=0)=>{effects.push([key,ticks]);customEffects[key]={until:ctx.system.currentTick+ticks,amp}},fxGet:(_player,key)=>customEffects[key],readFx:()=>customEffects,writeFx(){},nativeDragonHealth(){},awardMetalToleranceFailed(){},awardEatItHot(){},awardMentalPreparationFailed(){},goldenSkewerFeedback(){},applyOrdinary(){}});
   const fixedBegin=source.indexOf('function applyFixedEffect('),fixedEnd=source.indexOf('function counts(',fixedBegin);
   const committedBegin=source.indexOf('function afterCommitted('),committedEnd=source.indexOf('function stackMeta(',committedBegin);
   const countCommitted=ctx.afterCommitted;
@@ -445,4 +446,14 @@ test('D02 immediate nutrition fault restores the already debited serving before 
 for(const hand of ['main','off'])test(`D02 heat at stop is authoritative, not the removed extra scheduling tick ${hand}`,()=>{
  const f=fixture({hand,realEffects:true,hot:true,hotUntil:126,seasonings:['minecraft:redstone'],saturationMultiplier:2});f.startUse();f.stop({tick:125,remaining:65});
  assert.equal(f.ctx.effectFinishTick,125);assert.equal(f.nativeEffects.get('strength').duration,400);assert.ok(f.nativeEffects.has('speed'));f.flush(500);assert.equal(f.counts.manualRewards,1);
+});
+
+test('stored seasoning ingredients resolve the reloaded mapping through the production effect consumer',()=>{
+ const stored=[...Array(4).fill('test:spice'),'kaleidoscope_grilling:houttuynia_powder'],f=fixture({realEffects:true});
+ try{
+  replaceSeasoningData([{seasoning_effects:[{ingredient:'test:spice',kind:'speed'}]}]);f.ctx.applySeasoning(f.player,stored);
+  assert.equal(f.effects[0][0],'speed');assert.equal(f.effects[0][1],7200);assert.equal(f.effects[0][2].amplifier,1);
+  f.effects.length=0;replaceSeasoningData([{seasoning_effects:[{ingredient:'test:spice',kind:'numbness'}]}]);f.ctx.applySeasoning(f.player,stored);
+  assert.deepEqual(f.effects,[['numb',1800]]);
+ }finally{replaceSeasoningData([]);}
 });

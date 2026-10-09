@@ -1,3 +1,5 @@
+import {replaceSeasoningData,seasoningDataSnapshot} from './seasoning_registry_core.js';
+export {replaceSeasoningData};
 import {canonicalFoodId} from './eating_profile_ids.js';
 import {ITEM_ID} from './integration_stack_core.js';
 import {SECRET_VISUAL_SLOTS} from './secret_visual_catalog.js';
@@ -21,11 +23,12 @@ export function registerHeldVisual(raw){
  return install(registry.held,raw.itemId,{itemId:raw.itemId,referenceItemId:raw.referenceItemId},128);
 }
 export const secretVisualIndex=id=>SECRET_VISUAL_SLOTS[registry.held.get(id)?.referenceItemId??canonicalFoodId(id)]??0;
-export function integrationRegistrySnapshot(){return Object.fromEntries(Object.entries(registry).map(([k,m])=>[k,[...m.values()]]));}
+export function integrationRegistrySnapshot(){return {...Object.fromEntries(Object.entries(registry).map(([k,m])=>[k,[...m.values()]])),seasonings:seasoningDataSnapshot()};}
 export function restoreIntegrationRegistry(raw){
  resetIntegrationRegistry();try{
   if(!raw||!['producers','projections','held'].every(k=>Array.isArray(raw[k])))throw Error('registry schema');
   for(const row of raw.producers)registerProducer(row);for(const row of raw.projections)registerProjectionDescriptor(row);for(const row of raw.held)registerHeldVisual(row);
+  replaceSeasoningData([{seasoning_effects:raw.seasonings===undefined?[]:raw.seasonings}]);
  }catch(e){resetIntegrationRegistry();throw e;}
 }
-export function resetIntegrationRegistry(){for(const map of Object.values(registry))map.clear();}
+export function resetIntegrationRegistry(){for(const map of Object.values(registry))map.clear();replaceSeasoningData([]);}

@@ -6,6 +6,8 @@ import * as fortress from '../../projects/grilling/gameplay_core/behavior_pack/s
 import {stationProjection} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/station_projection_core.js';
 import {readPublicFood,writePublicFood} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/host_api/food_api_core.js';
 import {normalizeConfig,configValue} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/server_config_core.js';
+import {seasoningKind,seasoningDataSnapshot} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/seasoning_registry_core.js';
+import {isSeasoningIngredient,seasoningEffectCounts,BASE_SEASONINGS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2743_seasoning_contract_core.js';
 class Stack{constructor(id='minecraft:cooked_beef',amount=1){this.typeId=id;this.amount=amount;this.lore=[];this.extra={foreign:'preserve'};}getRawLore(){return structuredClone(this.lore)}setLore(lore){this.lore=structuredClone(lore)}getComponent(k){return k==='minecraft:food'&&this.typeId==='test:data_driven'?{}:undefined}clone(){const n=new Stack(this.typeId,this.amount);Object.assign(n,structuredClone(this));return n;}}
 const runtime='projects/grilling/gameplay_core/behavior_pack/scripts/integration_api_runtime.js';
 function engine({saved=new Map(),fault}={}){
@@ -85,6 +87,27 @@ test('a commit rejected before persistence retains the prepared guard after actu
 test('registration post-write faults restore both stores and unresolved rollback fails closed',()=>{
  let writes=0;const e=engine({fault(kind,k){if(kind==='property'&&k.includes('integration_registry')&&++writes===1)throw Error('after registry write')}});assert.throws(()=>e.register(),/after registry write/);assert.deepEqual(registry.integrationRegistrySnapshot().producers,[]);assert.deepEqual(JSON.parse(e.props.get('kaleidoscope_grilling:integration_registry_v1')).producers,[]);assert.equal(e.register().replayed,false);
  const bad=engine({fault(kind,k){if(kind==='before_property'&&k.includes('integration_registry'))throw Error('storage unavailable')}});assert.throws(()=>bad.register());assert.throws(()=>bad.invoke('discover'),/unresolved/);
+});
+test('ordered seasoning roots override defaults, survive saved reload and preserve the three base identities',()=>{
+ const e=engine(),roots=[{seasoning_effects:[{ingredient:'test:spice',kind:'speed'},{ingredient:'minecraft:redstone',kind:'strength'}]},{seasoning_effects:[{ingredient:'test:spice',kind:'numbness'},{ingredient:'test:blank',kind:''}]}];
+ assert.ok(e.invoke('discover').capabilities.includes('seasoning_data_roots_v1'));
+ e.invoke('replace_seasoning_data',{roots});roots[1].seasoning_effects[0].kind='totem';
+ assert.equal(isSeasoningIngredient('test:spice'),true);assert.equal(isSeasoningIngredient('test:blank'),true);
+ assert.equal(seasoningKind('test:spice'),'numbness');assert.equal(seasoningKind('minecraft:redstone'),'strength');
+ assert.equal(seasoningEffectCounts(Array(9).fill('test:spice')).numbness,9);
+ assert.ok(BASE_SEASONINGS.every(isSeasoningIngredient));
+ const restarted=engine({saved:e.props});assert.equal(seasoningKind('test:spice'),'numbness');
+ restarted.invoke('replace_seasoning_data',{roots:[]});assert.equal(isSeasoningIngredient('test:spice'),false);assert.equal(seasoningKind('minecraft:redstone'),'speed');
+ const oldSave={producers:[],projections:[],held:[]};registry.restoreIntegrationRegistry(oldSave);assert.deepEqual(seasoningDataSnapshot(),[]);
+});
+test('invalid seasoning roots and a post-persist fault retain both the previous mappings and registration store',()=>{
+ let armed=false;const e=engine({fault(kind,key){if(armed&&kind==='property'&&key.includes('integration_registry')){armed=false;throw Error('seasoning write failed')}}});
+ e.register();e.invoke('replace_seasoning_data',{roots:[{seasoning_effects:[{ingredient:'test:spice',kind:'duration'}]}]});
+ const before=registry.integrationRegistrySnapshot(),stored=e.props.get('kaleidoscope_grilling:integration_registry_v1');
+ assert.throws(()=>e.invoke('replace_seasoning_data',{roots:[{seasoning_effects:[{ingredient:'test:new',kind:'speed'}]},{seasoning_effects:null}]}));
+ assert.deepEqual(registry.integrationRegistrySnapshot(),before);assert.equal(e.props.get('kaleidoscope_grilling:integration_registry_v1'),stored);
+ armed=true;assert.throws(()=>e.invoke('replace_seasoning_data',{roots:[{seasoning_effects:[{ingredient:'test:spice',kind:'strength'}]}]}),/seasoning write failed/);
+ assert.deepEqual(registry.integrationRegistrySnapshot(),before);assert.equal(e.props.get('kaleidoscope_grilling:integration_registry_v1'),stored);
 });
 test('fresh host batch follows Java signed-long hash/age and rejects player farms, stale or out-of-bounds evidence',()=>{
  const e=engine();e.register();const positions=Array.from({length:16},(_,x)=>({x,y:64,z:0})),blocks=positions.map((p,i)=>e.wart(p,i%4));

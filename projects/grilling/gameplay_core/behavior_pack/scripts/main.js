@@ -71,7 +71,7 @@ import {
  SEASONING_CAPACITY,SEASONING_MAX_BOTTLES,SEASONING_MAX_USES,SEASONING_VARIANT_MAX,
  PENDING_SEASONING_ID as PENDING_SEASONING,SEASONING_PLACE_BLOCK_ID as SEASONING_BLOCK,
  SEASONING_USES_KEY as SEASON_USES_KEY,
- SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,SEASONING_KINDS,
+ SEASONING_VARIANT_KEY as SEASON_VARIANT_KEY,isSeasoningIngredient,seasoningEffectCounts,
  hasSeasoningBase,isPendingSeasoningId,seasoningFillVisualId,isSeasoningBlockId as isSeasoningBlock
 } from './a2743_seasoning_contract_core.js';
 import {
@@ -651,7 +651,7 @@ function handleSeasoningBlock(block,player,hand='main'){
  const held=heldByHand(player,hand),id=held?.typeId;
  if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}
  const topItem=items.at(-1),top=bottleDataFromItem(topItem);
- if(id&&Object.hasOwn(SEASONING_KINDS,id)){
+ if(id&&isSeasoningIngredient(id)){
   if(top.kind==='special'){javaInteractionFeedback(player,top.ingredients.length>=SEASONING_CAPACITY?'bottle_full':'invalid_seasoning');return}
   if(top.ingredients.length>=SEASONING_CAPACITY){javaInteractionFeedback(player,'bottle_full');return}
   const storage=captureWritableHand(player,hand),free=creative(player),next=free?storage.before:reducedStack(storage.before);
@@ -860,7 +860,7 @@ function applyFixedEffect(player,id){
  if(e.effect==='kaleidoscope_grilling:invincible'){fxSet(player,'invincible',ticks);return}
  if(e.effect.startsWith('kaleidoscope_cookery:'))fxSet(player,e.effect.split(':')[1],ticks);
 }
-function counts(list){const out={};for(const id of list){const kind=SEASONING_KINDS[id];if(kind)out[kind]=(out[kind]??0)+1}return out}
+function counts(list){return seasoningEffectCounts(list)}
 function applyDragonBlood(player,ticks,amp){
  const old=fxGet(player,'dragon_blood');amp=Math.max(amp,old?.amp??0);
  fxSet(player,'dragon_blood',Math.max(ticks,old?old.until-now():0),amp);

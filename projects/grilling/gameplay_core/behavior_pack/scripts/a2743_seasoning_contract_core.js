@@ -1,3 +1,4 @@
+import {DEFAULT_SEASONING_EFFECTS,seasoningKind,hasSeasoningMapping} from './seasoning_registry_core.js';
 export const SEASONING_CAPACITY=8;
 export const SEASONING_MAX_BOTTLES=4;
 export const SEASONING_MAX_USES=16;
@@ -38,15 +39,11 @@ export const BASE_SEASONINGS=Object.freeze([
 ]);
 
 export const SEASONING_KINDS=Object.freeze({
- 'minecraft:redstone':'speed',
- 'minecraft:gunpowder':'strength',
- 'kaleidoscope_grilling:houttuynia_powder':'duration',
- 'kaleidoscope_grilling:totem_powder':'totem',
- 'kaleidoscope_grilling:dragon_egg_powder':'vitality',
- 'kaleidoscope_grilling:sichuan_pepper':'numbness',
+ ...DEFAULT_SEASONING_EFFECTS,
  'kaleidoscope_grilling:green_chili_powder':'base',
  'kaleidoscope_grilling:onion_powder':'base'
 });
+export function isSeasoningIngredient(id){return BASE_SEASONINGS.includes(id)||hasSeasoningMapping(id);}
 
 const BLOCK_IDS=new Set(SEASONING_BLOCK_IDS);
 const EFFECT_ORDER=Object.freeze(['speed','strength','duration','totem','vitality']);
@@ -85,8 +82,8 @@ export function remainingSeasoningUses(row={}){
 
 export function seasoningEffectCounts(values){
  const out={speed:0,strength:0,duration:0,totem:0,vitality:0,numbness:0};
- for(const id of normalizeSeasoningList(values)){
-  const kind=SEASONING_KINDS[id];
+ for(const id of Array.isArray(values)?values:[]){
+  const kind=seasoningKind(id);
   if(Object.hasOwn(out,kind))out[kind]++;
  }
  return out;
