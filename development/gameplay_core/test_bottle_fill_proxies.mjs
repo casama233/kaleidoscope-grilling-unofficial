@@ -9,6 +9,8 @@ import * as itemData from '../../projects/grilling/gameplay_core/behavior_pack/s
 import * as rack from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_core.js';
 import {bottleHeldVisualPlan} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/bottle_held_visual_core.js';
 import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
+import {playSeasoningShakeAudio,stopSoundHandle} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_audio_core.js';
+import {flatulenceSoundOrigin as seasoningFinishSoundOrigin} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/flatulence_sound_runtime.js';
 const N='kaleidoscope_grilling:',EMPTY=core.EMPTY_BOTTLE_ID,PENDING=core.PENDING_SEASONING_ID;
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const read=name=>fs.readFileSync(new URL(name,root),'utf8');
@@ -75,16 +77,22 @@ test('inventory/offhand refresh skips active use and clears scan history on leav
  for(const event of ['playerLeave','playerSpawn']){f.inventory.rows[2]=decorated(PENDING,3);f.events[event]({player:f.player,playerId:f.player.id});f.api.prepareBottleFillItems(f.player);assert.equal(f.inventory.rows[2].typeId,PENDING+'_f3');}
 });
 test('all pending proxies start and complete native use; partial proxies do not shake',()=>{
- const events={},uses=new Map(),animations=[];let completed=0;
+ const events={},uses=new Map(),animations=[],sounds=[];let completed=0;
  const world={afterEvents:Object.fromEntries(['itemStartUse','itemCompleteUse'].map(k=>[k,{subscribe(f){events[k]=f}}]))};
- const context=vm.createContext({...core,world,canonicalFoodId,PENDING_USES:uses,stopSoundHandle(){},captureInteractionIntent:()=>({hand:'off'}),captureEatingIdentity:s=>({identity:s.typeId}),useSound(){},syncSeasoningMotion(){},completePending(){completed++},PLATE_ID:N+'skewer_plate',CUISINE_FOOD_SET:new Set(),FOOD_DATA:{},SECRET_ID:N+'secret_skewer',dangerousPreservation(){}});
- const source=read('main.js'),start=source.indexOf('world.afterEvents.itemStartUse.subscribe('),end=source.indexOf('world.afterEvents.itemStopUse.subscribe(',start);
+ const context=vm.createContext({...core,world,canonicalFoodId,PENDING_USES:uses,stopSoundHandle,playSeasoningShakeAudio,seasoningFinishSoundOrigin,captureInteractionIntent:()=>({hand:'off'}),captureEatingIdentity:s=>({identity:s.typeId}),syncSeasoningMotion(){},completePending(){completed++},PLATE_ID:N+'skewer_plate',CUISINE_FOOD_SET:new Set(),FOOD_DATA:{},SECRET_ID:N+'secret_skewer',dangerousPreservation(){}});
+ // Keep the real runtime wrapper and its pure audio/origin dependencies; only
+ // the native Player sound request/handle is doubled in this extracted fixture.
+ vm.runInContext(body(read('immersion_audio_runtime.js'),'seasoningShakeSound'),context);
+ const source=read('main.js');
  // Only register the two relevant listeners, using their original complete bodies.
  for(const [event,next] of [['itemStartUse','itemCompleteUse'],['itemCompleteUse','itemStopUse']]){const a=source.indexOf('world.afterEvents.'+event+'.subscribe('),b=source.indexOf('world.afterEvents.'+next+'.subscribe(',a);vm.runInContext(source.slice(a,b),context);}
- const player={id:'holder',selectedSlotIndex:0,playAnimation(name,options){animations.push({name,options})}};
+ const player={id:'holder',selectedSlotIndex:0,location:{x:1,y:64,z:2},dimension:{getPlayers:()=>[player]},playAnimation(name,options){animations.push({name,options})},playSound(name,options){const handle={stops:0,stop(){this.stops++}};sounds.push({name,options,handle});return handle}};
  for(let fill=1;fill<=8;fill++){
+  const previous={stops:0,stop(){this.stops++}};uses.set(player.id,{audio:previous});
   const pending=decorated(PENDING+'_f'+fill,fill);events.itemStartUse({source:player,itemStack:pending});assert.equal(uses.get(player.id).stack.typeId,pending.typeId);assert.ok(animations.at(-1).options.stopExpression.includes(pending.typeId));events.itemCompleteUse({source:player,itemStack:pending});
+  assert.equal(previous.stops,1);assert.equal(sounds.length,fill);assert.equal(sounds.at(-1).name,'kg_imm.shake_seasoning');assert.deepEqual(sounds.at(-1).options,{volume:.8,pitch:1});assert.equal(uses.get(player.id).audio,sounds.at(-1).handle);assert.equal(sounds.at(-1).handle.stops,0);
   uses.clear();events.itemStartUse({source:player,itemStack:decorated(N+'partial_seasoning_f'+fill,fill)});assert.equal(uses.size,0);
+  assert.equal(sounds.length,fill);assert.equal(previous.stops,1);assert.equal(sounds.at(-1).handle.stops,0);
  }
  assert.equal(completed,8);
 });
