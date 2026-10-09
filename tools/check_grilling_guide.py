@@ -8,7 +8,7 @@ GP=ROOT/'projects/grilling/gameplay_core/resource_pack'
 BP_UUID='c68005c5-23ff-54e8-a3ff-da6349ad43c2'
 RP_UUID='bbbd2d60-52e5-53a6-8b9a-c09b0f516389'
 NS='kaleidoscope_grilling:'
-G120_GUIDE_BASE='8dc3e9d440577cd70501c377722f8e27b0913d44'
+GUIDE_BASE='8dc3e9d440577cd70501c377722f8e27b0913d44'
 
 def require(ok,message):
     if not ok:raise AssertionError(message)
@@ -151,7 +151,7 @@ def main():
     if tuple(version)==(2,8,121):
         # This host bridge release changes only the Grilling guide's identity.
         # Keep the independently reviewed G120 content and existing locale checks.
-        previous_source=json.loads(subprocess.check_output(['git','show',G120_GUIDE_BASE+':'+SOURCE.relative_to(ROOT).as_posix()],cwd=ROOT))
+        previous_source=json.loads(subprocess.check_output(['git','show',GUIDE_BASE+':'+SOURCE.relative_to(ROOT).as_posix()],cwd=ROOT))
         current_source=json.loads(json.dumps(s))
         require(previous_source.pop('version')=='0.3.50' and current_source.pop('version')=='0.3.51','G121 guide identity differs')
         require(current_source==previous_source,'G121 changed reviewed G120 guide content')
