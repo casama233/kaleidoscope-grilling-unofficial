@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    121
+  ],
+  "scope": "Seven exact G121 cuisine quality admission and native-use ownership edits from the unchanged G119/G120 public main.js; every earlier source witness is preserved.",
+  "previous_public_commit": "1e8011e1f71833739ea12097e80c0f69a21c844e",
+  "reviewed_commit": "f27d40a7c1bab951398e3fc3d3906bcc416c5c3f",
+  "before_sha256": "3a084acdff9d8c8d0bba3a1ea49ee83cd8dd6a925a2e902066c1e3a59cf29064",
+  "after_sha256": "1d17d1396acc9be260f785b3ade16b80ba080dc90db405f51cef6ca3ce6988d6",
+  "operations": [
+    {
+      "start": 2542,
+      "end": 2542,
+      "before": "",
+      "after": "import {canUseCuisineFood,captureCuisineUse,cuisineUseEventMatches,completedCuisineUse} from './cuisine_eating_core.js';\n"
+    },
+    {
+      "start": 72580,
+      "end": 72580,
+      "before": "",
+      "after": "   const use=captureCuisineUse(e.itemStack,heldMain(e.source),heldOff(e.source),e.source.selectedSlotIndex,system.currentTick,e.useDuration,now());\n   if(!use){CUISINE_EATS.delete(e.source.id);return;}\n"
+    },
+    {
+      "start": 72675,
+      "end": 72865,
+      "before": "   CUISINE_EATS.set(e.source.id,{id,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});\n",
+      "after": "   CUISINE_EATS.set(e.source.id,{id,use,meta,nativeBefore:meta.hot?nativeSnapshot(e.source):{},fxBefore:meta.hot?fxSnapshot(e.source):{},saturationBefore:meta.hot?sat?.currentValue:undefined});\n"
+    },
+    {
+      "start": 76298,
+      "end": 76429,
+      "before": "   const a=CUISINE_EATS.get(e.source.id)??{id,meta:stackMeta(e.itemStack),nativeBefore:{},fxBefore:{},saturationBefore:undefined};\n",
+      "after": "   const a=CUISINE_EATS.get(e.source.id);\n   if(!a||a.id!==id||!completedCuisineUse(a.use,e.itemStack,heldByHand(e.source,a.use.hand),e.source.selectedSlotIndex,system.currentTick,e.useDuration,now()))return;\n"
+    },
+    {
+      "start": 78151,
+      "end": 78228,
+      "before": " const id=e.source.id,plate=PLATE_EATS.get(id),pending=PENDING_USES.get(id);\n",
+      "after": " const id=e.source.id,plate=PLATE_EATS.get(id),pending=PENDING_USES.get(id),cuisine=CUISINE_EATS.get(id);\n"
+    },
+    {
+      "start": 78505,
+      "end": 78572,
+      "before": " CUISINE_EATS.delete(id);const a=ACTIVE_EATS.get(id);if(!a)return;\n",
+      "after": " const cuisineMatches=!e.itemStack||!cuisine||cuisineUseEventMatches(cuisine.use,e.itemStack,now());\n system.run(()=>{if(cuisineMatches&&CUISINE_EATS.get(id)===cuisine)CUISINE_EATS.delete(id)});\n const a=ACTIVE_EATS.get(id);if(!a)return;\n"
+    },
+    {
+      "start": 83903,
+      "end": 83903,
+      "before": "",
+      "after": " if(!canUseCuisineFood(e.itemStack)){e.cancel=true;return;}\n"
+    }
+  ]
+}

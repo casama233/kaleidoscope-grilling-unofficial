@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    121
+  ],
+  "scope": "Exact G120 to G121 guide 0.3.51: three original dish entries with paragraphs 1–7, Oil Residue paragraphs 3 and 6, and four source-backed cuisine quality tooltip keys in three languages. Every other guide paragraph, plain name and inventory alias stays conserved. Null preimage means a new key.",
+  "previous_public_commit": "187e179d58f48fbc9b4d57b5f01cff90b7489ee6",
+  "reviewed_commit": "f27d40a7c1bab951398e3fc3d3906bcc416c5c3f",
+  "locales": {
+    "en_US": {
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.1": {
+        "before": "Use the Cookery wok: add oil and the listed ingredients, cook for 10 seconds, then serve with a bowl.",
+        "after": "Use the updated Cookery Wok. Let a pot that was already active or holding a result in an older version finish through its original flow, then empty it before starting a new batch."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.2": {
+        "before": null,
+        "after": "The first card is an exact-count recipe and takes priority, producing the base dish without a quality bonus. The second card shows one of each required flex ingredient. Increase any of those counts up to 9 items in total; the output remains 1 dish. Quality improves as the proportions approach the target determined by the world and this recipe."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.3": {
+        "before": null,
+        "after": "Adding oil to an empty heated wok starts 60 seconds of preparation. Adding or removing ingredients does not restart that time; removing the heat pauses it. Ingredients must be ordinary stackable items. Custom-named items and items carrying extra data remain in your hand."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.4": {
+        "before": null,
+        "after": "With ingredients in the wok, the first Kitchen Shovel stir starts 10 seconds of cooking and counts as stir 1. Stir 3 times in total before completion. Cooking also starts when preparation time runs out. Ordinary ingredients cannot be added or removed after cooking starts; seasoning still follows its normal rules."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.5": {
+        "before": null,
+        "after": "Fewer than 3 stirs at completion produces Suspicious Stir-Fry. Leave a finished dish heated for 40 seconds and it becomes Dark Cuisine. Another 20 seconds turns it into 1–3 Charcoal and clears the wok. Removing the heat pauses these countdowns."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.6": {
+        "before": null,
+        "after": "Use 1 bowl to serve 1 dish, retaining hot-food and seasoning effects. Flex quality changes the food values and survives cooling. The nutrition shown on this page is the base value for the exact recipe. Dark Cuisine does not inherit the original dish's quality, heat, or seasoning."
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.7": {
+        "before": null,
+        "after": "During preparation, use an empty hand or an ingredient container to take back the last ingredient. Taking ingredients from a hot wok, or touching a finished hot wok without a bowl or Kitchen Shovel, deals 1 damage. Stir with a shovel and serve with a bowl."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.1": {
+        "before": "Use the Cookery wok: add oil and the listed ingredients, cook for 10 seconds, then serve with a bowl.",
+        "after": "Use the updated Cookery Wok. Let a pot that was already active or holding a result in an older version finish through its original flow, then empty it before starting a new batch."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.2": {
+        "before": null,
+        "after": "The first card is an exact-count recipe and takes priority, producing the base dish without a quality bonus. The second card shows one of each required flex ingredient. Increase any of those counts up to 9 items in total; the output remains 1 dish. Quality improves as the proportions approach the target determined by the world and this recipe."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.3": {
+        "before": null,
+        "after": "Adding oil to an empty heated wok starts 60 seconds of preparation. Adding or removing ingredients does not restart that time; removing the heat pauses it. Ingredients must be ordinary stackable items. Custom-named items and items carrying extra data remain in your hand."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.4": {
+        "before": null,
+        "after": "With ingredients in the wok, the first Kitchen Shovel stir starts 10 seconds of cooking and counts as stir 1. Stir 3 times in total before completion. Cooking also starts when preparation time runs out. Ordinary ingredients cannot be added or removed after cooking starts; seasoning still follows its normal rules."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.5": {
+        "before": null,
+        "after": "Fewer than 3 stirs at completion produces Suspicious Stir-Fry. Leave a finished dish heated for 40 seconds and it becomes Dark Cuisine. Another 20 seconds turns it into 1–3 Charcoal and clears the wok. Removing the heat pauses these countdowns."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.6": {
+        "before": null,
+        "after": "Use 1 bowl to serve 1 dish, retaining hot-food and seasoning effects. Flex quality changes the food values and survives cooling. The nutrition shown on this page is the base value for the exact recipe. Dark Cuisine does not inherit the original dish's quality, heat, or seasoning."
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.7": {
+        "before": null,
+        "after": "During preparation, use an empty hand or an ingredient container to take back the last ingredient. Taking ingredients from a hot wok, or touching a finished hot wok without a bowl or Kitchen Shovel, deals 1 damage. Stir with a shovel and serve with a bowl."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.1": {
+        "before": "Use the Cookery wok: add oil and the listed ingredients, cook for 10 seconds, then serve with a bowl.",
+        "after": "Use the updated Cookery Wok. Let a pot that was already active or holding a result in an older version finish through its original flow, then empty it before starting a new batch."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.2": {
+        "before": null,
+        "after": "The first card is an exact-count recipe and takes priority, producing the base dish without a quality bonus. The second card shows one of each required flex ingredient. Increase any of those counts up to 9 items in total; the output remains 1 dish. Quality improves as the proportions approach the target determined by the world and this recipe."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.3": {
+        "before": null,
+        "after": "Adding oil to an empty heated wok starts 60 seconds of preparation. Adding or removing ingredients does not restart that time; removing the heat pauses it. Ingredients must be ordinary stackable items. Custom-named items and items carrying extra data remain in your hand."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.4": {
+        "before": null,
+        "after": "With ingredients in the wok, the first Kitchen Shovel stir starts 10 seconds of cooking and counts as stir 1. Stir 3 times in total before completion. Cooking also starts when preparation time runs out. Ordinary ingredients cannot be added or removed after cooking starts; seasoning still follows its normal rules."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.5": {
+        "before": null,
+        "after": "Fewer than 3 stirs at completion produces Suspicious Stir-Fry. Leave a finished dish heated for 40 seconds and it becomes Dark Cuisine. Another 20 seconds turns it into 1–3 Charcoal and clears the wok. Removing the heat pauses these countdowns."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.6": {
+        "before": null,
+        "after": "Use 1 bowl to serve 1 dish, retaining hot-food and seasoning effects. Flex quality changes the food values and survives cooling. The nutrition shown on this page is the base value for the exact recipe. Dark Cuisine does not inherit the original dish's quality, heat, or seasoning."
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.7": {
+        "before": null,
+        "after": "During preparation, use an empty hand or an ingredient container to take back the last ingredient. Taking ingredients from a hot wok, or touching a finished hot wok without a bowl or Kitchen Shovel, deals 1 damage. Stir with a shovel and serve with a bowl."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, Ferns, Pumpkin Stems, Melon Stems, Rooted Dirt, Twisting Vines, and Weeping Vines. Other plants still need individual adapters.",
+        "after": "Also supports Cocoa, Sweet Berry Bushes, Pink Petals, berry-free Cave Vines, Sunflowers, Lilacs, Rose Bushes, Peonies, Short Grass, Ferns, Pumpkin Stems, Melon Stems, Rooted Dirt, Twisting Vines, Weeping Vines, Mangrove Leaves, and dry hanging Mangrove Propagules. Other plants still need individual adapters."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": "Cocoa advances one stage per attempt. Cave Vines gain Glow Berries without extending. Short Grass and Ferns become tall plants when there is room above.",
+        "after": "Cocoa advances one stage per attempt. Cave Vines gain Glow Berries without extending. Short Grass and Ferns become tall plants when there is room above. Mangrove Leaves grow a hanging propagule into dry air below. Dry hanging propagules mature one stage per attempt, up to stage 4. Grounded or waterlogged propagules are not supported."
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.excellent": {
+        "before": null,
+        "after": "Excellent"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.poor": {
+        "before": null,
+        "after": "Poor"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.standard": {
+        "before": null,
+        "after": "Standard"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.superb": {
+        "before": null,
+        "after": "Superb"
+      }
+    },
+    "zh_CN": {
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.1": {
+        "before": "操作：按 Cookery 炒锅流程加油、投入配方食材，加热 10 秒后以碗盛出。",
+        "after": "使用已更新的森罗厨房炒锅。旧版已在制作或已有成品的锅，先按原流程取完、清空，再开始新一锅。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.2": {
+        "before": null,
+        "after": "第一张卡是固定数量配方，优先匹配，成品没有品质加成。第二张卡列出弹性配方的每种必需食材各 1 个；各种数量可增加，合计最多 9 个，仍只做 1 份。比例与世界及该配方决定的目标越接近，品质越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.3": {
+        "before": null,
+        "after": "在热源上的空锅加油后开始 60 秒备料时间。期间可加料或取回食材，时间不会重新计算；没有热源时暂停。食材须是普通可堆叠物品，自定义名称或附带数据的材料会留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.4": {
+        "before": null,
+        "after": "有食材时第一次用锅铲翻炒，会启动 10 秒烹调，并算作第 1 次；完成前合计须翻炒 3 次。备料时间用完也会自动开始。开始烹调后不能加取普通食材，仍可按调料规则撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.5": {
+        "before": null,
+        "after": "完成时不足 3 次翻炒会成为可疑的炒菜。成品继续受热 40 秒后变成黑暗料理，再过 20 秒化成 1–3 个木炭并清空锅；失去热源会暂停这些倒数。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.6": {
+        "before": null,
+        "after": "用 1 个碗盛出 1 份成品，保留热食与调味效果。弹性料理的品质会改变食物值，冷却后仍保留品质；本页列出的营养是固定配方的基础值。 黑暗料理不继承原成品的品质、热食或调味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.7": {
+        "before": null,
+        "after": "备料时空手或持食材容器可取回最后放入的 1 个食材。从热锅直接取食材，或不用碗触碰已完成的热锅，会受到 1 点伤害；请用锅铲翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.1": {
+        "before": "操作：按 Cookery 炒锅流程加油、投入配方食材，加热 10 秒后以碗盛出。",
+        "after": "使用已更新的森罗厨房炒锅。旧版已在制作或已有成品的锅，先按原流程取完、清空，再开始新一锅。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.2": {
+        "before": null,
+        "after": "第一张卡是固定数量配方，优先匹配，成品没有品质加成。第二张卡列出弹性配方的每种必需食材各 1 个；各种数量可增加，合计最多 9 个，仍只做 1 份。比例与世界及该配方决定的目标越接近，品质越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.3": {
+        "before": null,
+        "after": "在热源上的空锅加油后开始 60 秒备料时间。期间可加料或取回食材，时间不会重新计算；没有热源时暂停。食材须是普通可堆叠物品，自定义名称或附带数据的材料会留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.4": {
+        "before": null,
+        "after": "有食材时第一次用锅铲翻炒，会启动 10 秒烹调，并算作第 1 次；完成前合计须翻炒 3 次。备料时间用完也会自动开始。开始烹调后不能加取普通食材，仍可按调料规则撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.5": {
+        "before": null,
+        "after": "完成时不足 3 次翻炒会成为可疑的炒菜。成品继续受热 40 秒后变成黑暗料理，再过 20 秒化成 1–3 个木炭并清空锅；失去热源会暂停这些倒数。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.6": {
+        "before": null,
+        "after": "用 1 个碗盛出 1 份成品，保留热食与调味效果。弹性料理的品质会改变食物值，冷却后仍保留品质；本页列出的营养是固定配方的基础值。 黑暗料理不继承原成品的品质、热食或调味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.7": {
+        "before": null,
+        "after": "备料时空手或持食材容器可取回最后放入的 1 个食材。从热锅直接取食材，或不用碗触碰已完成的热锅，会受到 1 点伤害；请用锅铲翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.1": {
+        "before": "操作：按 Cookery 炒锅流程加油、投入配方食材，加热 10 秒后以碗盛出。",
+        "after": "使用已更新的森罗厨房炒锅。旧版已在制作或已有成品的锅，先按原流程取完、清空，再开始新一锅。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.2": {
+        "before": null,
+        "after": "第一张卡是固定数量配方，优先匹配，成品没有品质加成。第二张卡列出弹性配方的每种必需食材各 1 个；各种数量可增加，合计最多 9 个，仍只做 1 份。比例与世界及该配方决定的目标越接近，品质越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.3": {
+        "before": null,
+        "after": "在热源上的空锅加油后开始 60 秒备料时间。期间可加料或取回食材，时间不会重新计算；没有热源时暂停。食材须是普通可堆叠物品，自定义名称或附带数据的材料会留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.4": {
+        "before": null,
+        "after": "有食材时第一次用锅铲翻炒，会启动 10 秒烹调，并算作第 1 次；完成前合计须翻炒 3 次。备料时间用完也会自动开始。开始烹调后不能加取普通食材，仍可按调料规则撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.5": {
+        "before": null,
+        "after": "完成时不足 3 次翻炒会成为可疑的炒菜。成品继续受热 40 秒后变成黑暗料理，再过 20 秒化成 1–3 个木炭并清空锅；失去热源会暂停这些倒数。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.6": {
+        "before": null,
+        "after": "用 1 个碗盛出 1 份成品，保留热食与调味效果。弹性料理的品质会改变食物值，冷却后仍保留品质；本页列出的营养是固定配方的基础值。 黑暗料理不继承原成品的品质、热食或调味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.7": {
+        "before": null,
+        "after": "备料时空手或持食材容器可取回最后放入的 1 个食材。从热锅直接取食材，或不用碗触碰已完成的热锅，会受到 1 点伤害；请用锅铲翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草、蕨、南瓜茎、西瓜茎、缠根泥土、缠怨藤和垂泪藤。其他植物仍需各自适配。",
+        "after": "也支持可可、甜莓、粉红色花簇、无果洞穴藤、向日葵、丁香、玫瑰丛、牡丹、短草、蕨、南瓜茎、西瓜茎、缠根泥土、缠怨藤、垂泪藤、红树树叶与干燥悬挂的红树胎生苗。其他植物仍需各自适配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": "可可每次长一阶；洞穴藤只结发光浆果，不延长。短草与蕨上方有空间时长成双高植物。",
+        "after": "可可每次长一阶；洞穴藤只结发光浆果，不延长。短草与蕨上方有空间时长成双高植物。 红树树叶下方有干燥空气时会长出悬挂胎生苗；干燥悬挂苗每次成熟一阶，最多 4 阶，地面或含水的苗仍不支持。"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.excellent": {
+        "before": null,
+        "after": "优秀"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.poor": {
+        "before": null,
+        "after": "生疏"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.standard": {
+        "before": null,
+        "after": "普通"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.superb": {
+        "before": null,
+        "after": "极佳"
+      }
+    },
+    "zh_TW": {
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.1": {
+        "before": "操作：按 Cookery 炒鍋流程加油、投入配方食材，加熱 10 秒後以碗盛出。",
+        "after": "使用已更新的森羅廚房炒鍋。舊版已在製作或已有成品的鍋，先按原流程取完、清空，再開始新一鍋。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.2": {
+        "before": null,
+        "after": "第一張卡是固定數量配方，優先匹配，成品沒有品質加成。第二張卡列出彈性配方的每種必需食材各 1 個；各種數量可增加，合計最多 9 個，仍只做 1 份。比例與世界及該配方決定的目標越接近，品質越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.3": {
+        "before": null,
+        "after": "在熱源上的空鍋加油後開始 60 秒備料時間。期間可加料或取回食材，時間不會重新計算；沒有熱源時暫停。食材須是普通可堆疊物品，自訂名稱或附帶資料的材料會留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.4": {
+        "before": null,
+        "after": "有食材時第一次用鍋鏟翻炒，會啟動 10 秒烹調，並算作第 1 次；完成前合計須翻炒 3 次。備料時間用完也會自動開始。開始烹調後不能加取普通食材，仍可按調料規則撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.5": {
+        "before": null,
+        "after": "完成時不足 3 次翻炒會成為可疑的炒菜。成品繼續受熱 40 秒後變成黑暗料理，再過 20 秒化成 1–3 個木炭並清空鍋；失去熱源會暫停這些倒數。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.6": {
+        "before": null,
+        "after": "用 1 個碗盛出 1 份成品，保留熱食與調味效果。彈性料理的品質會改變食物值，冷卻後仍保留品質；本頁列出的營養是固定配方的基礎值。 黑暗料理不繼承原成品的品質、熱食或調味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:braised_chicken_wings.7": {
+        "before": null,
+        "after": "備料時空手或持食材容器可取回最後放入的 1 個食材。從熱鍋直接取食材，或不用碗碰觸已完成的熱鍋，會受到 1 點傷害；請用鍋鏟翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.1": {
+        "before": "操作：按 Cookery 炒鍋流程加油、投入配方食材，加熱 10 秒後以碗盛出。",
+        "after": "使用已更新的森羅廚房炒鍋。舊版已在製作或已有成品的鍋，先按原流程取完、清空，再開始新一鍋。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.2": {
+        "before": null,
+        "after": "第一張卡是固定數量配方，優先匹配，成品沒有品質加成。第二張卡列出彈性配方的每種必需食材各 1 個；各種數量可增加，合計最多 9 個，仍只做 1 份。比例與世界及該配方決定的目標越接近，品質越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.3": {
+        "before": null,
+        "after": "在熱源上的空鍋加油後開始 60 秒備料時間。期間可加料或取回食材，時間不會重新計算；沒有熱源時暫停。食材須是普通可堆疊物品，自訂名稱或附帶資料的材料會留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.4": {
+        "before": null,
+        "after": "有食材時第一次用鍋鏟翻炒，會啟動 10 秒烹調，並算作第 1 次；完成前合計須翻炒 3 次。備料時間用完也會自動開始。開始烹調後不能加取普通食材，仍可按調料規則撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.5": {
+        "before": null,
+        "after": "完成時不足 3 次翻炒會成為可疑的炒菜。成品繼續受熱 40 秒後變成黑暗料理，再過 20 秒化成 1–3 個木炭並清空鍋；失去熱源會暫停這些倒數。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.6": {
+        "before": null,
+        "after": "用 1 個碗盛出 1 份成品，保留熱食與調味效果。彈性料理的品質會改變食物值，冷卻後仍保留品質；本頁列出的營養是固定配方的基礎值。 黑暗料理不繼承原成品的品質、熱食或調味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:green_pepper_squid_tentacles.7": {
+        "before": null,
+        "after": "備料時空手或持食材容器可取回最後放入的 1 個食材。從熱鍋直接取食材，或不用碗碰觸已完成的熱鍋，會受到 1 點傷害；請用鍋鏟翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.1": {
+        "before": "操作：按 Cookery 炒鍋流程加油、投入配方食材，加熱 10 秒後以碗盛出。",
+        "after": "使用已更新的森羅廚房炒鍋。舊版已在製作或已有成品的鍋，先按原流程取完、清空，再開始新一鍋。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.2": {
+        "before": null,
+        "after": "第一張卡是固定數量配方，優先匹配，成品沒有品質加成。第二張卡列出彈性配方的每種必需食材各 1 個；各種數量可增加，合計最多 9 個，仍只做 1 份。比例與世界及該配方決定的目標越接近，品質越好。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.3": {
+        "before": null,
+        "after": "在熱源上的空鍋加油後開始 60 秒備料時間。期間可加料或取回食材，時間不會重新計算；沒有熱源時暫停。食材須是普通可堆疊物品，自訂名稱或附帶資料的材料會留在手中。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.4": {
+        "before": null,
+        "after": "有食材時第一次用鍋鏟翻炒，會啟動 10 秒烹調，並算作第 1 次；完成前合計須翻炒 3 次。備料時間用完也會自動開始。開始烹調後不能加取普通食材，仍可按調料規則撒料。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.5": {
+        "before": null,
+        "after": "完成時不足 3 次翻炒會成為可疑的炒菜。成品繼續受熱 40 秒後變成黑暗料理，再過 20 秒化成 1–3 個木炭並清空鍋；失去熱源會暫停這些倒數。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.6": {
+        "before": null,
+        "after": "用 1 個碗盛出 1 份成品，保留熱食與調味效果。彈性料理的品質會改變食物值，冷卻後仍保留品質；本頁列出的營養是固定配方的基礎值。 黑暗料理不繼承原成品的品質、熱食或調味。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia_stir_fried_pork.7": {
+        "before": null,
+        "after": "備料時空手或持食材容器可取回最後放入的 1 個食材。從熱鍋直接取食材，或不用碗碰觸已完成的熱鍋，會受到 1 點傷害；請用鍋鏟翻炒、用碗盛出。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草、蕨、南瓜梗、西瓜梗、纏根土、扭曲藤與垂淚藤。其他植物仍需各自適配。",
+        "after": "也支援可可、甜莓、粉紅花簇、無果洞穴藤、向日葵、紫丁香、玫瑰叢、牡丹、短草、蕨、南瓜梗、西瓜梗、纏根土、扭曲藤、垂淚藤、紅樹葉與乾燥懸掛的紅樹胎生苗。其他植物仍需各自適配。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.6": {
+        "before": "可可每次長一階；洞穴藤只結發光莓，不延長。短草與蕨上方有空間時長成雙高植物。",
+        "after": "可可每次長一階；洞穴藤只結發光莓，不延長。短草與蕨上方有空間時長成雙高植物。 紅樹葉下方有乾燥空氣時會生出懸掛胎生苗；乾燥懸掛苗每次成熟一階，最多 4 階，地面或含水的苗仍不支援。"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.excellent": {
+        "before": null,
+        "after": "優秀"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.poor": {
+        "before": null,
+        "after": "生疏"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.standard": {
+        "before": null,
+        "after": "普通"
+      },
+      "tooltip.kaleidoscope_grilling.cuisine_quality.superb": {
+        "before": null,
+        "after": "極佳"
+      }
+    }
+  }
+}

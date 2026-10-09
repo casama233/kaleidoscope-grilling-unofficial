@@ -4,6 +4,7 @@ import json
 import subprocess
 from copy import deepcopy
 import re
+import struct
 PROFILE_SOURCE=json.loads(re.search(r"PROFILE_BY_ITEM=Object.freeze\((\{.*?\})\)",subprocess.check_output(["git","show","d795c0e:projects/grilling/gameplay_core/behavior_pack/scripts/data.js"],cwd=Path(__file__).resolve().parents[2]).decode()).group(1))
 ALL_EATING_ITEMS={k.split(':')[1] for k in PROFILE_SOURCE}|{'secret_skewer'}
 RANDOM_ITEMS={k.split(":")[1] for k,v in PROFILE_SOURCE.items() if v=="THREE_RANDOM"}|{"secret_skewer"}
@@ -16,6 +17,9 @@ LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
 PREVIOUS_GUIDE_BASE='f7bd2d26367c113ab8881bc67e9f5e69624917ff'
 REVIEWED_GUIDE_BASE='8099dc2d211e79c881548a2abc90c06e6c876dc5'
 CURRENT_GUIDE_BASE='187e179d58f48fbc9b4d57b5f01cff90b7489ee6'
+CUISINE_GUIDE_BASE='f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
+QUALITY_CUISINE_ITEMS = frozenset({'houttuynia_stir_fried_pork', 'green_pepper_squid_tentacles', 'braised_chicken_wings'})
+QUALITY_TOOLTIP_KEYS = frozenset('tooltip.kaleidoscope_grilling.cuisine_quality.' + name for name in ('superb', 'excellent', 'standard', 'poor'))
 LABELS = {'en_US': 'Kaleidoscope Grilling', 'zh_CN': '森罗物语烟火',
           'zh_TW': '森羅物語煙火'}
 
@@ -88,9 +92,36 @@ def main():
     version = tuple(json.loads((PROJECT / 'behavior_pack/manifest.json').read_bytes())['header']['version'])
     counts = {}
     bottle_eligibility = set()
+    quality_aliases = set()
+    quality_food = {}
+    if version >= (2,8,121):
+        oracle = json.loads((ROOT / 'development/gameplay_core/fixtures/java-cuisine-quality-160.json').read_text())
+        quality_food = {(row['baseId'].split(':',1)[1],row['quality']): row for row in oracle['neoforge_nutrition']}
+        assert len(oracle['neoforge_nutrition']) == len(quality_food) == 12
+        assert set(quality_food) == {(stem,quality) for stem in QUALITY_CUISINE_ITEMS for quality in range(4)}
     for folder, kind in [('items', 'item'), ('blocks', 'block')]:
         count = 0
         for path in sorted((PROJECT / 'behavior_pack' / folder).glob('*.json')):
+            cuisine = re.fullmatch(r'(.+)_cuisine_q([0-3])', path.stem) if kind == 'item' else None
+            if cuisine:
+                assert version >= (2,8,121) and cuisine.group(1) in QUALITY_CUISINE_ITEMS, 'Unreviewed cuisine alias: ' + str(path)
+                assert not CUISINE_GUIDE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
+                stem,quality = cuisine.group(1),int(cuisine.group(2))
+                expected = json.loads(path.with_name(stem+'.json').read_bytes())
+                item = expected['minecraft:item']
+                item['description']['identifier'] += '_cuisine_q' + str(quality)
+                item['description'].pop('menu_category',None)
+                food = quality_food[(stem,quality)]
+                item['components']['minecraft:food']['nutrition'] = food['nutrition']
+                # NeoForge's observed float saturation gain is represented as
+                # a native Bedrock modifier. The item still keeps all base
+                # names/assets/use/stack/remainder fields exactly.
+                item['components']['minecraft:food']['saturation_modifier'] = struct.unpack('!f',struct.pack('!f',food['saturationGain']/(2*food['nutrition'])))[0]
+                actual = json.loads(path.read_bytes())
+                assert actual == expected, 'Cuisine alias changed unrelated base behaviour: ' + str(path)
+                assert actual == json.loads(prior(path,CUISINE_GUIDE_BASE)), 'Cuisine alias differs from reviewed public source: ' + str(path)
+                quality_aliases.add(path.stem)
+                continue
             if kind == 'item' and path.stem == 'pepper_leaves':
                 assert version >= (2,8,118)
                 # G118 exposes the existing block item to native composting;
@@ -172,6 +203,7 @@ def main():
             count += 1
         counts[kind] = count
     assert counts == {'item': 156, 'block': 18}, counts
+    assert quality_aliases == ({f'{stem}_cuisine_q{quality}' for stem in QUALITY_CUISINE_ITEMS for quality in range(4)} if version >= (2,8,121) else set()), 'Missing/unexpected cuisine quality aliases'
     if version >= (2, 8, 61):
         assert bottle_eligibility == BOTTLES, 'Missing/unexpected bottle eligibility route'
         assert check_authoring() == 67
@@ -184,6 +216,7 @@ def main():
         previous_guide = language(prior(path, PREVIOUS_GUIDE_BASE)) if version >= (2,8,119) else current
         approved = {}
         guide_added = set()
+        quality_added = set()
         if version >= (2,8,74):
             name = 'g75-guide-reviewed-delta.json' if version >= (2,8,75) else 'g74-guide-reviewed-delta.json'
             approved = json.loads((ROOT / 'tools/fixtures' / name).read_text())['locales'][locale]
@@ -252,16 +285,39 @@ def main():
             for key, change in changes.items():
                 assert set(change) == {'before', 'after'}
                 assert reviewed.get(key) == change['before'], 'Reviewed G120 guide preimage drift'
-                assert latest_reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G120 guide delta drift'
+                assert latest_reviewed[key] == change['after'], 'Reviewed G120 guide delta drift'
                 if change['before'] is None:
                     assert key not in old and key not in approved
                     guide_added.add(key)
             assert len(guide_added) == 13
             approved.update(changes)
+        if version >= (2,8,121):
+            assert not CUISINE_GUIDE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
+            delta = json.loads((ROOT / 'tools/fixtures/g121-guide-reviewed-delta.json').read_text())
+            assert delta['schema'] == 1 and delta['release'] == [2,8,121]
+            assert delta['previous_public_commit'] == CURRENT_GUIDE_BASE
+            assert delta['reviewed_commit'] == CUISINE_GUIDE_BASE
+            assert set(delta['locales']) == set(LABELS)
+            changes = delta['locales'][locale]
+            expected_keys = {f'guide.kg.body.kaleidoscope_grilling:{stem}.{n}' for stem in QUALITY_CUISINE_ITEMS for n in range(1,8)}
+            expected_keys |= {f'guide.kg.body.kaleidoscope_grilling:oil_residue.{n}' for n in (3,6)} | QUALITY_TOOLTIP_KEYS
+            assert set(changes) == expected_keys, 'Reviewed G121 language scope changed'
+            cuisine_reviewed = language(prior(path,CUISINE_GUIDE_BASE))
+            assert {key for key in set(latest_reviewed) | set(cuisine_reviewed)
+                if latest_reviewed.get(key) != cuisine_reviewed.get(key)} == expected_keys, 'G121 language witness changed outside reviewed scope'
+            for key, change in changes.items():
+                assert set(change) == {'before', 'after'}
+                assert latest_reviewed.get(key) == change['before'], 'Reviewed G121 language preimage drift'
+                assert cuisine_reviewed[key] == change['after'] and current[key] == change['after'], 'Reviewed G121 language delta drift'
+                if change['before'] is None:
+                    assert key not in old and key not in approved
+                    (quality_added if key in QUALITY_TOOLTIP_KEYS else guide_added).add(key)
+            assert len(guide_added) == 31 and quality_added == QUALITY_TOOLTIP_KEYS
+            approved.update(changes)
         assert all(current[key] == change['after'] for key, change in approved.items()), 'Reviewed guide final text drift'
         assert all(current.get(k) == v for k, v in old.items() if k not in approved), 'Plain names/guide text changed'
         config_keys=set(['guide.kg.body.kaleidoscope_grilling:skewer_plate.5', 'guide.kg.body.kaleidoscope_grilling:special_seasoning.8', 'guide.kg.body.kaleidoscope_grilling:grill.8', 'message.kaleidoscope_grilling.cookery_integration_disabled']) if version >= (2,8,67) else set()
-        assert set(current) - set(old) == set(aliases) | public_keys | config_keys | guide_added, 'Unexpected localization override'
+        assert set(current) - set(old) == set(aliases) | public_keys | config_keys | guide_added | quality_added, 'Unexpected localization override'
         assert all(current[k] == '' for k in public_keys), 'Public metadata must remain invisible'
         released = language(subprocess.check_output(['git','show',LABEL_BASE+':'+path.relative_to(ROOT).as_posix()],cwd=ROOT))
         assert set(released) - set(old) == set(aliases), 'Historical label-only release drift'

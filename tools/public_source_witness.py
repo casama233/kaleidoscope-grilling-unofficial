@@ -110,6 +110,7 @@ REVIEWED_NUTRITION_BASE = '88e44dcd3815a52b5393adef5733a9abbca4e0c6'
 REVIEWED_CONSERVATION_BASE = '0e23c65e74100a8b4171fc214d77f2241477a1e9'
 REVIEWED_PARITY_BASE = '4a75af7ca1b54d30a2f877593c55a0f535423baf'
 REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
+REVIEWED_CUISINE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -210,6 +211,25 @@ def _g119_remaining_bytes(expected):
     assert len(delta['operations']) == 5, 'Reviewed G119 source requires exactly five edits'
     repaired = _apply_main_operations(expected, delta)
     assert repaired == _reviewed_remaining_source(), 'Reviewed G119 source differs outside remaining deltas'
+    return repaired
+
+
+@lru_cache(maxsize=1)
+def _reviewed_cuisine_source():
+    assert not REVIEWED_CUISINE_BASE.startswith('PENDING'), 'G121 public cuisine witness is pending publication'
+    return subprocess.check_output(['git', 'show', REVIEWED_CUISINE_BASE + ':' + MAIN_PATH], cwd=ROOT)
+
+
+def _g121_cuisine_bytes(expected):
+    # G120 retained the exact public G119 main.js. Append only the seven
+    # quality admission/use-ownership edits; no earlier witness is replaced.
+    delta = _main_delta('g121-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 121]
+    assert delta['previous_public_commit'] == REVIEWED_REMAINING_BASE
+    assert delta['reviewed_commit'] == REVIEWED_CUISINE_BASE
+    assert len(delta['operations']) == 7, 'Reviewed G121 source requires exactly seven edits'
+    repaired = _apply_main_operations(expected, delta)
+    assert repaired == _reviewed_cuisine_source(), 'Reviewed G121 source differs outside cuisine deltas'
     return repaired
 
 
@@ -315,6 +335,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _g118_parity_bytes(expected)
         if version >= (2, 8, 119):
             expected = _g119_remaining_bytes(expected)
+        if version >= (2, 8, 121):
+            expected = _g121_cuisine_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)
