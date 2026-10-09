@@ -29,16 +29,18 @@ import {configureSecretHeldReader,syncSecretHeld} from './secret_held_runtime.js
 import {configureSecretVisuals} from './station_contents_visual_runtime.js';
 import {foodFacts} from './food_snapshot_core.js';
 import {canUseCuisineFood,captureCuisineUse,cuisineUseEventMatches,completedCuisineUse} from './cuisine_eating_core.js';
-import {updateGrillAudio,removeGrillAudio,blockSound,useSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
+import {updateGrillAudio,removeGrillAudio,blockSound,useSound,seasoningShakeSound,stopSoundHandle,seasoningFinished} from './immersion_audio_runtime.js';
+import {updateNumbVisual,forgetNumbVisual,suppressNumbVisual} from './numb_visual_runtime.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {readNativeBottles,isNativeBottleItem} from './seasoning_native_storage.js';
 import {slotWrite,planInventoryInsert} from './rack_transfer_plan.js';
+import {nativeItemSignature,ownedItemStep,planOwnedInventoryDelivery,commitPlayerItemTransaction} from './owned_item_transaction_core.js';
 import {acknowledgedDrop,commitStationTransfer} from './grill_transfer.js';
 import './dragon_powder_runtime.js';
 import './a288_parity_runtime.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop} from './blockSupport.js';
-import {stationContainer,retireEmptyStationContainer,quarantineStation,inspectStationStorage,storageKey as stationStorageKey} from './family_station_storage.js';
+import {stationContainer,peekStationContainer,retireEmptyStationContainer,quarantineStation,inspectStationStorage,storageKey as stationStorageKey} from './family_station_storage.js';
 import {rolledIngredientEffects} from './a285_ingredient_effects.js';
 import {resolveSecretSmokedId} from './secret_compat_core.js';
 import {emitSecretIngredientConsumed} from './secret_compat_runtime.js';
@@ -59,6 +61,7 @@ import {initialState,normalizeState,tickState,light,brush,flip,season,canInsert,
 import {grillStateKey as stateKey,readGrillState as readState,occupiedGrillSlots as occupied} from './a2740_grill_state_adapter.js';
 import {mergeIntoContainer,compactSkewerContainer,compactMatchingHotFood,isFoodStack} from './a23_hot_runtime.js';
 import './a23_oil_world.js';
+import './oil_pot_ambient_runtime.js';
 import {UNFINISHED_ID,SECRET_ID,SKEWER_INGREDIENTS_KEY,SECRET_COOKED_KEY,SECRET_COOKED_INGREDIENTS_KEY,SECRET_CREATOR_KEY,FLUID_CAPACITY,appendOutcome,secretFood,isDisassemblableRaw,canAppendConfigured,isConfiguredIngredient} from './a24_skewering_core.js';
 import {PLATE_ID,plateHighestNutritionIndex} from './a25_plate_recipe_core.js';
 import {a25PlateRows,a25PlateItem,a25RestoreStack} from './a25_plate_recipe_runtime.js';
@@ -132,7 +135,6 @@ const DANGEROUS_FOODS=new Set(['minecraft:rotten_flesh','minecraft:chicken','min
 const BITE_TIMES=Object.freeze({
  ONE:[1.16667,3.08333],TWO:[0.95833,4.0],THREE:[0.95833,2.33333,3.54167],THREE_ALT:[0.95833,2.16667,3.5],FOUR:[0.95833,2.33333,3.45833,4.08333]
 });
-const NUMB_VISUAL=new Set();
 const STORAGE_SORT_BLOCKS=new Set(['minecraft:chest','minecraft:trapped_chest','minecraft:barrel']);
 const OIL_TYPES=Object.freeze({canola:{heatTicks:1200},secret_chili:{heatTicks:12000},premium_chili:{heatTicks:24000}});
 function writeTickState(block,before,next){
@@ -225,15 +227,8 @@ function reducedStack(stack,count=1){
  if(stack.amount===count)return undefined;
  const next=stack.clone();next.amount-=count;return next;
 }
-// A full inventory rejects threading/disassembly and restores both hands.
-// Never gamble remaining ingredients on an unacknowledged world drop.
-function prepareOutputDelivery(player,outputs){
- const container=mainContainer(player);if(!container)throw new Error('Grilling: output inventory unavailable');
- const before=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone());
- return {
-  apply(){for(const output of outputs){const remaining=mergeIntoContainer(container,output,undefined,true);if(remaining)throw new Error('Grilling: make inventory space for remaining skewers/ingredients')}},
-  rollback(){let failed=0;for(let i=0;i<before.length;i++)try{container.setItem(i,before[i])}catch{failed++}if(failed)throw new Error('Grilling: output rollback failed for '+failed+' writes');}
- };
+function prepareOutputDelivery(player,outputs,startingItems){
+ return planOwnedInventoryDelivery(mainContainer(player),outputs,{startingItems,dimension:player.dimension,location:player.location});
 }
 function give(player,stack){const c=mainContainer(player);if(!c)return;const rem=mergeIntoContainer(c,stack);if(rem)player.dimension.spawnItem(rem,player.location)}
 function copyOne(stack){const out=stack.clone();out.amount=1;return out}
@@ -346,13 +341,18 @@ function threadCurrent(player){
  const starter=off.typeId==='minecraft:stick'||(off.typeId===UNFINISHED_ID&&rows.length===0);
  const keep=off.amount-(free&&starter?0:1);
  if(keep>0){const remaining=off.clone();remaining.amount=keep;outputs.push(remaining)}
- const delivery=outputs.length?prepareOutputDelivery(player,outputs):null;
- const steps=[
-  {apply(){if(!free)main.write(nextMain)},rollback(){if(!free)main.write(food)}},
-  {apply(){other.write(next)},rollback(){other.write(off)}}
- ];
- if(delivery)steps.push(delivery);
- if(!transactionStatus(commitSteps(steps),'threading')){interactionFailure(player,'§c穿串失敗，已嘗試回復原料');return false}
+ const container=mainContainer(player);if(!container)throw Error('Grilling: output inventory unavailable');
+ const startingItems=Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone()),selected=player.selectedSlotIndex;
+ if(nativeItemSignature(startingItems[selected])!==nativeItemSignature(food))throw Error('Grilling: threading hand changed');
+ if(!free)startingItems[selected]=nextMain?.clone();
+ const delivery=prepareOutputDelivery(player,outputs,startingItems);let offRecovered=true;
+ const offWrite=ownedItemStep({read:()=>other.read(),write:stack=>other.write(stack),before:off,after:next,canRestore:delivery.canRestoreInputs});
+ const mainWrite=ownedItemStep({read:()=>main.read(),write:stack=>main.write(stack),before:food,after:nextMain,canRestore:()=>offRecovered&&delivery.canRestoreInputs()});
+ // The new offhand skewer is itself a credit. Its recovery must be confirmed
+ // before refunding the ingredient, even when every inventory drop was undone.
+ const offStep={apply(){offRecovered=false;offWrite.apply()},rollback(){offWrite.rollback();offRecovered=true}};
+ const steps=[...(free?[]:[mainWrite]),offStep,...delivery.steps];
+ if(!transactionStatus(commitPlayerItemTransaction(world,player,steps,{tick:system.currentTick,label:'threading'}),'threading')){interactionFailure(player,'§c穿串未完成；已回復可確認的原料，未確認交易請查看紀錄');return false}
  useSound(player,'action_success',.7,1);
  awardLookingThePart(player,outcome);
  return true;
@@ -363,9 +363,8 @@ function disassembleOff(player){
  if(outputs.some(item=>!item))throw new Error('Grilling: an ingredient cannot be restored');
  outputs.push(new ItemStack('minecraft:stick',1));
  const delivery=prepareOutputDelivery(player,outputs),next=reducedStack(off);
- if(!transactionStatus(commitSteps([
-  {apply(){other.write(next)},rollback(){other.write(off)}},delivery
- ]),'disassembly')){interactionFailure(player,'§c拆串失敗，已嘗試回復原料');return false}
+ const debit=ownedItemStep({read:()=>other.read(),write:stack=>other.write(stack),before:off,after:next,canRestore:delivery.canRestoreInputs});
+ if(!transactionStatus(commitPlayerItemTransaction(world,player,[debit,...delivery.steps],{tick:system.currentTick,label:'disassembly'}),'disassembly')){interactionFailure(player,'§c拆串未完成；已回復可確認的原料，未確認交易請查看紀錄');return false}
  useSound(player,'skewer_disassemble',.8);
  return true;
 }
@@ -493,6 +492,54 @@ function customBreak(block,player){
  try{removeGrillAudio(block)}catch{}
  try{retireEmptyStationContainer(dim.getBlock(loc))}catch(error){console.warn('[Grilling storage retirement] '+error)}
 }
+// Deferred destruction owns only the captured station and its native contents.
+// Inspection must not allocate a backing inventory in a before-event callback.
+function grillBreakSnapshot(block){
+ if(!block?.isValid||block.typeId!==GRILL_ID)throw new Error('Grill target unavailable');
+ const {phaseTicks,flipCooldown,...operation}=readState(block),container=peekStationContainer(block);
+ // clone is available in restricted execution; full canDestroy/canPlaceOn
+ // metadata getters are not. Compare those frozen native clones after defer.
+ const contents=container?Array.from({length:container.size},(_,i)=>container.getItem(i)?.clone()??null):undefined;
+ return {dimension:block.dimension,location:{...block.location},states:metadataSignature(block.permutation.getAllStates()),
+  owner:world.getDynamicProperty(stationStorageKey(block)),operation:metadataSignature(operation),
+  contents};
+}
+function sameGrillForBreak(captured){
+ const block=captured.dimension.getBlock(captured.location);
+ if(!block?.isValid||block.typeId!==GRILL_ID)return;
+ const current=grillBreakSnapshot(block);
+ // Normal cooking/cooldown clock advancement does not replace a station. A
+ // changed phase, owner, facing or item payload does invalidate this action.
+ if(current.states!==captured.states||current.owner!==captured.owner||current.operation!==captured.operation)return;
+ const contentsSignature=items=>items===undefined?undefined:metadataSignature(items.map(item=>item?{amount:item.amount,metadata:captureSkewerMetadata(item)}:null));
+ if(contentsSignature(current.contents)!==contentsSignature(captured.contents))return;
+ return block;
+}
+function scheduleGrillExplosion(event){
+ try{if(event.cancel!==false)return}catch{return}
+ const pending=[],keep=[];let protectedGrill=false;
+ for(const block of event.getImpactedBlocks()){
+  if(block.typeId!==GRILL_ID){keep.push(block);continue}
+  protectedGrill=true;
+  try{pending.push(grillBreakSnapshot(block))}catch(error){console.warn('[Grilling explosion capture] retained '+error)}
+ }
+ if(!protectedGrill)return;
+ event.setImpactedBlocks(keep);if(!pending.length)return;
+ system.run(()=>{
+  // A later subscriber can still cancel this event. An unreadable final
+  // status is not permission to destroy a station or release its contents.
+  try{if(event.cancel!==false)return}catch(error){console.warn('[Grilling explosion status] '+error);return}
+  for(const captured of pending)try{const block=sameGrillForBreak(captured);if(block)customBreak(block,undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}
+ });
+}
+function scheduleGrillPlayerBreak(event){
+ if(event.cancel||event.block.typeId!==GRILL_ID)return;
+ event.cancel=true;
+ try{
+  const captured=grillBreakSnapshot(event.block),player=event.player;
+  system.run(()=>{try{const block=sameGrillForBreak(captured);if(block)customBreak(block,player)}catch(error){console.warn('[Grilling break recovery] '+error)}});
+ }catch(error){console.warn('[Grilling break capture] retained '+error)}
+}
 function heatForOil(type){return OIL_TYPES[type]?.heatTicks??OIL_TYPES.canola.heatTicks}
 function planCookeryOil(player,hand,needed){
  const stack=heldByHand(player,hand),oil=planCookeryOilPotConsumption(stack,needed);
@@ -555,10 +602,11 @@ function handleGrill(block,player,hand='main'){
    if(!commitGrillAndHand(block,state,result.state,player,hand,oil.before,oil.next,oil.mutate)){interactionFailure(player,'§c刷油交易失敗，油與烤架已嘗試回滾');return}
    awardGleamingWithOil(player);javaInteractionFeedback(player,'oiled',[n]);
    blockSound(block,'grill_flip',.75);
-   try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}
+   // 1.3 s brush clip plus 0.12 s native blend-out: keep Numb off for 29 ticks.
+   try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12});suppressNumbVisual(player,system.currentTick,29)}catch{}
   }return;
  }
- if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12})}catch{}}return}
+ if(id&&Object.hasOwn(OIL_TOOLS,id)){const result=brush(state,n,OIL_TOOLS[id]);if(result.ok){writeState(block,result.state);awardGleamingWithOil(player);blockSound(block,'grill_flip',.75);try{player.playAnimation('animation.kg_imm.player.brush.'+hand,{blendOutTime:.12});suppressNumbVisual(player,system.currentTick,29)}catch{}}return}
  if(isSpecialSeasoningId(id)){
   if(state.phase!==2||state.seasoned||n<1){javaInteractionFeedback(player,'no_seasonable_skewers');return}
   const bottle=planSeasoningBottle(player,hand,n);if(!bottle.ok){javaInteractionFeedback(player,bottle.reason==='insufficient'?'not_enough_seasoning':'no_seasonable_skewers');return}
@@ -984,7 +1032,7 @@ world.afterEvents.itemStartUse.subscribe(e=>{
  const id=canonicalFoodId(e.itemStack?.typeId);
  if(isPendingSeasoningId(id)){const hand=captureInteractionIntent(e.source,e.itemStack).hand;
   stopSoundHandle(PENDING_USES.get(e.source.id)?.audio);
-  PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:useSound(e.source,'shake_seasoning',.8)});
+  PENDING_USES.set(e.source.id,{stack:e.itemStack.clone(),hand,use:captureEatingIdentity(e.itemStack,hand,e.source.selectedSlotIndex),audio:seasoningShakeSound(e.source)});
   try{syncSeasoningMotion(e.source,PENDING_USES.get(e.source.id))}catch(error){console.warn('[Grilling seasoning motion] '+error)}
   try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:"!q.is_using_item || !q.is_item_name_any('"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+"','"+e.itemStack.typeId+"')"})}catch{}return}
  if(id===PLATE_ID){
@@ -1092,7 +1140,7 @@ world.beforeEvents.entityHurt.subscribe(e=>{
  if(fxGet(target,'invincible')&&cause!=='selfDestruct'&&cause!=='override'){e.cancel=true;invincibleDamageFeedback(target);return}
  handleHeavyMetalBeforeHurt(e);
 });
-world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);NUMB_VISUAL.delete(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
+world.afterEvents.playerSpawn.subscribe(e=>{forgetProjectileDodge(e.player);try{e.player.setProperty(EAT_PROJECTION_PROPERTY,false);e.player.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.player.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0);e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{};if(!e.initialSpawn){forgetHeavyMetalRescue(e.player.id);try{clearEffects(e.player)}catch{};stopSoundHandle(ACTIVE_EATS.get(e.player.id)?.audio);stopSoundHandle(PENDING_USES.get(e.player.id)?.audio);for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,PENDING_USES,SETTLED,VIGOR_LAST,SNEAK_LAST])cache.delete(e.player.id);forgetNumbVisual(e.player.id);try{e.player.setProperty(EAT_PROFILE_PROPERTY,0);e.player.setProperty(EAT_HAND_PROPERTY,0)}catch{}}});
 world.afterEvents.entityHurt.subscribe(e=>{
  // Cookery HinderEvent follows damage from a living attacker, including its
  // projectile; a melee contact event cannot represent that source contract.
@@ -1168,15 +1216,10 @@ world.beforeEvents.playerInteractWithBlock.subscribe(e=>{
 });
 world.afterEvents.playerPlaceBlock.subscribe(e=>{if(e.block.typeId===GRILL_ID)resetBlock(e.block,false)});
 world.beforeEvents.explosion.subscribe(scheduleNativeBottleExplosion);
-world.beforeEvents.explosion.subscribe(e=>{
- if(e.cancel)return;
- const grills=[],keep=[];for(const b of e.getImpactedBlocks()){if(b.typeId===GRILL_ID)grills.push({d:b.dimension,p:{...b.location}});else keep.push(b)}
- if(!grills.length)return;e.setImpactedBlocks(keep);
- system.run(()=>{for(const row of grills)try{customBreak(row.d.getBlock(row.p),undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}});
-});
+world.beforeEvents.explosion.subscribe(scheduleGrillExplosion);
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  if(e.cancel)return;
- if(e.block.typeId===GRILL_ID){e.cancel=true;const p=e.player,loc={...e.block.location},dim=e.block.dimension;system.run(()=>customBreak(dim.getBlock(loc),p));return}
+ if(e.block.typeId===GRILL_ID){scheduleGrillPlayerBreak(e);return}
  scheduleNativeBottleBreak(e);
 });
 function nearHeat(player){
@@ -1234,14 +1277,14 @@ system.runInterval(()=>{
   if(fxGet(p,'tundra_strider')){try{const b=p.getBlockStandingOn();if(b&&TUNDRA_BLOCKS.has(b.typeId)){const v=p.getVelocity(),factor=tundraFactor(b.typeId);p.applyImpulse({x:v.x*(factor-1),y:0,z:v.z*(factor-1)});if(b.typeId==='minecraft:powder_snow'&&v.y<.02)p.applyImpulse({x:0,y:Math.min(.16,Math.max(.04,-v.y+.04)),z:0})}}catch{}}
   if(system.currentTick%20===0&&fxGet(p,'warmth')){const hp=p.getComponent('minecraft:health');if(hp&&hp.currentValue<hp.effectiveMax){if(nearHeat(p))hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+1));else if(p.dimension.id==='minecraft:nether'&&Math.random()<.25)hp.setCurrentValue(Math.min(hp.effectiveMax,hp.currentValue+.5))}}
   const db=fxGet(p,'dragon_blood');nativeDragonHealth(p,db?.amp);
-  const numb=fxGet(p,'numb');if(numb&&!ACTIVE_EATS.has(p.id)){if(system.currentTick%12===0)try{p.playAnimation('animation.kg_a22.player.numb',{blendOutTime:.08})}catch{};NUMB_VISUAL.add(p.id)}else if(!numb&&NUMB_VISUAL.delete(p.id)){try{p.playAnimation('animation.kg_core.player.reset',{blendOutTime:.12})}catch{}}
+  updateNumbVisual(p,!!fxGet(p,'numb')&&!ACTIVE_EATS.has(p.id)&&!PENDING_USES.has(p.id)&&!(p.getProperty('kaleidoscope_grilling:season_phase')>0),system.currentTick);
 
  }catch{}}
 },1);
 
 world.afterEvents.playerLeave.subscribe(({playerId})=>{
  for(const cache of [ACTIVE_EATS,CUISINE_EATS,PLATE_EATS,SETTLED,VIGOR_LAST,SNEAK_LAST,THREAD_LAST])cache.delete(playerId);
- NUMB_VISUAL.delete(playerId);forgetDragonHealth(playerId);
+ forgetNumbVisual(playerId);forgetDragonHealth(playerId);
 });
 
 configureSecretVisuals(readEffectiveSkewerRows,restoreIngredient);

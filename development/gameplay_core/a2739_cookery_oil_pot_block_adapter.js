@@ -14,10 +14,19 @@ export function readPlacedOilPotState(b){
 system.afterEvents.scriptEventReceive.subscribe(e=>{if(e.id!=='senluo:oil_block_snapshot')return;try{
  const r=JSON.parse(e.message),s=r.station;if(r.api!==1||!s||![s.x,s.y,s.z].every(Number.isInteger)||typeof s.dimensionId!=='string')return;
  const id=s.dimensionId+':'+s.x+','+s.y+','+s.z,state=r.state===undefined?undefined:normalizePublicOil(r.state);if(r.state!==undefined&&!state)return;
- if(state){const previous=snapshots.get(id);if(previous&&state.revision<previous.state.revision)return;snapshots.set(id,{state,tick:system.currentTick});}else snapshots.delete(id);
+ if(state){const previous=snapshots.get(id);if(previous&&state.revision<previous.state.revision)return;snapshots.set(id,{state,station:{dimensionId:s.dimensionId,x:s.x,y:s.y,z:s.z},tick:system.currentTick});}else snapshots.delete(id);
  const legacyKey=typedOilBlockKey(s.dimensionId,s.x,s.y,s.z),legacy=world.getDynamicProperty(legacyKey);
  if(state&&(state.type===legacy||state.count===0))world.setDynamicProperty(legacyKey,undefined);
 }catch(error){console.warn('[Grilling Oil API] invalid block receipt '+error)}});
+// Cosmetics may discover only recent public receipts. This exposes no mutable
+// state and omits unloaded/stale candidates instead of scanning world blocks.
+export function* currentPlacedOilPotCandidates(){
+ for(const cached of snapshots.values()){
+  // Retain the existing revision barrier even after its visual freshness ends.
+  if(system.currentTick-cached.tick>40)continue;
+  yield {...cached.station};
+ }
+}
 export function capturePlacedOilPotSnapshot(b){return readPlacedOilPotState(b);}
 export function placedOilPotSnapshotMatches(b,s){const actual=readPlacedOilPotState(b);return !!actual&&JSON.stringify(actual)===JSON.stringify(s);}
 // Mutations are owned by Cookery; a mirror is never a write permission.

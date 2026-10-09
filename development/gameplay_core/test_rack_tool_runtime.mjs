@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {execFileSync} from 'node:child_process';
 import {RACK_TOOL_VISUAL_TYPE,RACK_TOOL_MODEL_INDEX,rackToolVisualModel} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/rack_tool_visual_data.js';
 import {TOOL_ITEM_IDS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_core.js';
 import {PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,plateMeshPlan,recipeIconModel} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/plate_recipe_visual_core.js';
@@ -60,7 +61,12 @@ test('new helpers preserve all four facing rotations and independent slot identi
   f.render(undefined,0,'rack/6');assert.deepEqual([...f.row.parts.keys()],['rack/5','rack/7','rack/8']);
  }
 });
-test('startup clears only the four transient render types and does not add a second visual loop',()=>{
- assert.ok(source.includes('for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE])'));
+test('startup clears exactly the six reviewed transient render types and keeps one visual loop',()=>{
+ const receipt=JSON.parse(fs.readFileSync(new URL('../../tools/fixtures/g125-main-reviewed-delta.json',import.meta.url),'utf8'));
+ assert.deepEqual(receipt.release,[2,8,125]);
+ const reviewed=execFileSync('git',['show',receipt.reviewed_commit+':projects/grilling/gameplay_core/behavior_pack/scripts/station_contents_visual_runtime.js'],{cwd:new URL('../../',import.meta.url),encoding:'utf8'});
+ const expected='for(const type of [TYPE,RACK_TOOL_VISUAL_TYPE,PLATE_FOOD_VISUAL_TYPE,RECIPE_ICON_VISUAL_TYPE,CUSTOM_RECIPE_ICON_VISUAL_TYPE,VAT_PREMIUM_VISUAL_TYPE])';
+ for(const [name,text] of [['reviewed G125 source',reviewed],['current source',source]])
+  assert.deepEqual(text.match(/for\(const type of \[[^\]]+\]\)/g),[expected],name);
  assert.equal((source.match(/system\.runInterval\(pump,1\)/g)??[]).length,1);
 });

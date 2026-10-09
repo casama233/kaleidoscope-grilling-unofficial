@@ -1,8 +1,10 @@
 # Kaleidoscope Grilling — unofficial Bedrock port
 
-## Current maintained baseline: 2.8.124
+## Current maintained baseline: 2.8.125
 
 家族目前的 LIVE 配套、部署與逐檔收據、保存演練及指南接收範圍，統一見[家族基線入口](https://github.com/casama233/kaleidoscope-tavern-unofficial/blob/main/family/BASELINE-STATUS.md)。本倉庫的版本記錄保留各次修補及當時的驗證範圍。
+
+[G125 場景聲畫與操作守恆](docs/STATUS-A2.8.125.md)：修復烤架後續取消／延後目標、榨油機扣料及滿背包串譜／穿串／拆串；烤架亮度回到 7，新增動畫油面、premium 大缸滿亮液面與秘製串牆譜 GUI 分層。Numb 修正 20 倍時間誤差，油壺粒子、搖瓶聲音及保命圖騰粒子補齊可用路由。仍有 native inventory／HUD／第一人稱及原生事件差異；隔離 BDS 診斷不代替完整家族准入或 LIVE 更新。
 
 [G124 調料資料映射](docs/STATUS-A2.8.124.md)：沿用公開 Server-only API 保存及重新載入調料資料，取料、食用與 HUD 共用目前映射。保留 G123 locale 掛鉤及 G122 保存／品質，明確 provider、原生玩家操作與真人驗收限制仍依版本記錄分開保留。
 

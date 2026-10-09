@@ -51,7 +51,7 @@ async function fixture({creative=false,hand='main',count=3,item=N+'oil_residue'}
   getDynamicProperty:key=>dp.get(key),getDynamicPropertyIds:()=>[...dp.keys()],setDynamicProperty(key,value){if(value===undefined)dp.delete(key);else dp.set(key,value);},
   getDimension:()=>dimension,
   beforeEvents:{playerInteractWithBlock:signal('interact'),playerBreakBlock:signal('break')},
-  afterEvents:Object.fromEntries(['entitySpawn','entityLoad','entityRemove','playerSpawn','playerDimensionChange','playerLeave','playerBreakBlock'].map(name=>[name,signal(name)]))
+  afterEvents:Object.fromEntries(['entitySpawn','entityLoad','entityRemove','playerSpawn','playerDimensionChange','playerLeave','playerBreakBlock','playerPlaceBlock'].map(name=>[name,signal(name)]))
  };
  const slots=Object.fromEntries(['main','off'].map(name=>[name,{
   hasItem:()=>!!hands[name],getItem:()=>hands[name]?.clone(),

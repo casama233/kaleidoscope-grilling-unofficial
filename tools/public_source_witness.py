@@ -113,6 +113,7 @@ REVIEWED_REMAINING_BASE = '1e8011e1f71833739ea12097e80c0f69a21c844e'
 CUISINE_CANDIDATE_BASE = 'f27d40a7c1bab951398e3fc3d3906bcc416c5c3f'
 REVIEWED_CUISINE_BASE = '9fd92988f872ec1128aa071f2e045d54dbcdd4f4'
 REVIEWED_SEASONING_DATA_BASE = '469441bc6556b5e91adedfd44876ac072572012a'
+REVIEWED_SCENE_INTERACTION_BASE = '2ef4b7b6ffa782316378dc5d8fef3f9217b098bf'
 NUTRITION_G114 = b"""function addSecretNutrition(player,stack,meta){
  const d=dynamicFood(stack),h=player.getComponent('minecraft:player.hunger'),sat=player.getComponent('minecraft:player.saturation');if(!d||!h||!sat)return;
  const hunger=Math.min(h.effectiveMax,h.currentValue+d.nutrition);h.setCurrentValue(hunger);
@@ -273,6 +274,20 @@ def _g124_seasoning_data_bytes(expected):
     return repaired
 
 
+def _g125_scene_interaction_bytes(expected):
+    # Continue from the exact G124 preimage. An editable operation/hash cannot
+    # admit source beyond the independently published, reviewed repair commit.
+    delta = _main_delta('g125-main-reviewed-delta.json')
+    assert delta['path'] == MAIN_PATH and delta['release'] == [2, 8, 125]
+    assert delta['previous_public_commit'] == REVIEWED_SEASONING_DATA_BASE
+    assert delta['reviewed_commit'] == REVIEWED_SCENE_INTERACTION_BASE
+    assert len(delta['operations']) == 17, 'G125 reviewed main scope changed'
+    repaired = _apply_main_operations(expected, delta)
+    reviewed = subprocess.check_output(['git', 'show', REVIEWED_SCENE_INTERACTION_BASE + ':' + MAIN_PATH], cwd=ROOT)
+    assert repaired == reviewed, 'G125 public source differs outside exact scene/interaction deltas'
+    return repaired
+
+
 def _local_bottle_main_bytes(expected, version):
     # These are local candidate identities, distinct from published G72/G73.
     for patch_version, filename in (
@@ -381,6 +396,8 @@ def expected_main_bytes(version, *, local_bottles=False, proposal=None):
             expected = _g122_cuisine_bytes(expected)
         if version >= (2, 8, 124):
             expected = _g124_seasoning_data_bytes(expected)
+        if version >= (2, 8, 125):
+            expected = _g125_scene_interaction_bytes(expected)
         return expected
     if local_bottles:
         return _local_bottle_main_bytes(original, version)

@@ -119,7 +119,7 @@
               "face_dimming": false
             }
           },
-          "minecraft:light_emission": 13
+          "minecraft:light_emission": 7
         }
       },
       {
@@ -149,7 +149,7 @@
               "face_dimming": false
             }
           },
-          "minecraft:light_emission": 13
+          "minecraft:light_emission": 7
         }
       },
       {

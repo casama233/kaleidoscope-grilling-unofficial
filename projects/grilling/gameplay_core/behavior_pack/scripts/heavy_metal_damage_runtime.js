@@ -73,7 +73,12 @@ function settle(entity,id,token){
   let healthError;try{health.setCurrentValue(1)}catch(error){healthError=error}
   if(entity.getComponent('minecraft:health')?.currentValue!==1)
    throw healthError??Error('Heavy Metal rescue health was not acknowledged');
-  entity.dimension.playSound('kg_java21.heavy_metal',entity.location);
+  // Java broadcasts entity event 35 only after committing the rescue. Stable
+  // Bedrock has no event-35 sender/native totem-screen API; retain its world
+  // sound and add the supported native totem emitter as an explicit adaptation.
+  // Either cosmetic may fail independently without retrying a paid rescue.
+  try{entity.dimension.playSound('kg_java21.heavy_metal',entity.location)}catch{}
+  try{entity.dimension.spawnParticle('minecraft:totem_particle',entity.getHeadLocation())}catch{}
  }catch(error){
   // A canceled hit is already protection. Do not grant another one on an
   // unchanged/unreadable effect, retry unknown writes, or replay native damage.

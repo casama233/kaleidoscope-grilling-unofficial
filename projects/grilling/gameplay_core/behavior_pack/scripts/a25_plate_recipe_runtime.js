@@ -5,6 +5,7 @@ import {itemTranslationKey} from './a2745_skewer_recipe_hud_core.js';
 import {captureSkewerMetadata,restoreSkewerMetadata,metadataSignature} from './skewer_item_snapshot.js';
 import {decodePlateStorage,verifiedPlateStep,commitPlateSteps,plateFacingFromYaw} from './plate_transaction_core.js';
 import {commitSteps} from './a277_grill_transaction_core.js';
+import {nativeItemSignature,ownedItemStep,planOwnedInventoryDelivery,commitPlayerItemTransaction} from './owned_item_transaction_core.js';
 import {getItemProperty,setItemProperty,getItemPropertyIds,getItemLore,getItemRawLore,setItemLore} from './itemData.js';
 import {hasSolidTop,hasFullCubeCollision,hasSturdySide} from './blockSupport.js';
 import {withoutAutomaticCreatorLore} from './a23_hot_runtime.js';
@@ -401,23 +402,45 @@ function recordBookFromSkewer(player,book,skewer,hand='main'){
  if(!result.ok){console.warn('[Grilling record recipe] '+result.error+'; rollback errors='+result.rollbackErrors);return false}
  return true;
 }
-function consumePlan(player,plan){
- if(creative(player))return true;const c=mainContainer(player);if(!c)return false;
- for(const x of plan){const s=c.getItem(x.slot);if(!s||s.amount<x.count)return false}
- for(const x of plan){const s=c.getItem(x.slot);if(s.amount===x.count)c.setItem(x.slot,undefined);else{s.amount-=x.count;c.setItem(x.slot,s)}}return true;
-}
 function isRecipeStick(stack){
  if(stack?.typeId==='minecraft:stick')return true;
  if(stack?.typeId!==UNFINISHED_ID)return false;
  const raw=getItemProperty(stack,SKEWER_INGREDIENTS_KEY);
  return raw===undefined||(typeof raw==='string'&&raw.trim()==='[]');
 }
+function recipeCraftSteps(player,container,before,planned,captured,stickHand,output){
+ const consumed=before.map(s=>s?.clone()),inputSlots=new Set();
+ const free=creative(player);
+ if(!free){
+  for(const row of planned){
+   const stack=consumed[row.slot];
+   if(!stack||!Number.isInteger(row.count)||row.count<1||stack.amount<row.count)throw Error('Recipe inputs changed');
+   if(stack.amount===row.count)consumed[row.slot]=undefined;else stack.amount-=row.count;
+   inputSlots.add(row.slot);
+  }
+  if(stickHand==='main'){
+   const slot=player.selectedSlotIndex,stack=consumed[slot];
+   if(nativeItemSignature(before[slot])!==nativeItemSignature(captured.before)||!isRecipeStick(stack)||stack.amount<1)throw Error('Recipe stick changed');
+   if(stack.amount===1)consumed[slot]=undefined;else stack.amount--;
+   inputSlots.add(slot);
+  }
+ }
+ const delivery=planOwnedInventoryDelivery(container,[output],{startingItems:consumed,dimension:player.dimension,location:player.location});
+ const steps=[...inputSlots].map(slot=>ownedItemStep({read:()=>container.getItem(slot),write:stack=>container.setItem(slot,stack),before:before[slot],after:consumed[slot],canRestore:delivery.canRestoreInputs}));
+ if(!free&&stickHand==='off'){
+  const after=captured.before.amount===1?undefined:captured.before.clone();if(after)after.amount--;
+  steps.push(ownedItemStep({read:()=>captured.read(),write:stack=>captured.write(stack),before:captured.before,after,canRestore:delivery.canRestoreInputs}));
+ }
+ return [...steps,...delivery.steps];
+}
 function craftFromBook(player,book,stickHand='off'){
  const record=readBookRecord(book);if(!record){message(player,'§7這本烤串食譜尚未記錄配方');return false}
  const stick=heldByHand(player,stickHand);if(!isRecipeStick(stick)){message(player,'§e需要木棍或空的未完成烤串');return false}
  const slots=bookIngredientSlots(record);if(!slots)return false;
  const c=mainContainer(player);if(!c)return false;
- const before=Array.from({length:c.size},(_,i)=>c.getItem(i)?.clone()),oldOff=heldOff(player)?.clone();
+ const captured=captureWritableHand(player,stickHand);
+ if(!isRecipeStick(captured.before)||nativeItemSignature(captured.before)!==nativeItemSignature(stick))return false;
+ const before=Array.from({length:c.size},(_,i)=>c.getItem(i)?.clone());
  const inventory=before.map(s=>s?{id:s.typeId,count:s.amount,tags:s.getTags?.()??[]}:null);
  const planned=planInventoryConsumption(inventory,slots,[player.selectedSlotIndex]);
  if(!planned.ok){const labels=[];for(const id of planned.missing??[]){if(labels.length)labels.push({text:'/'});labels.push(id.startsWith('#')?{text:id}:{translate:itemTranslationKey(id)})}javaInteractionFeedback(player,'skewer_book_missing',[{rawtext:labels},1]);return false}
@@ -433,19 +456,8 @@ function craftFromBook(player,book,stickHand='off'){
   }
  }else if(record.resultId!==SECRET_ID)output=new ItemStack(record.resultId,1);
  if(!output)return false;
- const result=commitSteps([{
-  apply(){
-   if(!consumePlan(player,planned.plan)||!decrementHand(player,stickHand,1))throw Error('Recipe inputs changed');
-   const leftover=c.addItem(output);if(leftover)throw Error('Make inventory space for the skewer');
-  },
-  rollback(){
-   let failures=0;
-   for(let i=0;i<before.length;i++)try{c.setItem(i,before[i])}catch{failures++}
-   try{setOff(player,oldOff)}catch{failures++}
-   if(failures)throw Error('Recipe rollback failed for '+failures+' writes');
-  }
- }]);
- if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);interactionFailure(player,'§c製作未完成，已嘗試回復材料；請預留背包空位');return false}
+ const result=commitPlayerItemTransaction(world,player,recipeCraftSteps(player,c,before,planned.plan,captured,stickHand,output),{tick:system.currentTick,label:'recipe'});
+ if(!result.ok){console.warn('[Grilling recipe] '+result.error+'; rollback errors='+result.rollbackErrors);interactionFailure(player,result.rollbackErrors?'§c製作交易需要恢復；已保留未確認的扣料，避免重複出料':'§c製作未完成，材料已回復');return false}
  useSound(player,'action_success',.7,1);return true;
 }
 function handleBookAir(player,item){

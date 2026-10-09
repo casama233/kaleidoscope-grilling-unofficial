@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createGrillAudioController,GRILL_LOOP_TICKS} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_audio_core.js';
+import {createGrillAudioController,GRILL_LOOP_TICKS,playSeasoningShakeAudio,stopSoundHandle} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/immersion_audio_core.js';
 // Native sound-operation doubles; no Minecraft or simulated player is constructed.
 function fixture(){
  const starts=[],stops=[];
@@ -40,4 +40,13 @@ test('a failing sound start retries with bounded work and cannot alter station d
  for(let tick=0;tick<40;tick++)audio.update('a',station,true,tick);
  assert.equal(attempts,2);assert.deepEqual(station,{lit:true,count:3});audio.update('a',station,false,40);
  assert.equal(audio.size,0);
+});
+test('shake release stops the local clip without cancelling the observer world one-shot',()=>{
+ const calls=[],stops=[],origin={x:-.5,y:64.5,z:2.5};
+ const listener=id=>({id,playSound(sound,options){calls.push({id,sound,options});return {stop(){stops.push(id)}}}});
+ const owner=listener('owner'),observer=listener('observer');
+ const handle=playSeasoningShakeAudio(owner,[owner,observer],origin);
+ assert.equal(calls.length,2);assert.ok(!Object.hasOwn(calls[0].options,'location'),'local clip must not be pinned to the start position');
+ assert.deepEqual(calls[1].options,{location:origin,volume:.8,pitch:1});
+ stopSoundHandle(handle);assert.deepEqual(stops,['owner']);
 });

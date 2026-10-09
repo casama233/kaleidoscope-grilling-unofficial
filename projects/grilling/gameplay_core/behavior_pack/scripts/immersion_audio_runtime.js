@@ -2,7 +2,7 @@ import {flatulenceSoundOrigin as seasoningFinishSoundOrigin} from './flatulence_
 export const SEASONING_FINISH_SOUND_ID='kg_java21.seasoning_finished';
 import {interactionParticleBurst} from './immersion_particles_runtime.js';
 import {system} from '@minecraft/server';
-import {createGrillAudioController,stopSoundHandle} from './immersion_audio_core.js';
+import {createGrillAudioController,playSeasoningShakeAudio,stopSoundHandle} from './immersion_audio_core.js';
 
 const stationKey=block=>[block.dimension.id,block.x,block.y,block.z].join('|');
 const center=block=>({x:block.x+.5,y:block.y+.35,z:block.z+.5});
@@ -19,6 +19,10 @@ export function blockSound(block,id,volume=1,pitch=1){
 }
 export function useSound(player,id,volume=1,pitch=1){
  try{return player.dimension.playSound('kg_imm.'+id,player.location,{volume,pitch})}catch{}
+}
+export function seasoningShakeSound(player){
+ let observers=[];try{observers=player.dimension.getPlayers()}catch{}
+ return playSeasoningShakeAudio(player,observers,seasoningFinishSoundOrigin(player));
 }
 export function seasoningFinished(player){
  const dimension=player.dimension;

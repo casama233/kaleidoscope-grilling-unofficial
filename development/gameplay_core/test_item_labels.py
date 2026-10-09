@@ -13,7 +13,7 @@ from test_bottle_item_offhand_sources import BOTTLES, check_authoring
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
-from public_source_witness import CUISINE_CANDIDATE_BASE, cuisine_release_link
+from public_source_witness import CUISINE_CANDIDATE_BASE, REVIEWED_SCENE_INTERACTION_BASE, cuisine_release_link
 PROJECT = ROOT / 'projects/grilling/gameplay_core'
 BASE='1cf16f39f449ee5ce95190ef9088e575d133f928'  # Merged 2.8.45 runtime, including the prior repairs.
 LABEL_BASE='49159e9d4dc9a88ad59dfda618146c0d7a3b9fc0'
@@ -86,6 +86,34 @@ def current_behavior_expectation(before, kind, stem, version):
         c['kaleidoscope_grilling:recipe_support'] = {}
         c['minecraft:tick'] = {'interval_range': [20, 20], 'looping': True}
         c['minecraft:movable'] = {'movement_type': 'immovable'}
+    if version >= (2,8,125) and kind == 'block' and stem in (
+            'canola_oil', 'secret_chili_oil', 'premium_chili_oil', 'grill'):
+        # Admit only the four reviewed G125 block deltas. Earlier versions
+        # retain their exact preimages, including the old grill light of 13.
+        block = expected['minecraft:block']
+        if stem == 'grill':
+            for index, legged in ((1, 'false'), (3, 'true')):
+                row = block['permutations'][index]
+                assert row['condition'] == (
+                    f"q.block_state('kaleidoscope_grilling:legged') == {legged} && "
+                    "q.block_state('kaleidoscope_grilling:lit') == true")
+                assert row['components']['minecraft:light_emission'] == 13, 'G125 grill preimage drift'
+                row['components']['minecraft:light_emission'] = 7
+        else:
+            materials = block['components']['minecraft:material_instances']
+            assert set(materials) == {'*'}, 'G125 oil material preimage drift'
+            materials['flow'] = {
+                'texture': 'kg_a23_' + stem + '_flow',
+                'render_method': 'blend',
+                'ambient_occlusion': 0.0,
+                'face_dimming': False,
+            }
+        reviewed = json.loads(prior(PROJECT / 'behavior_pack/blocks' / (stem + '.json'),
+                                    REVIEWED_SCENE_INTERACTION_BASE))
+        # The caller checks the label separately. Every non-display field,
+        # including unchanged materials/permutations, must match public source.
+        reviewed['minecraft:block']['components']['minecraft:display_name'] = block['components']['minecraft:display_name']
+        assert reviewed == expected, 'G125 block witness differs outside reviewed delta: ' + stem
     return expected
 
 
