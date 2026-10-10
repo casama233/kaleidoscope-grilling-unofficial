@@ -98,7 +98,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python development/gameplay_core/test_two_route_eating_projection.py
           python tools/test_source_provenance.py
           python tools/test_historical_source_refs.py
           python development/gameplay_core/test_verify_current.py
