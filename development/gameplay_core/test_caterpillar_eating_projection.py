@@ -16,7 +16,11 @@ class CaterpillarProjectionTests(unittest.TestCase):
    self.assertEqual(hashlib.sha256((P/relative).read_bytes()).hexdigest(),sha,relative)
   original=subprocess.check_output(['git','show',FIX['source_predecessor']+':projects/grilling/gameplay_core/behavior_pack/scripts/main.js'],cwd=ROOT).decode()
   current=(scoped.BP/'scripts/main.js').read_text()
-  self.assertEqual(scoped.patch_main(original),current)
+  # Preserve the original two-edit G126 comparison after verifying and
+  # reversing only the exact bounded two-route continuation, when present.
+  from verify_a284 import eating_dispatch_source
+  version=json.loads((scoped.BP/'manifest.json').read_text())['header']['version']
+  self.assertEqual(scoped.patch_main(original),eating_dispatch_source(current,version))
   self.assertEqual(scoped.patch_main(current),current)
   for bad in ('',original+original,current+current):
    with self.assertRaises(ValueError):scoped.patch_main(bad)
