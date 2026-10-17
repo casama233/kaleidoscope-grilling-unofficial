@@ -1,0 +1,25 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:vat_premium_visual",
+      "materials": {
+        "default": "entity_emissive_alpha"
+      },
+      "textures": {
+        "default": "textures/blocks/java_oil/premium_chili_still"
+      },
+      "geometry": {
+        "level1": "geometry.kg_station.vat_premium_1",
+        "level2": "geometry.kg_station.vat_premium_2",
+        "level3": "geometry.kg_station.vat_premium_3",
+        "level4": "geometry.kg_station.vat_premium_4"
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_station.vat_premium": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:level') > 0"
+        }
+      ]
+    }
+  }
+}

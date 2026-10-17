@@ -1,0 +1,30 @@
+{
+  "version": "A2.7.59",
+  "p1_actionable_complete": true,
+  "advanced_rack_complete": true,
+  "pepper_tree_complete": true,
+  "worldgen_initial_fruiting_probability": 0.25,
+  "worldgen_leaf_weights": [
+    3,
+    1
+  ],
+  "worldgen_bridge_internal": true,
+  "worldgen_bridge_one_shot_tick": true,
+  "entity_inside_platform_limit": true,
+  "global_entity_leaf_polling_added": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 281,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 633,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

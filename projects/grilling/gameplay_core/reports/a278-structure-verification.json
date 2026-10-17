@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.8",
+  "carrot_dice_item": true,
+  "potato_slice_item": true,
+  "carrot_chopping_registered": true,
+  "potato_chopping_registered": true,
+  "cuts": 4,
+  "beef_chunks_deferred_due_builtin_priority": true,
+  "exact_java_staged_board_visual": false,
+  "a277_transactions_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    114
+  ],
+  "scope": "Documented RawMessage ownership and semantic readback for bottle lore; metadata preservation and privacy-safe mismatch diagnostics. All G113 mechanics retained.",
+  "before_sha256": "e8a6eb7d2e3ba40d0e946904ff9daa33ba8d6e9eebeed37fc1b95b92e72f22fd",
+  "after_sha256": "1333bcb1af77f85f0ffc0f52c0597eff7767db31a21d86d0bc14d260f1ea50bc",
+  "operations": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {isOwnedBottleLore,bottleLoreSignature,bottleLoreMismatch} from './bottle_lore_core.js';\n"
+    },
+    {
+      "start": 45319,
+      "end": 45429,
+      "before": " const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);\n",
+      "after": ""
+    },
+    {
+      "start": 45608,
+      "end": 45853,
+      "before": " const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];\n setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');\n",
+      "after": " const lore=[...getItemRawLore(stack).filter(line=>!isOwnedBottleLore(line)),...derived];\n const properties=()=>metadataSignature(Object.fromEntries(getItemPropertyIds(stack).map(key=>[key,getItemProperty(stack,key)]))),beforeProperties=properties();\n setItemLore(stack,lore);if(properties()!==beforeProperties)throw new Error('Bottle lore metadata write rejected');const actual=getItemRawLore(stack);if(bottleLoreSignature(actual)!==bottleLoreSignature(lore))throw new Error('Bottle ingredient lore write rejected: '+bottleLoreMismatch(lore,actual));\n"
+    }
+  ]
+}

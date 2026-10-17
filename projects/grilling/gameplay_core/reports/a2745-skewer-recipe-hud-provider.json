@@ -1,0 +1,35 @@
+{
+  "version": "A2.7.45",
+  "scope": "attach wall-mounted Skewer Recipe Java Jade data to shared crosshair HUD using A2.5 recipe state",
+  "java_contract": {
+    "jade": [
+      "record",
+      "recorded_item",
+      "ingredients",
+      "wall_usage"
+    ],
+    "provider": "SkewerRecipeProvider",
+    "entity": "SkewerRecipeBlockEntity"
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "recipe_snapshot": "a25ReadRecipeBlockSnapshot",
+    "existing_chain": [
+      "readRecipeBlock",
+      "restoreStack",
+      "readBookRecord",
+      "bookIngredientSlots"
+    ],
+    "single_poll_loop": true,
+    "duplicate_recipe_state_parser": false,
+    "direct_dynamic_property_access": false
+  },
+  "ui_adaptation": {
+    "java_item_icons": true,
+    "bedrock_item_icons": false,
+    "localized_item_names": true,
+    "ingredient_signature": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

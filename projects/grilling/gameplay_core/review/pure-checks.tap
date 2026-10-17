@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: void-returning successful steps are accepted
+ok 1 - void-returning successful steps are accepted
+  ---
+  duration_ms: 2.578327
+  type: 'test'
+  ...
+# Subtest: first-step failure rolls back only the attempted step
+ok 2 - first-step failure rolls back only the attempted step
+  ---
+  duration_ms: 0.289477
+  type: 'test'
+  ...
+# Subtest: explicit false from second step is a failure with reverse rollback
+ok 3 - explicit false from second step is a failure with reverse rollback
+  ---
+  duration_ms: 0.234875
+  type: 'test'
+  ...
+# Subtest: rollback false or exception does not suppress remaining rollback
+ok 4 - rollback false or exception does not suppress remaining rollback
+  ---
+  duration_ms: 0.286623
+  type: 'test'
+  ...
+# Subtest: all partial stages restore in reverse order
+ok 5 - all partial stages restore in reverse order
+  ---
+  duration_ms: 0.244459
+  type: 'test'
+  ...
+# Subtest: zero-step transaction is a no-op
+ok 6 - zero-step transaction is a no-op
+  ---
+  duration_ms: 0.186432
+  type: 'test'
+  ...
+# Subtest: unchanged two-hand intent is accepted
+ok 7 - unchanged two-hand intent is accepted
+  ---
+  duration_ms: 0.201945
+  type: 'test'
+  ...
+# Subtest: changed main cancels deferred intent
+ok 8 - changed main cancels deferred intent
+  ---
+  duration_ms: 0.089956
+  type: 'test'
+  ...
+# Subtest: changed off cancels deferred intent
+ok 9 - changed off cancels deferred intent
+  ---
+  duration_ms: 0.32408
+  type: 'test'
+  ...
+# Subtest: changed slot cancels deferred intent
+ok 10 - changed slot cancels deferred intent
+  ---
+  duration_ms: 0.673808
+  type: 'test'
+  ...
+# Subtest: changed dimensionId cancels deferred intent
+ok 11 - changed dimensionId cancels deferred intent
+  ---
+  duration_ms: 0.136075
+  type: 'test'
+  ...
+# Subtest: changed sneaking cancels deferred intent
+ok 12 - changed sneaking cancels deferred intent
+  ---
+  duration_ms: 0.081333
+  type: 'test'
+  ...
+# Subtest: invalid or lost snapshot is never accepted
+ok 13 - invalid or lost snapshot is never accepted
+  ---
+  duration_ms: 0.077527
+  type: 'test'
+  ...
+# Subtest: round-robin visits unique rows, size 0
+ok 14 - round-robin visits unique rows, size 0
+  ---
+  duration_ms: 0.142466
+  type: 'test'
+  ...
+# Subtest: round-robin visits unique rows, size 1
+ok 15 - round-robin visits unique rows, size 1
+  ---
+  duration_ms: 0.081102
+  type: 'test'
+  ...
+# Subtest: round-robin visits unique rows, size 3
+ok 16 - round-robin visits unique rows, size 3
+  ---
+  duration_ms: 0.047451
+  type: 'test'
+  ...
+# Subtest: round-robin visits unique rows, size 12
+ok 17 - round-robin visits unique rows, size 12
+  ---
+  duration_ms: 0.108284
+  type: 'test'
+  ...
+# Subtest: round-robin visits unique rows, size 40
+ok 18 - round-robin visits unique rows, size 40
+  ---
+  duration_ms: 0.064527
+  type: 'test'
+  ...
+# Subtest: dirty rows are not visited a second time
+ok 19 - dirty rows are not visited a second time
+  ---
+  duration_ms: 0.100702
+  type: 'test'
+  ...
+# Subtest: large queues preserve round-robin progress
+ok 20 - large queues preserve round-robin progress
+  ---
+  duration_ms: 0.208264
+  type: 'test'
+  ...
+# Subtest: deletion during traversal stays bounded
+ok 21 - deletion during traversal stays bounded
+  ---
+  duration_ms: 0.221495
+  type: 'test'
+  ...
+# Subtest: all rows already seen causes zero repeat work
+ok 22 - all rows already seen causes zero repeat work
+  ---
+  duration_ms: 0.081733
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73.513664

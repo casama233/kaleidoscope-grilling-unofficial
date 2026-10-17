@@ -1,0 +1,40 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:rack_tool_visual",
+      "materials": {
+        "default": "entity_alphatest_one_sided"
+      },
+      "textures": {
+        "s0": "textures/items/kc_iron_kitchen_knife",
+        "s1": "textures/items/kc_gold_kitchen_knife",
+        "s2": "textures/items/kc_diamond_kitchen_knife",
+        "s3": "textures/items/kc_netherite_kitchen_knife",
+        "s4": "textures/items/kc_kitchen_shovel",
+        "s5": "textures/items/flint_and_steel"
+      },
+      "geometry": {
+        "s0": "geometry.kg_station.rack_tool.s0",
+        "s1": "geometry.kg_station.rack_tool.s1",
+        "s2": "geometry.kg_station.rack_tool.s2",
+        "s3": "geometry.kg_station.rack_tool.s3",
+        "s4": "geometry.kg_station.rack_tool.s4",
+        "s5": "geometry.kg_station.rack_tool.s5"
+      },
+      "animations": {
+        "pose": "animation.kg_station.rack_tool"
+      },
+      "scripts": {
+        "animate": [
+          "pose"
+        ]
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_station.rack_tool": "q.property('kaleidoscope_grilling:ready')"
+        }
+      ]
+    }
+  }
+}

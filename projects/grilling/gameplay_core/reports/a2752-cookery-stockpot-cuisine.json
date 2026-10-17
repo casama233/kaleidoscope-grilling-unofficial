@@ -1,0 +1,52 @@
+{
+  "version": "A2.7.52",
+  "scope": "three remaining Java Stockpot dishes through Cookery exact/flex host API",
+  "foods": [
+    "potato_beef_stew",
+    "red_sweet_potato_porridge",
+    "sour_spicy_noodles"
+  ],
+  "recipes": {
+    "stockpot_exact": 3,
+    "stockpot_flex": 3
+  },
+  "cookery_host": {
+    "single_recipe_publisher": true,
+    "stockpot_exact": true,
+    "stockpot_flex": true,
+    "private_kc_station_access": false,
+    "existing_cuisine_bridge_reused": true
+  },
+  "tavern": {
+    "java_optional_mod_condition_preserved": true,
+    "java_vinegar_id": "kaleidoscope_tavern:vinegar",
+    "bedrock_quality_ids": [
+      "kaleidoscope_tavern:vinegar_q1",
+      "kaleidoscope_tavern:vinegar_q2",
+      "kaleidoscope_tavern:vinegar_q3",
+      "kaleidoscope_tavern:vinegar_q4",
+      "kaleidoscope_tavern:vinegar_q5",
+      "kaleidoscope_tavern:vinegar_q6"
+    ],
+    "registration_requires_all_quality_ids": true,
+    "duplicate_vinegar_created": false
+  },
+  "effects": {
+    "red_sweet_potato_porridge": {
+      "flatulence": 900,
+      "warmth": 900
+    },
+    "sour_spicy_noodles": {
+      "warmth": 900
+    },
+    "shared_standalone_food_effect_runtime": true
+  },
+  "shared_state": {
+    "cuisine_bridge": "a2750_cookery_cuisine_runtime.js",
+    "cuisine_eat_map_unified": true,
+    "new_item_complete_use_listener": false
+  },
+  "catalog_registered": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

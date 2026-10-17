@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.53",
+  "java_advancement": "mountain_fragrance",
+  "trigger": "empty-hand harvest of fruiting Pepper Leaves",
+  "xp_reward": 25,
+  "once_per_player": true,
+  "announce_to_chat": true,
+  "frame": "goal",
+  "shared_advancement_adapter": true,
+  "dynamic_property_key": "kaleidoscope_grilling:adv_mountain_fragrance",
+  "new_poll_loop": false,
+  "new_world_event_listener": false,
+  "native_java_advancement_tree": false,
+  "native_java_toast": false,
+  "bedrock_chat_goal_message": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

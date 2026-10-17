@@ -1,0 +1,16 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_furnace": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:roasted_chicken_wing"
+    },
+    "tags": [
+      "furnace",
+      "smoker",
+      "campfire",
+      "soul_campfire"
+    ],
+    "input": "kaleidoscope_grilling:chicken_wing",
+    "output": "kaleidoscope_grilling:roasted_chicken_wing"
+  }
+}

@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:sichuan_pepper",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:sichuan_pepper.name"
+        "value": "kaleidoscope_grilling.display.item.sichuan_pepper"
       },
       "minecraft:icon": {
         "textures": {

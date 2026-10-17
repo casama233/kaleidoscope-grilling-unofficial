@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:clear_partial_seasoning_f6"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "kaleidoscope_grilling:partial_seasoning_f6"
+      }
+    ],
+    "result": {
+      "item": "kaleidoscope_grilling:empty_seasoning_bottle",
+      "count": 1
+    },
+    "unlock": [
+      {
+        "item": "kaleidoscope_grilling:partial_seasoning_f6"
+      }
+    ]
+  }
+}

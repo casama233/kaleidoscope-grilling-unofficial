@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "author_commit": "9a1acdab27698457bec16c9362678e574895a28c",
+  "source_path": "neoforge-1.21.1/src/main/java/cn/breezeth/kaleidoscope_grilling/food/FoodState.java",
+  "source_sha256": "0ca3a0ee9e9f5800a23ddb6274d59783952cd330f6f4731045b7c05fb0a71ba4",
+  "oracle": "Unchanged extracted Java HEAT_BUCKET_TICKS declaration and bucket method executed with javac/java; nonnegative world time only",
+  "bucket_ticks": 100,
+  "vectors": [
+    {
+      "until": 0,
+      "expected": 0
+    },
+    {
+      "until": 1,
+      "expected": 0
+    },
+    {
+      "until": 2,
+      "expected": 0
+    },
+    {
+      "until": 99,
+      "expected": 0
+    },
+    {
+      "until": 100,
+      "expected": 100
+    },
+    {
+      "until": 101,
+      "expected": 100
+    },
+    {
+      "until": 1099,
+      "expected": 1000
+    },
+    {
+      "until": 1100,
+      "expected": 1100
+    },
+    {
+      "until": 1200,
+      "expected": 1200
+    },
+    {
+      "until": 1201,
+      "expected": 1200
+    },
+    {
+      "until": 1299,
+      "expected": 1200
+    },
+    {
+      "until": 1300,
+      "expected": 1300
+    },
+    {
+      "until": 2299,
+      "expected": 2200
+    },
+    {
+      "until": 11234,
+      "expected": 11200
+    },
+    {
+      "until": 12000,
+      "expected": 12000
+    },
+    {
+      "until": 12001,
+      "expected": 12000
+    },
+    {
+      "until": 12099,
+      "expected": 12000
+    },
+    {
+      "until": 12100,
+      "expected": 12100
+    },
+    {
+      "until": 13099,
+      "expected": 13000
+    },
+    {
+      "until": 24000,
+      "expected": 24000
+    },
+    {
+      "until": 24001,
+      "expected": 24000
+    },
+    {
+      "until": 24099,
+      "expected": 24000
+    },
+    {
+      "until": 24100,
+      "expected": 24100
+    },
+    {
+      "until": 25099,
+      "expected": 25000
+    }
+  ]
+}

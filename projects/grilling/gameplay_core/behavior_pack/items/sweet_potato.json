@@ -1,0 +1,53 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:sweet_potato",
+      "menu_category": {
+        "category": "nature",
+        "group": "kaleidoscope_cookery:itemGroup.name.crops"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "kaleidoscope_grilling.display.item.sweet_potato"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "sweet_potato"
+        }
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:allow_off_hand": true,
+      "minecraft:use_modifiers": {
+        "start_using": "if_first",
+        "use_duration": 1.6,
+        "movement_modifier": 0.35
+      },
+      "minecraft:food": {
+        "can_always_eat": false,
+        "nutrition": 3,
+        "saturation_modifier": 0.1
+      },
+      "minecraft:use_animation": {
+        "value": "eat"
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_food",
+          "kaleidoscope_grilling:ingredients/sweet_potatoes"
+        ]
+      },
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:sweet_potato_crop",
+        "use_on": [
+          "minecraft:farmland"
+        ],
+        "replace_block_item": false
+      },
+      "minecraft:compostable": {
+        "composting_chance": 65
+      }
+    }
+  }
+}

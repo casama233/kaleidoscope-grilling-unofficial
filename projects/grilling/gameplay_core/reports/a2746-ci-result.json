@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.46",
+  "tested_commit": "5a2e69d90bcef7a4a0118c3f7ad01a391c8a6c7a",
+  "run_id": "35677806921",
+  "incremental_from_published_a2745": true,
+  "advanced_rack": true,
+  "compartments": 9,
+  "persistent_filters": true,
+  "deposit_matching": true,
+  "hotbar_binding": true,
+  "automation_api": true,
+  "break_preserves_contents": true,
+  "models_reused": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "13df5949ccf7dd10063366a2909355541a7fa42332c2b7cc30b57e197e491aec",
+  "brproject_sha256": "70f976c2e7247b387d74fb826d35c80c51621512f813c47b7dc2350bcec4359d",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

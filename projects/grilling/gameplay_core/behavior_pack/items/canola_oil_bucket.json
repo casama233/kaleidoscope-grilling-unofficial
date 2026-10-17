@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:canola_oil_bucket",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:canola_oil_bucket.name"
+        "value": "kaleidoscope_grilling.display.item.canola_oil_bucket"
       },
       "minecraft:icon": {
         "textures": {

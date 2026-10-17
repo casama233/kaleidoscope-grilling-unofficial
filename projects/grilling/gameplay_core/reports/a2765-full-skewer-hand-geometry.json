@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.65",
+  "title": "Full Skewer Hand Geometry",
+  "attachable_count": 39,
+  "source_geometry_count": 150,
+  "baked_geometry_count": 150,
+  "source_geometry": "models/entity/a22_bites",
+  "baked_geometry": "models/entity/a2764_skewer_hand",
+  "hand_space_translation": [
+    0,
+    7,
+    2
+  ],
+  "provenance": "A2.7.25 raw beef stage0 to A1.16 geometry.kg_imm.hand_skewer exact delta",
+  "root_binding": "q.item_slot_to_bone_name(context.item_slot)",
+  "root_animation_removed_for_all_skewers": true,
+  "a2725_runtime_reference_count": 0,
+  "a2725_animation_file_retained_for_history": true,
+  "bite_stage_logic_changed": false,
+  "textures_changed": false,
+  "render_controller_changed": false,
+  "gameplay_logic_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

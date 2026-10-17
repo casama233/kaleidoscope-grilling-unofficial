@@ -1,0 +1,20 @@
+{
+  "product_version": [
+    2,
+    7,
+    65
+  ],
+  "guide_module_id": "kg_a1:grilling",
+  "guide_entries": 76,
+  "same_bp_uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
+  "same_rp_uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
+  "script_entry": "scripts/main.js",
+  "guide_entry_imports": 1,
+  "unchanged_existing_files": 919,
+  "gameplay_languages_preserved": 3,
+  "guide_pngs": 105,
+  "separate_guide_packs_required": false,
+  "host_scripts_copied": false,
+  "host_patch_produced": false,
+  "host_106_locale_fallback": "zh_TW mechanics on unpatched registry; per-locale payload retained"
+}

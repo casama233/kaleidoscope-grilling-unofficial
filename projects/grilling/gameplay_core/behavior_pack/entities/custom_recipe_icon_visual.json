@@ -1,0 +1,92 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:custom_recipe_icon_visual",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "kaleidoscope_grilling:ready": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:gui_count": {
+          "type": "int",
+          "range": [
+            0,
+            3
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:gui_bits": {
+          "type": "int",
+          "range": [
+            0,
+            7
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:gui_color_0": {
+          "type": "int",
+          "range": [
+            0,
+            16777215
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:gui_color_1": {
+          "type": "int",
+          "range": [
+            0,
+            16777215
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kaleidoscope_grilling:gui_color_2": {
+          "type": "int",
+          "range": [
+            0,
+            16777215
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "kg_render_helper"
+        ]
+      },
+      "minecraft:transient": {},
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:collision_box": {
+        "width": 0,
+        "height": 0
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:fire_immune": {}
+    }
+  }
+}

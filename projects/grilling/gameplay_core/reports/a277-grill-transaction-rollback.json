@@ -1,0 +1,33 @@
+{
+  "version": "A2.7.7",
+  "scope": "grill commit ordering and rollback only; no new content",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "fixes": {
+    "state_resource_commits": {
+      "status": "fixed",
+      "covers": [
+        "flint_and_steel ignition",
+        "Cookery oil brush",
+        "special seasoning"
+      ],
+      "policy": "apply grill state then used-hand resource; on either exception restore both snapshots best-effort"
+    },
+    "extract": {
+      "status": "fixed",
+      "policy": "prepare output -> clear grill source -> deliver to one known-empty inventory slot or spawn -> restore source on delivery exception"
+    },
+    "break": {
+      "status": "fixed",
+      "policy": "spawn all intended drops as escrow while source still intact -> commit container/state/block removal -> remove escrow and restore grill snapshot on commit exception",
+      "escrow_cleanup_api": "Entity.remove()"
+    }
+  },
+  "known_boundaries": [
+    "When the player inventory has no empty slot, extraction intentionally spawns the output at the player instead of attempting a potentially-partial merge into a full inventory. Java placeItemBackInInventory may merge into a compatible partial stack.",
+    "Rollback is best-effort if the underlying engine itself throws again while restoring a snapshot.",
+    "The temporary escrow entities during custom break exist only inside one synchronous callback; script callbacks do not interleave during that commit section.",
+    "Minecraft/BDS engine acceptance remains required."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

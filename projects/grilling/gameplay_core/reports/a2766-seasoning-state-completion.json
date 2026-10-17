@@ -1,0 +1,33 @@
+{
+  "version": "A2.7.66",
+  "title": "Seasoning State Completion and Safe Cookery Commit",
+  "base_commit": "1743ee615e59939085208ac09131b569a3fe6136",
+  "java_reference": {
+    "repository": "breezeth-CN/KaleidoscopeGrilling",
+    "commit": "9a1acdab27698457bec16c9362678e574895a28c",
+    "seasoning_data_blob": "e1a5fd6b924bd480ab6eb48f66b80af3fb0de3f3",
+    "variant_6_model_blob": "43bbf10e2b6ccd8a9f76ca98f8d4d966589e9915",
+    "variant_7_model_blob": "d002226d6aa0b92f94f83eb9e3b7f9a56023a75e"
+  },
+  "previous_defined_states": 42,
+  "added_states": 22,
+  "state_count": 64,
+  "active_uses_variant_combinations": 128,
+  "new_palette_textures": 3,
+  "palette_method": "Reuse matching remaining-level v0 geometry; copy the exact variant tile from the existing 32x32 Java atlas into its v0 fill tile. Glass, label, transform and fill height stay unchanged.",
+  "metadata_copy_fail_closed": true,
+  "cookery_prepare_before_commit": true,
+  "cookery_two_party_rollback": true,
+  "cookery_deferred_intent_recheck": true,
+  "uuid_and_existing_identifiers_preserved": true,
+  "cookery_dependency": "1.0.6",
+  "mocked_runtime_tests": 15,
+  "remaining": [
+    "Placed stacked bottles still use their existing static world geometry.",
+    "Typed Oil Pot world visuals, MAXIM tooltip and other parity work are not claimed complete.",
+    "Client hand transforms, transparency and multiplayer still need in-engine testing."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

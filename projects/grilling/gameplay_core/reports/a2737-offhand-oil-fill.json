@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.37",
+  "scope": "port Java OilFillingHandler RightClickItem: main-hand Grilling oil bucket + offhand Cookery oil pot",
+  "java_1_1_1": {
+    "event": "PlayerInteractEvent.RightClickItem",
+    "main_hand_only": true,
+    "offhand_pot_required": true,
+    "bucket_points": 8,
+    "typed_capacity": 64,
+    "native_fat_retyping_blocked": true,
+    "different_oil_blocked": true,
+    "survival_bucket_replaced_with_empty_bucket": true,
+    "creative_bucket_preserved": true
+  },
+  "reuse": {
+    "oil_registry": "a23_oil_world.js OIL_TYPES",
+    "oil_pot_adapter": "a2734_cookery_oil_pot_adapter.js",
+    "player_io": "a2735_player_io.js",
+    "new_bucket_registry": false,
+    "direct_host_dynamic_property_access": false
+  },
+  "after": {
+    "air_item_use_path": true,
+    "empty_pot_supported": true,
+    "filled_pot_supported": true,
+    "same_type_stacks_by_8": true,
+    "native_fat_blocked": true,
+    "different_type_blocked": true,
+    "full_pot_blocked": true,
+    "post_commit_verification_and_rollback": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

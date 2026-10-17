@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.38",
+  "tested_commit": "c5da0f9511eb2d988df69a59b57c98b433bffaaa",
+  "run_id": "35669310351",
+  "incremental_from_published_a2737": true,
+  "shared_oil_contract": true,
+  "host_fat_capacity": 256,
+  "typed_fluid_capacity": 64,
+  "bucket_points": 8,
+  "a2736_private_bucket_registry_removed": true,
+  "duplicate_host_block_created": false,
+  "visual_adapter_deferred": true,
+  "hud_adapter_deferred": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "60992890f5309ac1afe304a8ae75a58a7fb44a00d5efa19baf2b88d75b69818e",
+  "brproject_sha256": "05ff46cda7f8c29c93a408afc412c4cf84e9f1f0e5e47d064e861bb2a2d7f5b1",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

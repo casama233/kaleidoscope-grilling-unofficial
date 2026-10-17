@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.28",
+  "languages": [
+    "zh_CN",
+    "zh_TW",
+    "en_US"
+  ],
+  "keys": 96,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false
+}

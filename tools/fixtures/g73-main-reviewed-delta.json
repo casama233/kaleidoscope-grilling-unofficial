@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "scope": "Only reviewed G73 lethal-health, ordinary-fatal-route and selected feedback changes; all public eating/completion/visual bytes outside these exact edits remain conserved. No functional or client parity inference.",
+  "before_sha256": "42a4096faada55381ffd0af37a8c46064dfc34d4e5875a325a21e477f0caace2",
+  "after_sha256": "14eb1a4b778241a7590c09ecc53b12abfe516d303dc90c0de9258ddc53f893cb",
+  "operations": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {definitelyLethalProvisionalHealth} from './heavy_metal_damage_core.js';\n"
+    },
+    {
+      "start": 400,
+      "end": 543,
+      "before": "import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback} from './immersion_effect_feedback.js';\n",
+      "after": "import {invincibleDamageFeedback,invincibleAmbientFeedback,goldenSkewerFeedback,ordinaryShieldFeedback,ordinaryFatalFeedback} from './immersion_effect_feedback.js';\n"
+    },
+    {
+      "start": 59315,
+      "end": 59418,
+      "before": " system.run(()=>{try{player.kill()}catch{try{player.applyDamage(100000,{cause:'override'})}catch{}}});\n",
+      "after": " ordinaryFatalFeedback(player);\n // Java uses damage, not generic kill: Heavy Metal and native totems retain their damage/death route.\n system.run(()=>{try{player.applyDamage(3.4028234663852886e38,{cause:'override'})}catch(error){console.warn('[Grilling ordinary damage] '+error)}});\n"
+    },
+    {
+      "start": 75719,
+      "end": 75857,
+      "before": " if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&hp.currentValue>0&&e.damage>=hp.currentValue){\n",
+      "after": " if(hm&&!PENDING_METAL_RESCUES.has(target.id)&&!fxGet(target,'heavy_metal_poisoning')&&hp&&definitelyLethalProvisionalHealth(hp.currentValue,target.getEffect?.('absorption'))&&e.damage>0){\n"
+    },
+    {
+      "start": 75937,
+      "end": 76015,
+      "before": "  // This remains a before-damage approximation, not a Java death-event hook.\n",
+      "after": "  // BDS exposes provisional post-hit health here; compare that value to zero,\n  // not incoming damage to already-reduced health. Cancellation restores it.\n  // Native remaining absorption is unavailable: skip ambiguous hits rather\n  // than consuming rescue for a shield-blocked nonfatal hit.\n  // Later addon cancellation/rewrite and exact Java death ordering remain separate.\n"
+    },
+    {
+      "start": 76625,
+      "end": 76688,
+      "before": "   target.dimension.playSound('random.totem',target.location);\n",
+      "after": "   target.dimension.playSound('kg_java21.heavy_metal',target.location);\n"
+    }
+  ]
+}

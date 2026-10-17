@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.45",
+  "skewer_recipe_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_recipe_chain_reused": true,
+  "single_poll_loop": true,
+  "duplicate_recipe_state_parser": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

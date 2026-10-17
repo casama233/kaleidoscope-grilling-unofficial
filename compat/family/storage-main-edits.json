@@ -1,0 +1,112 @@
+{
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "before": "c401580fd8cbf2b390671f85bbaf838e5e5381dbc1bf847b3c4770f1dfc0c183",
+  "after": "3d15e583bc00aef6267c839a3e8466e7a6a95c362266bceacb3c7f4a1df14e17",
+  "edits": [
+    [
+      0,
+      0,
+      "import {stationContainer,retireEmptyStationContainer,quarantineStation} from './family_station_storage.js';\n"
+    ],
+    [
+      7774,
+      7782,
+      "s"
+    ],
+    [
+      7783,
+      7787,
+      "ati"
+    ],
+    [
+      7789,
+      7818,
+      "C"
+    ],
+    [
+      7826,
+      7826,
+      "(block)"
+    ],
+    [
+      21753,
+      21753,
+      "let ok=true;"
+    ],
+    [
+      21799,
+      21799,
+      "ok=false"
+    ],
+    [
+      21800,
+      21800,
+      "return ok"
+    ],
+    [
+      22051,
+      22051,
+      "return true;"
+    ],
+    [
+      22060,
+      22060,
+      "return false"
+    ],
+    [
+      22301,
+      22301,
+      "if(!c){message(player,'§c烤架庫存暫不可用，未拆除');return}\n "
+    ],
+    [
+      22328,
+      22329,
+      ""
+    ],
+    [
+      22723,
+      22723,
+      "if(!"
+    ],
+    [
+      22742,
+      22742,
+      "))quarantineStation(block,'partial output cleanup unconfirmed'"
+    ],
+    [
+      22902,
+      22902,
+      "if(!"
+    ],
+    [
+      22922,
+      22922,
+      "){quarantineStation(block,'escrow cleanup unconfirmed')"
+    ],
+    [
+      22923,
+      22923,
+      "return}\n  if(!"
+    ],
+    [
+      22973,
+      22973,
+      ")quarantineStation(block,'grill rollback incomplete')"
+    ],
+    [
+      23009,
+      23009,
+      "return;"
+    ],
+    [
+      23011,
+      23011,
+      "}\n try{retireEmptyStationContainer(dim.getBlock(loc))}catch(error){console.warn('[Grilling storage retirement] '+error)"
+    ],
+    [
+      49200,
+      49200,
+      "explosion.subscribe(e=>{\n const grills=[],keep=[];for(const b of e.getImpactedBlocks()){if(b.typeId===GRILL_ID)grills.push({d:b.dimension,p:{...b.location}});else keep.push(b)}\n if(!grills.length)return;e.setImpactedBlocks(keep);\n system.run(()=>{for(const row of grills)try{customBreak(row.d.getBlock(row.p),undefined)}catch(error){console.warn('[Grilling explosion recovery] '+error)}});\n});\nworld.beforeEvents."
+    ]
+  ]
+}

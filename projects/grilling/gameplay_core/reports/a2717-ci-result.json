@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.17",
+  "tested_commit": "ff1ccbca7bd3a724910927f44da3465b00db89c4",
+  "run_id": "35588495963",
+  "onion_item": true,
+  "onion_crop": true,
+  "ages": 8,
+  "straw_hat_acquisition": true,
+  "compostable_65_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "onion_to_powder_processing_complete": false,
+  "a2716_canola_chain_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "d73efecda93de83623e658549c1c0d97438fb33779e10d415d8d81a9f923eea6",
+  "brproject_sha256": "47c0d9c0b3f91cbc410a36723d6946741cb89c47dd5ad0fedd48aae5b90d6fc5",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

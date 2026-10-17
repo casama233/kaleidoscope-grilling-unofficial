@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.30",
+  "tested_commit": "5f92182b3abd06a1cc622540ca61a54f16df563a",
+  "run_id": "35605275539",
+  "incremental_from_published_a2729": true,
+  "cookery_oil_pot_adapter": true,
+  "active_consumers": 3,
+  "consumer_direct_host_key_access": 0,
+  "untyped_capacity": 256,
+  "typed_capacity": 64,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "2bfeb4e37cf7a0b40e4c241b3c1ee9a9f0d54adc7e8405aa9133ab739d475edb",
+  "brproject_sha256": "c655186c4fb7c828667c535a4ba5f692f147361f78cfde1c9d2bd0d58209309b",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

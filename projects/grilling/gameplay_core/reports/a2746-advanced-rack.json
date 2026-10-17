@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.46",
+  "scope": "Java Advanced Rack gameplay",
+  "java": {
+    "compartments": 9,
+    "seasoning_slots": 5,
+    "tool_slots": 4,
+    "shortcut_range": 8,
+    "spice_levels": 5,
+    "persistent_filters": true,
+    "deposit_matching": true,
+    "hotbar_binding": true,
+    "break_preserves_contents": true,
+    "automation_api": true
+  },
+  "bedrock": {
+    "block_container_slots": 9,
+    "action_form_ui": true,
+    "custom_command": "kaleidoscope_grilling:rack",
+    "itemstack_codec_scope": "rack-legal-items-only",
+    "server_ui": "2.2.0",
+    "models_reused": true
+  },
+  "storage_item_rejected": {
+    "reason": "stable Storage Item weight limit is capped at 64 and cannot represent nine arbitrary non-stackable tools"
+  },
+  "parity_boundary": {
+    "java_keybinding_caps_lock": true,
+    "bedrock_custom_keyboard_mapping": false,
+    "replacement": "/kaleidoscope_grilling:rack"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

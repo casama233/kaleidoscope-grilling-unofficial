@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    80
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only proof-gated synchronous nonterminal itemStopUse checkpoint settlement; terminal/unknown native completion stays deferred; no before-leave gameplay writes or generic logout equivalence claimed",
+  "base_commit": "2191440213e5befde97f842a5b57d732739e195d",
+  "before_sha256": "c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727",
+  "after_sha256": "159a67ea0efc2d5252e5525bf313b5beccdf478e2cc000345201af07d507736b",
+  "operations": [
+    {
+      "start": 74388,
+      "end": 74991,
+      "before": "system.run(()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);forgetEatingItem(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{};if(!a.plain&&e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);if(a.id===SECRET_ID)try{syncSecretHeld(e.source)}catch(error){console.warn('[Grilling held release] '+error)}}",
+      "after": "const settleReleased=()=>{if(ACTIVE_EATS.get(id)!==a)return;ACTIVE_EATS.delete(id);forgetEatingItem(id);try{e.source.setProperty(EAT_PROFILE_PROPERTY,0);e.source.setProperty(EAT_HAND_PROPERTY,0);e.source.setProperty(EAT_PROJECTION_PROPERTY,false);e.source.setProperty(EAT_NATIVE_TICKS_PROPERTY,0);e.source.setProperty(EAT_ELAPSED_TICKS_PROPERTY,0)}catch{};if(!a.plain&&e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&hungerSettle(e.source,a.id,a))SETTLED.set(id,system.currentTick);if(a.id===SECRET_ID)try{syncSecretHeld(e.source)}catch(error){console.warn('[Grilling held release] '+error)}};\n // A proven nonterminal stop cannot race native completion. Settle in this\n // writable after-event, like Java releaseUsing, before leave clears the session.\n // Terminal/unknown clocks retain deferred completion ownership; before-leave\n // stays read-only and no offline Player reference is used for gameplay writes.\n const immediate=!a.plain&&e.itemStack&&used+RELEASE_CHECKPOINT_GRACE_TICKS>=MINIMUM_EAT_TICKS&&\n  Number.isInteger(a.nativeDuration)&&a.nativeDuration>0&&a.nativeDuration<=72000&&Number.isInteger(used)&&used>=0&&used+1<a.nativeDuration&&\n  Number.isInteger(e.useDuration)&&e.useDuration>0&&e.useDuration<=a.nativeDuration;\n if(immediate)settleReleased();else system.run(settleReleased"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.37",
+  "tested_commit": "0c70dbbd87ac7fbd1e95dca5a07f2a45cb690632",
+  "run_id": "35617938768",
+  "incremental_from_published_a2736": true,
+  "offhand_oil_pot_item_fill": true,
+  "reuses_oil_registry": true,
+  "reuses_a2734_adapter": true,
+  "reuses_a2735_player_io": true,
+  "bucket_points": 8,
+  "typed_capacity": 64,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "ab87d3aa47a8627f463a615b2d616d23175f387888a9266d734c6141378e2de8",
+  "brproject_sha256": "fc85b6e9e113bfb58cd87d9d52a364791fb9f862e3aa49ff1ebcf27cbb038f56",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

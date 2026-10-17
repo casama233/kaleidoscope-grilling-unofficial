@@ -1,0 +1,25 @@
+{
+  "version": "A2.7.57",
+  "official_api_hardening": true,
+  "hot_before_seasoning": true,
+  "official_samples_pinned": true,
+  "wok_foods": 3,
+  "stockpot_foods": 3,
+  "cookery_private_state_access": false,
+  "duplicate_host_station": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 276,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 633,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

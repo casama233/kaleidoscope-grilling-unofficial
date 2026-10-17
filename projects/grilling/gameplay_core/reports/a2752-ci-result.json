@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.52",
+  "tested_commit": "44d5c640d6b44bb279a76085b895da21463afcd8",
+  "run_id": "35690523630",
+  "incremental_from_published_a2751": true,
+  "cookery_stockpot_cuisine": true,
+  "stockpot_foods": 3,
+  "stockpot_exact": 3,
+  "stockpot_flex": 3,
+  "single_recipe_publisher": true,
+  "tavern_vinegar_quality_adapter": true,
+  "shared_cuisine_bridge": true,
+  "shared_standalone_effect_runtime": true,
+  "new_item_complete_use_listener": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "b52ef920f8c01c48ddc4f78c69e6b886a36fc4e48406e0cb58ab20f23cd14c3c",
+  "brproject_sha256": "07e5a9f9dbaf347602a09315d5ac8170ab7e09125e0d391b7dbe0d597517f12b",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

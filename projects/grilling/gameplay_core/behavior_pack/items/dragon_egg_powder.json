@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:dragon_egg_powder",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:dragon_egg_powder.name"
+        "value": "kaleidoscope_grilling.display.item.dragon_egg_powder"
       },
       "minecraft:icon": {
         "textures": {

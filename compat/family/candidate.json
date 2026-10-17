@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "version": "2.8.9",
+  "archive": "Kaleidoscope_Grilling_A2.8.9_compat2.mcaddon",
+  "packs": {
+    "BP": "projects/grilling/gameplay_core/behavior_pack",
+    "RP": "projects/grilling/gameplay_core/resource_pack"
+  },
+  "baselineCommit": "1ed332a5410e28290c80cc27cb971658864733ef",
+  "baselineManifests": {
+    "BP": {
+      "format_version": 2,
+      "header": {
+        "name": "Kaleidoscope Grilling A2.8.7 Survival Repair BP",
+        "description": "逐口3D、四瓶調料堆疊與Numb動作；需要 Cookery 1.0.6",
+        "uuid": "c68005c5-23ff-54e8-a3ff-da6349ad43c2",
+        "version": [
+          2,
+          8,
+          8
+        ],
+        "min_engine_version": [
+          1,
+          26,
+          50
+        ]
+      },
+      "modules": [
+        {
+          "type": "data",
+          "uuid": "dcf70052-c592-56e3-84d2-2a9b86abe7ab",
+          "version": [
+            2,
+            8,
+            8
+          ]
+        },
+        {
+          "type": "script",
+          "language": "javascript",
+          "entry": "scripts/main.js",
+          "uuid": "d0bb6818-8187-5d20-8e1f-a2ab7b517795",
+          "version": [
+            2,
+            8,
+            8
+          ]
+        }
+      ],
+      "dependencies": [
+        {
+          "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
+          "version": [
+            2,
+            8,
+            8
+          ]
+        },
+        {
+          "uuid": "d322809c-a51e-4742-bfc4-16d3c1491c9d",
+          "version": [
+            1,
+            0,
+            8
+          ]
+        },
+        {
+          "module_name": "@minecraft/server",
+          "version": "2.9.0"
+        },
+        {
+          "module_name": "@minecraft/server-ui",
+          "version": "2.2.0"
+        }
+      ]
+    },
+    "RP": {
+      "format_version": 2,
+      "header": {
+        "name": "Kaleidoscope Grilling A2.8.7 Survival Repair RP",
+        "description": "逐口3D與四瓶調料外觀；需要 Cookery 1.0.6",
+        "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
+        "version": [
+          2,
+          8,
+          8
+        ],
+        "min_engine_version": [
+          1,
+          26,
+          50
+        ]
+      },
+      "modules": [
+        {
+          "type": "resources",
+          "uuid": "e7d592db-f4a0-53ce-8b0a-cab7a0cee8d7",
+          "version": [
+            2,
+            8,
+            8
+          ]
+        }
+      ],
+      "dependencies": [
+        {
+          "uuid": "8e2c6318-2f5f-4907-aad0-31d10610e405",
+          "version": [
+            1,
+            0,
+            8
+          ]
+        }
+      ],
+      "capabilities": [
+        "pbr"
+      ]
+    }
+  },
+  "expectedDependencies": {
+    "BP": [
+      {
+        "uuid": "bbbd2d60-52e5-53a6-8b9a-c09b0f516389",
+        "version": [
+          2,
+          8,
+          9
+        ]
+      },
+      {
+        "uuid": "d322809c-a51e-4742-bfc4-16d3c1491c9d",
+        "version": [
+          1,
+          0,
+          8
+        ]
+      },
+      {
+        "module_name": "@minecraft/server",
+        "version": "2.9.0"
+      },
+      {
+        "module_name": "@minecraft/server-ui",
+        "version": "2.2.0"
+      }
+    ],
+    "RP": [
+      {
+        "uuid": "8e2c6318-2f5f-4907-aad0-31d10610e405",
+        "version": [
+          1,
+          0,
+          8
+        ]
+      }
+    ]
+  },
+  "allowedRuntimeChanges": [
+    "projects/grilling/gameplay_core/behavior_pack/blocks/advanced_rack_block.json",
+    "projects/grilling/gameplay_core/behavior_pack/blocks/grill.json",
+    "projects/grilling/gameplay_core/behavior_pack/entities/family_inventory_grill.json",
+    "projects/grilling/gameplay_core/behavior_pack/entities/family_inventory_rack.json",
+    "projects/grilling/gameplay_core/behavior_pack/manifest.json",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2740_grill_state_adapter.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2746_rack_state_adapter.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/family_station_storage.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+    "projects/grilling/gameplay_core/resource_pack/entity/family_inventory_grill.entity.json",
+    "projects/grilling/gameplay_core/resource_pack/entity/family_inventory_rack.entity.json",
+    "projects/grilling/gameplay_core/resource_pack/manifest.json",
+    "projects/grilling/gameplay_core/resource_pack/models/entity/family_inventory.geo.json",
+    "projects/grilling/gameplay_core/resource_pack/render_controllers/family_inventory.render_controllers.json"
+  ],
+  "untouchedCount": 1897,
+  "untouchedDigest": "d09972d8edb445b16a00db04744cebddf40886965d28ef67a38c9dbb0f7f94b1",
+  "allowedHeaderMetadata": {
+    "BP": {
+      "name": "Kaleidoscope Grilling 2.8.9 Compatibility Candidate BP",
+      "description": "Cookery 1.0.8; persistent station inventories without block-container experiments. Candidate, not legacy inventory migration."
+    },
+    "RP": {
+      "name": "Kaleidoscope Grilling 2.8.9 Compatibility Candidate RP",
+      "description": "Cookery 1.0.8; persistent station inventories without block-container experiments. Candidate, not legacy inventory migration."
+    }
+  },
+  "profileScripts": [
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2710_chicken_acquisition_core.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2710_chicken_acquisition_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2712_remaining_knife_drops_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2736_typed_oil_pot_block_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2739_cookery_oil_pot_block_adapter.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2740_grill_state_adapter.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2746_advanced_rack_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a2746_rack_state_adapter.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/a279_beef_board_runtime.js",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/family_station_storage.js"
+  ]
+}

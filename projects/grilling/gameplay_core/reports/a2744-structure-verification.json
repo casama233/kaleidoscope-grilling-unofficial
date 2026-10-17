@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.44",
+  "skewer_plate_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_plate_reader_reused": true,
+  "single_poll_loop": true,
+  "duplicate_plate_state_parser": false,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

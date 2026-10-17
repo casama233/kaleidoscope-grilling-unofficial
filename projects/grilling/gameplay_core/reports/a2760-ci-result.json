@@ -1,0 +1,21 @@
+{
+  "version": "A2.7.60",
+  "tested_commit": "d30bc08aab23b0f054bd3520e33838ffd34bf72c",
+  "run_id": "35729522064",
+  "incremental_from_published_a2759": true,
+  "pepper_worldgen_bds_fix": true,
+  "lean_height_present": true,
+  "lean_steps_present": true,
+  "worldgen_initial_fruiting_probability": 0.25,
+  "worldgen_leaf_weights": [
+    3,
+    1
+  ],
+  "server_shim_becomes_noop_for_trunk_lean": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "44a62f9b19277fee7bf0cb0514b08b550338fb3d4f5aa7a435d289a43ba81fbe",
+  "brproject_sha256": "ca15cefa13eb8fa3b7669d47a820290b9f0d30598fb7665b44786a0129dc2565",
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "prior_server_shim_bds_tested": true
+}

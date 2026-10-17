@@ -1,0 +1,28 @@
+{
+  "version": "A2.7.48",
+  "pepper_tree_lifecycle": true,
+  "sapling_growth": true,
+  "leaf_fruiting": true,
+  "leaf_harvest": true,
+  "leaf_decay": true,
+  "pepper_sting": true,
+  "log_stripping": true,
+  "preconverted_assets_reused": true,
+  "forest_worldgen": false,
+  "village_acquisition": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 220,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 625,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

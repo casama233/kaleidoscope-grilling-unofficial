@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    113
+  ],
+  "scope": "Only ingredient-count/status lore on committed addition and pickup, reviewed from PR174 head57d9068a5a08262661ec050b22cc694114ad3f59; preserves the consuming seasoning and rejection/chat repair from the distinct unmerged G111 parent. No pose assets imported.",
+  "before_sha256": "1f90d2c5b7f60f6fc991a85608a4886080d784b76f82dcc9b56c19fb90534259",
+  "after_sha256": "e8a6eb7d2e3ba40d0e946904ff9daa33ba8d6e9eebeed37fc1b95b92e72f22fd",
+  "operations": [
+    {
+      "start": 45187,
+      "end": 45187,
+      "before": "",
+      "after": "function refreshBottleIngredientLore(stack,data){\n // Only derived Grilling count/status lines change; native metadata stays owned.\n const owned=['ingredients','ready','missing_base'].map(key=>'tooltip.kaleidoscope_grilling.seasoning.'+key);\n const derived=data.ingredients.length||data.kind==='pending'?seasoningLore(undefined,data.ingredients.length,{pending:data.kind==='pending',missingBase:data.kind==='empty'}):[];\n const lore=[...getItemRawLore(stack).filter(line=>!owned.includes(line?.translate)),...derived];\n setItemLore(stack,lore);if(JSON.stringify(getItemRawLore(stack))!==JSON.stringify(lore))throw new Error('Bottle ingredient lore write rejected');\n}\n"
+    },
+    {
+      "start": 46227,
+      "end": 46463,
+      "before": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}\n",
+      "after": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');refreshBottleIngredientLore(topItem,top);items[items.length-1]=retargetBottleFillStack(topItem);}\n"
+    },
+    {
+      "start": 47073,
+      "end": 47116,
+      "before": "  else item=retargetBottleFillStack(item);\n",
+      "after": "  else{if(data.kind!=='special')refreshBottleIngredientLore(item,data);item=retargetBottleFillStack(item);}\n"
+    }
+  ]
+}

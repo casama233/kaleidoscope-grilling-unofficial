@@ -1,0 +1,30 @@
+{
+  "version": "A2.7.21",
+  "roasted_chicken_wing_item": true,
+  "native_cooking_recipe": true,
+  "station_tags": [
+    "furnace",
+    "smoker",
+    "campfire",
+    "soul_campfire"
+  ],
+  "base_food_properties_exact": true,
+  "java_experience_0_35_exact": false,
+  "cuisine_quality_scaling_ported": false,
+  "a2720_roasted_sweet_potato_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 157,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 600,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

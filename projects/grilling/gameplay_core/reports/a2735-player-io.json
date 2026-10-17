@@ -1,0 +1,48 @@
+{
+  "version": "A2.7.35",
+  "scope": "centralize identical selected-main/offhand/creative player IO helpers without changing transaction semantics",
+  "migrated_consumers": [
+    "main.js",
+    "a25_plate_recipe_runtime.js",
+    "a26_oil_machine_runtime.js",
+    "a2722_cold_houttuynia_runtime.js",
+    "a23_oil_world.js"
+  ],
+  "shared_functions": [
+    "playerInventory",
+    "getMainHand",
+    "setMainHand",
+    "getOffHand",
+    "setOffHand",
+    "getHand",
+    "setHand",
+    "findHand",
+    "findHandEntry",
+    "isCreative"
+  ],
+  "before": {
+    "duplicated_player_io_helper_sets": 5,
+    "modules_importing_EquipmentSlot_or_GameMode_only_for_basic_hand_io": 5
+  },
+  "after": {
+    "shared_player_io_modules": 1,
+    "migrated_consumer_local_basic_hand_io_helpers": 0
+  },
+  "intentionally_not_migrated": {
+    "a279_beef_board_runtime.js": "uses EquipmentSlot.Mainhand slot object for transactional verification",
+    "a2731_farmland_crop_host_runtime.js": "bone-meal mutation needs writable equipment slot objects"
+  },
+  "not_generalized": [
+    "give/merge semantics",
+    "transaction rollback",
+    "durability mutation",
+    "writable equipment slots"
+  ],
+  "remaining_infrastructure_duplicates": [
+    "face/offset and coordinate-key helpers",
+    "position-key/dynamic-property helpers",
+    "per-slice manifest/version/package CI boilerplate"
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

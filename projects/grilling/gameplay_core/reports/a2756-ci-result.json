@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.56",
+  "tested_commit": "10fc0cf7f41ea9388f82dc3517c189df7b7a3959",
+  "run_id": "35719656208",
+  "incremental_from_published_a2755": true,
+  "event_advancement_parity": true,
+  "advancement_count": 6,
+  "shared_a2753_adapter": true,
+  "new_listener_count": 0,
+  "new_interval_count": 0,
+  "fortress_wart_replacement": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "530a05199b7239eef3bed886f376e2f926b318536e7a42e59816dc18af0faa92",
+  "brproject_sha256": "4ed4c7b60010f28e913f7aeb934032938c792cbd01bfea5c1693d5bbc565ec16",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

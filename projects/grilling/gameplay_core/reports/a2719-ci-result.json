@@ -1,0 +1,21 @@
+{
+  "version": "A2.7.19",
+  "tested_commit": "8f19e9aaceef3836a6a3b5fafe0d814ba5b48e12",
+  "run_id": "35591021870",
+  "incremental_from_published_a2718": true,
+  "sweet_potato_crop": true,
+  "ages": 8,
+  "food_and_plantable": true,
+  "compostable_65_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "unified_cropdrop_handler": true,
+  "java_branch_draw_order_complete": true,
+  "java_rng_algorithm_identical": false,
+  "sweet_potato_survival_processing_to_sheet_complete": true,
+  "a2718_onion_processing_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "d54dab83685d1db031ceb0de75e51c9d244dc724b42a20b2c57cf396d83b0c46",
+  "brproject_sha256": "efa8ce05900319bb7df7bafe542aed628ccd6dbf53cc16bd56cd4638bb7b6e2f",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

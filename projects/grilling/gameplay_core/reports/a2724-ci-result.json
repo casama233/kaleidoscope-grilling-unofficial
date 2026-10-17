@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.24",
+  "tested_commit": "a23bd1d6fa8523dc8579fa1646645d1d92cdbd06",
+  "run_id": "35599704087",
+  "incremental_from_published_a2723": true,
+  "red_chili_powder_item": true,
+  "cookery_millstone_registered": true,
+  "secret_chili_oil_native_recipe": true,
+  "powder_per_bucket": 3,
+  "creative_catalog_entries": 77,
+  "secret_chili_oil_survival_entry_complete": true,
+  "additional_api_ping": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "c6df9319868524aac9645f2a2711a0ca54aaa4fef30272836f7937e00c077ba1",
+  "brproject_sha256": "f234ecf5ff020c012c90c8147ca420e54c017db4a3578fc93e8531bf4ff9fb6d",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

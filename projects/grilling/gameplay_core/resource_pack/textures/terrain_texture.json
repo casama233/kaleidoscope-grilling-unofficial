@@ -27,13 +27,163 @@
       "textures": "textures/blocks/grill_lit"
     },
     "kg_a23_canola_oil": {
-      "textures": "textures/blocks/canola_oil"
+      "textures": "textures/blocks/java_oil/canola_still_first"
     },
     "kg_a23_secret_chili_oil": {
-      "textures": "textures/blocks/secret_chili_oil"
+      "textures": "textures/blocks/java_oil/secret_chili_still_first"
     },
     "kg_a23_premium_chili_oil": {
-      "textures": "textures/blocks/premium_chili_oil"
+      "textures": "textures/blocks/java_oil/premium_chili_still_first"
+    },
+    "kg_a25_plate": {
+      "textures": "textures/blocks/skewer_plate"
+    },
+    "kg_a25_recipe": {
+      "textures": "textures/blocks/skewer_recipe"
+    },
+    "kg_a26_oil_press": {
+      "textures": "textures/blocks/oil_press"
+    },
+    "kg_a26_big_vat": {
+      "textures": "textures/blocks/big_vat"
+    },
+    "houttuynia_stage0": {
+      "textures": "textures/blocks/crop/houttuynia/stage0"
+    },
+    "houttuynia_stage1": {
+      "textures": "textures/blocks/crop/houttuynia/stage1"
+    },
+    "houttuynia_stage2": {
+      "textures": "textures/blocks/crop/houttuynia/stage2"
+    },
+    "houttuynia_stage3": {
+      "textures": "textures/blocks/crop/houttuynia/stage3"
+    },
+    "houttuynia_stage4": {
+      "textures": "textures/blocks/crop/houttuynia/stage4"
+    },
+    "houttuynia_stage5": {
+      "textures": "textures/blocks/crop/houttuynia/stage5"
+    },
+    "houttuynia_stage5_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage5_2"
+    },
+    "houttuynia_stage6": {
+      "textures": "textures/blocks/crop/houttuynia/stage6"
+    },
+    "houttuynia_stage6_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage6_2"
+    },
+    "houttuynia_stage7": {
+      "textures": "textures/blocks/crop/houttuynia/stage7"
+    },
+    "houttuynia_stage7_2": {
+      "textures": "textures/blocks/crop/houttuynia/stage7_2"
+    },
+    "canola_stage0": {
+      "textures": "textures/blocks/crop/canola/stage0"
+    },
+    "canola_stage1": {
+      "textures": "textures/blocks/crop/canola/stage1"
+    },
+    "canola_stage2": {
+      "textures": "textures/blocks/crop/canola/stage2"
+    },
+    "canola_stage3": {
+      "textures": "textures/blocks/crop/canola/stage3"
+    },
+    "canola_stage4": {
+      "textures": "textures/blocks/crop/canola/stage4"
+    },
+    "canola_stage5": {
+      "textures": "textures/blocks/crop/canola/stage5"
+    },
+    "canola_stage6": {
+      "textures": "textures/blocks/crop/canola/stage6"
+    },
+    "canola_stage7": {
+      "textures": "textures/blocks/crop/canola/stage7"
+    },
+    "onion_stage0": {
+      "textures": "textures/blocks/crop/onion/stage0"
+    },
+    "onion_stage1": {
+      "textures": "textures/blocks/crop/onion/stage1"
+    },
+    "onion_stage2": {
+      "textures": "textures/blocks/crop/onion/stage2"
+    },
+    "onion_stage3": {
+      "textures": "textures/blocks/crop/onion/stage3"
+    },
+    "onion_stage4": {
+      "textures": "textures/blocks/crop/onion/stage4"
+    },
+    "onion_stage5": {
+      "textures": "textures/blocks/crop/onion/stage5"
+    },
+    "onion_stage6": {
+      "textures": "textures/blocks/crop/onion/stage6"
+    },
+    "onion_stage7": {
+      "textures": "textures/blocks/crop/onion/stage7"
+    },
+    "sweet_potato_stage0": {
+      "textures": "textures/blocks/crop/sweet_potato/stage0"
+    },
+    "sweet_potato_stage1": {
+      "textures": "textures/blocks/crop/sweet_potato/stage1"
+    },
+    "sweet_potato_stage2": {
+      "textures": "textures/blocks/crop/sweet_potato/stage2"
+    },
+    "sweet_potato_stage3": {
+      "textures": "textures/blocks/crop/sweet_potato/stage3"
+    },
+    "sweet_potato_stage4": {
+      "textures": "textures/blocks/crop/sweet_potato/stage4"
+    },
+    "sweet_potato_stage5": {
+      "textures": "textures/blocks/crop/sweet_potato/stage5"
+    },
+    "sweet_potato_stage6": {
+      "textures": "textures/blocks/crop/sweet_potato/stage6"
+    },
+    "sweet_potato_stage7": {
+      "textures": "textures/blocks/crop/sweet_potato/stage7"
+    },
+    "kg_a2733_seasoning_bottle": {
+      "textures": "textures/blocks/seasoning_bottle"
+    },
+    "kg_a2746_advanced_rack": {
+      "textures": "textures/blocks/advanced_rack"
+    },
+    "kg_a2748_pepper_log": {
+      "textures": "textures/blocks/pepper_log"
+    },
+    "kg_a2748_pepper_leaves": {
+      "textures": "textures/blocks/pepper_leaves"
+    },
+    "kg_a2748_pepper_leaves_fruiting": {
+      "textures": "textures/blocks/pepper_leaves_fruiting"
+    },
+    "kg_a2748_pepper_sapling": {
+      "textures": "textures/blocks/pepper_sapling"
+    },
+    "kg_a23_canola_oil_flow": {
+      "textures": "textures/blocks/java_oil/canola_flow_first"
+    },
+    "kg_a23_secret_chili_oil_flow": {
+      "textures": "textures/blocks/java_oil/secret_chili_flow_first"
+    },
+    "kg_a23_premium_chili_oil_flow": {
+      "textures": "textures/blocks/java_oil/premium_chili_flow_first"
+    },
+    "kg_native_icon_grilled_slime_skewer": {
+      "textures": "textures/ui/kg_java/grilled_slime_skewer_cooked_frame_0"
+    },
+    "kg_native_icon_mysterious_skewer": {
+      "textures": "textures/ui/kg_java/mysterious_skewer_frame_0"
     }
   }
 }

@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:dark_grilling",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.foods"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:dark_grilling.name"
+        "value": "kaleidoscope_grilling.display.item.dark_grilling"
       },
       "minecraft:icon": {
         "textures": {
@@ -25,7 +26,7 @@
         "movement_modifier": 0.35
       },
       "minecraft:food": {
-        "can_always_eat": false,
+        "can_always_eat": true,
         "nutrition": 1,
         "saturation_modifier": 0
       },
@@ -34,7 +35,8 @@
       },
       "minecraft:tags": {
         "tags": [
-          "minecraft:is_food"
+          "minecraft:is_food",
+          "kaleidoscope_grilling:food_dark_grilling"
         ]
       }
     }

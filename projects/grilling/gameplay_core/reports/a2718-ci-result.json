@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.18",
+  "tested_commit": "522d9f6d62c7d05c355027cce56c4c9da4998776",
+  "run_id": "35589492013",
+  "incremental_from_published_a2717": true,
+  "onion_millstone_registered": true,
+  "output_count": 1,
+  "output_chance": 1.0,
+  "additional_api_ping": false,
+  "locked_baseline_onion_input_exact": true,
+  "third_party_common_tag_expansion": false,
+  "survival_onion_processing_chain_complete": true,
+  "a2717_onion_crop_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "36a081f18037910ddfd87ad046b2a1ce9d862b7089e8f5c39f1ad9b0a2f8335c",
+  "brproject_sha256": "74b31e8af99e6584da0f86bbff5aebda05b4fec9d3d3d439edd051c496202a4f",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

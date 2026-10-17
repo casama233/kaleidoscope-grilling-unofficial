@@ -1,0 +1,38 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_station.vat_premium": {
+      "arrays": {
+        "geometries": {
+          "Array.levels": [
+            "Geometry.level1",
+            "Geometry.level1",
+            "Geometry.level2",
+            "Geometry.level3",
+            "Geometry.level4"
+          ]
+        }
+      },
+      "geometry": "Array.levels[q.property('kaleidoscope_grilling:level')]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "ignore_lighting": true,
+      "uv_anim": {
+        "offset": [
+          0,
+          "q.property('kaleidoscope_grilling:frame')/32"
+        ],
+        "scale": [
+          1,
+          0.03125
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    71
+  ],
+  "before_sha256": "42a4096faada55381ffd0af37a8c46064dfc34d4e5875a325a21e477f0caace2",
+  "after_sha256": "74d1e8b16018d6a9b495a84134ff05c7c025186d5f6fc13ffbba0c1a598dea60",
+  "scope": "Exact G71 bottle-only main.js delta: proxy import, canonical bottle kind and fill, native bottle dispatch, pending alias use/motion and idle fill refresh. No secret eating mechanics edits.",
+  "edits": [
+    {
+      "start": 0,
+      "end": 0,
+      "before": "",
+      "after": "import {retargetBottleFillStack,prepareBottleFillItems} from './bottle_fill_item_runtime.js';\n"
+    },
+    {
+      "start": 64,
+      "end": 65,
+      "before": " hasSeasoningBase,isSeasoningBlockId as isSeasoningBlock\n",
+      "after": " hasSeasoningBase,isPendingSeasoningId,seasoningFillVisualId,isSeasoningBlockId as isSeasoningBlock\n"
+    },
+    {
+      "start": 566,
+      "end": 567,
+      "before": " const kind=isSpecialSeasoningId(stack?.typeId)?'special':stack?.typeId===PENDING_SEASONING?'pending':'empty';\n",
+      "after": " const kind=isSpecialSeasoningId(stack?.typeId)?'special':isPendingSeasoningId(stack?.typeId)?'pending':'empty';\n"
+    },
+    {
+      "start": 570,
+      "end": 571,
+      "before": " const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);\n",
+      "after": " const id=data.kind==='special'?specialSeasoningVisualId(data.uses??0,data.variant??0):seasoningFillVisualId(data.kind==='pending'?PENDING_SEASONING:EMPTY_SEASONING_ID,data.ingredients??[]),stack=new ItemStack(id,1);setSeasonings(stack,data.ingredients??[]);\n"
+    },
+    {
+      "start": 619,
+      "end": 620,
+      "before": " if(id===EMPTY_SEASONING_ID||id===PENDING_SEASONING||isSpecialSeasoningId(id)){pushBottle(block,player,held,hand);return}\n",
+      "after": " if(isNativeBottleItem(held)){pushBottle(block,player,held,hand);return}\n"
+    },
+    {
+      "start": 626,
+      "end": 627,
+      "before": "  // Java mutates the existing stack, except the explicit EMPTY -> PENDING promotion.\n",
+      "after": "  // Java's explicit EMPTY -> PENDING promotion creates a fresh semantic item.\n  // Same-kind fill changes preserve all stable-API metadata through readback.\n"
+    },
+    {
+      "start": 628,
+      "end": 629,
+      "before": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');}\n",
+      "after": "  else{setSeasonings(topItem,top.ingredients);if(JSON.stringify(readSeasonings(topItem))!==JSON.stringify(top.ingredients))throw new Error('Bottle seasoning data write rejected');items[items.length-1]=retargetBottleFillStack(topItem);}\n"
+    },
+    {
+      "start": 639,
+      "end": 639,
+      "before": "",
+      "after": "  else item=retargetBottleFillStack(item);\n"
+    },
+    {
+      "start": 685,
+      "end": 686,
+      "before": "  const isBottle=held=>!!held&&(held.typeId===EMPTY_SEASONING_ID||held.typeId===PENDING_SEASONING||isSpecialSeasoningId(held.typeId));\n",
+      "after": "  const isBottle=isNativeBottleItem;\n"
+    },
+    {
+      "start": 908,
+      "end": 909,
+      "before": " if(id===PENDING_SEASONING){const hand=captureInteractionIntent(e.source,e.itemStack).hand;\n",
+      "after": " if(isPendingSeasoningId(id)){const hand=captureInteractionIntent(e.source,e.itemStack).hand;\n"
+    },
+    {
+      "start": 912,
+      "end": 913,
+      "before": "  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:\"!q.is_using_item || !q.is_item_name_any('\"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+\"','\"+PENDING_SEASONING+\"')\"})}catch{}return}\n",
+      "after": "  try{e.source.playAnimation('animation.kg_a21.player.shake.'+hand,{controller:'kg_seasoning_shake',blendOutTime:0,stopExpression:\"!q.is_using_item || !q.is_item_name_any('\"+(hand==='off'?'slot.weapon.offhand':'slot.weapon.mainhand')+\"','\"+e.itemStack.typeId+\"')\"})}catch{}return}\n"
+    },
+    {
+      "start": 952,
+      "end": 953,
+      "before": " const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(id===PENDING_SEASONING){completePending(e.source,e.itemStack);return}\n",
+      "after": " const id=canonicalFoodId(e.itemStack?.typeId);if(id==='minecraft:milk_bucket'){clearEffects(e.source,{milk:true});return}if(isPendingSeasoningId(id)){completePending(e.source,e.itemStack);return}\n"
+    },
+    {
+      "start": 1117,
+      "end": 1118,
+      "before": "  try{prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}\n",
+      "after": "  try{prepareBottleFillItems(p,!!active||PENDING_USES.has(p.id));prepareEatingItems(p,!!active,grillingConfig().enableEatingAnimations)}catch(error){if(system.currentTick%20===0)console.warn('[Grilling native eating item] '+error)}\n"
+    }
+  ]
+}

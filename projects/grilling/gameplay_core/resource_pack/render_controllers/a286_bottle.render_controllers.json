@@ -1,0 +1,16 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_a286.contents": {
+      "geometry": "Geometry.contents",
+      "materials": [
+        {
+          "*": "Material.contents"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ]
+    }
+  }
+}

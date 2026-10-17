@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    117
+  ],
+  "reviewed_commit": "0e23c65e74100a8b4171fc214d77f2241477a1e9",
+  "scope": "Exactly the reviewed G117 deferred bottle cancellation recheck and in-transaction handheld saturation refresh from PR180. Preserve the complete G116 preimage, all historical deltas, and every other main.js byte. This source witness does not add native or client acceptance.",
+  "before_sha256": "7abeebed7f1cf2c38d962463ff728f6ce9f41931cbdaf4a862f769506bd1895c",
+  "after_sha256": "49e540b9628a7444566b97cf2d2bd30e5e6c910b4b12bb4aed6007632bb6dc4a",
+  "operations": [
+    {
+      "start": 58297,
+      "end": 58558,
+      "before": " system.run(()=>{for(const row of pending)try{\n  const block=row.dimension.getBlock(row.location);\n  if(bottleActionStillCurrent(block,row.captured))breakNativeBottles(block,false);\n }catch(error){console.warn('[Grilling bottle explosion recovery] '+error)}});\n",
+      "after": " system.run(()=>{\n  // Later before-event subscribers may cancel. Keep native contents intact\n  // unless the deferred event still confirms the explosion may proceed.\n  try{if(e.cancel!==false)return}catch(error){console.warn('[Grilling bottle explosion status] '+error);return}\n  for(const row of pending)try{\n   const block=row.dimension.getBlock(row.location);\n   if(bottleActionStillCurrent(block,row.captured))breakNativeBottles(block,false);\n  }catch(error){console.warn('[Grilling bottle explosion recovery] '+error)}\n });\n"
+    },
+    {
+      "start": 65092,
+      "end": 65228,
+      "before": " if(!commitEating({debit:()=>{if(!creative(player))write(next)},reward:()=>{h.setCurrentValue(hunger);sat.setCurrentValue(saturation)},\n",
+      "after": " if(!commitEating({debit:()=>{if(!creative(player))write(next)},reward:()=>{\n  h.setCurrentValue(hunger);\n  // As with plate nutrition, the pre-hunger saturation view may retain its\n  // old cap. Refresh inside the transaction so failure restores the serving.\n  const currentSat=player.getComponent('minecraft:player.saturation');\n  if(!currentSat)throw new Error('Grilling: saturation component unavailable after nutrition update');\n  currentSat.setCurrentValue(Math.min(saturation,currentSat.effectiveMax));\n },\n"
+    }
+  ]
+}

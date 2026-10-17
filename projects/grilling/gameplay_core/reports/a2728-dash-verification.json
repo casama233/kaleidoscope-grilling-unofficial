@@ -1,0 +1,23 @@
+{
+  "version": "A2.7.28",
+  "languages": [
+    "zh_CN",
+    "zh_TW",
+    "en_US"
+  ],
+  "keys": 96,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 167,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 608,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false
+}

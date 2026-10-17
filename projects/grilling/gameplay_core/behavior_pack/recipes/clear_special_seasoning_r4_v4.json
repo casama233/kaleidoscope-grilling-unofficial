@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:clear_special_seasoning_r4_v4"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "kaleidoscope_grilling:special_seasoning_r4_v4"
+      }
+    ],
+    "result": {
+      "item": "kaleidoscope_grilling:empty_seasoning_bottle",
+      "count": 1
+    },
+    "unlock": [
+      {
+        "item": "kaleidoscope_grilling:special_seasoning_r4_v4"
+      }
+    ]
+  }
+}

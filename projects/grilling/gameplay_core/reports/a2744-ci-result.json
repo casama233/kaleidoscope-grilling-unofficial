@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.44",
+  "tested_commit": "836db1847dca2402ca7f33d444a1eaa88cb50651",
+  "run_id": "35676112914",
+  "incremental_from_published_a2743": true,
+  "skewer_plate_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_plate_reader_reused": true,
+  "single_poll_loop": true,
+  "duplicate_plate_state_parser": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "41607f4e74b80e33a301751098819a432bd70ae5f0d8067dc32874a1787fca3e",
+  "brproject_sha256": "465abdd40e5cd40fe1bcd2df2ac3f683e49fb9af054f48252e53be407bb8e451",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.62",
+  "title": "Runtime Intent Split + Legacy Workflow Retirement",
+  "runtime_refactor": {
+    "pure_intent_core": "scripts/a2762_interaction_intent_core.js",
+    "minecraft_intent_adapter": "scripts/a2762_interaction_intent_adapter.js",
+    "main_local_intent_helpers_removed": true,
+    "gameplay_rule_changes": false
+  },
+  "legacy_workflow_retirement": {
+    "active_versioned_workflows": 0,
+    "archived_versioned_workflows": 65,
+    "archive_path": "docs/legacy_workflows",
+    "canonical_workflow": ".github/workflows/gameplay-core.yml",
+    "historical_yaml_bytes_preserved": true
+  },
+  "compatibility": {
+    "identifiers_preserved": true,
+    "uuids_preserved": true,
+    "dynamic_property_keys_preserved": true,
+    "cookery_dependency_preserved": "1.0.6"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

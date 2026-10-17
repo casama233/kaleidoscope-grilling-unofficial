@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:grill"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "III",
+      "BCB",
+      "I I"
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "B": {
+        "item": "minecraft:brick"
+      },
+      "C": {
+        "tag": "minecraft:coals"
+      }
+    },
+    "result": {
+      "item": "kaleidoscope_grilling:grill",
+      "count": 1
+    },
+    "unlock": [
+      {
+        "item": "minecraft:iron_ingot"
+      }
+    ]
+  }
+}

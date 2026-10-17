@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.46",
+  "advanced_rack": true,
+  "compartments": 9,
+  "persistent_filters": true,
+  "deposit_matching": true,
+  "hotbar_binding": true,
+  "automation_api": true,
+  "break_preserves_contents": true,
+  "models_reused": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

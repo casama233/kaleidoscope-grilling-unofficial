@@ -4,12 +4,12 @@
     "description": {
       "identifier": "kaleidoscope_grilling:canola_oil_brush",
       "menu_category": {
-        "category": "items"
+        "category": "none"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:canola_oil_brush.name"
+        "value": "kaleidoscope_grilling.display.item.canola_oil_brush"
       },
       "minecraft:icon": {
         "textures": {

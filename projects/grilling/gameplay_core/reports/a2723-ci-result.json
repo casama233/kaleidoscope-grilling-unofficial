@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.23",
+  "tested_commit": "51e3422d41cb23b688b4fe9e053db70e5793e3cc",
+  "run_id": "35599296014",
+  "incremental_from_published_a2722": true,
+  "creative_catalog": true,
+  "hidden_internal_items": 7,
+  "catalog_entries": 76,
+  "java_order_for_existing_static_content": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "6718654db9f922a7b85cc448cdc145d03bb42ae0ae2602ddfe91fa96eb8bf8c4",
+  "brproject_sha256": "6010ccffb139615e492bbe48642f5d3f765764e02afb2e08d8e6a4ab2243d0d2",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -84244,9 +84244,9 @@
         "rightarm": {
           "position": {
             "0": [
-              0.0,
-              0.0,
-              0.0
+              0,
+              0,
+              0
             ],
             "0.01667": [
               "variable.is_first_person ? 0.462963 : 0.0",
@@ -84634,9 +84634,9 @@
               "variable.is_first_person ? 0.411523 : 0.0"
             ],
             "1.3": [
-              0.0,
-              0.0,
-              0.0
+              0,
+              0,
+              0
             ]
           },
           "rotation": {
@@ -85842,9 +85842,9 @@
         "leftarm": {
           "position": {
             "0": [
-              0.0,
-              0.0,
-              0.0
+              0,
+              0,
+              0
             ],
             "0.01667": [
               "variable.is_first_person ? -0.462963 : 0.0",
@@ -86232,9 +86232,9 @@
               "variable.is_first_person ? 0.411523 : 0.0"
             ],
             "1.3": [
-              0.0,
-              0.0,
-              0.0
+              0,
+              0,
+              0
             ]
           },
           "rotation": {
@@ -87434,1998 +87434,28 @@
       }
     },
     "animation.kg_imm.player.season.main": {
-      "animation_length": 0.8,
-      "override_previous_animation": true,
+      "animation_length": 0.5,
+      "blend_weight": "!variable.is_first_person && q.property('kaleidoscope_grilling:season_hand') == 1 && q.property('kaleidoscope_grilling:season_phase') != 0",
       "bones": {
         "rightarm": {
-          "position": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? 0.462963 : 0.0",
-              "variable.is_first_person ? -0.342936 : 0.0",
-              "variable.is_first_person ? 0.411523 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? 1.703704 : 0.0",
-              "variable.is_first_person ? -1.262003 : 0.0",
-              "variable.is_first_person ? 1.514403 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? 3.5 : 0.0",
-              "variable.is_first_person ? -2.592593 : 0.0",
-              "variable.is_first_person ? 3.111111 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? 5.62963 : 0.0",
-              "variable.is_first_person ? -4.170096 : 0.0",
-              "variable.is_first_person ? 5.004115 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? 7.87037 : 0.0",
-              "variable.is_first_person ? -5.829904 : 0.0",
-              "variable.is_first_person ? 6.995885 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? 10.0 : 0.0",
-              "variable.is_first_person ? -7.407407 : 0.0",
-              "variable.is_first_person ? 8.888889 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? 11.796296 : 0.0",
-              "variable.is_first_person ? -8.737997 : 0.0",
-              "variable.is_first_person ? 10.485597 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? 13.037037 : 0.0",
-              "variable.is_first_person ? -9.657064 : 0.0",
-              "variable.is_first_person ? 11.588477 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? 13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? 13.037037 : 0.0",
-              "variable.is_first_person ? -9.657064 : 0.0",
-              "variable.is_first_person ? 11.588477 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? 11.796296 : 0.0",
-              "variable.is_first_person ? -8.737997 : 0.0",
-              "variable.is_first_person ? 10.485597 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? 10.0 : 0.0",
-              "variable.is_first_person ? -7.407407 : 0.0",
-              "variable.is_first_person ? 8.888889 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? 7.87037 : 0.0",
-              "variable.is_first_person ? -5.829904 : 0.0",
-              "variable.is_first_person ? 6.995885 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? 5.62963 : 0.0",
-              "variable.is_first_person ? -4.170096 : 0.0",
-              "variable.is_first_person ? 5.004115 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? 3.5 : 0.0",
-              "variable.is_first_person ? -2.592593 : 0.0",
-              "variable.is_first_person ? 3.111111 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? 1.703704 : 0.0",
-              "variable.is_first_person ? -1.262003 : 0.0",
-              "variable.is_first_person ? 1.514403 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? 0.462963 : 0.0",
-              "variable.is_first_person ? -0.342936 : 0.0",
-              "variable.is_first_person ? 0.411523 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          },
-          "rotation": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? 3.257888 : -3.438533",
-              "variable.is_first_person ? -1.54321 : 0.687707",
-              "variable.is_first_person ? 3.943759 : 1.080682"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? 11.989026 : -12.6538",
-              "variable.is_first_person ? -5.679012 : 2.53076",
-              "variable.is_first_person ? 14.513032 : 3.976909"
-            ],
-            "0.05": [
-              "variable.is_first_person ? 24.62963 : -25.995307",
-              "variable.is_first_person ? -11.666667 : 5.199061",
-              "variable.is_first_person ? 29.814815 : 8.169954"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? 39.615912 : -41.812558",
-              "variable.is_first_person ? -18.765432 : 8.362512",
-              "variable.is_first_person ? 47.956104 : 13.14109"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? 55.384088 : -58.455056",
-              "variable.is_first_person ? -26.234568 : 11.691011",
-              "variable.is_first_person ? 67.043896 : 18.371589"
-            ],
-            "0.1": [
-              "variable.is_first_person ? 70.37037 : -74.272307",
-              "variable.is_first_person ? -33.333333 : 14.854461",
-              "variable.is_first_person ? 85.185185 : 23.342725"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? 83.010974 : -87.613814",
-              "variable.is_first_person ? -39.320988 : 17.522763",
-              "variable.is_first_person ? 100.486968 : 27.53577"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? 91.742112 : -96.829081",
-              "variable.is_first_person ? -43.45679 : 19.365816",
-              "variable.is_first_person ? 111.056241 : 30.431997"
-            ],
-            "0.15": [
-              "variable.is_first_person ? 95.0 : -100.267614",
-              "variable.is_first_person ? -45.0 : 20.053523",
-              "variable.is_first_person ? 115.0 : 31.512679"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? 95.0 : -98.169005",
-              "variable.is_first_person ? -45.0 : 42.192601",
-              "variable.is_first_person ? 115.0 : 40.632724"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? 95.0 : -96.772745",
-              "variable.is_first_person ? -45.0 : 60.503632",
-              "variable.is_first_person ? 115.0 : 48.709299"
-            ],
-            "0.2": [
-              "variable.is_first_person ? 95.0 : -96.656019",
-              "variable.is_first_person ? -45.0 : 71.820471",
-              "variable.is_first_person ? 115.0 : 54.873513"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? 95.0 : -98.167373",
-              "variable.is_first_person ? -45.0 : 74.186335",
-              "variable.is_first_person ? 115.0 : 58.575517"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? 95.0 : -101.362847",
-              "variable.is_first_person ? -45.0 : 67.192143",
-              "variable.is_first_person ? 115.0 : 59.673918"
-            ],
-            "0.25": [
-              "variable.is_first_person ? 95.0 : -105.992809",
-              "variable.is_first_person ? -45.0 : 52.047256",
-              "variable.is_first_person ? 115.0 : 58.45477"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 95.0 : -111.541797",
-              "variable.is_first_person ? -45.0 : 31.370362",
-              "variable.is_first_person ? 115.0 : 55.576892"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 95.0 : -117.314529",
-              "variable.is_first_person ? -45.0 : 8.736684",
-              "variable.is_first_person ? 115.0 : 51.953047"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 95.0 : -122.553225",
-              "variable.is_first_person ? -45.0 : -11.940211",
-              "variable.is_first_person ? 115.0 : 48.587568"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 95.0 : -126.566002",
-              "variable.is_first_person ? -45.0 : -27.085098",
-              "variable.is_first_person ? 115.0 : 46.398559"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 95.0 : -128.844162",
-              "variable.is_first_person ? -45.0 : -34.079289",
-              "variable.is_first_person ? 115.0 : 46.055466"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 95.0 : -129.148122",
-              "variable.is_first_person ? -45.0 : -31.713425",
-              "variable.is_first_person ? 115.0 : 47.860136"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 95.0 : -127.547151",
-              "variable.is_first_person ? -45.0 : -20.396586",
-              "variable.is_first_person ? 115.0 : 51.691964"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 95.0 : -124.406054",
-              "variable.is_first_person ? -45.0 : -2.085556",
-              "variable.is_first_person ? 115.0 : 57.026654"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 95.0 : -120.321137",
-              "variable.is_first_person ? -45.0 : 20.053523",
-              "variable.is_first_person ? 115.0 : 63.025357"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 95.0 : -116.016509",
-              "variable.is_first_person ? -45.0 : 42.192601",
-              "variable.is_first_person ? 115.0 : 68.678801"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 95.0 : -112.218688",
-              "variable.is_first_person ? -45.0 : 60.503632",
-              "variable.is_first_person ? 115.0 : 72.981495"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 95.0 : -109.531173",
-              "variable.is_first_person ? -45.0 : 71.820471",
-              "variable.is_first_person ? 115.0 : 75.105898"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 95.0 : -108.330676",
-              "variable.is_first_person ? -45.0 : 74.186335",
-              "variable.is_first_person ? 115.0 : 74.54642"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 95.0 : -108.702946",
-              "variable.is_first_person ? -45.0 : 67.192143",
-              "variable.is_first_person ? 115.0 : 71.208359"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 95.0 : -110.429284",
-              "variable.is_first_person ? -45.0 : 52.047256",
-              "variable.is_first_person ? 115.0 : 65.426375"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 95.0 : -113.026043",
-              "variable.is_first_person ? -45.0 : 31.370362",
-              "variable.is_first_person ? 115.0 : 57.909278"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 95.0 : -115.830283",
-              "variable.is_first_person ? -45.0 : 8.736684",
-              "variable.is_first_person ? 115.0 : 49.620661"
-            ],
-            "0.55": [
-              "variable.is_first_person ? 95.0 : -118.11675",
-              "variable.is_first_person ? -45.0 : -11.940211",
-              "variable.is_first_person ? 115.0 : 41.615963"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? 95.0 : -119.225904",
-              "variable.is_first_person ? -45.0 : -27.085098",
-              "variable.is_first_person ? 115.0 : 34.864118"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? 95.0 : -118.68086",
-              "variable.is_first_person ? -45.0 : -34.079289",
-              "variable.is_first_person ? 115.0 : 30.084563"
-            ],
-            "0.6": [
-              "variable.is_first_person ? 95.0 : -116.272968",
-              "variable.is_first_person ? -45.0 : -31.713425",
-              "variable.is_first_person ? 115.0 : 27.627751"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? 95.0 : -112.101207",
-              "variable.is_first_person ? -45.0 : -20.396586",
-              "variable.is_first_person ? 115.0 : 27.419768"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? 95.0 : -106.558551",
-              "variable.is_first_person ? -45.0 : -2.085556",
-              "variable.is_first_person ? 115.0 : 28.980577"
-            ],
-            "0.65": [
-              "variable.is_first_person ? 95.0 : -100.267614",
-              "variable.is_first_person ? -45.0 : 20.053523",
-              "variable.is_first_person ? 115.0 : 31.512679"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? 91.742112 : -96.829081",
-              "variable.is_first_person ? -43.45679 : 19.365816",
-              "variable.is_first_person ? 111.056241 : 30.431997"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? 83.010974 : -87.613814",
-              "variable.is_first_person ? -39.320988 : 17.522763",
-              "variable.is_first_person ? 100.486968 : 27.53577"
-            ],
-            "0.7": [
-              "variable.is_first_person ? 70.37037 : -74.272307",
-              "variable.is_first_person ? -33.333333 : 14.854461",
-              "variable.is_first_person ? 85.185185 : 23.342725"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? 55.384088 : -58.455056",
-              "variable.is_first_person ? -26.234568 : 11.691011",
-              "variable.is_first_person ? 67.043896 : 18.371589"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? 39.615912 : -41.812558",
-              "variable.is_first_person ? -18.765432 : 8.362512",
-              "variable.is_first_person ? 47.956104 : 13.14109"
-            ],
-            "0.75": [
-              "variable.is_first_person ? 24.62963 : -25.995307",
-              "variable.is_first_person ? -11.666667 : 5.199061",
-              "variable.is_first_person ? 29.814815 : 8.169954"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? 11.989026 : -12.6538",
-              "variable.is_first_person ? -5.679012 : 2.53076",
-              "variable.is_first_person ? 14.513032 : 3.976909"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? 3.257888 : -3.438533",
-              "variable.is_first_person ? -1.54321 : 0.687707",
-              "variable.is_first_person ? 3.943759 : 1.080682"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          }
-        },
-        "rightitem": {
-          "position": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? 0.274348 : 0.0",
-              "variable.is_first_person ? -0.224966 : 0.0",
-              "variable.is_first_person ? -0.449931 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? 1.009602 : 0.0",
-              "variable.is_first_person ? -0.827874 : 0.0",
-              "variable.is_first_person ? -1.655748 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? 2.074074 : 0.0",
-              "variable.is_first_person ? -1.700741 : 0.0",
-              "variable.is_first_person ? -3.401481 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? 3.336077 : 0.0",
-              "variable.is_first_person ? -2.735583 : 0.0",
-              "variable.is_first_person ? -5.471166 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? 4.663923 : 0.0",
-              "variable.is_first_person ? -3.824417 : 0.0",
-              "variable.is_first_person ? -7.648834 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? 5.925926 : 0.0",
-              "variable.is_first_person ? -4.859259 : 0.0",
-              "variable.is_first_person ? -9.718519 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? 6.990398 : 0.0",
-              "variable.is_first_person ? -5.732126 : 0.0",
-              "variable.is_first_person ? -11.464252 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? 7.725652 : 0.0",
-              "variable.is_first_person ? -6.335034 : 0.0",
-              "variable.is_first_person ? -12.670069 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? 8.0 : 0.0",
-              "variable.is_first_person ? -6.56 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? 8.520623 : 0.0",
-              "variable.is_first_person ? -6.392754 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? 8.951225 : 0.0",
-              "variable.is_first_person ? -6.227341 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? 9.217352 : 0.0",
-              "variable.is_first_person ? -6.065573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? 9.272988 : 0.0",
-              "variable.is_first_person ? -5.909221 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? 9.108513 : 0.0",
-              "variable.is_first_person ? -5.76 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? 8.752365 : 0.0",
-              "variable.is_first_person ? -5.619544 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 8.266127 : 0.0",
-              "variable.is_first_person ? -5.489391 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 7.733873 : 0.0",
-              "variable.is_first_person ? -5.370968 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 7.247635 : 0.0",
-              "variable.is_first_person ? -5.265573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 6.891487 : 0.0",
-              "variable.is_first_person ? -5.174359 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 6.727012 : 0.0",
-              "variable.is_first_person ? -5.098327 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 6.782648 : 0.0",
-              "variable.is_first_person ? -5.03831 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 7.048775 : 0.0",
-              "variable.is_first_person ? -4.994964 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 7.479377 : 0.0",
-              "variable.is_first_person ? -4.968765 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 8.0 : 0.0",
-              "variable.is_first_person ? -4.96 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 8.520623 : 0.0",
-              "variable.is_first_person ? -4.968765 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 8.951225 : 0.0",
-              "variable.is_first_person ? -4.994964 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 9.217352 : 0.0",
-              "variable.is_first_person ? -5.03831 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 9.272988 : 0.0",
-              "variable.is_first_person ? -5.098327 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 9.108513 : 0.0",
-              "variable.is_first_person ? -5.174359 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 8.752365 : 0.0",
-              "variable.is_first_person ? -5.265573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 8.266127 : 0.0",
-              "variable.is_first_person ? -5.370968 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 7.733873 : 0.0",
-              "variable.is_first_person ? -5.489391 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? 7.247635 : 0.0",
-              "variable.is_first_person ? -5.619544 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? 6.891487 : 0.0",
-              "variable.is_first_person ? -5.76 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? 6.727012 : 0.0",
-              "variable.is_first_person ? -5.909221 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? 6.782648 : 0.0",
-              "variable.is_first_person ? -6.065573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? 7.048775 : 0.0",
-              "variable.is_first_person ? -6.227341 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? 7.479377 : 0.0",
-              "variable.is_first_person ? -6.392754 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? 8.0 : 0.0",
-              "variable.is_first_person ? -6.56 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? 7.725652 : 0.0",
-              "variable.is_first_person ? -6.335034 : 0.0",
-              "variable.is_first_person ? -12.670069 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? 6.990398 : 0.0",
-              "variable.is_first_person ? -5.732126 : 0.0",
-              "variable.is_first_person ? -11.464252 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? 5.925926 : 0.0",
-              "variable.is_first_person ? -4.859259 : 0.0",
-              "variable.is_first_person ? -9.718519 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? 4.663923 : 0.0",
-              "variable.is_first_person ? -3.824417 : 0.0",
-              "variable.is_first_person ? -7.648834 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? 3.336077 : 0.0",
-              "variable.is_first_person ? -2.735583 : 0.0",
-              "variable.is_first_person ? -5.471166 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? 2.074074 : 0.0",
-              "variable.is_first_person ? -1.700741 : 0.0",
-              "variable.is_first_person ? -3.401481 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? 1.009602 : 0.0",
-              "variable.is_first_person ? -0.827874 : 0.0",
-              "variable.is_first_person ? -1.655748 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? 0.274348 : 0.0",
-              "variable.is_first_person ? -0.224966 : 0.0",
-              "variable.is_first_person ? -0.449931 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          },
-          "rotation": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? -0.960219 : 0.0",
-              "variable.is_first_person ? 6.17284 : 0.0",
-              "variable.is_first_person ? 6.927298 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? -3.533608 : 0.0",
-              "variable.is_first_person ? 22.716049 : 0.0",
-              "variable.is_first_person ? 25.492455 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? -7.259259 : 0.0",
-              "variable.is_first_person ? 46.666667 : 0.0",
-              "variable.is_first_person ? 52.37037 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? -11.676269 : 0.0",
-              "variable.is_first_person ? 75.061728 : 0.0",
-              "variable.is_first_person ? 84.23594 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? -16.323731 : 0.0",
-              "variable.is_first_person ? 104.938272 : 0.0",
-              "variable.is_first_person ? 117.76406 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? -20.740741 : 0.0",
-              "variable.is_first_person ? 133.333333 : 0.0",
-              "variable.is_first_person ? 149.62963 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? -24.466392 : 0.0",
-              "variable.is_first_person ? 157.283951 : 0.0",
-              "variable.is_first_person ? 176.507545 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? -27.039781 : 0.0",
-              "variable.is_first_person ? 173.82716 : 0.0",
-              "variable.is_first_person ? 195.072702 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? -28.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 202.0 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? -23.609805 : 0.0",
-              "variable.is_first_person ? 187.32126 : 0.0",
-              "variable.is_first_person ? 212.168416 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? -19.267709 : 0.0",
-              "variable.is_first_person ? 193.376607 : 0.0",
-              "variable.is_first_person ? 220.578621 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? -15.021286 : 0.0",
-              "variable.is_first_person ? 197.119017 : 0.0",
-              "variable.is_first_person ? 225.776413 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? -10.917061 : 0.0",
-              "variable.is_first_person ? 197.901394 : 0.0",
-              "variable.is_first_person ? 226.863047 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? -7.0 : 0.0",
-              "variable.is_first_person ? 195.588457 : 0.0",
-              "variable.is_first_person ? 223.650635 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? -3.313019 : 0.0",
-              "variable.is_first_person ? 190.580135 : 0.0",
-              "variable.is_first_person ? 216.694631 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 0.103485 : 0.0",
-              "variable.is_first_person ? 183.74241 : 0.0",
-              "variable.is_first_person ? 207.197792 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 3.212083 : 0.0",
-              "variable.is_first_person ? 176.25759 : 0.0",
-              "variable.is_first_person ? 196.802208 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 5.978714 : 0.0",
-              "variable.is_first_person ? 169.419865 : 0.0",
-              "variable.is_first_person ? 187.305369 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 8.373067 : 0.0",
-              "variable.is_first_person ? 164.411543 : 0.0",
-              "variable.is_first_person ? 180.349365 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 10.368909 : 0.0",
-              "variable.is_first_person ? 162.098606 : 0.0",
-              "variable.is_first_person ? 177.136953 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 11.944374 : 0.0",
-              "variable.is_first_person ? 162.880983 : 0.0",
-              "variable.is_first_person ? 178.223587 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 13.082199 : 0.0",
-              "variable.is_first_person ? 166.623393 : 0.0",
-              "variable.is_first_person ? 183.421379 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 13.76992 : 0.0",
-              "variable.is_first_person ? 172.67874 : 0.0",
-              "variable.is_first_person ? 191.831584 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 14.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 202.0 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 13.76992 : 0.0",
-              "variable.is_first_person ? 187.32126 : 0.0",
-              "variable.is_first_person ? 212.168416 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 13.082199 : 0.0",
-              "variable.is_first_person ? 193.376607 : 0.0",
-              "variable.is_first_person ? 220.578621 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 11.944374 : 0.0",
-              "variable.is_first_person ? 197.119017 : 0.0",
-              "variable.is_first_person ? 225.776413 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 10.368909 : 0.0",
-              "variable.is_first_person ? 197.901394 : 0.0",
-              "variable.is_first_person ? 226.863047 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 8.373067 : 0.0",
-              "variable.is_first_person ? 195.588457 : 0.0",
-              "variable.is_first_person ? 223.650635 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 5.978714 : 0.0",
-              "variable.is_first_person ? 190.580135 : 0.0",
-              "variable.is_first_person ? 216.694631 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 3.212083 : 0.0",
-              "variable.is_first_person ? 183.74241 : 0.0",
-              "variable.is_first_person ? 207.197792 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 0.103485 : 0.0",
-              "variable.is_first_person ? 176.25759 : 0.0",
-              "variable.is_first_person ? 196.802208 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? -3.313019 : 0.0",
-              "variable.is_first_person ? 169.419865 : 0.0",
-              "variable.is_first_person ? 187.305369 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? -7.0 : 0.0",
-              "variable.is_first_person ? 164.411543 : 0.0",
-              "variable.is_first_person ? 180.349365 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? -10.917061 : 0.0",
-              "variable.is_first_person ? 162.098606 : 0.0",
-              "variable.is_first_person ? 177.136953 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? -15.021286 : 0.0",
-              "variable.is_first_person ? 162.880983 : 0.0",
-              "variable.is_first_person ? 178.223587 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? -19.267709 : 0.0",
-              "variable.is_first_person ? 166.623393 : 0.0",
-              "variable.is_first_person ? 183.421379 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? -23.609805 : 0.0",
-              "variable.is_first_person ? 172.67874 : 0.0",
-              "variable.is_first_person ? 191.831584 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? -28.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 202.0 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? -27.039781 : 0.0",
-              "variable.is_first_person ? 173.82716 : 0.0",
-              "variable.is_first_person ? 195.072702 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? -24.466392 : 0.0",
-              "variable.is_first_person ? 157.283951 : 0.0",
-              "variable.is_first_person ? 176.507545 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? -20.740741 : 0.0",
-              "variable.is_first_person ? 133.333333 : 0.0",
-              "variable.is_first_person ? 149.62963 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? -16.323731 : 0.0",
-              "variable.is_first_person ? 104.938272 : 0.0",
-              "variable.is_first_person ? 117.76406 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? -11.676269 : 0.0",
-              "variable.is_first_person ? 75.061728 : 0.0",
-              "variable.is_first_person ? 84.23594 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? -7.259259 : 0.0",
-              "variable.is_first_person ? 46.666667 : 0.0",
-              "variable.is_first_person ? 52.37037 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? -3.533608 : 0.0",
-              "variable.is_first_person ? 22.716049 : 0.0",
-              "variable.is_first_person ? 25.492455 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? -0.960219 : 0.0",
-              "variable.is_first_person ? 6.17284 : 0.0",
-              "variable.is_first_person ? 6.927298 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          }
+          "rotation": [
+            "-100.26761414789407 - (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 180)) * 20.05352282957881 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * 10.313240312354818",
+            "20.05352282957881 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * 54.43099053742821",
+            "31.512678732195283 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 180)) * 31.512678732195283 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * 14.32394487827058"
+          ]
         }
       }
     },
     "animation.kg_imm.player.season.off": {
-      "animation_length": 0.8,
-      "override_previous_animation": true,
+      "animation_length": 0.5,
+      "blend_weight": "!variable.is_first_person && q.property('kaleidoscope_grilling:season_hand') == 2 && q.property('kaleidoscope_grilling:season_phase') != 0",
       "bones": {
         "leftarm": {
-          "position": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? -0.462963 : 0.0",
-              "variable.is_first_person ? -0.342936 : 0.0",
-              "variable.is_first_person ? 0.411523 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? -1.703704 : 0.0",
-              "variable.is_first_person ? -1.262003 : 0.0",
-              "variable.is_first_person ? 1.514403 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? -3.5 : 0.0",
-              "variable.is_first_person ? -2.592593 : 0.0",
-              "variable.is_first_person ? 3.111111 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? -5.62963 : 0.0",
-              "variable.is_first_person ? -4.170096 : 0.0",
-              "variable.is_first_person ? 5.004115 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? -7.87037 : 0.0",
-              "variable.is_first_person ? -5.829904 : 0.0",
-              "variable.is_first_person ? 6.995885 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? -7.407407 : 0.0",
-              "variable.is_first_person ? 8.888889 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? -11.796296 : 0.0",
-              "variable.is_first_person ? -8.737997 : 0.0",
-              "variable.is_first_person ? 10.485597 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? -13.037037 : 0.0",
-              "variable.is_first_person ? -9.657064 : 0.0",
-              "variable.is_first_person ? 11.588477 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? -13.5 : 0.0",
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? 12.0 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? -13.037037 : 0.0",
-              "variable.is_first_person ? -9.657064 : 0.0",
-              "variable.is_first_person ? 11.588477 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? -11.796296 : 0.0",
-              "variable.is_first_person ? -8.737997 : 0.0",
-              "variable.is_first_person ? 10.485597 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? -10.0 : 0.0",
-              "variable.is_first_person ? -7.407407 : 0.0",
-              "variable.is_first_person ? 8.888889 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? -7.87037 : 0.0",
-              "variable.is_first_person ? -5.829904 : 0.0",
-              "variable.is_first_person ? 6.995885 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? -5.62963 : 0.0",
-              "variable.is_first_person ? -4.170096 : 0.0",
-              "variable.is_first_person ? 5.004115 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? -3.5 : 0.0",
-              "variable.is_first_person ? -2.592593 : 0.0",
-              "variable.is_first_person ? 3.111111 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? -1.703704 : 0.0",
-              "variable.is_first_person ? -1.262003 : 0.0",
-              "variable.is_first_person ? 1.514403 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? -0.462963 : 0.0",
-              "variable.is_first_person ? -0.342936 : 0.0",
-              "variable.is_first_person ? 0.411523 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          },
-          "rotation": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? 3.257888 : -3.438533",
-              "variable.is_first_person ? 1.54321 : -0.687707",
-              "variable.is_first_person ? -3.943759 : -1.080682"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? 11.989026 : -12.6538",
-              "variable.is_first_person ? 5.679012 : -2.53076",
-              "variable.is_first_person ? -14.513032 : -3.976909"
-            ],
-            "0.05": [
-              "variable.is_first_person ? 24.62963 : -25.995307",
-              "variable.is_first_person ? 11.666667 : -5.199061",
-              "variable.is_first_person ? -29.814815 : -8.169954"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? 39.615912 : -41.812558",
-              "variable.is_first_person ? 18.765432 : -8.362512",
-              "variable.is_first_person ? -47.956104 : -13.14109"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? 55.384088 : -58.455056",
-              "variable.is_first_person ? 26.234568 : -11.691011",
-              "variable.is_first_person ? -67.043896 : -18.371589"
-            ],
-            "0.1": [
-              "variable.is_first_person ? 70.37037 : -74.272307",
-              "variable.is_first_person ? 33.333333 : -14.854461",
-              "variable.is_first_person ? -85.185185 : -23.342725"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? 83.010974 : -87.613814",
-              "variable.is_first_person ? 39.320988 : -17.522763",
-              "variable.is_first_person ? -100.486968 : -27.53577"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? 91.742112 : -96.829081",
-              "variable.is_first_person ? 43.45679 : -19.365816",
-              "variable.is_first_person ? -111.056241 : -30.431997"
-            ],
-            "0.15": [
-              "variable.is_first_person ? 95.0 : -100.267614",
-              "variable.is_first_person ? 45.0 : -20.053523",
-              "variable.is_first_person ? -115.0 : -31.512679"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? 95.0 : -98.169005",
-              "variable.is_first_person ? 45.0 : -42.192601",
-              "variable.is_first_person ? -115.0 : -40.632724"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? 95.0 : -96.772745",
-              "variable.is_first_person ? 45.0 : -60.503632",
-              "variable.is_first_person ? -115.0 : -48.709299"
-            ],
-            "0.2": [
-              "variable.is_first_person ? 95.0 : -96.656019",
-              "variable.is_first_person ? 45.0 : -71.820471",
-              "variable.is_first_person ? -115.0 : -54.873513"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? 95.0 : -98.167373",
-              "variable.is_first_person ? 45.0 : -74.186335",
-              "variable.is_first_person ? -115.0 : -58.575517"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? 95.0 : -101.362847",
-              "variable.is_first_person ? 45.0 : -67.192143",
-              "variable.is_first_person ? -115.0 : -59.673918"
-            ],
-            "0.25": [
-              "variable.is_first_person ? 95.0 : -105.992809",
-              "variable.is_first_person ? 45.0 : -52.047256",
-              "variable.is_first_person ? -115.0 : -58.45477"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 95.0 : -111.541797",
-              "variable.is_first_person ? 45.0 : -31.370362",
-              "variable.is_first_person ? -115.0 : -55.576892"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 95.0 : -117.314529",
-              "variable.is_first_person ? 45.0 : -8.736684",
-              "variable.is_first_person ? -115.0 : -51.953047"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 95.0 : -122.553225",
-              "variable.is_first_person ? 45.0 : 11.940211",
-              "variable.is_first_person ? -115.0 : -48.587568"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 95.0 : -126.566002",
-              "variable.is_first_person ? 45.0 : 27.085098",
-              "variable.is_first_person ? -115.0 : -46.398559"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 95.0 : -128.844162",
-              "variable.is_first_person ? 45.0 : 34.079289",
-              "variable.is_first_person ? -115.0 : -46.055466"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 95.0 : -129.148122",
-              "variable.is_first_person ? 45.0 : 31.713425",
-              "variable.is_first_person ? -115.0 : -47.860136"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 95.0 : -127.547151",
-              "variable.is_first_person ? 45.0 : 20.396586",
-              "variable.is_first_person ? -115.0 : -51.691964"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 95.0 : -124.406054",
-              "variable.is_first_person ? 45.0 : 2.085556",
-              "variable.is_first_person ? -115.0 : -57.026654"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 95.0 : -120.321137",
-              "variable.is_first_person ? 45.0 : -20.053523",
-              "variable.is_first_person ? -115.0 : -63.025357"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 95.0 : -116.016509",
-              "variable.is_first_person ? 45.0 : -42.192601",
-              "variable.is_first_person ? -115.0 : -68.678801"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 95.0 : -112.218688",
-              "variable.is_first_person ? 45.0 : -60.503632",
-              "variable.is_first_person ? -115.0 : -72.981495"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 95.0 : -109.531173",
-              "variable.is_first_person ? 45.0 : -71.820471",
-              "variable.is_first_person ? -115.0 : -75.105898"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 95.0 : -108.330676",
-              "variable.is_first_person ? 45.0 : -74.186335",
-              "variable.is_first_person ? -115.0 : -74.54642"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 95.0 : -108.702946",
-              "variable.is_first_person ? 45.0 : -67.192143",
-              "variable.is_first_person ? -115.0 : -71.208359"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 95.0 : -110.429284",
-              "variable.is_first_person ? 45.0 : -52.047256",
-              "variable.is_first_person ? -115.0 : -65.426375"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 95.0 : -113.026043",
-              "variable.is_first_person ? 45.0 : -31.370362",
-              "variable.is_first_person ? -115.0 : -57.909278"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 95.0 : -115.830283",
-              "variable.is_first_person ? 45.0 : -8.736684",
-              "variable.is_first_person ? -115.0 : -49.620661"
-            ],
-            "0.55": [
-              "variable.is_first_person ? 95.0 : -118.11675",
-              "variable.is_first_person ? 45.0 : 11.940211",
-              "variable.is_first_person ? -115.0 : -41.615963"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? 95.0 : -119.225904",
-              "variable.is_first_person ? 45.0 : 27.085098",
-              "variable.is_first_person ? -115.0 : -34.864118"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? 95.0 : -118.68086",
-              "variable.is_first_person ? 45.0 : 34.079289",
-              "variable.is_first_person ? -115.0 : -30.084563"
-            ],
-            "0.6": [
-              "variable.is_first_person ? 95.0 : -116.272968",
-              "variable.is_first_person ? 45.0 : 31.713425",
-              "variable.is_first_person ? -115.0 : -27.627751"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? 95.0 : -112.101207",
-              "variable.is_first_person ? 45.0 : 20.396586",
-              "variable.is_first_person ? -115.0 : -27.419768"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? 95.0 : -106.558551",
-              "variable.is_first_person ? 45.0 : 2.085556",
-              "variable.is_first_person ? -115.0 : -28.980577"
-            ],
-            "0.65": [
-              "variable.is_first_person ? 95.0 : -100.267614",
-              "variable.is_first_person ? 45.0 : -20.053523",
-              "variable.is_first_person ? -115.0 : -31.512679"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? 91.742112 : -96.829081",
-              "variable.is_first_person ? 43.45679 : -19.365816",
-              "variable.is_first_person ? -111.056241 : -30.431997"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? 83.010974 : -87.613814",
-              "variable.is_first_person ? 39.320988 : -17.522763",
-              "variable.is_first_person ? -100.486968 : -27.53577"
-            ],
-            "0.7": [
-              "variable.is_first_person ? 70.37037 : -74.272307",
-              "variable.is_first_person ? 33.333333 : -14.854461",
-              "variable.is_first_person ? -85.185185 : -23.342725"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? 55.384088 : -58.455056",
-              "variable.is_first_person ? 26.234568 : -11.691011",
-              "variable.is_first_person ? -67.043896 : -18.371589"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? 39.615912 : -41.812558",
-              "variable.is_first_person ? 18.765432 : -8.362512",
-              "variable.is_first_person ? -47.956104 : -13.14109"
-            ],
-            "0.75": [
-              "variable.is_first_person ? 24.62963 : -25.995307",
-              "variable.is_first_person ? 11.666667 : -5.199061",
-              "variable.is_first_person ? -29.814815 : -8.169954"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? 11.989026 : -12.6538",
-              "variable.is_first_person ? 5.679012 : -2.53076",
-              "variable.is_first_person ? -14.513032 : -3.976909"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? 3.257888 : -3.438533",
-              "variable.is_first_person ? 1.54321 : -0.687707",
-              "variable.is_first_person ? -3.943759 : -1.080682"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          }
-        },
-        "leftitem": {
-          "position": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? -0.274348 : 0.0",
-              "variable.is_first_person ? -0.224966 : 0.0",
-              "variable.is_first_person ? -0.449931 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? -1.009602 : 0.0",
-              "variable.is_first_person ? -0.827874 : 0.0",
-              "variable.is_first_person ? -1.655748 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? -2.074074 : 0.0",
-              "variable.is_first_person ? -1.700741 : 0.0",
-              "variable.is_first_person ? -3.401481 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? -3.336077 : 0.0",
-              "variable.is_first_person ? -2.735583 : 0.0",
-              "variable.is_first_person ? -5.471166 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? -4.663923 : 0.0",
-              "variable.is_first_person ? -3.824417 : 0.0",
-              "variable.is_first_person ? -7.648834 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? -5.925926 : 0.0",
-              "variable.is_first_person ? -4.859259 : 0.0",
-              "variable.is_first_person ? -9.718519 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? -6.990398 : 0.0",
-              "variable.is_first_person ? -5.732126 : 0.0",
-              "variable.is_first_person ? -11.464252 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? -7.725652 : 0.0",
-              "variable.is_first_person ? -6.335034 : 0.0",
-              "variable.is_first_person ? -12.670069 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? -8.0 : 0.0",
-              "variable.is_first_person ? -6.56 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? -8.520623 : 0.0",
-              "variable.is_first_person ? -6.392754 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? -8.951225 : 0.0",
-              "variable.is_first_person ? -6.227341 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? -9.217352 : 0.0",
-              "variable.is_first_person ? -6.065573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? -9.272988 : 0.0",
-              "variable.is_first_person ? -5.909221 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? -9.108513 : 0.0",
-              "variable.is_first_person ? -5.76 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? -8.752365 : 0.0",
-              "variable.is_first_person ? -5.619544 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? -8.266127 : 0.0",
-              "variable.is_first_person ? -5.489391 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? -7.733873 : 0.0",
-              "variable.is_first_person ? -5.370968 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? -7.247635 : 0.0",
-              "variable.is_first_person ? -5.265573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? -6.891487 : 0.0",
-              "variable.is_first_person ? -5.174359 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? -6.727012 : 0.0",
-              "variable.is_first_person ? -5.098327 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? -6.782648 : 0.0",
-              "variable.is_first_person ? -5.03831 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? -7.048775 : 0.0",
-              "variable.is_first_person ? -4.994964 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? -7.479377 : 0.0",
-              "variable.is_first_person ? -4.968765 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? -8.0 : 0.0",
-              "variable.is_first_person ? -4.96 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? -8.520623 : 0.0",
-              "variable.is_first_person ? -4.968765 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? -8.951225 : 0.0",
-              "variable.is_first_person ? -4.994964 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? -9.217352 : 0.0",
-              "variable.is_first_person ? -5.03831 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? -9.272988 : 0.0",
-              "variable.is_first_person ? -5.098327 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? -9.108513 : 0.0",
-              "variable.is_first_person ? -5.174359 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? -8.752365 : 0.0",
-              "variable.is_first_person ? -5.265573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? -8.266127 : 0.0",
-              "variable.is_first_person ? -5.370968 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? -7.733873 : 0.0",
-              "variable.is_first_person ? -5.489391 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? -7.247635 : 0.0",
-              "variable.is_first_person ? -5.619544 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? -6.891487 : 0.0",
-              "variable.is_first_person ? -5.76 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? -6.727012 : 0.0",
-              "variable.is_first_person ? -5.909221 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? -6.782648 : 0.0",
-              "variable.is_first_person ? -6.065573 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? -7.048775 : 0.0",
-              "variable.is_first_person ? -6.227341 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? -7.479377 : 0.0",
-              "variable.is_first_person ? -6.392754 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? -8.0 : 0.0",
-              "variable.is_first_person ? -6.56 : 0.0",
-              "variable.is_first_person ? -13.12 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? -7.725652 : 0.0",
-              "variable.is_first_person ? -6.335034 : 0.0",
-              "variable.is_first_person ? -12.670069 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? -6.990398 : 0.0",
-              "variable.is_first_person ? -5.732126 : 0.0",
-              "variable.is_first_person ? -11.464252 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? -5.925926 : 0.0",
-              "variable.is_first_person ? -4.859259 : 0.0",
-              "variable.is_first_person ? -9.718519 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? -4.663923 : 0.0",
-              "variable.is_first_person ? -3.824417 : 0.0",
-              "variable.is_first_person ? -7.648834 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? -3.336077 : 0.0",
-              "variable.is_first_person ? -2.735583 : 0.0",
-              "variable.is_first_person ? -5.471166 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? -2.074074 : 0.0",
-              "variable.is_first_person ? -1.700741 : 0.0",
-              "variable.is_first_person ? -3.401481 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? -1.009602 : 0.0",
-              "variable.is_first_person ? -0.827874 : 0.0",
-              "variable.is_first_person ? -1.655748 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? -0.274348 : 0.0",
-              "variable.is_first_person ? -0.224966 : 0.0",
-              "variable.is_first_person ? -0.449931 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          },
-          "rotation": {
-            "0": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "0.01667": [
-              "variable.is_first_person ? -0.960219 : 0.0",
-              "variable.is_first_person ? 6.17284 : 0.0",
-              "variable.is_first_person ? 5.418381 : 0.0"
-            ],
-            "0.03333": [
-              "variable.is_first_person ? -3.533608 : 0.0",
-              "variable.is_first_person ? 22.716049 : 0.0",
-              "variable.is_first_person ? 19.939643 : 0.0"
-            ],
-            "0.05": [
-              "variable.is_first_person ? -7.259259 : 0.0",
-              "variable.is_first_person ? 46.666667 : 0.0",
-              "variable.is_first_person ? 40.962963 : 0.0"
-            ],
-            "0.06667": [
-              "variable.is_first_person ? -11.676269 : 0.0",
-              "variable.is_first_person ? 75.061728 : 0.0",
-              "variable.is_first_person ? 65.887517 : 0.0"
-            ],
-            "0.08333": [
-              "variable.is_first_person ? -16.323731 : 0.0",
-              "variable.is_first_person ? 104.938272 : 0.0",
-              "variable.is_first_person ? 92.112483 : 0.0"
-            ],
-            "0.1": [
-              "variable.is_first_person ? -20.740741 : 0.0",
-              "variable.is_first_person ? 133.333333 : 0.0",
-              "variable.is_first_person ? 117.037037 : 0.0"
-            ],
-            "0.11667": [
-              "variable.is_first_person ? -24.466392 : 0.0",
-              "variable.is_first_person ? 157.283951 : 0.0",
-              "variable.is_first_person ? 138.060357 : 0.0"
-            ],
-            "0.13333": [
-              "variable.is_first_person ? -27.039781 : 0.0",
-              "variable.is_first_person ? 173.82716 : 0.0",
-              "variable.is_first_person ? 152.581619 : 0.0"
-            ],
-            "0.15": [
-              "variable.is_first_person ? -28.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 158.0 : 0.0"
-            ],
-            "0.16667": [
-              "variable.is_first_person ? -23.609805 : 0.0",
-              "variable.is_first_person ? 172.67874 : 0.0",
-              "variable.is_first_person ? 147.831584 : 0.0"
-            ],
-            "0.18333": [
-              "variable.is_first_person ? -19.267709 : 0.0",
-              "variable.is_first_person ? 166.623393 : 0.0",
-              "variable.is_first_person ? 139.421379 : 0.0"
-            ],
-            "0.2": [
-              "variable.is_first_person ? -15.021286 : 0.0",
-              "variable.is_first_person ? 162.880983 : 0.0",
-              "variable.is_first_person ? 134.223587 : 0.0"
-            ],
-            "0.21667": [
-              "variable.is_first_person ? -10.917061 : 0.0",
-              "variable.is_first_person ? 162.098606 : 0.0",
-              "variable.is_first_person ? 133.136953 : 0.0"
-            ],
-            "0.23333": [
-              "variable.is_first_person ? -7.0 : 0.0",
-              "variable.is_first_person ? 164.411543 : 0.0",
-              "variable.is_first_person ? 136.349365 : 0.0"
-            ],
-            "0.25": [
-              "variable.is_first_person ? -3.313019 : 0.0",
-              "variable.is_first_person ? 169.419865 : 0.0",
-              "variable.is_first_person ? 143.305369 : 0.0"
-            ],
-            "0.26667": [
-              "variable.is_first_person ? 0.103485 : 0.0",
-              "variable.is_first_person ? 176.25759 : 0.0",
-              "variable.is_first_person ? 152.802208 : 0.0"
-            ],
-            "0.28333": [
-              "variable.is_first_person ? 3.212083 : 0.0",
-              "variable.is_first_person ? 183.74241 : 0.0",
-              "variable.is_first_person ? 163.197792 : 0.0"
-            ],
-            "0.3": [
-              "variable.is_first_person ? 5.978714 : 0.0",
-              "variable.is_first_person ? 190.580135 : 0.0",
-              "variable.is_first_person ? 172.694631 : 0.0"
-            ],
-            "0.31667": [
-              "variable.is_first_person ? 8.373067 : 0.0",
-              "variable.is_first_person ? 195.588457 : 0.0",
-              "variable.is_first_person ? 179.650635 : 0.0"
-            ],
-            "0.33333": [
-              "variable.is_first_person ? 10.368909 : 0.0",
-              "variable.is_first_person ? 197.901394 : 0.0",
-              "variable.is_first_person ? 182.863047 : 0.0"
-            ],
-            "0.35": [
-              "variable.is_first_person ? 11.944374 : 0.0",
-              "variable.is_first_person ? 197.119017 : 0.0",
-              "variable.is_first_person ? 181.776413 : 0.0"
-            ],
-            "0.36667": [
-              "variable.is_first_person ? 13.082199 : 0.0",
-              "variable.is_first_person ? 193.376607 : 0.0",
-              "variable.is_first_person ? 176.578621 : 0.0"
-            ],
-            "0.38333": [
-              "variable.is_first_person ? 13.76992 : 0.0",
-              "variable.is_first_person ? 187.32126 : 0.0",
-              "variable.is_first_person ? 168.168416 : 0.0"
-            ],
-            "0.4": [
-              "variable.is_first_person ? 14.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 158.0 : 0.0"
-            ],
-            "0.41667": [
-              "variable.is_first_person ? 13.76992 : 0.0",
-              "variable.is_first_person ? 172.67874 : 0.0",
-              "variable.is_first_person ? 147.831584 : 0.0"
-            ],
-            "0.43333": [
-              "variable.is_first_person ? 13.082199 : 0.0",
-              "variable.is_first_person ? 166.623393 : 0.0",
-              "variable.is_first_person ? 139.421379 : 0.0"
-            ],
-            "0.45": [
-              "variable.is_first_person ? 11.944374 : 0.0",
-              "variable.is_first_person ? 162.880983 : 0.0",
-              "variable.is_first_person ? 134.223587 : 0.0"
-            ],
-            "0.46667": [
-              "variable.is_first_person ? 10.368909 : 0.0",
-              "variable.is_first_person ? 162.098606 : 0.0",
-              "variable.is_first_person ? 133.136953 : 0.0"
-            ],
-            "0.48333": [
-              "variable.is_first_person ? 8.373067 : 0.0",
-              "variable.is_first_person ? 164.411543 : 0.0",
-              "variable.is_first_person ? 136.349365 : 0.0"
-            ],
-            "0.5": [
-              "variable.is_first_person ? 5.978714 : 0.0",
-              "variable.is_first_person ? 169.419865 : 0.0",
-              "variable.is_first_person ? 143.305369 : 0.0"
-            ],
-            "0.51667": [
-              "variable.is_first_person ? 3.212083 : 0.0",
-              "variable.is_first_person ? 176.25759 : 0.0",
-              "variable.is_first_person ? 152.802208 : 0.0"
-            ],
-            "0.53333": [
-              "variable.is_first_person ? 0.103485 : 0.0",
-              "variable.is_first_person ? 183.74241 : 0.0",
-              "variable.is_first_person ? 163.197792 : 0.0"
-            ],
-            "0.55": [
-              "variable.is_first_person ? -3.313019 : 0.0",
-              "variable.is_first_person ? 190.580135 : 0.0",
-              "variable.is_first_person ? 172.694631 : 0.0"
-            ],
-            "0.56667": [
-              "variable.is_first_person ? -7.0 : 0.0",
-              "variable.is_first_person ? 195.588457 : 0.0",
-              "variable.is_first_person ? 179.650635 : 0.0"
-            ],
-            "0.58333": [
-              "variable.is_first_person ? -10.917061 : 0.0",
-              "variable.is_first_person ? 197.901394 : 0.0",
-              "variable.is_first_person ? 182.863047 : 0.0"
-            ],
-            "0.6": [
-              "variable.is_first_person ? -15.021286 : 0.0",
-              "variable.is_first_person ? 197.119017 : 0.0",
-              "variable.is_first_person ? 181.776413 : 0.0"
-            ],
-            "0.61667": [
-              "variable.is_first_person ? -19.267709 : 0.0",
-              "variable.is_first_person ? 193.376607 : 0.0",
-              "variable.is_first_person ? 176.578621 : 0.0"
-            ],
-            "0.63333": [
-              "variable.is_first_person ? -23.609805 : 0.0",
-              "variable.is_first_person ? 187.32126 : 0.0",
-              "variable.is_first_person ? 168.168416 : 0.0"
-            ],
-            "0.65": [
-              "variable.is_first_person ? -28.0 : 0.0",
-              "variable.is_first_person ? 180.0 : 0.0",
-              "variable.is_first_person ? 158.0 : 0.0"
-            ],
-            "0.66667": [
-              "variable.is_first_person ? -27.039781 : 0.0",
-              "variable.is_first_person ? 173.82716 : 0.0",
-              "variable.is_first_person ? 152.581619 : 0.0"
-            ],
-            "0.68333": [
-              "variable.is_first_person ? -24.466392 : 0.0",
-              "variable.is_first_person ? 157.283951 : 0.0",
-              "variable.is_first_person ? 138.060357 : 0.0"
-            ],
-            "0.7": [
-              "variable.is_first_person ? -20.740741 : 0.0",
-              "variable.is_first_person ? 133.333333 : 0.0",
-              "variable.is_first_person ? 117.037037 : 0.0"
-            ],
-            "0.71667": [
-              "variable.is_first_person ? -16.323731 : 0.0",
-              "variable.is_first_person ? 104.938272 : 0.0",
-              "variable.is_first_person ? 92.112483 : 0.0"
-            ],
-            "0.73333": [
-              "variable.is_first_person ? -11.676269 : 0.0",
-              "variable.is_first_person ? 75.061728 : 0.0",
-              "variable.is_first_person ? 65.887517 : 0.0"
-            ],
-            "0.75": [
-              "variable.is_first_person ? -7.259259 : 0.0",
-              "variable.is_first_person ? 46.666667 : 0.0",
-              "variable.is_first_person ? 40.962963 : 0.0"
-            ],
-            "0.76667": [
-              "variable.is_first_person ? -3.533608 : 0.0",
-              "variable.is_first_person ? 22.716049 : 0.0",
-              "variable.is_first_person ? 19.939643 : 0.0"
-            ],
-            "0.78333": [
-              "variable.is_first_person ? -0.960219 : 0.0",
-              "variable.is_first_person ? 6.17284 : 0.0",
-              "variable.is_first_person ? 5.418381 : 0.0"
-            ],
-            "0.8": [
-              0.0,
-              0.0,
-              0.0
-            ]
-          }
+          "rotation": [
+            "-100.26761414789407 - (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 180)) * 20.05352282957881 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * 10.313240312354818",
+            "-20.05352282957881 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * -54.43099053742821",
+            "-31.512678732195283 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 180)) * -31.512678732195283 + (math.sin((math.clamp(q.anim_time / 0.5, 0, 1)) * 720)) * -14.32394487827058"
+          ]
         }
       }
     },
@@ -89436,284 +87466,284 @@
         "rightarm": {
           "position": {
             "0": [
-              "variable.is_first_person ? 13.5 : -2.943967",
-              "variable.is_first_person ? -10.0 : -5.717771",
-              "variable.is_first_person ? 12.0 : -4.828908"
+              "variable.is_first_person ? 13.5 : 0.0",
+              "variable.is_first_person ? -10.0 : 0.0",
+              "variable.is_first_person ? 12.0 : 0.0"
             ],
             "0.01667": [
-              "variable.is_first_person ? 13.402411 : -3.041557",
-              "variable.is_first_person ? -10.049713 : -5.767484",
-              "variable.is_first_person ? 11.91354 : -4.915368"
+              "variable.is_first_person ? 13.402411 : 0.0",
+              "variable.is_first_person ? -10.049713 : 0.0",
+              "variable.is_first_person ? 11.91354 : 0.0"
             ],
             "0.03333": [
-              "variable.is_first_person ? 13.28722 : -3.156747",
-              "variable.is_first_person ? -10.111749 : -5.82952",
-              "variable.is_first_person ? 11.809144 : -5.019765"
+              "variable.is_first_person ? 13.28722 : 0.0",
+              "variable.is_first_person ? -10.111749 : 0.0",
+              "variable.is_first_person ? 11.809144 : 0.0"
             ],
             "0.05": [
-              "variable.is_first_person ? 13.155941 : -3.288026",
-              "variable.is_first_person ? -10.185019 : -5.90279",
-              "variable.is_first_person ? 11.688318 : -5.140591"
+              "variable.is_first_person ? 13.155941 : 0.0",
+              "variable.is_first_person ? -10.185019 : 0.0",
+              "variable.is_first_person ? 11.688318 : 0.0"
             ],
             "0.06667": [
-              "variable.is_first_person ? 13.010087 : -3.43388",
-              "variable.is_first_person ? -10.268438 : -5.986209",
-              "variable.is_first_person ? 11.552571 : -5.276338"
+              "variable.is_first_person ? 13.010087 : 0.0",
+              "variable.is_first_person ? -10.268438 : 0.0",
+              "variable.is_first_person ? 11.552571 : 0.0"
             ],
             "0.08333": [
-              "variable.is_first_person ? 12.851169 : -3.592799",
-              "variable.is_first_person ? -10.360928 : -6.078699",
-              "variable.is_first_person ? 11.403411 : -5.425497"
+              "variable.is_first_person ? 12.851169 : 0.0",
+              "variable.is_first_person ? -10.360928 : 0.0",
+              "variable.is_first_person ? 11.403411 : 0.0"
             ],
             "0.1": [
-              "variable.is_first_person ? 12.680688 : -3.763279",
-              "variable.is_first_person ? -10.461414 : -6.179186",
-              "variable.is_first_person ? 11.242348 : -5.58656"
+              "variable.is_first_person ? 12.680688 : 0.0",
+              "variable.is_first_person ? -10.461414 : 0.0",
+              "variable.is_first_person ? 11.242348 : 0.0"
             ],
             "0.11667": [
-              "variable.is_first_person ? 12.500137 : -3.94383",
-              "variable.is_first_person ? -10.568827 : -6.286598",
-              "variable.is_first_person ? 11.07089 : -5.758018"
+              "variable.is_first_person ? 12.500137 : 0.0",
+              "variable.is_first_person ? -10.568827 : 0.0",
+              "variable.is_first_person ? 11.07089 : 0.0"
             ],
             "0.13333": [
-              "variable.is_first_person ? 12.310991 : -4.132976",
-              "variable.is_first_person ? -10.682097 : -6.399868",
-              "variable.is_first_person ? 10.890547 : -5.938361"
+              "variable.is_first_person ? 12.310991 : 0.0",
+              "variable.is_first_person ? -10.682097 : 0.0",
+              "variable.is_first_person ? 10.890547 : 0.0"
             ],
             "0.15": [
-              "variable.is_first_person ? 12.114709 : -4.329258",
-              "variable.is_first_person ? -10.800157 : -6.517928",
-              "variable.is_first_person ? 10.70283 : -6.126078"
+              "variable.is_first_person ? 12.114709 : 0.0",
+              "variable.is_first_person ? -10.800157 : 0.0",
+              "variable.is_first_person ? 10.70283 : 0.0"
             ],
             "0.16667": [
-              "variable.is_first_person ? 11.91273 : -4.531238",
-              "variable.is_first_person ? -10.921938 : -6.639709",
-              "variable.is_first_person ? 10.509249 : -6.31966"
+              "variable.is_first_person ? 11.91273 : 0.0",
+              "variable.is_first_person ? -10.921938 : 0.0",
+              "variable.is_first_person ? 10.509249 : 0.0"
             ],
             "0.18333": [
-              "variable.is_first_person ? 11.706469 : -4.737498",
-              "variable.is_first_person ? -11.046369 : -6.76414",
-              "variable.is_first_person ? 10.311314 : -6.517594"
+              "variable.is_first_person ? 11.706469 : 0.0",
+              "variable.is_first_person ? -11.046369 : 0.0",
+              "variable.is_first_person ? 10.311314 : 0.0"
             ],
             "0.2": [
-              "variable.is_first_person ? 11.497321 : -4.946647",
-              "variable.is_first_person ? -11.172371 : -6.890142",
-              "variable.is_first_person ? 10.110537 : -6.718371"
+              "variable.is_first_person ? 11.497321 : 0.0",
+              "variable.is_first_person ? -11.172371 : 0.0",
+              "variable.is_first_person ? 10.110537 : 0.0"
             ],
             "0.21667": [
-              "variable.is_first_person ? 11.286655 : -5.157313",
-              "variable.is_first_person ? -11.298858 : -7.016629",
-              "variable.is_first_person ? 9.908431 : -6.920477"
+              "variable.is_first_person ? 11.286655 : 0.0",
+              "variable.is_first_person ? -11.298858 : 0.0",
+              "variable.is_first_person ? 9.908431 : 0.0"
             ],
             "0.23333": [
-              "variable.is_first_person ? 11.075818 : -5.36815",
-              "variable.is_first_person ? -11.424734 : -7.142505",
-              "variable.is_first_person ? 9.706507 : -7.122401"
+              "variable.is_first_person ? 11.075818 : 0.0",
+              "variable.is_first_person ? -11.424734 : 0.0",
+              "variable.is_first_person ? 9.706507 : 0.0"
             ],
             "0.25": [
-              "variable.is_first_person ? 10.866133 : -5.577834",
-              "variable.is_first_person ? -11.548887 : -7.266659",
-              "variable.is_first_person ? 9.506277 : -7.322631"
+              "variable.is_first_person ? 10.866133 : 0.0",
+              "variable.is_first_person ? -11.548887 : 0.0",
+              "variable.is_first_person ? 9.506277 : 0.0"
             ],
             "0.26667": [
-              "variable.is_first_person ? 10.658903 : -5.785064",
-              "variable.is_first_person ? -11.670195 : -7.387966",
-              "variable.is_first_person ? 9.309254 : -7.519654"
+              "variable.is_first_person ? 10.658903 : 0.0",
+              "variable.is_first_person ? -11.670195 : 0.0",
+              "variable.is_first_person ? 9.309254 : 0.0"
             ],
             "0.28333": [
-              "variable.is_first_person ? 10.45541 : -5.988557",
-              "variable.is_first_person ? -11.787515 : -7.505286",
-              "variable.is_first_person ? 9.11695 : -7.711958"
+              "variable.is_first_person ? 10.45541 : 0.0",
+              "variable.is_first_person ? -11.787515 : 0.0",
+              "variable.is_first_person ? 9.11695 : 0.0"
             ],
             "0.3": [
-              "variable.is_first_person ? 10.256917 : -6.18705",
-              "variable.is_first_person ? -11.899688 : -7.61746",
-              "variable.is_first_person ? 8.930878 : -7.89803"
+              "variable.is_first_person ? 10.256917 : 0.0",
+              "variable.is_first_person ? -11.899688 : 0.0",
+              "variable.is_first_person ? 8.930878 : 0.0"
             ],
             "0.31667": [
-              "variable.is_first_person ? 10.064673 : -6.379295",
-              "variable.is_first_person ? -12.005537 : -7.723308",
-              "variable.is_first_person ? 8.75255 : -8.076358"
+              "variable.is_first_person ? 10.064673 : 0.0",
+              "variable.is_first_person ? -12.005537 : 0.0",
+              "variable.is_first_person ? 8.75255 : 0.0"
             ],
             "0.33333": [
-              "variable.is_first_person ? 9.879911 : -6.564056",
-              "variable.is_first_person ? -12.103864 : -7.821635",
-              "variable.is_first_person ? 8.583478 : -8.24543"
+              "variable.is_first_person ? 9.879911 : 0.0",
+              "variable.is_first_person ? -12.103864 : 0.0",
+              "variable.is_first_person ? 8.583478 : 0.0"
             ],
             "0.35": [
-              "variable.is_first_person ? 9.703856 : -6.740111",
-              "variable.is_first_person ? -12.193455 : -7.911226",
-              "variable.is_first_person ? 8.425175 : -8.403733"
+              "variable.is_first_person ? 9.703856 : 0.0",
+              "variable.is_first_person ? -12.193455 : 0.0",
+              "variable.is_first_person ? 8.425175 : 0.0"
             ],
             "0.36667": [
-              "variable.is_first_person ? 9.537724 : -6.906243",
-              "variable.is_first_person ? -12.273076 : -7.990847",
-              "variable.is_first_person ? 8.279152 : -8.549756"
+              "variable.is_first_person ? 9.537724 : 0.0",
+              "variable.is_first_person ? -12.273076 : 0.0",
+              "variable.is_first_person ? 8.279152 : 0.0"
             ],
             "0.38333": [
-              "variable.is_first_person ? 9.382726 : -7.061241",
-              "variable.is_first_person ? -12.34148 : -8.059251",
-              "variable.is_first_person ? 8.14692 : -8.681988"
+              "variable.is_first_person ? 9.382726 : 0.0",
+              "variable.is_first_person ? -12.34148 : 0.0",
+              "variable.is_first_person ? 8.14692 : 0.0"
             ],
             "0.4": [
-              "variable.is_first_person ? 9.24007 : -7.203897",
-              "variable.is_first_person ? -12.397403 : -8.115174",
-              "variable.is_first_person ? 8.029991 : -8.798917"
+              "variable.is_first_person ? 9.24007 : 0.0",
+              "variable.is_first_person ? -12.397403 : 0.0",
+              "variable.is_first_person ? 8.029991 : 0.0"
             ],
             "0.41667": [
-              "variable.is_first_person ? 9.110965 : -7.333002",
-              "variable.is_first_person ? -12.439573 : -8.157345",
-              "variable.is_first_person ? 7.929876 : -8.899033"
+              "variable.is_first_person ? 9.110965 : 0.0",
+              "variable.is_first_person ? -12.439573 : 0.0",
+              "variable.is_first_person ? 7.929876 : 0.0"
             ],
             "0.43333": [
-              "variable.is_first_person ? 8.99662 : -7.447347",
-              "variable.is_first_person ? -12.466711 : -8.184482",
-              "variable.is_first_person ? 7.848084 : -8.980824"
+              "variable.is_first_person ? 8.99662 : 0.0",
+              "variable.is_first_person ? -12.466711 : 0.0",
+              "variable.is_first_person ? 7.848084 : 0.0"
             ],
             "0.45": [
-              "variable.is_first_person ? 8.898252 : -7.545716",
-              "variable.is_first_person ? -12.477533 : -8.195304",
-              "variable.is_first_person ? 7.786128 : -9.04278"
+              "variable.is_first_person ? 8.898252 : 0.0",
+              "variable.is_first_person ? -12.477533 : 0.0",
+              "variable.is_first_person ? 7.786128 : 0.0"
             ],
             "0.46667": [
-              "variable.is_first_person ? 8.898288 : -7.54568",
-              "variable.is_first_person ? -12.477532 : -8.195303",
-              "variable.is_first_person ? 7.786149 : -9.04276"
+              "variable.is_first_person ? 8.898288 : 0.0",
+              "variable.is_first_person ? -12.477532 : 0.0",
+              "variable.is_first_person ? 7.786149 : 0.0"
             ],
             "0.48333": [
-              "variable.is_first_person ? 8.996663 : -7.447304",
-              "variable.is_first_person ? -12.466703 : -8.184475",
-              "variable.is_first_person ? 7.848113 : -8.980795"
+              "variable.is_first_person ? 8.996663 : 0.0",
+              "variable.is_first_person ? -12.466703 : 0.0",
+              "variable.is_first_person ? 7.848113 : 0.0"
             ],
             "0.5": [
-              "variable.is_first_person ? 9.111014 : -7.332954",
-              "variable.is_first_person ? -12.43956 : -8.157331",
-              "variable.is_first_person ? 7.929912 : -8.898996"
+              "variable.is_first_person ? 9.111014 : 0.0",
+              "variable.is_first_person ? -12.43956 : 0.0",
+              "variable.is_first_person ? 7.929912 : 0.0"
             ],
             "0.51667": [
-              "variable.is_first_person ? 9.240125 : -7.203843",
-              "variable.is_first_person ? -12.397383 : -8.115154",
-              "variable.is_first_person ? 8.030035 : -8.798874"
+              "variable.is_first_person ? 9.240125 : 0.0",
+              "variable.is_first_person ? -12.397383 : 0.0",
+              "variable.is_first_person ? 8.030035 : 0.0"
             ],
             "0.53333": [
-              "variable.is_first_person ? 9.382786 : -7.061182",
-              "variable.is_first_person ? -12.341455 : -8.059226",
-              "variable.is_first_person ? 8.14697 : -8.681938"
+              "variable.is_first_person ? 9.382786 : 0.0",
+              "variable.is_first_person ? -12.341455 : 0.0",
+              "variable.is_first_person ? 8.14697 : 0.0"
             ],
             "0.55": [
-              "variable.is_first_person ? 9.537789 : -6.906179",
-              "variable.is_first_person ? -12.273047 : -7.990818",
-              "variable.is_first_person ? 8.279208 : -8.549701"
+              "variable.is_first_person ? 9.537789 : 0.0",
+              "variable.is_first_person ? -12.273047 : 0.0",
+              "variable.is_first_person ? 8.279208 : 0.0"
             ],
             "0.56667": [
-              "variable.is_first_person ? 9.703925 : -6.740043",
-              "variable.is_first_person ? -12.193421 : -7.911192",
-              "variable.is_first_person ? 8.425236 : -8.403672"
+              "variable.is_first_person ? 9.703925 : 0.0",
+              "variable.is_first_person ? -12.193421 : 0.0",
+              "variable.is_first_person ? 8.425236 : 0.0"
             ],
             "0.58333": [
-              "variable.is_first_person ? 9.879983 : -6.563984",
-              "variable.is_first_person ? -12.103827 : -7.821598",
-              "variable.is_first_person ? 8.583544 : -8.245364"
+              "variable.is_first_person ? 9.879983 : 0.0",
+              "variable.is_first_person ? -12.103827 : 0.0",
+              "variable.is_first_person ? 8.583544 : 0.0"
             ],
             "0.6": [
-              "variable.is_first_person ? 10.064748 : -6.379219",
-              "variable.is_first_person ? -12.005496 : -7.723267",
-              "variable.is_first_person ? 8.75262 : -8.076289"
+              "variable.is_first_person ? 10.064748 : 0.0",
+              "variable.is_first_person ? -12.005496 : 0.0",
+              "variable.is_first_person ? 8.75262 : 0.0"
             ],
             "0.61667": [
-              "variable.is_first_person ? 10.256996 : -6.186972",
-              "variable.is_first_person ? -11.899645 : -7.617416",
-              "variable.is_first_person ? 8.930951 : -7.897957"
+              "variable.is_first_person ? 10.256996 : 0.0",
+              "variable.is_first_person ? -11.899645 : 0.0",
+              "variable.is_first_person ? 8.930951 : 0.0"
             ],
             "0.63333": [
-              "variable.is_first_person ? 10.455491 : -5.988477",
-              "variable.is_first_person ? -11.787469 : -7.50524",
-              "variable.is_first_person ? 9.117026 : -7.711882"
+              "variable.is_first_person ? 10.455491 : 0.0",
+              "variable.is_first_person ? -11.787469 : 0.0",
+              "variable.is_first_person ? 9.117026 : 0.0"
             ],
             "0.65": [
-              "variable.is_first_person ? 10.658986 : -5.784982",
-              "variable.is_first_person ? -11.670147 : -7.387918",
-              "variable.is_first_person ? 9.309332 : -7.519576"
+              "variable.is_first_person ? 10.658986 : 0.0",
+              "variable.is_first_person ? -11.670147 : 0.0",
+              "variable.is_first_person ? 9.309332 : 0.0"
             ],
             "0.66667": [
-              "variable.is_first_person ? 10.866217 : -5.577751",
-              "variable.is_first_person ? -11.548838 : -7.266609",
-              "variable.is_first_person ? 9.506356 : -7.322552"
+              "variable.is_first_person ? 10.866217 : 0.0",
+              "variable.is_first_person ? -11.548838 : 0.0",
+              "variable.is_first_person ? 9.506356 : 0.0"
             ],
             "0.68333": [
-              "variable.is_first_person ? 11.075902 : -5.368066",
-              "variable.is_first_person ? -11.424684 : -7.142455",
-              "variable.is_first_person ? 9.706587 : -7.122321"
+              "variable.is_first_person ? 11.075902 : 0.0",
+              "variable.is_first_person ? -11.424684 : 0.0",
+              "variable.is_first_person ? 9.706587 : 0.0"
             ],
             "0.7": [
-              "variable.is_first_person ? 11.286739 : -5.157228",
-              "variable.is_first_person ? -11.298808 : -7.016579",
-              "variable.is_first_person ? 9.908512 : -6.920396"
+              "variable.is_first_person ? 11.286739 : 0.0",
+              "variable.is_first_person ? -11.298808 : 0.0",
+              "variable.is_first_person ? 9.908512 : 0.0"
             ],
             "0.71667": [
-              "variable.is_first_person ? 11.497405 : -4.946563",
-              "variable.is_first_person ? -11.17232 : -6.890092",
-              "variable.is_first_person ? 10.110618 : -6.71829"
+              "variable.is_first_person ? 11.497405 : 0.0",
+              "variable.is_first_person ? -11.17232 : 0.0",
+              "variable.is_first_person ? 10.110618 : 0.0"
             ],
             "0.73333": [
-              "variable.is_first_person ? 11.706552 : -4.737415",
-              "variable.is_first_person ? -11.046319 : -6.76409",
-              "variable.is_first_person ? 10.311394 : -6.517515"
+              "variable.is_first_person ? 11.706552 : 0.0",
+              "variable.is_first_person ? -11.046319 : 0.0",
+              "variable.is_first_person ? 10.311394 : 0.0"
             ],
             "0.75": [
-              "variable.is_first_person ? 11.912812 : -4.531156",
-              "variable.is_first_person ? -10.921889 : -6.63966",
-              "variable.is_first_person ? 10.509327 : -6.319581"
+              "variable.is_first_person ? 11.912812 : 0.0",
+              "variable.is_first_person ? -10.921889 : 0.0",
+              "variable.is_first_person ? 10.509327 : 0.0"
             ],
             "0.76667": [
-              "variable.is_first_person ? 12.114789 : -4.329178",
-              "variable.is_first_person ? -10.800109 : -6.51788",
-              "variable.is_first_person ? 10.702906 : -6.126002"
+              "variable.is_first_person ? 12.114789 : 0.0",
+              "variable.is_first_person ? -10.800109 : 0.0",
+              "variable.is_first_person ? 10.702906 : 0.0"
             ],
             "0.78333": [
-              "variable.is_first_person ? 12.311068 : -4.132899",
-              "variable.is_first_person ? -10.68205 : -6.399821",
-              "variable.is_first_person ? 10.890621 : -5.938287"
+              "variable.is_first_person ? 12.311068 : 0.0",
+              "variable.is_first_person ? -10.68205 : 0.0",
+              "variable.is_first_person ? 10.890621 : 0.0"
             ],
             "0.8": [
-              "variable.is_first_person ? 12.500211 : -3.943756",
-              "variable.is_first_person ? -10.568782 : -6.286554",
-              "variable.is_first_person ? 11.070961 : -5.757948"
+              "variable.is_first_person ? 12.500211 : 0.0",
+              "variable.is_first_person ? -10.568782 : 0.0",
+              "variable.is_first_person ? 11.070961 : 0.0"
             ],
             "0.81667": [
-              "variable.is_first_person ? 12.680759 : -3.763209",
-              "variable.is_first_person ? -10.461373 : -6.179144",
-              "variable.is_first_person ? 11.242414 : -5.586494"
+              "variable.is_first_person ? 12.680759 : 0.0",
+              "variable.is_first_person ? -10.461373 : 0.0",
+              "variable.is_first_person ? 11.242414 : 0.0"
             ],
             "0.83333": [
-              "variable.is_first_person ? 12.851235 : -3.592733",
-              "variable.is_first_person ? -10.360889 : -6.07866",
-              "variable.is_first_person ? 11.403473 : -5.425435"
+              "variable.is_first_person ? 12.851235 : 0.0",
+              "variable.is_first_person ? -10.360889 : 0.0",
+              "variable.is_first_person ? 11.403473 : 0.0"
             ],
             "0.85": [
-              "variable.is_first_person ? 13.010148 : -3.433819",
-              "variable.is_first_person ? -10.268403 : -5.986174",
-              "variable.is_first_person ? 11.552628 : -5.276281"
+              "variable.is_first_person ? 13.010148 : 0.0",
+              "variable.is_first_person ? -10.268403 : 0.0",
+              "variable.is_first_person ? 11.552628 : 0.0"
             ],
             "0.86667": [
-              "variable.is_first_person ? 13.155997 : -3.287971",
-              "variable.is_first_person ? -10.184987 : -5.902758",
-              "variable.is_first_person ? 11.688369 : -5.140539"
+              "variable.is_first_person ? 13.155997 : 0.0",
+              "variable.is_first_person ? -10.184987 : 0.0",
+              "variable.is_first_person ? 11.688369 : 0.0"
             ],
             "0.88333": [
-              "variable.is_first_person ? 13.28727 : -3.156698",
-              "variable.is_first_person ? -10.111722 : -5.829493",
-              "variable.is_first_person ? 11.809189 : -5.01972"
+              "variable.is_first_person ? 13.28727 : 0.0",
+              "variable.is_first_person ? -10.111722 : 0.0",
+              "variable.is_first_person ? 11.809189 : 0.0"
             ],
             "0.9": [
-              "variable.is_first_person ? 13.402453 : -3.041514",
-              "variable.is_first_person ? -10.049691 : -5.767462",
-              "variable.is_first_person ? 11.913579 : -4.91533"
+              "variable.is_first_person ? 13.402453 : 0.0",
+              "variable.is_first_person ? -10.049691 : 0.0",
+              "variable.is_first_person ? 11.913579 : 0.0"
             ],
             "0.91667": [
-              "variable.is_first_person ? 13.5 : -2.943967",
-              "variable.is_first_person ? -10.0 : -5.717771",
-              "variable.is_first_person ? 12.0 : -4.828908"
+              "variable.is_first_person ? 13.5 : 0.0",
+              "variable.is_first_person ? -10.0 : 0.0",
+              "variable.is_first_person ? 12.0 : 0.0"
             ]
           },
           "rotation": {
@@ -90008,284 +88038,284 @@
         "leftarm": {
           "position": {
             "0": [
-              "variable.is_first_person ? -13.5 : 2.943967",
-              "variable.is_first_person ? -10.0 : -5.717771",
-              "variable.is_first_person ? 12.0 : -4.828908"
+              "variable.is_first_person ? -13.5 : 0.0",
+              "variable.is_first_person ? -10.0 : 0.0",
+              "variable.is_first_person ? 12.0 : 0.0"
             ],
             "0.01667": [
-              "variable.is_first_person ? -13.402411 : 3.041557",
-              "variable.is_first_person ? -10.049713 : -5.767484",
-              "variable.is_first_person ? 11.91354 : -4.915368"
+              "variable.is_first_person ? -13.402411 : 0.0",
+              "variable.is_first_person ? -10.049713 : 0.0",
+              "variable.is_first_person ? 11.91354 : 0.0"
             ],
             "0.03333": [
-              "variable.is_first_person ? -13.28722 : 3.156747",
-              "variable.is_first_person ? -10.111749 : -5.82952",
-              "variable.is_first_person ? 11.809144 : -5.019765"
+              "variable.is_first_person ? -13.28722 : 0.0",
+              "variable.is_first_person ? -10.111749 : 0.0",
+              "variable.is_first_person ? 11.809144 : 0.0"
             ],
             "0.05": [
-              "variable.is_first_person ? -13.155941 : 3.288026",
-              "variable.is_first_person ? -10.185019 : -5.90279",
-              "variable.is_first_person ? 11.688318 : -5.140591"
+              "variable.is_first_person ? -13.155941 : 0.0",
+              "variable.is_first_person ? -10.185019 : 0.0",
+              "variable.is_first_person ? 11.688318 : 0.0"
             ],
             "0.06667": [
-              "variable.is_first_person ? -13.010087 : 3.43388",
-              "variable.is_first_person ? -10.268438 : -5.986209",
-              "variable.is_first_person ? 11.552571 : -5.276338"
+              "variable.is_first_person ? -13.010087 : 0.0",
+              "variable.is_first_person ? -10.268438 : 0.0",
+              "variable.is_first_person ? 11.552571 : 0.0"
             ],
             "0.08333": [
-              "variable.is_first_person ? -12.851169 : 3.592799",
-              "variable.is_first_person ? -10.360928 : -6.078699",
-              "variable.is_first_person ? 11.403411 : -5.425497"
+              "variable.is_first_person ? -12.851169 : 0.0",
+              "variable.is_first_person ? -10.360928 : 0.0",
+              "variable.is_first_person ? 11.403411 : 0.0"
             ],
             "0.1": [
-              "variable.is_first_person ? -12.680688 : 3.763279",
-              "variable.is_first_person ? -10.461414 : -6.179186",
-              "variable.is_first_person ? 11.242348 : -5.58656"
+              "variable.is_first_person ? -12.680688 : 0.0",
+              "variable.is_first_person ? -10.461414 : 0.0",
+              "variable.is_first_person ? 11.242348 : 0.0"
             ],
             "0.11667": [
-              "variable.is_first_person ? -12.500137 : 3.94383",
-              "variable.is_first_person ? -10.568827 : -6.286598",
-              "variable.is_first_person ? 11.07089 : -5.758018"
+              "variable.is_first_person ? -12.500137 : 0.0",
+              "variable.is_first_person ? -10.568827 : 0.0",
+              "variable.is_first_person ? 11.07089 : 0.0"
             ],
             "0.13333": [
-              "variable.is_first_person ? -12.310991 : 4.132976",
-              "variable.is_first_person ? -10.682097 : -6.399868",
-              "variable.is_first_person ? 10.890547 : -5.938361"
+              "variable.is_first_person ? -12.310991 : 0.0",
+              "variable.is_first_person ? -10.682097 : 0.0",
+              "variable.is_first_person ? 10.890547 : 0.0"
             ],
             "0.15": [
-              "variable.is_first_person ? -12.114709 : 4.329258",
-              "variable.is_first_person ? -10.800157 : -6.517928",
-              "variable.is_first_person ? 10.70283 : -6.126078"
+              "variable.is_first_person ? -12.114709 : 0.0",
+              "variable.is_first_person ? -10.800157 : 0.0",
+              "variable.is_first_person ? 10.70283 : 0.0"
             ],
             "0.16667": [
-              "variable.is_first_person ? -11.91273 : 4.531238",
-              "variable.is_first_person ? -10.921938 : -6.639709",
-              "variable.is_first_person ? 10.509249 : -6.31966"
+              "variable.is_first_person ? -11.91273 : 0.0",
+              "variable.is_first_person ? -10.921938 : 0.0",
+              "variable.is_first_person ? 10.509249 : 0.0"
             ],
             "0.18333": [
-              "variable.is_first_person ? -11.706469 : 4.737498",
-              "variable.is_first_person ? -11.046369 : -6.76414",
-              "variable.is_first_person ? 10.311314 : -6.517594"
+              "variable.is_first_person ? -11.706469 : 0.0",
+              "variable.is_first_person ? -11.046369 : 0.0",
+              "variable.is_first_person ? 10.311314 : 0.0"
             ],
             "0.2": [
-              "variable.is_first_person ? -11.497321 : 4.946647",
-              "variable.is_first_person ? -11.172371 : -6.890142",
-              "variable.is_first_person ? 10.110537 : -6.718371"
+              "variable.is_first_person ? -11.497321 : 0.0",
+              "variable.is_first_person ? -11.172371 : 0.0",
+              "variable.is_first_person ? 10.110537 : 0.0"
             ],
             "0.21667": [
-              "variable.is_first_person ? -11.286655 : 5.157313",
-              "variable.is_first_person ? -11.298858 : -7.016629",
-              "variable.is_first_person ? 9.908431 : -6.920477"
+              "variable.is_first_person ? -11.286655 : 0.0",
+              "variable.is_first_person ? -11.298858 : 0.0",
+              "variable.is_first_person ? 9.908431 : 0.0"
             ],
             "0.23333": [
-              "variable.is_first_person ? -11.075818 : 5.36815",
-              "variable.is_first_person ? -11.424734 : -7.142505",
-              "variable.is_first_person ? 9.706507 : -7.122401"
+              "variable.is_first_person ? -11.075818 : 0.0",
+              "variable.is_first_person ? -11.424734 : 0.0",
+              "variable.is_first_person ? 9.706507 : 0.0"
             ],
             "0.25": [
-              "variable.is_first_person ? -10.866133 : 5.577834",
-              "variable.is_first_person ? -11.548887 : -7.266659",
-              "variable.is_first_person ? 9.506277 : -7.322631"
+              "variable.is_first_person ? -10.866133 : 0.0",
+              "variable.is_first_person ? -11.548887 : 0.0",
+              "variable.is_first_person ? 9.506277 : 0.0"
             ],
             "0.26667": [
-              "variable.is_first_person ? -10.658903 : 5.785064",
-              "variable.is_first_person ? -11.670195 : -7.387966",
-              "variable.is_first_person ? 9.309254 : -7.519654"
+              "variable.is_first_person ? -10.658903 : 0.0",
+              "variable.is_first_person ? -11.670195 : 0.0",
+              "variable.is_first_person ? 9.309254 : 0.0"
             ],
             "0.28333": [
-              "variable.is_first_person ? -10.45541 : 5.988557",
-              "variable.is_first_person ? -11.787515 : -7.505286",
-              "variable.is_first_person ? 9.11695 : -7.711958"
+              "variable.is_first_person ? -10.45541 : 0.0",
+              "variable.is_first_person ? -11.787515 : 0.0",
+              "variable.is_first_person ? 9.11695 : 0.0"
             ],
             "0.3": [
-              "variable.is_first_person ? -10.256917 : 6.18705",
-              "variable.is_first_person ? -11.899688 : -7.61746",
-              "variable.is_first_person ? 8.930878 : -7.89803"
+              "variable.is_first_person ? -10.256917 : 0.0",
+              "variable.is_first_person ? -11.899688 : 0.0",
+              "variable.is_first_person ? 8.930878 : 0.0"
             ],
             "0.31667": [
-              "variable.is_first_person ? -10.064673 : 6.379295",
-              "variable.is_first_person ? -12.005537 : -7.723308",
-              "variable.is_first_person ? 8.75255 : -8.076358"
+              "variable.is_first_person ? -10.064673 : 0.0",
+              "variable.is_first_person ? -12.005537 : 0.0",
+              "variable.is_first_person ? 8.75255 : 0.0"
             ],
             "0.33333": [
-              "variable.is_first_person ? -9.879911 : 6.564056",
-              "variable.is_first_person ? -12.103864 : -7.821635",
-              "variable.is_first_person ? 8.583478 : -8.24543"
+              "variable.is_first_person ? -9.879911 : 0.0",
+              "variable.is_first_person ? -12.103864 : 0.0",
+              "variable.is_first_person ? 8.583478 : 0.0"
             ],
             "0.35": [
-              "variable.is_first_person ? -9.703856 : 6.740111",
-              "variable.is_first_person ? -12.193455 : -7.911226",
-              "variable.is_first_person ? 8.425175 : -8.403733"
+              "variable.is_first_person ? -9.703856 : 0.0",
+              "variable.is_first_person ? -12.193455 : 0.0",
+              "variable.is_first_person ? 8.425175 : 0.0"
             ],
             "0.36667": [
-              "variable.is_first_person ? -9.537724 : 6.906243",
-              "variable.is_first_person ? -12.273076 : -7.990847",
-              "variable.is_first_person ? 8.279152 : -8.549756"
+              "variable.is_first_person ? -9.537724 : 0.0",
+              "variable.is_first_person ? -12.273076 : 0.0",
+              "variable.is_first_person ? 8.279152 : 0.0"
             ],
             "0.38333": [
-              "variable.is_first_person ? -9.382726 : 7.061241",
-              "variable.is_first_person ? -12.34148 : -8.059251",
-              "variable.is_first_person ? 8.14692 : -8.681988"
+              "variable.is_first_person ? -9.382726 : 0.0",
+              "variable.is_first_person ? -12.34148 : 0.0",
+              "variable.is_first_person ? 8.14692 : 0.0"
             ],
             "0.4": [
-              "variable.is_first_person ? -9.24007 : 7.203897",
-              "variable.is_first_person ? -12.397403 : -8.115174",
-              "variable.is_first_person ? 8.029991 : -8.798917"
+              "variable.is_first_person ? -9.24007 : 0.0",
+              "variable.is_first_person ? -12.397403 : 0.0",
+              "variable.is_first_person ? 8.029991 : 0.0"
             ],
             "0.41667": [
-              "variable.is_first_person ? -9.110965 : 7.333002",
-              "variable.is_first_person ? -12.439573 : -8.157345",
-              "variable.is_first_person ? 7.929876 : -8.899033"
+              "variable.is_first_person ? -9.110965 : 0.0",
+              "variable.is_first_person ? -12.439573 : 0.0",
+              "variable.is_first_person ? 7.929876 : 0.0"
             ],
             "0.43333": [
-              "variable.is_first_person ? -8.99662 : 7.447347",
-              "variable.is_first_person ? -12.466711 : -8.184482",
-              "variable.is_first_person ? 7.848084 : -8.980824"
+              "variable.is_first_person ? -8.99662 : 0.0",
+              "variable.is_first_person ? -12.466711 : 0.0",
+              "variable.is_first_person ? 7.848084 : 0.0"
             ],
             "0.45": [
-              "variable.is_first_person ? -8.898252 : 7.545716",
-              "variable.is_first_person ? -12.477533 : -8.195304",
-              "variable.is_first_person ? 7.786128 : -9.04278"
+              "variable.is_first_person ? -8.898252 : 0.0",
+              "variable.is_first_person ? -12.477533 : 0.0",
+              "variable.is_first_person ? 7.786128 : 0.0"
             ],
             "0.46667": [
-              "variable.is_first_person ? -8.898288 : 7.54568",
-              "variable.is_first_person ? -12.477532 : -8.195303",
-              "variable.is_first_person ? 7.786149 : -9.04276"
+              "variable.is_first_person ? -8.898288 : 0.0",
+              "variable.is_first_person ? -12.477532 : 0.0",
+              "variable.is_first_person ? 7.786149 : 0.0"
             ],
             "0.48333": [
-              "variable.is_first_person ? -8.996663 : 7.447304",
-              "variable.is_first_person ? -12.466703 : -8.184475",
-              "variable.is_first_person ? 7.848113 : -8.980795"
+              "variable.is_first_person ? -8.996663 : 0.0",
+              "variable.is_first_person ? -12.466703 : 0.0",
+              "variable.is_first_person ? 7.848113 : 0.0"
             ],
             "0.5": [
-              "variable.is_first_person ? -9.111014 : 7.332954",
-              "variable.is_first_person ? -12.43956 : -8.157331",
-              "variable.is_first_person ? 7.929912 : -8.898996"
+              "variable.is_first_person ? -9.111014 : 0.0",
+              "variable.is_first_person ? -12.43956 : 0.0",
+              "variable.is_first_person ? 7.929912 : 0.0"
             ],
             "0.51667": [
-              "variable.is_first_person ? -9.240125 : 7.203843",
-              "variable.is_first_person ? -12.397383 : -8.115154",
-              "variable.is_first_person ? 8.030035 : -8.798874"
+              "variable.is_first_person ? -9.240125 : 0.0",
+              "variable.is_first_person ? -12.397383 : 0.0",
+              "variable.is_first_person ? 8.030035 : 0.0"
             ],
             "0.53333": [
-              "variable.is_first_person ? -9.382786 : 7.061182",
-              "variable.is_first_person ? -12.341455 : -8.059226",
-              "variable.is_first_person ? 8.14697 : -8.681938"
+              "variable.is_first_person ? -9.382786 : 0.0",
+              "variable.is_first_person ? -12.341455 : 0.0",
+              "variable.is_first_person ? 8.14697 : 0.0"
             ],
             "0.55": [
-              "variable.is_first_person ? -9.537789 : 6.906179",
-              "variable.is_first_person ? -12.273047 : -7.990818",
-              "variable.is_first_person ? 8.279208 : -8.549701"
+              "variable.is_first_person ? -9.537789 : 0.0",
+              "variable.is_first_person ? -12.273047 : 0.0",
+              "variable.is_first_person ? 8.279208 : 0.0"
             ],
             "0.56667": [
-              "variable.is_first_person ? -9.703925 : 6.740043",
-              "variable.is_first_person ? -12.193421 : -7.911192",
-              "variable.is_first_person ? 8.425236 : -8.403672"
+              "variable.is_first_person ? -9.703925 : 0.0",
+              "variable.is_first_person ? -12.193421 : 0.0",
+              "variable.is_first_person ? 8.425236 : 0.0"
             ],
             "0.58333": [
-              "variable.is_first_person ? -9.879983 : 6.563984",
-              "variable.is_first_person ? -12.103827 : -7.821598",
-              "variable.is_first_person ? 8.583544 : -8.245364"
+              "variable.is_first_person ? -9.879983 : 0.0",
+              "variable.is_first_person ? -12.103827 : 0.0",
+              "variable.is_first_person ? 8.583544 : 0.0"
             ],
             "0.6": [
-              "variable.is_first_person ? -10.064748 : 6.379219",
-              "variable.is_first_person ? -12.005496 : -7.723267",
-              "variable.is_first_person ? 8.75262 : -8.076289"
+              "variable.is_first_person ? -10.064748 : 0.0",
+              "variable.is_first_person ? -12.005496 : 0.0",
+              "variable.is_first_person ? 8.75262 : 0.0"
             ],
             "0.61667": [
-              "variable.is_first_person ? -10.256996 : 6.186972",
-              "variable.is_first_person ? -11.899645 : -7.617416",
-              "variable.is_first_person ? 8.930951 : -7.897957"
+              "variable.is_first_person ? -10.256996 : 0.0",
+              "variable.is_first_person ? -11.899645 : 0.0",
+              "variable.is_first_person ? 8.930951 : 0.0"
             ],
             "0.63333": [
-              "variable.is_first_person ? -10.455491 : 5.988477",
-              "variable.is_first_person ? -11.787469 : -7.50524",
-              "variable.is_first_person ? 9.117026 : -7.711882"
+              "variable.is_first_person ? -10.455491 : 0.0",
+              "variable.is_first_person ? -11.787469 : 0.0",
+              "variable.is_first_person ? 9.117026 : 0.0"
             ],
             "0.65": [
-              "variable.is_first_person ? -10.658986 : 5.784982",
-              "variable.is_first_person ? -11.670147 : -7.387918",
-              "variable.is_first_person ? 9.309332 : -7.519576"
+              "variable.is_first_person ? -10.658986 : 0.0",
+              "variable.is_first_person ? -11.670147 : 0.0",
+              "variable.is_first_person ? 9.309332 : 0.0"
             ],
             "0.66667": [
-              "variable.is_first_person ? -10.866217 : 5.577751",
-              "variable.is_first_person ? -11.548838 : -7.266609",
-              "variable.is_first_person ? 9.506356 : -7.322552"
+              "variable.is_first_person ? -10.866217 : 0.0",
+              "variable.is_first_person ? -11.548838 : 0.0",
+              "variable.is_first_person ? 9.506356 : 0.0"
             ],
             "0.68333": [
-              "variable.is_first_person ? -11.075902 : 5.368066",
-              "variable.is_first_person ? -11.424684 : -7.142455",
-              "variable.is_first_person ? 9.706587 : -7.122321"
+              "variable.is_first_person ? -11.075902 : 0.0",
+              "variable.is_first_person ? -11.424684 : 0.0",
+              "variable.is_first_person ? 9.706587 : 0.0"
             ],
             "0.7": [
-              "variable.is_first_person ? -11.286739 : 5.157228",
-              "variable.is_first_person ? -11.298808 : -7.016579",
-              "variable.is_first_person ? 9.908512 : -6.920396"
+              "variable.is_first_person ? -11.286739 : 0.0",
+              "variable.is_first_person ? -11.298808 : 0.0",
+              "variable.is_first_person ? 9.908512 : 0.0"
             ],
             "0.71667": [
-              "variable.is_first_person ? -11.497405 : 4.946563",
-              "variable.is_first_person ? -11.17232 : -6.890092",
-              "variable.is_first_person ? 10.110618 : -6.71829"
+              "variable.is_first_person ? -11.497405 : 0.0",
+              "variable.is_first_person ? -11.17232 : 0.0",
+              "variable.is_first_person ? 10.110618 : 0.0"
             ],
             "0.73333": [
-              "variable.is_first_person ? -11.706552 : 4.737415",
-              "variable.is_first_person ? -11.046319 : -6.76409",
-              "variable.is_first_person ? 10.311394 : -6.517515"
+              "variable.is_first_person ? -11.706552 : 0.0",
+              "variable.is_first_person ? -11.046319 : 0.0",
+              "variable.is_first_person ? 10.311394 : 0.0"
             ],
             "0.75": [
-              "variable.is_first_person ? -11.912812 : 4.531156",
-              "variable.is_first_person ? -10.921889 : -6.63966",
-              "variable.is_first_person ? 10.509327 : -6.319581"
+              "variable.is_first_person ? -11.912812 : 0.0",
+              "variable.is_first_person ? -10.921889 : 0.0",
+              "variable.is_first_person ? 10.509327 : 0.0"
             ],
             "0.76667": [
-              "variable.is_first_person ? -12.114789 : 4.329178",
-              "variable.is_first_person ? -10.800109 : -6.51788",
-              "variable.is_first_person ? 10.702906 : -6.126002"
+              "variable.is_first_person ? -12.114789 : 0.0",
+              "variable.is_first_person ? -10.800109 : 0.0",
+              "variable.is_first_person ? 10.702906 : 0.0"
             ],
             "0.78333": [
-              "variable.is_first_person ? -12.311068 : 4.132899",
-              "variable.is_first_person ? -10.68205 : -6.399821",
-              "variable.is_first_person ? 10.890621 : -5.938287"
+              "variable.is_first_person ? -12.311068 : 0.0",
+              "variable.is_first_person ? -10.68205 : 0.0",
+              "variable.is_first_person ? 10.890621 : 0.0"
             ],
             "0.8": [
-              "variable.is_first_person ? -12.500211 : 3.943756",
-              "variable.is_first_person ? -10.568782 : -6.286554",
-              "variable.is_first_person ? 11.070961 : -5.757948"
+              "variable.is_first_person ? -12.500211 : 0.0",
+              "variable.is_first_person ? -10.568782 : 0.0",
+              "variable.is_first_person ? 11.070961 : 0.0"
             ],
             "0.81667": [
-              "variable.is_first_person ? -12.680759 : 3.763209",
-              "variable.is_first_person ? -10.461373 : -6.179144",
-              "variable.is_first_person ? 11.242414 : -5.586494"
+              "variable.is_first_person ? -12.680759 : 0.0",
+              "variable.is_first_person ? -10.461373 : 0.0",
+              "variable.is_first_person ? 11.242414 : 0.0"
             ],
             "0.83333": [
-              "variable.is_first_person ? -12.851235 : 3.592733",
-              "variable.is_first_person ? -10.360889 : -6.07866",
-              "variable.is_first_person ? 11.403473 : -5.425435"
+              "variable.is_first_person ? -12.851235 : 0.0",
+              "variable.is_first_person ? -10.360889 : 0.0",
+              "variable.is_first_person ? 11.403473 : 0.0"
             ],
             "0.85": [
-              "variable.is_first_person ? -13.010148 : 3.433819",
-              "variable.is_first_person ? -10.268403 : -5.986174",
-              "variable.is_first_person ? 11.552628 : -5.276281"
+              "variable.is_first_person ? -13.010148 : 0.0",
+              "variable.is_first_person ? -10.268403 : 0.0",
+              "variable.is_first_person ? 11.552628 : 0.0"
             ],
             "0.86667": [
-              "variable.is_first_person ? -13.155997 : 3.287971",
-              "variable.is_first_person ? -10.184987 : -5.902758",
-              "variable.is_first_person ? 11.688369 : -5.140539"
+              "variable.is_first_person ? -13.155997 : 0.0",
+              "variable.is_first_person ? -10.184987 : 0.0",
+              "variable.is_first_person ? 11.688369 : 0.0"
             ],
             "0.88333": [
-              "variable.is_first_person ? -13.28727 : 3.156698",
-              "variable.is_first_person ? -10.111722 : -5.829493",
-              "variable.is_first_person ? 11.809189 : -5.01972"
+              "variable.is_first_person ? -13.28727 : 0.0",
+              "variable.is_first_person ? -10.111722 : 0.0",
+              "variable.is_first_person ? 11.809189 : 0.0"
             ],
             "0.9": [
-              "variable.is_first_person ? -13.402453 : 3.041514",
-              "variable.is_first_person ? -10.049691 : -5.767462",
-              "variable.is_first_person ? 11.913579 : -4.91533"
+              "variable.is_first_person ? -13.402453 : 0.0",
+              "variable.is_first_person ? -10.049691 : 0.0",
+              "variable.is_first_person ? 11.913579 : 0.0"
             ],
             "0.91667": [
-              "variable.is_first_person ? -13.5 : 2.943967",
-              "variable.is_first_person ? -10.0 : -5.717771",
-              "variable.is_first_person ? 12.0 : -4.828908"
+              "variable.is_first_person ? -13.5 : 0.0",
+              "variable.is_first_person ? -10.0 : 0.0",
+              "variable.is_first_person ? 12.0 : 0.0"
             ]
           },
           "rotation": {

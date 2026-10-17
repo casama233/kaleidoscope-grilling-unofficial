@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.17",
+  "onion_item": true,
+  "onion_crop": true,
+  "ages": 8,
+  "straw_hat_acquisition": true,
+  "compostable_65_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "onion_to_powder_processing_complete": false,
+  "a2716_canola_chain_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

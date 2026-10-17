@@ -4,7 +4,8 @@
     "description": {
       "identifier": "kaleidoscope_grilling:grill",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.cooking_stations"
       },
       "states": {
         "kaleidoscope_grilling:legged": [
@@ -26,17 +27,12 @@
       }
     },
     "components": {
-      "minecraft:display_name": "tile.kaleidoscope_grilling:grill.name",
-      "minecraft:block_entity": {
-        "container": {
-          "slot_count": 3
-        }
-      },
+      "minecraft:display_name": "kaleidoscope_grilling.display.block.grill",
       "minecraft:geometry": "geometry.kg_a23.grill_flat",
       "minecraft:material_instances": {
         "*": {
           "texture": "kg_a23_grill_unlit",
-          "render_method": "alpha_test",
+          "render_method": "alpha_test_single_sided",
           "ambient_occlusion": 1.0,
           "face_dimming": true
         }
@@ -50,7 +46,7 @@
         ],
         "size": [
           16,
-          6,
+          4,
           12
         ]
       },
@@ -62,7 +58,7 @@
         ],
         "size": [
           16,
-          8,
+          4,
           12
         ]
       },
@@ -71,6 +67,28 @@
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 6
+      },
+      "minecraft:item_visual": {
+        "geometry": "geometry.kg_a283.item_grill",
+        "material_instances": {
+          "*": {
+            "texture": "kg_a23_grill_unlit",
+            "render_method": "alpha_test_single_sided",
+            "ambient_occlusion": 1.0,
+            "face_dimming": true
+          }
+        }
+      },
+      "minecraft:tick": {
+        "interval_range": [
+          1,
+          1
+        ],
+        "looping": true
+      },
+      "kaleidoscope_grilling:grill_tick": {},
+      "minecraft:connection_rule": {
+        "accepts_connections_from": "none"
       }
     },
     "permutations": [
@@ -81,7 +99,7 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_unlit",
-              "render_method": "alpha_test",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             }
@@ -96,22 +114,22 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_lit",
-              "render_method": "alpha_test",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0.0,
               "face_dimming": false
             }
           },
-          "minecraft:light_emission": 13
+          "minecraft:light_emission": 7
         }
       },
       {
         "condition": "q.block_state('kaleidoscope_grilling:legged') == true && q.block_state('kaleidoscope_grilling:lit') == false",
         "components": {
-          "minecraft:geometry": "geometry.kg_a23.grill_legged",
+          "minecraft:geometry": "geometry.kg_a23.grill_flat",
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_unlit",
-              "render_method": "alpha_test",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 1.0,
               "face_dimming": true
             }
@@ -122,16 +140,16 @@
       {
         "condition": "q.block_state('kaleidoscope_grilling:legged') == true && q.block_state('kaleidoscope_grilling:lit') == true",
         "components": {
-          "minecraft:geometry": "geometry.kg_a23.grill_legged_lit",
+          "minecraft:geometry": "geometry.kg_a23.grill_flat_lit",
           "minecraft:material_instances": {
             "*": {
               "texture": "kg_a23_grill_lit",
-              "render_method": "alpha_test",
+              "render_method": "alpha_test_single_sided",
               "ambient_occlusion": 0.0,
               "face_dimming": false
             }
           },
-          "minecraft:light_emission": 13
+          "minecraft:light_emission": 7
         }
       },
       {

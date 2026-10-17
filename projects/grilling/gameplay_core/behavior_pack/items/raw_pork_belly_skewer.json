@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:raw_pork_belly_skewer",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:raw_pork_belly_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.raw_pork_belly_skewer"
       },
       "minecraft:icon": {
         "textures": {
@@ -25,7 +26,7 @@
         "movement_modifier": 0.35
       },
       "minecraft:food": {
-        "can_always_eat": false,
+        "can_always_eat": true,
         "nutrition": 2,
         "saturation_modifier": 0.3
       },
@@ -34,9 +35,11 @@
       },
       "minecraft:tags": {
         "tags": [
-          "minecraft:is_food"
+          "minecraft:is_food",
+          "kaleidoscope_grilling:food_raw_pork_belly_skewer"
         ]
-      }
+      },
+      "minecraft:interact_button": true
     }
   }
 }

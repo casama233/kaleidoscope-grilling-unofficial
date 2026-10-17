@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+/artifacts/review/
+/projects/grilling/gameplay_core/builds/
+*.bundle
+
+# Obtain third-party Cookery inputs separately; publish only owned text patches.
+*Cookery*.mcaddon
+*cookery*.mcaddon
+*Cookery*.mcpack
+*cookery*.mcpack

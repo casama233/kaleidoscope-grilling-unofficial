@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    105
+  ],
+  "source": "PendingSeasoningItem.useOn in maintained Forge1.20.1 and NeoForge1.21.1 Java sources; preserve ordinary 80-tick held use",
+  "before_sha256": "a0530cf9f12a4b17a3d0f180c2b3dd8b7a169cd038d0c85cfac13ee9cd9bdd78",
+  "after_sha256": "37ad481af615f875259d1898dcb7571288126e43ac0d91f89d531d80a8f38b4a",
+  "operations": [
+    {
+      "start": 49205,
+      "end": 49205,
+      "before": "",
+      "after": "// Java PendingSeasoningItem.useOn only places while sneaking. Ordinary use\n  // must leave the pending bottle in its hand for the 80-tick shake.\n  if(isPendingSeasoningId(off.typeId)&&!player.isSneaking)return false;\n  "
+    },
+    {
+      "start": 50373,
+      "end": 50373,
+      "before": "",
+      "after": "f(isPendingSeasoningId(held.typeId)&&!player.isSneaking)return;\n  i"
+    },
+    {
+      "start": 51432,
+      "end": 51432,
+      "before": "",
+      "after": ")return;\n   // A released sneak must not turn a later ordinary use into a queued place.\n   if(isPendingSeasoningId(heldByHand(player,intent.hand)?.typeId)&&!player.isSneaking"
+    }
+  ]
+}

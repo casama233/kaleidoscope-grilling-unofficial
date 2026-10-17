@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.3",
+  "formal_ui_icons": 41,
+  "distinct_icon_hashes": 38,
+  "grill_main_negative_y_geometry": false,
+  "grill_helper_block": true,
+  "grill_helper_cubes": 6,
+  "dash_compiled_and_compared": false,
+  "compiled_packs": [],
+  "minecraft_tested_after_fix": false,
+  "bds_tested_after_fix": false
+}

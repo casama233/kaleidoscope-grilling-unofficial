@@ -1,0 +1,54 @@
+{
+  "version": "A2.7.21",
+  "scope": "Roasted Chicken Wing item + native cooking",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:roasted_chicken_wing",
+    "nutrition": 5,
+    "saturation_modifier": 0.12,
+    "flavor_food_item": true,
+    "texture_git_blob_sha1": "88d0b45b57a7958f185f9b292eda18d5b57dac42"
+  },
+  "recipes": {
+    "locked_input_tag": "kaleidoscope_grilling:ingredients/chicken_wings",
+    "resolved_inputs": [
+      "kaleidoscope_grilling:chicken_wing"
+    ],
+    "output": "kaleidoscope_grilling:roasted_chicken_wing",
+    "java": {
+      "furnace": {
+        "cookingtime": 200,
+        "experience": 0.35
+      },
+      "smoker": {
+        "cookingtime": 100,
+        "experience": 0.35
+      },
+      "campfire": {
+        "cookingtime": 600,
+        "experience": 0.35
+      }
+    },
+    "bedrock_station_tags": [
+      "furnace",
+      "smoker",
+      "campfire",
+      "soul_campfire"
+    ],
+    "station_access_parity": true,
+    "explicit_cookingtime_field_available": false,
+    "explicit_experience_field_available": false,
+    "java_experience_0_35_exact": false
+  },
+  "flavor_food": {
+    "base_food_properties_exact": true,
+    "cuisine_quality_food_scaling_ported": false,
+    "maxim_tooltip_ported": false
+  },
+  "survival_chain": {
+    "chicken_wing_acquisition": "A2.7.10",
+    "roasted_chicken_wing_obtainable_in_survival": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

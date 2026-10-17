@@ -1,0 +1,37 @@
+{
+  "version": "A2.7.39",
+  "scope": "shared crosshair HUD runtime + Cookery oil-pot provider",
+  "shared_hud": {
+    "poll_ticks": 4,
+    "max_distance": 6,
+    "provider_registry": true,
+    "publishes_only_when_signature_changes": true,
+    "actionbar_rawmessage_localized": true,
+    "clears_cache_when_target_missing": true,
+    "no_per_provider_poll_loop": true
+  },
+  "oil_pot_provider": {
+    "uses_cookery_host_block": true,
+    "empty_state": true,
+    "native_fat_state": true,
+    "typed_oil_states": [
+      "canola",
+      "secret_chili",
+      "premium_chili"
+    ],
+    "capacity_and_remaining": true,
+    "uses_shared_block_state_adapter": true
+  },
+  "dedupe": {
+    "a2736_world_property_io_moved_to_adapter": true,
+    "hud_does_not_read_host_dynamic_properties_directly": true,
+    "duplicate_oil_pot_block_created": false
+  },
+  "api": {
+    "minecraft_server": "2.9.0",
+    "view_raycast": "Entity.getBlockFromViewDirection",
+    "display": "ScreenDisplay.setActionBar"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

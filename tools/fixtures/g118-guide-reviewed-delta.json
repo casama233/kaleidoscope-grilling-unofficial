@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    118
+  ],
+  "scope": "Only the reviewed three-language farming and oil-production facts from G117: five existing guide entries; preserve all plain names, aliases, previous deltas and unrelated guide text. Null preimage means a new numbered paragraph.",
+  "locales": {
+    "en_US": {
+      "guide.kg.body.kaleidoscope_grilling:big_vat.2": {
+        "before": "Use the matching bucket to fill or extract it; use an empty hand to view its current fluid and bucket count.",
+        "after": "Use the matching bucket to fill or extract it; use an empty hand to view its current bucket count and capacity."
+      },
+      "guide.kg.body.kaleidoscope_grilling:big_vat.5": {
+        "before": "Crafting-table pattern (· = empty):\\nB·B\\nBUB\\nBBB\\nB = Bricks；U = Bucket",
+        "after": "Craft with 7 Brick items and 1 Bucket. Crafting-table pattern (· = empty):\\nB·B\\nBUB\\nBBB\\nB = Brick; U = Bucket"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia.2": {
+        "before": null,
+        "after": "Houttuynia can also go into a Composter. Each item has a 65% chance to raise the compost level by one."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.2": {
+        "before": "A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press.",
+        "after": "A batch needs 16 progress: an anvil adds 4; Stone, Cobblestone, Deepslate, Cobbled Deepslate, or Blackstone adds 1 per press. After reaching 16, wait another 10 game ticks (about 0.5 seconds) for the oil."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.5": {
+        "before": "Crafting-table pattern (· = empty):\\nLIL\\nF·F\\nLHL\\nL = Any log；I = Iron Ingot；F = Oak Fence；H = Hopper",
+        "after": "Crafting-table pattern (· = empty):\\nLIL\\nF·G\\nLHL\\nL = Any log; I = Iron Ingot; F and G = Any supported fences, including mixed types; H = Hopper"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.6": {
+        "before": null,
+        "after": "Supports 12 vanilla fence types: Oak, Spruce, Birch, Jungle, Acacia, Dark Oak, Mangrove, Cherry, Bamboo, Crimson, Warped, and Nether Brick. The two fence slots may use different types."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.1": {
+        "before": "Acquisition and use: an oil-press by-product. Use it on crops with supported growth states to advance their growth.",
+        "after": "Oil Residue is an oil-press by-product, with 4 produced per batch. Using it on a supported plant makes 2 consecutive bone-meal attempts, each following that plant's own growth rules."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": null,
+        "after": "Currently supports 8 plant types: Canola, Onion, Sweet Potato, Houttuynia, Sichuan Pepper Saplings, Wheat, Carrots, and Potatoes. Other plants cannot currently be fertilized with Oil Residue."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": null,
+        "after": "A valid use consumes only 1 Oil Residue in total. Fully grown crops and unsupported targets consume none; Creative mode also consumes none."
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": null,
+        "after": "Each application on a pepper sapling has a 45% chance to advance growth. A valid use still consumes 1 Oil Residue even if neither attempt makes the sapling grow."
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.1": {
+        "before": "Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly, and Bone Meal can also attempt to advance growth.",
+        "after": "Plant a Sichuan Pepper Sapling on a dirt-like block. At light level 9 or higher it can grow randomly. Bone Meal can attempt to advance growth; Oil Residue makes two consecutive attempts."
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.5": {
+        "before": null,
+        "after": "Naturally grown leaves decay when no nearby pepper log supports them. Decay has a 10% chance to drop a sapling and a 2% chance to drop a stick; fruiting leaves also drop 1 Sichuan Pepper. Player-placed leaves do not decay."
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.6": {
+        "before": null,
+        "after": "Pepper saplings and leaves can both go into a Composter. Each item has a 30% chance to raise the compost level by one."
+      }
+    },
+    "zh_CN": {
+      "guide.kg.body.kaleidoscope_grilling:big_vat.2": {
+        "before": "用对应的桶可灌入或取出；空手使用会显示当前流体与桶数。",
+        "after": "用对应的桶可灌入或取出；空手使用可查看当前桶数与容量。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:big_vat.5": {
+        "before": "工作台图样（空位为 ·）：\\nB·B\\nBUB\\nBBB\\nB = 红砖块；U = 桶",
+        "after": "用 7 颗红砖和 1 个桶合成。工作台图样（空位为 ·）：\\nB·B\\nBUB\\nBBB\\nB = 红砖；U = 桶"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia.2": {
+        "before": null,
+        "after": "折耳根也可放入堆肥桶；每份有 65% 机会增加一层堆肥。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.2": {
+        "before": "榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。",
+        "after": "榨油进度需要 16 点：铁砧每次推进 4 点；石头、圆石、深板岩、深板岩圆石或黑石每次推进 1 点。达到 16 点后，还需等待 10 游戏刻（约 0.5 秒）才会出油。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.5": {
+        "before": "工作台图样（空位为 ·）：\\nLIL\\nF·F\\nLHL\\nL = 任意原木；I = 铁锭；F = 橡木栅栏；H = 漏斗",
+        "after": "工作台图样（空位为 ·）：\\nLIL\\nF·G\\nLHL\\nL = 任意原木；I = 铁锭；F、G = 下列任意栅栏，可混搭；H = 漏斗"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.6": {
+        "before": null,
+        "after": "支持 12 种原版栅栏：橡木、云杉木、白桦木、丛林木、金合欢木、深色橡木、红树木、樱花木、竹、绯红、诡异和下界砖栅栏。左右两格可以使用不同种类。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.1": {
+        "before": "取得与使用：榨油副产物；对具有受支持生长阶段的作物使用可促进生长。",
+        "after": "油渣是榨油副产物，每批可得到 4 个。对支持的植物使用时，会连续尝试 2 次骨粉施肥，每次都遵循该植物自己的生长规则。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": null,
+        "after": "目前支持 8 类植物：油菜、洋葱、红薯、折耳根、花椒树苗、小麦、胡萝卜和马铃薯。其他植物目前不能用油渣催生。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": null,
+        "after": "一次有效使用合计只消耗 1 个油渣；成熟作物和不受支持的目标不消耗，创造模式也不消耗。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": null,
+        "after": "花椒树苗每次施肥有 45% 机会推进生长；即使两次都没有长大，有效使用仍会消耗 1 个油渣。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.1": {
+        "before": "花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生。",
+        "after": "花椒树苗种在泥土类方块上；光照达到 9 以上会随机生长，骨粉也可尝试催生；油渣会连续尝试施肥两次。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.5": {
+        "before": null,
+        "after": "自然长出的树叶失去附近花椒原木的支撑后会凋落：有 10% 机会掉落树苗、2% 机会掉落木棍；结果的叶子还会掉落 1 份花椒。玩家放置的叶子不会自然凋落。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.6": {
+        "before": null,
+        "after": "花椒树苗和树叶都可放入堆肥桶；每份有 30% 机会增加一层堆肥。"
+      }
+    },
+    "zh_TW": {
+      "guide.kg.body.kaleidoscope_grilling:big_vat.2": {
+        "before": "用對應的桶可灌入或取出；空手使用會顯示目前流體與桶數。",
+        "after": "用對應的桶可灌入或取出；空手使用可查看目前桶數與容量。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:big_vat.5": {
+        "before": "工作台圖樣（空位為 ·）：\\nB·B\\nBUB\\nBBB\\nB = 紅磚塊；U = 桶",
+        "after": "用 7 顆紅磚和 1 個桶合成。工作台圖樣（空位為 ·）：\\nB·B\\nBUB\\nBBB\\nB = 紅磚；U = 桶"
+      },
+      "guide.kg.body.kaleidoscope_grilling:houttuynia.2": {
+        "before": null,
+        "after": "折耳根也可放入堆肥桶；每份有 65% 機會增加一層堆肥。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.2": {
+        "before": "榨油進度需要 16 點：鐵砧每次推進 4 點；石頭、圓石、深板岩、深板岩圓石或黑石每次推進 1 點。",
+        "after": "榨油進度需要 16 點：鐵砧每次推進 4 點；石頭、圓石、深板岩、深板岩圓石或黑石每次推進 1 點。達到 16 點後，還需等待 10 遊戲刻（約 0.5 秒）才會出油。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.5": {
+        "before": "工作台圖樣（空位為 ·）：\\nLIL\\nF·F\\nLHL\\nL = 任意原木；I = 鐵錠；F = 橡木柵欄；H = 漏斗",
+        "after": "工作台圖樣（空位為 ·）：\\nLIL\\nF·G\\nLHL\\nL = 任意原木；I = 鐵錠；F、G = 下列任意柵欄，可混搭；H = 漏斗"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_press.6": {
+        "before": null,
+        "after": "支援 12 種原版柵欄：橡木、杉木、樺木、叢林木、相思木、黑橡木、紅樹林木、櫻花木、竹、緋紅、扭曲和地獄磚柵欄。左右兩格可以使用不同種類。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.1": {
+        "before": "取得與使用：榨油副產物；對具有受支援生長階段的作物使用可促進生長。",
+        "after": "油渣是榨油副產物，每批可得到 4 個。對支援的植物使用時，會連續嘗試 2 次骨粉施肥，每次都遵循該植物自己的生長規則。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.2": {
+        "before": null,
+        "after": "目前支援 8 類植物：油菜、洋蔥、番薯、折耳根、花椒樹苗、小麥、胡蘿蔔和馬鈴薯。其他植物目前不能用油渣催生。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.3": {
+        "before": null,
+        "after": "一次有效使用合計只消耗 1 個油渣；成熟作物和不受支援的目標不消耗，創造模式也不消耗。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:oil_residue.4": {
+        "before": null,
+        "after": "花椒樹苗每次施肥有 45% 機會推進生長；即使兩次都沒有長大，有效使用仍會消耗 1 個油渣。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.1": {
+        "before": "花椒樹苗種在泥土類方塊上；光照達到 9 以上會隨機生長，骨粉也可嘗試催生。",
+        "after": "花椒樹苗種在泥土類方塊上；光照達到 9 以上會隨機生長，骨粉也可嘗試催生；油渣會連續嘗試施肥兩次。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.5": {
+        "before": null,
+        "after": "自然長出的樹葉失去附近花椒原木的支撐後會凋落：有 10% 機會掉落樹苗、2% 機會掉落木棒；結果的葉子還會掉落 1 份花椒。玩家放置的葉子不會自然凋落。"
+      },
+      "guide.kg.body.kaleidoscope_grilling:pepper_sapling.6": {
+        "before": null,
+        "after": "花椒樹苗和樹葉都可放入堆肥桶；每份有 30% 機會增加一層堆肥。"
+      }
+    }
+  }
+}

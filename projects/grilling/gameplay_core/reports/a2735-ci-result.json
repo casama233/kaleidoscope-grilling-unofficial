@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.35",
+  "tested_commit": "6c88876a96f977a1130a805c6c0844ced487c31b",
+  "run_id": "35613928740",
+  "incremental_from_published_a2734": true,
+  "shared_player_io": true,
+  "migrated_consumers": 5,
+  "local_basic_hand_io_helpers_after": 0,
+  "specialized_slot_consumers_retained": 2,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "9667e9adec525ae85e11f224bf38b7a8e4a945d7d60cd1dd4f9f1bc20ea136fd",
+  "brproject_sha256": "50ed41de874f54a4f836ef7ab0363769d6e8fd1132fa23c923e39c0e166e4fac",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

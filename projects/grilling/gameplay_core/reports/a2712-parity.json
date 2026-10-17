@@ -1,0 +1,55 @@
+{
+  "version": "A2.7.12",
+  "scope": "remaining Java KnifeDropHandler parity: cow raw offal + squid tentacle",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_source": {
+    "path": "neoforge-1.21.1/src/main/java/cn/breezeth/kaleidoscope_grilling/world/KnifeDropHandler.java",
+    "git_blob_sha1": "4acd1490f9302e3698795c291e2907bdafaf14c8"
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "knife_ids_owned_by_a2710_contract": true,
+    "raw_cow_offal_item_required": true,
+    "private_scripts_modified": false
+  },
+  "items": {
+    "raw_cow_offal": {
+      "namespace": "kaleidoscope_cookery",
+      "owned_by_grilling": false
+    },
+    "squid_tentacle": {
+      "plain_item": true,
+      "max_stack_size": 64,
+      "texture_git_blob_sha1": "60aab20cf2c9c4b250780430f7114c22ae7b9dff"
+    }
+  },
+  "drops": {
+    "cow": {
+      "entity": "minecraft:cow",
+      "result": "kaleidoscope_cookery:raw_cow_offal",
+      "chance": 1.0,
+      "base_count": "1 + random(0..1)",
+      "looting_bonus": "random(0..Looting level)"
+    },
+    "squid": {
+      "entity": "minecraft:squid",
+      "result": "kaleidoscope_grilling:squid_tentacle",
+      "chance": 0.5,
+      "base_count": "2 + random(0..1)",
+      "looting_bonus": "random(0..Looting level)"
+    }
+  },
+  "trigger_semantics": {
+    "killer": "damageSource.damagingEntity must be minecraft:player",
+    "weapon": "player current main hand must be one of the Cookery kitchen knife ids pinned by A2.7.10",
+    "projectile_note": "no explicit projectile rejection, matching Java causing-player/current-main-hand logic"
+  },
+  "downstream": {
+    "raw_squid_tentacle_skewer_recipe_already_references_squid_tentacle": true,
+    "squid_fixed_skewer_chain_reachable": true,
+    "cow_offal_restores_java_kitchen_knife_bonus_drop": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

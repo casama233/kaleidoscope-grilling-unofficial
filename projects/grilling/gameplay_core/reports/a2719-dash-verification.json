@@ -1,0 +1,28 @@
+{
+  "version": "A2.7.19",
+  "sweet_potato_crop": true,
+  "ages": 8,
+  "food_and_plantable": true,
+  "compostable_65_percent": true,
+  "mature_fortune_0_3_exact": true,
+  "unified_cropdrop_handler": true,
+  "java_branch_draw_order_complete": true,
+  "java_rng_algorithm_identical": false,
+  "sweet_potato_survival_processing_to_sheet_complete": true,
+  "a2718_onion_processing_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 151,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 598,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

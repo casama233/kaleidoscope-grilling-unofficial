@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    86
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only Cookery LivingEntity class import and responsible/victim Hinder gates; G85 producer/cost/movement/audio call sites conserved. Liquid admission is integrated in the owned movement helper.",
+  "base_commit": "93056ea40dd598761a200fa22e91de02c8eadb0a",
+  "before_sha256": "6e56192ba6994a24d1f3135d4cde5384e93043dc6b98e1491ee944f759107f85",
+  "after_sha256": "507c00a0450a28f5774a0dc1fe09a15ffafaf89e422ad1273a63c19ec49e6ffc",
+  "operations": [
+    {
+      "start": 77,
+      "end": 77,
+      "before": "",
+      "after": ".js';\nimport {isCookeryLivingEntity} from './cookery_living_class"
+    },
+    {
+      "start": 80297,
+      "end": 80297,
+      "before": "",
+      "after": "isCookeryLivingEntity("
+    },
+    {
+      "start": 80305,
+      "end": 80338,
+      "before": "?.getComponent('minecraft:health'",
+      "after": ""
+    },
+    {
+      "start": 80703,
+      "end": 80703,
+      "before": "",
+      "after": "isCookeryLivingEntity("
+    },
+    {
+      "start": 80711,
+      "end": 80744,
+      "before": "?.getComponent('minecraft:health'",
+      "after": ""
+    },
+    {
+      "start": 80748,
+      "end": 80748,
+      "before": "",
+      "after": "isCookeryLivingEntity("
+    },
+    {
+      "start": 80760,
+      "end": 80792,
+      "before": ".getComponent('minecraft:health'",
+      "after": ""
+    }
+  ]
+}

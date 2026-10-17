@@ -1,0 +1,26 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:advanced_rack",
+      "menu_category": {
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.storage_utility"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "kaleidoscope_grilling.display.item.advanced_rack"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "advanced_rack"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:advanced_rack_block"
+      }
+    }
+  }
+}

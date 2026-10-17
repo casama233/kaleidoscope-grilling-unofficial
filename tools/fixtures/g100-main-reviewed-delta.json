@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    100
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only flatulence pre-Cloud dimension capture and reuse for sound; G94 origin/pitch, Cloud/impulse/sneak, Hinder/movement conserved. No ground work.",
+  "base_commit": "a039645fcff20dfcc80acd91b709961e119f73da",
+  "before_sha256": "dc5dc0b6d1ba8fd80587c714dcebc5bcb9d0bdc2de5eb74af8a6e62c324077cb",
+  "after_sha256": "a0530cf9f12a4b17a3d0f180c2b3dd8b7a169cd038d0c85cfac13ee9cd9bdd78",
+  "operations": [
+    {
+      "start": 91240,
+      "end": 91667,
+      "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{const dimension=p.dimension,origin=flatulenceSoundOrigin(p);if(origin){const pitch=flatulenceSoundPitch();if(pitch!==undefined)dimension.playSound(FLATULENCE_SOUND_ID,origin,{volume:1,pitch})}}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
+      "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});const dimension=p.dimension;interactionParticleBurst(dimension,p.location,'flatulence');try{const origin=flatulenceSoundOrigin(p);if(origin){const pitch=flatulenceSoundPitch();if(pitch!==undefined)dimension.playSound(FLATULENCE_SOUND_ID,origin,{volume:1,pitch})}}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+    }
+  ]
+}

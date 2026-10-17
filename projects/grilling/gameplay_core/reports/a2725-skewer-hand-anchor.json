@@ -1,0 +1,36 @@
+{
+  "version": "A2.7.25",
+  "scope": "fixed-skewer attachable hand anchor correction",
+  "source_bug": "all 39 fixed/raw/ordinary skewer attachables bound source geometry directly at its model origin, omitting the hand-space offset already used by the A1.16 player-binding prototype",
+  "bedrock_fix": {
+    "attachable_count": 39,
+    "shared_animation_file": "animations/a2725_skewer_hold.animation.json",
+    "root_bone": "root",
+    "first_person_offset": [
+      0,
+      7,
+      2
+    ],
+    "third_person_offset": [
+      0,
+      7,
+      2
+    ],
+    "first_person_condition": "context.is_first_person == 1.0",
+    "third_person_condition": "context.is_first_person == 0.0",
+    "geometry_rebaked": false,
+    "bite_stage_pre_animation_preserved": true
+  },
+  "offset_provenance": {
+    "prototype": "projects/grilling/integration/immersion_lab/resource_pack/models/entity/hand_props.geo.json",
+    "prototype_builder": "development/player_binding/build.py",
+    "raw_beef_stage0_to_prototype_delta": [
+      0,
+      7,
+      2
+    ]
+  },
+  "java_note": "Java item models carry separate first/third-person display transforms. Bedrock item-slot binding already supplies the holder/view basis, so this batch restores the missing local hand anchor only instead of blindly applying Java rotations a second time.",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

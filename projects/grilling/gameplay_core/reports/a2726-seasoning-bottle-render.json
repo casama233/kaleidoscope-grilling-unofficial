@@ -1,0 +1,42 @@
+{
+  "version": "A2.7.26",
+  "scope": "seasoning bottle held and placed render hotfix",
+  "observed_from_user_runtime": {
+    "held": "seasoning bottle/shaker item rendered edge-on as a thin 2D hand-equipped icon",
+    "placed": "one-bottle placement rendered as a full textured cube instead of the authored bottle shape"
+  },
+  "held_fix": {
+    "attachable_items": [
+      "kaleidoscope_grilling:empty_seasoning_bottle",
+      "kaleidoscope_grilling:pending_seasoning",
+      "kaleidoscope_grilling:special_seasoning"
+    ],
+    "shared_geometry": "models/entity/a2726_seasoning_bottle_hand.geo.json",
+    "shared_animation": "animations/a2726_seasoning_bottle_hold.animation.json",
+    "root_binding": "q.item_slot_to_bone_name(context.item_slot)",
+    "first_person_offset": [
+      0,
+      -6,
+      0
+    ],
+    "third_person_offset": [
+      0,
+      -6,
+      0
+    ],
+    "offset_provenance": "integration immersion-lab seasoning hand geometry differs from the converted one-bottle block shell by exactly [0,-6,0]"
+  },
+  "placed_fix": {
+    "geometry_variants": 5,
+    "new_identifier_prefix": "geometry.kg_a2726.seasoning_bottle",
+    "removed_spice_empty_planes": 11,
+    "reason": "the Java empty-content placeholder is a zero-height plane authored with six faces; the gameplay conversion preserved it as a zero-size cube. The hotfix removes that non-visible placeholder from empty bottle shells and forces fresh geometry identifiers so the runtime cannot keep using the previous converted resource.",
+    "java_ambient_occlusion": false,
+    "bedrock_ambient_occlusion": 0.0,
+    "face_dimming": false
+  },
+  "logic_unchanged": true,
+  "known_visual_gap": "pending/special seasoning now use the correct bottle shell while held, but Java remaining/variant-dependent fill appearance is still a later dynamic-render parity task.",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,19 @@
+{
+  "version": "A2.7.39",
+  "tested_commit": "7623447a14a5639d0bf0aba3daa03c27cfc4f3c7",
+  "run_id": "35670020079",
+  "incremental_from_published_a2738": true,
+  "shared_crosshair_hud": true,
+  "oil_pot_provider": true,
+  "shared_block_state_adapter": true,
+  "poll_ticks": 4,
+  "max_distance": 6,
+  "localized_rawmessage": true,
+  "single_poll_loop": true,
+  "duplicate_host_block_created": false,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "540521b0b206788a0080ace83473bb11521ccd3c3fc9f716a16558fcbcf88869",
+  "brproject_sha256": "1a5f4024199e0e4f6db8d7bae8f025771cfd898effa94f4026e50e31d5ba371e",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

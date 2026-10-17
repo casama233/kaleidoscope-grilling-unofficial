@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    119
+  ],
+  "previous_public_commit": "a2656e08d97a6b4c31ef3667b2c957e18c80c8fd",
+  "reviewed_commit": "b37ec0d78b75f61e441a97fe31746dab5aac7fef",
+  "scope": "Only the five G69-conserved files changed by the reviewed shared held transport and owner marker. Original G69 witness bytes remain unchanged.",
+  "changes": {
+    "projects/grilling/gameplay_core/behavior_pack/entities/player.json": {
+      "before_sha256": "27abbba759270142bae9d5ff9f7104c09fd7496dd9882b6aae5919fcb966cf67",
+      "after_sha256": "aff4ac80cc2c8932aa5ce129f2b6ea6b78e8121dab8e73a9b96595f6d418dbe2"
+    },
+    "projects/grilling/gameplay_core/behavior_pack/scripts/secret_held_runtime.js": {
+      "before_sha256": "24d0f5e74d3f2b115283f613624e4882517e8fa7e555a5707fb7372704088a70",
+      "after_sha256": "868adf8540db5fb2c8d37be504128b111f4a6094bc2c50da09f201c69a00b792"
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer.attachable.json": {
+      "before_sha256": "44f3141458982484caaafd389d9ee659b04e1212c175a5d90dc35ae86fd8b61e",
+      "after_sha256": "4b747bf8465a5f2da244bc54db8064a5968868d40b2f45200db2fc0410869396"
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer_java_three_alt.attachable.json": {
+      "before_sha256": "ee40305fd2ca9b1b85d5e8745025b73176c2069409d7c1df6637e5867f7dbc71",
+      "after_sha256": "53be0af73651a9abc185eaa794facbb2b0520c3b41bbd31194a835ef2789cd97"
+    },
+    "projects/grilling/gameplay_core/resource_pack/attachables/unfinished_skewer.attachable.json": {
+      "before_sha256": "f1c9587bfbddc0f33fc3c7f1b5ce627f95861031c6ef0e0d78d70608f639e9b7",
+      "after_sha256": "f889ab6440aab6e6c4132088aff48d08e74a9a081bdc8efdaaef2144d4cb2b14"
+    }
+  }
+}

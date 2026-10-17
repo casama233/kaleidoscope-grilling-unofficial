@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.22",
+  "cold_houttuynia_item": true,
+  "scripted_crafting_equivalent": true,
+  "houttuynia_used": 3,
+  "premium_chili_oil_points_used": 2,
+  "base_fire_resistance_ticks": 1200,
+  "crafting_grid_surface_exact": false,
+  "cuisine_quality_scaling_ported": false,
+  "a2721_roasted_chicken_wing_preserved": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 160,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 601,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

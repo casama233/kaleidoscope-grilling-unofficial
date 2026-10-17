@@ -1,0 +1,21 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_java_eating.piece": {
+      "geometry": "Geometry.java_piece",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.java_piece"
+      ],
+      "part_visibility": [
+        {
+          "*": "v.kg_java_piece_visible == 1"
+        }
+      ]
+    }
+  }
+}

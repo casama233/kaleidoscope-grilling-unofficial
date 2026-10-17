@@ -1,0 +1,16 @@
+{
+  "version": "A2.7.27",
+  "tested_commit": "4bca29ad203055da85609fc4d67c465bc7bde3a3",
+  "run_id": "35603224597",
+  "incremental_from_published_a2726": true,
+  "cookery_recipe_host_reuse": true,
+  "hosted_recipe_rows": 9,
+  "active_recipe_runtime_modules": 1,
+  "startup_api_pings": 1,
+  "beef_override_retained": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "35e4d19c43aef1b99c6f01f673bc91c7e44f7894708754a02286890f0ffae54f",
+  "brproject_sha256": "4603b8b6b7e8b749a3f5b143359ead5a4457c56fd891a5ca9ea180165f03340d",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

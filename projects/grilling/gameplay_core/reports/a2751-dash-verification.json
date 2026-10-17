@@ -1,0 +1,24 @@
+{
+  "version": "A2.7.51",
+  "pepper_forest_worldgen": true,
+  "forest_tag": true,
+  "rarity_denominator": 16,
+  "native_tree_feature": true,
+  "native_feature_rule": true,
+  "new_script_runtime": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 234,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 630,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

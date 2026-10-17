@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/casama233/kaleidoscope-grilling-unofficial",
+  "commit": "a2656e08d97a6b4c31ef3667b2c957e18c80c8fd",
+  "tree": "7d2c9c91d9d3be7713d893c76d64aa458b2cb1db",
+  "scope": "Current repaired-source regression and byte conservation from immutable public PR134. This is not proof of unavailable earlier before/after changes or native-client acceptance.",
+  "files": {
+    "projects/grilling/gameplay_core/behavior_pack/entities/player.json": "27abbba759270142bae9d5ff9f7104c09fd7496dd9882b6aae5919fcb966cf67",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/main.js": "42a4096faada55381ffd0af37a8c46064dfc34d4e5875a325a21e477f0caace2",
+    "projects/grilling/gameplay_core/behavior_pack/scripts/secret_held_runtime.js": "24d0f5e74d3f2b115283f613624e4882517e8fa7e555a5707fb7372704088a70",
+    "projects/grilling/gameplay_core/resource_pack/animations/a287_skewer_held.animation.json": "fb147fb20d4211ff1601137058a0a1b70b60fca6f142086c1a6dd1a22a731189",
+    "projects/grilling/gameplay_core/resource_pack/animations/java_eating_player.animation.json": "4ef03575f562e32f159ebfb9ba35e5bd05047a758b7e6a6004092d17e43d72e4",
+    "projects/grilling/gameplay_core/resource_pack/animations/java_eating_projection.animation.json": "30cf8da05d3d4de9b538690feba3422465ff93c18687390e1f507461467308b1",
+    "projects/grilling/gameplay_core/resource_pack/animations/secret_idle_fp_calibration.animation.json": "c85c1c5582bbb588e042f70f6a4bb80683aae3cde34e9a4661cebbf9191be1ef",
+    "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer.attachable.json": "44f3141458982484caaafd389d9ee659b04e1212c175a5d90dc35ae86fd8b61e",
+    "projects/grilling/gameplay_core/resource_pack/attachables/secret_skewer_java_three_alt.attachable.json": "ee40305fd2ca9b1b85d5e8745025b73176c2069409d7c1df6637e5867f7dbc71",
+    "projects/grilling/gameplay_core/resource_pack/attachables/unfinished_skewer.attachable.json": "f1c9587bfbddc0f33fc3c7f1b5ce627f95861031c6ef0e0d78d70608f639e9b7",
+    "projects/grilling/gameplay_core/resource_pack/models/entity/secret_held.geo.json": "8ef2f5fe8d0bea13a8bc8e44f96624530929f0917205fae22e9fb3790295e6f7",
+    "projects/grilling/gameplay_core/resource_pack/models/entity/secret_helper_sprites.geo.json": "0bb2d2f33de93580361ab73fad63210478aadc389db7cd151fa8a2a7b3c615f6",
+    "projects/grilling/gameplay_core/resource_pack/render_controllers/secret_held.render_controllers.json": "98403b7be47d3ab7feb9af13fc61c2fea99caeef1acfd147c1c8d3b4f394d5df"
+  }
+}

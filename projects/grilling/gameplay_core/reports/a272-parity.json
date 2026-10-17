@@ -1,0 +1,56 @@
+{
+  "version": "A2.7.2",
+  "scope": "Cookery public-API adapter for the sweet-potato Millstone and Chopping Board chain only",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "bp_uuid": "10f37ae2-9ccf-435f-b34b-0eec8191cd94",
+    "rp_uuid": "c89dc8df-c3fc-4bc8-8bd0-527abba76681",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_recipe_api": 1,
+    "events": [
+      "kaleidoscope_cookery:api_ping",
+      "kaleidoscope_cookery:api_ready",
+      "kaleidoscope_cookery:register_recipe"
+    ],
+    "required_capabilities": [
+      "chopping_board",
+      "millstone"
+    ]
+  },
+  "sweet_potato_item": {
+    "nutrition": 3,
+    "saturation_modifier": 0.1,
+    "crop_planting_ported": false
+  },
+  "recipes": {
+    "chopping_board": {
+      "input": "kaleidoscope_grilling:sweet_potato_powder",
+      "result": "kaleidoscope_grilling:raw_sweet_potato_sheet",
+      "count": 1,
+      "cuts": 4,
+      "registered_through_public_api": true
+    },
+    "millstone": {
+      "input": "kaleidoscope_grilling:sweet_potato",
+      "result": "kaleidoscope_grilling:sweet_potato_powder",
+      "count": 1,
+      "chance": 1.0,
+      "registered_through_public_api": true
+    }
+  },
+  "java_audio_difference": {
+    "java_second_cut_bucket_empty_sound": true,
+    "bedrock_public_api_stage_sound_hook": false,
+    "status": "gameplay-equivalent recipe timing/result; second-cut sound remains an explicit audio-only difference"
+  },
+  "create_milling_ported": false,
+  "known_boundaries": [
+    "Cookery station recipes are registered only after api_ready and only when the exact advertised capability is present; the addon does not import Cookery private scripts.",
+    "The Java sweet_potato ItemNameBlockItem also plants the crop. A2.7.2 adds the edible gameplay item required by the Millstone chain; Bedrock crop planting/growth remains A2.8.",
+    "Java replaces the second chopping sound with BUCKET_EMPTY via a Cookery mixin. Cookery Extension Recipe API v1 has no per-cut sound field, so A2.7.2 keeps Cookery normal board audio rather than patching the host.",
+    "Create Milling remains Java/Create integration and is not claimed as Bedrock Cookery parity in this slice."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -1,0 +1,21 @@
+{
+  "version": "A2.7.54",
+  "java_handler": "VillagePepperLootHandler",
+  "village_chest_tables": 15,
+  "mojang_bedrock_samples_commit": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+  "mojang_bedrock_samples_version": "1.26.50.4",
+  "wrapper_strategy": true,
+  "vanilla_snapshots_byte_pinned": true,
+  "shared_bonus_table": true,
+  "village_bundle_overridden": false,
+  "pepper_chance": 0.4,
+  "pepper_min": 3,
+  "pepper_max": 10,
+  "sapling_chance": 0.2,
+  "sapling_count": 1,
+  "new_script_runtime": false,
+  "vanilla_loot_table_override": true,
+  "loot_override_compatibility_risk": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

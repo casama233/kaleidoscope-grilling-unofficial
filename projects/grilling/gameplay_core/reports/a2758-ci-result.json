@@ -1,0 +1,18 @@
+{
+  "version": "A2.7.58",
+  "tested_commit": "01c9d6b0768028032db77b444ac77edded2f0c22",
+  "run_id": "35727926131",
+  "incremental_from_published_a2757": true,
+  "challenge_advancement_parity": true,
+  "advancement_count": 7,
+  "shared_a2753_adapter": true,
+  "frame_aware_messages": true,
+  "new_listener_count": 0,
+  "new_interval_count": 0,
+  "wedding_daily_xp_bug_fixed": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "535fe0762dba5a36f1c277ceef1ab9f938c6f557574d07f380e58df1faeb8cff",
+  "brproject_sha256": "eb5df866b09900351c691827327883d4da7529827aef86a4e63aebe73f0c25d6",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

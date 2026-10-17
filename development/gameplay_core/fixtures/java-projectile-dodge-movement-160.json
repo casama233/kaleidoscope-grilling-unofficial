@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "attempts": 16,
+  "sample_range": 3,
+  "loader_sources": {
+    "forge1.20.1": {
+      "minecraft": "1.20.1",
+      "cookery_version": "1.6.0",
+      "cookery_revision": "2f4e386ce23f49a385ddf003c67fc6415c55417a",
+      "author_source": "src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/event/effect/ProjectileDodgeEvent.java",
+      "author_source_url": "https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/2f4e386ce23f49a385ddf003c67fc6415c55417a/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/event/effect/ProjectileDodgeEvent.java#L73-L90",
+      "publisher_archive": {
+        "sha1": "0c3ec587af28e5a785c0b4a7b8a30f9a8f78f838",
+        "size": 23028853,
+        "url": "https://piston-data.mojang.com/v1/objects/0c3ec587af28e5a785c0b4a7b8a30f9a8f78f838/client.jar"
+      },
+      "source_lookup": "Bounded official HTTP Range reads: ZIP directory plus only three source JSON entries; each entry CRC/size checked. Full archive was neither downloaded nor hashed by this lookup.",
+      "dimension_types": {
+        "data/minecraft/dimension_type/overworld.json": {
+          "json": {
+            "ambient_light": 0.0,
+            "bed_works": true,
+            "coordinate_scale": 1.0,
+            "effects": "minecraft:overworld",
+            "has_ceiling": false,
+            "has_raids": true,
+            "has_skylight": true,
+            "height": 384,
+            "infiniburn": "#minecraft:infiniburn_overworld",
+            "logical_height": 384,
+            "min_y": -64,
+            "monster_spawn_block_light_limit": 0,
+            "monster_spawn_light_level": {
+              "type": "minecraft:uniform",
+              "value": {
+                "max_inclusive": 7,
+                "min_inclusive": 0
+              }
+            },
+            "natural": true,
+            "piglin_safe": false,
+            "respawn_anchor_works": false,
+            "ultrawarm": false
+          },
+          "original_text": "{\n  \"ambient_light\": 0.0,\n  \"bed_works\": true,\n  \"coordinate_scale\": 1.0,\n  \"effects\": \"minecraft:overworld\",\n  \"has_ceiling\": false,\n  \"has_raids\": true,\n  \"has_skylight\": true,\n  \"height\": 384,\n  \"infiniburn\": \"#minecraft:infiniburn_overworld\",\n  \"logical_height\": 384,\n  \"min_y\": -64,\n  \"monster_spawn_block_light_limit\": 0,\n  \"monster_spawn_light_level\": {\n    \"type\": \"minecraft:uniform\",\n    \"value\": {\n      \"max_inclusive\": 7,\n      \"min_inclusive\": 0\n    }\n  },\n  \"natural\": true,\n  \"piglin_safe\": false,\n  \"respawn_anchor_works\": false,\n  \"ultrawarm\": false\n}",
+          "archive_entry_crc32": "ef1cf403",
+          "compressed_size": 273,
+          "uncompressed_size": 569
+        },
+        "data/minecraft/dimension_type/the_end.json": {
+          "json": {
+            "ambient_light": 0.0,
+            "bed_works": false,
+            "coordinate_scale": 1.0,
+            "effects": "minecraft:the_end",
+            "fixed_time": 6000,
+            "has_ceiling": false,
+            "has_raids": true,
+            "has_skylight": false,
+            "height": 256,
+            "infiniburn": "#minecraft:infiniburn_end",
+            "logical_height": 256,
+            "min_y": 0,
+            "monster_spawn_block_light_limit": 0,
+            "monster_spawn_light_level": {
+              "type": "minecraft:uniform",
+              "value": {
+                "max_inclusive": 7,
+                "min_inclusive": 0
+              }
+            },
+            "natural": false,
+            "piglin_safe": false,
+            "respawn_anchor_works": false,
+            "ultrawarm": false
+          },
+          "original_text": "{\n  \"ambient_light\": 0.0,\n  \"bed_works\": false,\n  \"coordinate_scale\": 1.0,\n  \"effects\": \"minecraft:the_end\",\n  \"fixed_time\": 6000,\n  \"has_ceiling\": false,\n  \"has_raids\": true,\n  \"has_skylight\": false,\n  \"height\": 256,\n  \"infiniburn\": \"#minecraft:infiniburn_end\",\n  \"logical_height\": 256,\n  \"min_y\": 0,\n  \"monster_spawn_block_light_limit\": 0,\n  \"monster_spawn_light_level\": {\n    \"type\": \"minecraft:uniform\",\n    \"value\": {\n      \"max_inclusive\": 7,\n      \"min_inclusive\": 0\n    }\n  },\n  \"natural\": false,\n  \"piglin_safe\": false,\n  \"respawn_anchor_works\": false,\n  \"ultrawarm\": false\n}",
+          "archive_entry_crc32": "4814bdb7",
+          "compressed_size": 279,
+          "uncompressed_size": 584
+        },
+        "data/minecraft/dimension_type/the_nether.json": {
+          "json": {
+            "ambient_light": 0.1,
+            "bed_works": false,
+            "coordinate_scale": 8.0,
+            "effects": "minecraft:the_nether",
+            "fixed_time": 18000,
+            "has_ceiling": true,
+            "has_raids": false,
+            "has_skylight": false,
+            "height": 256,
+            "infiniburn": "#minecraft:infiniburn_nether",
+            "logical_height": 128,
+            "min_y": 0,
+            "monster_spawn_block_light_limit": 15,
+            "monster_spawn_light_level": 7,
+            "natural": false,
+            "piglin_safe": true,
+            "respawn_anchor_works": true,
+            "ultrawarm": true
+          },
+          "original_text": "{\n  \"ambient_light\": 0.1,\n  \"bed_works\": false,\n  \"coordinate_scale\": 8.0,\n  \"effects\": \"minecraft:the_nether\",\n  \"fixed_time\": 18000,\n  \"has_ceiling\": true,\n  \"has_raids\": false,\n  \"has_skylight\": false,\n  \"height\": 256,\n  \"infiniburn\": \"#minecraft:infiniburn_nether\",\n  \"logical_height\": 128,\n  \"min_y\": 0,\n  \"monster_spawn_block_light_limit\": 15,\n  \"monster_spawn_light_level\": 7,\n  \"natural\": false,\n  \"piglin_safe\": true,\n  \"respawn_anchor_works\": true,\n  \"ultrawarm\": true\n}",
+          "archive_entry_crc32": "3873f3c4",
+          "compressed_size": 246,
+          "uncompressed_size": 480
+        }
+      }
+    },
+    "neoforge1.21.1": {
+      "minecraft": "1.21.1",
+      "cookery_version": "1.6.0",
+      "cookery_revision": "4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c",
+      "author_source": "src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/event/effect/ProjectileDodgeEvent.java",
+      "author_source_url": "https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/event/effect/ProjectileDodgeEvent.java#L73-L90",
+      "publisher_archive": {
+        "sha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+        "size": 26836906,
+        "url": "https://piston-data.mojang.com/v1/objects/30c73b1c5da787909b2f73340419fdf13b9def88/client.jar"
+      },
+      "source_lookup": "Three source entries read from the existing reviewed official client reference using ZIP entry CRC/size checks; no full archive download or re-hash in this task.",
+      "dimension_types": {
+        "data/minecraft/dimension_type/overworld.json": {
+          "json": {
+            "ambient_light": 0.0,
+            "bed_works": true,
+            "coordinate_scale": 1.0,
+            "effects": "minecraft:overworld",
+            "has_ceiling": false,
+            "has_raids": true,
+            "has_skylight": true,
+            "height": 384,
+            "infiniburn": "#minecraft:infiniburn_overworld",
+            "logical_height": 384,
+            "min_y": -64,
+            "monster_spawn_block_light_limit": 0,
+            "monster_spawn_light_level": {
+              "type": "minecraft:uniform",
+              "max_inclusive": 7,
+              "min_inclusive": 0
+            },
+            "natural": true,
+            "piglin_safe": false,
+            "respawn_anchor_works": false,
+            "ultrawarm": false
+          },
+          "original_text": "{\n  \"ambient_light\": 0.0,\n  \"bed_works\": true,\n  \"coordinate_scale\": 1.0,\n  \"effects\": \"minecraft:overworld\",\n  \"has_ceiling\": false,\n  \"has_raids\": true,\n  \"has_skylight\": true,\n  \"height\": 384,\n  \"infiniburn\": \"#minecraft:infiniburn_overworld\",\n  \"logical_height\": 384,\n  \"min_y\": -64,\n  \"monster_spawn_block_light_limit\": 0,\n  \"monster_spawn_light_level\": {\n    \"type\": \"minecraft:uniform\",\n    \"max_inclusive\": 7,\n    \"min_inclusive\": 0\n  },\n  \"natural\": true,\n  \"piglin_safe\": false,\n  \"respawn_anchor_works\": false,\n  \"ultrawarm\": false\n}",
+          "archive_entry_crc32": "5d5187d1",
+          "compressed_size": 263,
+          "uncompressed_size": 544
+        },
+        "data/minecraft/dimension_type/the_nether.json": {
+          "json": {
+            "ambient_light": 0.1,
+            "bed_works": false,
+            "coordinate_scale": 8.0,
+            "effects": "minecraft:the_nether",
+            "fixed_time": 18000,
+            "has_ceiling": true,
+            "has_raids": false,
+            "has_skylight": false,
+            "height": 256,
+            "infiniburn": "#minecraft:infiniburn_nether",
+            "logical_height": 128,
+            "min_y": 0,
+            "monster_spawn_block_light_limit": 15,
+            "monster_spawn_light_level": 7,
+            "natural": false,
+            "piglin_safe": true,
+            "respawn_anchor_works": true,
+            "ultrawarm": true
+          },
+          "original_text": "{\n  \"ambient_light\": 0.1,\n  \"bed_works\": false,\n  \"coordinate_scale\": 8.0,\n  \"effects\": \"minecraft:the_nether\",\n  \"fixed_time\": 18000,\n  \"has_ceiling\": true,\n  \"has_raids\": false,\n  \"has_skylight\": false,\n  \"height\": 256,\n  \"infiniburn\": \"#minecraft:infiniburn_nether\",\n  \"logical_height\": 128,\n  \"min_y\": 0,\n  \"monster_spawn_block_light_limit\": 15,\n  \"monster_spawn_light_level\": 7,\n  \"natural\": false,\n  \"piglin_safe\": true,\n  \"respawn_anchor_works\": true,\n  \"ultrawarm\": true\n}",
+          "archive_entry_crc32": "3873f3c4",
+          "compressed_size": 246,
+          "uncompressed_size": 480
+        },
+        "data/minecraft/dimension_type/the_end.json": {
+          "json": {
+            "ambient_light": 0.0,
+            "bed_works": false,
+            "coordinate_scale": 1.0,
+            "effects": "minecraft:the_end",
+            "fixed_time": 6000,
+            "has_ceiling": false,
+            "has_raids": true,
+            "has_skylight": false,
+            "height": 256,
+            "infiniburn": "#minecraft:infiniburn_end",
+            "logical_height": 256,
+            "min_y": 0,
+            "monster_spawn_block_light_limit": 0,
+            "monster_spawn_light_level": {
+              "type": "minecraft:uniform",
+              "max_inclusive": 7,
+              "min_inclusive": 0
+            },
+            "natural": false,
+            "piglin_safe": false,
+            "respawn_anchor_works": false,
+            "ultrawarm": false
+          },
+          "original_text": "{\n  \"ambient_light\": 0.0,\n  \"bed_works\": false,\n  \"coordinate_scale\": 1.0,\n  \"effects\": \"minecraft:the_end\",\n  \"fixed_time\": 6000,\n  \"has_ceiling\": false,\n  \"has_raids\": true,\n  \"has_skylight\": false,\n  \"height\": 256,\n  \"infiniburn\": \"#minecraft:infiniburn_end\",\n  \"logical_height\": 256,\n  \"min_y\": 0,\n  \"monster_spawn_block_light_limit\": 0,\n  \"monster_spawn_light_level\": {\n    \"type\": \"minecraft:uniform\",\n    \"max_inclusive\": 7,\n    \"min_inclusive\": 0\n  },\n  \"natural\": false,\n  \"piglin_safe\": false,\n  \"respawn_anchor_works\": false,\n  \"ultrawarm\": false\n}",
+          "archive_entry_crc32": "9f558315",
+          "compressed_size": 269,
+          "uncompressed_size": 559
+        }
+      }
+    }
+  },
+  "vanilla_bounds": {
+    "minecraft:overworld": {
+      "source_path": "data/minecraft/dimension_type/overworld.json",
+      "min": -64,
+      "max": 319,
+      "logical_height": 384,
+      "build_height": 384
+    },
+    "minecraft:nether": {
+      "source_path": "data/minecraft/dimension_type/the_nether.json",
+      "min": 0,
+      "max": 127,
+      "logical_height": 128,
+      "build_height": 256
+    },
+    "minecraft:the_end": {
+      "source_path": "data/minecraft/dimension_type/the_end.json",
+      "min": 0,
+      "max": 255,
+      "logical_height": 256,
+      "build_height": 256
+    }
+  },
+  "native_height_range_role": "Coverage guard only; API max is never subtracted or treated as a Java logical height. Native endpoint acceptance still requires the selected engine observation.",
+  "dismount_contract": {
+    "target_component": "minecraft:riding",
+    "mount_property": "entityRidingOn",
+    "mount_component": "minecraft:rideable",
+    "method": "ejectRider",
+    "scope": "only the target rider before each attempt while still riding; never eject all riders"
+  },
+  "boundaries": [
+    "Unknown/custom logical dimensions are unsupported; do not infer a vanilla identity from heightRange.",
+    "No Java ground search, blocksMotion/noCollision/no-liquid AABB equivalence, navigation stop or TELEPORT game event is added.",
+    "Randomness uses the same uniform distribution with Math.random; Java actor RNG sequences are not available.",
+    "Dismount and tryTeleport run only in mutable script context; API reads/writes and actual native rider state must be observed separately.",
+    "Native heightRange coverage is not proof of inclusive/exclusive endpoint convention or native collision semantics."
+  ],
+  "client": false
+}

@@ -1,0 +1,459 @@
+{
+  "version": "A2.7.3-render-baseline",
+  "renderer": "pinned Java model + authored GUI transform -> independent Bedrock UI icon",
+  "count": 41,
+  "items": [
+    {
+      "id": "dark_grilling",
+      "model": "kaleidoscope_grilling:item/ordinary_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 684
+    },
+    {
+      "id": "grilled_beef_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_beef_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 621
+    },
+    {
+      "id": "grilled_bun_slice_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_bun_slice_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 566
+    },
+    {
+      "id": "grilled_caterpillar_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_caterpillar_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 592
+    },
+    {
+      "id": "grilled_chicken_skin_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_chicken_skin_skewer",
+      "bbox": [
+        25,
+        5,
+        39,
+        59
+      ],
+      "opaque_pixels": 407
+    },
+    {
+      "id": "grilled_ender_pearl_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_ender_pearl_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 658
+    },
+    {
+      "id": "grilled_fish_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_fish_skewer",
+      "bbox": [
+        26,
+        5,
+        38,
+        59
+      ],
+      "opaque_pixels": 488
+    },
+    {
+      "id": "grilled_fried_egg_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_fried_egg_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 556
+    },
+    {
+      "id": "grilled_gluten_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_gluten_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 629
+    },
+    {
+      "id": "grilled_golden_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_golden_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 646
+    },
+    {
+      "id": "grilled_lamb_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_lamb_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 614
+    },
+    {
+      "id": "grilled_meat_and_bone_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_meat_and_bone_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 704
+    },
+    {
+      "id": "grilled_meatball_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_meatball_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 558
+    },
+    {
+      "id": "grilled_mid_wing_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_mid_wing_skewer",
+      "bbox": [
+        25,
+        5,
+        39,
+        59
+      ],
+      "opaque_pixels": 569
+    },
+    {
+      "id": "grilled_mushroom_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_mushroom_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 511
+    },
+    {
+      "id": "grilled_pork_belly_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_pork_belly_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 628
+    },
+    {
+      "id": "grilled_potato_slice_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_potato_slice_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 546
+    },
+    {
+      "id": "grilled_slime_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_slime_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 580
+    },
+    {
+      "id": "grilled_squid_tentacle_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_squid_tentacle_skewer",
+      "bbox": [
+        21,
+        5,
+        43,
+        59
+      ],
+      "opaque_pixels": 681
+    },
+    {
+      "id": "grilled_sweet_potato_sheet_skewer",
+      "model": "kaleidoscope_grilling:item/grilled_sweet_potato_sheet_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 546
+    },
+    {
+      "id": "mysterious_skewer",
+      "model": "kaleidoscope_grilling:item/ordinary_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 684
+    },
+    {
+      "id": "ordinary_skewer",
+      "model": "kaleidoscope_grilling:item/ordinary_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 684
+    },
+    {
+      "id": "raw_beef_skewer",
+      "model": "kaleidoscope_grilling:item/raw_beef_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 621
+    },
+    {
+      "id": "raw_bun_slice_skewer",
+      "model": "kaleidoscope_grilling:item/raw_bun_slice_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 566
+    },
+    {
+      "id": "raw_caterpillar_skewer",
+      "model": "kaleidoscope_grilling:item/raw_caterpillar_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 592
+    },
+    {
+      "id": "raw_chicken_skin_skewer",
+      "model": "kaleidoscope_grilling:item/raw_chicken_skin_skewer",
+      "bbox": [
+        25,
+        5,
+        39,
+        59
+      ],
+      "opaque_pixels": 407
+    },
+    {
+      "id": "raw_ender_pearl_skewer",
+      "model": "kaleidoscope_grilling:item/raw_ender_pearl_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 658
+    },
+    {
+      "id": "raw_fish_skewer",
+      "model": "kaleidoscope_grilling:item/raw_fish_skewer",
+      "bbox": [
+        26,
+        5,
+        38,
+        59
+      ],
+      "opaque_pixels": 488
+    },
+    {
+      "id": "raw_fried_egg_skewer",
+      "model": "kaleidoscope_grilling:item/raw_fried_egg_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 556
+    },
+    {
+      "id": "raw_gluten_skewer",
+      "model": "kaleidoscope_grilling:item/raw_gluten_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 629
+    },
+    {
+      "id": "raw_golden_skewer",
+      "model": "kaleidoscope_grilling:item/raw_golden_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 646
+    },
+    {
+      "id": "raw_lamb_skewer",
+      "model": "kaleidoscope_grilling:item/raw_lamb_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 614
+    },
+    {
+      "id": "raw_meat_and_bone_skewer",
+      "model": "kaleidoscope_grilling:item/raw_meat_and_bone_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 704
+    },
+    {
+      "id": "raw_meatball_skewer",
+      "model": "kaleidoscope_grilling:item/raw_meatball_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 558
+    },
+    {
+      "id": "raw_mid_wing_skewer",
+      "model": "kaleidoscope_grilling:item/raw_mid_wing_skewer",
+      "bbox": [
+        25,
+        5,
+        39,
+        59
+      ],
+      "opaque_pixels": 569
+    },
+    {
+      "id": "raw_mushroom_skewer",
+      "model": "kaleidoscope_grilling:item/raw_mushroom_skewer",
+      "bbox": [
+        22,
+        5,
+        42,
+        59
+      ],
+      "opaque_pixels": 511
+    },
+    {
+      "id": "raw_pork_belly_skewer",
+      "model": "kaleidoscope_grilling:item/raw_pork_belly_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 628
+    },
+    {
+      "id": "raw_potato_slice_skewer",
+      "model": "kaleidoscope_grilling:item/raw_potato_slice_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 546
+    },
+    {
+      "id": "raw_slime_skewer",
+      "model": "kaleidoscope_grilling:item/raw_slime_skewer",
+      "bbox": [
+        23,
+        5,
+        41,
+        59
+      ],
+      "opaque_pixels": 580
+    },
+    {
+      "id": "raw_squid_tentacle_skewer",
+      "model": "kaleidoscope_grilling:item/raw_squid_tentacle_skewer",
+      "bbox": [
+        21,
+        5,
+        43,
+        59
+      ],
+      "opaque_pixels": 681
+    },
+    {
+      "id": "raw_sweet_potato_sheet_skewer",
+      "model": "kaleidoscope_grilling:item/raw_sweet_potato_sheet_skewer",
+      "bbox": [
+        24,
+        5,
+        40,
+        59
+      ],
+      "opaque_pixels": 546
+    }
+  ],
+  "minecraft_tested": false
+}

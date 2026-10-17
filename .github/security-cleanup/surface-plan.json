@@ -1,0 +1,28 @@
+{
+  "build": {},
+  "delete_actions_artifacts": [
+    {
+      "artifact_id": 11960955651,
+      "name": "native-icon-authored-source",
+      "original_sha256": "064c4db853cc83c2802c3ff601d14c9cc7bf6b7a0867d17974a324cbf6097921",
+      "original_size": 191598661,
+      "original_updated_at": "2026-10-15T09:09:53Z",
+      "repository": "casama233/kaleidoscope-grilling-unofficial",
+      "run_id": 38710858992
+    },
+    {
+      "artifact_id": 11710034312,
+      "name": "motion-workspace",
+      "original_sha256": "7584efe5d29d5c872e81f49735729444ac93d5aa027933cb78951dfe07e3b507",
+      "original_size": 194026884,
+      "original_updated_at": "2026-10-11T18:03:36Z",
+      "repository": "casama233/kaleidoscope-grilling-unofficial",
+      "run_id": 38162191972
+    }
+  ],
+  "delete_run_logs": [],
+  "patch_release_bodies": [],
+  "purpose": "Authorized exact-object public repository surface cleanup",
+  "replace_release_assets": [],
+  "schema_version": 2
+}

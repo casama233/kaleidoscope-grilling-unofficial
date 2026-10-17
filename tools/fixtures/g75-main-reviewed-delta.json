@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    75
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only plated secret-skewer canonical alias finish dispatch, after pinned public PR138 G74",
+  "base_commit": "d11185cce41a1f6f134247af9f1a6cf80117cd2b",
+  "before_sha256": "7788ca0e01d497e22e96a11991c6f33a96cfce6b08f1d0c93778d17d87850838",
+  "after_sha256": "c01d01737c5124df0eacb032817c25c271bfa905b55a140c80efe39bb42d1727",
+  "operations": [
+    {
+      "start": 64784,
+      "end": 64841,
+      "before": " const id=eaten.typeId;dangerousPreservation(player,id);\n",
+      "after": " const id=canonicalFoodId(eaten.typeId);dangerousPreservation(player,id);\n"
+    }
+  ]
+}

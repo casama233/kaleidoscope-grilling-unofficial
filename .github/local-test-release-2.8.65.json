@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "version": [
+    2,
+    8,
+    65
+  ],
+  "mode": "local-pending-native-test",
+  "publication_status": "not_published",
+  "bounded_native_evidence": "docs/G65-SEASONING-NATIVE-EVIDENCE.json",
+  "bounded_native_evidence_sha256": "ce7b541e893e6111ea2943d24ca91992bc1da2d30f9ddafcf184f2842a0b97c6",
+  "source_trees": {
+    "BP": {
+      "sha256": "d42cc631a82b588ba1adc8b9c41703b07e64162d87d6ea367add571c48adf29a",
+      "files": 560
+    },
+    "RP": {
+      "sha256": "7771ef3f74ea87017145d906202db31c6d9e41178a3b898738d9537c0e7f678c",
+      "files": 1882
+    }
+  },
+  "complete_client_acceptance": false,
+  "java_all_view_parity": false,
+  "production_ready": false,
+  "saved_world_migration": false,
+  "public_base_commit": "81df62d2574c23175a8027fdcfdf1d3eec0a315b",
+  "source_binding": "Exact canonical release runtime fingerprints; private media/export inventories are retained outside the public source"
+}

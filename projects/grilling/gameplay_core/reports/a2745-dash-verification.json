@@ -1,0 +1,23 @@
+{
+  "version": "A2.7.45",
+  "skewer_recipe_hud_provider": true,
+  "shared_crosshair_runtime": true,
+  "existing_recipe_chain_reused": true,
+  "single_poll_loop": true,
+  "duplicate_recipe_state_parser": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 200,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 610,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

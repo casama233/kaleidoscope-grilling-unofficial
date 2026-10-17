@@ -1,0 +1,28 @@
+{
+  "version": "A2.7.26",
+  "seasoning_geometry_variants": 5,
+  "positive_shell_cubes": 99,
+  "held_attachables": 3,
+  "hand_offset": [
+    0,
+    -6,
+    0
+  ],
+  "removed_empty_planes": 11,
+  "logic_unchanged": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 165,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 608,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

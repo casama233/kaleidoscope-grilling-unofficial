@@ -1,0 +1,53 @@
+{
+  "version": "A2.7.24",
+  "scope": "Cookery red chili -> red chili powder -> secret chili oil survival chain",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:red_chili_powder",
+    "texture_git_blob_sha1": "57936897efae12b743a539f0bf1dac54d45dda39",
+    "stack_size": 64
+  },
+  "creative_catalog": {
+    "a2723_group_preserved": true,
+    "catalog_entry_count": 77,
+    "java_registration_order_neighbors": [
+      "kaleidoscope_grilling:canola_powder",
+      "kaleidoscope_grilling:red_chili_powder",
+      "kaleidoscope_grilling:onion"
+    ]
+  },
+  "millstone": {
+    "java_recipe_id": "kaleidoscope_grilling:millstone/red_chili_powder",
+    "type": "kaleidoscope_cookery:millstone",
+    "input": "kaleidoscope_cookery:red_chili",
+    "output": "kaleidoscope_grilling:red_chili_powder",
+    "count": 1,
+    "chance": 1.0,
+    "bedrock_registration": "Cookery 1.0.6 public register_recipe extension API",
+    "cookery_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "additional_api_ping": false
+  },
+  "secret_chili_oil": {
+    "java_recipe_type": "minecraft:crafting_shapeless",
+    "ingredients": {
+      "kaleidoscope_grilling:canola_oil_bucket": 1,
+      "kaleidoscope_grilling:red_chili_powder": 3
+    },
+    "result": "kaleidoscope_grilling:secret_chili_oil_bucket",
+    "native_bedrock_shapeless": true,
+    "ingredient_counts_exact": true
+  },
+  "survival_chain": {
+    "cookery_red_chili_to_powder": true,
+    "powder_plus_canola_to_secret_chili_bucket": true,
+    "secret_chili_bucket_world_fluid_and_vat_support": "A2.3/A2.6",
+    "secret_chili_oil_survival_entry_complete": true
+  },
+  "create_optional_processing": {
+    "java_create_milling_recipe_exists": true,
+    "bedrock_create_ported": false,
+    "required_for_survival_chain": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

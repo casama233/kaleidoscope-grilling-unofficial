@@ -1,0 +1,20 @@
+{
+  "version": "A2.7.26",
+  "tested_commit": "f8878277136f29649f42a1632b2d989ddbe5f206",
+  "run_id": "35601444625",
+  "incremental_from_published_a2725": true,
+  "seasoning_geometry_variants": 5,
+  "held_attachables": 3,
+  "removed_empty_planes": 11,
+  "hand_offset": [
+    0,
+    -6,
+    0
+  ],
+  "logic_unchanged": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "06e7967c79f778f352868e993fe012d4e3aa84dce407bc8b2ce41bf5c8305903",
+  "brproject_sha256": "d1a8626bf6c91f4c125858e0f67c5bb99653054b6b834157230dc5689069cadf",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

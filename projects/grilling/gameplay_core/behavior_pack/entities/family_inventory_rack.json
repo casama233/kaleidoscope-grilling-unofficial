@@ -1,0 +1,47 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:inventory_rack_v1",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "kg_storage_inventory"
+        ]
+      },
+      "minecraft:persistent": {},
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:collision_box": {
+        "width": 0,
+        "height": 0
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:fire_immune": {},
+      "minecraft:inventory": {
+        "inventory_size": 9,
+        "container_type": "inventory",
+        "private": true,
+        "restrict_to_owner": true,
+        "can_be_siphoned_from": false
+      }
+    }
+  }
+}

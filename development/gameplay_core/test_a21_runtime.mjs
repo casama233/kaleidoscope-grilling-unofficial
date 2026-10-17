@@ -1,3 +1,4 @@
+import {canonicalFoodId} from '../../projects/grilling/gameplay_core/behavior_pack/scripts/eating_profile_ids.js';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -70,7 +71,7 @@ function interact(block){const e={block,player,cancel:false};beforeEvents.player
 function place(block){afterEvents.playerPlaceBlock.emit({block,player})}
 function itemComplete(stack){afterEvents.itemCompleteUse.emit({source:player,itemStack:stack})}
 const math=Object.create(Math);math.random=()=>.2;
-const context=vm.createContext({console,JSON,Map,Set,Object,Array,Number,String,Error,Boolean,Math:math});
+const context=vm.createContext({canonicalFoodId,forgetEatingItem(){},console,JSON,Map,Set,Object,Array,Number,String,Error,Boolean,Math:math});
 const root=new URL('../../projects/grilling/gameplay_core/behavior_pack/scripts/',import.meta.url);
 const mods={};
 for(const n of ['main.js','data.js','core_logic.js'])mods[n]=new vm.SourceTextModule(fs.readFileSync(new URL(n,root),'utf8'),{context,identifier:n});

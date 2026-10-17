@@ -1,0 +1,47 @@
+{
+  "version": "A2.7.18",
+  "scope": "Onion -> Cookery Millstone -> Onion Powder",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_recipe": {
+    "id": "kaleidoscope_grilling:millstone/onion_powder",
+    "type": "kaleidoscope_cookery:millstone",
+    "input_tag": "kaleidoscope_grilling:ingredients/onions",
+    "tag_chain": [
+      "#c:crops/onion",
+      "kaleidoscope_grilling:onion"
+    ],
+    "locked_baseline_resolved_inputs": [
+      "kaleidoscope_grilling:onion"
+    ],
+    "result": "kaleidoscope_grilling:onion_powder",
+    "count": 1,
+    "chance": 1.0
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_api": 1,
+    "registration": "public register_recipe event, gated by millstone capability",
+    "additional_api_ping": false,
+    "private_scripts_modified": false
+  },
+  "common_tag_compatibility": {
+    "java_common_tag_extensible": true,
+    "bedrock_third_party_common_tag_expansion": false,
+    "locked_baseline_native_input_exact": true,
+    "reason": "Cookery Bedrock extension recipe input is an item identifier; the locked Java baseline resolves to Grilling Onion only, but Java modpacks may add third-party onions to c:crops/onion."
+  },
+  "chain": {
+    "straw_hat_short_grass_to_onion": "A2.7.17",
+    "onion_crop_reproduction": "A2.7.17",
+    "onion_to_powder": "A2.7.18",
+    "survival_onion_processing_chain_complete": true
+  },
+  "create_optional_processing": {
+    "java_milling_recipe_exists": true,
+    "bedrock_create_ported": false,
+    "required_for_cookery_survival_chain": false
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

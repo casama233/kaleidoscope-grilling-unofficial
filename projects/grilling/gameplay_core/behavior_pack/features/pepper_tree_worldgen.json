@@ -1,0 +1,31 @@
+{
+  "format_version": "1.21.20",
+  "minecraft:single_block_feature": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:pepper_tree_worldgen"
+    },
+    "places_block": "kaleidoscope_grilling:pepper_worldgen_seed",
+    "enforce_placement_rules": true,
+    "enforce_survivability_rules": true,
+    "may_replace": [
+      "minecraft:air",
+      "minecraft:short_grass",
+      "minecraft:tall_grass",
+      "minecraft:fern",
+      "minecraft:large_fern",
+      "minecraft:snow_layer",
+      "minecraft:vine"
+    ],
+    "may_attach_to": {
+      "min_sides_must_attach": 1,
+      "bottom": [
+        "minecraft:dirt",
+        "minecraft:grass_block",
+        "minecraft:podzol",
+        "minecraft:coarse_dirt",
+        "minecraft:dirt_with_roots",
+        "minecraft:mycelium"
+      ]
+    }
+  }
+}

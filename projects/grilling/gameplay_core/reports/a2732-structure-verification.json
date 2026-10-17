@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.32",
+  "standalone_food_effect_registry": true,
+  "registry_rows": 2,
+  "active_standalone_effect_runtime_modules": 1,
+  "active_standalone_item_complete_use_subscribers": 1,
+  "cold_houttuynia_crafting_preserved": true,
+  "main_skewer_effect_registry_preserved": true,
+  "a2731_crop_host_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

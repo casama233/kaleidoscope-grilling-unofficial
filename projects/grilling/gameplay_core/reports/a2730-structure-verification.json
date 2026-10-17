@@ -1,0 +1,14 @@
+{
+  "version": "A2.7.30",
+  "cookery_oil_pot_adapter": true,
+  "active_consumers": 3,
+  "consumer_direct_host_key_access": 0,
+  "untyped_capacity": 256,
+  "typed_capacity": 64,
+  "a2727_host_recipe_reuse_preserved": true,
+  "a2729_language_hotfix_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:chicken_wing",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:chicken_wing.name"
+        "value": "kaleidoscope_grilling.display.item.chicken_wing"
       },
       "minecraft:icon": {
         "textures": {
@@ -20,7 +21,7 @@
       "minecraft:allow_off_hand": true,
       "minecraft:use_modifiers": {
         "start_using": "always",
-        "use_duration": 5,
+        "use_duration": 1.6,
         "movement_modifier": 0.35
       },
       "minecraft:food": {
@@ -33,7 +34,8 @@
       },
       "minecraft:tags": {
         "tags": [
-          "minecraft:is_food"
+          "minecraft:is_food",
+          "kaleidoscope_grilling:ingredients/chicken_wings"
         ]
       }
     }

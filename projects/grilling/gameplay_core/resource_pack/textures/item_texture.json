@@ -1,5 +1,5 @@
 {
-  "resource_pack_name": "Kaleidoscope Grilling A2.4",
+  "resource_pack_name": "Kaleidoscope Grilling A2",
   "texture_name": "atlas.items",
   "texture_data": {
     "dark_grilling": {
@@ -147,16 +147,16 @@
       "textures": "textures/items/sichuan_pepper"
     },
     "onion_powder": {
-      "textures": "textures/items/onion_powder"
+      "textures": "textures/items/a283_icons/onion_powder"
     },
     "houttuynia_powder": {
-      "textures": "textures/items/houttuynia_powder"
+      "textures": "textures/items/a283_icons/houttuynia_powder"
     },
     "totem_powder": {
-      "textures": "textures/items/totem_powder"
+      "textures": "textures/items/a283_icons/totem_powder"
     },
     "dragon_egg_powder": {
-      "textures": "textures/items/dragon_egg_powder"
+      "textures": "textures/items/a283_icons/dragon_egg_powder"
     },
     "pending_seasoning": {
       "textures": "textures/items/pending_seasoning"
@@ -171,10 +171,40 @@
       "textures": "textures/items/premium_chili_oil_bucket"
     },
     "unfinished_skewer": {
-      "textures": "textures/items/secret_skewer_stick"
+      "textures": "textures/items/unfinished_skewer_gui"
     },
     "secret_skewer": {
-      "textures": "textures/items/secret_skewer_stick"
+      "textures": "textures/items/secret_skewer_gui"
+    },
+    "skewer_plate": {
+      "textures": "textures/items/skewer_plate"
+    },
+    "skewer_recipe_book": {
+      "textures": "textures/items/skewer_recipe_book"
+    },
+    "canola_powder": {
+      "textures": "textures/items/canola_powder"
+    },
+    "oil_cake": {
+      "textures": "textures/items/oil_cake"
+    },
+    "oil_residue": {
+      "textures": "textures/items/oil_residue"
+    },
+    "sweet_potato_powder": {
+      "textures": "textures/items/sweet_potato_powder"
+    },
+    "raw_sweet_potato_sheet": {
+      "textures": "textures/items/raw_sweet_potato_sheet"
+    },
+    "sweet_potato": {
+      "textures": "textures/items/sweet_potato"
+    },
+    "carrot_dice": {
+      "textures": "textures/items/carrot_dice"
+    },
+    "potato_slice": {
+      "textures": "textures/items/potato_slice"
     },
     "beef_chunks": {
       "textures": "textures/items/beef_chunks"
@@ -185,26 +215,308 @@
     "chicken_wing": {
       "textures": "textures/items/chicken_wing"
     },
+    "raw_mantou_slice": {
+      "textures": "textures/items/raw_mantou_slice"
+    },
     "squid_tentacle": {
       "textures": "textures/items/squid_tentacle"
     },
-    "raw_sweet_potato_sheet": {
-      "textures": "textures/items/raw_sweet_potato_sheet"
+    "houttuynia": {
+      "textures": "textures/items/houttuynia"
     },
     "minced_houttuynia": {
       "textures": "textures/items/minced_houttuynia"
     },
-    "potato_slice": {
-      "textures": "textures/items/potato_slice"
+    "canola_seeds": {
+      "textures": "textures/items/canola_seeds"
     },
-    "carrot_dice": {
-      "textures": "textures/items/carrot_dice"
+    "onion": {
+      "textures": "textures/items/onion"
     },
-    "raw_mantou_slice": {
-      "textures": "textures/items/raw_mantou_slice"
+    "roasted_sweet_potato": {
+      "textures": "textures/items/roasted_sweet_potato"
     },
-    "houttuynia": {
-      "textures": "textures/items/houttuynia"
+    "roasted_chicken_wing": {
+      "textures": "textures/items/roasted_chicken_wing"
+    },
+    "cold_houttuynia": {
+      "textures": "textures/items/cold_houttuynia"
+    },
+    "red_chili_powder": {
+      "textures": "textures/items/red_chili_powder"
+    },
+    "advanced_rack": {
+      "textures": "textures/items/advanced_rack"
+    },
+    "wedding_candy": {
+      "textures": "textures/items/a283_icons/wedding_candy"
+    },
+    "sugared_tomato": {
+      "textures": "textures/items/sugared_tomato"
+    },
+    "pepper_honey": {
+      "textures": "textures/items/pepper_honey"
+    },
+    "houttuynia_stir_fried_pork": {
+      "textures": "textures/items/houttuynia_stir_fried_pork"
+    },
+    "green_pepper_squid_tentacles": {
+      "textures": "textures/items/green_pepper_squid_tentacles"
+    },
+    "braised_chicken_wings": {
+      "textures": "textures/items/braised_chicken_wings"
+    },
+    "potato_beef_stew": {
+      "textures": "textures/items/potato_beef_stew"
+    },
+    "red_sweet_potato_porridge": {
+      "textures": "textures/items/red_sweet_potato_porridge"
+    },
+    "sour_spicy_noodles": {
+      "textures": "textures/items/sour_spicy_noodles"
+    },
+    "pepper_sapling": {
+      "textures": "textures/blocks/pepper_sapling"
+    },
+    "special_seasoning_r1_v0": {
+      "textures": "textures/items/special_seasoning_r1_v0"
+    },
+    "special_seasoning_r1_v1": {
+      "textures": "textures/items/special_seasoning_r1_v1"
+    },
+    "special_seasoning_r1_v2": {
+      "textures": "textures/items/special_seasoning_r1_v2"
+    },
+    "special_seasoning_r1_v3": {
+      "textures": "textures/items/special_seasoning_r1_v3"
+    },
+    "special_seasoning_r1_v4": {
+      "textures": "textures/items/special_seasoning_r1_v4"
+    },
+    "special_seasoning_r1_v5": {
+      "textures": "textures/items/special_seasoning_r1_v5"
+    },
+    "special_seasoning_r1_v6": {
+      "textures": "textures/items/special_seasoning_r1_v6"
+    },
+    "special_seasoning_r1_v7": {
+      "textures": "textures/items/special_seasoning_r1_v7"
+    },
+    "special_seasoning_r2_v0": {
+      "textures": "textures/items/special_seasoning_r2_v0"
+    },
+    "special_seasoning_r2_v1": {
+      "textures": "textures/items/special_seasoning_r2_v1"
+    },
+    "special_seasoning_r2_v2": {
+      "textures": "textures/items/special_seasoning_r2_v2"
+    },
+    "special_seasoning_r2_v3": {
+      "textures": "textures/items/special_seasoning_r2_v3"
+    },
+    "special_seasoning_r2_v4": {
+      "textures": "textures/items/special_seasoning_r2_v4"
+    },
+    "special_seasoning_r2_v5": {
+      "textures": "textures/items/special_seasoning_r2_v5"
+    },
+    "special_seasoning_r2_v6": {
+      "textures": "textures/items/special_seasoning_r2_v6"
+    },
+    "special_seasoning_r2_v7": {
+      "textures": "textures/items/special_seasoning_r2_v7"
+    },
+    "special_seasoning_r3_v0": {
+      "textures": "textures/items/special_seasoning_r3_v0"
+    },
+    "special_seasoning_r3_v1": {
+      "textures": "textures/items/special_seasoning_r3_v1"
+    },
+    "special_seasoning_r3_v2": {
+      "textures": "textures/items/special_seasoning_r3_v2"
+    },
+    "special_seasoning_r3_v3": {
+      "textures": "textures/items/special_seasoning_r3_v3"
+    },
+    "special_seasoning_r3_v4": {
+      "textures": "textures/items/special_seasoning_r3_v4"
+    },
+    "special_seasoning_r3_v5": {
+      "textures": "textures/items/special_seasoning_r3_v5"
+    },
+    "special_seasoning_r3_v6": {
+      "textures": "textures/items/special_seasoning_r3_v6"
+    },
+    "special_seasoning_r3_v7": {
+      "textures": "textures/items/special_seasoning_r3_v7"
+    },
+    "special_seasoning_r4_v0": {
+      "textures": "textures/items/special_seasoning_r4_v0"
+    },
+    "special_seasoning_r4_v1": {
+      "textures": "textures/items/special_seasoning_r4_v1"
+    },
+    "special_seasoning_r4_v2": {
+      "textures": "textures/items/special_seasoning_r4_v2"
+    },
+    "special_seasoning_r4_v3": {
+      "textures": "textures/items/special_seasoning_r4_v3"
+    },
+    "special_seasoning_r4_v4": {
+      "textures": "textures/items/special_seasoning_r4_v4"
+    },
+    "special_seasoning_r4_v5": {
+      "textures": "textures/items/special_seasoning_r4_v5"
+    },
+    "special_seasoning_r4_v6": {
+      "textures": "textures/items/special_seasoning_r4_v6"
+    },
+    "special_seasoning_r4_v7": {
+      "textures": "textures/items/special_seasoning_r4_v7"
+    },
+    "special_seasoning_r5_v0": {
+      "textures": "textures/items/special_seasoning_r5_v0"
+    },
+    "special_seasoning_r5_v1": {
+      "textures": "textures/items/special_seasoning_r5_v1"
+    },
+    "special_seasoning_r5_v2": {
+      "textures": "textures/items/special_seasoning_r5_v2"
+    },
+    "special_seasoning_r5_v3": {
+      "textures": "textures/items/special_seasoning_r5_v3"
+    },
+    "special_seasoning_r5_v4": {
+      "textures": "textures/items/special_seasoning_r5_v4"
+    },
+    "special_seasoning_r5_v5": {
+      "textures": "textures/items/special_seasoning_r5_v5"
+    },
+    "special_seasoning_r5_v6": {
+      "textures": "textures/items/special_seasoning_r5_v6"
+    },
+    "special_seasoning_r5_v7": {
+      "textures": "textures/items/special_seasoning_r5_v7"
+    },
+    "special_seasoning_r6_v0": {
+      "textures": "textures/items/special_seasoning_r6_v0"
+    },
+    "special_seasoning_r6_v1": {
+      "textures": "textures/items/special_seasoning_r6_v1"
+    },
+    "special_seasoning_r6_v2": {
+      "textures": "textures/items/special_seasoning_r6_v2"
+    },
+    "special_seasoning_r6_v3": {
+      "textures": "textures/items/special_seasoning_r6_v3"
+    },
+    "special_seasoning_r6_v4": {
+      "textures": "textures/items/special_seasoning_r6_v4"
+    },
+    "special_seasoning_r6_v5": {
+      "textures": "textures/items/special_seasoning_r6_v5"
+    },
+    "special_seasoning_r6_v6": {
+      "textures": "textures/items/special_seasoning_r6_v6"
+    },
+    "special_seasoning_r6_v7": {
+      "textures": "textures/items/special_seasoning_r6_v7"
+    },
+    "special_seasoning_r7_v0": {
+      "textures": "textures/items/special_seasoning_r7_v0"
+    },
+    "special_seasoning_r7_v1": {
+      "textures": "textures/items/special_seasoning_r7_v1"
+    },
+    "special_seasoning_r7_v2": {
+      "textures": "textures/items/special_seasoning_r7_v2"
+    },
+    "special_seasoning_r7_v3": {
+      "textures": "textures/items/special_seasoning_r7_v3"
+    },
+    "special_seasoning_r7_v4": {
+      "textures": "textures/items/special_seasoning_r7_v4"
+    },
+    "special_seasoning_r7_v5": {
+      "textures": "textures/items/special_seasoning_r7_v5"
+    },
+    "special_seasoning_r7_v6": {
+      "textures": "textures/items/special_seasoning_r7_v6"
+    },
+    "special_seasoning_r7_v7": {
+      "textures": "textures/items/special_seasoning_r7_v7"
+    },
+    "special_seasoning_r8_v0": {
+      "textures": "textures/items/special_seasoning_r8_v0"
+    },
+    "special_seasoning_r8_v1": {
+      "textures": "textures/items/special_seasoning_r8_v1"
+    },
+    "special_seasoning_r8_v2": {
+      "textures": "textures/items/special_seasoning_r8_v2"
+    },
+    "special_seasoning_r8_v3": {
+      "textures": "textures/items/special_seasoning_r8_v3"
+    },
+    "special_seasoning_r8_v4": {
+      "textures": "textures/items/special_seasoning_r8_v4"
+    },
+    "special_seasoning_r8_v5": {
+      "textures": "textures/items/special_seasoning_r8_v5"
+    },
+    "special_seasoning_r8_v6": {
+      "textures": "textures/items/special_seasoning_r8_v6"
+    },
+    "special_seasoning_r8_v7": {
+      "textures": "textures/items/special_seasoning_r8_v7"
+    },
+    "partial_seasoning_f1": {
+      "textures": "textures/items/partial_seasoning_f1"
+    },
+    "partial_seasoning_f2": {
+      "textures": "textures/items/partial_seasoning_f2"
+    },
+    "partial_seasoning_f3": {
+      "textures": "textures/items/partial_seasoning_f3"
+    },
+    "partial_seasoning_f4": {
+      "textures": "textures/items/partial_seasoning_f4"
+    },
+    "partial_seasoning_f5": {
+      "textures": "textures/items/partial_seasoning_f5"
+    },
+    "partial_seasoning_f6": {
+      "textures": "textures/items/partial_seasoning_f6"
+    },
+    "partial_seasoning_f7": {
+      "textures": "textures/items/partial_seasoning_f7"
+    },
+    "partial_seasoning_f8": {
+      "textures": "textures/items/partial_seasoning_f8"
+    },
+    "pending_seasoning_f1": {
+      "textures": "textures/items/pending_seasoning_f1"
+    },
+    "pending_seasoning_f2": {
+      "textures": "textures/items/pending_seasoning_f2"
+    },
+    "pending_seasoning_f3": {
+      "textures": "textures/items/pending_seasoning_f3"
+    },
+    "pending_seasoning_f4": {
+      "textures": "textures/items/pending_seasoning_f4"
+    },
+    "pending_seasoning_f5": {
+      "textures": "textures/items/pending_seasoning_f5"
+    },
+    "pending_seasoning_f6": {
+      "textures": "textures/items/pending_seasoning_f6"
+    },
+    "pending_seasoning_f7": {
+      "textures": "textures/items/pending_seasoning_f7"
+    },
+    "pending_seasoning_f8": {
+      "textures": "textures/items/pending_seasoning_f8"
     }
   }
 }

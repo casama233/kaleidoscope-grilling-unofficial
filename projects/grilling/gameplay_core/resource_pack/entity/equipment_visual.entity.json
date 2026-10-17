@@ -1,0 +1,29 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:equipment_visual",
+      "enable_attachables": true,
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/items/secret_skewer"
+      },
+      "geometry": {
+        "default": "geometry.kg_station.equipment"
+      },
+      "animations": {
+        "pose": "animation.kg_station.equipment"
+      },
+      "scripts": {
+        "animate": [
+          "pose"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

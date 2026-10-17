@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.3",
+  "scope": "engine-first display/runtime stabilization; no new recipe/content batch",
+  "user_reproduced_failures": [
+    "creative inventory showed raw Java UV/material sheets instead of recognisable 3D skewer icons",
+    "unsupported/legged grill had selection box and gameplay state but no visible model"
+  ],
+  "item_render_split": {
+    "inventory_ui": "64x64 transparent icon rasterized from pinned Java 3D item model and GUI transform",
+    "held_eating": "existing Bedrock attachable/staged geometry remains separate",
+    "formal_icon_count_expected": 41
+  },
+  "grill_render_fix": {
+    "main_block": "always renders in-cell flat or flat-lit top geometry",
+    "unsupported_visual": "replaceable non-colliding grill_legs helper in block below",
+    "helper_geometry_cubes": 6,
+    "helper_geometry_y_range": [
+      0,
+      16
+    ],
+    "legged_state_preserved": true
+  },
+  "compatibility_note": "Cookery v1.0.6 public CurseForge listing currently tags 26.40/26.30 and its description says Minecraft 26.3+; Grilling 26.51 runtime remains provisional until direct engine acceptance.",
+  "minecraft_tested_after_fix": false,
+  "bds_tested_after_fix": false
+}

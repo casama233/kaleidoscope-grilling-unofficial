@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    83
+  ],
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "scope": "Only Cookery living-source Hinder damage dispatch and original flatulence sound/10-Cloud event. All eating, stop/completion ownership, rack, machine and other source bytes remain conserved. Native phase/render differences remain explicit.",
+  "base_commit": "c85cb34f591079c0b06878b8e565e7f262833e49",
+  "before_sha256": "159a67ea0efc2d5252e5525bf313b5beccdf478e2cc000345201af07d507736b",
+  "after_sha256": "5d09325573be741ba585c80a2daec1ff71f057f25d2e284f18b6dc2f7be61320",
+  "operations": [
+    {
+      "start": 79283,
+      "end": 79453,
+      "before": "world.afterEvents.entityHitEntity.subscribe(e=>{if(fxGet(e.damagingEntity,'hinder'))try{e.hitEntity.addEffect('slowness',100,{amplifier:1,showParticles:true})}catch{}});\n",
+      "after": "world.afterEvents.entityHurt.subscribe(e=>{\n // Cookery HinderEvent follows damage from a living attacker, including its\n // projectile; a melee contact event cannot represent that source contract.\n // Java has no positive-amount gate. Do not invent one for after-hurt events.\n try{\n  const source=e.damageSource;\n  const attacker=source?.damagingEntity??source?.damagingProjectile?.getComponent('minecraft:projectile')?.owner;\n  if(!attacker?.getComponent('minecraft:health')||!e.hurtEntity.getComponent('minecraft:health')||!fxGet(attacker,'hinder'))return;\n  e.hurtEntity.addEffect('slowness',100,{amplifier:1,showParticles:true});\n }catch{} // A removed actor/projectile must not abort other damage subscribers.\n});\n"
+    },
+    {
+      "start": 89581,
+      "end": 89912,
+      "before": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});try{p.dimension.spawnParticle('minecraft:basic_smoke_particle',{x:p.location.x,y:p.location.y+.25,z:p.location.z});p.dimension.playSound('random.fizz',p.location)}catch{}}SNEAK_LAST.set(p.id,sneak);\n",
+      "after": "  const sneak=!!p.isSneaking,was=SNEAK_LAST.get(p.id)??false;if(sneak&&!was&&fxGet(p,'flatulence')){p.applyImpulse({x:0,y:.75,z:0});interactionParticleBurst(p.dimension,p.location,'flatulence');try{p.dimension.playSound('kaleidoscope_cookery.fart',p.location,{volume:1,pitch:.8+Math.random()*.4})}catch{}}SNEAK_LAST.set(p.id,sneak);\n"
+    }
+  ]
+}

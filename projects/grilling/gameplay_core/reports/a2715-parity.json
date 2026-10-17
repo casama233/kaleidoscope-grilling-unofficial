@@ -1,0 +1,79 @@
+{
+  "version": "A2.7.15",
+  "scope": "Canola seeds acquisition + 8-age crop + composting",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "item": {
+    "id": "kaleidoscope_grilling:canola_seeds",
+    "plain_seed_item": true,
+    "max_stack_size": 64,
+    "plants": "kaleidoscope_grilling:canola_crop",
+    "plantable_on": [
+      "minecraft:farmland"
+    ],
+    "composting_chance_percent": 30,
+    "texture_git_blob_sha1": "89a7008164006a16dcd194ce27b6e5c165b14987"
+  },
+  "crop": {
+    "ages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_age": 7,
+    "farmland_only": true,
+    "farmland_survival_min_light": 8,
+    "growth_min_light": 9,
+    "bonemeal_age_increase": [
+      2,
+      5
+    ],
+    "growth_speed": "reuses A2.7.14 Java CropBlock 3x3 farmland weighting + crowding helper",
+    "cross_geometry": "dedicated 16x16 world-space cross planes with explicit 16x28 full-sprite UV mapping; no crop/rescale of Java source art",
+    "texture_git_blob_sha1": {
+      "stage0": "afc9eb650ca70bece3a5f0fb08e979d64512e71c",
+      "stage1": "f4fa3cc14f2876aaf932dce2ebf7c4bd1a149aae",
+      "stage2": "18ec9e2d1e55e491c90dbeb6c20d7ed652d0474e",
+      "stage3": "4cb6afb9df1d62f590f7cea118f88049cbdfef0c",
+      "stage4": "4cb6afb9df1d62f590f7cea118f88049cbdfef0c",
+      "stage5": "314dcd4e949c5f610b1d07431424ec278ece5dc2",
+      "stage6": "314dcd4e949c5f610b1d07431424ec278ece5dc2",
+      "stage7": "5f7f96c41be52be77d53a2e337e7b2dbfa9f7218"
+    }
+  },
+  "drops": {
+    "immature": "1 canola_seeds",
+    "mature": "2 + Binomial(Fortune+2, 0.5714286) canola_seeds; exact for vanilla Fortune 0..3",
+    "overleveled_fortune_exact": false
+  },
+  "initial_acquisition": {
+    "trigger": "successful minecraft:short_grass break",
+    "creative": false,
+    "required_head": [
+      "kaleidoscope_cookery:straw_hat",
+      "kaleidoscope_cookery:straw_hat_flower"
+    ],
+    "chance": 0.125,
+    "count": "1 + random(0..Fortune level)",
+    "fortune_source": "itemStackBeforeBreak",
+    "other_java_cropdrop_outputs_deferred": [
+      "kaleidoscope_grilling:sweet_potato",
+      "kaleidoscope_grilling:onion"
+    ]
+  },
+  "downstream": {
+    "canola_powder_item_already_present": true,
+    "oil_cake_recipe_already_present": true,
+    "oil_press_chain_already_present": true,
+    "canola_seed_to_powder_processing_complete": false,
+    "next_gap": "Cookery millstone: canola_seeds -> canola_powder x1"
+  },
+  "survival_canola_seed_acquisition_complete": true,
+  "survival_canola_oil_chain_complete": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

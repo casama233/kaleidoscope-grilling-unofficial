@@ -1,0 +1,224 @@
+{
+  "version": "A2.7.4",
+  "source": "Java 1.1.1 fixed_skewer_gui_16 hand-authored/default GUI icons",
+  "java_commit": "9a1acdab27698457bec16c9362678e574895a28c",
+  "java_default_config": {
+    "useFixedSkewer64xCache": false,
+    "meaning": "hand-drawn 16x16 icons are the Java default for fixed skewers"
+  },
+  "exact_static_java_icons": 39,
+  "frame0_java_icons": {
+    "grilled_slime_skewer": "Java cycles 5 cooked frames every 4 game ticks; Bedrock A2.7.4 uses exact Java frame 0.",
+    "mysterious_skewer": "Java cycles 5 failure frames every 4 game ticks; Bedrock A2.7.4 uses exact Java frame 0."
+  },
+  "items": [
+    {
+      "item": "dark_grilling",
+      "java_file": "dark_grilling.png",
+      "git_blob_sha1": "abbfe3d7a5bb9575a24e028978ff42b3535bd17d"
+    },
+    {
+      "item": "grilled_beef_skewer",
+      "java_file": "grilled_beef_skewer_cooked.png",
+      "git_blob_sha1": "8abbdbc8e9c6e7cf1ad1b42d1173e62c7507081e"
+    },
+    {
+      "item": "grilled_bun_slice_skewer",
+      "java_file": "grilled_bun_slice_skewer_cooked.png",
+      "git_blob_sha1": "1f6c1b495a79fbcdc788e10f4c315cda01d69bc9"
+    },
+    {
+      "item": "grilled_caterpillar_skewer",
+      "java_file": "grilled_caterpillar_skewer_cooked.png",
+      "git_blob_sha1": "3ec9ba93b84efa08b0c5ae70108416aa3a789578"
+    },
+    {
+      "item": "grilled_chicken_skin_skewer",
+      "java_file": "grilled_chicken_skin_skewer_cooked.png",
+      "git_blob_sha1": "fb7313df0d0e47e45d8455cabc285bff756f1769"
+    },
+    {
+      "item": "grilled_ender_pearl_skewer",
+      "java_file": "grilled_ender_pearl_skewer_cooked.png",
+      "git_blob_sha1": "1f732e6a9576b53d5728532b9b5df4827b5f7269"
+    },
+    {
+      "item": "grilled_fish_skewer",
+      "java_file": "grilled_fish_skewer_cooked.png",
+      "git_blob_sha1": "688377302cd5f6fa68182f4d6e4359cbf1a7b31c"
+    },
+    {
+      "item": "grilled_fried_egg_skewer",
+      "java_file": "grilled_fried_egg_skewer_cooked.png",
+      "git_blob_sha1": "4bf9b6529107d7ddeb36a8b645cdd19a4cd42362"
+    },
+    {
+      "item": "grilled_gluten_skewer",
+      "java_file": "grilled_gluten_skewer_cooked.png",
+      "git_blob_sha1": "1d244babc36022fc877fa64859fdc97c465057c2"
+    },
+    {
+      "item": "grilled_golden_skewer",
+      "java_file": "grilled_golden_skewer_cooked.png",
+      "git_blob_sha1": "1d59443ed6e10f684b85fccba35f49a08f7a4335"
+    },
+    {
+      "item": "grilled_lamb_skewer",
+      "java_file": "grilled_lamb_skewer_cooked.png",
+      "git_blob_sha1": "b983c58fa38ddc4381edb6c3f0dca31cd3575139"
+    },
+    {
+      "item": "grilled_meat_and_bone_skewer",
+      "java_file": "grilled_meat_and_bone_skewer_cooked.png",
+      "git_blob_sha1": "953203719639179edf40eafe27f4b0fa81504bc2"
+    },
+    {
+      "item": "grilled_meatball_skewer",
+      "java_file": "grilled_meatball_skewer_cooked.png",
+      "git_blob_sha1": "af6a48d5df60f53641e167944cc18f0104849420"
+    },
+    {
+      "item": "grilled_mid_wing_skewer",
+      "java_file": "grilled_mid_wing_skewer_cooked.png",
+      "git_blob_sha1": "9b292bf832fe25edbd0cb45c77cd40513ef5956a"
+    },
+    {
+      "item": "grilled_mushroom_skewer",
+      "java_file": "grilled_mushroom_skewer_cooked.png",
+      "git_blob_sha1": "ae010d232bee1a8fdec52436964ec3daff7d9b8b"
+    },
+    {
+      "item": "grilled_pork_belly_skewer",
+      "java_file": "grilled_pork_belly_skewer_cooked.png",
+      "git_blob_sha1": "f4952c85477e4f80d1ad6e0b3a5610615771fbe1"
+    },
+    {
+      "item": "grilled_potato_slice_skewer",
+      "java_file": "grilled_potato_slice_skewer_cooked.png",
+      "git_blob_sha1": "574abe897515341875371f6228b2f32cefcc60c9"
+    },
+    {
+      "item": "grilled_slime_skewer",
+      "java_file": "grilled_slime_skewer_cooked_frame_0.png",
+      "git_blob_sha1": "9ca49b428d49c498d50f23e2937ca357016ff66b"
+    },
+    {
+      "item": "grilled_squid_tentacle_skewer",
+      "java_file": "grilled_squid_tentacle_skewer_cooked.png",
+      "git_blob_sha1": "e4eeb7092f2b0c2be66bb67e003dac8f1ec1a12a"
+    },
+    {
+      "item": "grilled_sweet_potato_sheet_skewer",
+      "java_file": "grilled_sweet_potato_sheet_skewer_cooked.png",
+      "git_blob_sha1": "03cf33b637ffdb8ffc645e1624414631c4749d06"
+    },
+    {
+      "item": "mysterious_skewer",
+      "java_file": "mysterious_skewer_frame_0.png",
+      "git_blob_sha1": "bec4837ffa879d4e98ff30632beda7d96ebdada8"
+    },
+    {
+      "item": "ordinary_skewer",
+      "java_file": "ordinary_skewer_cooked.png",
+      "git_blob_sha1": "da504d39a68b44572cda466599302351a929f039"
+    },
+    {
+      "item": "raw_beef_skewer",
+      "java_file": "raw_beef_skewer_raw.png",
+      "git_blob_sha1": "2ba5b17264927b7ca9d3b767c29742f6921aaf50"
+    },
+    {
+      "item": "raw_bun_slice_skewer",
+      "java_file": "raw_bun_slice_skewer_raw.png",
+      "git_blob_sha1": "cc6200ec355cc242c71ee1c70073325ffa3fed0f"
+    },
+    {
+      "item": "raw_caterpillar_skewer",
+      "java_file": "raw_caterpillar_skewer_raw.png",
+      "git_blob_sha1": "abc8c1c9ea499e3362f4cb5335ce7a50c2db595c"
+    },
+    {
+      "item": "raw_chicken_skin_skewer",
+      "java_file": "raw_chicken_skin_skewer_raw.png",
+      "git_blob_sha1": "610862271dbfa68692d23256e7fac69004de5f3d"
+    },
+    {
+      "item": "raw_ender_pearl_skewer",
+      "java_file": "raw_ender_pearl_skewer_raw.png",
+      "git_blob_sha1": "c70ec384120d460ee9bccfbb9d80ab3db9c022be"
+    },
+    {
+      "item": "raw_fish_skewer",
+      "java_file": "raw_fish_skewer_raw.png",
+      "git_blob_sha1": "09f197a93995859ca4faff78d2d3a633b806fd18"
+    },
+    {
+      "item": "raw_fried_egg_skewer",
+      "java_file": "raw_fried_egg_skewer_raw.png",
+      "git_blob_sha1": "dcd2f1a58c5fa06032786ceb8e22a75472d2e2eb"
+    },
+    {
+      "item": "raw_gluten_skewer",
+      "java_file": "raw_gluten_skewer_raw.png",
+      "git_blob_sha1": "3a7688125ca3f345784812e32b813fccae8368a6"
+    },
+    {
+      "item": "raw_golden_skewer",
+      "java_file": "raw_golden_skewer_raw.png",
+      "git_blob_sha1": "62a80f23cbb7dc55e6412cc35557e8068fa4d3c9"
+    },
+    {
+      "item": "raw_lamb_skewer",
+      "java_file": "raw_lamb_skewer_raw.png",
+      "git_blob_sha1": "b4ce6d2dd6798faa34be7965d2178125052299c0"
+    },
+    {
+      "item": "raw_meat_and_bone_skewer",
+      "java_file": "raw_meat_and_bone_skewer_raw.png",
+      "git_blob_sha1": "7384836e1f837e49315fd60913ffedfb0e7ccbcd"
+    },
+    {
+      "item": "raw_meatball_skewer",
+      "java_file": "raw_meatball_skewer_raw.png",
+      "git_blob_sha1": "fa47078cb6f8a4f806039cfb6e6c3b69a8ad29aa"
+    },
+    {
+      "item": "raw_mid_wing_skewer",
+      "java_file": "raw_mid_wing_skewer_raw.png",
+      "git_blob_sha1": "b9d58cef80f9679d7cceabc14dfc6558fa587fe0"
+    },
+    {
+      "item": "raw_mushroom_skewer",
+      "java_file": "raw_mushroom_skewer_raw.png",
+      "git_blob_sha1": "8d6208dfe712acc92d72de279e70d9498f5dfe62"
+    },
+    {
+      "item": "raw_pork_belly_skewer",
+      "java_file": "raw_pork_belly_skewer_raw.png",
+      "git_blob_sha1": "100dcd919c27fb2eec0dfad9d6c5fcb630bf1ea6"
+    },
+    {
+      "item": "raw_potato_slice_skewer",
+      "java_file": "raw_potato_slice_skewer_raw.png",
+      "git_blob_sha1": "d7ec71b205b8963b13e0f850d1ba07bbc21949fb"
+    },
+    {
+      "item": "raw_slime_skewer",
+      "java_file": "raw_slime_skewer_raw.png",
+      "git_blob_sha1": "c9f1c608adf4ba2d8064955540459d04bd741c0e"
+    },
+    {
+      "item": "raw_squid_tentacle_skewer",
+      "java_file": "raw_squid_tentacle_skewer_raw.png",
+      "git_blob_sha1": "18d5e127c542ee81cc47c6f6c73f9095309a87e7"
+    },
+    {
+      "item": "raw_sweet_potato_sheet_skewer",
+      "java_file": "raw_sweet_potato_sheet_skewer_raw.png",
+      "git_blob_sha1": "4aef022016a54b0e30de9610697325bc3848cb73"
+    }
+  ],
+  "note": "No Python 3D rasterizer is used for final inventory icons. Held/eating attachables remain separate.",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

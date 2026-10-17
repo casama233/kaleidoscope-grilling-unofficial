@@ -25,8 +25,17 @@
           "binding": "q.item_slot_to_bone_name(context.item_slot)"
         },
         {
-          "name": "instance_0_wood_0",
+          "name": "display",
           "parent": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "instance_0_wood_0",
+          "parent": "display",
           "pivot": [
             0,
             0,
@@ -111,7 +120,7 @@
         },
         {
           "name": "instance_0_food2_lower_1",
-          "parent": "root",
+          "parent": "display",
           "pivot": [
             0,
             0,

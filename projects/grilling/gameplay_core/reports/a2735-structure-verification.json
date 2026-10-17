@@ -1,0 +1,12 @@
+{
+  "version": "A2.7.35",
+  "shared_player_io": true,
+  "migrated_consumers": 5,
+  "local_basic_hand_io_helpers_after": 0,
+  "specialized_slot_consumers_retained": 2,
+  "a2734_oil_contract_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

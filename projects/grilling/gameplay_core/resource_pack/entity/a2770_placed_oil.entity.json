@@ -1,0 +1,29 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:placed_oil_visual",
+      "materials": {
+        "default": "entity_alphatest",
+        "glow": "entity_emissive_alpha"
+      },
+      "textures": {
+        "canola": "textures/a2770_placed/oil_pot_canola",
+        "chili": "textures/a2770_placed/oil_pot_secret_chili",
+        "glow": "textures/a2770_placed/oil_pot_premium_glow"
+      },
+      "geometry": {
+        "default": "geometry.kg_a2770.oil_skin",
+        "glow": "geometry.kg_a2770.oil_glow"
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_a2770.oil": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:oil') > 0"
+        },
+        {
+          "controller.render.kg_a2770.oil_glow": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:oil') == 3"
+        }
+      ]
+    }
+  }
+}

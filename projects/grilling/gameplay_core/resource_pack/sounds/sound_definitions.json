@@ -1,6 +1,15 @@
 {
   "format_version": "1.14.0",
   "sound_definitions": {
+    "kg_imm.action_success": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/action_success",
+          "volume": 0.85
+        }
+      ]
+    },
     "kg_imm.grill_flip": {
       "category": "block",
       "sounds": [
@@ -33,6 +42,16 @@
         }
       ]
     },
+    "kg_imm.skewer_disassemble": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/pickup_item",
+          "volume": 0.85,
+          "pitch": 0.82
+        }
+      ]
+    },
     "kg_imm.season": {
       "category": "block",
       "sounds": [
@@ -42,11 +61,52 @@
       ]
     },
     "kg_imm.shake_seasoning": {
-      "category": "block",
+      "category": "player",
       "sounds": [
         {
           "name": "sounds/kg_imm/shake_seasoning",
           "stream": true
+        }
+      ]
+    },
+    "kg_imm.seasoning_bottle_place": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/glass_place_1"
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_2"
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_3",
+          "pitch": 1.2
+        }
+      ]
+    },
+    "kg_imm.seasoning_bottle_stack": {
+      "category": "block",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/glass_clink_1",
+          "weight": 3
+        },
+        {
+          "name": "sounds/kg_imm/glass_clink_2",
+          "weight": 3
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_1",
+          "weight": 1
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_2",
+          "weight": 1
+        },
+        {
+          "name": "sounds/kg_imm/glass_place_3",
+          "weight": 1,
+          "pitch": 1.2
         }
       ]
     },
@@ -157,6 +217,173 @@
           "stream": true
         }
       ]
+    },
+    "kg_java21.shield": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/item/shield/block1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block3",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block4",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/item/shield/block5",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.chime": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/block/amethyst/shimmer",
+          "volume": 0.2,
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.golden": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/block/beacon/power1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/block/beacon/power2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/block/beacon/power3",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.ordinary_break": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/random/break",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.ordinary_impact": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/random/explode1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode2",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode3",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/random/explode4",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.heavy_metal": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/item/totem/use_totem",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.teleport": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.teleport_neutral": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.teleport_hostile": {
+      "category": "hostile",
+      "sounds": [
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal",
+          "stream": false
+        },
+        {
+          "name": "sounds/kg_java21/mob/endermen/portal2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_cookery.flatulence": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kc_entity_fart_fart_0",
+          "stream": false
+        },
+        {
+          "name": "sounds/kc_entity_fart_fart_1",
+          "stream": false
+        },
+        {
+          "name": "sounds/kc_entity_fart_fart_2",
+          "stream": false
+        }
+      ],
+      "max_distance": 16
+    },
+    "kg_java21.seasoning_finished": {
+      "category": "player",
+      "sounds": [
+        {
+          "name": "sounds/kg_imm/action_success",
+          "volume": 0.85
+        }
+      ],
+      "max_distance": 16
     }
   }
 }

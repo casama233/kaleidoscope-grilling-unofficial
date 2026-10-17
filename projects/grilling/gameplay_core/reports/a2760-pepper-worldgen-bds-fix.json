@@ -1,0 +1,52 @@
+{
+  "version": "A2.7.60",
+  "scope": "promote the BDS-validated Pepper Tree trunk_lean schema fix into the canonical gameplay_core pack",
+  "bug": {
+    "feature": "kaleidoscope_grilling:pepper_tree_worldgen",
+    "previous_missing": [
+      "lean_height",
+      "lean_steps"
+    ],
+    "symptom": "tree feature fails to register; feature rule reports no definition",
+    "source_pack_was_affected": true,
+    "server_build_shim_already_worked_around_it": true
+  },
+  "fix": {
+    "allow_diagonal_growth": false,
+    "lean_height": {
+      "base": 1,
+      "intervals": [
+        1
+      ],
+      "min_height_for_canopy": 2
+    },
+    "lean_steps": {
+      "base": 1,
+      "intervals": [
+        1
+      ]
+    },
+    "worldgen_leaf_weights": [
+      3,
+      1
+    ],
+    "initial_fruiting_probability": 0.25
+  },
+  "official_reference": {
+    "repository": "Mojang/bedrock-samples",
+    "commit": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+    "path": "documentation/Features.html",
+    "git_blob": "dfb66d2371e818bea6bfffb1c1785d956a76b6d6",
+    "contract": "acacia_trunk.trunk_lean includes lean_height and lean_steps"
+  },
+  "regression": {
+    "a2759_fruiting_bridge_preserved": true,
+    "a2748_pepper_lifecycle_preserved": true,
+    "advanced_rack_preserved": true,
+    "advancement_runtime_preserved": true,
+    "cookery_hardening_preserved": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "prior_server_shim_bds_tested": true
+}

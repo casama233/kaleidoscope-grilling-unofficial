@@ -4,20 +4,21 @@
     "description": {
       "identifier": "kaleidoscope_grilling:unfinished_skewer",
       "menu_category": {
-        "category": "items"
+        "category": "none"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:unfinished_skewer.name"
+        "value": "kaleidoscope_grilling.display.item.unfinished_skewer"
       },
       "minecraft:icon": {
         "textures": {
-          "default": "secret_skewer_stick"
+          "default": "unfinished_skewer"
         }
       },
       "minecraft:max_stack_size": 64,
-      "minecraft:allow_off_hand": true
+      "minecraft:allow_off_hand": true,
+      "minecraft:hand_equipped": true
     }
   }
 }

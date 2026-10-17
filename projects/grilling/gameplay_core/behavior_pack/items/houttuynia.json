@@ -4,12 +4,13 @@
     "description": {
       "identifier": "kaleidoscope_grilling:houttuynia",
       "menu_category": {
-        "category": "items"
+        "category": "nature",
+        "group": "kaleidoscope_cookery:itemGroup.name.crops"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:houttuynia.name"
+        "value": "kaleidoscope_grilling.display.item.houttuynia"
       },
       "minecraft:icon": {
         "textures": {
@@ -19,8 +20,8 @@
       "minecraft:max_stack_size": 64,
       "minecraft:allow_off_hand": true,
       "minecraft:use_modifiers": {
-        "start_using": "always",
-        "use_duration": 5,
+        "start_using": "if_first",
+        "use_duration": 1.6,
         "movement_modifier": 0.35
       },
       "minecraft:food": {
@@ -35,6 +36,17 @@
         "tags": [
           "minecraft:is_food"
         ]
+      },
+      "minecraft:block_placer": {
+        "block": "kaleidoscope_grilling:houttuynia_crop",
+        "use_on": [
+          "minecraft:farmland",
+          "minecraft:soul_sand"
+        ],
+        "replace_block_item": false
+      },
+      "minecraft:compostable": {
+        "composting_chance": 65
       }
     }
   }

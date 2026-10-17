@@ -1,0 +1,27 @@
+{
+  "version": "A2.7.25",
+  "skewer_attachables": 39,
+  "shared_hold_animation": true,
+  "hand_offset": [
+    0,
+    7,
+    2
+  ],
+  "bite_stage_logic_preserved": true,
+  "geometry_rebaked": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 165,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 603,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

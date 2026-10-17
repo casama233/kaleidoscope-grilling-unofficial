@@ -1,0 +1,26 @@
+{
+  "version": "A2.7.38",
+  "shared_oil_contract": true,
+  "host_fat_capacity": 256,
+  "typed_fluid_capacity": 64,
+  "bucket_points": 8,
+  "a2736_private_bucket_registry_removed": true,
+  "duplicate_host_block_created": false,
+  "visual_adapter_deferred": true,
+  "hud_adapter_deferred": true,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 181,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 610,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

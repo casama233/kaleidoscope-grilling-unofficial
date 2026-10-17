@@ -1,0 +1,68 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kg_a26.player.anvil_press": {
+      "animation_length": 0.45,
+      "override_previous_animation": false,
+      "bones": {
+        "rightarm": {
+          "rotation": {
+            "0.0": [
+              -125,
+              0,
+              10
+            ],
+            "0.30": [
+              -25,
+              0,
+              5
+            ],
+            "0.45": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "leftarm": {
+          "rotation": {
+            "0.0": [
+              -125,
+              0,
+              -10
+            ],
+            "0.30": [
+              -25,
+              0,
+              -5
+            ],
+            "0.45": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              -8,
+              0,
+              0
+            ],
+            "0.30": [
+              18,
+              0,
+              0
+            ],
+            "0.45": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  }
+}

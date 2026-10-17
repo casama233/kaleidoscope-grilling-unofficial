@@ -1,0 +1,13 @@
+{
+  "version": "A2.7.27",
+  "cookery_recipe_host_reuse": true,
+  "hosted_recipe_rows": 9,
+  "active_recipe_runtime_modules": 1,
+  "startup_api_pings": 1,
+  "beef_override_retained": true,
+  "a2726_seasoning_render_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

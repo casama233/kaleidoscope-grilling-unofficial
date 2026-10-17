@@ -1,0 +1,22 @@
+{
+  "version": "A2.7.12",
+  "cow_raw_offal_knife_drop": true,
+  "squid_tentacle_item": true,
+  "squid_tentacle_knife_drop": true,
+  "cow_base_count_range": [
+    1,
+    2
+  ],
+  "squid_base_count_range": [
+    2,
+    3
+  ],
+  "squid_chance": 0.5,
+  "looting_bonus_inclusive": true,
+  "a2710_chicken_acquisition_preserved": true,
+  "a2711_mantou_chopping_preserved": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

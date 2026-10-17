@@ -1,0 +1,2952 @@
+{
+  "schema": 1,
+  "release": [
+    2,
+    8,
+    105
+  ],
+  "base_commit": "b8bb78b523fbb17c5dc12e674026f084231b4a7d",
+  "scope": "Only two bottle first-person idle grip positions and the inherited constant position translation of all four existing shake/sprinkle clips. Preserve motion curves, rotation, .72 scale, time keys, duration, selectors, player anchors, all content/mesh/material/storage fields. This is a bounded native-unaccepted grip candidate, not active absolute Java parity.",
+  "camera_offset_before": [
+    -3,
+    5,
+    -6
+  ],
+  "camera_offset_after": [
+    -1,
+    3,
+    -3
+  ],
+  "files": {
+    "projects/grilling/gameplay_core/resource_pack/animations/a286_held.animation.json": {
+      "before_sha256": "9974c8ba85a8cdbceacd56e3a1cba2ed7da91d78ab3260919046efdc5d497c53",
+      "after_sha256": "7efa0944bb50d874c2b294130487c68ea2f68e55a683dc8fb78961eeb518d644",
+      "operations": [
+        {
+          "path": [
+            "animations",
+            "animation.kg_a286.bottle_fp_right",
+            "bones",
+            "grip",
+            "position"
+          ],
+          "before": [
+            -2.15012987,
+            -3.38229092,
+            -8.3407315
+          ],
+          "after": [
+            -3.58740993,
+            -0.81925261,
+            -5.44849005
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_a286.bottle_fp_left",
+            "bones",
+            "grip",
+            "position"
+          ],
+          "before": [
+            -12.039,
+            9.242,
+            17.6
+          ],
+          "after": [
+            -14.039,
+            7.242,
+            14.6
+          ]
+        }
+      ]
+    },
+    "projects/grilling/gameplay_core/resource_pack/animations/seasoning_held.animation.json": {
+      "before_sha256": "d6262073dc8cfb57ce94018b9e618be3f3358ee0189697f9cced49d81e1bd07d",
+      "after_sha256": "2dd6a636e1c56709437557dd3fd2c5ab4c48b0048e279c7f23b0dbb24be20450",
+      "operations": [
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.0"
+          ],
+          "before": [
+            -0.5312759836763348,
+            -3.251366136932532,
+            -10.49860530519348
+          ],
+          "after": [
+            -1.9685560436763345,
+            -0.6883278269325319,
+            -7.606363855193481
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.01666667"
+          ],
+          "before": [
+            -0.09298658095201179,
+            -3.001935724621898,
+            -10.31438068486494
+          ],
+          "after": [
+            -1.5302666409520116,
+            -0.438897414621898,
+            -7.4221392348649395
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.03333333"
+          ],
+          "before": [
+            0.2561984778015203,
+            -2.7907765211750393,
+            -10.196315941349681
+          ],
+          "after": [
+            -1.1810815821984795,
+            -0.22773821117503967,
+            -7.30407449134968
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.05"
+          ],
+          "before": [
+            0.4952812203778545,
+            -2.608428926309376,
+            -10.106672215891484
+          ],
+          "after": [
+            -0.9419988396221453,
+            -0.0453906163093758,
+            -7.214430765891484
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.06666667"
+          ],
+          "before": [
+            0.6030776904033808,
+            -2.4501409995216124,
+            -9.998843974126814
+          ],
+          "after": [
+            -0.834202369596619,
+            0.11289731047838769,
+            -7.106602524126813
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.08333333"
+          ],
+          "before": [
+            0.5696283920212216,
+            -2.3267703046134005,
+            -9.858452619648329
+          ],
+          "after": [
+            -0.867651667978778,
+            0.23626800538659953,
+            -6.966211169648328
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.1"
+          ],
+          "before": [
+            0.40471875121776335,
+            -2.255623392715444,
+            -9.717305189326204
+          ],
+          "after": [
+            -1.0325613087822363,
+            0.30741491728455594,
+            -6.825063739326204
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.11666667"
+          ],
+          "before": [
+            0.13253950487469285,
+            -2.235243194247743,
+            -9.631580563428948
+          ],
+          "after": [
+            -1.304740555125307,
+            0.3277951157522567,
+            -6.739339113428948
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.13333333"
+          ],
+          "before": [
+            -0.21167643550965182,
+            -2.2354370002023356,
+            -9.633721513911082
+          ],
+          "after": [
+            -1.6489564955096516,
+            0.32760130979766444,
+            -6.741480063911082
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.15"
+          ],
+          "before": [
+            -0.5710738048277109,
+            -2.2216429843074073,
+            -9.699848000231842
+          ],
+          "after": [
+            -2.0083538648277104,
+            0.3413953256925928,
+            -6.807606550231843
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.16666667"
+          ],
+          "before": [
+            -0.8611979561189451,
+            -2.1841858633634366,
+            -9.76754996027448
+          ],
+          "after": [
+            -2.2984780161189446,
+            0.3788524466365635,
+            -6.875308510274479
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.18333333"
+          ],
+          "before": [
+            -0.9941482630867167,
+            -2.137271700753145,
+            -9.779538126007763
+          ],
+          "after": [
+            -2.4314283230867164,
+            0.42576660924685505,
+            -6.887296676007763
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.2"
+          ],
+          "before": [
+            -0.9225633565010112,
+            -2.096812749489161,
+            -9.709516854933547
+          ],
+          "after": [
+            -2.359843416501011,
+            0.4662255605108392,
+            -6.8172754049335476
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.21666667"
+          ],
+          "before": [
+            -0.6662923972686297,
+            -2.0629640558019515,
+            -9.566919767531928
+          ],
+          "after": [
+            -2.1035724572686294,
+            0.5000742541980481,
+            -6.674678317531928
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.23333333"
+          ],
+          "before": [
+            -0.2985423320852061,
+            -2.0188252353815237,
+            -9.39572688578597
+          ],
+          "after": [
+            -1.7358223920852058,
+            0.5442130746184763,
+            -6.50348543578597
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.25"
+          ],
+          "before": [
+            0.09665555661283809,
+            -1.9482077930653805,
+            -9.261052452063069
+          ],
+          "after": [
+            -1.3406245033871615,
+            0.6148305169346195,
+            -6.36881100206307
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.26666667"
+          ],
+          "before": [
+            0.4566270953314807,
+            -1.85943930365591,
+            -9.21234177655214
+          ],
+          "after": [
+            -0.980652964668519,
+            0.7035990063440902,
+            -6.320100326552139
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.28333333"
+          ],
+          "before": [
+            0.7379349068478506,
+            -1.785381513124261,
+            -9.247540858996976
+          ],
+          "after": [
+            -0.6993451531521492,
+            0.7776567968757391,
+            -6.355299408996975
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.3"
+          ],
+          "before": [
+            0.9024061972550754,
+            -1.7571020685030934,
+            -9.318655003664414
+          ],
+          "after": [
+            -0.5348738627449245,
+            0.8059362414969065,
+            -6.426413553664414
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.31666667"
+          ],
+          "before": [
+            0.9211323821082642,
+            -1.785883111898132,
+            -9.375239992207396
+          ],
+          "after": [
+            -0.5161476778917355,
+            0.7771551981018678,
+            -6.482998542207396
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.33333333"
+          ],
+          "before": [
+            0.7895385221443202,
+            -1.8686812090034464,
+            -9.404538903544616
+          ],
+          "after": [
+            -0.6477415378556797,
+            0.6943571009965535,
+            -6.512297453544616
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.35"
+          ],
+          "before": [
+            0.5293032678407887,
+            -1.9963597661887187,
+            -9.440643269199704
+          ],
+          "after": [
+            -0.907976792159211,
+            0.5666785438112814,
+            -6.548401819199704
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.36666667"
+          ],
+          "before": [
+            0.17214807795303066,
+            -2.1527403416922493,
+            -9.538572992395064
+          ],
+          "after": [
+            -1.265131982046969,
+            0.41029796830775034,
+            -6.646331542395065
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.38333333"
+          ],
+          "before": [
+            -0.2512850085879896,
+            -2.317939852757829,
+            -9.726729084944965
+          ],
+          "after": [
+            -1.6885650685879894,
+            0.24509845724217083,
+            -6.834487634944965
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.4"
+          ],
+          "before": [
+            -0.695658321450736,
+            -2.4809066108341318,
+            -9.976509920358342
+          ],
+          "after": [
+            -2.1329383814507357,
+            0.08213169916586782,
+            -7.084268470358343
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.41666667"
+          ],
+          "before": [
+            -1.081108086242043,
+            -2.642274958973391,
+            -10.221463676378193
+          ],
+          "after": [
+            -2.5183881462420428,
+            -0.07923664897339089,
+            -7.329222226378191
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.43333333"
+          ],
+          "before": [
+            -1.3122029547916005,
+            -2.801529588376625,
+            -10.40314210792718
+          ],
+          "after": [
+            -2.7494830147916005,
+            -0.2384912783766251,
+            -7.51090065792718
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.45"
+          ],
+          "before": [
+            -1.3296883333782321,
+            -2.9481396072954427,
+            -10.497534067160617
+          ],
+          "after": [
+            -2.7669683933782316,
+            -0.3851012972954422,
+            -7.605292617160617
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.46666667"
+          ],
+          "before": [
+            -1.1480288263149605,
+            -3.0683590638527303,
+            -10.515694849884634
+          ],
+          "after": [
+            -2.58530888631496,
+            -0.5053207538527307,
+            -7.623453399884633
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.48333333"
+          ],
+          "before": [
+            -0.8481560083687002,
+            -3.1613216563475106,
+            -10.497765794098772
+          ],
+          "after": [
+            -2.2854360683687,
+            -0.5982833463475106,
+            -7.605524344098771
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.right",
+            "bones",
+            "grip",
+            "position",
+            "0.5"
+          ],
+          "before": [
+            -0.5312759836763354,
+            -3.251366136932532,
+            -10.49860530519348
+          ],
+          "after": [
+            -1.9685560436763352,
+            -0.6883278269325319,
+            -7.606363855193481
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.0"
+          ],
+          "before": [
+            -2.15012987,
+            -3.38229092,
+            -8.3407315
+          ],
+          "after": [
+            -3.5874099299999997,
+            -0.81925261,
+            -5.44849005
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.00436332"
+          ],
+          "before": [
+            -1.8655844731654156,
+            -3.4306945731606033,
+            -8.386840590099007
+          ],
+          "after": [
+            -3.302864533165416,
+            -0.8676562631606036,
+            -5.494599140099006
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.00872665"
+          ],
+          "before": [
+            -1.5843424040647318,
+            -3.4826714490817894,
+            -8.418964562772963
+          ],
+          "after": [
+            -3.021622464064732,
+            -0.9196331390817895,
+            -5.526723112772963
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.01308997"
+          ],
+          "before": [
+            -1.3147172582875537,
+            -3.5357230649377946,
+            -8.437280317314908
+          ],
+          "after": [
+            -2.751997318287553,
+            -0.9726847549377947,
+            -5.545038867314908
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.01745329"
+          ],
+          "before": [
+            -1.0645949734200277,
+            -3.5872157575435217,
+            -8.443358855697506
+          ],
+          "after": [
+            -2.5018750334200273,
+            -1.0241774475435217,
+            -5.5511174056975054
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.02181662"
+          ],
+          "before": [
+            -0.8410668819112979,
+            -3.634668165288642,
+            -8.439883272152676
+          ],
+          "after": [
+            -2.278346941911298,
+            -1.0716298552886419,
+            -5.547641822152675
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.02617994"
+          ],
+          "before": [
+            -0.6501847235203859,
+            -3.6759693921286907,
+            -8.430230758331547
+          ],
+          "after": [
+            -2.087464783520386,
+            -1.1129310821286906,
+            -5.537989308331547
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.03054326"
+          ],
+          "before": [
+            -0.4968405839312786,
+            -3.7094938178127626,
+            -8.41799294810543
+          ],
+          "after": [
+            -1.9341206439312781,
+            -1.146455507812763,
+            -5.52575149810543
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.03490659"
+          ],
+          "before": [
+            -0.3847481288481205,
+            -3.7341116732611344,
+            -8.406507638277665
+          ],
+          "after": [
+            -1.8220281888481202,
+            -1.1710733632611348,
+            -5.514266188277665
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.03926991"
+          ],
+          "before": [
+            -0.31648667683467036,
+            -3.749123668111051,
+            -8.39845840115966
+          ],
+          "after": [
+            -1.75376673683467,
+            -1.1860853581110513,
+            -5.50621695115966
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.04363323"
+          ],
+          "before": [
+            -0.2935672465430994,
+            -3.7541647810289254,
+            -8.395576262525971
+          ],
+          "after": [
+            -1.7308473065430994,
+            -1.1911264710289253,
+            -5.503334812525972
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.04799655"
+          ],
+          "before": [
+            -0.31648667683467036,
+            -3.749123668111051,
+            -8.39845840115966
+          ],
+          "after": [
+            -1.75376673683467,
+            -1.1860853581110513,
+            -5.50621695115966
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.05235988"
+          ],
+          "before": [
+            -0.3847481288481205,
+            -3.7341116732611344,
+            -8.406507638277665
+          ],
+          "after": [
+            -1.8220281888481202,
+            -1.1710733632611348,
+            -5.514266188277665
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.0567232"
+          ],
+          "before": [
+            -0.4968405839312784,
+            -3.7094938178127626,
+            -8.41799294810543
+          ],
+          "after": [
+            -1.934120643931278,
+            -1.146455507812763,
+            -5.52575149810543
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.06108652"
+          ],
+          "before": [
+            -0.6501847235203859,
+            -3.6759693921286907,
+            -8.430230758331547
+          ],
+          "after": [
+            -2.087464783520386,
+            -1.1129310821286906,
+            -5.537989308331547
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.06544985"
+          ],
+          "before": [
+            -0.8410668819112981,
+            -3.634668165288642,
+            -8.439883272152676
+          ],
+          "after": [
+            -2.2783469419112983,
+            -1.0716298552886419,
+            -5.547641822152675
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.06981317"
+          ],
+          "before": [
+            -1.0645949734200275,
+            -3.5872157575435217,
+            -8.443358855697506
+          ],
+          "after": [
+            -2.501875033420027,
+            -1.0241774475435217,
+            -5.5511174056975054
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.07417649"
+          ],
+          "before": [
+            -1.3147172582875535,
+            -3.5357230649377946,
+            -8.437280317314908
+          ],
+          "after": [
+            -2.751997318287553,
+            -0.9726847549377947,
+            -5.545038867314908
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.07853982"
+          ],
+          "before": [
+            -1.5843424040647318,
+            -3.4826714490817894,
+            -8.418964562772963
+          ],
+          "after": [
+            -3.021622464064732,
+            -0.9196331390817895,
+            -5.526723112772963
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.08290314"
+          ],
+          "before": [
+            -1.8655844731654154,
+            -3.4306945731606038,
+            -8.386840590099007
+          ],
+          "after": [
+            -3.3028645331654154,
+            -0.8676562631606038,
+            -5.494599140099006
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.08726646"
+          ],
+          "before": [
+            -2.15012987,
+            -3.38229092,
+            -8.3407315
+          ],
+          "after": [
+            -3.5874099299999997,
+            -0.8192526100000003,
+            -5.44849005
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.09162979"
+          ],
+          "before": [
+            -2.4296907953939364,
+            -3.339526709962949,
+            -8.281945331338662
+          ],
+          "after": [
+            -3.8669708553939364,
+            -0.7764883999629492,
+            -5.3897038813386615
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.09599311"
+          ],
+          "before": [
+            -2.6964814741274274,
+            -3.30379705028665,
+            -8.21315655445606
+          ],
+          "after": [
+            -4.133761534127427,
+            -0.7407587402866497,
+            -5.320915104456059
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.10035643"
+          ],
+          "before": [
+            -2.9436398837224615,
+            -3.2756997741497087,
+            -8.138104605454698
+          ],
+          "after": [
+            -4.3809199437224615,
+            -0.7126614641497088,
+            -5.245863155454697
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.10471976"
+          ],
+          "before": [
+            -3.1655250662186343,
+            -3.255046186336222,
+            -8.06117359981889
+          ],
+          "after": [
+            -4.602805126218634,
+            -0.6920078763362222,
+            -5.168932149818889
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.10908308"
+          ],
+          "before": [
+            -3.3578468824644467,
+            -3.2409971795010373,
+            -7.9869361647810395
+          ],
+          "after": [
+            -4.795126942464447,
+            -0.6779588695010373,
+            -5.094694714781039
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.1134464"
+          ],
+          "before": [
+            -3.5176225965941956,
+            -3.2322847952019265,
+            -7.919739353024491
+          ],
+          "after": [
+            -4.954902656594196,
+            -0.6692464852019263,
+            -5.027497903024491
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.11780972"
+          ],
+          "before": [
+            -3.6429909922547243,
+            -3.227466892520838,
+            -7.863385904740499
+          ],
+          "after": [
+            -5.080271052254724,
+            -0.6644285825208379,
+            -4.971144454740498
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.12217305"
+          ],
+          "before": [
+            -3.7329397629315726,
+            -3.2251672801452744,
+            -7.820930090027218
+          ],
+          "after": [
+            -5.170219822931573,
+            -0.6621289701452745,
+            -4.928688640027218
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.12653637"
+          ],
+          "before": [
+            -3.787011174888455,
+            -3.224269789357871,
+            -7.7945758323226
+          ],
+          "after": [
+            -5.2242912348884545,
+            -0.661231479357871,
+            -4.9023343823226
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.13089969"
+          ],
+          "before": [
+            -3.805045959715189,
+            -3.2240534806071732,
+            -7.785644647599704
+          ],
+          "after": [
+            -5.242326019715189,
+            -0.6610151706071731,
+            -4.893403197599704
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.13526302"
+          ],
+          "before": [
+            -3.7870111748884554,
+            -3.224269789357871,
+            -7.7945758323226
+          ],
+          "after": [
+            -5.2242912348884545,
+            -0.661231479357871,
+            -4.9023343823226
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.13962634"
+          ],
+          "before": [
+            -3.7329397629315726,
+            -3.225167280145274,
+            -7.820930090027218
+          ],
+          "after": [
+            -5.170219822931573,
+            -0.6621289701452743,
+            -4.928688640027218
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.14398966"
+          ],
+          "before": [
+            -3.642990992254725,
+            -3.2274668925208374,
+            -7.863385904740499
+          ],
+          "after": [
+            -5.080271052254725,
+            -0.6644285825208377,
+            -4.971144454740498
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.14835299"
+          ],
+          "before": [
+            -3.5176225965941965,
+            -3.2322847952019265,
+            -7.91973935302449
+          ],
+          "after": [
+            -4.9549026565941965,
+            -0.6692464852019263,
+            -5.02749790302449
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.15271631"
+          ],
+          "before": [
+            -3.3578468824644476,
+            -3.2409971795010373,
+            -7.986936164781039
+          ],
+          "after": [
+            -4.795126942464448,
+            -0.6779588695010371,
+            -5.094694714781038
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.15707963"
+          ],
+          "before": [
+            -3.1655250662186347,
+            -3.255046186336222,
+            -8.06117359981889
+          ],
+          "after": [
+            -4.602805126218635,
+            -0.6920078763362222,
+            -5.168932149818889
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.16144296"
+          ],
+          "before": [
+            -2.9436398837224615,
+            -3.2756997741497087,
+            -8.138104605454696
+          ],
+          "after": [
+            -4.3809199437224615,
+            -0.7126614641497088,
+            -5.245863155454697
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.16580628"
+          ],
+          "before": [
+            -2.6964814741274283,
+            -3.3037970502866494,
+            -8.21315655445606
+          ],
+          "after": [
+            -4.133761534127428,
+            -0.7407587402866495,
+            -5.320915104456058
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.1701696"
+          ],
+          "before": [
+            -2.4296907953939364,
+            -3.339526709962949,
+            -8.281945331338662
+          ],
+          "after": [
+            -3.8669708553939364,
+            -0.7764883999629492,
+            -5.389703881338662
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.right",
+            "bones",
+            "grip",
+            "position",
+            "0.17453293"
+          ],
+          "before": [
+            -2.1501298700000007,
+            -3.38229092,
+            -8.3407315
+          ],
+          "after": [
+            -3.58740993,
+            -0.81925261,
+            -5.44849005
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.0"
+          ],
+          "before": [
+            -10.613856513434698,
+            6.154798051127922,
+            16.785463391176084
+          ],
+          "after": [
+            -12.613856513434698,
+            4.154798051127922,
+            13.785463391176084
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.01666667"
+          ],
+          "before": [
+            -11.289656187137608,
+            6.237516267699425,
+            16.657999002724456
+          ],
+          "after": [
+            -13.289656187137608,
+            4.237516267699425,
+            13.657999002724452
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.03333333"
+          ],
+          "before": [
+            -11.830877891266438,
+            6.371285339335204,
+            16.560927810182342
+          ],
+          "after": [
+            -13.830877891266438,
+            4.371285339335204,
+            13.560927810182342
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.05"
+          ],
+          "before": [
+            -12.175935573049733,
+            6.495257321705401,
+            16.521783802466857
+          ],
+          "after": [
+            -14.175935573049733,
+            4.495257321705401,
+            13.521783802466855
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.06666667"
+          ],
+          "before": [
+            -12.309799553018998,
+            6.56559677857057,
+            16.550657669506016
+          ],
+          "after": [
+            -14.309799553018998,
+            4.56559677857057,
+            13.550657669506013
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.08333333"
+          ],
+          "before": [
+            -12.239003394740005,
+            6.579452885522051,
+            16.652864725391993
+          ],
+          "after": [
+            -14.239003394740005,
+            4.579452885522052,
+            13.652864725391991
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.1"
+          ],
+          "before": [
+            -11.975575356636071,
+            6.571740661689527,
+            16.82821426155525
+          ],
+          "after": [
+            -13.975575356636071,
+            4.571740661689527,
+            13.828214261555246
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.11666667"
+          ],
+          "before": [
+            -11.541883209754717,
+            6.589870500604492,
+            17.051619112376386
+          ],
+          "after": [
+            -13.541883209754717,
+            4.589870500604492,
+            14.051619112376386
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.13333333"
+          ],
+          "before": [
+            -10.996241054056485,
+            6.66016668643633,
+            17.268269395700532
+          ],
+          "after": [
+            -12.996241054056485,
+            4.66016668643633,
+            14.26826939570053
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.15"
+          ],
+          "before": [
+            -10.448622921315406,
+            6.770914774003203,
+            17.426560181128334
+          ],
+          "after": [
+            -12.448622921315406,
+            4.770914774003203,
+            14.426560181128332
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.16666667"
+          ],
+          "before": [
+            -10.03363280261982,
+            6.884440423270485,
+            17.515284851574418
+          ],
+          "after": [
+            -12.03363280261982,
+            4.884440423270485,
+            14.515284851574416
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.18333333"
+          ],
+          "before": [
+            -9.860193434008348,
+            6.963502992131754,
+            17.55882647955705
+          ],
+          "after": [
+            -11.860193434008348,
+            4.963502992131754,
+            14.558826479557048
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.2"
+          ],
+          "before": [
+            -9.979826088202948,
+            6.991675104232498,
+            17.579566473800355
+          ],
+          "after": [
+            -11.979826088202948,
+            4.991675104232498,
+            14.579566473800352
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.21666667"
+          ],
+          "before": [
+            -10.377506897371292,
+            6.97905091989326,
+            17.57049906126984
+          ],
+          "after": [
+            -12.377506897371292,
+            4.97905091989326,
+            14.570499061269837
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.23333333"
+          ],
+          "before": [
+            -10.970238433725719,
+            6.953100981456336,
+            17.50286816330694
+          ],
+          "after": [
+            -12.970238433725719,
+            4.953100981456336,
+            14.502868163306939
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.25"
+          ],
+          "before": [
+            -11.623128120141976,
+            6.9408144619735275,
+            17.362309638350048
+          ],
+          "after": [
+            -13.623128120141976,
+            4.9408144619735275,
+            14.362309638350046
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.26666667"
+          ],
+          "before": [
+            -12.197729880470886,
+            6.953100981456336,
+            17.17700587726207
+          ],
+          "after": [
+            -14.197729880470886,
+            4.953100981456336,
+            14.177005877262069
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.28333333"
+          ],
+          "before": [
+            -12.60431838861394,
+            6.97905091989326,
+            17.00298547369162
+          ],
+          "after": [
+            -14.60431838861394,
+            4.97905091989326,
+            14.002985473691616
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.3"
+          ],
+          "before": [
+            -12.811489476814016,
+            6.991675104232499,
+            16.88503278502693
+          ],
+          "after": [
+            -14.811489476814016,
+            4.991675104232499,
+            13.885032785026928
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.31666667"
+          ],
+          "before": [
+            -12.816774061329122,
+            6.963502992131754,
+            16.84041747309908
+          ],
+          "after": [
+            -14.816774061329122,
+            4.963502992131754,
+            13.84041747309908
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.33333333"
+          ],
+          "before": [
+            -12.61933131825653,
+            6.884440423270486,
+            16.870240042321523
+          ],
+          "after": [
+            -14.61933131825653,
+            4.884440423270485,
+            13.870240042321523
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.35"
+          ],
+          "before": [
+            -12.216601101249873,
+            6.770914774003204,
+            16.9659718238693
+          ],
+          "after": [
+            -14.216601101249873,
+            4.770914774003204,
+            13.965971823869298
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.36666667"
+          ],
+          "before": [
+            -11.62512767755811,
+            6.660166686436332,
+            17.099197245488682
+          ],
+          "after": [
+            -13.62512767755811,
+            4.660166686436332,
+            14.099197245488682
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.38333333"
+          ],
+          "before": [
+            -10.912996586253096,
+            6.589870500604493,
+            17.220691262588236
+          ],
+          "after": [
+            -12.912996586253096,
+            4.589870500604493,
+            14.220691262588234
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.4"
+          ],
+          "before": [
+            -10.207597176701606,
+            6.571740661689527,
+            17.288802618814284
+          ],
+          "after": [
+            -12.207597176701606,
+            4.571740661689527,
+            14.28880261881428
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.41666667"
+          ],
+          "before": [
+            -9.653304879103295,
+            6.579452885522051,
+            17.297909534644884
+          ],
+          "after": [
+            -11.653304879103295,
+            4.579452885522052,
+            14.297909534644884
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.43333333"
+          ],
+          "before": [
+            -9.353218925698224,
+            6.565596778570569,
+            17.269066675963984
+          ],
+          "after": [
+            -11.353218925698224,
+            4.565596778570569,
+            14.26906667596398
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.45"
+          ],
+          "before": [
+            -9.344272184438665,
+            6.495257321705402,
+            17.216317491240282
+          ],
+          "after": [
+            -11.344272184438665,
+            4.495257321705402,
+            14.216317491240279
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.46666667"
+          ],
+          "before": [
+            -9.604066400023788,
+            6.371285339335203,
+            17.128441397760565
+          ],
+          "after": [
+            -11.604066400023788,
+            4.371285339335203,
+            14.128441397760563
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.48333333"
+          ],
+          "before": [
+            -10.062164740392438,
+            6.237516267699424,
+            16.983861288769326
+          ],
+          "after": [
+            -12.062164740392438,
+            4.237516267699424,
+            13.983861288769324
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.sprinkle.left",
+            "bones",
+            "grip",
+            "position",
+            "0.5"
+          ],
+          "before": [
+            -10.613856513434698,
+            6.154798051127922,
+            16.785463391176084
+          ],
+          "after": [
+            -12.613856513434698,
+            4.154798051127922,
+            13.785463391176084
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.0"
+          ],
+          "before": [
+            -12.039,
+            9.242,
+            17.6
+          ],
+          "after": [
+            -14.039,
+            7.242000000000001,
+            14.6
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.00436332"
+          ],
+          "before": [
+            -12.191845487875812,
+            9.23907651091159,
+            17.696553603964823
+          ],
+          "after": [
+            -14.191845487875812,
+            7.239076510911589,
+            14.696553603964823
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.00872665"
+          ],
+          "before": [
+            -12.352882583203467,
+            9.230590842027642,
+            17.795912931440768
+          ],
+          "after": [
+            -14.352882583203467,
+            7.230590842027643,
+            14.795912931440768
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.01308997"
+          ],
+          "before": [
+            -12.517253232623577,
+            9.217370198406465,
+            17.893850841404078
+          ],
+          "after": [
+            -14.517253232623577,
+            7.217370198406465,
+            14.893850841404076
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.01745329"
+          ],
+          "before": [
+            -12.679009780745407,
+            9.200704883522533,
+            17.98626370744283
+          ],
+          "after": [
+            -14.679009780745407,
+            7.200704883522534,
+            14.98626370744283
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.02181662"
+          ],
+          "before": [
+            -12.83150700722227,
+            9.18222370555633,
+            18.069536458884304
+          ],
+          "after": [
+            -14.83150700722227,
+            7.18222370555633,
+            15.069536458884304
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.02617994"
+          ],
+          "before": [
+            -12.967912463361552,
+            9.163735435784105,
+            18.14077030883445
+          ],
+          "after": [
+            -14.967912463361552,
+            7.163735435784106,
+            15.14077030883445
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.03054326"
+          ],
+          "before": [
+            -13.081754684714223,
+            9.147051548801096,
+            18.19785348442953
+          ],
+          "after": [
+            -15.081754684714223,
+            7.147051548801096,
+            15.197853484429528
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.03490659"
+          ],
+          "before": [
+            -13.167434885262526,
+            9.133807937783171,
+            18.239397161506353
+          ],
+          "after": [
+            -15.167434885262526,
+            7.13380793778317,
+            15.239397161506352
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.03926991"
+          ],
+          "before": [
+            -13.220649212959925,
+            9.125303678969674,
+            18.26458858258622
+          ],
+          "after": [
+            -15.220649212959925,
+            7.125303678969674,
+            15.26458858258622
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.04363323"
+          ],
+          "before": [
+            -13.238694348741808,
+            9.122373087055406,
+            18.273025244204064
+          ],
+          "after": [
+            -15.238694348741808,
+            7.122373087055406,
+            15.273025244204062
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.04799655"
+          ],
+          "before": [
+            -13.220649212959925,
+            9.125303678969674,
+            18.26458858258622
+          ],
+          "after": [
+            -15.220649212959925,
+            7.125303678969674,
+            15.26458858258622
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.05235988"
+          ],
+          "before": [
+            -13.167434885262526,
+            9.133807937783171,
+            18.239397161506353
+          ],
+          "after": [
+            -15.167434885262526,
+            7.13380793778317,
+            15.239397161506352
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.0567232"
+          ],
+          "before": [
+            -13.081754684714223,
+            9.147051548801096,
+            18.19785348442953
+          ],
+          "after": [
+            -15.081754684714223,
+            7.147051548801096,
+            15.197853484429528
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.06108652"
+          ],
+          "before": [
+            -12.967912463361552,
+            9.163735435784105,
+            18.14077030883445
+          ],
+          "after": [
+            -14.967912463361552,
+            7.163735435784106,
+            15.14077030883445
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.06544985"
+          ],
+          "before": [
+            -12.83150700722227,
+            9.18222370555633,
+            18.069536458884304
+          ],
+          "after": [
+            -14.83150700722227,
+            7.18222370555633,
+            15.069536458884304
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.06981317"
+          ],
+          "before": [
+            -12.679009780745407,
+            9.200704883522533,
+            17.98626370744283
+          ],
+          "after": [
+            -14.679009780745407,
+            7.200704883522534,
+            14.98626370744283
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.07417649"
+          ],
+          "before": [
+            -12.517253232623577,
+            9.217370198406465,
+            17.893850841404078
+          ],
+          "after": [
+            -14.517253232623577,
+            7.217370198406465,
+            14.893850841404076
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.07853982"
+          ],
+          "before": [
+            -12.352882583203467,
+            9.230590842027642,
+            17.795912931440768
+          ],
+          "after": [
+            -14.352882583203467,
+            7.230590842027643,
+            14.795912931440768
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.08290314"
+          ],
+          "before": [
+            -12.191845487875812,
+            9.23907651091159,
+            17.696553603964823
+          ],
+          "after": [
+            -14.191845487875812,
+            7.239076510911589,
+            14.696553603964823
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.08726646"
+          ],
+          "before": [
+            -12.039,
+            9.242,
+            17.6
+          ],
+          "after": [
+            -14.039,
+            7.242000000000001,
+            14.6
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.09162979"
+          ],
+          "before": [
+            -11.897904724032383,
+            9.23907651091159,
+            17.51016219542723
+          ],
+          "after": [
+            -13.897904724032383,
+            7.239076510911589,
+            14.51016219542723
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.09599311"
+          ],
+          "before": [
+            -11.770817380579293,
+            9.230590842027643,
+            17.430206749751967
+          ],
+          "after": [
+            -13.770817380579293,
+            7.230590842027643,
+            14.430206749751965
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.10035643"
+          ],
+          "before": [
+            -11.658879955225817,
+            9.217370198406465,
+            17.36223689628511
+          ],
+          "after": [
+            -13.658879955225817,
+            7.217370198406465,
+            14.36223689628511
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.10471976"
+          ],
+          "before": [
+            -11.562426304574156,
+            9.200704883522533,
+            17.307147711091943
+          ],
+          "after": [
+            -13.562426304574156,
+            7.200704883522534,
+            14.30714771109194
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.10908308"
+          ],
+          "before": [
+            -11.48132604677972,
+            9.18222370555633,
+            17.264681689147615
+          ],
+          "after": [
+            -13.48132604677972,
+            7.18222370555633,
+            14.264681689147613
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.1134464"
+          ],
+          "before": [
+            -11.415283259387579,
+            9.163735435784105,
+            17.23366341757914
+          ],
+          "after": [
+            -13.415283259387579,
+            7.163735435784106,
+            14.233663417579141
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.11780972"
+          ],
+          "before": [
+            -11.364036059921853,
+            9.147051548801098,
+            17.212356244427106
+          ],
+          "after": [
+            -13.364036059921853,
+            7.147051548801097,
+            14.212356244427106
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.12217305"
+          ],
+          "before": [
+            -11.32744187874816,
+            9.133807937783171,
+            17.198867538754197
+          ],
+          "after": [
+            -13.32744187874816,
+            7.133807937783171,
+            14.198867538754195
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.12653637"
+          ],
+          "before": [
+            -11.30546928754918,
+            9.125303678969674,
+            17.19153224117423
+          ],
+          "after": [
+            -13.30546928754918,
+            7.125303678969674,
+            14.191532241174228
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.13089969"
+          ],
+          "before": [
+            -11.298139977343423,
+            9.122373087055406,
+            17.189220178453137
+          ],
+          "after": [
+            -13.298139977343423,
+            7.122373087055406,
+            14.189220178453136
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.13526302"
+          ],
+          "before": [
+            -11.30546928754918,
+            9.125303678969674,
+            17.19153224117423
+          ],
+          "after": [
+            -13.30546928754918,
+            7.125303678969674,
+            14.191532241174228
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.13962634"
+          ],
+          "before": [
+            -11.32744187874816,
+            9.133807937783171,
+            17.198867538754197
+          ],
+          "after": [
+            -13.32744187874816,
+            7.13380793778317,
+            14.198867538754195
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.14398966"
+          ],
+          "before": [
+            -11.364036059921851,
+            9.147051548801096,
+            17.212356244427106
+          ],
+          "after": [
+            -13.364036059921851,
+            7.147051548801096,
+            14.212356244427106
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.14835299"
+          ],
+          "before": [
+            -11.415283259387579,
+            9.163735435784105,
+            17.23366341757914
+          ],
+          "after": [
+            -13.415283259387579,
+            7.163735435784106,
+            14.233663417579141
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.15271631"
+          ],
+          "before": [
+            -11.481326046779719,
+            9.18222370555633,
+            17.264681689147615
+          ],
+          "after": [
+            -13.481326046779719,
+            7.18222370555633,
+            14.264681689147613
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.15707963"
+          ],
+          "before": [
+            -11.562426304574156,
+            9.200704883522533,
+            17.30714771109194
+          ],
+          "after": [
+            -13.562426304574156,
+            7.200704883522534,
+            14.30714771109194
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.16144296"
+          ],
+          "before": [
+            -11.658879955225819,
+            9.217370198406465,
+            17.36223689628511
+          ],
+          "after": [
+            -13.658879955225819,
+            7.217370198406465,
+            14.36223689628511
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.16580628"
+          ],
+          "before": [
+            -11.770817380579293,
+            9.230590842027642,
+            17.430206749751967
+          ],
+          "after": [
+            -13.770817380579293,
+            7.230590842027643,
+            14.430206749751965
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.1701696"
+          ],
+          "before": [
+            -11.897904724032383,
+            9.23907651091159,
+            17.51016219542723
+          ],
+          "after": [
+            -13.897904724032383,
+            7.239076510911589,
+            14.51016219542723
+          ]
+        },
+        {
+          "path": [
+            "animations",
+            "animation.kg_seasoning.item.shake.left",
+            "bones",
+            "grip",
+            "position",
+            "0.17453293"
+          ],
+          "before": [
+            -12.039,
+            9.242,
+            17.6
+          ],
+          "after": [
+            -14.039,
+            7.242000000000001,
+            14.6
+          ]
+        }
+      ]
+    }
+  }
+}

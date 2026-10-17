@@ -1,0 +1,557 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kg_a2770.seasoning": {
+      "arrays": {
+        "geometries": {
+          "Array.fills": [
+            "Geometry.r1v0",
+            "Geometry.r1v1",
+            "Geometry.r1v2",
+            "Geometry.r1v3",
+            "Geometry.r1v4",
+            "Geometry.r2v0",
+            "Geometry.r2v1",
+            "Geometry.r2v2",
+            "Geometry.r2v3",
+            "Geometry.r2v4",
+            "Geometry.r3v0",
+            "Geometry.r3v1",
+            "Geometry.r3v2",
+            "Geometry.r3v3",
+            "Geometry.r3v4",
+            "Geometry.r4v0",
+            "Geometry.r4v1",
+            "Geometry.r4v2",
+            "Geometry.r4v3",
+            "Geometry.r4v4",
+            "Geometry.r5v0",
+            "Geometry.r5v1",
+            "Geometry.r5v2",
+            "Geometry.r5v3",
+            "Geometry.r5v4",
+            "Geometry.r6v0",
+            "Geometry.r6v1",
+            "Geometry.r6v2",
+            "Geometry.r6v3",
+            "Geometry.r6v4",
+            "Geometry.r7v0",
+            "Geometry.r7v1",
+            "Geometry.r7v2",
+            "Geometry.r7v3",
+            "Geometry.r7v4",
+            "Geometry.r8v0",
+            "Geometry.r8v1",
+            "Geometry.r8v2",
+            "Geometry.r8v3",
+            "Geometry.r8v4"
+          ]
+        },
+        "textures": {
+          "Array.colors": [
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.default",
+            "Texture.v5",
+            "Texture.v6",
+            "Texture.v7"
+          ]
+        }
+      },
+      "geometry": "Array.fills[(math.clamp(q.property('kaleidoscope_grilling:fill'),1,8)-1)*5+(q.property('kaleidoscope_grilling:variant')<5?q.property('kaleidoscope_grilling:variant'):0)]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.colors[q.property('kaleidoscope_grilling:variant')]"
+      ]
+    },
+    "controller.render.kg_a2770.pending": {
+      "geometry": "Geometry.pending",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.pending"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "root": true
+        },
+        {
+          "pending_0_color_1": "q.property('kaleidoscope_grilling:layer_0') == 1"
+        },
+        {
+          "pending_0_color_2": "q.property('kaleidoscope_grilling:layer_0') == 2"
+        },
+        {
+          "pending_0_color_3": "q.property('kaleidoscope_grilling:layer_0') == 3"
+        },
+        {
+          "pending_0_color_4": "q.property('kaleidoscope_grilling:layer_0') == 4"
+        },
+        {
+          "pending_0_color_5": "q.property('kaleidoscope_grilling:layer_0') == 5"
+        },
+        {
+          "pending_0_color_6": "q.property('kaleidoscope_grilling:layer_0') == 6"
+        },
+        {
+          "pending_0_color_7": "q.property('kaleidoscope_grilling:layer_0') == 7"
+        },
+        {
+          "pending_0_color_8": "q.property('kaleidoscope_grilling:layer_0') == 8"
+        },
+        {
+          "pending_0_color_9": "q.property('kaleidoscope_grilling:layer_0') == 9"
+        },
+        {
+          "pending_1_color_1": "q.property('kaleidoscope_grilling:layer_0') == 1"
+        },
+        {
+          "pending_1_color_2": "q.property('kaleidoscope_grilling:layer_0') == 2"
+        },
+        {
+          "pending_1_color_3": "q.property('kaleidoscope_grilling:layer_0') == 3"
+        },
+        {
+          "pending_1_color_4": "q.property('kaleidoscope_grilling:layer_0') == 4"
+        },
+        {
+          "pending_1_color_5": "q.property('kaleidoscope_grilling:layer_0') == 5"
+        },
+        {
+          "pending_1_color_6": "q.property('kaleidoscope_grilling:layer_0') == 6"
+        },
+        {
+          "pending_1_color_7": "q.property('kaleidoscope_grilling:layer_0') == 7"
+        },
+        {
+          "pending_1_color_8": "q.property('kaleidoscope_grilling:layer_0') == 8"
+        },
+        {
+          "pending_1_color_9": "q.property('kaleidoscope_grilling:layer_0') == 9"
+        },
+        {
+          "pending_2_color_1": "q.property('kaleidoscope_grilling:layer_1') == 1"
+        },
+        {
+          "pending_2_color_2": "q.property('kaleidoscope_grilling:layer_1') == 2"
+        },
+        {
+          "pending_2_color_3": "q.property('kaleidoscope_grilling:layer_1') == 3"
+        },
+        {
+          "pending_2_color_4": "q.property('kaleidoscope_grilling:layer_1') == 4"
+        },
+        {
+          "pending_2_color_5": "q.property('kaleidoscope_grilling:layer_1') == 5"
+        },
+        {
+          "pending_2_color_6": "q.property('kaleidoscope_grilling:layer_1') == 6"
+        },
+        {
+          "pending_2_color_7": "q.property('kaleidoscope_grilling:layer_1') == 7"
+        },
+        {
+          "pending_2_color_8": "q.property('kaleidoscope_grilling:layer_1') == 8"
+        },
+        {
+          "pending_2_color_9": "q.property('kaleidoscope_grilling:layer_1') == 9"
+        },
+        {
+          "pending_3_color_1": "q.property('kaleidoscope_grilling:layer_1') == 1"
+        },
+        {
+          "pending_3_color_2": "q.property('kaleidoscope_grilling:layer_1') == 2"
+        },
+        {
+          "pending_3_color_3": "q.property('kaleidoscope_grilling:layer_1') == 3"
+        },
+        {
+          "pending_3_color_4": "q.property('kaleidoscope_grilling:layer_1') == 4"
+        },
+        {
+          "pending_3_color_5": "q.property('kaleidoscope_grilling:layer_1') == 5"
+        },
+        {
+          "pending_3_color_6": "q.property('kaleidoscope_grilling:layer_1') == 6"
+        },
+        {
+          "pending_3_color_7": "q.property('kaleidoscope_grilling:layer_1') == 7"
+        },
+        {
+          "pending_3_color_8": "q.property('kaleidoscope_grilling:layer_1') == 8"
+        },
+        {
+          "pending_3_color_9": "q.property('kaleidoscope_grilling:layer_1') == 9"
+        },
+        {
+          "pending_4_color_1": "q.property('kaleidoscope_grilling:layer_2') == 1"
+        },
+        {
+          "pending_4_color_2": "q.property('kaleidoscope_grilling:layer_2') == 2"
+        },
+        {
+          "pending_4_color_3": "q.property('kaleidoscope_grilling:layer_2') == 3"
+        },
+        {
+          "pending_4_color_4": "q.property('kaleidoscope_grilling:layer_2') == 4"
+        },
+        {
+          "pending_4_color_5": "q.property('kaleidoscope_grilling:layer_2') == 5"
+        },
+        {
+          "pending_4_color_6": "q.property('kaleidoscope_grilling:layer_2') == 6"
+        },
+        {
+          "pending_4_color_7": "q.property('kaleidoscope_grilling:layer_2') == 7"
+        },
+        {
+          "pending_4_color_8": "q.property('kaleidoscope_grilling:layer_2') == 8"
+        },
+        {
+          "pending_4_color_9": "q.property('kaleidoscope_grilling:layer_2') == 9"
+        },
+        {
+          "pending_5_color_1": "q.property('kaleidoscope_grilling:layer_2') == 1"
+        },
+        {
+          "pending_5_color_2": "q.property('kaleidoscope_grilling:layer_2') == 2"
+        },
+        {
+          "pending_5_color_3": "q.property('kaleidoscope_grilling:layer_2') == 3"
+        },
+        {
+          "pending_5_color_4": "q.property('kaleidoscope_grilling:layer_2') == 4"
+        },
+        {
+          "pending_5_color_5": "q.property('kaleidoscope_grilling:layer_2') == 5"
+        },
+        {
+          "pending_5_color_6": "q.property('kaleidoscope_grilling:layer_2') == 6"
+        },
+        {
+          "pending_5_color_7": "q.property('kaleidoscope_grilling:layer_2') == 7"
+        },
+        {
+          "pending_5_color_8": "q.property('kaleidoscope_grilling:layer_2') == 8"
+        },
+        {
+          "pending_5_color_9": "q.property('kaleidoscope_grilling:layer_2') == 9"
+        },
+        {
+          "pending_6_color_1": "q.property('kaleidoscope_grilling:layer_3') == 1"
+        },
+        {
+          "pending_6_color_2": "q.property('kaleidoscope_grilling:layer_3') == 2"
+        },
+        {
+          "pending_6_color_3": "q.property('kaleidoscope_grilling:layer_3') == 3"
+        },
+        {
+          "pending_6_color_4": "q.property('kaleidoscope_grilling:layer_3') == 4"
+        },
+        {
+          "pending_6_color_5": "q.property('kaleidoscope_grilling:layer_3') == 5"
+        },
+        {
+          "pending_6_color_6": "q.property('kaleidoscope_grilling:layer_3') == 6"
+        },
+        {
+          "pending_6_color_7": "q.property('kaleidoscope_grilling:layer_3') == 7"
+        },
+        {
+          "pending_6_color_8": "q.property('kaleidoscope_grilling:layer_3') == 8"
+        },
+        {
+          "pending_6_color_9": "q.property('kaleidoscope_grilling:layer_3') == 9"
+        },
+        {
+          "pending_7_color_1": "q.property('kaleidoscope_grilling:layer_3') == 1"
+        },
+        {
+          "pending_7_color_2": "q.property('kaleidoscope_grilling:layer_3') == 2"
+        },
+        {
+          "pending_7_color_3": "q.property('kaleidoscope_grilling:layer_3') == 3"
+        },
+        {
+          "pending_7_color_4": "q.property('kaleidoscope_grilling:layer_3') == 4"
+        },
+        {
+          "pending_7_color_5": "q.property('kaleidoscope_grilling:layer_3') == 5"
+        },
+        {
+          "pending_7_color_6": "q.property('kaleidoscope_grilling:layer_3') == 6"
+        },
+        {
+          "pending_7_color_7": "q.property('kaleidoscope_grilling:layer_3') == 7"
+        },
+        {
+          "pending_7_color_8": "q.property('kaleidoscope_grilling:layer_3') == 8"
+        },
+        {
+          "pending_7_color_9": "q.property('kaleidoscope_grilling:layer_3') == 9"
+        },
+        {
+          "pending_8_color_1": "q.property('kaleidoscope_grilling:layer_4') == 1"
+        },
+        {
+          "pending_8_color_2": "q.property('kaleidoscope_grilling:layer_4') == 2"
+        },
+        {
+          "pending_8_color_3": "q.property('kaleidoscope_grilling:layer_4') == 3"
+        },
+        {
+          "pending_8_color_4": "q.property('kaleidoscope_grilling:layer_4') == 4"
+        },
+        {
+          "pending_8_color_5": "q.property('kaleidoscope_grilling:layer_4') == 5"
+        },
+        {
+          "pending_8_color_6": "q.property('kaleidoscope_grilling:layer_4') == 6"
+        },
+        {
+          "pending_8_color_7": "q.property('kaleidoscope_grilling:layer_4') == 7"
+        },
+        {
+          "pending_8_color_8": "q.property('kaleidoscope_grilling:layer_4') == 8"
+        },
+        {
+          "pending_8_color_9": "q.property('kaleidoscope_grilling:layer_4') == 9"
+        },
+        {
+          "pending_9_color_1": "q.property('kaleidoscope_grilling:layer_4') == 1"
+        },
+        {
+          "pending_9_color_2": "q.property('kaleidoscope_grilling:layer_4') == 2"
+        },
+        {
+          "pending_9_color_3": "q.property('kaleidoscope_grilling:layer_4') == 3"
+        },
+        {
+          "pending_9_color_4": "q.property('kaleidoscope_grilling:layer_4') == 4"
+        },
+        {
+          "pending_9_color_5": "q.property('kaleidoscope_grilling:layer_4') == 5"
+        },
+        {
+          "pending_9_color_6": "q.property('kaleidoscope_grilling:layer_4') == 6"
+        },
+        {
+          "pending_9_color_7": "q.property('kaleidoscope_grilling:layer_4') == 7"
+        },
+        {
+          "pending_9_color_8": "q.property('kaleidoscope_grilling:layer_4') == 8"
+        },
+        {
+          "pending_9_color_9": "q.property('kaleidoscope_grilling:layer_4') == 9"
+        },
+        {
+          "pending_10_color_1": "q.property('kaleidoscope_grilling:layer_5') == 1"
+        },
+        {
+          "pending_10_color_2": "q.property('kaleidoscope_grilling:layer_5') == 2"
+        },
+        {
+          "pending_10_color_3": "q.property('kaleidoscope_grilling:layer_5') == 3"
+        },
+        {
+          "pending_10_color_4": "q.property('kaleidoscope_grilling:layer_5') == 4"
+        },
+        {
+          "pending_10_color_5": "q.property('kaleidoscope_grilling:layer_5') == 5"
+        },
+        {
+          "pending_10_color_6": "q.property('kaleidoscope_grilling:layer_5') == 6"
+        },
+        {
+          "pending_10_color_7": "q.property('kaleidoscope_grilling:layer_5') == 7"
+        },
+        {
+          "pending_10_color_8": "q.property('kaleidoscope_grilling:layer_5') == 8"
+        },
+        {
+          "pending_10_color_9": "q.property('kaleidoscope_grilling:layer_5') == 9"
+        },
+        {
+          "pending_11_color_1": "q.property('kaleidoscope_grilling:layer_5') == 1"
+        },
+        {
+          "pending_11_color_2": "q.property('kaleidoscope_grilling:layer_5') == 2"
+        },
+        {
+          "pending_11_color_3": "q.property('kaleidoscope_grilling:layer_5') == 3"
+        },
+        {
+          "pending_11_color_4": "q.property('kaleidoscope_grilling:layer_5') == 4"
+        },
+        {
+          "pending_11_color_5": "q.property('kaleidoscope_grilling:layer_5') == 5"
+        },
+        {
+          "pending_11_color_6": "q.property('kaleidoscope_grilling:layer_5') == 6"
+        },
+        {
+          "pending_11_color_7": "q.property('kaleidoscope_grilling:layer_5') == 7"
+        },
+        {
+          "pending_11_color_8": "q.property('kaleidoscope_grilling:layer_5') == 8"
+        },
+        {
+          "pending_11_color_9": "q.property('kaleidoscope_grilling:layer_5') == 9"
+        },
+        {
+          "pending_12_color_1": "q.property('kaleidoscope_grilling:layer_6') == 1"
+        },
+        {
+          "pending_12_color_2": "q.property('kaleidoscope_grilling:layer_6') == 2"
+        },
+        {
+          "pending_12_color_3": "q.property('kaleidoscope_grilling:layer_6') == 3"
+        },
+        {
+          "pending_12_color_4": "q.property('kaleidoscope_grilling:layer_6') == 4"
+        },
+        {
+          "pending_12_color_5": "q.property('kaleidoscope_grilling:layer_6') == 5"
+        },
+        {
+          "pending_12_color_6": "q.property('kaleidoscope_grilling:layer_6') == 6"
+        },
+        {
+          "pending_12_color_7": "q.property('kaleidoscope_grilling:layer_6') == 7"
+        },
+        {
+          "pending_12_color_8": "q.property('kaleidoscope_grilling:layer_6') == 8"
+        },
+        {
+          "pending_12_color_9": "q.property('kaleidoscope_grilling:layer_6') == 9"
+        },
+        {
+          "pending_13_color_1": "q.property('kaleidoscope_grilling:layer_6') == 1"
+        },
+        {
+          "pending_13_color_2": "q.property('kaleidoscope_grilling:layer_6') == 2"
+        },
+        {
+          "pending_13_color_3": "q.property('kaleidoscope_grilling:layer_6') == 3"
+        },
+        {
+          "pending_13_color_4": "q.property('kaleidoscope_grilling:layer_6') == 4"
+        },
+        {
+          "pending_13_color_5": "q.property('kaleidoscope_grilling:layer_6') == 5"
+        },
+        {
+          "pending_13_color_6": "q.property('kaleidoscope_grilling:layer_6') == 6"
+        },
+        {
+          "pending_13_color_7": "q.property('kaleidoscope_grilling:layer_6') == 7"
+        },
+        {
+          "pending_13_color_8": "q.property('kaleidoscope_grilling:layer_6') == 8"
+        },
+        {
+          "pending_13_color_9": "q.property('kaleidoscope_grilling:layer_6') == 9"
+        },
+        {
+          "pending_14_color_1": "q.property('kaleidoscope_grilling:layer_7') == 1"
+        },
+        {
+          "pending_14_color_2": "q.property('kaleidoscope_grilling:layer_7') == 2"
+        },
+        {
+          "pending_14_color_3": "q.property('kaleidoscope_grilling:layer_7') == 3"
+        },
+        {
+          "pending_14_color_4": "q.property('kaleidoscope_grilling:layer_7') == 4"
+        },
+        {
+          "pending_14_color_5": "q.property('kaleidoscope_grilling:layer_7') == 5"
+        },
+        {
+          "pending_14_color_6": "q.property('kaleidoscope_grilling:layer_7') == 6"
+        },
+        {
+          "pending_14_color_7": "q.property('kaleidoscope_grilling:layer_7') == 7"
+        },
+        {
+          "pending_14_color_8": "q.property('kaleidoscope_grilling:layer_7') == 8"
+        },
+        {
+          "pending_14_color_9": "q.property('kaleidoscope_grilling:layer_7') == 9"
+        },
+        {
+          "pending_15_color_1": "q.property('kaleidoscope_grilling:layer_7') == 1"
+        },
+        {
+          "pending_15_color_2": "q.property('kaleidoscope_grilling:layer_7') == 2"
+        },
+        {
+          "pending_15_color_3": "q.property('kaleidoscope_grilling:layer_7') == 3"
+        },
+        {
+          "pending_15_color_4": "q.property('kaleidoscope_grilling:layer_7') == 4"
+        },
+        {
+          "pending_15_color_5": "q.property('kaleidoscope_grilling:layer_7') == 5"
+        },
+        {
+          "pending_15_color_6": "q.property('kaleidoscope_grilling:layer_7') == 6"
+        },
+        {
+          "pending_15_color_7": "q.property('kaleidoscope_grilling:layer_7') == 7"
+        },
+        {
+          "pending_15_color_8": "q.property('kaleidoscope_grilling:layer_7') == 8"
+        },
+        {
+          "pending_15_color_9": "q.property('kaleidoscope_grilling:layer_7') == 9"
+        }
+      ]
+    },
+    "controller.render.kg_a2770.oil": {
+      "arrays": {
+        "textures": {
+          "Array.oils": [
+            "Texture.canola",
+            "Texture.canola",
+            "Texture.chili",
+            "Texture.chili"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.oils[q.property('kaleidoscope_grilling:oil')]"
+      ]
+    },
+    "controller.render.kg_a2770.oil_glow": {
+      "geometry": "Geometry.glow",
+      "materials": [
+        {
+          "*": "Material.glow"
+        }
+      ],
+      "textures": [
+        "Texture.glow"
+      ]
+    }
+  }
+}

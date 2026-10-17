@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.47",
+  "scope": "port Java Wedding Candy item, Invincible food effect, and September 2026 acquisition event",
+  "java_contract": {
+    "nutrition": 20,
+    "saturation_modifier": 0.5,
+    "always_edible": true,
+    "effect": "kaleidoscope_grilling:invincible",
+    "effect_ticks": 300,
+    "event_timezone": "Asia/Shanghai",
+    "event_dates": "2026-09-01..2026-09-12",
+    "required_online_seconds": "day_of_month * 60",
+    "reward_count": "day_of_month",
+    "advancement_xp_reward": 50
+  },
+  "reuse": {
+    "standalone_food_effect_runtime": "a2732_standalone_food_effect_runtime.js",
+    "existing_item_complete_use_listener": true,
+    "new_item_complete_use_listener": false,
+    "existing_invincible_damage_guard": "main.js FX_KEY / beforeEvents.entityHurt"
+  },
+  "bedrock_adaptation": {
+    "advancement_ui": false,
+    "xp_reward_preserved": true,
+    "intrinsic_java_hover_tooltip": false,
+    "translation_keys_preserved": true,
+    "event_state": "player dynamic property JSON"
+  },
+  "texture": {
+    "upstream_git_blob": "d7ca9f5dfa61d6658372d8e181283fb5bf756d78"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

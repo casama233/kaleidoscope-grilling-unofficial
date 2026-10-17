@@ -1,0 +1,23 @@
+{
+  "version": "A2.7.67",
+  "baselineCommit": "b2e575cd8c1687e6ec6165c6c7f30f3b38a20a44",
+  "baselineRuntimeFilesExcludingManifests": 1239,
+  "baselineNormalizedRuntimeSha256": "5ea4764f782be5ff6f22fb29b16ddaa4af280830e1898db7662362d77188b9f3",
+  "normalization": "Integral JSON floats normalized to integers; sorted keys; raw bytes otherwise. Reverse only eight added unlock fields and six vat shell render_method changes before hashing.",
+  "addedUnlocks": {
+    "oil_press": "minecraft:iron_ingot",
+    "advanced_rack": "minecraft:iron_ingot",
+    "oak_planks_from_pepper_log": "kaleidoscope_grilling:pepper_log",
+    "big_vat": "minecraft:brick_block",
+    "secret_chili_oil": "kaleidoscope_grilling:canola_oil_bucket",
+    "pepper_honey": "kaleidoscope_grilling:sichuan_pepper",
+    "oil_cake": "kaleidoscope_grilling:canola_powder",
+    "sugared_tomato": "kaleidoscope_cookery:tomato"
+  },
+  "vatMaterialMapsCorrected": 6,
+  "sourceScope": "Current A2.7.66 branch; historical private-server adapters are not imported or removed.",
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false,
+  "blankRegistryErrorAttributed": false
+}

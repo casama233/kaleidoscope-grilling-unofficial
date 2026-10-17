@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "path": "projects/grilling/gameplay_core/behavior_pack/scripts/main.js",
+  "release": [
+    2,
+    8,
+    110
+  ],
+  "scope": "Exactly the reviewed retained ingredient-count call and current Java unconditional PENDING completion; all other main bytes conserved.",
+  "before_sha256": "37ad481af615f875259d1898dcb7571288126e43ac0d91f89d531d80a8f38b4a",
+  "after_sha256": "9dc47fe72bcc8dfe1632f8931a39c05029bf11ba0aa8c0a9ad03fab4c57d1c64",
+  "operations": [
+    {
+      "start": 35600,
+      "end": 35626,
+      "before": "seasoningLore(16-nextUses)",
+      "after": "seasoningLore(16-nextUses,ingredients.length)"
+    },
+    {
+      "start": 66515,
+      "end": 66641,
+      "before": " const list=readSeasonings(stack);if(!hasSeasoningBase(list)){javaInteractionFeedback(player,'missing_base_seasoning');return}",
+      "after": " // Both current Java branches finish any PENDING identity. Legacy pending\n // bottles may lack a base ingredient; EMPTY promotion owns that requirement.\n const list=readSeasonings(stack);"
+    }
+  ]
+}

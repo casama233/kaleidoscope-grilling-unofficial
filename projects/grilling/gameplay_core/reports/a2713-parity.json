@@ -1,0 +1,65 @@
+{
+  "version": "A2.7.13",
+  "scope": "houttuynia item + minced_houttuynia chopping processing",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "java_tag": {
+    "id": "kaleidoscope_grilling:ingredients/houttuynia",
+    "values": [
+      "kaleidoscope_grilling:houttuynia"
+    ],
+    "direct_item_registration_is_exact_for_locked_baseline": true
+  },
+  "java_recipe": {
+    "id": "kaleidoscope_grilling:chopping_board/minced_houttuynia",
+    "input_tag": "kaleidoscope_grilling:ingredients/houttuynia",
+    "resolved_input": "kaleidoscope_grilling:houttuynia",
+    "cuts": 4,
+    "model_id": "kaleidoscope_grilling:houttuynia",
+    "result": "kaleidoscope_grilling:minced_houttuynia",
+    "count": 1
+  },
+  "items": {
+    "houttuynia": {
+      "java_kind": "ItemNameBlockItem",
+      "max_stack_size": 64,
+      "nutrition": 2,
+      "saturation_modifier": 0.2,
+      "texture_git_blob_sha1": "40afc94ae7826ddb7cb5a8cd106434a6745dfe25",
+      "bedrock_crop_placer": false
+    },
+    "minced_houttuynia": {
+      "plain_item": true,
+      "max_stack_size": 64,
+      "texture_git_blob_sha1": "c6653c730bb5d1fefab02db05388b0f2e6aefc30"
+    }
+  },
+  "cookery_bedrock": {
+    "version": "1.0.6",
+    "exact_public_archive_sha256": "c589efb60277bea295ac12ef760d8f2c7e8af3ea62e809b320862bd786033351",
+    "extension_api": 1,
+    "built_in_houttuynia_board_recipe": false,
+    "registration": "public register_recipe event, gated by chopping_board capability",
+    "private_scripts_modified": false
+  },
+  "deferred_acquisition": {
+    "fortress_chest_bonus": {
+      "java": "chests/nether_bridge extra pool: rolls 1..2, 65% pool chance, houttuynia count 1..3 per successful roll",
+      "bedrock": "not implemented in this slice; stable 2.9.0 LootTable/LootPool inspection is read-only and replacing the whole vanilla table is intentionally avoided"
+    },
+    "fortress_wart_replacement": {
+      "java": "new Nether Fortress chunks replace 25% of fortress-bounds nether wart with red-variant houttuynia crop",
+      "bedrock": "deferred with crop/worldgen slice"
+    },
+    "survival_houttuynia_acquisition_complete": false
+  },
+  "visual_difference": {
+    "java_model_id": "kaleidoscope_grilling:houttuynia",
+    "exact_java_staged_board_visual": false
+  },
+  "downstream": {
+    "raw_slime_skewer_uses_houttuynia": true,
+    "raw_sweet_potato_sheet_skewer_uses_minced_houttuynia": true
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

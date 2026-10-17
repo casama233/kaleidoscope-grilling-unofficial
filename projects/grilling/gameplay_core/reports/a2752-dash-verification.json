@@ -1,0 +1,27 @@
+{
+  "version": "A2.7.52",
+  "cookery_stockpot_cuisine": true,
+  "stockpot_foods": 3,
+  "stockpot_exact": 3,
+  "stockpot_flex": 3,
+  "single_recipe_publisher": true,
+  "tavern_vinegar_quality_adapter": true,
+  "shared_cuisine_bridge": true,
+  "shared_standalone_effect_runtime": true,
+  "new_item_complete_use_listener": false,
+  "compiled": true,
+  "compiled_packs": [
+    {
+      "pack": "behavior_pack",
+      "compared_files": 238,
+      "matches_source": true
+    },
+    {
+      "pack": "resource_pack",
+      "compared_files": 633,
+      "matches_source": true
+    }
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

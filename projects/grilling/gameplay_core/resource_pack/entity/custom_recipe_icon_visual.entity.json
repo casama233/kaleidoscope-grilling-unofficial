@@ -1,0 +1,151 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:custom_recipe_icon_visual",
+      "materials": {
+        "default": "entity_alphatest_one_sided"
+      },
+      "textures": {
+        "stick_0": "textures/ui/kg_java/custom_layers/stick_0",
+        "stick_1": "textures/ui/kg_java/custom_layers/stick_1",
+        "stick_2": "textures/ui/kg_java/custom_layers/stick_2",
+        "stick_3": "textures/ui/kg_java/custom_layers/stick_3",
+        "stick_4": "textures/ui/kg_java/custom_layers/stick_4",
+        "stick_5": "textures/ui/kg_java/custom_layers/stick_5",
+        "stick_6": "textures/ui/kg_java/custom_layers/stick_6",
+        "stick_7": "textures/ui/kg_java/custom_layers/stick_7",
+        "stick_8": "textures/ui/kg_java/custom_layers/stick_8",
+        "stick_9": "textures/ui/kg_java/custom_layers/stick_9",
+        "stick_10": "textures/ui/kg_java/custom_layers/stick_10",
+        "stick_11": "textures/ui/kg_java/custom_layers/stick_11",
+        "stick_12": "textures/ui/kg_java/custom_layers/stick_12",
+        "stick_13": "textures/ui/kg_java/custom_layers/stick_13",
+        "stick_14": "textures/ui/kg_java/custom_layers/stick_14",
+        "food_0_0_0": "textures/ui/kg_java/custom_layers/food_0_0_0",
+        "food_0_1_0": "textures/ui/kg_java/custom_layers/food_0_1_0",
+        "food_0_2_0": "textures/ui/kg_java/custom_layers/food_0_2_0",
+        "food_0_3_0": "textures/ui/kg_java/custom_layers/food_0_3_0",
+        "food_0_4_0": "textures/ui/kg_java/custom_layers/food_0_4_0",
+        "food_0_0_1": "textures/ui/kg_java/custom_layers/food_0_0_1",
+        "food_0_1_1": "textures/ui/kg_java/custom_layers/food_0_1_1",
+        "food_0_2_1": "textures/ui/kg_java/custom_layers/food_0_2_1",
+        "food_0_3_1": "textures/ui/kg_java/custom_layers/food_0_3_1",
+        "food_0_4_1": "textures/ui/kg_java/custom_layers/food_0_4_1",
+        "food_1_0_0": "textures/ui/kg_java/custom_layers/food_1_0_0",
+        "food_1_1_0": "textures/ui/kg_java/custom_layers/food_1_1_0",
+        "food_1_2_0": "textures/ui/kg_java/custom_layers/food_1_2_0",
+        "food_1_3_0": "textures/ui/kg_java/custom_layers/food_1_3_0",
+        "food_1_4_0": "textures/ui/kg_java/custom_layers/food_1_4_0",
+        "food_1_0_1": "textures/ui/kg_java/custom_layers/food_1_0_1",
+        "food_1_1_1": "textures/ui/kg_java/custom_layers/food_1_1_1",
+        "food_1_2_1": "textures/ui/kg_java/custom_layers/food_1_2_1",
+        "food_1_3_1": "textures/ui/kg_java/custom_layers/food_1_3_1",
+        "food_1_4_1": "textures/ui/kg_java/custom_layers/food_1_4_1",
+        "food_1_0_2": "textures/ui/kg_java/custom_layers/food_1_0_2",
+        "food_1_1_2": "textures/ui/kg_java/custom_layers/food_1_1_2",
+        "food_1_2_2": "textures/ui/kg_java/custom_layers/food_1_2_2",
+        "food_1_3_2": "textures/ui/kg_java/custom_layers/food_1_3_2",
+        "food_1_4_2": "textures/ui/kg_java/custom_layers/food_1_4_2",
+        "food_1_0_3": "textures/ui/kg_java/custom_layers/food_1_0_3",
+        "food_1_1_3": "textures/ui/kg_java/custom_layers/food_1_1_3",
+        "food_1_2_3": "textures/ui/kg_java/custom_layers/food_1_2_3",
+        "food_1_3_3": "textures/ui/kg_java/custom_layers/food_1_3_3",
+        "food_1_4_3": "textures/ui/kg_java/custom_layers/food_1_4_3",
+        "food_2_0_0": "textures/ui/kg_java/custom_layers/food_2_0_0",
+        "food_2_1_0": "textures/ui/kg_java/custom_layers/food_2_1_0",
+        "food_2_2_0": "textures/ui/kg_java/custom_layers/food_2_2_0",
+        "food_2_3_0": "textures/ui/kg_java/custom_layers/food_2_3_0",
+        "food_2_4_0": "textures/ui/kg_java/custom_layers/food_2_4_0",
+        "food_2_0_1": "textures/ui/kg_java/custom_layers/food_2_0_1",
+        "food_2_1_1": "textures/ui/kg_java/custom_layers/food_2_1_1",
+        "food_2_2_1": "textures/ui/kg_java/custom_layers/food_2_2_1",
+        "food_2_3_1": "textures/ui/kg_java/custom_layers/food_2_3_1",
+        "food_2_4_1": "textures/ui/kg_java/custom_layers/food_2_4_1",
+        "food_2_0_2": "textures/ui/kg_java/custom_layers/food_2_0_2",
+        "food_2_1_2": "textures/ui/kg_java/custom_layers/food_2_1_2",
+        "food_2_2_2": "textures/ui/kg_java/custom_layers/food_2_2_2",
+        "food_2_3_2": "textures/ui/kg_java/custom_layers/food_2_3_2",
+        "food_2_4_2": "textures/ui/kg_java/custom_layers/food_2_4_2",
+        "food_2_0_3": "textures/ui/kg_java/custom_layers/food_2_0_3",
+        "food_2_1_3": "textures/ui/kg_java/custom_layers/food_2_1_3",
+        "food_2_2_3": "textures/ui/kg_java/custom_layers/food_2_2_3",
+        "food_2_3_3": "textures/ui/kg_java/custom_layers/food_2_3_3",
+        "food_2_4_3": "textures/ui/kg_java/custom_layers/food_2_4_3",
+        "food_2_0_4": "textures/ui/kg_java/custom_layers/food_2_0_4",
+        "food_2_1_4": "textures/ui/kg_java/custom_layers/food_2_1_4",
+        "food_2_2_4": "textures/ui/kg_java/custom_layers/food_2_2_4",
+        "food_2_3_4": "textures/ui/kg_java/custom_layers/food_2_3_4",
+        "food_2_4_4": "textures/ui/kg_java/custom_layers/food_2_4_4",
+        "food_2_0_5": "textures/ui/kg_java/custom_layers/food_2_0_5",
+        "food_2_1_5": "textures/ui/kg_java/custom_layers/food_2_1_5",
+        "food_2_2_5": "textures/ui/kg_java/custom_layers/food_2_2_5",
+        "food_2_3_5": "textures/ui/kg_java/custom_layers/food_2_3_5",
+        "food_2_4_5": "textures/ui/kg_java/custom_layers/food_2_4_5",
+        "food_2_0_6": "textures/ui/kg_java/custom_layers/food_2_0_6",
+        "food_2_1_6": "textures/ui/kg_java/custom_layers/food_2_1_6",
+        "food_2_2_6": "textures/ui/kg_java/custom_layers/food_2_2_6",
+        "food_2_3_6": "textures/ui/kg_java/custom_layers/food_2_3_6",
+        "food_2_4_6": "textures/ui/kg_java/custom_layers/food_2_4_6",
+        "food_2_0_7": "textures/ui/kg_java/custom_layers/food_2_0_7",
+        "food_2_1_7": "textures/ui/kg_java/custom_layers/food_2_1_7",
+        "food_2_2_7": "textures/ui/kg_java/custom_layers/food_2_2_7",
+        "food_2_3_7": "textures/ui/kg_java/custom_layers/food_2_3_7",
+        "food_2_4_7": "textures/ui/kg_java/custom_layers/food_2_4_7"
+      },
+      "geometry": {
+        "default": "geometry.kg_station.recipe_icon"
+      },
+      "render_controllers": [
+        {
+          "controller.render.kg_station.custom_stick": "q.property('kaleidoscope_grilling:ready')"
+        },
+        {
+          "controller.render.kg_station.custom_food_0_0": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 0"
+        },
+        {
+          "controller.render.kg_station.custom_food_0_1": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 0"
+        },
+        {
+          "controller.render.kg_station.custom_food_0_2": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 0"
+        },
+        {
+          "controller.render.kg_station.custom_food_0_3": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 0"
+        },
+        {
+          "controller.render.kg_station.custom_food_0_4": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 0"
+        },
+        {
+          "controller.render.kg_station.custom_food_1_0": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 1"
+        },
+        {
+          "controller.render.kg_station.custom_food_1_1": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 1"
+        },
+        {
+          "controller.render.kg_station.custom_food_1_2": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 1"
+        },
+        {
+          "controller.render.kg_station.custom_food_1_3": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 1"
+        },
+        {
+          "controller.render.kg_station.custom_food_1_4": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 1"
+        },
+        {
+          "controller.render.kg_station.custom_food_2_0": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 2"
+        },
+        {
+          "controller.render.kg_station.custom_food_2_1": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 2"
+        },
+        {
+          "controller.render.kg_station.custom_food_2_2": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 2"
+        },
+        {
+          "controller.render.kg_station.custom_food_2_3": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 2"
+        },
+        {
+          "controller.render.kg_station.custom_food_2_4": "q.property('kaleidoscope_grilling:ready') && q.property('kaleidoscope_grilling:gui_count') > 2"
+        }
+      ]
+    }
+  }
+}

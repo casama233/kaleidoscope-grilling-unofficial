@@ -1,0 +1,34 @@
+{
+  "version": "A2.7.58",
+  "challenge_advancements": [
+    "mental_preparation_failed",
+    "metallic_taste",
+    "taste_of_dragon",
+    "metal_tolerance_failed",
+    "strongest_shield",
+    "strongest_spear",
+    "wedding_candy"
+  ],
+  "reuse": {
+    "one_shot_adapter": "a2753_advancement_runtime.js",
+    "frame_aware_shared_adapter": true,
+    "new_listener_count": 0,
+    "new_interval_count": 0,
+    "duplicate_progression_store": false,
+    "existing_wedding_interval_reused": true
+  },
+  "wedding_candy": {
+    "direct_daily_xp_removed": true,
+    "one_shot_advancement_xp": 50,
+    "daily_candy_claim_preserved": true
+  },
+  "ordinary_skewer": {
+    "single_rng_result_shared_with_advancement": true,
+    "shield_on_block": true,
+    "spear_on_failed_challenge": true
+  },
+  "native_java_advancement_tree": false,
+  "native_java_toast": false,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

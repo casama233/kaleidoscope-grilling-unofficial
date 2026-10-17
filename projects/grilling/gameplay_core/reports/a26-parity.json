@@ -1,0 +1,45 @@
+{
+  "version": "A2.6.0",
+  "java_baseline": "breezeth-CN/KaleidoscopeGrilling@9a1acdab27698457bec16c9362678e574895a28c",
+  "oil_press": {
+    "max_cakes": 4,
+    "required_progress": 16,
+    "anvil_progress": 4,
+    "press_stone_progress": 1,
+    "player_cooldown_ticks": 10,
+    "impact_tick": 6,
+    "completion_delay_ticks": 10,
+    "nearby_scan": [
+      4,
+      2,
+      4
+    ],
+    "canola_output_buckets": 4,
+    "residue_output": 4,
+    "waits_for_container": true,
+    "break_returns_unpressed_cakes": true
+  },
+  "big_vat": {
+    "capacity_buckets": 8,
+    "single_fluid": true,
+    "packed_break_state": true,
+    "oil_pot_points_per_bucket": 8,
+    "java_visual_levels": 4
+  },
+  "supported_stable_vat_fluids": [
+    "water",
+    "lava",
+    "canola",
+    "secret_chili",
+    "premium_chili"
+  ],
+  "oil_residue_double_growth_approximation": true,
+  "known_platform_substitutions": [
+    "Forge arbitrary IFluidHandler/third-party fluids are not discoverable through stable Bedrock Script API; the vat supports vanilla water/lava plus all three Grilling oils.",
+    "Create funnel/tank automation hooks are unavailable without an installed Bedrock Create compatibility layer; manual machine semantics are preserved.",
+    "Oil Residue emulates the two BoneMealItem applications for numeric growth-state crops; non-age bonemeal targets remain a platform gap.",
+    "The Java c:fences crafting tag is represented by oak_fence in the A2.6 machine recipe; tag-wide recipe normalization remains in the all-recipes pass."
+  ],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

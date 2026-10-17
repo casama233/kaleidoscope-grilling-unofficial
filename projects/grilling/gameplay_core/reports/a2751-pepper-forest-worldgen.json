@@ -1,0 +1,35 @@
+{
+  "version": "A2.7.51",
+  "scope": "data-driven Pepper Tree generation in forest biomes",
+  "java": {
+    "forest_tag": "#minecraft:is_forest",
+    "rarity_denominator": 16,
+    "surface_water_depth": 0,
+    "heightmap": "OCEAN_FLOOR",
+    "placement_step": "vegetal_decoration"
+  },
+  "bedrock": {
+    "tree_feature": "kaleidoscope_grilling:pepper_tree_worldgen",
+    "feature_rule": "kaleidoscope_grilling:pepper_tree_worldgen_rule",
+    "biome_tag": "forest",
+    "scatter_chance": {
+      "numerator": 1,
+      "denominator": 16
+    },
+    "placement_pass": "surface_pass",
+    "script_runtime_added": false
+  },
+  "reuse": {
+    "pepper_log": "A2.7.48",
+    "pepper_leaves": "A2.7.48",
+    "pepper_lifecycle_runtime": "A2.7.48",
+    "duplicate_tree_blocks": false
+  },
+  "known_difference": {
+    "java_initial_fruiting_chance": 0.25,
+    "bedrock_initial_fruiting_chance": 0.0,
+    "reason": "Bedrock random_spread_canopy cannot weight custom permutations of the same block state; existing A2.7.48 random-tick fruiting remains active"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

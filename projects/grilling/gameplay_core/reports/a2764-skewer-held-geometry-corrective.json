@@ -1,0 +1,30 @@
+{
+  "version": "A2.7.64",
+  "title": "Skewer Held Geometry Corrective",
+  "phase": "sample_validation",
+  "sample_attachables": [
+    "raw_beef_skewer",
+    "grilled_beef_skewer",
+    "ordinary_skewer"
+  ],
+  "sample_geometry_count": 14,
+  "source_geometry": "models/entity/a22_bites",
+  "output_geometry": "models/entity/a2764_skewer_hand",
+  "hand_space_translation": [
+    0,
+    7,
+    2
+  ],
+  "provenance": "A2.7.25 raw_beef stage0 -> A1.16 geometry.kg_imm.hand_skewer delta",
+  "root_binding": "q.item_slot_to_bone_name(context.item_slot)",
+  "root_animation_removed_for_samples": true,
+  "remaining_legacy_attachables": 36,
+  "a2725_animation_file_retained": true,
+  "bite_stage_logic_changed": false,
+  "textures_changed": false,
+  "render_controller_changed": false,
+  "gameplay_logic_changed": false,
+  "minecraft_tested": false,
+  "bds_tested": false,
+  "client_visuals_tested": false
+}

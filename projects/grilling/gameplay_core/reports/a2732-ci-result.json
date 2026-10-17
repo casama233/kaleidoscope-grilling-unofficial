@@ -1,0 +1,17 @@
+{
+  "version": "A2.7.32",
+  "tested_commit": "9f18f7bcdc5c8103c2e0c5a245fc7bf78dd0a4b3",
+  "run_id": "35608548970",
+  "incremental_from_published_a2731": true,
+  "standalone_food_effect_registry": true,
+  "registry_rows": 2,
+  "active_standalone_effect_runtime_modules": 1,
+  "active_standalone_item_complete_use_subscribers": 1,
+  "cold_houttuynia_crafting_preserved": true,
+  "main_skewer_effect_registry_preserved": true,
+  "dash_compiled_and_compared": true,
+  "mcaddon_sha256": "993ca7df00d60581e8457ecfd10d6392723220b3c49d404e08b892bfd245dc12",
+  "brproject_sha256": "922a683a0d6868881cfcce38a8a6b23d5b4a8eb8c54aa6d6afbd167c3a8e0136",
+  "minecraft_tested": false,
+  "bds_tested": false
+}

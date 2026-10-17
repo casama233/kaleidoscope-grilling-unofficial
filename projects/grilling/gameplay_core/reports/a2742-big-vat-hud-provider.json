@@ -1,0 +1,36 @@
+{
+  "version": "A2.7.42",
+  "scope": "attach Big Vat to A2.7.39 shared crosshair HUD using the existing A2.6 vat reader",
+  "java_contract": {
+    "capacity_buckets": 8,
+    "machine_hud": [
+      "title",
+      "content_name",
+      "capacity",
+      "single_fluid_hint"
+    ],
+    "backend": "FluidTank / IFluidHandler"
+  },
+  "reuse": {
+    "shared_crosshair_runtime": "a2739_crosshair_hud_runtime.js",
+    "vat_state_reader": "a26ReadVat",
+    "single_poll_loop": true,
+    "duplicate_vat_state_parser": false,
+    "direct_dynamic_property_access": false
+  },
+  "grill_ready_contract_repaired": true,
+  "bedrock_fluid_types": [
+    "water",
+    "lava",
+    "canola",
+    "secret_chili",
+    "premium_chili"
+  ],
+  "parity_boundary": {
+    "java_generic_registered_fluids": true,
+    "bedrock_generic_fluid_api": false,
+    "reason": "A2.6 VAT_TYPES intentionally implements five concrete fluid types; HUD reflects actual Bedrock support"
+  },
+  "minecraft_tested": false,
+  "bds_tested": false
+}

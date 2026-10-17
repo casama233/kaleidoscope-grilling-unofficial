@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kaleidoscope_grilling:inventory_grill_v1",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/blocks/advanced_rack"
+      },
+      "geometry": {
+        "default": "geometry.kg_family.empty_inventory"
+      },
+      "render_controllers": [
+        "controller.render.kg_family.empty_inventory"
+      ]
+    }
+  }
+}

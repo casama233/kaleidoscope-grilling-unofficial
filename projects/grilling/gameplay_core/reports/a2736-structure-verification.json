@@ -1,0 +1,15 @@
+{
+  "version": "A2.7.36",
+  "typed_oil_pot_block_bridge": true,
+  "uses_cookery_host_block": true,
+  "reuses_a2735_player_io": true,
+  "typed_capacity": 64,
+  "bucket_points": 8,
+  "player_break_preserves_type": true,
+  "explosion_preserves_type": true,
+  "host_duplicate_drop_avoided": true,
+  "compiled": false,
+  "compiled_packs": [],
+  "minecraft_tested": false,
+  "bds_tested": false
+}

@@ -4,20 +4,20 @@
     "description": {
       "identifier": "kaleidoscope_grilling:carrot_dice",
       "menu_category": {
-        "category": "items"
+        "category": "equipment",
+        "group": "kaleidoscope_cookery:itemGroup.name.ingredients"
       }
     },
     "components": {
       "minecraft:display_name": {
-        "value": "item.kaleidoscope_grilling:carrot_dice.name"
+        "value": "kaleidoscope_grilling.display.item.carrot_dice"
       },
       "minecraft:icon": {
         "textures": {
           "default": "carrot_dice"
         }
       },
-      "minecraft:max_stack_size": 64,
-      "minecraft:allow_off_hand": true
+      "minecraft:max_stack_size": 64
     }
   }
 }

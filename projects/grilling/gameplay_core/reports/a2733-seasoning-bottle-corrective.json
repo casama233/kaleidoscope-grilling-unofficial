@@ -1,0 +1,31 @@
+{
+  "version": "A2.7.33",
+  "scope": "correct user-reported seasoning bottle held transform and harden placed geometry/material reference chain",
+  "held": {
+    "items": [
+      "kaleidoscope_grilling:empty_seasoning_bottle",
+      "kaleidoscope_grilling:pending_seasoning",
+      "kaleidoscope_grilling:special_seasoning"
+    ],
+    "geometry": "geometry.kg_a2733.seasoning_bottle_hand",
+    "render_controller": "controller.render.kg_a2733.seasoning_bottle_hand",
+    "bound_root_animation_removed": true,
+    "hand_space_baked_from_block_shell": true,
+    "verified_against": "geometry.kg_imm.hand_seasoning",
+    "baked_y_offset": -6
+  },
+  "placed": {
+    "variants": 5,
+    "fresh_geometry_identifier_prefix": "geometry.kg_a2733.",
+    "geometry_component_representation": "explicit identifier object",
+    "fresh_terrain_texture_key": "kg_a2733_seasoning_bottle",
+    "texture": "textures/blocks/seasoning_bottle",
+    "no_full_block_geometry": true,
+    "all_shell_cube_sizes_positive": true,
+    "render_method": "blend"
+  },
+  "gameplay_logic_changed": false,
+  "old_a2726_hold_animation_retained_unreferenced_for_historical_rebuilds": true,
+  "minecraft_tested": false,
+  "bds_tested": false
+}

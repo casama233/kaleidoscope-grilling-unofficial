@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "cookery_version": "1.6.0",
+  "loader_sources": {
+    "forge1.20.1": {
+      "revision": "2f4e386ce23f49a385ddf003c67fc6415c55417a",
+      "source_url": "https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/2f4e386ce23f49a385ddf003c67fc6415c55417a/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/network/message/SimpleC2SModMessage.java#L48-L58",
+      "release_url": "https://modrinth.com/mod/kaleidoscope-cookery/version/Ghp0qCKY",
+      "release_file_url": "https://cdn.modrinth.com/data/v17FatAc/versions/Ghp0qCKY/kaleidoscopecookery-1.6.0-forge%2Bmc1.20.1.jar",
+      "release_publisher_sha1": "e44b450aa485b1474eaf13981790e2d80c7c72b6",
+      "release_size": 3607215,
+      "reviewed_class": "com.github.ysbbbbbb.kaleidoscopecookery.network.message.SimpleC2SModMessage",
+      "pitch_bytecode_offsets": [87, 89, 92, 93, 95, 96],
+      "source_expression": "0.8F + (float) Math.random() * 0.4F"
+    },
+    "neoforge1.21.1": {
+      "revision": "4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c",
+      "source_url": "https://github.com/KaleidoscopeMods/KaleidoscopeCookery/blob/4d39e36cfa749939ba5f9d6d3b715ef9a984cb9c/src/main/java/com/github/ysbbbbbb/kaleidoscopecookery/network/message/SimpleC2SModMessage.java#L48-L57",
+      "release_url": "https://modrinth.com/mod/kaleidoscope-cookery/version/g8w0b2ly",
+      "release_file_url": "https://cdn.modrinth.com/data/v17FatAc/versions/g8w0b2ly/kaleidoscopecookery-1.6.0-neoforge%2Bmc1.21.1.jar",
+      "release_publisher_sha1": "9093e830c91a8f2e19eca7dda78713f0bbc21327",
+      "release_size": 3496661,
+      "reviewed_class": "com.github.ysbbbbbb.kaleidoscopecookery.network.message.SimpleC2SModMessage",
+      "pitch_bytecode_offsets": [91, 93, 96, 97, 99, 100],
+      "source_expression": "0.8F + (float) Math.random() * 0.4F"
+    }
+  },
+  "reviewed_pitch_operations": ["ldc 0.8f", "Math.random()D", "d2f", "ldc 0.4f", "fmul", "fadd"],
+  "sound": {
+    "existing_owned_alias": "kg_cookery.flatulence",
+    "category": "PLAYERS",
+    "volume": 1,
+    "fixed_range": 16,
+    "existing_alias_provenance": "development/gameplay_core/fixtures/java-projectile-dodge-audio-160.json",
+    "origin": "floor(actualEntityX/Y/Z) + 0.5 on all three axes",
+    "sound_after_cloud_packet": true,
+    "random_draw_count": 1
+  },
+  "minecraft_origin_bodies": {
+    "1.20.1": {
+      "metadata_url": "https://piston-meta.mojang.com/v1/packages/760a390e336b2b6202ec5906757cee3a929a7c85/1.20.1.json",
+      "level_sound_overload": "Level.playSound(Player,BlockPos,SoundEvent,SoundSource,float,float), original lines 399-400: add 0.5 on X/Y/Z",
+      "entity_position_update": "Entity.setPosRaw(double,double,double), original lines 3514-3529: floor all three coordinates into cached BlockPos"
+    },
+    "1.21.1": {
+      "metadata_origin": "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
+      "client_publisher_sha1": "30c73b1c5da787909b2f73340419fdf13b9def88",
+      "level_sound_overload": "Level.playSound(Player,BlockPos,SoundEvent,SoundSource,float,float), original lines 403-404: add 0.5 on X/Y/Z",
+      "entity_position_update": "Entity.setPosRaw(double,double,double), original lines 3587-3602: floor all three coordinates into cached BlockPos"
+    }
+  },
+  "pitch_oracle": {
+    "method": "Java scalar evaluation of the independently source/bytecode-confirmed expression with the one double draw supplied; not a Minecraft client",
+    "cases": [
+      {"draw": 0, "pitch": 0.800000011920929, "float_bits": "3f4ccccd"},
+      {"draw": 0.1, "pitch": 0.8400000333786011, "float_bits": "3f570a3e", "final_round_only_pitch": 0.8399999737739563},
+      {"draw": 0.9999999701976776, "pitch": 1.2000000476837158, "float_bits": "3f99999a", "cast_draw": 1},
+      {"draw": 0.9999999999999999, "pitch": 1.2000000476837158, "float_bits": "3f99999a", "cast_draw": 1}
+    ]
+  },
+  "client": false,
+  "production_ready": false,
+  "boundaries": [
+    "These helpers alone do not establish producer integration, native playback or human audibility.",
+    "Original Java and Bedrock random-generator sequences are not synchronized; matching one supplied draw establishes scalar arithmetic only.",
+    "Particle emission remains continuous at (x,y+0.25,z); its nearest-player attraction and per-client random stages are separate unfinished adapters.",
+    "Unreadable, nonfinite or out-of-signed-int BlockPos locations and invalid random sources return undefined instead of guessed cues.",
+    "Input/network timing, sound attenuation/mixing and rendered client behavior remain separate acceptance boundaries."
+  ]
+}
